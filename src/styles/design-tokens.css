@@ -1,0 +1,17 @@
+:root {
+  --alios-sidebar-width: 16rem;
+  --alios-topbar-height: 4rem;
+
+  --alios-page-padding-x: 1.5rem;
+  --alios-page-padding-y: 1.5rem;
+
+  --alios-card-padding: 1rem;
+  --alios-section-gap: 1.5rem;
+
+  --alios-transition-fast: 150ms ease;
+  --alios-transition-base: 200ms ease;
+}
+
+.dark {
+  color-scheme: dark;
+}

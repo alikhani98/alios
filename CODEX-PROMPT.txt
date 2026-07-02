@@ -1,0 +1,4 @@
+Read AGENTS.md first.
+Implement only the requested stage.
+Keep the project runnable.
+Ensure the build succeeds before finishing.
