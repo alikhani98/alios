@@ -1,22 +1,33 @@
-import type {
-  DailyCheckin,
-  JournalEntry,
-  KnowledgeItem,
-  Project,
-  Setting,
-  Task,
-} from "@/shared/types";
+import { z } from "zod";
 
-export type AliosBackup = {
-  app: "AliOS";
-  backupVersion: 1;
-  exportedAt: string;
-  data: {
-    dailyCheckins: DailyCheckin[];
-    tasks: Task[];
-    projects: Project[];
-    journalEntries: JournalEntry[];
-    knowledgeItems: KnowledgeItem[];
-    settings: Setting[];
-  };
-};
+import {
+  dailyCheckinSchema,
+  journalEntrySchema,
+  knowledgeItemSchema,
+  projectSchema,
+  settingSchema,
+  taskSchema,
+} from "@/shared/types";
+import { isoDateTimeSchema } from "@/shared/utils";
+
+export const ALIOS_BACKUP_APP = "AliOS" as const;
+export const ALIOS_BACKUP_VERSION = 1 as const;
+
+export const aliosBackupDataSchema = z.object({
+  dailyCheckins: z.array(dailyCheckinSchema),
+  tasks: z.array(taskSchema),
+  projects: z.array(projectSchema),
+  journalEntries: z.array(journalEntrySchema),
+  knowledgeItems: z.array(knowledgeItemSchema),
+  settings: z.array(settingSchema),
+});
+
+export const aliosBackupSchema = z.object({
+  app: z.literal(ALIOS_BACKUP_APP),
+  backupVersion: z.literal(ALIOS_BACKUP_VERSION),
+  exportedAt: isoDateTimeSchema,
+  data: aliosBackupDataSchema,
+});
+
+export type AliosBackupData = z.infer<typeof aliosBackupDataSchema>;
+export type AliosBackup = z.infer<typeof aliosBackupSchema>;

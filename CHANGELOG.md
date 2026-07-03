@@ -2,6 +2,15 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 10 — Backup / Restore
+
+- Added manual export of all six IndexedDB data tables to versioned JSON
+- Added strict backup structure and domain-record validation before restore
+- Added atomic full-data restore with rollback protection
+- Added Settings UI with export, file selection, restore confirmation, success, and error states
+- Added a backup-specific port to the Storage Adapter boundary without changing repository contracts
+- Kept automatic/cloud/remote backup, encryption, compression, attachments, scheduling, notifications, AI, authentication, and backend services out of scope
+
 ## Stage 9 — Today + Tasks + Daily Check-in
 
 - Added Today page with a daily check-in section and date-scoped task list

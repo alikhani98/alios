@@ -4,8 +4,8 @@
 
 - Project name: AliOS
 - Architecture version: AliOS 1.0
-- Current status: The application foundation, data architecture, repository CRUD, Projects CRUD UI, Journal CRUD UI, Knowledge CRUD with simple search, and Today task/check-in UI are implemented.
-- Current stage: Stage 9 Completed
+- Current status: The application foundation, data architecture, repository CRUD, Projects CRUD UI, Journal CRUD UI, Knowledge CRUD with simple search, Today task/check-in UI, and manual JSON backup/restore are implemented.
+- Current stage: Stage 10 Completed
 
 ## Architecture References
 
@@ -46,16 +46,19 @@
 - Stage 7 — Journal CRUD UI
 - Stage 8 — Knowledge CRUD UI + Simple Search
 - Stage 9 — Today + Tasks + Daily Check-in
+- Stage 10 — Backup / Restore
 
 Stage 9 completion is evidenced by the Today page, daily check-in create/update form, date-scoped task CRUD, all approved task statuses, completed timestamps, and single-MIT selection synchronized with today’s check-in. Browser validation confirmed task and check-in persistence across refresh, task editing, status updates, MIT selection, deletion, and the task empty state. The feature consumes TasksRepository and DailyCheckinsRepository through the injected `StorageAdapter` and does not import Dexie. Health advice, Home dashboard data, recurring tasks, notifications, analytics, backup, AI, and cross-feature workflows remain unavailable. TypeScript validation and the production build pass.
 
+Stage 10 completion is evidenced by the Settings backup/restore UI, versioned JSON validation, complete export of all six data tables, explicit restore confirmation, and atomic full-data replacement through a backup-specific `StorageAdapter` port. The UI and backup service do not import Dexie. Automatic backup, cloud sync, remote backup, encryption, compression, attachments, scheduling, notifications, AI, authentication, and backend services remain unavailable. TypeScript validation and the production build pass.
+
 ## Next Stage
 
-No next stage is approved. Define and approve its scope before implementation. Do not infer Home dashboard data, recurring tasks, notifications, analytics, backup, AI, cross-feature linking, or other feature UIs from the completion of Today.
+No next stage is approved. Define and approve its scope before implementation. Do not infer automatic backup, cloud sync, encryption, compression, attachments, scheduling, notifications, AI, authentication, backend services, or other future features from the completion of manual backup/restore.
 
 ## Git Latest Recommended Commit
 
-`feat(today): implement tasks and daily check-in`
+`feat(backup): implement manual backup and restore`
 
 ## Build Status
 
