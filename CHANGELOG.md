@@ -2,6 +2,16 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 6 — Projects CRUD UI
+
+- Added Projects create, list, edit, and delete UI
+- Added inline project forms using React Hook Form and Zod validation
+- Added project cards with status, priority, and next-action information
+- Added loading, empty, error, success, and delete-confirmation states
+- Added an injected StorageAdapter provider and repository-facing Projects hook
+- Verified IndexedDB persistence across a browser refresh
+- Kept archive, search, details, tasks, backup, and AI out of scope
+
 ## Stage 5 — Repository CRUD Foundation
 
 - Implemented list, read, create, update, and delete operations for all six repositories

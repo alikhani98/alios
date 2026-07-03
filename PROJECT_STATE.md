@@ -4,8 +4,8 @@
 
 - Project name: AliOS
 - Architecture version: AliOS 1.0
-- Current status: The application foundation, app shell, domain foundation, Dexie infrastructure, and repository CRUD foundation are implemented.
-- Current stage: Stage 5 Completed
+- Current status: The application foundation, data architecture, repository CRUD, and Projects CRUD UI are implemented.
+- Current stage: Stage 6 Completed
 
 ## Architecture References
 
@@ -42,16 +42,17 @@
 - Stage 3 — Domain Foundation
 - Stage 4 — Dexie Foundation
 - Stage 5 — Repository CRUD Foundation
+- Stage 6 — Projects CRUD UI
 
-Stage 5 completion is evidenced by schema-validated list, read, create, update, and delete operations across all six repositories. New records use UUIDs and ISO timestamps; updates and deletes are transactional; storage and validation failures use project error types. Knowledge search and project archive remain intentionally unavailable because they are outside the approved CRUD scope. TypeScript validation and the production build pass.
+Stage 6 completion is evidenced by the Projects create, list, edit, and delete UI; loading, empty, error, and success states; React Hook Form and Zod validation; and browser-verified IndexedDB persistence across refresh. The feature consumes the `StorageAdapter` interface through an injected provider and does not import Dexie. Project archiving, search, details, and task integration remain intentionally unavailable. TypeScript validation and the production build pass.
 
 ## Next Stage
 
-No next stage is approved. Define and approve its scope before implementation. Do not infer UI, hooks, business workflows, search, project archiving, backup, or AI work from the completion of repository CRUD.
+No next stage is approved. Define and approve its scope before implementation. Do not infer project archiving, search, project details, tasks, other feature UIs, backup, or AI work from the completion of Projects CRUD UI.
 
 ## Git Latest Recommended Commit
 
-`feat(storage): implement repository crud foundation`
+`feat(projects): implement projects crud ui`
 
 ## Build Status
 
