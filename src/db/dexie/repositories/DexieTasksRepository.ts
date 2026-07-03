@@ -3,7 +3,7 @@ import type {
   TasksRepository,
   UpdateTaskInput,
 } from "@/core/repositories";
-import type { Task } from "@/shared/types";
+import { taskSchema, type Task } from "@/shared/types";
 import type { AliosDatabase } from "../db";
 import { DexieRepositoryBase } from "./DexieRepositoryBase";
 
@@ -16,22 +16,54 @@ export class DexieTasksRepository
   }
 
   async list(): Promise<Task[]> {
-    return this.unavailable("Listing tasks");
+    return this.execute("listing tasks", async () => {
+      const records = await this.database.tasks.toArray();
+      return records.map((record) => taskSchema.parse(record));
+    });
   }
 
-  async getById(_id: string): Promise<Task | undefined> {
-    return this.unavailable("Reading a task");
+  async getById(id: string): Promise<Task | undefined> {
+    return this.execute("reading a task", async () => {
+      const record = await this.database.tasks.get(id);
+      return record === undefined ? undefined : taskSchema.parse(record);
+    });
   }
 
-  async create(_input: CreateTaskInput): Promise<Task> {
-    return this.unavailable("Creating a task");
+  async create(input: CreateTaskInput): Promise<Task> {
+    return this.execute("creating a task", async () => {
+      const task = taskSchema.parse({ ...input, ...this.createMetadata() });
+      await this.database.tasks.add(task);
+      return task;
+    });
   }
 
-  async update(_id: string, _input: UpdateTaskInput): Promise<Task> {
-    return this.unavailable("Updating a task");
+  async update(id: string, input: UpdateTaskInput): Promise<Task> {
+    return this.execute("updating a task", () =>
+      this.database.transaction("rw", this.database.tasks, async () => {
+        const current = this.requireEntity(
+          "Task",
+          id,
+          await this.database.tasks.get(id)
+        );
+        const task = taskSchema.parse({
+          ...current,
+          ...input,
+          id: current.id,
+          createdAt: current.createdAt,
+          updatedAt: new Date().toISOString(),
+        });
+        await this.database.tasks.put(task);
+        return task;
+      })
+    );
   }
 
-  async delete(_id: string): Promise<void> {
-    return this.unavailable("Deleting a task");
+  async delete(id: string): Promise<void> {
+    return this.execute("deleting a task", () =>
+      this.database.transaction("rw", this.database.tasks, async () => {
+        this.requireEntity("Task", id, await this.database.tasks.get(id));
+        await this.database.tasks.delete(id);
+      })
+    );
   }
 }

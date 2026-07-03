@@ -4,8 +4,8 @@
 
 - Project name: AliOS
 - Architecture version: AliOS 1.0
-- Current status: The application foundation, app shell, domain foundation, and Dexie infrastructure are implemented; repository operations are intentionally inactive.
-- Current stage: Stage 4 Completed
+- Current status: The application foundation, app shell, domain foundation, Dexie infrastructure, and repository CRUD foundation are implemented.
+- Current stage: Stage 5 Completed
 
 ## Architecture References
 
@@ -20,7 +20,7 @@
 - Vite, React, and TypeScript
 - Tailwind CSS and shadcn/ui-compatible components
 - React Router
-- IndexedDB and Dexie (initialized infrastructure; CRUD is not implemented)
+- IndexedDB and Dexie with schema-validated repository CRUD
 - Zod and React Hook Form
 - date-fns
 - Vazirmatn and lucide-react
@@ -41,16 +41,17 @@
 - Stage 2 — App Shell
 - Stage 3 — Domain Foundation
 - Stage 4 — Dexie Foundation
+- Stage 5 — Repository CRUD Foundation
 
-Stage 4 completion is evidenced by the initialized and typed Dexie database, version-1 schema, centralized table names, repository implementation skeletons, and `DexieStorageAdapter` wiring. Repository operations deliberately remain unavailable until an approved CRUD stage. TypeScript validation and the production build pass.
+Stage 5 completion is evidenced by schema-validated list, read, create, update, and delete operations across all six repositories. New records use UUIDs and ISO timestamps; updates and deletes are transactional; storage and validation failures use project error types. Knowledge search and project archive remain intentionally unavailable because they are outside the approved CRUD scope. TypeScript validation and the production build pass.
 
 ## Next Stage
 
-No next stage is approved. Define and approve its scope before implementation. Do not infer CRUD, UI, backup, search, or AI work from the completion of the Dexie foundation.
+No next stage is approved. Define and approve its scope before implementation. Do not infer UI, hooks, business workflows, search, project archiving, backup, or AI work from the completion of repository CRUD.
 
 ## Git Latest Recommended Commit
 
-`feat(storage): implement dexie foundation and storage adapter`
+`feat(storage): implement repository crud foundation`
 
 ## Build Status
 

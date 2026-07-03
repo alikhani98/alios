@@ -3,7 +3,7 @@ import type {
   DailyCheckinsRepository,
   UpdateDailyCheckinInput,
 } from "@/core/repositories";
-import type { DailyCheckin } from "@/shared/types";
+import { dailyCheckinSchema, type DailyCheckin } from "@/shared/types";
 import type { AliosDatabase } from "../db";
 import { DexieRepositoryBase } from "./DexieRepositoryBase";
 
@@ -16,25 +16,67 @@ export class DexieDailyCheckinsRepository
   }
 
   async list(): Promise<DailyCheckin[]> {
-    return this.unavailable("Listing daily check-ins");
+    return this.execute("listing daily check-ins", async () => {
+      const records = await this.database.dailyCheckins.toArray();
+      return records.map((record) => dailyCheckinSchema.parse(record));
+    });
   }
 
-  async getByDate(_date: string): Promise<DailyCheckin | undefined> {
-    return this.unavailable("Reading a daily check-in");
+  async getByDate(date: string): Promise<DailyCheckin | undefined> {
+    return this.execute("reading a daily check-in", async () => {
+      const record = await this.database.dailyCheckins
+        .where("date")
+        .equals(date)
+        .first();
+      return record === undefined ? undefined : dailyCheckinSchema.parse(record);
+    });
   }
 
-  async create(_input: CreateDailyCheckinInput): Promise<DailyCheckin> {
-    return this.unavailable("Creating a daily check-in");
+  async create(input: CreateDailyCheckinInput): Promise<DailyCheckin> {
+    return this.execute("creating a daily check-in", async () => {
+      const checkin = dailyCheckinSchema.parse({
+        ...input,
+        ...this.createMetadata(),
+      });
+      await this.database.dailyCheckins.add(checkin);
+      return checkin;
+    });
   }
 
   async update(
-    _id: string,
-    _input: UpdateDailyCheckinInput
+    id: string,
+    input: UpdateDailyCheckinInput
   ): Promise<DailyCheckin> {
-    return this.unavailable("Updating a daily check-in");
+    return this.execute("updating a daily check-in", () =>
+      this.database.transaction("rw", this.database.dailyCheckins, async () => {
+        const current = this.requireEntity(
+          "DailyCheckin",
+          id,
+          await this.database.dailyCheckins.get(id)
+        );
+        const checkin = dailyCheckinSchema.parse({
+          ...current,
+          ...input,
+          id: current.id,
+          createdAt: current.createdAt,
+          updatedAt: new Date().toISOString(),
+        });
+        await this.database.dailyCheckins.put(checkin);
+        return checkin;
+      })
+    );
   }
 
-  async delete(_id: string): Promise<void> {
-    return this.unavailable("Deleting a daily check-in");
+  async delete(id: string): Promise<void> {
+    return this.execute("deleting a daily check-in", () =>
+      this.database.transaction("rw", this.database.dailyCheckins, async () => {
+        this.requireEntity(
+          "DailyCheckin",
+          id,
+          await this.database.dailyCheckins.get(id)
+        );
+        await this.database.dailyCheckins.delete(id);
+      })
+    );
   }
 }

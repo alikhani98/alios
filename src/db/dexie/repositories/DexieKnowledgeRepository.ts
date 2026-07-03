@@ -3,7 +3,7 @@ import type {
   KnowledgeRepository,
   UpdateKnowledgeItemInput,
 } from "@/core/repositories";
-import type { KnowledgeItem } from "@/shared/types";
+import { knowledgeItemSchema, type KnowledgeItem } from "@/shared/types";
 import type { AliosDatabase } from "../db";
 import { DexieRepositoryBase } from "./DexieRepositoryBase";
 
@@ -16,29 +16,65 @@ export class DexieKnowledgeRepository
   }
 
   async list(): Promise<KnowledgeItem[]> {
-    return this.unavailable("Listing knowledge items");
+    return this.execute("listing knowledge items", async () => {
+      const records = await this.database.knowledgeItems.toArray();
+      return records.map((record) => knowledgeItemSchema.parse(record));
+    });
   }
 
   async search(_query: string): Promise<KnowledgeItem[]> {
     return this.unavailable("Searching knowledge items");
   }
 
-  async getById(_id: string): Promise<KnowledgeItem | undefined> {
-    return this.unavailable("Reading a knowledge item");
+  async getById(id: string): Promise<KnowledgeItem | undefined> {
+    return this.execute("reading a knowledge item", async () => {
+      const record = await this.database.knowledgeItems.get(id);
+      return record === undefined ? undefined : knowledgeItemSchema.parse(record);
+    });
   }
 
-  async create(_input: CreateKnowledgeItemInput): Promise<KnowledgeItem> {
-    return this.unavailable("Creating a knowledge item");
+  async create(input: CreateKnowledgeItemInput): Promise<KnowledgeItem> {
+    return this.execute("creating a knowledge item", async () => {
+      const item = knowledgeItemSchema.parse({ ...input, ...this.createMetadata() });
+      await this.database.knowledgeItems.add(item);
+      return item;
+    });
   }
 
   async update(
-    _id: string,
-    _input: UpdateKnowledgeItemInput
+    id: string,
+    input: UpdateKnowledgeItemInput
   ): Promise<KnowledgeItem> {
-    return this.unavailable("Updating a knowledge item");
+    return this.execute("updating a knowledge item", () =>
+      this.database.transaction("rw", this.database.knowledgeItems, async () => {
+        const current = this.requireEntity(
+          "KnowledgeItem",
+          id,
+          await this.database.knowledgeItems.get(id)
+        );
+        const item = knowledgeItemSchema.parse({
+          ...current,
+          ...input,
+          id: current.id,
+          createdAt: current.createdAt,
+          updatedAt: new Date().toISOString(),
+        });
+        await this.database.knowledgeItems.put(item);
+        return item;
+      })
+    );
   }
 
-  async delete(_id: string): Promise<void> {
-    return this.unavailable("Deleting a knowledge item");
+  async delete(id: string): Promise<void> {
+    return this.execute("deleting a knowledge item", () =>
+      this.database.transaction("rw", this.database.knowledgeItems, async () => {
+        this.requireEntity(
+          "KnowledgeItem",
+          id,
+          await this.database.knowledgeItems.get(id)
+        );
+        await this.database.knowledgeItems.delete(id);
+      })
+    );
   }
 }

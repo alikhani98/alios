@@ -2,6 +2,16 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 5 — Repository CRUD Foundation
+
+- Implemented list, read, create, update, and delete operations for all six repositories
+- Added UUID generation and ISO creation/update timestamps
+- Added Zod validation for records crossing repository boundaries
+- Added transactional update and delete operations
+- Added project error translation for validation, missing records, and storage failures
+- Kept knowledge search and project archiving deferred as non-CRUD behavior
+- Kept UI, hooks, workflows, backup, and AI out of scope
+
 ## Stage 4 — Dexie Foundation
 
 - Initialized the typed Dexie database
