@@ -4,8 +4,8 @@
 
 - Project name: AliOS
 - Architecture version: AliOS 1.0
-- Current status: The application foundation, data architecture, repository CRUD, Projects CRUD UI, Journal CRUD UI, and Knowledge CRUD with simple search are implemented.
-- Current stage: Stage 8 Completed
+- Current status: The application foundation, data architecture, repository CRUD, Projects CRUD UI, Journal CRUD UI, Knowledge CRUD with simple search, and Today task/check-in UI are implemented.
+- Current stage: Stage 9 Completed
 
 ## Architecture References
 
@@ -45,16 +45,17 @@
 - Stage 6 — Projects CRUD UI
 - Stage 7 — Journal CRUD UI
 - Stage 8 — Knowledge CRUD UI + Simple Search
+- Stage 9 — Today + Tasks + Daily Check-in
 
-Stage 8 completion is evidenced by the Knowledge create, list, edit, and delete UI; loading, empty, error, and success states; React Hook Form and Zod validation; browser-verified IndexedDB persistence; and case-insensitive local substring search across title, summary, content, and source. Knowledge type filtering is available using existing domain types. The feature consumes the `StorageAdapter` interface through its repository-facing hook and does not import Dexie. Semantic/vector/AI search, summarization, tags, attachments, backup, and cross-feature linking remain unavailable. TypeScript validation and the production build pass.
+Stage 9 completion is evidenced by the Today page, daily check-in create/update form, date-scoped task CRUD, all approved task statuses, completed timestamps, and single-MIT selection synchronized with today’s check-in. Browser validation confirmed task and check-in persistence across refresh, task editing, status updates, MIT selection, deletion, and the task empty state. The feature consumes TasksRepository and DailyCheckinsRepository through the injected `StorageAdapter` and does not import Dexie. Health advice, Home dashboard data, recurring tasks, notifications, analytics, backup, AI, and cross-feature workflows remain unavailable. TypeScript validation and the production build pass.
 
 ## Next Stage
 
-No next stage is approved. Define and approve its scope before implementation. Do not infer semantic or vector search, AI summarization, tags, attachments, backup, cross-feature linking, or other feature UIs from the completion of Knowledge CRUD and simple search.
+No next stage is approved. Define and approve its scope before implementation. Do not infer Home dashboard data, recurring tasks, notifications, analytics, backup, AI, cross-feature linking, or other feature UIs from the completion of Today.
 
 ## Git Latest Recommended Commit
 
-`feat(knowledge): implement knowledge crud ui and simple search`
+`feat(today): implement tasks and daily check-in`
 
 ## Build Status
 

@@ -2,6 +2,17 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 9 — Today + Tasks + Daily Check-in
+
+- Added Today page with a daily check-in section and date-scoped task list
+- Added daily check-in create/update using approved health-status fields only
+- Added task create, list, edit, delete, and status-update behavior
+- Added single-MIT selection synchronized with today’s daily check-in
+- Added completed-task styling and completion timestamps
+- Added loading, empty, error, success, and delete-confirmation states
+- Verified tasks and daily check-in persistence across browser refreshes
+- Kept health advice, Home dashboard data, recurring tasks, notifications, analytics, backup, AI, and cross-feature workflows out of scope
+
 ## Stage 8 — Knowledge CRUD UI + Simple Search
 
 - Added Knowledge create, list, edit, and delete UI
