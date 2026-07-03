@@ -1,6 +1,3 @@
-// Database-record to domain-object mappers will be implemented when the real Dexie
-// storage adapter is introduced.
-
-export const dexieMappersStatus = {
-  enabled: false,
-} as const;
+// Stage 4 stores domain objects without a separate persistence shape. Add explicit
+// mappers here only if a future schema diverges from the domain model.
+export type DexieRecord<TDomain> = TDomain;

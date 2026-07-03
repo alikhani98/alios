@@ -2,6 +2,15 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 4 — Dexie Foundation
+
+- Initialized the typed Dexie database
+- Defined schema version 1, table names, and store indexes
+- Added typed tables for all six domain entities
+- Added empty repository implementations with safe failure behavior
+- Added and wired the DexieStorageAdapter
+- Kept CRUD, business logic, search, UI, backup, and AI out of scope
+
 ## Stage 3 — Domain Foundation
 
 - Added Task, Project, DailyCheckin, JournalEntry, KnowledgeItem, and Setting domain models

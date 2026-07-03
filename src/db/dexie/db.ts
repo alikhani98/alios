@@ -1,7 +1,31 @@
-// Dexie dependency is installed in Stage 1, but the real database is intentionally
-// not initialized yet. The actual Dexie implementation will be added in a later stage.
+import Dexie, { type Table } from "dexie";
 
-export const dexieDatabaseStatus = {
-  enabled: false,
-  reason: "Dexie database implementation starts in a later stage.",
-} as const;
+import type {
+  DailyCheckin,
+  JournalEntry,
+  KnowledgeItem,
+  Project,
+  Setting,
+  Task,
+} from "@/shared/types";
+import {
+  DEXIE_DATABASE_NAME,
+  DEXIE_SCHEMA_V1,
+  DEXIE_SCHEMA_VERSION,
+} from "./schema";
+
+export class AliosDatabase extends Dexie {
+  dailyCheckins!: Table<DailyCheckin, string>;
+  tasks!: Table<Task, string>;
+  projects!: Table<Project, string>;
+  journalEntries!: Table<JournalEntry, string>;
+  knowledgeItems!: Table<KnowledgeItem, string>;
+  settings!: Table<Setting, string>;
+
+  constructor() {
+    super(DEXIE_DATABASE_NAME);
+    this.version(DEXIE_SCHEMA_VERSION).stores(DEXIE_SCHEMA_V1);
+  }
+}
+
+export const aliosDatabase = new AliosDatabase();

@@ -9,7 +9,7 @@ AliOS 1.0 is a local-first static web app.
 - TypeScript
 - Tailwind CSS
 - shadcn/ui-compatible components
-- IndexedDB via Dexie in future stages
+- IndexedDB via Dexie
 - Repository Pattern
 - Storage Adapter
 - AIProvider Interface without real AI integration in v1

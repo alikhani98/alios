@@ -4,8 +4,8 @@
 
 - Project name: AliOS
 - Architecture version: AliOS 1.0
-- Current status: Foundation, application shell, and domain foundation are implemented; persistence is not active.
-- Current stage: Stage 3 Completed
+- Current status: The application foundation, app shell, domain foundation, and Dexie infrastructure are implemented; repository operations are intentionally inactive.
+- Current stage: Stage 4 Completed
 
 ## Architecture References
 
@@ -20,7 +20,7 @@
 - Vite, React, and TypeScript
 - Tailwind CSS and shadcn/ui-compatible components
 - React Router
-- IndexedDB and Dexie (planned persistence layer; not initialized yet)
+- IndexedDB and Dexie (initialized infrastructure; CRUD is not implemented)
 - Zod and React Hook Form
 - date-fns
 - Vazirmatn and lucide-react
@@ -40,38 +40,17 @@
 - Stage 1 — Foundation
 - Stage 2 — App Shell
 - Stage 3 — Domain Foundation
+- Stage 4 — Dexie Foundation
 
-Stage 3 completion is evidenced by the six domain entities, their Zod schemas, shared domain constants and validation utilities, the shared error hierarchy, and repository contracts. TypeScript validation and the production build pass.
+Stage 4 completion is evidenced by the initialized and typed Dexie database, version-1 schema, centralized table names, repository implementation skeletons, and `DexieStorageAdapter` wiring. Repository operations deliberately remain unavailable until an approved CRUD stage. TypeScript validation and the production build pass.
 
 ## Next Stage
 
-Stage 4 — Dexie Foundation
-
-Scope:
-
-- Database initialization
-- Schema Version 1
-- Table definitions
-- Mapper layer
-- Dexie configuration
-- Storage Adapter implementation
-- Empty repository implementations
-
-Do not implement in Stage 4:
-
-- CRUD behavior
-- Business logic
-- Hooks
-- Forms
-- UI changes
-- AI
-- Backup
-
-The existing Dexie status placeholders and schema constants do not constitute a completed Stage 4. Stage 4 requires explicit approval before implementation.
+No next stage is approved. Define and approve its scope before implementation. Do not infer CRUD, UI, backup, search, or AI work from the completion of the Dexie foundation.
 
 ## Git Latest Recommended Commit
 
-`docs(project): add project governance and state files`
+`feat(storage): implement dexie foundation and storage adapter`
 
 ## Build Status
 
