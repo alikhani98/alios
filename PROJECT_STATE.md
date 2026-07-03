@@ -4,8 +4,8 @@
 
 - Project name: AliOS
 - Architecture version: AliOS 1.0
-- Current status: The application foundation, data architecture, repository CRUD, and Projects CRUD UI are implemented.
-- Current stage: Stage 6 Completed
+- Current status: The application foundation, data architecture, repository CRUD, Projects CRUD UI, Journal CRUD UI, and Knowledge CRUD with simple search are implemented.
+- Current stage: Stage 8 Completed
 
 ## Architecture References
 
@@ -43,16 +43,18 @@
 - Stage 4 — Dexie Foundation
 - Stage 5 — Repository CRUD Foundation
 - Stage 6 — Projects CRUD UI
+- Stage 7 — Journal CRUD UI
+- Stage 8 — Knowledge CRUD UI + Simple Search
 
-Stage 6 completion is evidenced by the Projects create, list, edit, and delete UI; loading, empty, error, and success states; React Hook Form and Zod validation; and browser-verified IndexedDB persistence across refresh. The feature consumes the `StorageAdapter` interface through an injected provider and does not import Dexie. Project archiving, search, details, and task integration remain intentionally unavailable. TypeScript validation and the production build pass.
+Stage 8 completion is evidenced by the Knowledge create, list, edit, and delete UI; loading, empty, error, and success states; React Hook Form and Zod validation; browser-verified IndexedDB persistence; and case-insensitive local substring search across title, summary, content, and source. Knowledge type filtering is available using existing domain types. The feature consumes the `StorageAdapter` interface through its repository-facing hook and does not import Dexie. Semantic/vector/AI search, summarization, tags, attachments, backup, and cross-feature linking remain unavailable. TypeScript validation and the production build pass.
 
 ## Next Stage
 
-No next stage is approved. Define and approve its scope before implementation. Do not infer project archiving, search, project details, tasks, other feature UIs, backup, or AI work from the completion of Projects CRUD UI.
+No next stage is approved. Define and approve its scope before implementation. Do not infer semantic or vector search, AI summarization, tags, attachments, backup, cross-feature linking, or other feature UIs from the completion of Knowledge CRUD and simple search.
 
 ## Git Latest Recommended Commit
 
-`feat(projects): implement projects crud ui`
+`feat(knowledge): implement knowledge crud ui and simple search`
 
 ## Build Status
 

@@ -2,6 +2,27 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 8 — Knowledge CRUD UI + Simple Search
+
+- Added Knowledge create, list, edit, and delete UI
+- Added inline Knowledge forms using React Hook Form and Zod validation
+- Added Knowledge cards with type, summary, content, and source information
+- Added loading, empty, search-empty, error, success, and delete-confirmation states
+- Implemented case-insensitive local text search across title, summary, content, and source
+- Added an optional type filter using existing Knowledge domain types
+- Verified IndexedDB persistence and search behavior in the browser
+- Kept semantic/vector/AI search, summarization, tags, attachments, backup, and cross-feature linking out of scope
+
+## Stage 7 — Journal CRUD UI
+
+- Added Journal create, list, edit, and delete UI
+- Added inline Journal forms using React Hook Form and Zod validation
+- Added Journal cards with entry type, date, mood, and energy information
+- Added loading, empty, error, success, and delete-confirmation states
+- Added a repository-facing Journal hook through the injected StorageAdapter
+- Verified IndexedDB persistence across a browser refresh
+- Kept AI analysis, summarization, search, analytics, weekly review, Knowledge integration, backup, and AI out of scope
+
 ## Stage 6 — Projects CRUD UI
 
 - Added Projects create, list, edit, and delete UI

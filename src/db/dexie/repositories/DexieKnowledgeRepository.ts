@@ -22,8 +22,22 @@ export class DexieKnowledgeRepository
     });
   }
 
-  async search(_query: string): Promise<KnowledgeItem[]> {
-    return this.unavailable("Searching knowledge items");
+  async search(query: string): Promise<KnowledgeItem[]> {
+    return this.execute("searching knowledge items", async () => {
+      const normalizedQuery = query.trim().toLocaleLowerCase();
+      const records = await this.database.knowledgeItems.toArray();
+      const items = records.map((record) => knowledgeItemSchema.parse(record));
+
+      if (normalizedQuery.length === 0) {
+        return items;
+      }
+
+      return items.filter((item) =>
+        [item.title, item.summary, item.content, item.source].some((value) =>
+          value?.toLocaleLowerCase().includes(normalizedQuery)
+        )
+      );
+    });
   }
 
   async getById(id: string): Promise<KnowledgeItem | undefined> {
