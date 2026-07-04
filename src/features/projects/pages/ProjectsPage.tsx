@@ -3,6 +3,7 @@ import { useState } from "react";
 
 import type { CreateProjectInput } from "@/core/repositories";
 import type { Project } from "@/shared/types";
+import { useI18n } from "@/shared/i18n";
 import {
   Button,
   Card,
@@ -16,6 +17,7 @@ import { useProjects } from "../hooks/useProjects";
 import type { ProjectFormValues } from "../types";
 
 export function ProjectsPage() {
+  const { t } = useI18n();
   const {
     projects,
     isLoading,
@@ -69,17 +71,17 @@ export function ProjectsPage() {
     try {
       if (editingProject) {
         await updateProject(editingProject.id, input);
-        setSuccessMessage("Project updated successfully.");
+        setSuccessMessage(t("projects.updated"));
       } else {
         await createProject(input);
-        setSuccessMessage("Project created successfully.");
+        setSuccessMessage(t("projects.created"));
       }
       closeForm();
     } catch (submitError) {
       setActionError(
         submitError instanceof Error
           ? submitError.message
-          : "The project could not be saved."
+          : t("projects.saveError")
       );
     } finally {
       setIsSubmitting(false);
@@ -93,12 +95,12 @@ export function ProjectsPage() {
 
     try {
       await deleteProject(project.id);
-      setSuccessMessage("Project deleted successfully.");
+      setSuccessMessage(t("projects.deleted"));
     } catch (deleteError) {
       setActionError(
         deleteError instanceof Error
           ? deleteError.message
-          : "The project could not be deleted."
+          : t("projects.deleteError")
       );
     } finally {
       setDeletingId(null);
@@ -109,14 +111,14 @@ export function ProjectsPage() {
     <section className="alios-page space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="alios-page-header mb-0">
-          <h2 className="alios-page-title">Projects</h2>
+          <h2 className="alios-page-title">{t("projects.title")}</h2>
           <p className="alios-page-description">
-            Keep your active work clear, focused, and moving forward.
+            {t("projects.description")}
           </p>
         </div>
         <Button type="button" onClick={openCreateForm}>
           <Plus className="me-2 h-4 w-4" />
-          New project
+          {t("projects.new")}
         </Button>
       </div>
 
@@ -124,7 +126,7 @@ export function ProjectsPage() {
         <Card>
           <CardHeader>
             <CardTitle>
-              {editingProject ? "Edit project" : "Create a project"}
+              {editingProject ? t("projects.edit") : t("projects.create")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -160,14 +162,14 @@ export function ProjectsPage() {
           {error ? (
             <Button type="button" size="sm" variant="outline" onClick={() => void loadProjects()}>
               <RotateCcw className="me-2 h-4 w-4" />
-              Try again
+              {t("common.tryAgain")}
             </Button>
           ) : null}
         </div>
       ) : null}
 
       {isLoading ? (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" aria-label="Loading projects">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" aria-label={t("projects.loading")}>
           {[0, 1, 2].map((item) => (
             <div
               key={item}
@@ -181,13 +183,13 @@ export function ProjectsPage() {
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
               <FolderKanban className="h-6 w-6" />
             </div>
-            <h3 className="text-lg font-semibold">No projects yet</h3>
+            <h3 className="text-lg font-semibold">{t("projects.emptyTitle")}</h3>
             <p className="mt-2 max-w-md text-sm leading-7 text-muted-foreground">
-              Create your first project to give an important outcome a clear home.
+              {t("projects.emptyDescription")}
             </p>
             <Button type="button" className="mt-5" onClick={openCreateForm}>
               <Plus className="me-2 h-4 w-4" />
-              Create first project
+              {t("projects.emptyAction")}
             </Button>
           </CardContent>
         </Card>

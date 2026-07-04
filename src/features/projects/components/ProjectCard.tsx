@@ -2,6 +2,7 @@ import { CalendarDays, CheckCircle2, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 import type { Project } from "@/shared/types";
+import { useI18n } from "@/shared/i18n";
 import {
   Badge,
   Button,
@@ -12,8 +13,8 @@ import {
   CardTitle,
 } from "@/shared/ui";
 import {
-  PROJECT_PRIORITY_LABELS,
-  PROJECT_STATUS_LABELS,
+  PROJECT_PRIORITY_LABEL_KEYS,
+  PROJECT_STATUS_LABEL_KEYS,
 } from "../constants";
 
 type ProjectCardProps = {
@@ -29,6 +30,7 @@ export function ProjectCard({
   onEdit,
   onDelete,
 }: ProjectCardProps) {
+  const { t } = useI18n();
   const [confirmingDelete, setConfirmingDelete] = useState(false);
 
   return (
@@ -38,10 +40,10 @@ export function ProjectCard({
           <CardTitle className="leading-7">{project.title}</CardTitle>
           <div className="flex flex-wrap justify-end gap-2">
             <Badge variant="secondary">
-              {PROJECT_STATUS_LABELS[project.status]}
+              {t(PROJECT_STATUS_LABEL_KEYS[project.status])}
             </Badge>
             <Badge variant="outline">
-              {PROJECT_PRIORITY_LABELS[project.priority]}
+              {t(PROJECT_PRIORITY_LABEL_KEYS[project.priority])}
             </Badge>
           </div>
         </div>
@@ -57,7 +59,7 @@ export function ProjectCard({
           <div className="flex items-start gap-2 text-sm">
             <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
             <span>
-              <span className="font-medium">Next: </span>
+              <span className="font-medium">{t("projects.next")} </span>
               {project.nextAction}
             </span>
           </div>
@@ -65,7 +67,7 @@ export function ProjectCard({
         {project.reviewDate ? (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <CalendarDays className="h-4 w-4" />
-            <span>Review {project.reviewDate}</span>
+            <span>{t("projects.review", { date: project.reviewDate })}</span>
           </div>
         ) : null}
       </CardContent>
@@ -80,7 +82,7 @@ export function ProjectCard({
               disabled={isDeleting}
               onClick={() => void onDelete()}
             >
-              {isDeleting ? "Deleting…" : "Confirm delete"}
+              {isDeleting ? t("common.deleting") : t("common.confirmDelete")}
             </Button>
             <Button
               type="button"
@@ -88,14 +90,14 @@ export function ProjectCard({
               variant="ghost"
               onClick={() => setConfirmingDelete(false)}
             >
-              Cancel
+              {t("common.cancel")}
             </Button>
           </>
         ) : (
           <>
             <Button type="button" size="sm" variant="outline" onClick={onEdit}>
               <Pencil className="me-2 h-4 w-4" />
-              Edit
+              {t("common.edit")}
             </Button>
             <Button
               type="button"
@@ -105,7 +107,7 @@ export function ProjectCard({
               onClick={() => setConfirmingDelete(true)}
             >
               <Trash2 className="me-2 h-4 w-4" />
-              Delete
+              {t("common.delete")}
             </Button>
           </>
         )}

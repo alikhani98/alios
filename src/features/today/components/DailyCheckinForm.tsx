@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
 import type { DailyCheckin } from "@/shared/types";
+import { useI18n } from "@/shared/i18n";
 import { Button, Textarea } from "@/shared/ui";
 import {
   LEVEL_OPTIONS,
@@ -24,6 +25,7 @@ export function DailyCheckinForm({
   isSubmitting,
   onSubmit,
 }: DailyCheckinFormProps) {
+  const { t } = useI18n();
   const { register, handleSubmit } = useForm<DailyCheckinFormValues>({
     resolver: zodResolver(dailyCheckinFormSchema),
     defaultValues: {
@@ -44,9 +46,9 @@ export function DailyCheckinForm({
     >
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {[
-          ["sleepQuality", "Sleep quality"],
-          ["energyLevel", "Energy"],
-          ["moodLevel", "Mood"],
+          ["sleepQuality", t("today.sleepQuality")],
+          ["energyLevel", t("today.energy")],
+          ["moodLevel", t("today.mood")],
         ].map(([name, label]) => (
           <div key={name} className="grid gap-2">
             <label htmlFor={`checkin-${name}`} className="text-sm font-medium">
@@ -59,7 +61,7 @@ export function DailyCheckinForm({
             >
               {LEVEL_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
-                  {option.label}
+                  {t(option.labelKey)}
                 </option>
               ))}
             </select>
@@ -68,7 +70,7 @@ export function DailyCheckinForm({
 
         <div className="grid gap-2">
           <label htmlFor="checkin-stress" className="text-sm font-medium">
-            Stress
+            {t("today.stress")}
           </label>
           <select
             id="checkin-stress"
@@ -77,7 +79,7 @@ export function DailyCheckinForm({
           >
             {STRESS_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
-                {option.label}
+                {t(option.labelKey)}
               </option>
             ))}
           </select>
@@ -87,7 +89,7 @@ export function DailyCheckinForm({
       <div className="grid gap-4 md:grid-cols-2">
         <div className="grid gap-2">
           <label htmlFor="checkin-smoking" className="text-sm font-medium">
-            Smoking status
+            {t("today.smokingStatus")}
           </label>
           <select
             id="checkin-smoking"
@@ -96,7 +98,7 @@ export function DailyCheckinForm({
           >
             {SMOKING_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
-                {option.label}
+                {t(option.labelKey)}
               </option>
             ))}
           </select>
@@ -108,17 +110,17 @@ export function DailyCheckinForm({
             className="h-4 w-4 rounded border-input accent-primary"
             {...register("medicationDone")}
           />
-          Medication recorded as done
+          {t("today.medicationDone")}
         </label>
       </div>
 
       <div className="grid gap-2">
         <label htmlFor="checkin-notes" className="text-sm font-medium">
-          Notes
+          {t("common.notes")}
         </label>
         <Textarea
           id="checkin-notes"
-          placeholder="Optional context about today"
+          placeholder={t("today.notesPlaceholder")}
           {...register("notes")}
         />
       </div>
@@ -126,10 +128,10 @@ export function DailyCheckinForm({
       <div>
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting
-            ? "Saving…"
+            ? t("common.saving")
             : checkin
-              ? "Update daily check-in"
-              : "Save daily check-in"}
+              ? t("today.updateCheckin")
+              : t("today.saveCheckin")}
         </Button>
       </div>
     </form>

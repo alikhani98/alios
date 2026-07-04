@@ -6,11 +6,19 @@ import {
   type AliosBackup,
 } from "@/core/backup";
 import { useStorageAdapter } from "@/core/storage";
+import { AppError } from "@/core/errors";
+import { useI18n } from "@/shared/i18n";
 
-function getErrorMessage(error: unknown): string {
-  return error instanceof Error
-    ? error.message
-    : "An unexpected backup error occurred.";
+function getErrorMessage(
+  error: unknown,
+  fallback: string,
+  validationMessage: string,
+  storageMessage: string
+): string {
+  if (error instanceof AppError) {
+    return error.code === "VALIDATION_ERROR" ? validationMessage : storageMessage;
+  }
+  return error instanceof Error ? error.message : fallback;
 }
 
 function downloadJson(backup: AliosBackup): void {
@@ -26,6 +34,7 @@ function downloadJson(backup: AliosBackup): void {
 }
 
 export function useBackupRestore() {
+  const { t } = useI18n();
   const { backup: backupStorage } = useStorageAdapter();
   const service = useMemo(
     () => new BackupService(backupStorage),
@@ -46,9 +55,9 @@ export function useBackupRestore() {
     try {
       const backup = await service.createBackup();
       downloadJson(backup);
-      setSuccess("Backup exported successfully.");
+      setSuccess(t("backup.exported"));
     } catch (exportError) {
-      setError(getErrorMessage(exportError));
+      setError(getErrorMessage(exportError, t("backup.unexpectedError"), t("backup.invalid"), t("backup.storageError")));
     } finally {
       setIsExporting(false);
     }
@@ -65,7 +74,7 @@ export function useBackupRestore() {
       setPendingBackup(backup);
       setPendingFilename(file.name);
     } catch (validationError) {
-      setError(getErrorMessage(validationError));
+      setError(getErrorMessage(validationError, t("backup.unexpectedError"), t("backup.invalid"), t("backup.storageError")));
     }
   };
 
@@ -87,9 +96,9 @@ export function useBackupRestore() {
       await service.restoreBackup(pendingBackup);
       setPendingBackup(null);
       setPendingFilename(null);
-      setSuccess("Backup restored successfully. Your local data is now up to date.");
+      setSuccess(t("backup.restored"));
     } catch (restoreError) {
-      setError(getErrorMessage(restoreError));
+      setError(getErrorMessage(restoreError, t("backup.unexpectedError"), t("backup.invalid"), t("backup.storageError")));
     } finally {
       setIsRestoring(false);
     }

@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
 import type { KnowledgeItem } from "@/shared/types";
+import { useI18n } from "@/shared/i18n";
 import { Button, Input, Textarea } from "@/shared/ui";
 import { KNOWLEDGE_TYPE_OPTIONS } from "../constants";
 import {
@@ -22,6 +23,7 @@ export function KnowledgeItemForm({
   onSubmit,
   onCancel,
 }: KnowledgeItemFormProps) {
+  const { t } = useI18n();
   const {
     register,
     handleSubmit,
@@ -45,23 +47,23 @@ export function KnowledgeItemForm({
       <div className="grid gap-4 md:grid-cols-[2fr_1fr]">
         <div className="grid gap-2">
           <label htmlFor="knowledge-title" className="text-sm font-medium">
-            Title
+            {t("common.title")}
           </label>
           <Input
             id="knowledge-title"
             autoFocus
-            placeholder="A clear, searchable title"
+            placeholder={t("knowledge.titlePlaceholder")}
             aria-invalid={Boolean(errors.title)}
             {...register("title")}
           />
           {errors.title ? (
-            <p className="text-sm text-destructive">{errors.title.message}</p>
+            <p className="text-sm text-destructive">{t("common.validation")}</p>
           ) : null}
         </div>
 
         <div className="grid gap-2">
           <label htmlFor="knowledge-type" className="text-sm font-medium">
-            Type
+            {t("common.type")}
           </label>
           <select
             id="knowledge-type"
@@ -70,7 +72,7 @@ export function KnowledgeItemForm({
           >
             {KNOWLEDGE_TYPE_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
-                {option.label}
+                {t(option.labelKey)}
               </option>
             ))}
           </select>
@@ -79,38 +81,38 @@ export function KnowledgeItemForm({
 
       <div className="grid gap-2">
         <label htmlFor="knowledge-summary" className="text-sm font-medium">
-          Summary
+          {t("knowledge.summary")}
         </label>
         <Input
           id="knowledge-summary"
-          placeholder="One-line takeaway"
+          placeholder={t("knowledge.summaryPlaceholder")}
           {...register("summary")}
         />
       </div>
 
       <div className="grid gap-2">
         <label htmlFor="knowledge-content" className="text-sm font-medium">
-          Content
+          {t("common.content")}
         </label>
         <Textarea
           id="knowledge-content"
           className="min-h-48"
-          placeholder="Write the complete note, lesson, rule, or resource…"
+          placeholder={t("knowledge.contentPlaceholder")}
           aria-invalid={Boolean(errors.content)}
           {...register("content")}
         />
         {errors.content ? (
-          <p className="text-sm text-destructive">{errors.content.message}</p>
+          <p className="text-sm text-destructive">{t("common.validation")}</p>
         ) : null}
       </div>
 
       <div className="grid gap-2">
         <label htmlFor="knowledge-source" className="text-sm font-medium">
-          Source
+          {t("knowledge.source")}
         </label>
         <Input
           id="knowledge-source"
-          placeholder="Book, URL, conversation, or origin"
+          placeholder={t("knowledge.sourcePlaceholder")}
           {...register("source")}
         />
       </div>
@@ -118,13 +120,13 @@ export function KnowledgeItemForm({
       <div className="flex flex-wrap gap-3">
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting
-            ? "Saving…"
+            ? t("common.saving")
             : item
-              ? "Save changes"
-              : "Create item"}
+              ? t("common.saveChanges")
+              : t("knowledge.createButton")}
         </Button>
         <Button type="button" variant="outline" onClick={onCancel}>
-          Cancel
+          {t("common.cancel")}
         </Button>
       </div>
     </form>

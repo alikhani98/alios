@@ -2,6 +2,7 @@ import { BatteryMedium, CalendarDays, Heart, Pencil, Trash2 } from "lucide-react
 import { useState } from "react";
 
 import type { JournalEntry } from "@/shared/types";
+import { useI18n } from "@/shared/i18n";
 import {
   Badge,
   Button,
@@ -11,7 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/shared/ui";
-import { JOURNAL_TYPE_LABELS, LEVEL_LABELS } from "../constants";
+import { JOURNAL_TYPE_LABEL_KEYS, LEVEL_LABEL_KEYS } from "../constants";
 
 type JournalEntryCardProps = {
   entry: JournalEntry;
@@ -26,6 +27,7 @@ export function JournalEntryCard({
   onEdit,
   onDelete,
 }: JournalEntryCardProps) {
+  const { t } = useI18n();
   const [confirmingDelete, setConfirmingDelete] = useState(false);
 
   return (
@@ -35,7 +37,7 @@ export function JournalEntryCard({
           <CardTitle className="leading-7">{entry.title}</CardTitle>
           <div className="flex flex-wrap gap-2">
             <Badge variant="secondary">
-              {JOURNAL_TYPE_LABELS[entry.type]}
+              {t(JOURNAL_TYPE_LABEL_KEYS[entry.type])}
             </Badge>
             <Badge variant="outline">
               <CalendarDays className="me-1 h-3.5 w-3.5" />
@@ -54,13 +56,13 @@ export function JournalEntryCard({
             {entry.moodLevel ? (
               <span className="flex items-center gap-2">
                 <Heart className="h-4 w-4" />
-                Mood: {LEVEL_LABELS[entry.moodLevel]}
+                {t("journal.mood")}: {t(LEVEL_LABEL_KEYS[entry.moodLevel])}
               </span>
             ) : null}
             {entry.energyLevel ? (
               <span className="flex items-center gap-2">
                 <BatteryMedium className="h-4 w-4" />
-                Energy: {LEVEL_LABELS[entry.energyLevel]}
+                {t("journal.energy")}: {t(LEVEL_LABEL_KEYS[entry.energyLevel])}
               </span>
             ) : null}
           </div>
@@ -77,7 +79,7 @@ export function JournalEntryCard({
               disabled={isDeleting}
               onClick={() => void onDelete()}
             >
-              {isDeleting ? "Deleting…" : "Confirm delete"}
+              {isDeleting ? t("common.deleting") : t("common.confirmDelete")}
             </Button>
             <Button
               type="button"
@@ -85,14 +87,14 @@ export function JournalEntryCard({
               variant="ghost"
               onClick={() => setConfirmingDelete(false)}
             >
-              Cancel
+              {t("common.cancel")}
             </Button>
           </>
         ) : (
           <>
             <Button type="button" size="sm" variant="outline" onClick={onEdit}>
               <Pencil className="me-2 h-4 w-4" />
-              Edit
+              {t("common.edit")}
             </Button>
             <Button
               type="button"
@@ -102,7 +104,7 @@ export function JournalEntryCard({
               onClick={() => setConfirmingDelete(true)}
             >
               <Trash2 className="me-2 h-4 w-4" />
-              Delete
+              {t("common.delete")}
             </Button>
           </>
         )}

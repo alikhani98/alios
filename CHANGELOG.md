@@ -2,6 +2,19 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 11 — Internationalization Foundation
+
+- Added a custom lightweight i18n layer under `src/shared/i18n`
+- Added Persian and English message catalogs
+- Added `I18nProvider` and `useI18n`
+- Added a language switch to Settings
+- Added language persistence in localStorage using `alios.language`
+- Added automatic document `lang` and `dir` updates
+- Converted existing visible UI strings to translation keys where practical
+- Made Persian the default language with RTL direction
+- Added English UI support with LTR direction
+- Kept advanced pluralization, date localization, AI translation, database-backed language settings, and user-content translation deferred
+
 ## Stage 10 — Backup / Restore
 
 - Added manual export of all six IndexedDB data tables to versioned JSON

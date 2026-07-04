@@ -2,6 +2,7 @@ import { ExternalLink, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 import type { KnowledgeItem } from "@/shared/types";
+import { useI18n } from "@/shared/i18n";
 import {
   Badge,
   Button,
@@ -11,7 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/shared/ui";
-import { KNOWLEDGE_TYPE_LABELS } from "../constants";
+import { KNOWLEDGE_TYPE_LABEL_KEYS } from "../constants";
 
 type KnowledgeItemCardProps = {
   item: KnowledgeItem;
@@ -26,6 +27,7 @@ export function KnowledgeItemCard({
   onEdit,
   onDelete,
 }: KnowledgeItemCardProps) {
+  const { t } = useI18n();
   const [confirmingDelete, setConfirmingDelete] = useState(false);
 
   return (
@@ -33,7 +35,7 @@ export function KnowledgeItemCard({
       <CardHeader className="gap-3">
         <div className="flex items-start justify-between gap-4">
           <CardTitle className="leading-7">{item.title}</CardTitle>
-          <Badge variant="secondary">{KNOWLEDGE_TYPE_LABELS[item.type]}</Badge>
+          <Badge variant="secondary">{t(KNOWLEDGE_TYPE_LABEL_KEYS[item.type])}</Badge>
         </div>
         {item.summary ? (
           <p className="text-sm font-medium leading-7 text-foreground/80">
@@ -64,7 +66,7 @@ export function KnowledgeItemCard({
               disabled={isDeleting}
               onClick={() => void onDelete()}
             >
-              {isDeleting ? "Deleting…" : "Confirm delete"}
+              {isDeleting ? t("common.deleting") : t("common.confirmDelete")}
             </Button>
             <Button
               type="button"
@@ -72,14 +74,14 @@ export function KnowledgeItemCard({
               variant="ghost"
               onClick={() => setConfirmingDelete(false)}
             >
-              Cancel
+              {t("common.cancel")}
             </Button>
           </>
         ) : (
           <>
             <Button type="button" size="sm" variant="outline" onClick={onEdit}>
               <Pencil className="me-2 h-4 w-4" />
-              Edit
+              {t("common.edit")}
             </Button>
             <Button
               type="button"
@@ -89,7 +91,7 @@ export function KnowledgeItemCard({
               onClick={() => setConfirmingDelete(true)}
             >
               <Trash2 className="me-2 h-4 w-4" />
-              Delete
+              {t("common.delete")}
             </Button>
           </>
         )}

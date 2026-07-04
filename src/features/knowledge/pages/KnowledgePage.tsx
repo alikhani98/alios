@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 
 import type { CreateKnowledgeItemInput } from "@/core/repositories";
 import type { KnowledgeItem, KnowledgeItemType } from "@/shared/types";
+import { useI18n } from "@/shared/i18n";
 import {
   Button,
   Card,
@@ -18,6 +19,7 @@ import { useKnowledgeItems } from "../hooks/useKnowledgeItems";
 import type { KnowledgeItemFormValues } from "../types";
 
 export function KnowledgePage() {
+  const { direction, t } = useI18n();
   const {
     items,
     isLoading,
@@ -96,10 +98,10 @@ export function KnowledgePage() {
     try {
       if (editingItem) {
         await updateItem(editingItem.id, input);
-        setSuccessMessage("Knowledge item updated successfully.");
+        setSuccessMessage(t("knowledge.updated"));
       } else {
         await createItem(input);
-        setSuccessMessage("Knowledge item created successfully.");
+        setSuccessMessage(t("knowledge.created"));
       }
       closeForm();
       await searchItems(appliedQuery);
@@ -107,7 +109,7 @@ export function KnowledgePage() {
       setActionError(
         submitError instanceof Error
           ? submitError.message
-          : "The knowledge item could not be saved."
+          : t("knowledge.saveError")
       );
     } finally {
       setIsSubmitting(false);
@@ -121,12 +123,12 @@ export function KnowledgePage() {
 
     try {
       await deleteItem(item.id);
-      setSuccessMessage("Knowledge item deleted successfully.");
+      setSuccessMessage(t("knowledge.deleted"));
     } catch (deleteError) {
       setActionError(
         deleteError instanceof Error
           ? deleteError.message
-          : "The knowledge item could not be deleted."
+          : t("knowledge.deleteError")
       );
     } finally {
       setDeletingId(null);
@@ -139,14 +141,14 @@ export function KnowledgePage() {
     <section className="alios-page space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="alios-page-header mb-0">
-          <h2 className="alios-page-title">Knowledge</h2>
+          <h2 className="alios-page-title">{t("knowledge.title")}</h2>
           <p className="alios-page-description">
-            Keep useful lessons, rules, resources, and reusable knowledge close.
+            {t("knowledge.description")}
           </p>
         </div>
         <Button type="button" onClick={openCreateForm}>
           <Plus className="me-2 h-4 w-4" />
-          New knowledge item
+          {t("knowledge.new")}
         </Button>
       </div>
 
@@ -154,7 +156,7 @@ export function KnowledgePage() {
         <Card>
           <CardHeader>
             <CardTitle>
-              {editingItem ? "Edit knowledge item" : "Create a knowledge item"}
+              {editingItem ? t("knowledge.edit") : t("knowledge.create")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -179,36 +181,36 @@ export function KnowledgePage() {
             }}
           >
             <div className="relative">
-              <Search className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Search className={`pointer-events-none absolute top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground ${direction === "rtl" ? "right-3" : "left-3"}`} />
               <Input
-                aria-label="Search knowledge"
+                aria-label={t("knowledge.searchLabel")}
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="Search title, summary, content, or source"
-                className="pr-9"
+                placeholder={t("knowledge.searchPlaceholder")}
+                className={direction === "rtl" ? "pr-9" : "pl-9"}
               />
             </div>
             <select
-              aria-label="Filter by type"
+              aria-label={t("knowledge.filterLabel")}
               value={typeFilter}
               onChange={(event) =>
                 setTypeFilter(event.target.value as KnowledgeItemType | "all")
               }
               className="flex h-10 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
-              <option value="all">All types</option>
+              <option value="all">{t("knowledge.allTypes")}</option>
               {KNOWLEDGE_TYPE_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
-                  {option.label}
+                  {t(option.labelKey)}
                 </option>
               ))}
             </select>
             <div className="flex gap-2">
-              <Button type="submit">Search</Button>
+              <Button type="submit">{t("knowledge.search")}</Button>
               {hasActiveSearch ? (
                 <Button type="button" variant="ghost" onClick={() => void clearSearch()}>
                   <X className="me-2 h-4 w-4" />
-                  Clear
+                  {t("knowledge.clear")}
                 </Button>
               ) : null}
             </div>
@@ -242,14 +244,14 @@ export function KnowledgePage() {
               onClick={() => void searchItems(appliedQuery)}
             >
               <RotateCcw className="me-2 h-4 w-4" />
-              Try again
+              {t("common.tryAgain")}
             </Button>
           ) : null}
         </div>
       ) : null}
 
       {isLoading ? (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" aria-label="Loading knowledge items">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" aria-label={t("knowledge.loading")}>
           {[0, 1, 2].map((item) => (
             <div
               key={item}
@@ -264,17 +266,17 @@ export function KnowledgePage() {
               <BookOpen className="h-6 w-6" />
             </div>
             <h3 className="text-lg font-semibold">
-              {hasActiveSearch ? "No matching knowledge" : "No knowledge items yet"}
+              {hasActiveSearch ? t("knowledge.noResultsTitle") : t("knowledge.emptyTitle")}
             </h3>
             <p className="mt-2 max-w-md text-sm leading-7 text-muted-foreground">
               {hasActiveSearch
-                ? "Try a different phrase or clear the type filter."
-                : "Save your first useful note, lesson, rule, or resource."}
+                ? t("knowledge.noResultsDescription")
+                : t("knowledge.emptyDescription")}
             </p>
             {!hasActiveSearch ? (
               <Button type="button" className="mt-5" onClick={openCreateForm}>
                 <Plus className="me-2 h-4 w-4" />
-                Create first item
+                {t("knowledge.emptyAction")}
               </Button>
             ) : null}
           </CardContent>

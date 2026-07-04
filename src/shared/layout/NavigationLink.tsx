@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 
 import type { NavItem } from "@/shared/constants/navigation";
+import { useI18n } from "@/shared/i18n";
 import { cn } from "@/shared/utils";
 
 import { navigationIcons } from "./navigation-icons";
@@ -16,7 +17,9 @@ export function NavigationLink({
   collapsed = false,
   onNavigate,
 }: NavigationLinkProps) {
+  const { t } = useI18n();
   const Icon = navigationIcons[item.icon];
+  const title = t(item.titleKey);
 
   return (
     <NavLink
@@ -33,10 +36,10 @@ export function NavigationLink({
           collapsed && "justify-center px-2"
         )
       }
-      title={collapsed ? item.title : undefined}
+      title={collapsed ? title : undefined}
     >
       <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
-      {!collapsed ? <span>{item.title}</span> : null}
+      {!collapsed ? <span>{title}</span> : null}
     </NavLink>
   );
 }

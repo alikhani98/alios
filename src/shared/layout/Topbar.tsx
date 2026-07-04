@@ -1,6 +1,7 @@
 import { Menu, Moon, Search, UserCircle } from "lucide-react";
 
 import { appConfig } from "@/shared/constants/app";
+import { useI18n } from "@/shared/i18n";
 import { Badge, Button, Input } from "@/shared/ui";
 
 type TopbarProps = {
@@ -9,6 +10,7 @@ type TopbarProps = {
 };
 
 export function Topbar({ title, onOpenMobileSidebar }: TopbarProps) {
+  const { direction, t } = useI18n();
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/75 md:px-6">
       <Button
@@ -17,7 +19,7 @@ export function Topbar({ title, onOpenMobileSidebar }: TopbarProps) {
         size="icon"
         className="md:hidden"
         onClick={onOpenMobileSidebar}
-        aria-label="باز کردن منوی اصلی"
+        aria-label={t("shell.openMenu")}
       >
         <Menu className="h-5 w-5" />
       </Button>
@@ -35,10 +37,10 @@ export function Topbar({ title, onOpenMobileSidebar }: TopbarProps) {
 
       <div className="hidden w-full max-w-xs items-center md:flex">
         <div className="relative w-full">
-          <Search className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Search className={`pointer-events-none absolute top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground ${direction === "rtl" ? "right-3" : "left-3"}`} />
           <Input
-            className="h-9 pr-9"
-            placeholder="جستجو — در مراحل بعد فعال می‌شود"
+            className={direction === "rtl" ? "h-9 pr-9" : "h-9 pl-9"}
+            placeholder={t("shell.searchPlaceholder")}
             disabled
           />
         </div>
@@ -49,8 +51,8 @@ export function Topbar({ title, onOpenMobileSidebar }: TopbarProps) {
         variant="ghost"
         size="icon"
         disabled
-        aria-label="تغییر تم — در مراحل بعد فعال می‌شود"
-        title="Theme switch placeholder"
+        aria-label={t("shell.themePlaceholder")}
+        title={t("shell.themePlaceholder")}
       >
         <Moon className="h-5 w-5" />
       </Button>
@@ -60,8 +62,8 @@ export function Topbar({ title, onOpenMobileSidebar }: TopbarProps) {
         variant="ghost"
         size="icon"
         disabled
-        aria-label="منوی کاربر — در مراحل بعد فعال می‌شود"
-        title="User menu placeholder"
+        aria-label={t("shell.userPlaceholder")}
+        title={t("shell.userPlaceholder")}
       >
         <UserCircle className="h-5 w-5" />
       </Button>

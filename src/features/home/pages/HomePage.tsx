@@ -1,10 +1,12 @@
 import { PagePlaceholder } from "@/shared/ui";
+import { useI18n } from "@/shared/i18n";
 
 export function HomePage() {
+  const { t } = useI18n();
   return (
     <PagePlaceholder
-      title="Home"
-      description="This page will become the main AliOS dashboard in future stages."
+      title={t("home.title")}
+      description={t("home.description")}
     />
   );
 }

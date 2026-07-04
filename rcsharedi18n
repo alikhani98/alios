@@ -1,0 +1,54 @@
+warning: in the working copy of 'src/app/providers.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/features/home/pages/HomePage.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/features/journal/components/JournalEntryCard.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/features/journal/components/JournalEntryForm.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/features/journal/constants.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/features/journal/pages/JournalPage.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/features/knowledge/components/KnowledgeItemCard.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/features/knowledge/components/KnowledgeItemForm.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/features/knowledge/constants.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/features/knowledge/pages/KnowledgePage.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/features/projects/components/ProjectCard.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/features/projects/components/ProjectForm.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/features/projects/constants.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/features/projects/pages/ProjectsPage.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/features/settings/hooks/useBackupRestore.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/features/settings/pages/SettingsPage.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/features/today/components/DailyCheckinForm.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/features/today/components/TodayTaskCard.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/features/today/components/TodayTaskForm.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/features/today/constants.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/features/today/pages/TodayPage.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/shared/constants/navigation.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/shared/layout/AppShell.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/shared/layout/MobileSidebar.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/shared/layout/NavigationLink.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/shared/layout/Sidebar.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/shared/layout/Topbar.tsx', LF will be replaced by CRLF the next time Git touches it
+M	src/app/providers.tsx
+M	src/features/home/pages/HomePage.tsx
+M	src/features/journal/components/JournalEntryCard.tsx
+M	src/features/journal/components/JournalEntryForm.tsx
+M	src/features/journal/constants.ts
+M	src/features/journal/pages/JournalPage.tsx
+M	src/features/knowledge/components/KnowledgeItemCard.tsx
+M	src/features/knowledge/components/KnowledgeItemForm.tsx
+M	src/features/knowledge/constants.ts
+M	src/features/knowledge/pages/KnowledgePage.tsx
+M	src/features/projects/components/ProjectCard.tsx
+M	src/features/projects/components/ProjectForm.tsx
+M	src/features/projects/constants.ts
+M	src/features/projects/pages/ProjectsPage.tsx
+M	src/features/settings/hooks/useBackupRestore.ts
+M	src/features/settings/pages/SettingsPage.tsx
+M	src/features/today/components/DailyCheckinForm.tsx
+M	src/features/today/components/TodayTaskCard.tsx
+M	src/features/today/components/TodayTaskForm.tsx
+M	src/features/today/constants.ts
+M	src/features/today/pages/TodayPage.tsx
+M	src/shared/constants/navigation.ts
+M	src/shared/layout/AppShell.tsx
+M	src/shared/layout/MobileSidebar.tsx
+M	src/shared/layout/NavigationLink.tsx
+M	src/shared/layout/Sidebar.tsx
+M	src/shared/layout/Topbar.tsx

@@ -4,8 +4,8 @@
 
 - Project name: AliOS
 - Architecture version: AliOS 1.0
-- Current status: The application foundation, data architecture, repository CRUD, Projects CRUD UI, Journal CRUD UI, Knowledge CRUD with simple search, Today task/check-in UI, and manual JSON backup/restore are implemented.
-- Current stage: Stage 10 Completed
+- Current status: The application foundation, data architecture, repository CRUD, Projects CRUD UI, Journal CRUD UI, Knowledge CRUD with simple search, Today task/check-in UI, manual JSON backup/restore, and bilingual Persian/English interface foundation are implemented.
+- Current stage: Stage 11 Completed
 
 ## Architecture References
 
@@ -47,24 +47,27 @@
 - Stage 8 — Knowledge CRUD UI + Simple Search
 - Stage 9 — Today + Tasks + Daily Check-in
 - Stage 10 — Backup / Restore
+- Stage 11 — Internationalization Foundation
 
 Stage 9 completion is evidenced by the Today page, daily check-in create/update form, date-scoped task CRUD, all approved task statuses, completed timestamps, and single-MIT selection synchronized with today’s check-in. Browser validation confirmed task and check-in persistence across refresh, task editing, status updates, MIT selection, deletion, and the task empty state. The feature consumes TasksRepository and DailyCheckinsRepository through the injected `StorageAdapter` and does not import Dexie. Health advice, Home dashboard data, recurring tasks, notifications, analytics, backup, AI, and cross-feature workflows remain unavailable. TypeScript validation and the production build pass.
 
 Stage 10 completion is evidenced by the Settings backup/restore UI, versioned JSON validation, complete export of all six data tables, explicit restore confirmation, and atomic full-data replacement through a backup-specific `StorageAdapter` port. The UI and backup service do not import Dexie. Automatic backup, cloud sync, remote backup, encryption, compression, attachments, scheduling, notifications, AI, authentication, and backend services remain unavailable. TypeScript validation and the production build pass.
 
+Stage 11 completion is evidenced by the custom lightweight i18n layer under `src/shared/i18n`, Persian and English message catalogs, `I18nProvider`, `useI18n`, the Settings language switch, localStorage persistence through `alios.language`, automatic document `lang` and `dir` updates, and translation-key coverage for existing visible UI strings where practical. Persian is the default language and uses RTL; English uses LTR. This stage added bilingual UI support only. It did not add business features, backend services, authentication, AI, database changes, repository changes, or backup format changes. TypeScript validation and the production build pass.
+
 ## Next Stage
 
-No next stage is approved. Define and approve its scope before implementation. Do not infer automatic backup, cloud sync, encryption, compression, attachments, scheduling, notifications, AI, authentication, backend services, or other future features from the completion of manual backup/restore.
+The next stage is intentionally undefined pending explicit approval. Do not infer Stage 12, business features, advanced localization, AI translation, database-backed language settings, authentication, backend services, or other future work from completion of the bilingual interface foundation.
 
 ## Git Latest Recommended Commit
 
-`feat(backup): implement manual backup and restore`
+`feat(i18n): add bilingual interface foundation`
 
 ## Build Status
 
 - TypeScript: passing (`pnpm exec tsc --noEmit`)
 - Production build: passing (`pnpm build`)
-- Last verified: 2026-07-03
+- Last verified: 2026-07-04
 
 ## Rules Before Modifying the Project
 

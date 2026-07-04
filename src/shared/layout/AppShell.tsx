@@ -3,6 +3,7 @@ import { Outlet, useLocation } from "react-router-dom";
 
 import { getNavigationItemByPath } from "@/shared/constants/navigation";
 import { usePersistentBoolean } from "@/shared/hooks";
+import { useI18n } from "@/shared/i18n";
 
 import { MobileSidebar } from "./MobileSidebar";
 import { Sidebar } from "./Sidebar";
@@ -11,6 +12,7 @@ import { Topbar } from "./Topbar";
 const SIDEBAR_COLLAPSED_STORAGE_KEY = "alios.sidebar.collapsed";
 
 export function AppShell() {
+  const { t } = useI18n();
   const location = useLocation();
   const currentNavigationItem = getNavigationItemByPath(location.pathname);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
@@ -38,7 +40,7 @@ export function AppShell() {
 
         <div className="flex min-w-0 flex-1 flex-col">
           <Topbar
-            title={currentNavigationItem.title}
+            title={t(currentNavigationItem.titleKey)}
             onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
           />
 

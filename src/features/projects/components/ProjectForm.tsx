@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
 import type { Project } from "@/shared/types";
+import { useI18n } from "@/shared/i18n";
 import { Button, Input, Textarea } from "@/shared/ui";
 import {
   PROJECT_PRIORITY_OPTIONS,
@@ -22,6 +23,7 @@ export function ProjectForm({
   onSubmit,
   onCancel,
 }: ProjectFormProps) {
+  const { t } = useI18n();
   const {
     register,
     handleSubmit,
@@ -45,27 +47,27 @@ export function ProjectForm({
     >
       <div className="grid gap-2">
         <label htmlFor="project-title" className="text-sm font-medium">
-          Title
+          {t("common.title")}
         </label>
         <Input
           id="project-title"
           autoFocus
-          placeholder="e.g. Launch personal website"
+          placeholder={t("projects.titlePlaceholder")}
           aria-invalid={Boolean(errors.title)}
           {...register("title")}
         />
         {errors.title ? (
-          <p className="text-sm text-destructive">{errors.title.message}</p>
+          <p className="text-sm text-destructive">{t("common.validation")}</p>
         ) : null}
       </div>
 
       <div className="grid gap-2">
         <label htmlFor="project-description" className="text-sm font-medium">
-          Description
+          {t("common.description")}
         </label>
         <Textarea
           id="project-description"
-          placeholder="What does this project aim to accomplish?"
+          placeholder={t("projects.descriptionPlaceholder")}
           {...register("description")}
         />
       </div>
@@ -73,7 +75,7 @@ export function ProjectForm({
       <div className="grid gap-4 md:grid-cols-2">
         <div className="grid gap-2">
           <label htmlFor="project-status" className="text-sm font-medium">
-            Status
+            {t("common.status")}
           </label>
           <select
             id="project-status"
@@ -82,7 +84,7 @@ export function ProjectForm({
           >
             {PROJECT_STATUS_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
-                {option.label}
+                {t(option.labelKey)}
               </option>
             ))}
           </select>
@@ -90,7 +92,7 @@ export function ProjectForm({
 
         <div className="grid gap-2">
           <label htmlFor="project-priority" className="text-sm font-medium">
-            Priority
+            {t("common.priority")}
           </label>
           <select
             id="project-priority"
@@ -99,7 +101,7 @@ export function ProjectForm({
           >
             {PROJECT_PRIORITY_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
-                {option.label}
+                {t(option.labelKey)}
               </option>
             ))}
           </select>
@@ -109,18 +111,18 @@ export function ProjectForm({
       <div className="grid gap-4 md:grid-cols-2">
         <div className="grid gap-2">
           <label htmlFor="project-next-action" className="text-sm font-medium">
-            Next action
+            {t("projects.nextAction")}
           </label>
           <Input
             id="project-next-action"
-            placeholder="The next concrete step"
+            placeholder={t("projects.nextActionPlaceholder")}
             {...register("nextAction")}
           />
         </div>
 
         <div className="grid gap-2">
           <label htmlFor="project-review-date" className="text-sm font-medium">
-            Review date
+            {t("projects.reviewDate")}
           </label>
           <Input id="project-review-date" type="date" {...register("reviewDate")} />
         </div>
@@ -129,13 +131,13 @@ export function ProjectForm({
       <div className="flex flex-wrap gap-3">
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting
-            ? "Saving…"
+            ? t("common.saving")
             : project
-              ? "Save changes"
-              : "Create project"}
+              ? t("common.saveChanges")
+              : t("projects.createButton")}
         </Button>
         <Button type="button" variant="outline" onClick={onCancel}>
-          Cancel
+          {t("common.cancel")}
         </Button>
       </div>
     </form>

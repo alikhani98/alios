@@ -2,9 +2,10 @@ import { Pencil, Star, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 import type { Task, TaskStatus } from "@/shared/types";
+import { useI18n } from "@/shared/i18n";
 import { Badge, Button, Card, CardContent } from "@/shared/ui";
 import {
-  TASK_PRIORITY_LABELS,
+  TASK_PRIORITY_LABEL_KEYS,
   TASK_STATUS_OPTIONS,
 } from "../constants";
 
@@ -25,6 +26,7 @@ export function TodayTaskCard({
   onSelectMit,
   onDelete,
 }: TodayTaskCardProps) {
+  const { t } = useI18n();
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const completed = task.status === "done" || task.status === "cancelled";
 
@@ -45,11 +47,11 @@ export function TodayTaskCard({
             {task.isMit ? (
               <Badge>
                 <Star className="me-1 h-3.5 w-3.5 fill-current" />
-                MIT
+                {t("today.mit")}
               </Badge>
             ) : null}
             <Badge variant="outline">
-              {TASK_PRIORITY_LABELS[task.priority]} priority
+              {t("today.priority", { value: t(TASK_PRIORITY_LABEL_KEYS[task.priority]) })}
             </Badge>
           </div>
           {task.description ? (
@@ -61,7 +63,7 @@ export function TodayTaskCard({
 
         <div className="flex flex-wrap items-center gap-2">
           <select
-            aria-label={`Status for ${task.title}`}
+            aria-label={t("today.statusFor", { title: task.title })}
             value={task.status}
             disabled={isBusy}
             onChange={(event) =>
@@ -71,7 +73,7 @@ export function TodayTaskCard({
           >
             {TASK_STATUS_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
-                {option.label}
+                {t(option.labelKey)}
               </option>
             ))}
           </select>
@@ -85,7 +87,7 @@ export function TodayTaskCard({
               onClick={() => void onSelectMit()}
             >
               <Star className="me-2 h-4 w-4" />
-              Make MIT
+              {t("today.makeMitShort")}
             </Button>
           ) : null}
 
@@ -98,7 +100,7 @@ export function TodayTaskCard({
                 disabled={isBusy}
                 onClick={() => void onDelete()}
               >
-                {isBusy ? "Deleting…" : "Confirm delete"}
+                {isBusy ? t("common.deleting") : t("common.confirmDelete")}
               </Button>
               <Button
                 type="button"
@@ -106,14 +108,14 @@ export function TodayTaskCard({
                 variant="ghost"
                 onClick={() => setConfirmingDelete(false)}
               >
-                Cancel
+                {t("common.cancel")}
               </Button>
             </>
           ) : (
             <>
               <Button type="button" size="sm" variant="outline" onClick={onEdit}>
                 <Pencil className="me-2 h-4 w-4" />
-                Edit
+                {t("common.edit")}
               </Button>
               <Button
                 type="button"
@@ -123,7 +125,7 @@ export function TodayTaskCard({
                 onClick={() => setConfirmingDelete(true)}
               >
                 <Trash2 className="me-2 h-4 w-4" />
-                Delete
+                {t("common.delete")}
               </Button>
             </>
           )}

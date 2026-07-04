@@ -3,6 +3,7 @@ import { format } from "date-fns";
 import { useForm } from "react-hook-form";
 
 import type { JournalEntry } from "@/shared/types";
+import { useI18n } from "@/shared/i18n";
 import { Button, Input, Textarea } from "@/shared/ui";
 import { JOURNAL_TYPE_OPTIONS, LEVEL_OPTIONS } from "../constants";
 import {
@@ -23,6 +24,7 @@ export function JournalEntryForm({
   onSubmit,
   onCancel,
 }: JournalEntryFormProps) {
+  const { t } = useI18n();
   const {
     register,
     handleSubmit,
@@ -47,7 +49,7 @@ export function JournalEntryForm({
       <div className="grid gap-4 md:grid-cols-2">
         <div className="grid gap-2">
           <label htmlFor="journal-date" className="text-sm font-medium">
-            Date
+            {t("common.date")}
           </label>
           <Input
             id="journal-date"
@@ -56,13 +58,13 @@ export function JournalEntryForm({
             {...register("date")}
           />
           {errors.date ? (
-            <p className="text-sm text-destructive">{errors.date.message}</p>
+            <p className="text-sm text-destructive">{t("common.validation")}</p>
           ) : null}
         </div>
 
         <div className="grid gap-2">
           <label htmlFor="journal-type" className="text-sm font-medium">
-            Entry type
+            {t("journal.entryType")}
           </label>
           <select
             id="journal-type"
@@ -71,7 +73,7 @@ export function JournalEntryForm({
           >
             {JOURNAL_TYPE_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
-                {option.label}
+                {t(option.labelKey)}
               </option>
             ))}
           </select>
@@ -80,50 +82,50 @@ export function JournalEntryForm({
 
       <div className="grid gap-2">
         <label htmlFor="journal-title" className="text-sm font-medium">
-          Title
+          {t("common.title")}
         </label>
         <Input
           id="journal-title"
           autoFocus
-          placeholder="Give this entry a clear title"
+          placeholder={t("journal.titlePlaceholder")}
           aria-invalid={Boolean(errors.title)}
           {...register("title")}
         />
         {errors.title ? (
-          <p className="text-sm text-destructive">{errors.title.message}</p>
+          <p className="text-sm text-destructive">{t("common.validation")}</p>
         ) : null}
       </div>
 
       <div className="grid gap-2">
         <label htmlFor="journal-content" className="text-sm font-medium">
-          Journal entry
+          {t("journal.entry")}
         </label>
         <Textarea
           id="journal-content"
           className="min-h-48"
-          placeholder="Write what happened, what you noticed, or what you learned…"
+          placeholder={t("journal.contentPlaceholder")}
           aria-invalid={Boolean(errors.content)}
           {...register("content")}
         />
         {errors.content ? (
-          <p className="text-sm text-destructive">{errors.content.message}</p>
+          <p className="text-sm text-destructive">{t("common.validation")}</p>
         ) : null}
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
         <div className="grid gap-2">
           <label htmlFor="journal-mood" className="text-sm font-medium">
-            Mood
+            {t("journal.mood")}
           </label>
           <select
             id="journal-mood"
             className="flex h-10 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             {...register("moodLevel")}
           >
-            <option value="">Not recorded</option>
+            <option value="">{t("common.notRecorded")}</option>
             {LEVEL_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
-                {option.label}
+                {t(option.labelKey)}
               </option>
             ))}
           </select>
@@ -131,17 +133,17 @@ export function JournalEntryForm({
 
         <div className="grid gap-2">
           <label htmlFor="journal-energy" className="text-sm font-medium">
-            Energy
+            {t("journal.energy")}
           </label>
           <select
             id="journal-energy"
             className="flex h-10 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             {...register("energyLevel")}
           >
-            <option value="">Not recorded</option>
+            <option value="">{t("common.notRecorded")}</option>
             {LEVEL_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
-                {option.label}
+                {t(option.labelKey)}
               </option>
             ))}
           </select>
@@ -151,13 +153,13 @@ export function JournalEntryForm({
       <div className="flex flex-wrap gap-3">
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting
-            ? "Saving…"
+            ? t("common.saving")
             : entry
-              ? "Save changes"
-              : "Create entry"}
+              ? t("common.saveChanges")
+              : t("journal.createButton")}
         </Button>
         <Button type="button" variant="outline" onClick={onCancel}>
-          Cancel
+          {t("common.cancel")}
         </Button>
       </div>
     </form>

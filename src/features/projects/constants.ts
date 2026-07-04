@@ -1,34 +1,35 @@
 import type { ProjectPriority, ProjectStatus } from "@/shared/types";
+import type { TranslationKey } from "@/shared/i18n";
 
 export const PROJECT_STATUS_OPTIONS: ReadonlyArray<{
   value: Exclude<ProjectStatus, "archived">;
-  label: string;
+  labelKey: TranslationKey;
 }> = [
-  { value: "active", label: "Active" },
-  { value: "waiting", label: "Waiting" },
-  { value: "later", label: "Later" },
-  { value: "completed", label: "Completed" },
+  { value: "active", labelKey: "common.active" },
+  { value: "waiting", labelKey: "common.waiting" },
+  { value: "later", labelKey: "common.later" },
+  { value: "completed", labelKey: "common.completed" },
 ];
 
 export const PROJECT_PRIORITY_OPTIONS: ReadonlyArray<{
   value: ProjectPriority;
-  label: string;
+  labelKey: TranslationKey;
 }> = [
-  { value: "low", label: "Low" },
-  { value: "medium", label: "Medium" },
-  { value: "high", label: "High" },
+  { value: "low", labelKey: "common.low" },
+  { value: "medium", labelKey: "common.medium" },
+  { value: "high", labelKey: "common.high" },
 ];
 
-export const PROJECT_STATUS_LABELS: Record<ProjectStatus, string> = {
-  active: "Active",
-  waiting: "Waiting",
-  later: "Later",
-  completed: "Completed",
-  archived: "Archived",
+export const PROJECT_STATUS_LABEL_KEYS: Record<ProjectStatus, TranslationKey> = {
+  active: "common.active",
+  waiting: "common.waiting",
+  later: "common.later",
+  completed: "common.completed",
+  archived: "common.archived",
 };
 
-export const PROJECT_PRIORITY_LABELS: Record<ProjectPriority, string> = {
-  low: "Low",
-  medium: "Medium",
-  high: "High",
+export const PROJECT_PRIORITY_LABEL_KEYS: Record<ProjectPriority, TranslationKey> = {
+  low: "common.low",
+  medium: "common.medium",
+  high: "common.high",
 };

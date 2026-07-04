@@ -1,6 +1,7 @@
 import { X } from "lucide-react";
 
 import { mainNavigation } from "@/shared/constants/navigation";
+import { useI18n } from "@/shared/i18n";
 import { Button } from "@/shared/ui";
 import { cn } from "@/shared/utils";
 
@@ -12,6 +13,7 @@ type MobileSidebarProps = {
 };
 
 export function MobileSidebar({ open, onClose }: MobileSidebarProps) {
+  const { direction, t } = useI18n();
   return (
     <div
       className={cn(
@@ -30,14 +32,15 @@ export function MobileSidebar({ open, onClose }: MobileSidebarProps) {
 
       <aside
         className={cn(
-          "absolute right-0 top-0 flex h-full w-72 max-w-[85vw] flex-col border-l bg-card shadow-aliosFloating transition-transform duration-300 ease-in-out",
-          open ? "translate-x-0" : "translate-x-full"
+          "absolute top-0 flex h-full w-72 max-w-[85vw] flex-col bg-card shadow-aliosFloating transition-transform duration-300 ease-in-out",
+          direction === "rtl" ? "right-0 border-l" : "left-0 border-r",
+          open ? "translate-x-0" : direction === "rtl" ? "translate-x-full" : "-translate-x-full"
         )}
       >
         <div className="flex h-16 items-center justify-between border-b px-4">
           <div className="flex flex-col">
             <span className="text-lg font-bold tracking-tight">AliOS</span>
-            <span className="text-xs text-muted-foreground">Personal OS</span>
+            <span className="text-xs text-muted-foreground">{t("app.tagline")}</span>
           </div>
 
           <Button
@@ -45,13 +48,13 @@ export function MobileSidebar({ open, onClose }: MobileSidebarProps) {
             variant="ghost"
             size="icon"
             onClick={onClose}
-            aria-label="بستن منوی موبایل"
+            aria-label={t("shell.closeMenu")}
           >
             <X className="h-5 w-5" />
           </Button>
         </div>
 
-        <nav className="flex flex-1 flex-col gap-1 p-3" aria-label="Mobile navigation">
+        <nav className="flex flex-1 flex-col gap-1 p-3" aria-label={t("nav.mobile")}>
           {mainNavigation.map((item) => (
             <NavigationLink key={item.href} item={item} onNavigate={onClose} />
           ))}

@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
 import type { Task } from "@/shared/types";
+import { useI18n } from "@/shared/i18n";
 import { Button, Input, Textarea } from "@/shared/ui";
 import { TASK_PRIORITY_OPTIONS, TASK_STATUS_OPTIONS } from "../constants";
 import { todayTaskFormSchema, type TodayTaskFormValues } from "../types";
@@ -19,6 +20,7 @@ export function TodayTaskForm({
   onSubmit,
   onCancel,
 }: TodayTaskFormProps) {
+  const { t } = useI18n();
   const {
     register,
     handleSubmit,
@@ -41,27 +43,27 @@ export function TodayTaskForm({
     >
       <div className="grid gap-2">
         <label htmlFor="today-task-title" className="text-sm font-medium">
-          Task title
+          {t("today.taskTitle")}
         </label>
         <Input
           id="today-task-title"
           autoFocus
-          placeholder="What needs to move today?"
+          placeholder={t("today.taskTitlePlaceholder")}
           aria-invalid={Boolean(errors.title)}
           {...register("title")}
         />
         {errors.title ? (
-          <p className="text-sm text-destructive">{errors.title.message}</p>
+          <p className="text-sm text-destructive">{t("common.validation")}</p>
         ) : null}
       </div>
 
       <div className="grid gap-2">
         <label htmlFor="today-task-description" className="text-sm font-medium">
-          Description
+          {t("common.description")}
         </label>
         <Textarea
           id="today-task-description"
-          placeholder="Optional details"
+          placeholder={t("today.optionalDetails")}
           {...register("description")}
         />
       </div>
@@ -69,7 +71,7 @@ export function TodayTaskForm({
       <div className="grid gap-4 md:grid-cols-2">
         <div className="grid gap-2">
           <label htmlFor="today-task-status" className="text-sm font-medium">
-            Status
+            {t("common.status")}
           </label>
           <select
             id="today-task-status"
@@ -78,7 +80,7 @@ export function TodayTaskForm({
           >
             {TASK_STATUS_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
-                {option.label}
+                {t(option.labelKey)}
               </option>
             ))}
           </select>
@@ -86,7 +88,7 @@ export function TodayTaskForm({
 
         <div className="grid gap-2">
           <label htmlFor="today-task-priority" className="text-sm font-medium">
-            Priority
+            {t("common.priority")}
           </label>
           <select
             id="today-task-priority"
@@ -95,7 +97,7 @@ export function TodayTaskForm({
           >
             {TASK_PRIORITY_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
-                {option.label}
+                {t(option.labelKey)}
               </option>
             ))}
           </select>
@@ -108,15 +110,15 @@ export function TodayTaskForm({
           className="h-4 w-4 rounded border-input accent-primary"
           {...register("isMit")}
         />
-        Make this today’s Most Important Task
+        {t("today.makeMit")}
       </label>
 
       <div className="flex flex-wrap gap-3">
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Saving…" : task ? "Save changes" : "Create task"}
+          {isSubmitting ? t("common.saving") : task ? t("common.saveChanges") : t("today.createTaskButton")}
         </Button>
         <Button type="button" variant="outline" onClick={onCancel}>
-          Cancel
+          {t("common.cancel")}
         </Button>
       </div>
     </form>

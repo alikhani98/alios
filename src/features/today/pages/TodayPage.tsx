@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import type { CreateTaskInput, UpdateTaskInput } from "@/core/repositories";
 import type { Task, TaskStatus } from "@/shared/types";
+import { useI18n } from "@/shared/i18n";
 import {
   Button,
   Card,
@@ -18,6 +19,7 @@ import { useTodayData } from "../hooks/useTodayData";
 import type { DailyCheckinFormValues, TodayTaskFormValues } from "../types";
 
 export function TodayPage() {
+  const { t } = useI18n();
   const today = format(new Date(), "yyyy-MM-dd");
   const {
     tasks,
@@ -72,11 +74,11 @@ export function TodayPage() {
       await saveCheckin(values);
       setSuccessMessage(
         checkin
-          ? "Daily check-in updated successfully."
-          : "Daily check-in saved successfully."
+          ? t("today.checkinUpdated")
+          : t("today.checkinSaved")
       );
     } catch (caught) {
-      showError(caught, "The daily check-in could not be saved.");
+      showError(caught, t("today.checkinError"));
     } finally {
       setIsCheckinSubmitting(false);
     }
@@ -101,14 +103,14 @@ export function TodayPage() {
               : undefined,
         };
         await updateTask(editingTask.id, updateInput);
-        setSuccessMessage("Task updated successfully.");
+        setSuccessMessage(t("today.taskUpdated"));
       } else {
         await createTask(input as Omit<CreateTaskInput, "dueDate">);
-        setSuccessMessage("Task created successfully.");
+        setSuccessMessage(t("today.taskCreated"));
       }
       closeTaskForm();
     } catch (caught) {
-      showError(caught, "The task could not be saved.");
+      showError(caught, t("today.taskSaveError"));
     } finally {
       setIsTaskSubmitting(false);
     }
@@ -137,32 +139,32 @@ export function TodayPage() {
     runTaskAction(
       task.id,
       () => updateTaskStatus(task.id, status),
-      "Task status updated.",
-      "The task status could not be updated."
+      t("today.statusUpdated"),
+      t("today.statusError")
     );
 
   const handleSelectMit = (task: Task) =>
     runTaskAction(
       task.id,
       () => selectMit(task.id),
-      "Most Important Task selected.",
-      "The MIT selection could not be saved."
+      t("today.mitSelected"),
+      t("today.mitError")
     );
 
   const handleDeleteTask = (task: Task) =>
     runTaskAction(
       task.id,
       () => deleteTask(task.id),
-      "Task deleted successfully.",
-      "The task could not be deleted."
+      t("today.taskDeleted"),
+      t("today.taskDeleteError")
     );
 
   return (
     <section className="alios-page space-y-6">
       <div className="alios-page-header">
-        <h2 className="alios-page-title">Today</h2>
+        <h2 className="alios-page-title">{t("today.title")}</h2>
         <p className="alios-page-description">
-          Record today’s state and keep the day’s work focused.
+          {t("today.description")}
         </p>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <CalendarDays className="h-4 w-4" />
@@ -191,7 +193,7 @@ export function TodayPage() {
           {error ? (
             <Button type="button" size="sm" variant="outline" onClick={() => void loadToday()}>
               <RotateCcw className="me-2 h-4 w-4" />
-              Try again
+              {t("common.tryAgain")}
             </Button>
           ) : null}
         </div>
@@ -199,7 +201,7 @@ export function TodayPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Daily Check-in</CardTitle>
+          <CardTitle>{t("today.checkin")}</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -217,21 +219,21 @@ export function TodayPage() {
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h3 className="text-xl font-semibold">Today’s tasks</h3>
+          <h3 className="text-xl font-semibold">{t("today.tasks")}</h3>
           <p className="mt-1 text-sm text-muted-foreground">
-            Choose one MIT and keep every task’s status current.
+            {t("today.tasksDescription")}
           </p>
         </div>
         <Button type="button" onClick={openCreateTask}>
           <Plus className="me-2 h-4 w-4" />
-          New task
+          {t("today.newTask")}
         </Button>
       </div>
 
       {taskFormOpen ? (
         <Card>
           <CardHeader>
-            <CardTitle>{editingTask ? "Edit task" : "Create a task"}</CardTitle>
+            <CardTitle>{editingTask ? t("today.editTask") : t("today.createTask")}</CardTitle>
           </CardHeader>
           <CardContent>
             <TodayTaskForm
@@ -246,7 +248,7 @@ export function TodayPage() {
       ) : null}
 
       {isLoading ? (
-        <div className="space-y-3" aria-label="Loading today's tasks">
+        <div className="space-y-3" aria-label={t("today.loadingTasks")}>
           {[0, 1, 2].map((item) => (
             <div key={item} className="h-28 animate-pulse rounded-2xl border bg-muted/60" />
           ))}
@@ -257,13 +259,13 @@ export function TodayPage() {
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
               <CheckSquare2 className="h-6 w-6" />
             </div>
-            <h3 className="text-lg font-semibold">No tasks for today</h3>
+            <h3 className="text-lg font-semibold">{t("today.noTasks")}</h3>
             <p className="mt-2 text-sm leading-7 text-muted-foreground">
-              Add the next concrete action that deserves your attention.
+              {t("today.noTasksDescription")}
             </p>
             <Button type="button" className="mt-5" onClick={openCreateTask}>
               <Plus className="me-2 h-4 w-4" />
-              Create first task
+              {t("today.firstTask")}
             </Button>
           </CardContent>
         </Card>

@@ -3,6 +3,7 @@ import { useState } from "react";
 
 import type { CreateJournalEntryInput } from "@/core/repositories";
 import type { JournalEntry } from "@/shared/types";
+import { useI18n } from "@/shared/i18n";
 import {
   Button,
   Card,
@@ -16,6 +17,7 @@ import { useJournalEntries } from "../hooks/useJournalEntries";
 import type { JournalEntryFormValues } from "../types";
 
 export function JournalPage() {
+  const { t } = useI18n();
   const {
     entries,
     isLoading,
@@ -69,17 +71,17 @@ export function JournalPage() {
     try {
       if (editingEntry) {
         await updateEntry(editingEntry.id, input);
-        setSuccessMessage("Journal entry updated successfully.");
+        setSuccessMessage(t("journal.updated"));
       } else {
         await createEntry(input);
-        setSuccessMessage("Journal entry created successfully.");
+        setSuccessMessage(t("journal.created"));
       }
       closeForm();
     } catch (submitError) {
       setActionError(
         submitError instanceof Error
           ? submitError.message
-          : "The journal entry could not be saved."
+          : t("journal.saveError")
       );
     } finally {
       setIsSubmitting(false);
@@ -93,12 +95,12 @@ export function JournalPage() {
 
     try {
       await deleteEntry(entry.id);
-      setSuccessMessage("Journal entry deleted successfully.");
+      setSuccessMessage(t("journal.deleted"));
     } catch (deleteError) {
       setActionError(
         deleteError instanceof Error
           ? deleteError.message
-          : "The journal entry could not be deleted."
+          : t("journal.deleteError")
       );
     } finally {
       setDeletingId(null);
@@ -109,14 +111,14 @@ export function JournalPage() {
     <section className="alios-page space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="alios-page-header mb-0">
-          <h2 className="alios-page-title">Journal</h2>
+          <h2 className="alios-page-title">{t("journal.title")}</h2>
           <p className="alios-page-description">
-            Capture what happened, what you felt, and what you learned.
+            {t("journal.description")}
           </p>
         </div>
         <Button type="button" onClick={openCreateForm}>
           <Plus className="me-2 h-4 w-4" />
-          New entry
+          {t("journal.new")}
         </Button>
       </div>
 
@@ -124,7 +126,7 @@ export function JournalPage() {
         <Card>
           <CardHeader>
             <CardTitle>
-              {editingEntry ? "Edit journal entry" : "Create a journal entry"}
+              {editingEntry ? t("journal.edit") : t("journal.create")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -165,14 +167,14 @@ export function JournalPage() {
               onClick={() => void loadEntries()}
             >
               <RotateCcw className="me-2 h-4 w-4" />
-              Try again
+              {t("common.tryAgain")}
             </Button>
           ) : null}
         </div>
       ) : null}
 
       {isLoading ? (
-        <div className="space-y-4" aria-label="Loading journal entries">
+        <div className="space-y-4" aria-label={t("journal.loading")}>
           {[0, 1, 2].map((item) => (
             <div
               key={item}
@@ -186,13 +188,13 @@ export function JournalPage() {
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
               <BookOpenText className="h-6 w-6" />
             </div>
-            <h3 className="text-lg font-semibold">No journal entries yet</h3>
+            <h3 className="text-lg font-semibold">{t("journal.emptyTitle")}</h3>
             <p className="mt-2 max-w-md text-sm leading-7 text-muted-foreground">
-              Start with a small note about today. A few honest lines are enough.
+              {t("journal.emptyDescription")}
             </p>
             <Button type="button" className="mt-5" onClick={openCreateForm}>
               <Plus className="me-2 h-4 w-4" />
-              Write first entry
+              {t("journal.emptyAction")}
             </Button>
           </CardContent>
         </Card>

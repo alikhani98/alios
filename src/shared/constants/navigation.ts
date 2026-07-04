@@ -7,48 +7,41 @@ export type NavIconName =
   | "settings";
 
 export type NavItem = {
-  title: string;
+  titleKey: TranslationKey;
   href: string;
   icon: NavIconName;
-  description: string;
 };
 
 export const mainNavigation: NavItem[] = [
   {
-    title: "Home",
+    titleKey: "nav.home",
     href: "/",
     icon: "home",
-    description: "داشبورد اصلی AliOS",
   },
   {
-    title: "Today",
+    titleKey: "nav.today",
     href: "/today",
     icon: "calendar-check",
-    description: "برنامه و وضعیت امروز",
   },
   {
-    title: "Projects",
+    titleKey: "nav.projects",
     href: "/projects",
     icon: "folder-kanban",
-    description: "پروژه‌های فعال و آینده",
   },
   {
-    title: "Journal",
+    titleKey: "nav.journal",
     href: "/journal",
     icon: "book-open",
-    description: "ثبت روزانه و بازتاب‌ها",
   },
   {
-    title: "Knowledge",
+    titleKey: "nav.knowledge",
     href: "/knowledge",
     icon: "database",
-    description: "پایگاه دانش شخصی",
   },
   {
-    title: "Settings",
+    titleKey: "nav.settings",
     href: "/settings",
     icon: "settings",
-    description: "تنظیمات و وضعیت سیستم",
   },
 ];
 
@@ -57,3 +50,4 @@ export function getNavigationItemByPath(pathname: string) {
     mainNavigation.find((item) => item.href === pathname) ?? mainNavigation[0]
   );
 }
+import type { TranslationKey } from "@/shared/i18n";

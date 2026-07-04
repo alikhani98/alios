@@ -10,9 +10,11 @@ import {
   CardTitle,
   Input,
 } from "@/shared/ui";
+import { useI18n } from "@/shared/i18n";
 import { useBackupRestore } from "../hooks/useBackupRestore";
 
 export function SettingsPage() {
+  const { language, setLanguage, t } = useI18n();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const {
     pendingBackup,
@@ -36,9 +38,9 @@ export function SettingsPage() {
   return (
     <section className="alios-page space-y-6">
       <div className="alios-page-header">
-        <h2 className="alios-page-title">Settings</h2>
+        <h2 className="alios-page-title">{t("settings.title")}</h2>
         <p className="alios-page-description">
-          Protect your local AliOS data with a manual JSON backup.
+          {t("settings.description")}
         </p>
       </div>
 
@@ -62,16 +64,42 @@ export function SettingsPage() {
         </div>
       ) : null}
 
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("settings.language")}</CardTitle>
+          <CardDescription>{t("settings.languageDescription")}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-3" role="group" aria-label={t("settings.language")}>
+            <Button
+              type="button"
+              variant={language === "fa" ? "default" : "outline"}
+              aria-pressed={language === "fa"}
+              onClick={() => setLanguage("fa")}
+            >
+              {t("settings.persian")}
+            </Button>
+            <Button
+              type="button"
+              variant={language === "en" ? "default" : "outline"}
+              aria-pressed={language === "en"}
+              onClick={() => setLanguage("en")}
+            >
+              {t("settings.english")}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Download className="h-5 w-5 text-primary" />
-              Export backup
+              {t("settings.backupExport")}
             </CardTitle>
             <CardDescription>
-              Download projects, tasks, daily check-ins, journal entries,
-              knowledge items, and settings as one versioned JSON file.
+              {t("settings.backupExportDescription")}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -81,7 +109,7 @@ export function SettingsPage() {
               onClick={() => void exportBackup()}
             >
               <Download className="me-2 h-4 w-4" />
-              {isExporting ? "Preparing backup..." : "Export backup"}
+              {isExporting ? t("settings.preparingBackup") : t("settings.backupExport")}
             </Button>
           </CardContent>
         </Card>
@@ -90,11 +118,10 @@ export function SettingsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Upload className="h-5 w-5 text-primary" />
-              Restore backup
+              {t("settings.backupRestore")}
             </CardTitle>
             <CardDescription>
-              Select an AliOS version 1 JSON backup. The file is validated
-              before any local data is changed.
+              {t("settings.backupRestoreDescription")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -103,7 +130,7 @@ export function SettingsPage() {
               type="file"
               accept="application/json,.json"
               disabled={isExporting || isRestoring}
-              aria-label="Choose AliOS backup file"
+              aria-label={t("settings.chooseBackup")}
               onChange={(event) => {
                 const file = event.target.files?.[0];
                 if (file) {
@@ -112,8 +139,7 @@ export function SettingsPage() {
               }}
             />
             <p className="text-sm leading-6 text-muted-foreground">
-              Restore replaces every supported local table. Automatic and cloud
-              backups are not enabled, so keep exported files somewhere safe.
+              {t("settings.restoreWarning")}
             </p>
           </CardContent>
         </Card>
@@ -124,12 +150,13 @@ export function SettingsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileJson className="h-5 w-5 text-destructive" />
-              Confirm restore
+              {t("settings.confirmRestore")}
             </CardTitle>
             <CardDescription>
-              {pendingFilename} is valid and was exported on{" "}
-              {new Date(pendingBackup.exportedAt).toLocaleString()}. Continuing
-              will replace all current AliOS data with this backup.
+              {t("settings.confirmRestoreDescription", {
+                filename: pendingFilename ?? "",
+                date: new Date(pendingBackup.exportedAt).toLocaleString(language),
+              })}
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-wrap gap-3">
@@ -139,7 +166,7 @@ export function SettingsPage() {
               disabled={isRestoring}
               onClick={() => void confirmRestore()}
             >
-              {isRestoring ? "Restoring..." : "Replace data and restore"}
+              {isRestoring ? t("settings.restoring") : t("settings.restoreAction")}
             </Button>
             <Button
               type="button"
@@ -150,7 +177,7 @@ export function SettingsPage() {
                 resetFileInput();
               }}
             >
-              Cancel
+              {t("common.cancel")}
             </Button>
           </CardContent>
         </Card>
