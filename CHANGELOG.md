@@ -2,6 +2,18 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 13 — Settings Polish + Local Data Management
+
+- Polished Settings into a bilingual local-first control center
+- Added local record counts for all six supported data tables
+- Added app information for mode, storage, backend, AI status, and version
+- Retained and clarified language and manual backup/restore controls
+- Added a visually distinct Danger Zone with explicit two-step confirmation
+- Added atomic clearing of all AliOS IndexedDB tables while preserving the localStorage language preference
+- Refreshed local data counts after restore and clear operations
+- Extended the existing BackupStorage boundary without changing repository contracts or backup format
+- Kept cloud sync, automatic or scheduled backup, encryption, accounts, authentication, backend services, AI settings, notifications, analytics, and charts out of scope
+
 ## Stage 12 — Home Dashboard Real Data
 
 - Replaced the Home placeholder with a real read-only local dashboard

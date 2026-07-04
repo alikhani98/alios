@@ -1,4 +1,8 @@
-import type { AliosBackupData, BackupStorage } from "@/core/backup";
+import type {
+  AliosBackupData,
+  BackupStorage,
+  LocalDataSummary,
+} from "@/core/backup";
 import { StorageError } from "@/core/errors";
 import type { AliosDatabase } from "./db";
 
@@ -63,6 +67,61 @@ export class DexieBackupStorage implements BackupStorage {
     } catch (error) {
       throw new StorageError(
         "AliOS data could not be restored. Existing data was left unchanged.",
+        { cause: error }
+      );
+    }
+  }
+
+  async getSummary(): Promise<LocalDataSummary> {
+    try {
+      const [
+        dailyCheckins,
+        tasks,
+        projects,
+        journalEntries,
+        knowledgeItems,
+        settings,
+      ] = await Promise.all([
+        this.database.dailyCheckins.count(),
+        this.database.tasks.count(),
+        this.database.projects.count(),
+        this.database.journalEntries.count(),
+        this.database.knowledgeItems.count(),
+        this.database.settings.count(),
+      ]);
+
+      return {
+        dailyCheckins,
+        tasks,
+        projects,
+        journalEntries,
+        knowledgeItems,
+        settings,
+      };
+    } catch (error) {
+      throw new StorageError("AliOS data counts could not be loaded.", {
+        cause: error,
+      });
+    }
+  }
+
+  async clearAll(): Promise<void> {
+    const tables = [
+      this.database.dailyCheckins,
+      this.database.tasks,
+      this.database.projects,
+      this.database.journalEntries,
+      this.database.knowledgeItems,
+      this.database.settings,
+    ];
+
+    try {
+      await this.database.transaction("rw", tables, async () => {
+        await Promise.all(tables.map((table) => table.clear()));
+      });
+    } catch (error) {
+      throw new StorageError(
+        "AliOS local data could not be cleared. Existing data was left unchanged.",
         { cause: error }
       );
     }

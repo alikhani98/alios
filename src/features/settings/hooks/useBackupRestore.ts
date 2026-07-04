@@ -33,7 +33,7 @@ function downloadJson(backup: AliosBackup): void {
   window.setTimeout(() => URL.revokeObjectURL(url), 0);
 }
 
-export function useBackupRestore() {
+export function useBackupRestore(onRestored?: () => Promise<void> | void) {
   const { t } = useI18n();
   const { backup: backupStorage } = useStorageAdapter();
   const service = useMemo(
@@ -94,6 +94,7 @@ export function useBackupRestore() {
 
     try {
       await service.restoreBackup(pendingBackup);
+      await onRestored?.();
       setPendingBackup(null);
       setPendingFilename(null);
       setSuccess(t("backup.restored"));

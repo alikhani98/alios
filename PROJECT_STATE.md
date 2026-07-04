@@ -4,8 +4,8 @@
 
 - Project name: AliOS
 - Architecture version: AliOS 1.0
-- Current status: The application foundation, data architecture, repository CRUD, Projects CRUD UI, Journal CRUD UI, Knowledge CRUD with simple search, Today task/check-in UI, manual JSON backup/restore, bilingual Persian/English interface foundation, and read-only Home dashboard are implemented.
-- Current stage: Stage 12 Completed
+- Current status: The application foundation, data architecture, repository CRUD, Projects CRUD UI, Journal CRUD UI, Knowledge CRUD with simple search, Today task/check-in UI, manual JSON backup/restore, bilingual Persian/English interface foundation, read-only Home dashboard, and polished local-data Settings control center are implemented.
+- Current stage: Stage 13 Completed
 
 ## Architecture References
 
@@ -49,6 +49,7 @@
 - Stage 10 — Backup / Restore
 - Stage 11 — Internationalization Foundation
 - Stage 12 — Home Dashboard Real Data
+- Stage 13 — Settings Polish + Local Data Management
 
 Stage 9 completion is evidenced by the Today page, daily check-in create/update form, date-scoped task CRUD, all approved task statuses, completed timestamps, and single-MIT selection synchronized with today’s check-in. Browser validation confirmed task and check-in persistence across refresh, task editing, status updates, MIT selection, deletion, and the task empty state. The feature consumes TasksRepository and DailyCheckinsRepository through the injected `StorageAdapter` and does not import Dexie. Health advice, Home dashboard data, recurring tasks, notifications, analytics, backup, AI, and cross-feature workflows remain unavailable. TypeScript validation and the production build pass.
 
@@ -58,13 +59,15 @@ Stage 11 completion is evidenced by the custom lightweight i18n layer under `src
 
 Stage 12 completion is evidenced by the real read-only Home dashboard, which loads Today tasks, today’s daily check-in, projects, journal entries, and knowledge items through existing repositories on the injected `StorageAdapter`. It derives summary counts, MIT/check-in details, active and recently updated projects, latest journal and knowledge items, empty/loading/error states, and quick links in memory. Browser validation confirmed the empty state, real persisted data after refresh, Persian RTL and English LTR rendering, preserved user-generated content, and no console errors. Charts, analytics, trends, weekly review, AI insights, recommendations, notifications, customization, and cross-feature automation remain unavailable. TypeScript validation and the production build pass.
 
+Stage 13 completion is evidenced by the polished bilingual Settings control center, local table-count summary, app information, retained language and backup/restore controls, and a visually distinct Danger Zone with explicit two-step confirmation for clearing all six supported AliOS data tables. Summary and atomic clear operations extend the existing all-table backup storage boundary; Settings does not import Dexie. Browser validation confirmed populated counts, backup export feedback, confirmation before clearing, zeroed summaries after clear, preserved localStorage language preference, post-clear usability, Persian RTL and English LTR behavior, and no console errors. Cloud sync, automatic or scheduled backup, encryption, accounts, authentication, backend services, AI settings, notifications, analytics, and charts remain unavailable. TypeScript validation and the production build pass.
+
 ## Next Stage
 
-The next stage is intentionally undefined pending explicit approval. Do not infer Stage 13, analytics, charts, weekly review, AI insights, recommendations, notifications, dashboard customization, cross-feature automation, or other future work from completion of the read-only Home dashboard.
+The next stage is intentionally undefined pending explicit approval. Do not infer Stage 14, cloud sync, automatic or scheduled backup, encryption, accounts, authentication, backend services, AI settings, notifications, analytics, charts, or other future work from completion of local data management.
 
 ## Git Latest Recommended Commit
 
-`feat(home): implement real dashboard data`
+`feat(settings): add local data management`
 
 ## Build Status
 
