@@ -2,6 +2,17 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 12 — Home Dashboard Real Data
+
+- Replaced the Home placeholder with a real read-only local dashboard
+- Added Today task counts, completed-task count, MIT, and daily check-in summary
+- Added total and active project counts with recently updated projects
+- Added journal and knowledge totals with their latest items
+- Added dashboard loading, empty, and error states
+- Added bilingual quick links to existing feature routes
+- Loaded all data through existing repositories on the injected StorageAdapter
+- Kept charts, analytics, trends, weekly review, AI insights, recommendations, notifications, customization, and cross-feature automation out of scope
+
 ## Stage 11 — Internationalization Foundation
 
 - Added a custom lightweight i18n layer under `src/shared/i18n`

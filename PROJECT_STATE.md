@@ -4,8 +4,8 @@
 
 - Project name: AliOS
 - Architecture version: AliOS 1.0
-- Current status: The application foundation, data architecture, repository CRUD, Projects CRUD UI, Journal CRUD UI, Knowledge CRUD with simple search, Today task/check-in UI, manual JSON backup/restore, and bilingual Persian/English interface foundation are implemented.
-- Current stage: Stage 11 Completed
+- Current status: The application foundation, data architecture, repository CRUD, Projects CRUD UI, Journal CRUD UI, Knowledge CRUD with simple search, Today task/check-in UI, manual JSON backup/restore, bilingual Persian/English interface foundation, and read-only Home dashboard are implemented.
+- Current stage: Stage 12 Completed
 
 ## Architecture References
 
@@ -48,6 +48,7 @@
 - Stage 9 — Today + Tasks + Daily Check-in
 - Stage 10 — Backup / Restore
 - Stage 11 — Internationalization Foundation
+- Stage 12 — Home Dashboard Real Data
 
 Stage 9 completion is evidenced by the Today page, daily check-in create/update form, date-scoped task CRUD, all approved task statuses, completed timestamps, and single-MIT selection synchronized with today’s check-in. Browser validation confirmed task and check-in persistence across refresh, task editing, status updates, MIT selection, deletion, and the task empty state. The feature consumes TasksRepository and DailyCheckinsRepository through the injected `StorageAdapter` and does not import Dexie. Health advice, Home dashboard data, recurring tasks, notifications, analytics, backup, AI, and cross-feature workflows remain unavailable. TypeScript validation and the production build pass.
 
@@ -55,13 +56,15 @@ Stage 10 completion is evidenced by the Settings backup/restore UI, versioned JS
 
 Stage 11 completion is evidenced by the custom lightweight i18n layer under `src/shared/i18n`, Persian and English message catalogs, `I18nProvider`, `useI18n`, the Settings language switch, localStorage persistence through `alios.language`, automatic document `lang` and `dir` updates, and translation-key coverage for existing visible UI strings where practical. Persian is the default language and uses RTL; English uses LTR. This stage added bilingual UI support only. It did not add business features, backend services, authentication, AI, database changes, repository changes, or backup format changes. TypeScript validation and the production build pass.
 
+Stage 12 completion is evidenced by the real read-only Home dashboard, which loads Today tasks, today’s daily check-in, projects, journal entries, and knowledge items through existing repositories on the injected `StorageAdapter`. It derives summary counts, MIT/check-in details, active and recently updated projects, latest journal and knowledge items, empty/loading/error states, and quick links in memory. Browser validation confirmed the empty state, real persisted data after refresh, Persian RTL and English LTR rendering, preserved user-generated content, and no console errors. Charts, analytics, trends, weekly review, AI insights, recommendations, notifications, customization, and cross-feature automation remain unavailable. TypeScript validation and the production build pass.
+
 ## Next Stage
 
-The next stage is intentionally undefined pending explicit approval. Do not infer Stage 12, business features, advanced localization, AI translation, database-backed language settings, authentication, backend services, or other future work from completion of the bilingual interface foundation.
+The next stage is intentionally undefined pending explicit approval. Do not infer Stage 13, analytics, charts, weekly review, AI insights, recommendations, notifications, dashboard customization, cross-feature automation, or other future work from completion of the read-only Home dashboard.
 
 ## Git Latest Recommended Commit
 
-`feat(i18n): add bilingual interface foundation`
+`feat(home): implement real dashboard data`
 
 ## Build Status
 
