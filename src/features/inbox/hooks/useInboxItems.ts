@@ -6,6 +6,11 @@ import type {
 } from "@/core/repositories";
 import { useStorageAdapter } from "@/core/storage";
 import type { InboxItem } from "@/shared/types";
+import {
+  processInboxItem,
+  setInboxItemProcessed,
+  type InboxProcessingTarget,
+} from "../inboxProcessing";
 
 function sortInboxItems(items: InboxItem[]): InboxItem[] {
   return [...items].sort((a, b) => {
@@ -17,7 +22,8 @@ function sortInboxItems(items: InboxItem[]): InboxItem[] {
 }
 
 export function useInboxItems() {
-  const { inbox } = useStorageAdapter();
+  const storage = useStorageAdapter();
+  const { inbox } = storage;
   const [items, setItems] = useState<InboxItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -66,5 +72,49 @@ export function useInboxItems() {
     [inbox]
   );
 
-  return { items, isLoading, error, loadItems, createItem, updateItem, deleteItem };
+  const convertItem = useCallback(
+    async (id: string, target: InboxProcessingTarget) => {
+      const item = await processInboxItem(storage, id, target);
+      setItems((current) =>
+        sortInboxItems(current.map((entry) => (entry.id === id ? item : entry)))
+      );
+      return item;
+    },
+    [storage]
+  );
+
+  const markProcessed = useCallback(
+    async (id: string) => {
+      const item = await setInboxItemProcessed(storage, id, true);
+      setItems((current) =>
+        sortInboxItems(current.map((entry) => (entry.id === id ? item : entry)))
+      );
+      return item;
+    },
+    [storage]
+  );
+
+  const markUnprocessed = useCallback(
+    async (id: string) => {
+      const item = await setInboxItemProcessed(storage, id, false);
+      setItems((current) =>
+        sortInboxItems(current.map((entry) => (entry.id === id ? item : entry)))
+      );
+      return item;
+    },
+    [storage]
+  );
+
+  return {
+    items,
+    isLoading,
+    error,
+    loadItems,
+    createItem,
+    updateItem,
+    deleteItem,
+    convertItem,
+    markProcessed,
+    markUnprocessed,
+  };
 }

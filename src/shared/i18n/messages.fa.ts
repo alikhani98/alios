@@ -308,4 +308,12 @@ export const messagesFa: Record<TranslationKey, string> = {
   "inbox.statusUpdated": "وضعیت مورد به‌روزرسانی شد.",
   "inbox.saveError": "ذخیره مورد ممکن نشد.",
   "inbox.actionError": "انجام عملیات صندوق ورودی ممکن نشد.",
+  "inbox.processInbox": "پردازش صندوق ورودی",
+  "inbox.convertToTodayTask": "تبدیل به کار امروز",
+  "inbox.convertToJournalEntry": "تبدیل به یادداشت روزانه",
+  "inbox.convertToKnowledgeItem": "تبدیل به مورد دانش",
+  "inbox.processedItems": "موارد بررسی‌شده",
+  "inbox.unprocessedItems": "موارد بررسی‌نشده",
+  "inbox.conversionSuccess": "مورد تبدیل و بررسی‌شده علامت‌گذاری شد.",
+  "inbox.conversionFailure": "تبدیل مورد ممکن نشد.",
 };

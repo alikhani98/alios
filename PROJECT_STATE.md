@@ -4,8 +4,8 @@
 
 - Project name: AliOS
 - Architecture version: AliOS 1.0
-- Current status: AliOS includes a validated mobile-first Quick Capture Inbox and remains ready for static GitHub Pages deployment.
-- Current Stage: Stage 20 Completed
+- Current status: AliOS includes validated mobile-first Inbox processing into Today, Journal, and Knowledge and remains ready for static GitHub Pages deployment.
+- Current Stage: Stage 21 Completed
 
 ## Architecture References
 
@@ -38,7 +38,7 @@
 
 ## Completed Stages
 
-Stages 1–20 are complete.
+Stages 1–21 are complete.
 
 - Stage 1 — Foundation
 - Stage 2 — App Shell
@@ -60,6 +60,7 @@ Stages 1–20 are complete.
 - Stage 18 — Mobile / PWA Readiness
 - Stage 19 — Static Deployment / GitHub Pages
 - Stage 20 — Quick Capture Inbox
+- Stage 21 — Inbox Processing / Triage
 
 Stage 9 completion is evidenced by the Today page, daily check-in create/update form, date-scoped task CRUD, all approved task statuses, completed timestamps, and single-MIT selection synchronized with today’s check-in. Browser validation confirmed task and check-in persistence across refresh, task editing, status updates, MIT selection, deletion, and the task empty state. The feature consumes TasksRepository and DailyCheckinsRepository through the injected `StorageAdapter` and does not import Dexie. Health advice, Home dashboard data, recurring tasks, notifications, analytics, backup, AI, and cross-feature workflows remain unavailable. TypeScript validation and the production build pass.
 
@@ -85,13 +86,15 @@ Stage 19 completion is evidenced by the least-privilege GitHub Pages workflow fo
 
 Stage 20 completion is evidenced by the Inbox domain schema, repository contract, injected Dexie repository, additive database schema version 2, mobile-first Quick Capture page, localized navigation, unprocessed-first list, edit/delete/status actions, shared date display, Home summary, and local-data summary. Backup version 1 now exports `inboxItems`; valid older backups without the field parse it as an empty array and restore safely. Automated coverage verifies Inbox CRUD, processed/unprocessed transitions, validation, export, restore, old-backup compatibility, and clear-all behavior. Browser verification passed at 360×800, 390×844, 430×932, and desktop width with no horizontal overflow or console errors; capture, validation, edit, processed/unprocessed, delete, Persian/English, RTL/LTR, and date display were exercised. No sync, backend, authentication, AI, routines, wellness, Inbox processing/conversion workflow, service worker, dependency, or new abstraction was added.
 
+Stage 21 completion is evidenced by the mobile-friendly Inbox processing actions and the focused Inbox use-case that converts captured items through existing repositories into a Today task, Journal entry, or Knowledge item. Each successful conversion creates the target record before marking the retained Inbox item processed; failed target creation leaves it unprocessed. Direct processed/unprocessed actions remain available. Automated coverage verifies all three conversions, retained Inbox history, failure ordering, and both status transitions. No AI, sync, backend, reminders, tags, workflow engine, dependency, schema migration, database table, Inbox field, or backup-format change was added.
+
 ## Next Stage
 
-The next stage is intentionally undefined pending explicit approval. Inbox processing/triage, conversion to Tasks/Journal/Knowledge, search/filtering, tags, attachments, routines, wellness, AI, offline service-worker caching, automatic sync, and cloud backup remain deferred.
+The next stage is intentionally undefined pending explicit approval. Project conversion, bulk triage, search/filtering, tags, attachments, reminders, routines, wellness, AI classification, offline service-worker caching, automatic sync, and cloud backup remain deferred.
 
 ## Git Latest Recommended Commit
 
-`feat(inbox): add quick capture`
+`feat(inbox): add processing actions`
 
 ## Build Status
 
@@ -99,7 +102,7 @@ The next stage is intentionally undefined pending explicit approval. Inbox proce
 - Automated tests: passing (`pnpm test:run`)
 - Production build: passing (`pnpm build`)
 - Production preview: manually verified (`pnpm preview`)
-- Automated test count: 36 passing across 5 suites
+- Automated test count: 41 passing across 6 suites
 - Last verified: 2026-07-05
 
 ## Rules Before Modifying the Project

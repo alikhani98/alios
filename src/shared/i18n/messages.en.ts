@@ -304,4 +304,12 @@ export const messagesEn = {
   "inbox.statusUpdated": "Inbox status updated.",
   "inbox.saveError": "The item could not be saved.",
   "inbox.actionError": "The inbox action could not be completed.",
+  "inbox.processInbox": "Process Inbox",
+  "inbox.convertToTodayTask": "Convert to Today Task",
+  "inbox.convertToJournalEntry": "Convert to Journal Entry",
+  "inbox.convertToKnowledgeItem": "Convert to Knowledge Item",
+  "inbox.processedItems": "Processed items",
+  "inbox.unprocessedItems": "Unprocessed items",
+  "inbox.conversionSuccess": "Item converted and marked processed.",
+  "inbox.conversionFailure": "The item could not be converted.",
 } as const;

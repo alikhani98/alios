@@ -2,6 +2,18 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 21 — Inbox Processing / Triage
+
+- Added mobile-friendly Inbox processing actions
+- Added conversion from Inbox items to Today tasks
+- Added conversion from Inbox items to Journal entries
+- Added conversion from Inbox items to Knowledge items
+- Kept original Inbox items as history and marked them processed only after successful conversion
+- Kept failed conversions unprocessed when target creation fails
+- Added focused tests for all conversions and processed/unprocessed behavior
+- Kept backup version and format unchanged
+- Added no dependency, schema migration, table, field, backend, sync, authentication, AI, or workflow engine
+
 ## Stage 20 — Quick Capture Inbox
 
 - Added the Inbox domain model, Zod schema, repository contract, and Dexie repository

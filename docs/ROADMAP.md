@@ -44,15 +44,24 @@ The later version ideas below are directional only. They are not approved stages
 - Mobile-first capture form and item list
 - Processed/unprocessed status
 - Manual backup/restore support for Inbox data
-- No Inbox processing or conversion workflow
+- Inbox processing and conversion were deferred from the initial capture stage
 
-## Deferred after Stage 20
+## Version 1.3
 
 - Inbox Processing / Triage
-- Convert Inbox item to Task / Journal / Knowledge
-- Search, filtering, tags, and attachments for Inbox
+- Convert Inbox items to Today tasks, Journal entries, or Knowledge items
+- Retain processed Inbox items as history
+- No schema migration or backup-format change
+
+## Deferred after Stage 21
+
+- Project conversion
+- Bulk triage
+- Search and filtering for Inbox
+- Tags and attachments
+- Reminders
 - Routines and Wellness
-- AI and AIProvider activation
+- AI classification and AIProvider activation
 - Automatic sync and cloud backup
 - Offline service worker
 

@@ -1,4 +1,4 @@
-import { CheckCircle2, Circle, Pencil, Trash2 } from "lucide-react";
+import { BookOpen, CheckCircle2, Circle, ListTodo, Pencil, Sparkles, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 import { useDateFormatter } from "@/shared/date";
@@ -8,20 +8,23 @@ import { Badge, Button, Card, CardContent, CardFooter } from "@/shared/ui";
 import { INBOX_STATUS_LABEL_KEYS, INBOX_TYPE_LABEL_KEYS } from "../constants";
 import { InboxItemForm } from "./InboxItemForm";
 import type { InboxFormValues } from "../types";
+import type { InboxProcessingTarget } from "../inboxProcessing";
 
 type Props = {
   item: InboxItem;
   isBusy: boolean;
   onEdit: (values: InboxFormValues) => Promise<boolean>;
   onToggleStatus: () => Promise<void>;
+  onConvert: (target: InboxProcessingTarget) => Promise<void>;
   onDelete: () => Promise<void>;
 };
 
-export function InboxItemCard({ item, isBusy, onEdit, onToggleStatus, onDelete }: Props) {
+export function InboxItemCard({ item, isBusy, onEdit, onToggleStatus, onConvert, onDelete }: Props) {
   const { t } = useI18n();
   const { formatDate } = useDateFormatter();
   const [isEditing, setIsEditing] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [showProcessing, setShowProcessing] = useState(false);
 
   if (isEditing) {
     return (
@@ -42,12 +45,30 @@ export function InboxItemCard({ item, isBusy, onEdit, onToggleStatus, onDelete }
           <Badge variant={item.status === "processed" ? "secondary" : "default"}>{t(INBOX_STATUS_LABEL_KEYS[item.status])}</Badge>
           <span className="text-xs text-muted-foreground">{formatDate(item.createdAt)}</span>
         </div>
+        {item.status === "unprocessed" && showProcessing ? (
+          <div className="grid gap-2 rounded-xl border bg-muted/30 p-3 sm:grid-cols-3">
+            <Button type="button" size="sm" variant="outline" disabled={isBusy} onClick={() => void onConvert("todayTask")}>
+              <ListTodo className="me-2 h-4 w-4" />{t("inbox.convertToTodayTask")}
+            </Button>
+            <Button type="button" size="sm" variant="outline" disabled={isBusy} onClick={() => void onConvert("journalEntry")}>
+              <BookOpen className="me-2 h-4 w-4" />{t("inbox.convertToJournalEntry")}
+            </Button>
+            <Button type="button" size="sm" variant="outline" disabled={isBusy} onClick={() => void onConvert("knowledgeItem")}>
+              <Sparkles className="me-2 h-4 w-4" />{t("inbox.convertToKnowledgeItem")}
+            </Button>
+          </div>
+        ) : null}
       </CardContent>
       <CardFooter className="flex-wrap gap-2 border-t pt-4">
         {confirmingDelete ? <>
           <Button type="button" size="sm" variant="destructive" disabled={isBusy} onClick={() => void onDelete()}>{isBusy ? t("common.deleting") : t("common.confirmDelete")}</Button>
           <Button type="button" size="sm" variant="ghost" onClick={() => setConfirmingDelete(false)}>{t("common.cancel")}</Button>
         </> : <>
+          {item.status === "unprocessed" ? (
+            <Button type="button" size="sm" disabled={isBusy} onClick={() => setShowProcessing((current) => !current)}>
+              {t("inbox.processInbox")}
+            </Button>
+          ) : null}
           <Button type="button" size="sm" variant="outline" disabled={isBusy} onClick={() => void onToggleStatus()}>
             {item.status === "unprocessed" ? <CheckCircle2 className="me-2 h-4 w-4" /> : <Circle className="me-2 h-4 w-4" />}
             {item.status === "unprocessed" ? t("inbox.markProcessed") : t("inbox.markUnprocessed")}
