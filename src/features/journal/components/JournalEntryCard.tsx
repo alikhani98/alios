@@ -3,6 +3,7 @@ import { useState } from "react";
 
 import type { JournalEntry } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
+import { useDateFormatter } from "@/shared/date";
 import {
   Badge,
   Button,
@@ -28,6 +29,7 @@ export function JournalEntryCard({
   onDelete,
 }: JournalEntryCardProps) {
   const { t } = useI18n();
+  const { formatDate } = useDateFormatter();
   const [confirmingDelete, setConfirmingDelete] = useState(false);
 
   return (
@@ -41,7 +43,7 @@ export function JournalEntryCard({
             </Badge>
             <Badge variant="outline">
               <CalendarDays className="me-1 h-3.5 w-3.5" />
-              {entry.date}
+              {formatDate(entry.date)}
             </Badge>
           </div>
         </div>

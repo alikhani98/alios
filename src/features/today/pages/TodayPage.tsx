@@ -5,6 +5,7 @@ import { useState } from "react";
 import type { CreateTaskInput, UpdateTaskInput } from "@/core/repositories";
 import type { Task, TaskStatus } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
+import { useDateFormatter } from "@/shared/date";
 import {
   Button,
   Card,
@@ -20,6 +21,7 @@ import type { DailyCheckinFormValues, TodayTaskFormValues } from "../types";
 
 export function TodayPage() {
   const { t } = useI18n();
+  const { formatDate } = useDateFormatter();
   const today = format(new Date(), "yyyy-MM-dd");
   const {
     tasks,
@@ -168,7 +170,7 @@ export function TodayPage() {
         </p>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <CalendarDays className="h-4 w-4" />
-          <span>{today}</span>
+          <span>{formatDate(today)}</span>
         </div>
       </div>
 

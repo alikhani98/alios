@@ -1,5 +1,6 @@
 import {
   AlertCircle,
+  CalendarDays,
   Database,
   Download,
   FileJson,
@@ -14,6 +15,7 @@ import {
 import { useRef } from "react";
 
 import { appConfig } from "@/shared/constants/app";
+import { useDateFormatter } from "@/shared/date";
 import { useI18n } from "@/shared/i18n";
 import {
   Button,
@@ -51,6 +53,8 @@ function InfoItem({ label, value }: InfoItemProps) {
 
 export function SettingsPage() {
   const { language, setLanguage, t } = useI18n();
+  const { calendarDisplay, formatDateTime, setCalendarDisplay } =
+    useDateFormatter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dataManagement = useLocalDataManagement();
   const backup = useBackupRestore(dataManagement.loadSummary);
@@ -119,6 +123,53 @@ export function SettingsPage() {
               {t("settings.english")}
             </Button>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <CalendarDays className="h-5 w-5 text-primary" />
+            {t("settings.calendarDisplay")}
+          </CardTitle>
+          <CardDescription>{t("settings.calendarDescription")}</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div
+            className="flex flex-wrap gap-3"
+            role="group"
+            aria-label={t("settings.calendarDisplay")}
+          >
+            <Button
+              type="button"
+              variant={calendarDisplay === "auto" ? "default" : "outline"}
+              aria-pressed={calendarDisplay === "auto"}
+              onClick={() => setCalendarDisplay("auto")}
+            >
+              {t("settings.calendarAuto")}
+            </Button>
+            <Button
+              type="button"
+              variant={
+                calendarDisplay === "gregorian" ? "default" : "outline"
+              }
+              aria-pressed={calendarDisplay === "gregorian"}
+              onClick={() => setCalendarDisplay("gregorian")}
+            >
+              {t("settings.calendarGregorian")}
+            </Button>
+            <Button
+              type="button"
+              variant={calendarDisplay === "jalali" ? "default" : "outline"}
+              aria-pressed={calendarDisplay === "jalali"}
+              onClick={() => setCalendarDisplay("jalali")}
+            >
+              {t("settings.calendarJalali")}
+            </Button>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            {t("settings.calendarAutoDescription")}
+          </p>
         </CardContent>
       </Card>
 
@@ -249,9 +300,7 @@ export function SettingsPage() {
             <CardDescription>
               {t("settings.confirmRestoreDescription", {
                 filename: backup.pendingFilename ?? "",
-                date: new Date(backup.pendingBackup.exportedAt).toLocaleString(
-                  language
-                ),
+                date: formatDateTime(backup.pendingBackup.exportedAt),
               })}
             </CardDescription>
           </CardHeader>

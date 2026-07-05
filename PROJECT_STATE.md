@@ -4,8 +4,8 @@
 
 - Project name: AliOS
 - Architecture version: AliOS 1.0
-- Current status: The application foundation, data architecture, repository CRUD, Projects CRUD UI, Journal CRUD UI, Knowledge CRUD with simple search, Today task/check-in UI, manual JSON backup/restore, bilingual Persian/English interface foundation, read-only Home dashboard, and polished local-data Settings control center are implemented.
-- Current stage: Stage 13 Completed
+- Current status: The AliOS 1.0 core product is implemented, documented, and verified as a v1.0 release candidate.
+- Current stage: Stage 17 Completed
 
 ## Architecture References
 
@@ -23,6 +23,7 @@
 - IndexedDB and Dexie with schema-validated repository CRUD
 - Zod and React Hook Form
 - date-fns
+- Vitest and fake-indexeddb for development-time automated tests
 - Vazirmatn and lucide-react
 
 ## Architecture Principles
@@ -50,6 +51,10 @@
 - Stage 11 — Internationalization Foundation
 - Stage 12 — Home Dashboard Real Data
 - Stage 13 — Settings Polish + Local Data Management
+- Stage 14 — Calendar Display Foundation
+- Stage 15 — Testing Foundation
+- Stage 16 — Performance / Code Splitting
+- Stage 17 — v1.0 Final QA / Release
 
 Stage 9 completion is evidenced by the Today page, daily check-in create/update form, date-scoped task CRUD, all approved task statuses, completed timestamps, and single-MIT selection synchronized with today’s check-in. Browser validation confirmed task and check-in persistence across refresh, task editing, status updates, MIT selection, deletion, and the task empty state. The feature consumes TasksRepository and DailyCheckinsRepository through the injected `StorageAdapter` and does not import Dexie. Health advice, Home dashboard data, recurring tasks, notifications, analytics, backup, AI, and cross-feature workflows remain unavailable. TypeScript validation and the production build pass.
 
@@ -61,19 +66,29 @@ Stage 12 completion is evidenced by the real read-only Home dashboard, which loa
 
 Stage 13 completion is evidenced by the polished bilingual Settings control center, local table-count summary, app information, retained language and backup/restore controls, and a visually distinct Danger Zone with explicit two-step confirmation for clearing all six supported AliOS data tables. Summary and atomic clear operations extend the existing all-table backup storage boundary; Settings does not import Dexie. Browser validation confirmed populated counts, backup export feedback, confirmation before clearing, zeroed summaries after clear, preserved localStorage language preference, post-clear usability, Persian RTL and English LTR behavior, and no console errors. Cloud sync, automatic or scheduled backup, encryption, accounts, authentication, backend services, AI settings, notifications, analytics, and charts remain unavailable. TypeScript validation and the production build pass.
 
+Stage 14 completion is evidenced by the display-only `src/shared/date` layer, calendar display type definitions, `formatDate`, `DateDisplayProvider`, `useDateFormatter`, Gregorian/Jalali display support, and the Settings calendar display preference persisted in localStorage. Existing visible dates use the shared formatter where practical. Dates remain stored as ISO/Gregorian strings. No schemas, repository contracts, Dexie tables, or backup formats changed. Google Calendar, ICS export, date pickers, recurring events, notifications, scheduling, timezone management, and a full calendar page remain deferred. TypeScript validation and the production build pass.
+
+Stage 15 completion is evidenced by the Vitest and fake-indexeddb test foundation, isolated fake IndexedDB setup, CRUD lifecycle coverage for all six repositories, backup/export/clear/restore coverage across all supported tables, localStorage language-preference preservation coverage, invalid-backup rejection, focused Zod schema tests, and lightweight i18n and Gregorian/Jalali date utility tests. The stage added automated testing only and introduced no business features, production storage changes, repository contracts, UI test framework, or new architectural layer. Thirty tests pass across five suites, TypeScript validation passes, and the production build passes.
+
+Stage 16 completion is evidenced by route-level `React.lazy` and `Suspense` boundaries for all six feature pages plus a shared bilingual route-loading fallback. The initial JavaScript chunk decreased from 566.25 kB to 444.83 kB, feature pages now build as independent lazy chunks, and Vite's bundle-size warning is resolved. Browser validation confirmed every route, sidebar navigation, Persian/English switching, RTL/LTR direction, calendar display controls, Backup/Restore, Local Data Summary, and an error-free console. This stage changed performance/loading behavior only; it added no product features, dependencies, schema changes, repository changes, storage changes, or backup format changes. Thirty tests, TypeScript validation, and the production build pass.
+
+Stage 17 completion is evidenced by the v1.0 README, static-hosting and backup guidance, explicit release checklist, frozen v1.0 roadmap, `1.0.0` release metadata, passing TypeScript/tests/build gates, and production-preview QA. Final QA covered empty and populated Home states, Today check-in/task/MIT/status flows, Projects, Journal, Knowledge search/filtering, Settings language/calendar/local-data controls, backup export feedback, clear confirmation and execution, language preservation, untranslated user content, route chunks, and an error-free console. Automated tests cover repository CRUD, all-table backup/clear/restore, invalid backup rejection, schemas, i18n, and date utilities. No product features, dependencies, storage changes, repository changes, backup format changes, or new abstractions were added.
+
 ## Next Stage
 
-The next stage is intentionally undefined pending explicit approval. Do not infer Stage 14, cloud sync, automatic or scheduled backup, encryption, accounts, authentication, backend services, AI settings, notifications, analytics, charts, or other future work from completion of local data management.
+The next phase is a real-world usage period. Post-v1.0 planning is intentionally pending explicit approval; do not infer or begin a new development stage.
 
 ## Git Latest Recommended Commit
 
-`feat(settings): add local data management`
+`chore(release): prepare v1.0`
 
 ## Build Status
 
 - TypeScript: passing (`pnpm exec tsc --noEmit`)
+- Automated tests: passing (`pnpm test:run`)
 - Production build: passing (`pnpm build`)
-- Last verified: 2026-07-04
+- Production preview: manually verified (`pnpm preview`)
+- Last verified: 2026-07-05
 
 ## Rules Before Modifying the Project
 

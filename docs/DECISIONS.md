@@ -38,3 +38,16 @@ Reason:
 
 - Features can evolve independently
 - Reduces long-term coupling
+
+## ADR-006: Minimize abstractions until they solve a current need
+
+Decision:
+
+> New abstractions are only allowed when there is a concrete current need, not a hypothetical future need. Prefer direct, simple implementation unless at least two real implementations exist or an immediate approved stage requires the boundary.
+
+Reason:
+
+- Do not add new Service, Port, Adapter, Manager, or Engine layers unless current functionality justifies them.
+- Future flexibility alone is not enough reason to introduce another boundary.
+- The existing Repository and Storage Adapter layers remain approved and in place.
+- New abstractions should be minimized and tied to demonstrable present requirements.

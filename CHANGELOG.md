@@ -2,6 +2,60 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 17 — v1.0 Final QA / Release
+
+- Replaced the stale foundation README with complete AliOS v1.0 documentation
+- Documented local development, tests, production builds, previews, and static-hosting deployment
+- Documented manual backup/restore usage, browser support, v1.0 limitations, and post-release direction
+- Added the v1.0 release checklist with automated and production-preview verification evidence
+- Froze the v1.0 roadmap around the existing core product
+- Updated application and package release metadata to `1.0.0`
+- Completed final QA across Home, Today, Projects, Journal, Knowledge, Settings, i18n, calendar display, backup/local data, and route-level code splitting
+- Verified TypeScript, 30 automated tests, production build, and production preview
+- Prepared the AliOS v1.0 release candidate without adding product features or dependencies
+- Kept storage schemas, repository contracts, backup format, and architecture unchanged
+
+## Stage 16 — Performance / Code Splitting
+
+- Added route-level code splitting with `React.lazy` and `Suspense`
+- Added lazy-loaded Home, Today, Projects, Journal, Knowledge, and Settings pages
+- Added a shared bilingual route-loading fallback
+- Reduced the initial JavaScript chunk from 566.25 kB to 444.83 kB
+- Split feature pages into independent route chunks between 9.63 kB and 16.24 kB
+- Removed the Vite bundle-size warning without manual chunk configuration
+- Preserved navigation, i18n, RTL/LTR, calendar display, Backup/Restore, and local data behavior
+- Added no product behavior changes, dependencies, schemas, repositories, storage changes, or backup format changes
+- Kept deeper bundle analysis, visualizer plugins, manual chunking, PWA, caching, and future performance audits deferred
+
+## Stage 15 — Testing Foundation
+
+- Added a Vitest testing foundation compatible with the existing Vite stack
+- Added isolated fake IndexedDB setup for Dexie tests
+- Added complete CRUD lifecycle tests for all six repositories
+- Added repository validation-error coverage
+- Added backup export, clear-all, restore, metadata, and invalid-backup tests
+- Added coverage confirming clear-all preserves the localStorage language preference
+- Added focused Zod validation tests for core domain schemas
+- Added lightweight i18n and Gregorian/Jalali date utility tests
+- Added `test` and `test:run` package scripts
+- Added an architecture decision requiring concrete current need before introducing new abstractions
+- Kept UI tests, end-to-end tests, Routines, Wellness, Weekly Review, Decision Log, Personal Manual, AI, Google Calendar, and ICS export deferred
+
+## Stage 14 — Calendar Display Foundation
+
+- Added `src/shared/date`
+- Added calendar display type definitions
+- Added `formatDate`
+- Added `DateDisplayProvider`
+- Added `useDateFormatter`
+- Added Gregorian/Jalali display support
+- Added the Settings calendar display preference
+- Added localStorage persistence for the calendar display preference
+- Applied formatted date display to existing visible dates where practical
+- Kept dates stored as ISO/Gregorian strings
+- Kept schemas, repository contracts, Dexie tables, and the backup format unchanged
+- Kept Google Calendar, ICS export, date pickers, recurring events, notifications, scheduling, timezone management, and a full calendar page deferred
+
 ## Stage 13 — Settings Polish + Local Data Management
 
 - Polished Settings into a bilingual local-first control center

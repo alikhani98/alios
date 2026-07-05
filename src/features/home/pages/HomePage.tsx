@@ -13,6 +13,7 @@ import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 
 import { useI18n, type TranslationKey } from "@/shared/i18n";
+import { useDateFormatter } from "@/shared/date";
 import type { Level3 } from "@/shared/types";
 import {
   Badge,
@@ -63,6 +64,7 @@ function SummaryCard({ icon, label, value }: SummaryCardProps) {
 
 export function HomePage() {
   const { t } = useI18n();
+  const { formatDate } = useDateFormatter();
   const { data, isLoading, hasError, loadDashboard } = useHomeDashboard();
 
   return (
@@ -204,7 +206,7 @@ export function HomePage() {
                         </span>
                         <span className="shrink-0 text-xs text-muted-foreground">
                           {t("home.updated", {
-                            date: project.updatedAt.slice(0, 10),
+                            date: formatDate(project.updatedAt),
                           })}
                         </span>
                       </div>
@@ -233,7 +235,7 @@ export function HomePage() {
                   <div className="rounded-xl border p-4">
                     <p className="font-medium">{data.journal.latest.title}</p>
                     <p className="mt-1 text-sm text-muted-foreground">
-                      {data.journal.latest.date}
+                      {formatDate(data.journal.latest.date)}
                     </p>
                   </div>
                 ) : (
@@ -260,7 +262,7 @@ export function HomePage() {
                     <p className="font-medium">{data.knowledge.latest.title}</p>
                     <p className="mt-1 text-sm text-muted-foreground">
                       {t("home.updated", {
-                        date: data.knowledge.latest.updatedAt.slice(0, 10),
+                        date: formatDate(data.knowledge.latest.updatedAt),
                       })}
                     </p>
                   </div>

@@ -3,6 +3,7 @@ import { useState } from "react";
 
 import type { Project } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
+import { useDateFormatter } from "@/shared/date";
 import {
   Badge,
   Button,
@@ -31,6 +32,7 @@ export function ProjectCard({
   onDelete,
 }: ProjectCardProps) {
   const { t } = useI18n();
+  const { formatDate } = useDateFormatter();
   const [confirmingDelete, setConfirmingDelete] = useState(false);
 
   return (
@@ -67,7 +69,9 @@ export function ProjectCard({
         {project.reviewDate ? (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <CalendarDays className="h-4 w-4" />
-            <span>{t("projects.review", { date: project.reviewDate })}</span>
+            <span>
+              {t("projects.review", { date: formatDate(project.reviewDate) })}
+            </span>
           </div>
         ) : null}
       </CardContent>

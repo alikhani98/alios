@@ -2,17 +2,25 @@
 
 ## Version 1.0
 
+- Status: scope frozen; release candidate prepared
 - Local-first app
-- Home
-- Today
-- Projects
-- Journal
-- Knowledge
-- Settings
-- CRUD
-- Simple search
+- Home Dashboard
+- Today tasks and daily check-in
+- Projects, Journal, and Knowledge CRUD
+- Knowledge simple search and type filter
+- Settings and local data management
 - Manual backup / restore
+- Persian / English i18n
+- Gregorian / Jalali display
+- Automated data-layer testing
+- Route-level code splitting
 - No AI integration
+
+## Real-world usage period
+
+AliOS v1.0 should be used with real personal data before more product scope is approved. Routines, Wellness, Weekly Review, Decision Log, Personal Manual, AI, Google Calendar, ICS export, cloud sync, and notifications remain deferred until observed usage justifies them.
+
+The later version ideas below are directional only. They are not approved stages and may change after real-world use.
 
 ## Version 1.1
 
