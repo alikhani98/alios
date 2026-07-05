@@ -4,8 +4,8 @@
 
 - Project name: AliOS
 - Architecture version: AliOS 1.0
-- Current status: The AliOS core product now includes verified mobile-responsive and manifest-level PWA readiness for the v1.1 product line.
-- Current stage: Stage 18 Completed
+- Current status: AliOS is configured and validated for static deployment to its GitHub Pages project URL.
+- Current stage: Stage 19 Completed
 
 ## Architecture References
 
@@ -56,6 +56,7 @@
 - Stage 16 — Performance / Code Splitting
 - Stage 17 — v1.0 Final QA / Release
 - Stage 18 — Mobile / PWA Readiness
+- Stage 19 — Static Deployment / GitHub Pages
 
 Stage 9 completion is evidenced by the Today page, daily check-in create/update form, date-scoped task CRUD, all approved task statuses, completed timestamps, and single-MIT selection synchronized with today’s check-in. Browser validation confirmed task and check-in persistence across refresh, task editing, status updates, MIT selection, deletion, and the task empty state. The feature consumes TasksRepository and DailyCheckinsRepository through the injected `StorageAdapter` and does not import Dexie. Health advice, Home dashboard data, recurring tasks, notifications, analytics, backup, AI, and cross-feature workflows remain unavailable. TypeScript validation and the production build pass.
 
@@ -77,13 +78,15 @@ Stage 17 completion is evidenced by the v1.0 README, static-hosting and backup g
 
 Stage 18 completion is evidenced by mobile-safe shared control sizing, responsive page/card spacing, mobile shell overflow protection, a scrollable safe-area-aware drawer, reduced mobile topbar crowding, and verified form usability. The production preview passed at 360×800, 390×844, 430×932, and desktop width across all six routes with no horizontal overflow or console errors. Task create/edit/delete, Knowledge search/filtering, Settings language/calendar controls, backup/import controls, and clear confirmation were verified at mobile width. The build includes a versioned web app manifest, mobile browser metadata, theme color, and scalable application icons. Mobile usage documentation explains that data remains local to each browser/device and that Backup/Restore is the only transfer method. No service worker, offline cache, sync, backend, authentication, cloud storage, dependency, schema, repository, backup-format, or product-feature change was added.
 
+Stage 19 completion is evidenced by the least-privilege GitHub Pages workflow for `main`, frozen pnpm installation, TypeScript/test/build gates, the `/alios/` production base, subpath-safe manifest and icon references, and deployment documentation for `https://alikhani98.github.io/alios/`. Hash routing remains compatible with static hosting, and the production artifact is published from `dist/`. This stage added deployment readiness only. It introduced no product feature, dependency, storage or schema change, repository change, backup-format change, backend, synchronization, authentication, or new abstraction.
+
 ## Next Stage
 
 The next stage is intentionally undefined pending explicit approval. Offline service-worker caching, automatic sync, cloud backup, native mobile applications, push notifications, integrations, and new product features remain deferred.
 
 ## Git Latest Recommended Commit
 
-`feat(mobile): add mobile and PWA readiness`
+`chore(deploy): add GitHub Pages deployment`
 
 ## Build Status
 

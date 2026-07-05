@@ -2,6 +2,17 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 19 — Static Deployment / GitHub Pages
+
+- Added a least-privilege GitHub Pages deployment workflow for pushes to `main` and manual runs
+- Added TypeScript, automated test, and production-build gates before deployment
+- Configured production assets for the `/alios/` GitHub project path
+- Kept local development at the development server root
+- Verified subpath-safe manifest, start URL, scope, and icon paths
+- Documented GitHub Pages setup, deployment steps, and the expected public URL
+- Documented that data remains local to each browser/device and Backup/Restore remains the manual transfer method
+- Added no synchronization, backend, authentication, dependency, storage change, backup-format change, or product feature
+
 ## Stage 18 — Mobile / PWA Readiness
 
 - Added mobile-responsive spacing, overflow protection, and safe-area-aware navigation

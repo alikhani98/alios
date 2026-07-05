@@ -27,6 +27,7 @@ The later version ideas below are directional only. They are not approved stages
 - Mobile-responsive polish
 - PWA manifest and home-screen metadata
 - Mobile backup/restore usage guidance
+- GitHub Pages static deployment readiness
 - No automatic sync or new business feature
 
 ## Later product candidates

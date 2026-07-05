@@ -4,6 +4,8 @@ AliOS can run from a modern mobile browser and can be added to the home screen w
 
 ## Open or install AliOS
 
+The expected GitHub Pages URL is `https://alikhani98.github.io/alios/` after Pages is enabled and the deployment workflow succeeds.
+
 1. Open the deployed HTTPS AliOS URL in the mobile browser.
 2. On Android/Chromium, use the browser menu and choose **Install app** or **Add to Home screen** when available.
 3. On iPhone/iPad Safari, use **Share** and choose **Add to Home Screen** when available.
@@ -20,6 +22,7 @@ AliOS stores data in IndexedDB for the current browser, device, and site origin.
 - Moving the deployment to a different domain or path may create a separate storage origin.
 - Clearing browser/site data can permanently remove AliOS records.
 - There is no automatic sync, cloud backup, account, or backend in v1.1.
+- Publishing AliOS to GitHub Pages does not change this device-local storage model.
 
 ## Move data between mobile and laptop
 

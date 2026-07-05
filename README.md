@@ -77,13 +77,26 @@ pnpm preview
 
 The production output is written to `dist/`.
 
-## Static hosting deployment
+## GitHub Pages deployment
 
-1. Run `pnpm build`.
-2. Upload the contents of `dist/` to the static hosting root, such as `public_html`.
-3. Open the deployed site and verify navigation, IndexedDB persistence, backup export, and backup import.
+AliOS is configured for the `alikhani98/alios` GitHub project site at:
 
-AliOS uses hash routing (`#/today`, `#/projects`, and similar routes), which is friendly to shared static hosting and does not require server rewrite rules. Do not deploy a Node.js server or backend for AliOS 1.0.
+```text
+https://alikhani98.github.io/alios/
+```
+
+The production build uses `/alios/` as its Vite base path. Local development remains available at the development server root. The deployment workflow runs TypeScript validation, automated tests, and the production build before publishing `dist/`.
+
+To enable deployment:
+
+1. In the GitHub repository, open **Settings → Pages**.
+2. Under **Build and deployment**, select **GitHub Actions** as the source.
+3. Push the approved changes to `main` or manually run the **Deploy GitHub Pages** workflow.
+4. Wait for both workflow jobs to pass, then open the Pages URL above.
+
+AliOS uses hash routing (`#/today`, `#/projects`, and similar routes), so direct navigation does not require server rewrite rules. A production build can also be uploaded to static hosting at a matching `/alios/` path. No production Node.js server or backend is required.
+
+Deployment creates a public application URL, not data synchronization. Records remain local to each browser/device. Use Backup Export and Backup Import to transfer data manually.
 
 ## Backup and restore
 
