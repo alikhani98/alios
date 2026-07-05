@@ -18,6 +18,7 @@ export class DexieBackupStorage implements BackupStorage {
         journalEntries,
         knowledgeItems,
         settings,
+        inboxItems,
       ] = await Promise.all([
         this.database.dailyCheckins.toArray(),
         this.database.tasks.toArray(),
@@ -25,6 +26,7 @@ export class DexieBackupStorage implements BackupStorage {
         this.database.journalEntries.toArray(),
         this.database.knowledgeItems.toArray(),
         this.database.settings.toArray(),
+        this.database.inboxItems.toArray(),
       ]);
 
       return {
@@ -34,6 +36,7 @@ export class DexieBackupStorage implements BackupStorage {
         journalEntries,
         knowledgeItems,
         settings,
+        inboxItems,
       };
     } catch (error) {
       throw new StorageError("AliOS data could not be exported.", {
@@ -50,6 +53,7 @@ export class DexieBackupStorage implements BackupStorage {
       this.database.journalEntries,
       this.database.knowledgeItems,
       this.database.settings,
+      this.database.inboxItems,
     ];
 
     try {
@@ -62,6 +66,7 @@ export class DexieBackupStorage implements BackupStorage {
           this.database.journalEntries.bulkPut(data.journalEntries),
           this.database.knowledgeItems.bulkPut(data.knowledgeItems),
           this.database.settings.bulkPut(data.settings),
+          this.database.inboxItems.bulkPut(data.inboxItems),
         ]);
       });
     } catch (error) {
@@ -81,6 +86,7 @@ export class DexieBackupStorage implements BackupStorage {
         journalEntries,
         knowledgeItems,
         settings,
+        inboxItems,
       ] = await Promise.all([
         this.database.dailyCheckins.count(),
         this.database.tasks.count(),
@@ -88,6 +94,7 @@ export class DexieBackupStorage implements BackupStorage {
         this.database.journalEntries.count(),
         this.database.knowledgeItems.count(),
         this.database.settings.count(),
+        this.database.inboxItems.count(),
       ]);
 
       return {
@@ -97,6 +104,7 @@ export class DexieBackupStorage implements BackupStorage {
         journalEntries,
         knowledgeItems,
         settings,
+        inboxItems,
       };
     } catch (error) {
       throw new StorageError("AliOS data counts could not be loaded.", {
@@ -113,6 +121,7 @@ export class DexieBackupStorage implements BackupStorage {
       this.database.journalEntries,
       this.database.knowledgeItems,
       this.database.settings,
+      this.database.inboxItems,
     ];
 
     try {

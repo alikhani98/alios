@@ -40,11 +40,21 @@ The later version ideas below are directional only. They are not approved stages
 
 ## Version 1.2
 
-- Manual AI workflow
-- Generate prompt
-- Copy to ChatGPT manually
-- Paste response
-- Save response to Knowledge
+- Quick Capture Inbox
+- Mobile-first capture form and item list
+- Processed/unprocessed status
+- Manual backup/restore support for Inbox data
+- No Inbox processing or conversion workflow
+
+## Deferred after Stage 20
+
+- Inbox Processing / Triage
+- Convert Inbox item to Task / Journal / Knowledge
+- Search, filtering, tags, and attachments for Inbox
+- Routines and Wellness
+- AI and AIProvider activation
+- Automatic sync and cloud backup
+- Offline service worker
 
 ## Version 2.0
 

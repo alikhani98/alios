@@ -51,6 +51,7 @@ export function useLocalDataManagement() {
         projects: 0,
         journalEntries: 0,
         knowledgeItems: 0,
+        inboxItems: 0,
         settings: 0,
       });
       setSuccess(t("settings.clearSuccess"));

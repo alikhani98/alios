@@ -9,7 +9,7 @@ function byUpdatedAtDescending<T extends { updatedAt: string }>(a: T, b: T) {
 }
 
 export function useHomeDashboard() {
-  const { tasks, dailyCheckins, projects, journal, knowledge } =
+  const { tasks, dailyCheckins, projects, journal, knowledge, inbox } =
     useStorageAdapter();
   const [data, setData] = useState<HomeDashboardData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -21,13 +21,14 @@ export function useHomeDashboard() {
 
     try {
       const today = format(new Date(), "yyyy-MM-dd");
-      const [allTasks, checkin, allProjects, journalEntries, knowledgeItems] =
+      const [allTasks, checkin, allProjects, journalEntries, knowledgeItems, inboxItems] =
         await Promise.all([
           tasks.list(),
           dailyCheckins.getByDate(today),
           projects.list(),
           journal.list(),
           knowledge.list(),
+          inbox.list(),
         ]);
 
       const todayTasks = allTasks.filter((task) => task.dueDate === today);
@@ -61,19 +62,23 @@ export function useHomeDashboard() {
           totalCount: knowledgeItems.length,
           latest: latestKnowledge,
         },
+        inbox: {
+          unprocessedCount: inboxItems.filter((item) => item.status === "unprocessed").length,
+        },
         isEmpty:
           todayTasks.length === 0 &&
           !checkin &&
           allProjects.length === 0 &&
           journalEntries.length === 0 &&
-          knowledgeItems.length === 0,
+          knowledgeItems.length === 0 &&
+          inboxItems.length === 0,
       });
     } catch {
       setHasError(true);
     } finally {
       setIsLoading(false);
     }
-  }, [dailyCheckins, journal, knowledge, projects, tasks]);
+  }, [dailyCheckins, inbox, journal, knowledge, projects, tasks]);
 
   useEffect(() => {
     void loadDashboard();

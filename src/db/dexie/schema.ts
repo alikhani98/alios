@@ -1,5 +1,5 @@
 export const DEXIE_DATABASE_NAME = "AliOS";
-export const DEXIE_SCHEMA_VERSION = 1;
+export const DEXIE_SCHEMA_VERSION = 2;
 
 export const DEXIE_TABLE_NAMES = {
   dailyCheckins: "dailyCheckins",
@@ -8,6 +8,7 @@ export const DEXIE_TABLE_NAMES = {
   journalEntries: "journalEntries",
   knowledgeItems: "knowledgeItems",
   settings: "settings",
+  inboxItems: "inboxItems",
 } as const;
 
 export type DexieTableName =
@@ -24,4 +25,10 @@ export const DEXIE_SCHEMA_V1 = {
   [DEXIE_TABLE_NAMES.knowledgeItems]:
     "id, type, title, createdAt, updatedAt",
   [DEXIE_TABLE_NAMES.settings]: "id, &key, createdAt, updatedAt",
+} satisfies Partial<Record<DexieTableName, string>>;
+
+export const DEXIE_SCHEMA_V2 = {
+  ...DEXIE_SCHEMA_V1,
+  [DEXIE_TABLE_NAMES.inboxItems]:
+    "id, status, type, createdAt, updatedAt",
 } satisfies Record<DexieTableName, string>;

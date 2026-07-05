@@ -26,5 +26,8 @@ export type HomeDashboardData = {
     totalCount: number;
     latest?: KnowledgeItem;
   };
+  inbox: {
+    unprocessedCount: number;
+  };
   isEmpty: boolean;
 };

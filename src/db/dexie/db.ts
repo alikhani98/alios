@@ -3,6 +3,7 @@ import Dexie, { type Table } from "dexie";
 import type {
   DailyCheckin,
   JournalEntry,
+  InboxItem,
   KnowledgeItem,
   Project,
   Setting,
@@ -11,6 +12,7 @@ import type {
 import {
   DEXIE_DATABASE_NAME,
   DEXIE_SCHEMA_V1,
+  DEXIE_SCHEMA_V2,
   DEXIE_SCHEMA_VERSION,
 } from "./schema";
 
@@ -21,10 +23,12 @@ export class AliosDatabase extends Dexie {
   journalEntries!: Table<JournalEntry, string>;
   knowledgeItems!: Table<KnowledgeItem, string>;
   settings!: Table<Setting, string>;
+  inboxItems!: Table<InboxItem, string>;
 
   constructor() {
     super(DEXIE_DATABASE_NAME);
-    this.version(DEXIE_SCHEMA_VERSION).stores(DEXIE_SCHEMA_V1);
+    this.version(1).stores(DEXIE_SCHEMA_V1);
+    this.version(DEXIE_SCHEMA_VERSION).stores(DEXIE_SCHEMA_V2);
   }
 }
 

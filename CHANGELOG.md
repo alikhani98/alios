@@ -2,6 +2,18 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 20 — Quick Capture Inbox
+
+- Added the Inbox domain model, Zod schema, repository contract, and Dexie repository
+- Added a safe additive Dexie schema v2 migration with the `inboxItems` table
+- Added a mobile-first Inbox page, Quick Capture form, item list, edit, delete, and processed/unprocessed actions
+- Added localized Inbox navigation, Persian/English messages, and existing date-display integration
+- Added an unprocessed Inbox count and quick link to Home
+- Added `inboxItems` to backup export, atomic restore, clear-all, and local-data summary behavior
+- Kept valid version 1 backups without `inboxItems` compatible by restoring an empty Inbox
+- Added Inbox repository, schema, backup, restore, and clear behavior tests
+- Added no conversion or processing workflow, search, tags, attachments, due dates, reminders, backend, sync, authentication, AI, service worker, dependency, or new abstraction layer
+
 ## Stage 19 — Static Deployment / GitHub Pages
 
 - Added a least-privilege GitHub Pages deployment workflow for pushes to `main` and manual runs

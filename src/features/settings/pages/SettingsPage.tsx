@@ -189,7 +189,7 @@ export function SettingsPage() {
               className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
               aria-label={t("settings.dataSummaryLoading")}
             >
-              {[0, 1, 2, 3, 4, 5].map((item) => (
+              {[0, 1, 2, 3, 4, 5, 6].map((item) => (
                 <div
                   key={item}
                   className="h-20 animate-pulse rounded-xl border bg-muted/60"
@@ -217,6 +217,10 @@ export function SettingsPage() {
               <CountItem
                 label={t("settings.checkinsCount")}
                 value={dataManagement.summary.dailyCheckins}
+              />
+              <CountItem
+                label={t("settings.inboxCount")}
+                value={dataManagement.summary.inboxItems}
               />
               <CountItem
                 label={t("settings.settingsCount")}

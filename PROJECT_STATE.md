@@ -4,8 +4,8 @@
 
 - Project name: AliOS
 - Architecture version: AliOS 1.0
-- Current status: AliOS is configured and validated for static deployment to its GitHub Pages project URL.
-- Current stage: Stage 19 Completed
+- Current status: AliOS includes a validated mobile-first Quick Capture Inbox and remains ready for static GitHub Pages deployment.
+- Current Stage: Stage 20 Completed
 
 ## Architecture References
 
@@ -38,6 +38,8 @@
 
 ## Completed Stages
 
+Stages 1–20 are complete.
+
 - Stage 1 — Foundation
 - Stage 2 — App Shell
 - Stage 3 — Domain Foundation
@@ -57,6 +59,7 @@
 - Stage 17 — v1.0 Final QA / Release
 - Stage 18 — Mobile / PWA Readiness
 - Stage 19 — Static Deployment / GitHub Pages
+- Stage 20 — Quick Capture Inbox
 
 Stage 9 completion is evidenced by the Today page, daily check-in create/update form, date-scoped task CRUD, all approved task statuses, completed timestamps, and single-MIT selection synchronized with today’s check-in. Browser validation confirmed task and check-in persistence across refresh, task editing, status updates, MIT selection, deletion, and the task empty state. The feature consumes TasksRepository and DailyCheckinsRepository through the injected `StorageAdapter` and does not import Dexie. Health advice, Home dashboard data, recurring tasks, notifications, analytics, backup, AI, and cross-feature workflows remain unavailable. TypeScript validation and the production build pass.
 
@@ -80,13 +83,15 @@ Stage 18 completion is evidenced by mobile-safe shared control sizing, responsiv
 
 Stage 19 completion is evidenced by the least-privilege GitHub Pages workflow for `main`, frozen pnpm installation, TypeScript/test/build gates, the `/alios/` production base, subpath-safe manifest and icon references, and deployment documentation for `https://alikhani98.github.io/alios/`. Hash routing remains compatible with static hosting, and the production artifact is published from `dist/`. This stage added deployment readiness only. It introduced no product feature, dependency, storage or schema change, repository change, backup-format change, backend, synchronization, authentication, or new abstraction.
 
+Stage 20 completion is evidenced by the Inbox domain schema, repository contract, injected Dexie repository, additive database schema version 2, mobile-first Quick Capture page, localized navigation, unprocessed-first list, edit/delete/status actions, shared date display, Home summary, and local-data summary. Backup version 1 now exports `inboxItems`; valid older backups without the field parse it as an empty array and restore safely. Automated coverage verifies Inbox CRUD, processed/unprocessed transitions, validation, export, restore, old-backup compatibility, and clear-all behavior. Browser verification passed at 360×800, 390×844, 430×932, and desktop width with no horizontal overflow or console errors; capture, validation, edit, processed/unprocessed, delete, Persian/English, RTL/LTR, and date display were exercised. No sync, backend, authentication, AI, routines, wellness, Inbox processing/conversion workflow, service worker, dependency, or new abstraction was added.
+
 ## Next Stage
 
-The next stage is intentionally undefined pending explicit approval. Offline service-worker caching, automatic sync, cloud backup, native mobile applications, push notifications, integrations, and new product features remain deferred.
+The next stage is intentionally undefined pending explicit approval. Inbox processing/triage, conversion to Tasks/Journal/Knowledge, search/filtering, tags, attachments, routines, wellness, AI, offline service-worker caching, automatic sync, and cloud backup remain deferred.
 
 ## Git Latest Recommended Commit
 
-`chore(deploy): add GitHub Pages deployment`
+`feat(inbox): add quick capture`
 
 ## Build Status
 
@@ -94,6 +99,7 @@ The next stage is intentionally undefined pending explicit approval. Offline ser
 - Automated tests: passing (`pnpm test:run`)
 - Production build: passing (`pnpm build`)
 - Production preview: manually verified (`pnpm preview`)
+- Automated test count: 36 passing across 5 suites
 - Last verified: 2026-07-05
 
 ## Rules Before Modifying the Project

@@ -32,7 +32,7 @@ AliOS stores data in IndexedDB for the current browser, device, and site origin.
 4. On the destination device, open **Settings** and choose the backup file.
 5. AliOS validates the file and shows a restore confirmation.
 6. Confirm only after reading the warning: restore replaces every supported local AliOS table on that device.
-7. Verify Today, Projects, Journal, Knowledge, and Settings after restore.
+7. Verify Inbox, Today, Projects, Journal, Knowledge, and Settings after restore.
 
 Export a fresh backup before restoring or clearing data. AliOS does not merge two devices automatically.
 

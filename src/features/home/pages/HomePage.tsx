@@ -6,6 +6,7 @@ import {
   CalendarCheck2,
   CheckCircle2,
   FolderKanban,
+  Inbox,
   RotateCcw,
   Sparkles,
 } from "lucide-react";
@@ -34,6 +35,7 @@ const levelLabelKeys: Record<Level3, TranslationKey> = {
 
 const quickLinks: ReadonlyArray<{ to: string; labelKey: TranslationKey }> = [
   { to: "/today", labelKey: "home.goToday" },
+  { to: "/inbox", labelKey: "home.goInbox" },
   { to: "/projects", labelKey: "home.goProjects" },
   { to: "/journal", labelKey: "home.goJournal" },
   { to: "/knowledge", labelKey: "home.goKnowledge" },
@@ -123,11 +125,16 @@ export function HomePage() {
             </Card>
           ) : null}
 
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
             <SummaryCard
               icon={<CalendarCheck2 className="h-5 w-5" />}
               label={t("home.todayTasks")}
               value={data.today.tasks.length}
+            />
+            <SummaryCard
+              icon={<Inbox className="h-5 w-5" />}
+              label={t("home.unprocessedInbox")}
+              value={data.inbox.unprocessedCount}
             />
             <SummaryCard
               icon={<FolderKanban className="h-5 w-5" />}

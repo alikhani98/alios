@@ -1,6 +1,7 @@
 import type {
   DailyCheckinsRepository,
   JournalRepository,
+  InboxRepository,
   KnowledgeRepository,
   ProjectsRepository,
   SettingsRepository,
@@ -10,6 +11,7 @@ import type { BackupStorage } from "@/core/backup";
 
 export interface StorageAdapter {
   backup: BackupStorage;
+  inbox: InboxRepository;
   dailyCheckins: DailyCheckinsRepository;
   tasks: TasksRepository;
   projects: ProjectsRepository;

@@ -1,12 +1,14 @@
 # AliOS
 
-AliOS is a bilingual, local-first personal life-management system. Version 1.0 brings Today planning, projects, journaling, personal knowledge, a read-only dashboard, manual backup/restore, and local data controls into one static web application.
+AliOS is a bilingual, local-first personal life-management system. It brings quick capture, Today planning, projects, journaling, personal knowledge, a read-only dashboard, manual backup/restore, and local data controls into one static web application.
 
 AliOS is designed for one person and stores its data in the browser through IndexedDB. It requires no backend, account, authentication, subscription, paid API, or hosted AI service.
 
 ## Core features
 
 - Home dashboard with Today, project, journal, and knowledge summaries
+- Mobile-first Quick Capture Inbox with note, task, idea, link, and other item types
+- Edit, delete, and processed/unprocessed Inbox status
 - Today tasks, statuses, Most Important Task selection, and daily check-in
 - Project create, list, edit, and delete
 - Journal create, list, edit, and delete
@@ -104,6 +106,8 @@ Open Settings to export all supported IndexedDB tables into one versioned AliOS 
 
 Restore validates the selected file before showing confirmation. Confirming restore replaces all supported local AliOS tables with the backup contents. Invalid JSON or an incompatible backup is rejected before stored data changes.
 
+Backups now include `inboxItems`. Valid older backups without this field remain compatible and restore with an empty Inbox.
+
 Clearing browser storage, using a different browser profile, changing the deployment origin, or losing the device can make local data unavailable. Export backups regularly; v1.0 does not provide automatic or cloud backup.
 
 ## Browser support
@@ -122,6 +126,10 @@ Data belongs to the exact browser, device, and deployed origin where it was crea
 4. Review the restore summary and explicitly confirm replacement.
 
 See [Mobile usage](docs/MOBILE_USAGE.md) for platform guidance and safety notes.
+
+## Quick Capture Inbox
+
+Open Inbox to save a thought, task, idea, link, reminder, or note with minimal typing. Unprocessed items appear first; each item can be edited, deleted, or marked processed/unprocessed. Organizing or converting Inbox items into Tasks, Journal, Knowledge, Projects, or Decisions is intentionally deferred.
 
 ## v1.0 scope and limitations
 

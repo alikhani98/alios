@@ -34,6 +34,11 @@ const SettingsPage = lazy(() =>
     default: module.SettingsPage,
   }))
 );
+const InboxPage = lazy(() =>
+  import("@/features/inbox/pages/InboxPage").then((module) => ({
+    default: module.InboxPage,
+  }))
+);
 
 const router = createHashRouter([
   {
@@ -53,6 +58,14 @@ const router = createHashRouter([
         element: (
           <Suspense fallback={<RouteLoadingFallback />}>
             <TodayPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "inbox",
+        element: (
+          <Suspense fallback={<RouteLoadingFallback />}>
+            <InboxPage />
           </Suspense>
         ),
       },

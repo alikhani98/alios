@@ -1,0 +1,63 @@
+warning: in the working copy of 'CHANGELOG.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'PROJECT_STATE.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'README.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/MOBILE_USAGE.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/ROADMAP.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'package.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/router.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/core/backup/BackupStorage.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/core/backup/__tests__/BackupService.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/core/backup/types.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/core/repositories/index.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/core/storage/StorageAdapter.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/db/dexie/DexieBackupStorage.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/db/dexie/DexieStorageAdapter.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/db/dexie/db.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/db/dexie/repositories/__tests__/repositories.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/db/dexie/repositories/index.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/db/dexie/schema.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/features/home/hooks/useHomeDashboard.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/features/home/pages/HomePage.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/features/home/types.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/features/settings/hooks/useLocalDataManagement.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/features/settings/pages/SettingsPage.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/shared/constants/app.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/shared/constants/navigation.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/shared/i18n/messages.en.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/shared/i18n/messages.fa.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/shared/layout/navigation-icons.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/shared/types/__tests__/schemas.test.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/shared/types/index.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/test/factories.ts', LF will be replaced by CRLF the next time Git touches it
+ CHANGELOG.md                                       | 12 [32m++++++++[m
+ PROJECT_STATE.md                                   | 14 [32m++++++[m[31m---[m
+ README.md                                          | 10 [32m++++++[m[31m-[m
+ docs/MOBILE_USAGE.md                               |  2 [32m+[m[31m-[m
+ docs/ROADMAP.md                                    | 20 [32m+++++++++[m[31m----[m
+ package.json                                       |  2 [32m+[m[31m-[m
+ src/app/router.tsx                                 | 13 [32m+++++++++[m
+ src/core/backup/BackupStorage.ts                   |  1 [32m+[m
+ src/core/backup/__tests__/BackupService.test.ts    | 18 [32m++++++++++++[m
+ src/core/backup/types.ts                           |  2 [32m++[m
+ src/core/repositories/index.ts                     |  1 [32m+[m
+ src/core/storage/StorageAdapter.ts                 |  2 [32m++[m
+ src/db/dexie/DexieBackupStorage.ts                 |  9 [32m++++++[m
+ src/db/dexie/DexieStorageAdapter.ts                |  3 [32m++[m
+ src/db/dexie/db.ts                                 |  6 [32m+++[m[31m-[m
+ .../repositories/__tests__/repositories.test.ts    | 31 [32m++++++++++++++++++++[m
+ src/db/dexie/repositories/index.ts                 |  1 [32m+[m
+ src/db/dexie/schema.ts                             |  9 [32m+++++[m[31m-[m
+ src/features/home/hooks/useHomeDashboard.ts        | 13 [32m++++++[m[31m---[m
+ src/features/home/pages/HomePage.tsx               |  9 [32m+++++[m[31m-[m
+ src/features/home/types.ts                         |  3 [32m++[m
+ .../settings/hooks/useLocalDataManagement.ts       |  1 [32m+[m
+ src/features/settings/pages/SettingsPage.tsx       |  6 [32m+++[m[31m-[m
+ src/shared/constants/app.ts                        |  2 [32m+[m[31m-[m
+ src/shared/constants/navigation.ts                 |  6 [32m++++[m
+ src/shared/i18n/messages.en.ts                     | 34 [32m++++++++++++++++++++[m[31m--[m
+ src/shared/i18n/messages.fa.ts                     | 34 [32m++++++++++++++++++++[m[31m--[m
+ src/shared/layout/navigation-icons.tsx             |  2 [32m++[m
+ src/shared/types/__tests__/schemas.test.ts         | 11 [32m+++++++[m
+ src/shared/types/index.ts                          |  1 [32m+[m
+ src/test/factories.ts                              | 12 [32m++++++++[m
+ 31 files changed, 265 insertions(+), 25 deletions(-)

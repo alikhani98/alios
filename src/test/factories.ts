@@ -1,6 +1,7 @@
 import type {
   CreateDailyCheckinInput,
   CreateJournalEntryInput,
+  CreateInboxItemInput,
   CreateKnowledgeItemInput,
   CreateProjectInput,
   CreateSettingInput,
@@ -9,6 +10,7 @@ import type {
 import type {
   DailyCheckin,
   JournalEntry,
+  InboxItem,
   KnowledgeItem,
   Project,
   Setting,
@@ -68,6 +70,11 @@ export const settingInput: CreateSettingInput = {
   value: true,
 };
 
+export const inboxItemInput: CreateInboxItemInput = {
+  content: "Capture the release idea",
+  type: "idea",
+};
+
 const metadata = {
   id: "fixture-id",
   createdAt: timestamp,
@@ -89,3 +96,8 @@ export const dailyCheckinRecord: DailyCheckin = {
   ...metadata,
 };
 export const settingRecord: Setting = { ...settingInput, ...metadata };
+export const inboxItemRecord: InboxItem = {
+  ...inboxItemInput,
+  status: "unprocessed",
+  ...metadata,
+};

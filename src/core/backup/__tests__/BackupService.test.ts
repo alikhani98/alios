@@ -6,6 +6,7 @@ import { LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
 import {
   dailyCheckinInput,
   journalEntryInput,
+  inboxItemInput,
   knowledgeItemInput,
   projectInput,
   settingInput,
@@ -37,6 +38,7 @@ describe("BackupService with DexieBackupStorage", () => {
     const knowledgeItem = await storage.knowledge.create(knowledgeItemInput);
     const dailyCheckin = await storage.dailyCheckins.create(dailyCheckinInput);
     const setting = await storage.settings.create(settingInput);
+    const inboxItem = await storage.inbox.create(inboxItemInput);
 
     const backup = await service.createBackup();
 
@@ -51,6 +53,7 @@ describe("BackupService with DexieBackupStorage", () => {
         "journalEntries",
         "knowledgeItems",
         "settings",
+        "inboxItems",
       ].sort()
     );
     expect(backup.data.projects).toEqual([project]);
@@ -59,6 +62,7 @@ describe("BackupService with DexieBackupStorage", () => {
     expect(backup.data.knowledgeItems).toEqual([knowledgeItem]);
     expect(backup.data.dailyCheckins).toEqual([dailyCheckin]);
     expect(backup.data.settings).toEqual([setting]);
+    expect(backup.data.inboxItems).toEqual([inboxItem]);
 
     localStorage.setItem(LANGUAGE_STORAGE_KEY, "en");
     await storage.backup.clearAll();
@@ -70,6 +74,7 @@ describe("BackupService with DexieBackupStorage", () => {
       journalEntries: 0,
       knowledgeItems: 0,
       settings: 0,
+      inboxItems: 0,
     });
     expect(localStorage.getItem(LANGUAGE_STORAGE_KEY)).toBe("en");
 
@@ -85,6 +90,19 @@ describe("BackupService with DexieBackupStorage", () => {
       dailyCheckin
     );
     expect(await storage.settings.getByKey(setting.key)).toEqual(setting);
+    expect(await storage.inbox.getById(inboxItem.id)).toEqual(inboxItem);
+  });
+
+  it("restores an older valid backup without inboxItems as an empty inbox", async () => {
+    await storage.inbox.create(inboxItemInput);
+    const backup = await service.createBackup();
+    const { inboxItems: _omitted, ...oldData } = backup.data;
+    const oldBackup = service.parseBackup(JSON.stringify({ ...backup, data: oldData }));
+
+    expect(oldBackup.data.inboxItems).toEqual([]);
+    await service.restoreBackup(oldBackup);
+    expect(await storage.inbox.list()).toEqual([]);
+    expect(await storage.projects.list()).toEqual([]);
   });
 
   it("rejects invalid JSON and structurally invalid backups", () => {

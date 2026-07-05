@@ -5,6 +5,7 @@ import type { AliosDatabase, DexieStorageAdapter } from "@/db/dexie";
 import {
   dailyCheckinInput,
   journalEntryInput,
+  inboxItemInput,
   knowledgeItemInput,
   projectInput,
   settingInput,
@@ -141,6 +142,36 @@ describe("Dexie repositories", () => {
     await storage.settings.delete(created.id);
     expect(await storage.settings.list()).toEqual([]);
     expect(await storage.settings.getByKey(created.key)).toBeUndefined();
+  });
+
+  it("supports the complete Inbox CRUD and status lifecycle", async () => {
+    const created = await storage.inbox.create(inboxItemInput);
+
+    expect(created.id).toMatch(/^[0-9a-f-]{36}$/i);
+    expect(created.status).toBe("unprocessed");
+    expect(await storage.inbox.list()).toEqual([created]);
+    expect(await storage.inbox.getById(created.id)).toEqual(created);
+
+    const edited = await storage.inbox.update(created.id, {
+      content: "Updated captured idea",
+      type: "note",
+    });
+    expect(edited.content).toBe("Updated captured idea");
+    expect(edited.type).toBe("note");
+
+    const processed = await storage.inbox.update(created.id, {
+      status: "processed",
+    });
+    expect(processed.status).toBe("processed");
+
+    const unprocessed = await storage.inbox.update(created.id, {
+      status: "unprocessed",
+    });
+    expect(unprocessed.status).toBe("unprocessed");
+
+    await storage.inbox.delete(created.id);
+    expect(await storage.inbox.list()).toEqual([]);
+    expect(await storage.inbox.getById(created.id)).toBeUndefined();
   });
 
   it("translates invalid repository input into a project ValidationError", async () => {

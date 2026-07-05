@@ -7,6 +7,7 @@ export type LocalDataSummary = {
   journalEntries: number;
   knowledgeItems: number;
   settings: number;
+  inboxItems: number;
 };
 
 export interface BackupStorage {

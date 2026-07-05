@@ -3,6 +3,7 @@ import { z } from "zod";
 import {
   dailyCheckinSchema,
   journalEntrySchema,
+  inboxItemSchema,
   knowledgeItemSchema,
   projectSchema,
   settingSchema,
@@ -20,6 +21,7 @@ export const aliosBackupDataSchema = z.object({
   journalEntries: z.array(journalEntrySchema),
   knowledgeItems: z.array(knowledgeItemSchema),
   settings: z.array(settingSchema),
+  inboxItems: z.array(inboxItemSchema).default([]),
 });
 
 export const aliosBackupSchema = z.object({

@@ -4,6 +4,7 @@ import { aliosDatabase, type AliosDatabase } from "./db";
 import {
   DexieDailyCheckinsRepository,
   DexieJournalRepository,
+  DexieInboxRepository,
   DexieKnowledgeRepository,
   DexieProjectsRepository,
   DexieSettingsRepository,
@@ -12,6 +13,7 @@ import {
 
 export class DexieStorageAdapter implements StorageAdapter {
   readonly backup: DexieBackupStorage;
+  readonly inbox: DexieInboxRepository;
   readonly dailyCheckins: DexieDailyCheckinsRepository;
   readonly tasks: DexieTasksRepository;
   readonly projects: DexieProjectsRepository;
@@ -21,6 +23,7 @@ export class DexieStorageAdapter implements StorageAdapter {
 
   constructor(readonly database: AliosDatabase = aliosDatabase) {
     this.backup = new DexieBackupStorage(database);
+    this.inbox = new DexieInboxRepository(database);
     this.dailyCheckins = new DexieDailyCheckinsRepository(database);
     this.tasks = new DexieTasksRepository(database);
     this.projects = new DexieProjectsRepository(database);
