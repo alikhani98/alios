@@ -28,7 +28,7 @@ export function NavigationLink({
       onClick={onNavigate}
       className={({ isActive }) =>
         cn(
-          "group flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition-colors",
+          "group flex min-h-11 items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition-colors",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
           isActive
             ? "bg-primary text-primary-foreground shadow-sm"

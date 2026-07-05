@@ -26,8 +26,8 @@ export function AppShell() {
   });
 
   return (
-    <div className="min-h-screen bg-muted/30 text-foreground">
-      <div className="flex min-h-screen">
+    <div className="min-h-screen overflow-x-hidden bg-muted/30 text-foreground">
+      <div className="flex min-h-screen min-w-0">
         <Sidebar
           collapsed={sidebarCollapsed}
           onToggleCollapsed={toggleSidebarCollapsed}
@@ -44,7 +44,7 @@ export function AppShell() {
             onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
           />
 
-          <main className="flex-1">
+          <main className="min-w-0 flex-1 overflow-x-hidden">
             <Outlet />
           </main>
         </div>

@@ -69,7 +69,7 @@ export function TodayTaskCard({
             onChange={(event) =>
               void onStatusChange(event.target.value as TaskStatus)
             }
-            className="flex h-9 rounded-lg border border-input bg-background px-3 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="flex min-h-11 max-w-full rounded-lg border border-input bg-background px-3 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:text-sm"
           >
             {TASK_STATUS_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>

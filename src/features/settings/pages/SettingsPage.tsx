@@ -44,7 +44,7 @@ type InfoItemProps = { label: string; value: string };
 
 function InfoItem({ label, value }: InfoItemProps) {
   return (
-    <div className="flex items-center justify-between gap-4 border-b py-3 last:border-0">
+    <div className="flex flex-col items-start gap-1 border-b py-3 last:border-0 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
       <span className="text-sm text-muted-foreground">{label}</span>
       <span className="text-sm font-medium">{value}</span>
     </div>

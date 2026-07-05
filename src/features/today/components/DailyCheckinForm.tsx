@@ -56,7 +56,7 @@ export function DailyCheckinForm({
             </label>
             <select
               id={`checkin-${name}`}
-              className="flex h-10 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
               {...register(name as "sleepQuality" | "energyLevel" | "moodLevel")}
             >
               {LEVEL_OPTIONS.map((option) => (
@@ -74,7 +74,7 @@ export function DailyCheckinForm({
           </label>
           <select
             id="checkin-stress"
-            className="flex h-10 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
             {...register("stressLevel")}
           >
             {STRESS_OPTIONS.map((option) => (
@@ -93,7 +93,7 @@ export function DailyCheckinForm({
           </label>
           <select
             id="checkin-smoking"
-            className="flex h-10 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
             {...register("smokingStatus")}
           >
             {SMOKING_OPTIONS.map((option) => (
@@ -104,10 +104,10 @@ export function DailyCheckinForm({
           </select>
         </div>
 
-        <label className="flex min-h-10 items-center gap-3 rounded-xl border px-4 py-2 text-sm font-medium">
+        <label className="flex min-h-11 items-center gap-3 rounded-xl border px-4 py-2 text-sm font-medium">
           <input
             type="checkbox"
-            className="h-4 w-4 rounded border-input accent-primary"
+            className="h-5 w-5 rounded border-input accent-primary"
             {...register("medicationDone")}
           />
           {t("today.medicationDone")}

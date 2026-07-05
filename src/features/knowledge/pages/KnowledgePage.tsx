@@ -196,7 +196,7 @@ export function KnowledgePage() {
               onChange={(event) =>
                 setTypeFilter(event.target.value as KnowledgeItemType | "all")
               }
-              className="flex h-10 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
             >
               <option value="all">{t("knowledge.allTypes")}</option>
               {KNOWLEDGE_TYPE_OPTIONS.map((option) => (
@@ -205,7 +205,7 @@ export function KnowledgePage() {
                 </option>
               ))}
             </select>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <Button type="submit">{t("knowledge.search")}</Button>
               {hasActiveSearch ? (
                 <Button type="button" variant="ghost" onClick={() => void clearSearch()}>

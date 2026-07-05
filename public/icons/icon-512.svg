@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="AliOS">
+  <rect width="512" height="512" rx="118" fill="#2563eb"/>
+  <circle cx="256" cy="256" r="166" fill="#ffffff" fill-opacity="0.12"/>
+  <path d="m256 120 131 267h-66l-28-62h-76l-27 62h-65l131-267Zm0 97-22 58h43l-21-58Z" fill="#ffffff"/>
+</svg>

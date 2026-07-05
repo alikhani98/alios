@@ -4,8 +4,8 @@
 
 - Project name: AliOS
 - Architecture version: AliOS 1.0
-- Current status: The AliOS 1.0 core product is implemented, documented, and verified as a v1.0 release candidate.
-- Current stage: Stage 17 Completed
+- Current status: The AliOS core product now includes verified mobile-responsive and manifest-level PWA readiness for the v1.1 product line.
+- Current stage: Stage 18 Completed
 
 ## Architecture References
 
@@ -55,6 +55,7 @@
 - Stage 15 — Testing Foundation
 - Stage 16 — Performance / Code Splitting
 - Stage 17 — v1.0 Final QA / Release
+- Stage 18 — Mobile / PWA Readiness
 
 Stage 9 completion is evidenced by the Today page, daily check-in create/update form, date-scoped task CRUD, all approved task statuses, completed timestamps, and single-MIT selection synchronized with today’s check-in. Browser validation confirmed task and check-in persistence across refresh, task editing, status updates, MIT selection, deletion, and the task empty state. The feature consumes TasksRepository and DailyCheckinsRepository through the injected `StorageAdapter` and does not import Dexie. Health advice, Home dashboard data, recurring tasks, notifications, analytics, backup, AI, and cross-feature workflows remain unavailable. TypeScript validation and the production build pass.
 
@@ -74,13 +75,15 @@ Stage 16 completion is evidenced by route-level `React.lazy` and `Suspense` boun
 
 Stage 17 completion is evidenced by the v1.0 README, static-hosting and backup guidance, explicit release checklist, frozen v1.0 roadmap, `1.0.0` release metadata, passing TypeScript/tests/build gates, and production-preview QA. Final QA covered empty and populated Home states, Today check-in/task/MIT/status flows, Projects, Journal, Knowledge search/filtering, Settings language/calendar/local-data controls, backup export feedback, clear confirmation and execution, language preservation, untranslated user content, route chunks, and an error-free console. Automated tests cover repository CRUD, all-table backup/clear/restore, invalid backup rejection, schemas, i18n, and date utilities. No product features, dependencies, storage changes, repository changes, backup format changes, or new abstractions were added.
 
+Stage 18 completion is evidenced by mobile-safe shared control sizing, responsive page/card spacing, mobile shell overflow protection, a scrollable safe-area-aware drawer, reduced mobile topbar crowding, and verified form usability. The production preview passed at 360×800, 390×844, 430×932, and desktop width across all six routes with no horizontal overflow or console errors. Task create/edit/delete, Knowledge search/filtering, Settings language/calendar controls, backup/import controls, and clear confirmation were verified at mobile width. The build includes a versioned web app manifest, mobile browser metadata, theme color, and scalable application icons. Mobile usage documentation explains that data remains local to each browser/device and that Backup/Restore is the only transfer method. No service worker, offline cache, sync, backend, authentication, cloud storage, dependency, schema, repository, backup-format, or product-feature change was added.
+
 ## Next Stage
 
-The next phase is a real-world usage period. Post-v1.0 planning is intentionally pending explicit approval; do not infer or begin a new development stage.
+The next stage is intentionally undefined pending explicit approval. Offline service-worker caching, automatic sync, cloud backup, native mobile applications, push notifications, integrations, and new product features remain deferred.
 
 ## Git Latest Recommended Commit
 
-`chore(release): prepare v1.0`
+`feat(mobile): add mobile and PWA readiness`
 
 ## Build Status
 

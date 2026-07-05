@@ -2,6 +2,19 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 18 — Mobile / PWA Readiness
+
+- Added mobile-responsive spacing, overflow protection, and safe-area-aware navigation
+- Increased important touch targets and mobile form control sizing
+- Improved mobile card padding, long action wrapping, file input usability, and topbar space
+- Verified Home, Today, Projects, Journal, Knowledge, and Settings at common phone widths
+- Added a web app manifest with standalone display metadata, theme colors, and scalable icons
+- Added mobile browser and Add to Home Screen metadata
+- Added mobile usage and manual device-transfer documentation
+- Documented that data remains local to each browser/device
+- Kept Backup/Restore as the only manual transfer method between mobile and laptop
+- Added no automatic sync, cloud backup, service worker cache, dependency, backend, authentication, storage change, or product feature
+
 ## Stage 17 — v1.0 Final QA / Release
 
 - Replaced the stale foundation README with complete AliOS v1.0 documentation

@@ -75,7 +75,7 @@ export function TodayTaskForm({
           </label>
           <select
             id="today-task-status"
-            className="flex h-10 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
             {...register("status")}
           >
             {TASK_STATUS_OPTIONS.map((option) => (
@@ -92,7 +92,7 @@ export function TodayTaskForm({
           </label>
           <select
             id="today-task-priority"
-            className="flex h-10 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
             {...register("priority")}
           >
             {TASK_PRIORITY_OPTIONS.map((option) => (
@@ -104,10 +104,10 @@ export function TodayTaskForm({
         </div>
       </div>
 
-      <label className="flex items-center gap-3 text-sm font-medium">
+      <label className="flex min-h-11 items-center gap-3 text-sm font-medium">
         <input
           type="checkbox"
-          className="h-4 w-4 rounded border-input accent-primary"
+          className="h-5 w-5 rounded border-input accent-primary"
           {...register("isMit")}
         />
         {t("today.makeMit")}

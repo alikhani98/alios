@@ -68,7 +68,7 @@ export function JournalEntryForm({
           </label>
           <select
             id="journal-type"
-            className="flex h-10 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
             {...register("type")}
           >
             {JOURNAL_TYPE_OPTIONS.map((option) => (
@@ -119,7 +119,7 @@ export function JournalEntryForm({
           </label>
           <select
             id="journal-mood"
-            className="flex h-10 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
             {...register("moodLevel")}
           >
             <option value="">{t("common.notRecorded")}</option>
@@ -137,7 +137,7 @@ export function JournalEntryForm({
           </label>
           <select
             id="journal-energy"
-            className="flex h-10 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
             {...register("energyLevel")}
           >
             <option value="">{t("common.notRecorded")}</option>

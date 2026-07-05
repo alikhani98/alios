@@ -17,6 +17,7 @@ AliOS is designed for one person and stores its data in the browser through Inde
 - Local data summary and confirmed clear-all operation
 - Automated data-layer, validation, backup, i18n, and date tests
 - Route-level code splitting for feature pages
+- Mobile-responsive layouts and manifest-level Add to Home Screen readiness
 
 ## Architecture and technology
 
@@ -31,6 +32,7 @@ Architecture references:
 - [Project state](PROJECT_STATE.md)
 - [Roadmap](docs/ROADMAP.md)
 - [Release checklist](docs/RELEASE_CHECKLIST.md)
+- [Mobile usage](docs/MOBILE_USAGE.md)
 
 ## Requirements
 
@@ -93,13 +95,26 @@ Clearing browser storage, using a different browser profile, changing the deploy
 
 ## Browser support
 
-AliOS targets current desktop releases of Chromium-based browsers, Firefox, and Safari that support IndexedDB and modern JavaScript modules. The v1.0 release candidate was manually verified in the bundled Chromium preview environment. Private-browsing storage policies and aggressive browser cleanup settings may reduce persistence guarantees.
+AliOS targets current mobile and desktop releases of Chromium-based browsers, Firefox, and Safari that support IndexedDB and modern JavaScript modules. The release is manually checked at common phone widths as well as desktop width. Private-browsing storage policies and aggressive browser cleanup settings may reduce persistence guarantees.
+
+## Mobile use and home-screen installation
+
+Open the deployed AliOS URL in a mobile browser. Where the browser and platform support it, use **Add to Home Screen** or **Install app** to launch AliOS in a standalone window. Stage 18 provides the manifest, icons, theme metadata, and mobile layout foundation; offline service-worker caching is intentionally deferred.
+
+Data belongs to the exact browser, device, and deployed origin where it was created. Mobile and laptop data do not synchronize automatically. To move data between devices:
+
+1. Export a backup from Settings on the source device.
+2. Transfer the JSON file using a method you trust.
+3. Open Settings on the destination device and import the backup.
+4. Review the restore summary and explicitly confirm replacement.
+
+See [Mobile usage](docs/MOBILE_USAGE.md) for platform guidance and safety notes.
 
 ## v1.0 scope and limitations
 
 Version 1.0 is intentionally single-user and local-only. It does not include:
 
-- Accounts, authentication, backend services, or multi-device sync
+- Accounts, authentication, backend services, or automatic multi-device sync
 - Cloud or scheduled backup, encryption, compression, or attachments
 - Routines, Wellness, Weekly Review, Decision Log, or Personal Manual
 - AI features or hosted AI providers

@@ -73,17 +73,18 @@
 
   html {
     scroll-behavior: smooth;
+    overflow-x: hidden;
   }
 
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply min-w-0 overflow-x-hidden bg-background text-foreground antialiased;
     font-family: Vazirmatn, system-ui, sans-serif;
   }
 }
 
 @layer components {
   .alios-page {
-    @apply mx-auto w-full max-w-7xl px-6 py-6;
+    @apply mx-auto w-full max-w-7xl px-4 py-4 sm:px-6 sm:py-6;
   }
 
   .alios-page-header {

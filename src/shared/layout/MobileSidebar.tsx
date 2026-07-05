@@ -32,7 +32,7 @@ export function MobileSidebar({ open, onClose }: MobileSidebarProps) {
 
       <aside
         className={cn(
-          "absolute top-0 flex h-full w-72 max-w-[85vw] flex-col bg-card shadow-aliosFloating transition-transform duration-300 ease-in-out",
+          "absolute top-0 flex h-full w-72 max-w-[88vw] flex-col bg-card pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)] shadow-aliosFloating transition-transform duration-300 ease-in-out",
           direction === "rtl" ? "right-0 border-l" : "left-0 border-r",
           open ? "translate-x-0" : direction === "rtl" ? "translate-x-full" : "-translate-x-full"
         )}
@@ -54,7 +54,7 @@ export function MobileSidebar({ open, onClose }: MobileSidebarProps) {
           </Button>
         </div>
 
-        <nav className="flex flex-1 flex-col gap-1 p-3" aria-label={t("nav.mobile")}>
+        <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-3" aria-label={t("nav.mobile")}>
           {mainNavigation.map((item) => (
             <NavigationLink key={item.href} item={item} onNavigate={onClose} />
           ))}

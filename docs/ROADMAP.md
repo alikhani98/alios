@@ -24,6 +24,13 @@ The later version ideas below are directional only. They are not approved stages
 
 ## Version 1.1
 
+- Mobile-responsive polish
+- PWA manifest and home-screen metadata
+- Mobile backup/restore usage guidance
+- No automatic sync or new business feature
+
+## Later product candidates
+
 - Decision Engine
 - Personal Manual
 - Master Prompt

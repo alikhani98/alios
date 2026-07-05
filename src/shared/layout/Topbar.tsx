@@ -12,7 +12,7 @@ type TopbarProps = {
 export function Topbar({ title, onOpenMobileSidebar }: TopbarProps) {
   const { direction, t } = useI18n();
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/75 md:px-6">
+    <header className="sticky top-0 z-30 flex min-h-16 items-center gap-2 border-b bg-background/95 px-3 pt-[env(safe-area-inset-top)] backdrop-blur supports-[backdrop-filter]:bg-background/75 sm:px-4 md:gap-3 md:px-6">
       <Button
         type="button"
         variant="ghost"
@@ -50,6 +50,7 @@ export function Topbar({ title, onOpenMobileSidebar }: TopbarProps) {
         type="button"
         variant="ghost"
         size="icon"
+        className="hidden md:inline-flex"
         disabled
         aria-label={t("shell.themePlaceholder")}
         title={t("shell.themePlaceholder")}
@@ -61,6 +62,7 @@ export function Topbar({ title, onOpenMobileSidebar }: TopbarProps) {
         type="button"
         variant="ghost"
         size="icon"
+        className="hidden md:inline-flex"
         disabled
         aria-label={t("shell.userPlaceholder")}
         title={t("shell.userPlaceholder")}
