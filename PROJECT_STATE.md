@@ -4,8 +4,8 @@
 
 - Project name: AliOS
 - Architecture version: AliOS 1.0
-- Current status: AliOS includes validated mobile-first Inbox capture, processing, search, and filters and remains ready for static GitHub Pages deployment.
-- Current Stage: Stage 22 Completed
+- Current status: AliOS includes validated mobile-first Inbox capture, processing, search, filters, and bulk triage and remains ready for static GitHub Pages deployment.
+- Current Stage: Stage 23 Completed
 
 ## Architecture References
 
@@ -38,7 +38,7 @@
 
 ## Completed Stages
 
-Stages 1–22 are complete.
+Stages 1–23 are complete.
 
 - Stage 1 — Foundation
 - Stage 2 — App Shell
@@ -62,6 +62,7 @@ Stages 1–22 are complete.
 - Stage 20 — Quick Capture Inbox
 - Stage 21 — Inbox Processing / Triage
 - Stage 22 — Inbox Search & Filters
+- Stage 23 — Inbox Bulk Triage
 
 Stage 9 completion is evidenced by the Today page, daily check-in create/update form, date-scoped task CRUD, all approved task statuses, completed timestamps, and single-MIT selection synchronized with today’s check-in. Browser validation confirmed task and check-in persistence across refresh, task editing, status updates, MIT selection, deletion, and the task empty state. The feature consumes TasksRepository and DailyCheckinsRepository through the injected `StorageAdapter` and does not import Dexie. Health advice, Home dashboard data, recurring tasks, notifications, analytics, backup, AI, and cross-feature workflows remain unavailable. TypeScript validation and the production build pass.
 
@@ -91,13 +92,15 @@ Stage 21 completion is evidenced by the mobile-friendly Inbox processing actions
 
 Stage 22 completion is evidenced by local case-insensitive content search, combinable status and type filters, active-filter clearing, and a distinct localized no-results state. Filtering preserves the existing unprocessed-first and newest-first ordering because it operates on the already sorted Inbox collection. Focused automated coverage verifies normalized search, empty-query behavior, status filtering, type filtering, combined filters, and no-result behavior. No schema migration, backup change, dependency, AI, sync, tags, bulk workflow, search index, repository change, or new abstraction was added.
 
+Stage 23 completion is evidenced by local Inbox multi-select, per-item selection controls, select all visible filtered items, clear selection, a mobile-friendly bulk action bar, bulk mark processed, bulk mark unprocessed, and bulk delete with confirmation. Selection is UI-only and is cleared after successful bulk actions and whenever search/status/type filters change, so bulk operations act only on selected visible items. Focused automated coverage verifies selected-only processed updates, selected-only unprocessed updates, selected-only deletion, non-selected items remaining unchanged, and visible select-all IDs. No schema migration, backup change, dependency, AI, sync, tags, bulk conversion, workflow engine, batch-processing engine, repository contract change, or new storage abstraction was added.
+
 ## Next Stage
 
-The next stage is intentionally undefined pending explicit approval. Project conversion, bulk triage, tags, attachments, reminders, routines, wellness, AI classification, semantic search, offline service-worker caching, automatic sync, and cloud backup remain deferred.
+The next stage is intentionally undefined pending explicit approval. Project conversion, bulk conversion, tags, attachments, reminders, routines, wellness, AI classification, semantic search, offline service-worker caching, automatic sync, and cloud backup remain deferred.
 
 ## Git Latest Recommended Commit
 
-`feat(inbox): add search and filters`
+`feat(inbox): add bulk triage`
 
 ## Build Status
 
@@ -105,8 +108,8 @@ The next stage is intentionally undefined pending explicit approval. Project con
 - Automated tests: passing (`pnpm test:run`)
 - Production build: passing (`pnpm build`)
 - Production preview: manually verified (`pnpm preview`)
-- Automated test count: 47 passing across 7 suites
-- Last verified: 2026-07-05
+- Automated test count: 51 passing across 7 suites
+- Last verified: 2026-07-06
 
 ## Rules Before Modifying the Project
 

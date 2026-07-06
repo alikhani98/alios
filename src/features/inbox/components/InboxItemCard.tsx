@@ -13,13 +13,24 @@ import type { InboxProcessingTarget } from "../inboxProcessing";
 type Props = {
   item: InboxItem;
   isBusy: boolean;
+  isSelected: boolean;
+  onSelectionChange: (selected: boolean) => void;
   onEdit: (values: InboxFormValues) => Promise<boolean>;
   onToggleStatus: () => Promise<void>;
   onConvert: (target: InboxProcessingTarget) => Promise<void>;
   onDelete: () => Promise<void>;
 };
 
-export function InboxItemCard({ item, isBusy, onEdit, onToggleStatus, onConvert, onDelete }: Props) {
+export function InboxItemCard({
+  item,
+  isBusy,
+  isSelected,
+  onSelectionChange,
+  onEdit,
+  onToggleStatus,
+  onConvert,
+  onDelete,
+}: Props) {
   const { t } = useI18n();
   const { formatDate } = useDateFormatter();
   const [isEditing, setIsEditing] = useState(false);
@@ -39,6 +50,16 @@ export function InboxItemCard({ item, isBusy, onEdit, onToggleStatus, onConvert,
   return (
     <Card className={item.status === "processed" ? "bg-muted/30" : undefined}>
       <CardContent className="space-y-4 p-5">
+        <label className="flex min-h-11 cursor-pointer items-center gap-3 rounded-xl border bg-background px-3 py-2 text-sm font-medium">
+          <input
+            type="checkbox"
+            checked={isSelected}
+            onChange={(event) => onSelectionChange(event.target.checked)}
+            className="h-5 w-5 shrink-0 accent-primary"
+            aria-label={t("inbox.select")}
+          />
+          <span>{t("inbox.select")}</span>
+        </label>
         <p className="whitespace-pre-wrap break-words text-base leading-7">{item.content}</p>
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant="outline">{t(INBOX_TYPE_LABEL_KEYS[item.type])}</Badge>

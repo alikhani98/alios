@@ -60,10 +60,19 @@ The later version ideas below are directional only. They are not approved stages
 - Combined search/filter behavior and a no-result state
 - No schema migration, search index, dependency, or backup-format change
 
-## Deferred after Stage 22
+## Version 1.5
+
+- Inbox Bulk Triage
+- Multi-select Inbox items
+- Select all visible filtered Inbox items
+- Bulk mark processed and unprocessed
+- Bulk delete with confirmation
+- No schema migration, backup-format change, dependency, AI, sync, tags, or bulk conversion
+
+## Deferred after Stage 23
 
 - Project conversion
-- Bulk triage
+- Bulk conversion
 - Tags and attachments
 - Reminders
 - Routines and Wellness

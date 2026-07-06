@@ -2,7 +2,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { AliosDatabase, DexieStorageAdapter } from "@/db/dexie";
 import { createTestStorage, destroyTestDatabase } from "@/test/database";
-import { processInboxItem, setInboxItemProcessed } from "../inboxProcessing";
+import {
+  deleteInboxItems,
+  processInboxItem,
+  setInboxItemProcessed,
+  setInboxItemsProcessed,
+} from "../inboxProcessing";
 
 describe("Inbox processing", () => {
   let database: AliosDatabase;
@@ -94,5 +99,53 @@ describe("Inbox processing", () => {
     expect((await setInboxItemProcessed(storage, inboxItem.id, true)).status).toBe("processed");
     expect((await setInboxItemProcessed(storage, inboxItem.id, false)).status).toBe("unprocessed");
     expect(await storage.inbox.getById(inboxItem.id)).toBeDefined();
+  });
+
+  it("bulk marks only selected Inbox items processed", async () => {
+    const first = await storage.inbox.create({ content: "First selected", type: "note" });
+    const second = await storage.inbox.create({ content: "Second selected", type: "task" });
+    const untouched = await storage.inbox.create({ content: "Do not touch", type: "idea" });
+
+    await setInboxItemsProcessed(storage, [first.id, second.id], true);
+
+    expect((await storage.inbox.getById(first.id))?.status).toBe("processed");
+    expect((await storage.inbox.getById(second.id))?.status).toBe("processed");
+    expect((await storage.inbox.getById(untouched.id))?.status).toBe("unprocessed");
+  });
+
+  it("bulk marks only selected Inbox items unprocessed", async () => {
+    const first = await storage.inbox.create({
+      content: "First selected",
+      type: "note",
+      status: "processed",
+    });
+    const second = await storage.inbox.create({
+      content: "Second selected",
+      type: "task",
+      status: "processed",
+    });
+    const untouched = await storage.inbox.create({
+      content: "Do not touch",
+      type: "idea",
+      status: "processed",
+    });
+
+    await setInboxItemsProcessed(storage, [first.id, second.id], false);
+
+    expect((await storage.inbox.getById(first.id))?.status).toBe("unprocessed");
+    expect((await storage.inbox.getById(second.id))?.status).toBe("unprocessed");
+    expect((await storage.inbox.getById(untouched.id))?.status).toBe("processed");
+  });
+
+  it("bulk deletes only selected Inbox items", async () => {
+    const first = await storage.inbox.create({ content: "Delete one", type: "note" });
+    const second = await storage.inbox.create({ content: "Delete two", type: "task" });
+    const untouched = await storage.inbox.create({ content: "Keep this", type: "idea" });
+
+    await deleteInboxItems(storage, [first.id, second.id]);
+
+    expect(await storage.inbox.getById(first.id)).toBeUndefined();
+    expect(await storage.inbox.getById(second.id)).toBeUndefined();
+    expect(await storage.inbox.getById(untouched.id)).toBeDefined();
   });
 });

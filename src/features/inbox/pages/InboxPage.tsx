@@ -1,5 +1,5 @@
-import { AlertCircle, Inbox, RotateCcw, Search, SearchX, X } from "lucide-react";
-import { useState } from "react";
+import { AlertCircle, CheckCircle2, Circle, Inbox, RotateCcw, Search, SearchX, Trash2, X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 
 import { useI18n } from "@/shared/i18n";
 import { INBOX_ITEM_TYPE_VALUES } from "@/shared/types";
@@ -13,6 +13,7 @@ import {
   type InboxTypeFilter,
 } from "../filterInboxItems";
 import { useInboxItems } from "../hooks/useInboxItems";
+import { selectVisibleInboxItemIds } from "../inboxSelection";
 import type { InboxFormValues } from "../types";
 
 export function InboxPage() {
@@ -28,8 +29,14 @@ export function InboxPage() {
     convertItem,
     markProcessed,
     markUnprocessed,
+    markItemsProcessed,
+    markItemsUnprocessed,
+    deleteItems,
   } = useInboxItems();
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [isBulkBusy, setIsBulkBusy] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [confirmingBulkDelete, setConfirmingBulkDelete] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -44,11 +51,64 @@ export function InboxPage() {
   });
   const filtersActive =
     searchQuery.trim().length > 0 || statusFilter !== "all" || typeFilter !== "all";
+  const visibleItemIds = useMemo(
+    () => selectVisibleInboxItemIds(filteredItems),
+    [filteredItems]
+  );
+  const selectedVisibleIds = selectedIds.filter((id) => visibleItemIds.includes(id));
+  const selectedVisibleCount = selectedVisibleIds.length;
+  const allVisibleSelected =
+    visibleItemIds.length > 0 && visibleItemIds.every((id) => selectedIds.includes(id));
+
+  useEffect(() => {
+    setSelectedIds([]);
+    setConfirmingBulkDelete(false);
+  }, [searchQuery, statusFilter, typeFilter]);
 
   const clearFilters = () => {
     setSearchQuery("");
     setStatusFilter("all");
     setTypeFilter("all");
+  };
+
+  const setItemSelected = (id: string, selected: boolean) => {
+    setSelectedIds((current) => {
+      if (selected) {
+        return current.includes(id) ? current : [...current, id];
+      }
+      return current.filter((selectedId) => selectedId !== id);
+    });
+    setConfirmingBulkDelete(false);
+  };
+
+  const clearSelection = () => {
+    setSelectedIds([]);
+    setConfirmingBulkDelete(false);
+  };
+
+  const selectAllVisible = () => {
+    setSelectedIds(visibleItemIds);
+    setConfirmingBulkDelete(false);
+  };
+
+  const runBulk = async (action: () => Promise<void>, success: string) => {
+    if (selectedVisibleIds.length === 0) {
+      setActionError(t("inbox.noItemsSelected"));
+      return;
+    }
+
+    setIsBulkBusy(true);
+    setActionError(null);
+    setMessage(null);
+    try {
+      await action();
+      setMessage(success);
+      clearSelection();
+    } catch {
+      setActionError(t("inbox.actionError"));
+    } finally {
+      setIsBulkBusy(false);
+    }
   };
 
   const run = async (
@@ -167,6 +227,82 @@ export function InboxPage() {
         </div>
       ) : null}
 
+      {selectedVisibleCount > 0 ? (
+        <Card>
+          <CardContent className="grid gap-3 p-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-sm font-medium">
+                {t("inbox.selectedCount").replace("{count}", String(selectedVisibleCount))}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  disabled={isBulkBusy || allVisibleSelected}
+                  onClick={selectAllVisible}
+                >
+                  {t("inbox.selectAllVisible")}
+                </Button>
+                <Button type="button" size="sm" variant="ghost" disabled={isBulkBusy} onClick={clearSelection}>
+                  <X className="me-2 h-4 w-4" />{t("inbox.clearSelection")}
+                </Button>
+              </div>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-3">
+              <Button
+                type="button"
+                size="sm"
+                disabled={isBulkBusy}
+                onClick={() => void runBulk(
+                  () => markItemsProcessed(selectedVisibleIds).then(() => undefined),
+                  t("inbox.bulkProcessed")
+                )}
+              >
+                <CheckCircle2 className="me-2 h-4 w-4" />{t("inbox.markSelectedProcessed")}
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                disabled={isBulkBusy}
+                onClick={() => void runBulk(
+                  () => markItemsUnprocessed(selectedVisibleIds).then(() => undefined),
+                  t("inbox.bulkUnprocessed")
+                )}
+              >
+                <Circle className="me-2 h-4 w-4" />{t("inbox.markSelectedUnprocessed")}
+              </Button>
+              {confirmingBulkDelete ? (
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="destructive"
+                  disabled={isBulkBusy}
+                  onClick={() => void runBulk(
+                    () => deleteItems(selectedVisibleIds),
+                    t("inbox.bulkDeleted")
+                  )}
+                >
+                  <Trash2 className="me-2 h-4 w-4" />{isBulkBusy ? t("common.deleting") : t("inbox.confirmDeleteSelected")}
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  className="text-destructive hover:text-destructive"
+                  disabled={isBulkBusy}
+                  onClick={() => setConfirmingBulkDelete(true)}
+                >
+                  <Trash2 className="me-2 h-4 w-4" />{t("inbox.deleteSelected")}
+                </Button>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      ) : null}
+
       {isLoading ? (
         <div className="grid gap-4 md:grid-cols-2" aria-label={t("inbox.loading")}>
           {[0, 1].map((index) => <div key={index} className="h-48 animate-pulse rounded-2xl border bg-muted/60" />)}
@@ -194,6 +330,8 @@ export function InboxPage() {
               key={item.id}
               item={item}
               isBusy={busyId === item.id}
+              isSelected={selectedIds.includes(item.id)}
+              onSelectionChange={(selected) => setItemSelected(item.id, selected)}
               onEdit={async (values) => {
                 let saved = false;
                 await run(item.id, async () => {

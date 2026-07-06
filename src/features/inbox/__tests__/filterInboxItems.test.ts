@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type { InboxItem } from "@/shared/types";
 import { filterInboxItems } from "../filterInboxItems";
+import { selectVisibleInboxItemIds } from "../inboxSelection";
 
 const timestamp = "2026-07-05T08:30:00.000Z";
 
@@ -71,5 +72,15 @@ describe("filterInboxItems", () => {
     expect(
       filterInboxItems(items, { query: "missing", status: "processed", type: "link" })
     ).toEqual([]);
+  });
+
+  it("selects only currently visible filtered item ids", () => {
+    const visibleItems = filterInboxItems(items, {
+      query: "book",
+      status: "unprocessed",
+      type: "all",
+    });
+
+    expect(selectVisibleInboxItemIds(visibleItems)).toEqual(["idea"]);
   });
 });

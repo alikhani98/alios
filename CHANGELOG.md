@@ -2,6 +2,18 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 23 — Inbox Bulk Triage
+
+- Added Inbox multi-select with per-item selection controls
+- Added select all visible for the current filtered Inbox view
+- Added clear selection and selected-count feedback
+- Added bulk mark processed
+- Added bulk mark unprocessed
+- Added bulk delete with confirmation
+- Added focused tests for selected-only bulk updates, deletion, and visible select-all IDs
+- Kept the Dexie schema and backup format unchanged
+- Added no dependency, backend, sync, authentication, AI, tags, bulk conversion, workflow engine, batch-processing engine, or new storage abstraction
+
 ## Stage 22 — Inbox Search & Filters
 
 - Added case-insensitive local Inbox content search

@@ -7,8 +7,10 @@ import type {
 import { useStorageAdapter } from "@/core/storage";
 import type { InboxItem } from "@/shared/types";
 import {
+  deleteInboxItems,
   processInboxItem,
   setInboxItemProcessed,
+  setInboxItemsProcessed,
   type InboxProcessingTarget,
 } from "../inboxProcessing";
 
@@ -105,6 +107,39 @@ export function useInboxItems() {
     [storage]
   );
 
+  const markItemsProcessed = useCallback(
+    async (ids: string[]) => {
+      const updatedItems = await setInboxItemsProcessed(storage, ids, true);
+      const updatedById = new Map(updatedItems.map((item) => [item.id, item]));
+      setItems((current) =>
+        sortInboxItems(current.map((entry) => updatedById.get(entry.id) ?? entry))
+      );
+      return updatedItems;
+    },
+    [storage]
+  );
+
+  const markItemsUnprocessed = useCallback(
+    async (ids: string[]) => {
+      const updatedItems = await setInboxItemsProcessed(storage, ids, false);
+      const updatedById = new Map(updatedItems.map((item) => [item.id, item]));
+      setItems((current) =>
+        sortInboxItems(current.map((entry) => updatedById.get(entry.id) ?? entry))
+      );
+      return updatedItems;
+    },
+    [storage]
+  );
+
+  const deleteItems = useCallback(
+    async (ids: string[]) => {
+      await deleteInboxItems(storage, ids);
+      const selectedIds = new Set(ids);
+      setItems((current) => current.filter((item) => !selectedIds.has(item.id)));
+    },
+    [storage]
+  );
+
   return {
     items,
     isLoading,
@@ -116,5 +151,8 @@ export function useInboxItems() {
     convertItem,
     markProcessed,
     markUnprocessed,
+    markItemsProcessed,
+    markItemsUnprocessed,
+    deleteItems,
   };
 }

@@ -68,3 +68,26 @@ export async function setInboxItemProcessed(
     status: processed ? "processed" : "unprocessed",
   });
 }
+
+export async function setInboxItemsProcessed(
+  storage: StorageAdapter,
+  ids: string[],
+  processed: boolean
+): Promise<InboxItem[]> {
+  const updatedItems: InboxItem[] = [];
+
+  for (const id of ids) {
+    updatedItems.push(await setInboxItemProcessed(storage, id, processed));
+  }
+
+  return updatedItems;
+}
+
+export async function deleteInboxItems(
+  storage: StorageAdapter,
+  ids: string[]
+): Promise<void> {
+  for (const id of ids) {
+    await storage.inbox.delete(id);
+  }
+}
