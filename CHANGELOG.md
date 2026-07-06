@@ -2,6 +2,17 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 22 — Inbox Search & Filters
+
+- Added case-insensitive local Inbox content search
+- Added status filtering for all, unprocessed, and processed items
+- Added type filtering for all supported Inbox item types
+- Added combinable search and filters with an active-filter clear action
+- Added a localized no-result empty state distinct from an empty Inbox
+- Added focused tests for search, status, type, combined, and no-result behavior
+- Kept the Dexie schema and backup format unchanged
+- Added no dependency, search index, backend, sync, authentication, AI, tags, bulk workflow, or new abstraction
+
 ## Stage 21 — Inbox Processing / Triage
 
 - Added mobile-friendly Inbox processing actions

@@ -4,8 +4,8 @@
 
 - Project name: AliOS
 - Architecture version: AliOS 1.0
-- Current status: AliOS includes validated mobile-first Inbox processing into Today, Journal, and Knowledge and remains ready for static GitHub Pages deployment.
-- Current Stage: Stage 21 Completed
+- Current status: AliOS includes validated mobile-first Inbox capture, processing, search, and filters and remains ready for static GitHub Pages deployment.
+- Current Stage: Stage 22 Completed
 
 ## Architecture References
 
@@ -38,7 +38,7 @@
 
 ## Completed Stages
 
-Stages 1–21 are complete.
+Stages 1–22 are complete.
 
 - Stage 1 — Foundation
 - Stage 2 — App Shell
@@ -61,6 +61,7 @@ Stages 1–21 are complete.
 - Stage 19 — Static Deployment / GitHub Pages
 - Stage 20 — Quick Capture Inbox
 - Stage 21 — Inbox Processing / Triage
+- Stage 22 — Inbox Search & Filters
 
 Stage 9 completion is evidenced by the Today page, daily check-in create/update form, date-scoped task CRUD, all approved task statuses, completed timestamps, and single-MIT selection synchronized with today’s check-in. Browser validation confirmed task and check-in persistence across refresh, task editing, status updates, MIT selection, deletion, and the task empty state. The feature consumes TasksRepository and DailyCheckinsRepository through the injected `StorageAdapter` and does not import Dexie. Health advice, Home dashboard data, recurring tasks, notifications, analytics, backup, AI, and cross-feature workflows remain unavailable. TypeScript validation and the production build pass.
 
@@ -88,13 +89,15 @@ Stage 20 completion is evidenced by the Inbox domain schema, repository contract
 
 Stage 21 completion is evidenced by the mobile-friendly Inbox processing actions and the focused Inbox use-case that converts captured items through existing repositories into a Today task, Journal entry, or Knowledge item. Each successful conversion creates the target record before marking the retained Inbox item processed; failed target creation leaves it unprocessed. Direct processed/unprocessed actions remain available. Automated coverage verifies all three conversions, retained Inbox history, failure ordering, and both status transitions. No AI, sync, backend, reminders, tags, workflow engine, dependency, schema migration, database table, Inbox field, or backup-format change was added.
 
+Stage 22 completion is evidenced by local case-insensitive content search, combinable status and type filters, active-filter clearing, and a distinct localized no-results state. Filtering preserves the existing unprocessed-first and newest-first ordering because it operates on the already sorted Inbox collection. Focused automated coverage verifies normalized search, empty-query behavior, status filtering, type filtering, combined filters, and no-result behavior. No schema migration, backup change, dependency, AI, sync, tags, bulk workflow, search index, repository change, or new abstraction was added.
+
 ## Next Stage
 
-The next stage is intentionally undefined pending explicit approval. Project conversion, bulk triage, search/filtering, tags, attachments, reminders, routines, wellness, AI classification, offline service-worker caching, automatic sync, and cloud backup remain deferred.
+The next stage is intentionally undefined pending explicit approval. Project conversion, bulk triage, tags, attachments, reminders, routines, wellness, AI classification, semantic search, offline service-worker caching, automatic sync, and cloud backup remain deferred.
 
 ## Git Latest Recommended Commit
 
-`feat(inbox): add processing actions`
+`feat(inbox): add search and filters`
 
 ## Build Status
 
@@ -102,7 +105,7 @@ The next stage is intentionally undefined pending explicit approval. Project con
 - Automated tests: passing (`pnpm test:run`)
 - Production build: passing (`pnpm build`)
 - Production preview: manually verified (`pnpm preview`)
-- Automated test count: 41 passing across 6 suites
+- Automated test count: 47 passing across 7 suites
 - Last verified: 2026-07-05
 
 ## Rules Before Modifying the Project

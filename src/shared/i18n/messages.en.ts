@@ -312,4 +312,13 @@ export const messagesEn = {
   "inbox.unprocessedItems": "Unprocessed items",
   "inbox.conversionSuccess": "Item converted and marked processed.",
   "inbox.conversionFailure": "The item could not be converted.",
+  "inbox.searchInbox": "Search Inbox",
+  "inbox.searchPlaceholder": "Search captured content…",
+  "inbox.filterByStatus": "Filter by status",
+  "inbox.filterByType": "Filter by type",
+  "inbox.allStatuses": "All statuses",
+  "inbox.allTypes": "All types",
+  "inbox.clearFilters": "Clear filters",
+  "inbox.noMatchingItems": "No matching inbox items",
+  "inbox.tryChangingFilters": "Try changing your search or filters.",
 } as const;

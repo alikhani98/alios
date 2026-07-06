@@ -9,6 +9,7 @@ AliOS is designed for one person and stores its data in the browser through Inde
 - Home dashboard with Today, project, journal, and knowledge summaries
 - Mobile-first Quick Capture Inbox with note, task, idea, link, and other item types
 - Process captured items into Today tasks, Journal entries, or Knowledge items while retaining Inbox history
+- Search captured content and combine status and type filters locally
 - Edit, delete, and processed/unprocessed Inbox status
 - Today tasks, statuses, Most Important Task selection, and daily check-in
 - Project create, list, edit, and delete
@@ -130,7 +131,7 @@ See [Mobile usage](docs/MOBILE_USAGE.md) for platform guidance and safety notes.
 
 ## Quick Capture Inbox
 
-Open Inbox to save a thought, task, idea, link, reminder, or note with minimal typing. Unprocessed items appear first; each item can be edited, deleted, marked processed/unprocessed, or converted into a Today task, Journal entry, or Knowledge item. Successful conversion keeps the original Inbox item as history and marks it processed. Project conversion and more complex triage remain deferred.
+Open Inbox to save a thought, task, idea, link, reminder, or note with minimal typing. Unprocessed items appear first; each item can be edited, deleted, marked processed/unprocessed, or converted into a Today task, Journal entry, or Knowledge item. Search matches captured content case-insensitively and combines with status and type filters. Successful conversion keeps the original Inbox item as history and marks it processed. Project conversion and more complex triage remain deferred.
 
 ## v1.0 scope and limitations
 

@@ -316,4 +316,13 @@ export const messagesFa: Record<TranslationKey, string> = {
   "inbox.unprocessedItems": "موارد بررسی‌نشده",
   "inbox.conversionSuccess": "مورد تبدیل و بررسی‌شده علامت‌گذاری شد.",
   "inbox.conversionFailure": "تبدیل مورد ممکن نشد.",
+  "inbox.searchInbox": "جستجو در صندوق ورودی",
+  "inbox.searchPlaceholder": "جستجو در محتوای ثبت‌شده…",
+  "inbox.filterByStatus": "فیلتر بر اساس وضعیت",
+  "inbox.filterByType": "فیلتر بر اساس نوع",
+  "inbox.allStatuses": "همه وضعیت‌ها",
+  "inbox.allTypes": "همه نوع‌ها",
+  "inbox.clearFilters": "پاک کردن فیلترها",
+  "inbox.noMatchingItems": "موردی مطابق جستجو پیدا نشد",
+  "inbox.tryChangingFilters": "عبارت جستجو یا فیلترها را تغییر دهید.",
 };

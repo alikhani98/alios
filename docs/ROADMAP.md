@@ -53,15 +53,21 @@ The later version ideas below are directional only. They are not approved stages
 - Retain processed Inbox items as history
 - No schema migration or backup-format change
 
-## Deferred after Stage 21
+## Version 1.4
+
+- Local case-insensitive Inbox content search
+- Inbox status and type filters
+- Combined search/filter behavior and a no-result state
+- No schema migration, search index, dependency, or backup-format change
+
+## Deferred after Stage 22
 
 - Project conversion
 - Bulk triage
-- Search and filtering for Inbox
 - Tags and attachments
 - Reminders
 - Routines and Wellness
-- AI classification and AIProvider activation
+- AI classification, semantic search, and AIProvider activation
 - Automatic sync and cloud backup
 - Offline service worker
 
