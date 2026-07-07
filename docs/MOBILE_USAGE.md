@@ -30,9 +30,11 @@ AliOS stores data in IndexedDB for the current browser, device, and site origin.
 2. Save the versioned AliOS JSON file somewhere you control.
 3. Transfer the file to the destination device using a trusted method.
 4. On the destination device, open **Settings** and choose the backup file.
-5. AliOS validates the file and shows a restore confirmation.
+5. AliOS validates the file and shows a restore preview with the backup version, export time, and table counts.
 6. Confirm only after reading the warning: restore replaces every supported local AliOS table on that device.
 7. Verify Inbox, Today, Projects, Journal, Knowledge, and Settings after restore.
+
+The Settings screen also shows the local data safety summary, including total local records and the last successful backup and restore times.
 
 Export a fresh backup before restoring or clearing data. AliOS does not merge two devices automatically.
 

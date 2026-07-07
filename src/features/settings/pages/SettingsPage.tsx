@@ -1,7 +1,6 @@
 import {
   AlertCircle,
   CalendarDays,
-  Database,
   Download,
   FileJson,
   HardDrive,
@@ -26,6 +25,7 @@ import {
   CardTitle,
   Input,
 } from "@/shared/ui";
+import { createBackupPreview } from "../backupPreview";
 import { useBackupRestore } from "../hooks/useBackupRestore";
 import { useLocalDataManagement } from "../hooks/useLocalDataManagement";
 
@@ -51,6 +51,36 @@ function InfoItem({ label, value }: InfoItemProps) {
   );
 }
 
+const backupTableLabelKeys = [
+  "settings.checkinsCount",
+  "settings.tasksCount",
+  "settings.projectsCount",
+  "settings.journalCount",
+  "settings.knowledgeCount",
+  "settings.settingsCount",
+  "settings.inboxCount",
+] as const;
+
+function getTotalRecords(summary: {
+  dailyCheckins: number;
+  tasks: number;
+  projects: number;
+  journalEntries: number;
+  knowledgeItems: number;
+  settings: number;
+  inboxItems: number;
+}): number {
+  return (
+    summary.dailyCheckins +
+    summary.tasks +
+    summary.projects +
+    summary.journalEntries +
+    summary.knowledgeItems +
+    summary.settings +
+    summary.inboxItems
+  );
+}
+
 export function SettingsPage() {
   const { language, setLanguage, t } = useI18n();
   const { calendarDisplay, formatDateTime, setCalendarDisplay } =
@@ -58,6 +88,12 @@ export function SettingsPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dataManagement = useLocalDataManagement();
   const backup = useBackupRestore(dataManagement.loadSummary);
+  const restorePreview = backup.pendingBackup
+    ? createBackupPreview(backup.pendingBackup)
+    : null;
+  const totalLocalRecords = dataManagement.summary
+    ? getTotalRecords(dataManagement.summary)
+    : 0;
 
   const resetFileInput = () => {
     if (fileInputRef.current) {
@@ -176,14 +212,14 @@ export function SettingsPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Database className="h-5 w-5 text-primary" />
-            {t("settings.dataSummary")}
+            <ShieldCheck className="h-5 w-5 text-primary" />
+            {t("settings.localDataSafety")}
           </CardTitle>
           <CardDescription>
-            {t("settings.dataSummaryDescription")}
+            {t("settings.localDataSafetyDescription")}
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           {dataManagement.isLoading ? (
             <div
               className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
@@ -197,36 +233,65 @@ export function SettingsPage() {
               ))}
             </div>
           ) : dataManagement.summary ? (
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              <CountItem
-                label={t("settings.projectsCount")}
-                value={dataManagement.summary.projects}
-              />
-              <CountItem
-                label={t("settings.tasksCount")}
-                value={dataManagement.summary.tasks}
-              />
-              <CountItem
-                label={t("settings.journalCount")}
-                value={dataManagement.summary.journalEntries}
-              />
-              <CountItem
-                label={t("settings.knowledgeCount")}
-                value={dataManagement.summary.knowledgeItems}
-              />
-              <CountItem
-                label={t("settings.checkinsCount")}
-                value={dataManagement.summary.dailyCheckins}
-              />
-              <CountItem
-                label={t("settings.inboxCount")}
-                value={dataManagement.summary.inboxItems}
-              />
-              <CountItem
-                label={t("settings.settingsCount")}
-                value={dataManagement.summary.settings}
-              />
-            </div>
+            <>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                <CountItem
+                  label={t("settings.totalLocalRecords")}
+                  value={totalLocalRecords}
+                />
+                <CountItem
+                  label={t("settings.projectsCount")}
+                  value={dataManagement.summary.projects}
+                />
+                <CountItem
+                  label={t("settings.tasksCount")}
+                  value={dataManagement.summary.tasks}
+                />
+                <CountItem
+                  label={t("settings.journalCount")}
+                  value={dataManagement.summary.journalEntries}
+                />
+                <CountItem
+                  label={t("settings.knowledgeCount")}
+                  value={dataManagement.summary.knowledgeItems}
+                />
+                <CountItem
+                  label={t("settings.checkinsCount")}
+                  value={dataManagement.summary.dailyCheckins}
+                />
+                <CountItem
+                  label={t("settings.inboxCount")}
+                  value={dataManagement.summary.inboxItems}
+                />
+                <CountItem
+                  label={t("settings.settingsCount")}
+                  value={dataManagement.summary.settings}
+                />
+              </div>
+              <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
+                <p className="text-sm leading-7 text-muted-foreground">
+                  {t("settings.localDataWarning")}
+                </p>
+              </div>
+              <div className="grid gap-3 md:grid-cols-2">
+                <InfoItem
+                  label={t("settings.lastBackupExportedAt")}
+                  value={
+                    backup.lastBackupExportedAt
+                      ? formatDateTime(backup.lastBackupExportedAt)
+                      : t("common.notRecorded")
+                  }
+                />
+                <InfoItem
+                  label={t("settings.lastRestoredAt")}
+                  value={
+                    backup.lastRestoredAt
+                      ? formatDateTime(backup.lastRestoredAt)
+                      : t("common.notRecorded")
+                  }
+                />
+              </div>
+            </>
           ) : (
             <Button
               type="button"
@@ -294,7 +359,7 @@ export function SettingsPage() {
         </Card>
       </div>
 
-      {backup.pendingBackup ? (
+      {restorePreview ? (
         <Card className="border-destructive/40">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -304,32 +369,60 @@ export function SettingsPage() {
             <CardDescription>
               {t("settings.confirmRestoreDescription", {
                 filename: backup.pendingFilename ?? "",
-                date: formatDateTime(backup.pendingBackup.exportedAt),
+                date: formatDateTime(restorePreview.exportedAt),
               })}
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-wrap gap-3">
-            <Button
-              type="button"
-              variant="destructive"
-              disabled={backup.isRestoring}
-              onClick={() => void backup.confirmRestore()}
-            >
-              {backup.isRestoring
-                ? t("settings.restoring")
-                : t("settings.restoreAction")}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              disabled={backup.isRestoring}
-              onClick={() => {
-                backup.cancelRestore();
-                resetFileInput();
-              }}
-            >
-              {t("common.cancel")}
-            </Button>
+          <CardContent className="space-y-4">
+            <div className="grid gap-3 md:grid-cols-3">
+              <InfoItem
+                label={t("settings.backupVersion")}
+                value={String(restorePreview.backupVersion)}
+              />
+              <InfoItem
+                label={t("settings.backupExportedAt")}
+                value={formatDateTime(restorePreview.exportedAt)}
+              />
+              <InfoItem
+                label={t("settings.totalBackupRecords")}
+                value={String(restorePreview.totalRecords)}
+              />
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {restorePreview.tableCounts.map((tableCount, index) => (
+                <CountItem
+                  key={tableCount.key}
+                  label={t(backupTableLabelKeys[index])}
+                  value={tableCount.count}
+                />
+              ))}
+            </div>
+            <p className="text-sm leading-7 text-muted-foreground">
+              {t("settings.legacyInboxSupportNote")}
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <Button
+                type="button"
+                variant="destructive"
+                disabled={backup.isRestoring}
+                onClick={() => void backup.confirmRestore()}
+              >
+                {backup.isRestoring
+                  ? t("settings.restoring")
+                  : t("settings.restoreAction")}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={backup.isRestoring}
+                onClick={() => {
+                  backup.cancelRestore();
+                  resetFileInput();
+                }}
+              >
+                {t("common.cancel")}
+              </Button>
+            </div>
           </CardContent>
         </Card>
       ) : null}

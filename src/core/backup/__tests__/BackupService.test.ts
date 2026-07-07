@@ -13,7 +13,7 @@ import {
   taskInput,
 } from "@/test/factories";
 import { createTestStorage, destroyTestDatabase } from "@/test/database";
-import { BackupService } from "../BackupService";
+import { BackupService, createBackupFilename } from "../BackupService";
 
 describe("BackupService with DexieBackupStorage", () => {
   let database: AliosDatabase;
@@ -63,6 +63,11 @@ describe("BackupService with DexieBackupStorage", () => {
     expect(backup.data.dailyCheckins).toEqual([dailyCheckin]);
     expect(backup.data.settings).toEqual([setting]);
     expect(backup.data.inboxItems).toEqual([inboxItem]);
+    expect(
+      createBackupFilename(new Date("2026-07-05T08:30:00.000Z"))
+    ).toBe(
+      "alios-backup-2026-07-05-08-30.json"
+    );
 
     localStorage.setItem(LANGUAGE_STORAGE_KEY, "en");
     await storage.backup.clearAll();

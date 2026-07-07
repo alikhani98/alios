@@ -9,6 +9,9 @@ import { useStorageAdapter } from "@/core/storage";
 import { AppError } from "@/core/errors";
 import { useI18n } from "@/shared/i18n";
 
+const LAST_BACKUP_EXPORTED_AT_KEY = "alios.lastBackupExportedAt";
+const LAST_RESTORED_AT_KEY = "alios.lastRestoredAt";
+
 function getErrorMessage(
   error: unknown,
   fallback: string,
@@ -28,9 +31,13 @@ function downloadJson(backup: AliosBackup): void {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = createBackupFilename();
+  link.download = createBackupFilename(new Date(backup.exportedAt));
   link.click();
   window.setTimeout(() => URL.revokeObjectURL(url), 0);
+}
+
+function readStoredTimestamp(key: string): string | null {
+  return localStorage.getItem(key);
 }
 
 export function useBackupRestore(onRestored?: () => Promise<void> | void) {
@@ -42,6 +49,12 @@ export function useBackupRestore(onRestored?: () => Promise<void> | void) {
   );
   const [pendingBackup, setPendingBackup] = useState<AliosBackup | null>(null);
   const [pendingFilename, setPendingFilename] = useState<string | null>(null);
+  const [lastBackupExportedAt, setLastBackupExportedAt] = useState<string | null>(
+    () => readStoredTimestamp(LAST_BACKUP_EXPORTED_AT_KEY)
+  );
+  const [lastRestoredAt, setLastRestoredAt] = useState<string | null>(() =>
+    readStoredTimestamp(LAST_RESTORED_AT_KEY)
+  );
   const [isExporting, setIsExporting] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -55,6 +68,8 @@ export function useBackupRestore(onRestored?: () => Promise<void> | void) {
     try {
       const backup = await service.createBackup();
       downloadJson(backup);
+      localStorage.setItem(LAST_BACKUP_EXPORTED_AT_KEY, backup.exportedAt);
+      setLastBackupExportedAt(backup.exportedAt);
       setSuccess(t("backup.exported"));
     } catch (exportError) {
       setError(getErrorMessage(exportError, t("backup.unexpectedError"), t("backup.invalid"), t("backup.storageError")));
@@ -95,6 +110,9 @@ export function useBackupRestore(onRestored?: () => Promise<void> | void) {
     try {
       await service.restoreBackup(pendingBackup);
       await onRestored?.();
+      const restoredAt = new Date().toISOString();
+      localStorage.setItem(LAST_RESTORED_AT_KEY, restoredAt);
+      setLastRestoredAt(restoredAt);
       setPendingBackup(null);
       setPendingFilename(null);
       setSuccess(t("backup.restored"));
@@ -108,6 +126,8 @@ export function useBackupRestore(onRestored?: () => Promise<void> | void) {
   return {
     pendingBackup,
     pendingFilename,
+    lastBackupExportedAt,
+    lastRestoredAt,
     isExporting,
     isRestoring,
     error,
