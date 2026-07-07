@@ -79,7 +79,14 @@ The later version ideas below are directional only. They are not approved stages
 - Legacy Inbox backup compatibility with empty inbox restoration
 - No schema migration, backup-format change, dependency, AI, sync, backend, or auth
 
-## Deferred after Stage 24
+## Version 1.7
+
+- Global Search Foundation
+- Local text search across Inbox, Today, Projects, Journal, and Knowledge
+- Search results with type badges, snippets, dates, and module links
+- No semantic search, vector index, dependency, AI, sync, backend, or schema change
+
+## Deferred after Stage 25
 
 - Project conversion
 - Bulk conversion

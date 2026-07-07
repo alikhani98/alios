@@ -1,5 +1,6 @@
 export type NavIconName =
   | "home"
+  | "search"
   | "calendar-check"
   | "inbox"
   | "folder-kanban"
@@ -18,6 +19,11 @@ export const mainNavigation: NavItem[] = [
     titleKey: "nav.home",
     href: "/",
     icon: "home",
+  },
+  {
+    titleKey: "nav.search",
+    href: "/search",
+    icon: "search",
   },
   {
     titleKey: "nav.today",
