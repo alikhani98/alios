@@ -4,8 +4,8 @@
 
 - Project name: AliOS
 - Architecture version: AliOS 1.0
-- Current status: AliOS includes validated mobile-first Inbox capture, processing, search, filters, and bulk triage and remains ready for static GitHub Pages deployment.
-- Current Stage: Stage 23 Completed
+- Current status: AliOS includes validated mobile-first Inbox capture, processing, search, filters, bulk triage, and hardened backup/restore safety and remains ready for static GitHub Pages deployment.
+- Current Stage: Stage 24 Completed
 
 ## Architecture References
 
@@ -94,22 +94,24 @@ Stage 22 completion is evidenced by local case-insensitive content search, combi
 
 Stage 23 completion is evidenced by local Inbox multi-select, per-item selection controls, select all visible filtered items, clear selection, a mobile-friendly bulk action bar, bulk mark processed, bulk mark unprocessed, and bulk delete with confirmation. Selection is UI-only and is cleared after successful bulk actions and whenever search/status/type filters change, so bulk operations act only on selected visible items. Focused automated coverage verifies selected-only processed updates, selected-only unprocessed updates, selected-only deletion, non-selected items remaining unchanged, and visible select-all IDs. No schema migration, backup change, dependency, AI, sync, tags, bulk conversion, workflow engine, batch-processing engine, repository contract change, or new storage abstraction was added.
 
+Stage 24 completion is evidenced by the safer backup export filename format, persisted last successful backup and restore timestamps, the new local data safety summary in Settings, the restore preview showing backup version, export time, per-table record counts, and the legacy inbox compatibility note, plus continued compatibility for valid older backups that omit `inboxItems`. The backup flow still uses the existing repository and storage boundaries, and no schema migration, new table, new field, or backup-version change was introduced. TypeScript validation, automated tests, and the production build pass.
+
 ## Next Stage
 
 The next stage is intentionally undefined pending explicit approval. Project conversion, bulk conversion, tags, attachments, reminders, routines, wellness, AI classification, semantic search, offline service-worker caching, automatic sync, and cloud backup remain deferred.
 
 ## Git Latest Recommended Commit
 
-`feat(inbox): add bulk triage`
+`feat(settings): harden backup and restore`
 
 ## Build Status
 
 - TypeScript: passing (`pnpm exec tsc --noEmit`)
 - Automated tests: passing (`pnpm test:run`)
 - Production build: passing (`pnpm build`)
-- Production preview: manually verified (`pnpm preview`)
-- Automated test count: 51 passing across 7 suites
-- Last verified: 2026-07-06
+- Production preview: attempted locally (`pnpm preview`; server launch timed out in this environment)
+- Automated test count: 52 passing across 8 suites
+- Last verified: 2026-07-07
 
 ## Rules Before Modifying the Project
 

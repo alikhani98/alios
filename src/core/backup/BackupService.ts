@@ -65,5 +65,6 @@ export class BackupService {
 }
 
 export function createBackupFilename(date = new Date()): string {
-  return `alios-backup-${date.toISOString().slice(0, 10)}.json`;
+  const stamp = date.toISOString().slice(0, 16).replace("T", "-").replace(/:/g, "-");
+  return `alios-backup-${stamp}.json`;
 }

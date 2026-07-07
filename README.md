@@ -18,7 +18,7 @@ AliOS is designed for one person and stores its data in the browser through Inde
 - Knowledge create, list, edit, delete, text search, and type filtering
 - Persian and English interface with automatic RTL/LTR direction
 - Gregorian and Persian/Jalali date display while storing ISO/Gregorian dates
-- Manual versioned JSON backup and restore
+- Manual versioned JSON backup and restore with safety summary, preview, and explicit confirmation
 - Local data summary and confirmed clear-all operation
 - Automated data-layer, validation, backup, i18n, and date tests
 - Route-level code splitting for feature pages
@@ -105,9 +105,11 @@ Deployment creates a public application URL, not data synchronization. Records r
 
 ## Backup and restore
 
-Open Settings to export all supported IndexedDB tables into one versioned AliOS JSON file. Keep exported files somewhere outside the browser profile.
+Open Settings to export all supported IndexedDB tables into one versioned AliOS JSON file. Exported filenames follow `alios-backup-YYYY-MM-DD-HH-mm.json`. Keep exported files somewhere outside the browser profile.
 
-Restore validates the selected file before showing confirmation. Confirming restore replaces all supported local AliOS tables with the backup contents. Invalid JSON or an incompatible backup is rejected before stored data changes.
+Settings also shows a local data safety summary with table counts, total local records, and the last successful backup and restore times.
+
+Restore validates the selected file before showing confirmation. The restore preview shows the backup version, export time, and record counts by table before you confirm replacement. Confirming restore replaces all supported local AliOS tables with the backup contents. Invalid JSON or an incompatible backup is rejected before stored data changes.
 
 Backups now include `inboxItems`. Valid older backups without this field remain compatible and restore with an empty Inbox.
 
@@ -126,7 +128,9 @@ Data belongs to the exact browser, device, and deployed origin where it was crea
 1. Export a backup from Settings on the source device.
 2. Transfer the JSON file using a method you trust.
 3. Open Settings on the destination device and import the backup.
-4. Review the restore summary and explicitly confirm replacement.
+4. Review the restore preview, including the backup version, export time, and table counts.
+5. Explicitly confirm replacement only after reading the warning that the restore is local-device specific.
+6. Verify Inbox, Today, Projects, Journal, Knowledge, and Settings after restore.
 
 See [Mobile usage](docs/MOBILE_USAGE.md) for platform guidance and safety notes.
 

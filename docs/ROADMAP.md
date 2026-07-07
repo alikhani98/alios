@@ -69,7 +69,17 @@ The later version ideas below are directional only. They are not approved stages
 - Bulk delete with confirmation
 - No schema migration, backup-format change, dependency, AI, sync, tags, or bulk conversion
 
-## Deferred after Stage 23
+## Version 1.6
+
+- Data Safety / Backup Hardening
+- Better backup export filenames
+- Local backup and restore timestamps in Settings
+- Local data safety summary with total records and per-table counts
+- Restore preview before explicit confirmation
+- Legacy Inbox backup compatibility with empty inbox restoration
+- No schema migration, backup-format change, dependency, AI, sync, backend, or auth
+
+## Deferred after Stage 24
 
 - Project conversion
 - Bulk conversion

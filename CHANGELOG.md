@@ -2,6 +2,17 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 24 — Data Safety / Backup Hardening
+
+- Added safer backup export filenames with hour and minute precision
+- Added persisted last successful backup and restore timestamps in Settings
+- Added a local data safety section with total records, per-table counts, and a local-device warning
+- Added a restore preview with backup version, export time, per-table counts, and the legacy inbox note
+- Kept valid older backups without `inboxItems` compatible by restoring an empty Inbox
+- Added focused tests for backup preview counts and filename formatting
+- Kept the Dexie schema and backup version unchanged
+- Added no sync, cloud backup, backend, authentication, AI, dependency, schema migration, or new abstraction
+
 ## Stage 23 — Inbox Bulk Triage
 
 - Added Inbox multi-select with per-item selection controls
