@@ -2,6 +2,14 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 25 — Global Search Foundation
+
+- Added a local Search page and topbar entry for Inbox, Today, Projects, Journal, and Knowledge
+- Added plain case-insensitive text search with trimmed queries and simple relevance ordering
+- Added result type badges, snippets, dates, and module links for the major local data sets
+- Added focused tests for empty queries, case-insensitive matching, trimming, multi-type search, no-results, and type labels
+- Kept the Dexie schema, backup format, backup version, backend, sync, cloud, dependency list, semantic search, and AI out of scope
+
 ## Stage 24 — Data Safety / Backup Hardening
 
 - Added safer backup export filenames with hour and minute precision

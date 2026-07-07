@@ -1,8 +1,9 @@
 import { Menu, Moon, Search, UserCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 import { appConfig } from "@/shared/constants/app";
 import { useI18n } from "@/shared/i18n";
-import { Badge, Button, Input } from "@/shared/ui";
+import { Badge, Button } from "@/shared/ui";
 
 type TopbarProps = {
   title: string;
@@ -11,6 +12,7 @@ type TopbarProps = {
 
 export function Topbar({ title, onOpenMobileSidebar }: TopbarProps) {
   const { direction, t } = useI18n();
+  const navigate = useNavigate();
   return (
     <header className="sticky top-0 z-30 flex min-h-16 items-center gap-2 border-b bg-background/95 px-3 pt-[env(safe-area-inset-top)] backdrop-blur supports-[backdrop-filter]:bg-background/75 sm:px-4 md:gap-3 md:px-6">
       <Button
@@ -35,15 +37,17 @@ export function Topbar({ title, onOpenMobileSidebar }: TopbarProps) {
         </div>
       </div>
 
-      <div className="hidden w-full max-w-xs items-center md:flex">
-        <div className="relative w-full">
-          <Search className={`pointer-events-none absolute top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground ${direction === "rtl" ? "right-3" : "left-3"}`} />
-          <Input
-            className={direction === "rtl" ? "h-9 pr-9" : "h-9 pl-9"}
-            placeholder={t("shell.searchPlaceholder")}
-            disabled
-          />
-        </div>
+      <div className="hidden w-full max-w-xs md:flex">
+        <Button
+          type="button"
+          variant="outline"
+          className="h-9 w-full justify-start gap-2 text-muted-foreground"
+          onClick={() => navigate("/search")}
+          aria-label={t("nav.search")}
+        >
+          <Search className="h-4 w-4 shrink-0" />
+          <span className="truncate">{t("shell.searchPlaceholder")}</span>
+        </Button>
       </div>
 
       <Button
