@@ -44,6 +44,13 @@ The later version ideas below are directional only. They are not approved stages
 - Simple due/planned date input for the existing task date field
 - No schema migration, backend, sync, cloud, dependency, AI, push notification, recurring task engine, event system, or backup-format change
 
+## Version 1.13
+
+- Routine Templates Foundation
+- Home routine templates section with built-in local-only previews
+- Morning warm-up nudge linked to the morning warm-up template preview
+- No schema migration, backend, sync, cloud, dependency, AI, push notification, recurring task engine, event system, wellness module, medical advice, or backup-format change
+
 ## Later product candidates
 
 - Decision Engine

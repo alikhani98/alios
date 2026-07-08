@@ -11,6 +11,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import type { ReactNode } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 import { useI18n, type TranslationKey } from "@/shared/i18n";
@@ -29,6 +30,7 @@ import { HomeCalendarCard } from "../components/HomeCalendarCard";
 import { HomeRoutineNudgeCard } from "../components/HomeRoutineNudgeCard";
 import { HomeUpcomingTasksCard } from "../components/HomeUpcomingTasksCard";
 import { useHomeDashboard } from "../hooks/useHomeDashboard";
+import { RoutineTemplatesCard, type RoutineTemplateId } from "@/features/routines";
 
 const levelLabelKeys: Record<Level3, TranslationKey> = {
   low: "common.low",
@@ -71,6 +73,8 @@ export function HomePage() {
   const { t } = useI18n();
   const { formatDate } = useDateFormatter();
   const { data, isLoading, hasError, loadDashboard } = useHomeDashboard();
+  const [selectedRoutineTemplateId, setSelectedRoutineTemplateId] =
+    useState<RoutineTemplateId | null>(null);
 
   return (
     <section className="alios-page space-y-6">
@@ -128,7 +132,14 @@ export function HomePage() {
             </Card>
           ) : null}
 
-          <HomeRoutineNudgeCard />
+          <HomeRoutineNudgeCard
+            onViewRoutine={setSelectedRoutineTemplateId}
+          />
+
+          <RoutineTemplatesCard
+            selectedTemplateId={selectedRoutineTemplateId}
+            onSelectTemplate={setSelectedRoutineTemplateId}
+          />
 
           <HomeUpcomingTasksCard tasks={data.tasks} />
 

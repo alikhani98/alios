@@ -20,6 +20,7 @@ import {
   parseDismissedDate,
   shouldShowMorningWarmupNudge,
 } from "@/shared/preferences";
+import type { RoutineTemplateId } from "@/features/routines";
 
 const checklistItems = [
   "home.warmupShoulders",
@@ -28,7 +29,13 @@ const checklistItems = [
   "home.warmupSlowly",
 ] as const;
 
-export function HomeRoutineNudgeCard() {
+type HomeRoutineNudgeCardProps = {
+  onViewRoutine: (templateId: RoutineTemplateId) => void;
+};
+
+export function HomeRoutineNudgeCard({
+  onViewRoutine,
+}: HomeRoutineNudgeCardProps) {
   const { t } = useI18n();
   const { value: morningWarmupEnabled, setValue: setMorningWarmupEnabled } =
     usePersistentBoolean({
@@ -100,6 +107,15 @@ export function HomeRoutineNudgeCard() {
         </div>
 
         <div className="flex flex-wrap gap-2">
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => onViewRoutine("morningWarmup")}
+          >
+            <Sunrise className="me-2 h-4 w-4" />
+            {t("routines.viewRoutine")}
+          </Button>
           <Button type="button" size="sm" onClick={handleDismissForToday}>
             <Clock3 className="me-2 h-4 w-4" />
             {t("home.dismissForToday")}
