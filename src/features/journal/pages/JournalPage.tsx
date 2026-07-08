@@ -1,5 +1,6 @@
 import { AlertCircle, BookOpenText, Plus, RotateCcw } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 import type { CreateJournalEntryInput } from "@/core/repositories";
 import type { JournalEntry } from "@/shared/types";
@@ -11,6 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/shared/ui";
+import { cn } from "@/shared/utils";
 import { JournalEntryCard } from "../components/JournalEntryCard";
 import { JournalEntryForm } from "../components/JournalEntryForm";
 import { useJournalEntries } from "../hooks/useJournalEntries";
@@ -18,6 +20,7 @@ import type { JournalEntryFormValues } from "../types";
 
 export function JournalPage() {
   const { t } = useI18n();
+  const [searchParams] = useSearchParams();
   const {
     entries,
     isLoading,
@@ -33,6 +36,10 @@ export function JournalPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [focusedEntryId, setFocusedEntryId] = useState<string | null>(null);
+  const [focusMessage, setFocusMessage] = useState<string | null>(null);
+  const entryRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const focusId = searchParams.get("focusId");
 
   const openCreateForm = () => {
     setEditingEntry(undefined);
@@ -107,6 +114,34 @@ export function JournalPage() {
     }
   };
 
+  useEffect(() => {
+    if (!focusId) {
+      setFocusedEntryId(null);
+      setFocusMessage(null);
+      return;
+    }
+
+    const focusedEntry = entries.find((entry) => entry.id === focusId);
+    if (!focusedEntry) {
+      if (!isLoading && entries.length > 0) {
+        setFocusedEntryId(null);
+        setFocusMessage(t("search.focusItemNotVisible"));
+      }
+      return;
+    }
+
+    setFocusMessage(null);
+    setFocusedEntryId(focusId);
+    const node = entryRefs.current[focusId];
+    node?.scrollIntoView({ behavior: "smooth", block: "center" });
+
+    const timeout = window.setTimeout(() => {
+      setFocusedEntryId((current) => (current === focusId ? null : current));
+    }, 2200);
+
+    return () => window.clearTimeout(timeout);
+  }, [entries, focusId, isLoading, t]);
+
   return (
     <section className="alios-page space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -172,6 +207,14 @@ export function JournalPage() {
           ) : null}
         </div>
       ) : null}
+      {focusMessage ? (
+        <div
+          role="status"
+          className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-foreground"
+        >
+          {focusMessage}
+        </div>
+      ) : null}
 
       {isLoading ? (
         <div className="space-y-4" aria-label={t("journal.loading")}>
@@ -201,13 +244,25 @@ export function JournalPage() {
       ) : (
         <div className="space-y-4">
           {entries.map((entry) => (
-            <JournalEntryCard
+            <div
               key={entry.id}
-              entry={entry}
-              isDeleting={deletingId === entry.id}
-              onEdit={() => openEditForm(entry)}
-              onDelete={() => handleDelete(entry)}
-            />
+              ref={(node) => {
+                entryRefs.current[entry.id] = node;
+              }}
+              className={cn(
+                "scroll-mt-24 rounded-2xl transition-shadow",
+                focusedEntryId === entry.id
+                  ? "ring-2 ring-primary/50 ring-offset-2 ring-offset-background shadow-lg shadow-primary/10"
+                  : null
+              )}
+            >
+              <JournalEntryCard
+                entry={entry}
+                isDeleting={deletingId === entry.id}
+                onEdit={() => openEditForm(entry)}
+                onDelete={() => handleDelete(entry)}
+              />
+            </div>
           ))}
         </div>
       )}

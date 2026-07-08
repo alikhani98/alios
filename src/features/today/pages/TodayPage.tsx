@@ -1,6 +1,7 @@
 import { AlertCircle, CalendarDays, CheckSquare2, Plus, RotateCcw } from "lucide-react";
 import { format } from "date-fns";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 import type { CreateTaskInput, UpdateTaskInput } from "@/core/repositories";
 import type { Task, TaskStatus } from "@/shared/types";
@@ -13,6 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/shared/ui";
+import { cn } from "@/shared/utils";
 import { DailyCheckinForm } from "../components/DailyCheckinForm";
 import { TodayTaskCard } from "../components/TodayTaskCard";
 import { TodayTaskForm } from "../components/TodayTaskForm";
@@ -22,6 +24,7 @@ import type { DailyCheckinFormValues, TodayTaskFormValues } from "../types";
 export function TodayPage() {
   const { t } = useI18n();
   const { formatDate } = useDateFormatter();
+  const [searchParams] = useSearchParams();
   const today = format(new Date(), "yyyy-MM-dd");
   const {
     tasks,
@@ -43,6 +46,10 @@ export function TodayPage() {
   const [busyTaskId, setBusyTaskId] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [focusedTaskId, setFocusedTaskId] = useState<string | null>(null);
+  const [focusMessage, setFocusMessage] = useState<string | null>(null);
+  const taskRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const focusId = searchParams.get("focusId");
 
   const showError = (caught: unknown, fallback: string) => {
     setActionError(caught instanceof Error ? caught.message : fallback);
@@ -161,6 +168,34 @@ export function TodayPage() {
       t("today.taskDeleteError")
     );
 
+  useEffect(() => {
+    if (!focusId) {
+      setFocusedTaskId(null);
+      setFocusMessage(null);
+      return;
+    }
+
+    const focusedTask = tasks.find((task) => task.id === focusId);
+    if (!focusedTask) {
+      if (!isLoading && tasks.length > 0) {
+        setFocusedTaskId(null);
+        setFocusMessage(t("search.focusItemNotVisible"));
+      }
+      return;
+    }
+
+    setFocusMessage(null);
+    setFocusedTaskId(focusId);
+    const node = taskRefs.current[focusId];
+    node?.scrollIntoView({ behavior: "smooth", block: "center" });
+
+    const timeout = window.setTimeout(() => {
+      setFocusedTaskId((current) => (current === focusId ? null : current));
+    }, 2200);
+
+    return () => window.clearTimeout(timeout);
+  }, [focusId, isLoading, tasks, t]);
+
   return (
     <section className="alios-page space-y-6">
       <div className="alios-page-header">
@@ -198,6 +233,14 @@ export function TodayPage() {
               {t("common.tryAgain")}
             </Button>
           ) : null}
+        </div>
+      ) : null}
+      {focusMessage ? (
+        <div
+          role="status"
+          className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-foreground"
+        >
+          {focusMessage}
         </div>
       ) : null}
 
@@ -274,15 +317,27 @@ export function TodayPage() {
       ) : (
         <div className="space-y-3">
           {tasks.map((task) => (
-            <TodayTaskCard
+            <div
               key={task.id}
-              task={task}
-              isBusy={busyTaskId === task.id}
-              onEdit={() => openEditTask(task)}
-              onStatusChange={(status) => handleStatusChange(task, status)}
-              onSelectMit={() => handleSelectMit(task)}
-              onDelete={() => handleDeleteTask(task)}
-            />
+              ref={(node) => {
+                taskRefs.current[task.id] = node;
+              }}
+              className={cn(
+                "scroll-mt-24 rounded-2xl transition-shadow",
+                focusedTaskId === task.id
+                  ? "ring-2 ring-primary/50 ring-offset-2 ring-offset-background shadow-lg shadow-primary/10"
+                  : null
+              )}
+            >
+              <TodayTaskCard
+                task={task}
+                isBusy={busyTaskId === task.id}
+                onEdit={() => openEditTask(task)}
+                onStatusChange={(status) => handleStatusChange(task, status)}
+                onSelectMit={() => handleSelectMit(task)}
+                onDelete={() => handleDeleteTask(task)}
+              />
+            </div>
           ))}
         </div>
       )}

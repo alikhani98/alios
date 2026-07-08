@@ -1,5 +1,6 @@
 import { AlertCircle, BookOpen, Plus, RotateCcw, Search, X } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 import type { CreateKnowledgeItemInput } from "@/core/repositories";
 import type { KnowledgeItem, KnowledgeItemType } from "@/shared/types";
@@ -12,6 +13,7 @@ import {
   CardTitle,
   Input,
 } from "@/shared/ui";
+import { cn } from "@/shared/utils";
 import { KnowledgeItemCard } from "../components/KnowledgeItemCard";
 import { KnowledgeItemForm } from "../components/KnowledgeItemForm";
 import { KNOWLEDGE_TYPE_OPTIONS } from "../constants";
@@ -20,6 +22,7 @@ import type { KnowledgeItemFormValues } from "../types";
 
 export function KnowledgePage() {
   const { direction, t } = useI18n();
+  const [searchParams] = useSearchParams();
   const {
     items,
     isLoading,
@@ -38,6 +41,10 @@ export function KnowledgePage() {
   const [typeFilter, setTypeFilter] = useState<KnowledgeItemType | "all">("all");
   const [actionError, setActionError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [focusedItemId, setFocusedItemId] = useState<string | null>(null);
+  const [focusMessage, setFocusMessage] = useState<string | null>(null);
+  const itemRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const focusId = searchParams.get("focusId");
 
   const visibleItems = useMemo(
     () =>
@@ -136,6 +143,34 @@ export function KnowledgePage() {
   };
 
   const hasActiveSearch = appliedQuery.length > 0 || typeFilter !== "all";
+
+  useEffect(() => {
+    if (!focusId) {
+      setFocusedItemId(null);
+      setFocusMessage(null);
+      return;
+    }
+
+    const focusedItem = visibleItems.find((item) => item.id === focusId);
+    if (!focusedItem) {
+      if (!isLoading && items.some((item) => item.id === focusId)) {
+        setFocusedItemId(null);
+        setFocusMessage(t("search.focusItemNotVisible"));
+      }
+      return;
+    }
+
+    setFocusMessage(null);
+    setFocusedItemId(focusId);
+    const node = itemRefs.current[focusId];
+    node?.scrollIntoView({ behavior: "smooth", block: "center" });
+
+    const timeout = window.setTimeout(() => {
+      setFocusedItemId((current) => (current === focusId ? null : current));
+    }, 2200);
+
+    return () => window.clearTimeout(timeout);
+  }, [focusId, isLoading, items, t, visibleItems]);
 
   return (
     <section className="alios-page space-y-6">
@@ -249,6 +284,14 @@ export function KnowledgePage() {
           ) : null}
         </div>
       ) : null}
+      {focusMessage ? (
+        <div
+          role="status"
+          className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-foreground"
+        >
+          {focusMessage}
+        </div>
+      ) : null}
 
       {isLoading ? (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" aria-label={t("knowledge.loading")}>
@@ -284,13 +327,25 @@ export function KnowledgePage() {
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {visibleItems.map((item) => (
-            <KnowledgeItemCard
+            <div
               key={item.id}
-              item={item}
-              isDeleting={deletingId === item.id}
-              onEdit={() => openEditForm(item)}
-              onDelete={() => handleDelete(item)}
-            />
+              ref={(node) => {
+                itemRefs.current[item.id] = node;
+              }}
+              className={cn(
+                "scroll-mt-24 rounded-2xl transition-shadow",
+                focusedItemId === item.id
+                  ? "ring-2 ring-primary/50 ring-offset-2 ring-offset-background shadow-lg shadow-primary/10"
+                  : null
+              )}
+            >
+              <KnowledgeItemCard
+                item={item}
+                isDeleting={deletingId === item.id}
+                onEdit={() => openEditForm(item)}
+                onDelete={() => handleDelete(item)}
+              />
+            </div>
           ))}
         </div>
       )}
