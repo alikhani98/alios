@@ -21,6 +21,7 @@ AliOS stores data in IndexedDB for the current browser, device, and site origin.
 - Different browsers or browser profiles on the same device have separate data.
 - Moving the deployment to a different domain or path may create a separate storage origin.
 - Clearing browser/site data can permanently remove AliOS records.
+- Appearance mode and local profile name stay on the current browser or device and do not sync.
 - There is no automatic sync, cloud backup, account, or backend in v1.1.
 - Publishing AliOS to GitHub Pages does not change this device-local storage model.
 

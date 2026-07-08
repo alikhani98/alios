@@ -2,6 +2,15 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 27 - Local User Preferences & Theme Activation
+
+- Activated the topbar theme control with local light, dark, and system appearance choices
+- Persisted appearance locally and applied the selected theme on reload without adding Dexie schema changes
+- Activated the topbar local profile control with an inline local display-name editor and generated initials
+- Added appearance controls to Settings and localized the new profile and theme messages in Persian and English
+- Added focused helper tests for appearance parsing/resolution and profile initials generation
+- Kept authentication, accounts, backend services, sync, cloud, paid APIs, AI, new tables, and backup-format changes out of scope
+
 ## Stage 25 — Global Search Foundation
 
 - Added a local Search page and topbar entry for Inbox, Today, Projects, Journal, and Knowledge

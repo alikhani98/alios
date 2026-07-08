@@ -4,8 +4,8 @@
 
 - Project name: AliOS
 - Architecture version: AliOS 1.0
-- Current status: AliOS includes validated mobile-first Inbox capture, processing, global search, focused search-result navigation, filters, bulk triage, and hardened backup/restore safety and remains ready for static GitHub Pages deployment.
-- Current Stage: Stage 26 Completed
+- Current status: AliOS includes validated mobile-first Inbox capture, processing, global search, focused search-result navigation, filters, bulk triage, local appearance switching, local profile preferences, and hardened backup/restore safety and remains ready for static GitHub Pages deployment.
+- Current Stage: Stage 27 Completed
 
 ## Architecture References
 
@@ -38,7 +38,7 @@
 
 ## Completed Stages
 
-Stages 1–26 are complete.
+Stages 1–27 are complete.
 
 - Stage 1 â€” Foundation
 - Stage 2 â€” App Shell
@@ -66,6 +66,7 @@ Stages 1–26 are complete.
 - Stage 24 â€” Data Safety / Backup Hardening
 - Stage 25 â€” Global Search Foundation
 - Stage 26 â€” Search Result Focus Navigation
+- Stage 27 â€” Local User Preferences & Theme Activation
 
 Stage 9 completion is evidenced by the Today page, daily check-in create/update form, date-scoped task CRUD, all approved task statuses, completed timestamps, and single-MIT selection synchronized with todayâ€™s check-in. Browser validation confirmed task and check-in persistence across refresh, task editing, status updates, MIT selection, deletion, and the task empty state. The feature consumes TasksRepository and DailyCheckinsRepository through the injected `StorageAdapter` and does not import Dexie. Health advice, Home dashboard data, recurring tasks, notifications, analytics, backup, AI, and cross-feature workflows remain unavailable. TypeScript validation and the production build pass.
 
@@ -102,6 +103,8 @@ Stage 24 completion is evidenced by the safer backup export filename format, per
 Stage 25 completion is evidenced by the local global search page and topbar entry that search Inbox items, Today tasks, Projects, Journal entries, and Knowledge items using plain case-insensitive text matching only. Results show the item type, snippet, date, and module link while reusing existing domain label keys for status, priority, and type badges. The search flow loads data through the repository/storage boundary, does not import Dexie in UI code, and keeps the backup format, schema, and stored records unchanged. TypeScript validation, automated tests, and the production build pass.
 
 Stage 26 completion is evidenced by search result links that now carry a lightweight `focusId` query parameter into Inbox, Today, Projects, Journal, and Knowledge routes. Each target page can scroll the matching loaded item into view and show a subtle focused state without opening edit mode or mutating data. If a focused item is not visible because of filtering or similar page state, AliOS shows a non-blocking notice and otherwise stays safe. This stage added no schema migration, new table, new field, backup-format change, backend, sync, cloud, dependency, AI, or semantic search behavior.
+
+Stage 27 completion is evidenced by the active topbar appearance control, localStorage-backed light/dark/system preference handling, document theme-class updates on load and preference change, the active local profile menu with inline local display name editing, generated initials, and the Settings page appearance controls. The new local preference data stays outside Dexie and no new table, migration, backup-format change, backend, sync, cloud, dependency, AI, or authentication behavior was added.
 
 ## Next Stage
 

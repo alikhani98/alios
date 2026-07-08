@@ -6,16 +6,28 @@ import {
   HardDrive,
   Info,
   Languages,
+  Moon,
+  MonitorSmartphone,
   RotateCcw,
   ShieldCheck,
   Trash2,
   Upload,
+  SunMoon,
+  SunMedium,
 } from "lucide-react";
 import { useRef } from "react";
 
+import {
+  APPEARANCE_STORAGE_KEY,
+} from "@/shared/constants";
 import { appConfig } from "@/shared/constants/app";
 import { useDateFormatter } from "@/shared/date";
+import { usePersistentString } from "@/shared/hooks";
 import { useI18n } from "@/shared/i18n";
+import {
+  DEFAULT_APPEARANCE_PREFERENCE,
+  parseAppearancePreference,
+} from "@/shared/preferences";
 import {
   Button,
   Card,
@@ -61,6 +73,12 @@ const backupTableLabelKeys = [
   "settings.inboxCount",
 ] as const;
 
+const appearanceOptions = [
+  { value: "light", icon: SunMedium, labelKey: "settings.light" },
+  { value: "dark", icon: Moon, labelKey: "settings.dark" },
+  { value: "system", icon: MonitorSmartphone, labelKey: "settings.system" },
+] as const;
+
 function getTotalRecords(summary: {
   dailyCheckins: number;
   tasks: number;
@@ -86,11 +104,17 @@ export function SettingsPage() {
   const { calendarDisplay, formatDateTime, setCalendarDisplay } =
     useDateFormatter();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { value: appearancePreference, setValue: setAppearancePreference } =
+    usePersistentString({
+      key: APPEARANCE_STORAGE_KEY,
+      defaultValue: DEFAULT_APPEARANCE_PREFERENCE,
+    });
   const dataManagement = useLocalDataManagement();
   const backup = useBackupRestore(dataManagement.loadSummary);
   const restorePreview = backup.pendingBackup
     ? createBackupPreview(backup.pendingBackup)
     : null;
+  const currentAppearance = parseAppearancePreference(appearancePreference);
   const totalLocalRecords = dataManagement.summary
     ? getTotalRecords(dataManagement.summary)
     : 0;
@@ -127,6 +151,36 @@ export function SettingsPage() {
           <span>{dataManagement.error ?? backup.error}</span>
         </div>
       ) : null}
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <SunMoon className="h-5 w-5 text-primary" />
+            {t("settings.appearance")}
+          </CardTitle>
+          <CardDescription>{t("settings.appearanceDescription")}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div
+            className="flex flex-wrap gap-3"
+            role="group"
+            aria-label={t("settings.appearance")}
+          >
+            {appearanceOptions.map(({ value, icon: Icon, labelKey }) => (
+              <Button
+                key={value}
+                type="button"
+                variant={currentAppearance === value ? "default" : "outline"}
+                aria-pressed={currentAppearance === value}
+                onClick={() => setAppearancePreference(value)}
+              >
+                <Icon className="me-2 h-4 w-4" />
+                {t(labelKey)}
+              </Button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

@@ -1,10 +1,12 @@
 import path from "node:path";
 import { defineConfig } from "vitest/config";
 
+const srcDir = path.resolve(process.cwd(), "src");
+
 export default defineConfig({
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      "@": srcDir,
     },
   },
   test: {

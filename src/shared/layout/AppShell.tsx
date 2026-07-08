@@ -1,9 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 
 import { getNavigationItemByPath } from "@/shared/constants/navigation";
-import { usePersistentBoolean } from "@/shared/hooks";
+import { usePersistentBoolean, usePersistentString } from "@/shared/hooks";
 import { useI18n } from "@/shared/i18n";
+import { APPEARANCE_STORAGE_KEY } from "@/shared/constants";
+import {
+  DEFAULT_APPEARANCE_PREFERENCE,
+  parseAppearancePreference,
+  resolveAppearance,
+} from "@/shared/preferences";
 
 import { MobileSidebar } from "./MobileSidebar";
 import { Sidebar } from "./Sidebar";
@@ -16,6 +22,10 @@ export function AppShell() {
   const location = useLocation();
   const currentNavigationItem = getNavigationItemByPath(location.pathname);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const { value: appearancePreference } = usePersistentString({
+    key: APPEARANCE_STORAGE_KEY,
+    defaultValue: DEFAULT_APPEARANCE_PREFERENCE,
+  });
 
   const {
     value: sidebarCollapsed,
@@ -24,6 +34,38 @@ export function AppShell() {
     key: SIDEBAR_COLLAPSED_STORAGE_KEY,
     defaultValue: false,
   });
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
+    const applyTheme = () => {
+      const resolvedAppearance = resolveAppearance(
+        parseAppearancePreference(appearancePreference),
+        mediaQuery.matches
+      );
+
+      document.documentElement.classList.toggle(
+        "dark",
+        resolvedAppearance === "dark"
+      );
+    };
+
+    applyTheme();
+
+    if (parseAppearancePreference(appearancePreference) !== "system") {
+      return;
+    }
+
+    mediaQuery.addEventListener("change", applyTheme);
+
+    return () => {
+      mediaQuery.removeEventListener("change", applyTheme);
+    };
+  }, [appearancePreference]);
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-muted/30 text-foreground">

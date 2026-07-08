@@ -22,6 +22,8 @@ describe("i18n utilities", () => {
     "nav.journal",
     "nav.knowledge",
     "nav.settings",
+    "settings.appearance",
+    "settings.localProfile",
   ] as const)("defines %s in both message catalogs", (key) => {
     expect(messagesEn[key]).toBeTruthy();
     expect(messagesFa[key]).toBeTruthy();
