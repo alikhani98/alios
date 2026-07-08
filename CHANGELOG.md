@@ -2,6 +2,14 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 28 - Calendar Month View Foundation
+
+- Added a calm monthly calendar card to the Home dashboard with current-month, previous-month, next-month, and return-to-current controls
+- Highlighted today, marked dates that have local tasks, and showed a simple per-day task preview without creating calendar events
+- Reused existing ISO/Gregorian task dates, added display-only Jalali/Gregorian month and day labels, and kept storage local-only
+- Added focused helper tests for month-grid building, weekday labels, task grouping, and month shifting
+- Kept reminders, recurrence, holidays, backend services, sync, cloud, AI, schema changes, and backup-format changes out of scope
+
 ## Stage 27 - Local User Preferences & Theme Activation
 
 - Activated the topbar theme control with local light, dark, and system appearance choices

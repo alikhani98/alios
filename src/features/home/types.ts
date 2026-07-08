@@ -7,6 +7,7 @@ import type {
 } from "@/shared/types";
 
 export type HomeDashboardData = {
+  tasks: Task[];
   today: {
     tasks: Task[];
     completedTaskCount: number;

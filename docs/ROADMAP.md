@@ -100,6 +100,14 @@ The later version ideas below are directional only. They are not approved stages
 - Local profile display name and generated initials
 - No authentication, backend, sync, cloud, backup-format, schema, or dependency change
 
+## Version 1.10
+
+- Calendar Month View Foundation
+- Home dashboard monthly calendar with current-month navigation
+- Task indicators and simple per-day task preview from existing local data
+- Display-only Jalali/Gregorian month and day labels
+- No schema migration, backend, sync, cloud, dependency, AI, reminder system, or backup-format change
+
 ## Deferred after Stage 25
 
 - Project conversion
