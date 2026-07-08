@@ -58,12 +58,15 @@ export function useTodayData(today: string) {
   );
 
   const createTask = useCallback(
-    async (input: Omit<CreateTaskInput, "dueDate">) => {
+    async (input: CreateTaskInput) => {
       setError(null);
       if (input.isMit) {
         await clearOtherMit();
       }
-      const task = await tasksRepository.create({ ...input, dueDate: today });
+      const task = await tasksRepository.create({
+        ...input,
+        dueDate: input.dueDate ?? today,
+      });
       setTasks((current) => [
         ...current.map((item) =>
           input.isMit ? { ...item, isMit: false } : item

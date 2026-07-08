@@ -1,6 +1,6 @@
 # AliOS
 
-AliOS is a bilingual, local-first personal life-management system. It brings quick capture, Today planning, projects, journaling, personal knowledge, a read-only dashboard, manual backup/restore, and local data controls into one static web application.
+AliOS is a bilingual, local-first personal life-management system. It brings quick capture, Today planning, projects, journaling, personal knowledge, a read-only dashboard, monthly calendar and upcoming-task views, manual backup/restore, and local data controls into one static web application.
 
 AliOS is designed for one person and stores its data in the browser through IndexedDB. It requires no backend, account, authentication, subscription, paid API, or hosted AI service.
 
@@ -8,6 +8,7 @@ AliOS is designed for one person and stores its data in the browser through Inde
 
 - Home dashboard with Today, project, journal, and knowledge summaries
 - Monthly calendar view on Home with local task indicators and simple day previews
+- Upcoming tasks foundation on Home with overdue, today, tomorrow, this week, and later groupings
 - Simple morning warm-up reminder on Home that appears only in a local time window
 - Mobile-first Quick Capture Inbox with note, task, idea, link, and other item types
 - Process captured items into Today tasks, Journal entries, or Knowledge items while retaining Inbox history
@@ -15,6 +16,7 @@ AliOS is designed for one person and stores its data in the browser through Inde
 - Bulk triage selected Inbox items with select all visible, mark processed/unprocessed, and confirmed delete
 - Edit, delete, and processed/unprocessed Inbox status
 - Today tasks, statuses, Most Important Task selection, and daily check-in
+- Simple due/planned date input for future task planning using the existing task date field
 - Project create, list, edit, and delete
 - Journal create, list, edit, and delete
 - Global local search across Inbox, Today, Projects, Journal, and Knowledge with focused links into the exact local record
@@ -154,7 +156,7 @@ Version 1.0 is intentionally single-user and local-only. It does not include:
 - UI automation or end-to-end browser tests
 
 Dates remain stored as ISO/Gregorian strings; Jalali support is display-only. User-generated content is never automatically translated.
-The Home dashboard also includes a small local-only morning reminder that can be dismissed for the day or disabled in Settings.
+The Home dashboard also includes a small local-only morning reminder that can be dismissed for the day or disabled in Settings, plus an upcoming tasks summary that helps separate overdue, today, tomorrow, this week, and later work.
 
 ## After v1.0
 

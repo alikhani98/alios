@@ -4,8 +4,8 @@
 
 - Project name: AliOS
 - Architecture version: AliOS 1.0
-- Current status: AliOS includes validated mobile-first Inbox capture, processing, global search, focused search-result navigation, filters, bulk triage, local appearance switching, local profile preferences, calendar month view foundation, home time-window routine nudges, and hardened backup/restore safety and remains ready for static GitHub Pages deployment.
-- Current Stage: Stage 29 Completed
+- Current status: AliOS includes validated mobile-first Inbox capture, processing, global search, focused search-result navigation, filters, bulk triage, local appearance switching, local profile preferences, calendar month view foundation, home time-window routine nudges, upcoming task grouping, and hardened backup/restore safety and remains ready for static GitHub Pages deployment.
+- Current Stage: Stage 30 Completed
 
 ## Architecture References
 
@@ -38,7 +38,7 @@
 
 ## Completed Stages
 
-Stages 1–29 are complete.
+Stages 1–30 are complete.
 
 - Stage 1 â€” Foundation
 - Stage 2 â€” App Shell
@@ -69,6 +69,7 @@ Stages 1–29 are complete.
 - Stage 27 â€” Local User Preferences & Theme Activation
 - Stage 28 â€” Calendar Month View Foundation
 - Stage 29 â€” Home Time Window Routine Nudges
+- Stage 30 â€” Upcoming / Future Tasks Foundation
 
 Stage 9 completion is evidenced by the Today page, daily check-in create/update form, date-scoped task CRUD, all approved task statuses, completed timestamps, and single-MIT selection synchronized with todayâ€™s check-in. Browser validation confirmed task and check-in persistence across refresh, task editing, status updates, MIT selection, deletion, and the task empty state. The feature consumes TasksRepository and DailyCheckinsRepository through the injected `StorageAdapter` and does not import Dexie. Health advice, Home dashboard data, recurring tasks, notifications, analytics, backup, AI, and cross-feature workflows remain unavailable. TypeScript validation and the production build pass.
 
@@ -112,6 +113,8 @@ Stage 28 completion is evidenced by the Home dashboard monthly calendar foundati
 
 Stage 29 completion is evidenced by the Home time-window routine nudge card and its local-only Settings toggle. The reminder shows only between 05:00 and 07:00 local browser time when enabled, can be dismissed for the current day, and can be disabled without adding push notifications, a background job, a medical coach, a routine engine, or any Dexie schema change. The feature uses localStorage preference keys only, keeps the reminder local to the current browser/device, and preserves the existing repository/storage boundaries. TypeScript validation, automated tests, and the production build pass.
 
+Stage 30 completion is evidenced by the Home upcoming tasks foundation and its task grouping helper, which organizes existing local tasks into overdue, today, tomorrow, this week, and later sections without introducing a new date field or Dexie schema migration. Home now shows a compact upcoming tasks summary, and Today exposes a simple due/planned date input for the existing task date field when creating or editing tasks. The stage keeps storage local-only, preserves the repository/storage boundaries, and adds no backend, sync, cloud, dependency, AI, push notification, recurring task engine, event system, or backup-format change. TypeScript validation, automated tests, and the production build pass.
+
 ## Next Stage
 
 The next stage is intentionally undefined pending explicit approval. Project conversion, bulk conversion, tags, attachments, reminders, routines, wellness, AI classification, semantic search, offline service-worker caching, automatic sync, and cloud backup remain deferred.
@@ -126,7 +129,7 @@ The next stage is intentionally undefined pending explicit approval. Project con
 - Automated tests: passing (`.\\node_modules\\.bin\\vitest.CMD run`)
 - Production build: passing (`.\\node_modules\\.bin\\vite.CMD build`)
 - Production preview: attempted locally (`pnpm preview`; server launch timed out in this environment)
-- Automated test count: 92 passing across 14 suites
+- Automated test count: 106 passing across 15 suites
 - Last verified: 2026-07-08
 
 ## Rules Before Modifying the Project

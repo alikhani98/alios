@@ -37,6 +37,13 @@ The later version ideas below are directional only. They are not approved stages
 - Local-only Settings toggle with dismiss-for-today and disable actions
 - No push notifications, background jobs, medical advice, schema migration, backend, sync, cloud, dependency, AI, or backup-format change
 
+## Version 1.12
+
+- Upcoming / Future Tasks Foundation
+- Home dashboard upcoming tasks card with overdue, today, tomorrow, this week, and later groupings
+- Simple due/planned date input for the existing task date field
+- No schema migration, backend, sync, cloud, dependency, AI, push notification, recurring task engine, event system, or backup-format change
+
 ## Later product candidates
 
 - Decision Engine
