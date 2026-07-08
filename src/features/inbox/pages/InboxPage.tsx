@@ -1,9 +1,11 @@
 import { AlertCircle, CheckCircle2, Circle, Inbox, RotateCcw, Search, SearchX, Trash2, X } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 import { useI18n } from "@/shared/i18n";
 import { INBOX_ITEM_TYPE_VALUES } from "@/shared/types";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input } from "@/shared/ui";
+import { cn } from "@/shared/utils";
 import { InboxItemCard } from "../components/InboxItemCard";
 import { InboxItemForm } from "../components/InboxItemForm";
 import { INBOX_STATUS_LABEL_KEYS, INBOX_TYPE_LABEL_KEYS } from "../constants";
@@ -18,6 +20,7 @@ import type { InboxFormValues } from "../types";
 
 export function InboxPage() {
   const { t } = useI18n();
+  const [searchParams] = useSearchParams();
   const {
     items,
     isLoading,
@@ -43,6 +46,10 @@ export function InboxPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<InboxStatusFilter>("all");
   const [typeFilter, setTypeFilter] = useState<InboxTypeFilter>("all");
+  const [focusedItemId, setFocusedItemId] = useState<string | null>(null);
+  const [focusMessage, setFocusMessage] = useState<string | null>(null);
+  const itemRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const focusId = searchParams.get("focusId");
 
   const filteredItems = filterInboxItems(items, {
     query: searchQuery,
@@ -64,6 +71,34 @@ export function InboxPage() {
     setSelectedIds([]);
     setConfirmingBulkDelete(false);
   }, [searchQuery, statusFilter, typeFilter]);
+
+  useEffect(() => {
+    if (!focusId) {
+      setFocusedItemId(null);
+      setFocusMessage(null);
+      return;
+    }
+
+    const focusedItem = filteredItems.find((item) => item.id === focusId);
+    if (!focusedItem) {
+      if (!isLoading && items.some((item) => item.id === focusId)) {
+        setFocusedItemId(null);
+        setFocusMessage(t("search.focusItemNotVisible"));
+      }
+      return;
+    }
+
+    setFocusMessage(null);
+    setFocusedItemId(focusId);
+    const node = itemRefs.current[focusId];
+    node?.scrollIntoView({ behavior: "smooth", block: "center" });
+
+    const timeout = window.setTimeout(() => {
+      setFocusedItemId((current) => (current === focusId ? null : current));
+    }, 2200);
+
+    return () => window.clearTimeout(timeout);
+  }, [focusId, filteredItems, isLoading, items, t]);
 
   const clearFilters = () => {
     setSearchQuery("");
@@ -226,6 +261,14 @@ export function InboxPage() {
           ) : null}
         </div>
       ) : null}
+      {focusMessage ? (
+        <div
+          role="status"
+          className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-foreground"
+        >
+          {focusMessage}
+        </div>
+      ) : null}
 
       {selectedVisibleCount > 0 ? (
         <Card>
@@ -326,33 +369,45 @@ export function InboxPage() {
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
           {filteredItems.map((item) => (
-            <InboxItemCard
+            <div
               key={item.id}
-              item={item}
-              isBusy={busyId === item.id}
-              isSelected={selectedIds.includes(item.id)}
-              onSelectionChange={(selected) => setItemSelected(item.id, selected)}
-              onEdit={async (values) => {
-                let saved = false;
-                await run(item.id, async () => {
-                  await updateItem(item.id, values);
-                  saved = true;
-                }, t("inbox.updated"));
-                return saved;
+              ref={(node) => {
+                itemRefs.current[item.id] = node;
               }}
-              onToggleStatus={() => run(
-                item.id,
-                () => (item.status === "unprocessed" ? markProcessed(item.id) : markUnprocessed(item.id)).then(() => undefined),
-                t("inbox.statusUpdated")
+              className={cn(
+                "scroll-mt-24 rounded-2xl transition-shadow",
+                focusedItemId === item.id
+                  ? "ring-2 ring-primary/50 ring-offset-2 ring-offset-background shadow-lg shadow-primary/10"
+                  : null
               )}
-              onConvert={(target) => run(
-                item.id,
-                () => convertItem(item.id, target).then(() => undefined),
-                t("inbox.conversionSuccess"),
-                t("inbox.conversionFailure")
-              )}
-              onDelete={() => run(item.id, () => deleteItem(item.id), t("inbox.deleted"))}
-            />
+            >
+              <InboxItemCard
+                item={item}
+                isBusy={busyId === item.id}
+                isSelected={selectedIds.includes(item.id)}
+                onSelectionChange={(selected) => setItemSelected(item.id, selected)}
+                onEdit={async (values) => {
+                  let saved = false;
+                  await run(item.id, async () => {
+                    await updateItem(item.id, values);
+                    saved = true;
+                  }, t("inbox.updated"));
+                  return saved;
+                }}
+                onToggleStatus={() => run(
+                  item.id,
+                  () => (item.status === "unprocessed" ? markProcessed(item.id) : markUnprocessed(item.id)).then(() => undefined),
+                  t("inbox.statusUpdated")
+                )}
+                onConvert={(target) => run(
+                  item.id,
+                  () => convertItem(item.id, target).then(() => undefined),
+                  t("inbox.conversionSuccess"),
+                  t("inbox.conversionFailure")
+                )}
+                onDelete={() => run(item.id, () => deleteItem(item.id), t("inbox.deleted"))}
+              />
+            </div>
           ))}
         </div>
       )}

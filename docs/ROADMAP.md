@@ -86,6 +86,13 @@ The later version ideas below are directional only. They are not approved stages
 - Search results with type badges, snippets, dates, and module links
 - No semantic search, vector index, dependency, AI, sync, backend, or schema change
 
+## Version 1.8
+
+- Search Result Focus Navigation
+- Search results can carry a lightweight `focusId` query parameter into the target module page
+- Target pages can scroll the matching loaded record into view and show a subtle focused state
+- No schema migration, dependency, AI, sync, backend, semantic search, or backup change
+
 ## Deferred after Stage 25
 
 - Project conversion

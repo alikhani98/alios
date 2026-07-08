@@ -15,7 +15,7 @@ AliOS is designed for one person and stores its data in the browser through Inde
 - Today tasks, statuses, Most Important Task selection, and daily check-in
 - Project create, list, edit, and delete
 - Journal create, list, edit, and delete
-- Global local search across Inbox, Today, Projects, Journal, and Knowledge
+- Global local search across Inbox, Today, Projects, Journal, and Knowledge with focused links into the exact local record
 - Knowledge create, list, edit, delete, text search, and type filtering
 - Persian and English interface with automatic RTL/LTR direction
 - Gregorian and Persian/Jalali date display while storing ISO/Gregorian dates

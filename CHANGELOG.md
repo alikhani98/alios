@@ -278,3 +278,10 @@ This changelog records completed AliOS development stages.
 - Added initial architecture documentation
 - Added the AIProvider placeholder
 - Added the StorageAdapter placeholder
+## Stage 26 — Search Result Focus Navigation
+
+- Added lightweight `focusId` deep links from global search results into Inbox, Today, Projects, Journal, and Knowledge
+- Added subtle focused-item highlighting and auto-scroll on target pages when the matching record is visible
+- Added a non-blocking not-visible notice for cases where the target item is filtered out or otherwise hidden
+- Added focused tests for the result-link helper and kept existing search coverage passing
+- Kept the Dexie schema, backup format, backup version, backend, sync, cloud, dependency list, semantic search, and AI out of scope

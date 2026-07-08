@@ -34,6 +34,7 @@ export const messagesFa: Record<TranslationKey, string> = {
   "search.noResultsDescription": "یک واژه دیگر را امتحان کنید، فاصله‌های اضافه را بردارید یا عبارت را کوتاه‌تر کنید.",
   "search.noSnippet": "پیش‌نمایشی موجود نیست.",
   "search.openModule": "باز کردن بخش",
+  "search.focusItemNotVisible": "این مورد در فهرست فعلی دیده نمی‌شود، بنابراین AliOS در همین صفحه ماند و هیچ داده‌ای را تغییر نداد.",
   "search.resultsSummary": "{count} نتیجه پیدا شد",
   "search.typeInbox": "مورد صندوق ورودی",
   "search.typeTask": "کار امروز",

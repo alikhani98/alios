@@ -1,5 +1,6 @@
 import { AlertCircle, FolderKanban, Plus, RotateCcw } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 import type { CreateProjectInput } from "@/core/repositories";
 import type { Project } from "@/shared/types";
@@ -11,6 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/shared/ui";
+import { cn } from "@/shared/utils";
 import { ProjectCard } from "../components/ProjectCard";
 import { ProjectForm } from "../components/ProjectForm";
 import { useProjects } from "../hooks/useProjects";
@@ -18,6 +20,7 @@ import type { ProjectFormValues } from "../types";
 
 export function ProjectsPage() {
   const { t } = useI18n();
+  const [searchParams] = useSearchParams();
   const {
     projects,
     isLoading,
@@ -33,6 +36,10 @@ export function ProjectsPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [focusedProjectId, setFocusedProjectId] = useState<string | null>(null);
+  const [focusMessage, setFocusMessage] = useState<string | null>(null);
+  const projectRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const focusId = searchParams.get("focusId");
 
   const openCreateForm = () => {
     setEditingProject(undefined);
@@ -107,6 +114,34 @@ export function ProjectsPage() {
     }
   };
 
+  useEffect(() => {
+    if (!focusId) {
+      setFocusedProjectId(null);
+      setFocusMessage(null);
+      return;
+    }
+
+    const focusedProject = projects.find((project) => project.id === focusId);
+    if (!focusedProject) {
+      if (!isLoading && projects.length > 0) {
+        setFocusedProjectId(null);
+        setFocusMessage(t("search.focusItemNotVisible"));
+      }
+      return;
+    }
+
+    setFocusMessage(null);
+    setFocusedProjectId(focusId);
+    const node = projectRefs.current[focusId];
+    node?.scrollIntoView({ behavior: "smooth", block: "center" });
+
+    const timeout = window.setTimeout(() => {
+      setFocusedProjectId((current) => (current === focusId ? null : current));
+    }, 2200);
+
+    return () => window.clearTimeout(timeout);
+  }, [focusId, isLoading, projects, t]);
+
   return (
     <section className="alios-page space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -167,6 +202,14 @@ export function ProjectsPage() {
           ) : null}
         </div>
       ) : null}
+      {focusMessage ? (
+        <div
+          role="status"
+          className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-foreground"
+        >
+          {focusMessage}
+        </div>
+      ) : null}
 
       {isLoading ? (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" aria-label={t("projects.loading")}>
@@ -196,13 +239,25 @@ export function ProjectsPage() {
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {projects.map((project) => (
-            <ProjectCard
+            <div
               key={project.id}
-              project={project}
-              isDeleting={deletingId === project.id}
-              onEdit={() => openEditForm(project)}
-              onDelete={() => handleDelete(project)}
-            />
+              ref={(node) => {
+                projectRefs.current[project.id] = node;
+              }}
+              className={cn(
+                "scroll-mt-24 rounded-2xl transition-shadow",
+                focusedProjectId === project.id
+                  ? "ring-2 ring-primary/50 ring-offset-2 ring-offset-background shadow-lg shadow-primary/10"
+                  : null
+              )}
+            >
+              <ProjectCard
+                project={project}
+                isDeleting={deletingId === project.id}
+                onEdit={() => openEditForm(project)}
+                onDelete={() => handleDelete(project)}
+              />
+            </div>
           ))}
         </div>
       )}

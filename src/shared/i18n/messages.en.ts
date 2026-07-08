@@ -30,6 +30,7 @@ export const messagesEn = {
   "search.noResultsDescription": "Try a different word, remove extra spaces, or search a shorter phrase.",
   "search.noSnippet": "No preview available.",
   "search.openModule": "Open module",
+  "search.focusItemNotVisible": "That item is not visible in the current list, so AliOS stayed on the page and did not change any data.",
   "search.resultsSummary": "{count} results found",
   "search.typeInbox": "Inbox item",
   "search.typeTask": "Today task",

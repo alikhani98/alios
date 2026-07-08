@@ -21,6 +21,8 @@ import type {
   Task,
 } from "@/shared/types";
 
+import { buildSearchResultHref } from "./searchNavigation";
+
 export type SearchResultKind =
   | "inbox"
   | "task"
@@ -172,7 +174,7 @@ export function searchLocalData(
       title: item.content,
       snippetSource: item.content,
       fields: [item.type, item.status],
-      href: "/inbox",
+      href: buildSearchResultHref("inbox", item.id),
       facets: [
         {
           labelKey: "common.status",
@@ -193,7 +195,7 @@ export function searchLocalData(
       title: item.title,
       snippetSource: item.description ?? item.title,
       fields: [item.description ?? "", item.status, item.priority, item.dueDate ?? ""],
-      href: "/today",
+      href: buildSearchResultHref("task", item.id),
       facets: [
         {
           labelKey: "common.status",
@@ -217,7 +219,7 @@ export function searchLocalData(
       title: item.title,
       snippetSource: item.description ?? item.nextAction ?? item.title,
       fields: [item.description ?? "", item.nextAction ?? "", item.status, item.priority],
-      href: "/projects",
+      href: buildSearchResultHref("project", item.id),
       facets: [
         {
           labelKey: "common.status",
@@ -241,7 +243,7 @@ export function searchLocalData(
       title: item.title,
       snippetSource: item.content,
       fields: [item.content, item.type],
-      href: "/journal",
+      href: buildSearchResultHref("journal", item.id),
       facets: [{ labelKey: "common.type", valueKey: JOURNAL_TYPE_LABEL_KEYS[item.type] }],
       sortKey: item.updatedAt,
       date: item.date,
@@ -256,7 +258,7 @@ export function searchLocalData(
       title: item.title,
       snippetSource: item.summary ?? item.content,
       fields: [item.summary ?? "", item.content, item.source ?? "", item.type],
-      href: "/knowledge",
+      href: buildSearchResultHref("knowledge", item.id),
       facets: [{ labelKey: "common.type", valueKey: KNOWLEDGE_TYPE_LABEL_KEYS[item.type] }],
       sortKey: item.updatedAt,
       date: item.createdAt,
