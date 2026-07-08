@@ -93,6 +93,13 @@ The later version ideas below are directional only. They are not approved stages
 - Target pages can scroll the matching loaded record into view and show a subtle focused state
 - No schema migration, dependency, AI, sync, backend, semantic search, or backup change
 
+## Version 1.9
+
+- Local User Preferences & Theme Activation
+- Local light, dark, and system appearance switching
+- Local profile display name and generated initials
+- No authentication, backend, sync, cloud, backup-format, schema, or dependency change
+
 ## Deferred after Stage 25
 
 - Project conversion

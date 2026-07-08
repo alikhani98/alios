@@ -103,6 +103,7 @@ To enable deployment:
 AliOS uses hash routing (`#/today`, `#/projects`, and similar routes), so direct navigation does not require server rewrite rules. A production build can also be uploaded to static hosting at a matching `/alios/` path. No production Node.js server or backend is required.
 
 Deployment creates a public application URL, not data synchronization. Records remain local to each browser/device. Use Backup Export and Backup Import to transfer data manually.
+Local appearance and profile preferences also stay on the current browser or device and do not sync between installations.
 
 ## Backup and restore
 
