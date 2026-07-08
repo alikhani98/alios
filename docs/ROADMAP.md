@@ -18,7 +18,7 @@
 
 ## Real-world usage period
 
-AliOS v1.0 should be used with real personal data before more product scope is approved. Routines, Wellness, Weekly Review, Decision Log, Personal Manual, AI, Google Calendar, ICS export, cloud sync, and notifications remain deferred until observed usage justifies them.
+AliOS v1.0 should be used with real personal data before more product scope is approved. Full routines and wellness engines, Weekly Review, Decision Log, Personal Manual, AI, Google Calendar, ICS export, cloud sync, and notifications remain deferred until observed usage justifies them.
 
 The later version ideas below are directional only. They are not approved stages and may change after real-world use.
 
@@ -29,6 +29,13 @@ The later version ideas below are directional only. They are not approved stages
 - Mobile backup/restore usage guidance
 - GitHub Pages static deployment readiness
 - No automatic sync or new business feature
+
+## Version 1.11
+
+- Home Time Window Routine Nudges
+- Local morning warm-up reminder card on Home between 05:00 and 07:00
+- Local-only Settings toggle with dismiss-for-today and disable actions
+- No push notifications, background jobs, medical advice, schema migration, backend, sync, cloud, dependency, AI, or backup-format change
 
 ## Later product candidates
 
@@ -114,7 +121,7 @@ The later version ideas below are directional only. They are not approved stages
 - Bulk conversion
 - Tags and attachments
 - Reminders
-- Routines and Wellness
+- Full routines and wellness engine
 - AI classification, semantic search, and AIProvider activation
 - Automatic sync and cloud backup
 - Offline service worker

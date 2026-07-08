@@ -2,6 +2,14 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 29 - Home Time Window Routine Nudges
+
+- Added a calm Home dashboard nudge card that appears only between 05:00 and 07:00 local browser time when enabled
+- Added local-only dismiss-for-today and disable actions with a Settings toggle for the morning warm-up reminder
+- Reused localStorage preference keys only, kept the reminder local to the current browser/device, and avoided push notifications or a routine engine
+- Added focused helper tests for time-window checks, local date keys, dismissal behavior, and safe preference parsing
+- Kept medical advice, medication advice, background jobs, service workers, backup-format changes, Dexie schema changes, backend services, sync, cloud, and AI out of scope
+
 ## Stage 28 - Calendar Month View Foundation
 
 - Added a calm monthly calendar card to the Home dashboard with current-month, previous-month, next-month, and return-to-current controls

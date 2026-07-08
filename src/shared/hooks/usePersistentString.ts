@@ -12,8 +12,12 @@ function readStoredString(key: string, defaultValue: string): string {
     return defaultValue;
   }
 
-  const storedValue = window.localStorage.getItem(key);
-  return storedValue ?? defaultValue;
+  try {
+    const storedValue = window.localStorage.getItem(key);
+    return storedValue ?? defaultValue;
+  } catch {
+    return defaultValue;
+  }
 }
 
 export function usePersistentString({
@@ -46,8 +50,12 @@ export function usePersistentString({
         return;
       }
 
-      window.localStorage.setItem(key, nextValue);
-      window.dispatchEvent(new Event(LOCAL_PREFERENCE_CHANGE_EVENT));
+      try {
+        window.localStorage.setItem(key, nextValue);
+        window.dispatchEvent(new Event(LOCAL_PREFERENCE_CHANGE_EVENT));
+      } catch {
+        // Keep the value in memory if storage is unavailable.
+      }
     },
     [key]
   );

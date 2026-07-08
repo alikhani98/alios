@@ -30,8 +30,21 @@ describe("i18n utilities", () => {
     "home.itemsForThisDay",
     "home.tasksOnThisDay",
     "home.noItemsForThisDay",
+    "home.morningWarmupTitle",
+    "home.morningWarmupDescription",
+    "home.warmupShoulders",
+    "home.warmupLegs",
+    "home.warmupWater",
+    "home.warmupSlowly",
+    "home.dismissForToday",
+    "home.disableReminder",
     "settings.appearance",
     "settings.localProfile",
+    "settings.morningWarmupReminder",
+    "settings.morningWarmupReminderDescription",
+    "settings.enableMorningWarmupReminder",
+    "settings.localInAppReminder",
+    "settings.noPushNotification",
   ] as const)("defines %s in both message catalogs", (key) => {
     expect(messagesEn[key]).toBeTruthy();
     expect(messagesFa[key]).toBeTruthy();

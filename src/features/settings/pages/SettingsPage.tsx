@@ -10,6 +10,7 @@ import {
   MonitorSmartphone,
   RotateCcw,
   ShieldCheck,
+  Sunrise,
   Trash2,
   Upload,
   SunMoon,
@@ -19,10 +20,11 @@ import { useRef } from "react";
 
 import {
   APPEARANCE_STORAGE_KEY,
+  MORNING_WARMUP_ENABLED_STORAGE_KEY,
 } from "@/shared/constants";
 import { appConfig } from "@/shared/constants/app";
 import { useDateFormatter } from "@/shared/date";
-import { usePersistentString } from "@/shared/hooks";
+import { usePersistentBoolean, usePersistentString } from "@/shared/hooks";
 import { useI18n } from "@/shared/i18n";
 import {
   DEFAULT_APPEARANCE_PREFERENCE,
@@ -109,6 +111,11 @@ export function SettingsPage() {
       key: APPEARANCE_STORAGE_KEY,
       defaultValue: DEFAULT_APPEARANCE_PREFERENCE,
     });
+  const { value: morningWarmupEnabled, setValue: setMorningWarmupEnabled } =
+    usePersistentBoolean({
+      key: MORNING_WARMUP_ENABLED_STORAGE_KEY,
+      defaultValue: true,
+    });
   const dataManagement = useLocalDataManagement();
   const backup = useBackupRestore(dataManagement.loadSummary);
   const restorePreview = backup.pendingBackup
@@ -179,6 +186,41 @@ export function SettingsPage() {
               </Button>
             ))}
           </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Sunrise className="h-5 w-5 text-primary" />
+            {t("settings.morningWarmupReminder")}
+          </CardTitle>
+          <CardDescription>
+            {t("settings.morningWarmupReminderDescription")}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="rounded-xl border bg-muted/30 p-4">
+            <p className="text-sm leading-7 text-muted-foreground">
+              {t("settings.enableMorningWarmupReminder")}
+            </p>
+            <p className="mt-2 text-xs leading-5 text-muted-foreground">
+              {t("settings.localInAppReminder")}
+            </p>
+            <p className="text-xs leading-5 text-muted-foreground">
+              {t("settings.noPushNotification")}
+            </p>
+          </div>
+          <Button
+            type="button"
+            variant={morningWarmupEnabled ? "default" : "outline"}
+            aria-pressed={morningWarmupEnabled}
+            onClick={() => setMorningWarmupEnabled(!morningWarmupEnabled)}
+          >
+            {morningWarmupEnabled
+              ? t("home.disableReminder")
+              : t("settings.enableMorningWarmupReminder")}
+          </Button>
         </CardContent>
       </Card>
 
