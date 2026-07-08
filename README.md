@@ -8,6 +8,7 @@ AliOS is designed for one person and stores its data in the browser through Inde
 
 - Home dashboard with Today, project, journal, and knowledge summaries
 - Monthly calendar view on Home with local task indicators and simple day previews
+- Simple morning warm-up reminder on Home that appears only in a local time window
 - Mobile-first Quick Capture Inbox with note, task, idea, link, and other item types
 - Process captured items into Today tasks, Journal entries, or Knowledge items while retaining Inbox history
 - Search captured content and combine status and type filters locally
@@ -147,12 +148,13 @@ Version 1.0 is intentionally single-user and local-only. It does not include:
 
 - Accounts, authentication, backend services, or automatic multi-device sync
 - Cloud or scheduled backup, encryption, compression, or attachments
-- Routines, Wellness, Weekly Review, Decision Log, or Personal Manual
+- Full routines and wellness engines, Weekly Review, Decision Log, or Personal Manual
 - AI features or hosted AI providers
 - Google Calendar, ICS export, notifications, analytics, or charts
 - UI automation or end-to-end browser tests
 
 Dates remain stored as ISO/Gregorian strings; Jalali support is display-only. User-generated content is never automatically translated.
+The Home dashboard also includes a small local-only morning reminder that can be dismissed for the day or disabled in Settings.
 
 ## After v1.0
 

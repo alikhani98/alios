@@ -26,6 +26,7 @@ import {
   CardTitle,
 } from "@/shared/ui";
 import { HomeCalendarCard } from "../components/HomeCalendarCard";
+import { HomeRoutineNudgeCard } from "../components/HomeRoutineNudgeCard";
 import { useHomeDashboard } from "../hooks/useHomeDashboard";
 
 const levelLabelKeys: Record<Level3, TranslationKey> = {
@@ -125,6 +126,8 @@ export function HomePage() {
               </CardContent>
             </Card>
           ) : null}
+
+          <HomeRoutineNudgeCard />
 
           <HomeCalendarCard tasks={data.tasks} />
 
