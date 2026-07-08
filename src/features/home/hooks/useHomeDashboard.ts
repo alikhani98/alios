@@ -39,6 +39,7 @@ export function useHomeDashboard() {
       const latestKnowledge = [...knowledgeItems].sort(byUpdatedAtDescending)[0];
 
       setData({
+        tasks: allTasks,
         today: {
           tasks: todayTasks,
           completedTaskCount: todayTasks.filter((task) => task.status === "done")
@@ -66,7 +67,7 @@ export function useHomeDashboard() {
           unprocessedCount: inboxItems.filter((item) => item.status === "unprocessed").length,
         },
         isEmpty:
-          todayTasks.length === 0 &&
+          allTasks.length === 0 &&
           !checkin &&
           allProjects.length === 0 &&
           journalEntries.length === 0 &&

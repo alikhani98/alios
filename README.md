@@ -7,6 +7,7 @@ AliOS is designed for one person and stores its data in the browser through Inde
 ## Core features
 
 - Home dashboard with Today, project, journal, and knowledge summaries
+- Monthly calendar view on Home with local task indicators and simple day previews
 - Mobile-first Quick Capture Inbox with note, task, idea, link, and other item types
 - Process captured items into Today tasks, Journal entries, or Knowledge items while retaining Inbox history
 - Search captured content and combine status and type filters locally

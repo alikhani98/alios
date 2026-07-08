@@ -25,6 +25,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/shared/ui";
+import { HomeCalendarCard } from "../components/HomeCalendarCard";
 import { useHomeDashboard } from "../hooks/useHomeDashboard";
 
 const levelLabelKeys: Record<Level3, TranslationKey> = {
@@ -124,6 +125,8 @@ export function HomePage() {
               </CardContent>
             </Card>
           ) : null}
+
+          <HomeCalendarCard tasks={data.tasks} />
 
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
             <SummaryCard

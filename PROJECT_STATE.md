@@ -4,8 +4,8 @@
 
 - Project name: AliOS
 - Architecture version: AliOS 1.0
-- Current status: AliOS includes validated mobile-first Inbox capture, processing, global search, focused search-result navigation, filters, bulk triage, local appearance switching, local profile preferences, and hardened backup/restore safety and remains ready for static GitHub Pages deployment.
-- Current Stage: Stage 27 Completed
+- Current status: AliOS includes validated mobile-first Inbox capture, processing, global search, focused search-result navigation, filters, bulk triage, local appearance switching, local profile preferences, calendar month view foundation, and hardened backup/restore safety and remains ready for static GitHub Pages deployment.
+- Current Stage: Stage 28 Completed
 
 ## Architecture References
 
@@ -38,7 +38,7 @@
 
 ## Completed Stages
 
-Stages 1–27 are complete.
+Stages 1–28 are complete.
 
 - Stage 1 â€” Foundation
 - Stage 2 â€” App Shell
@@ -67,6 +67,7 @@ Stages 1–27 are complete.
 - Stage 25 â€” Global Search Foundation
 - Stage 26 â€” Search Result Focus Navigation
 - Stage 27 â€” Local User Preferences & Theme Activation
+- Stage 28 â€” Calendar Month View Foundation
 
 Stage 9 completion is evidenced by the Today page, daily check-in create/update form, date-scoped task CRUD, all approved task statuses, completed timestamps, and single-MIT selection synchronized with todayâ€™s check-in. Browser validation confirmed task and check-in persistence across refresh, task editing, status updates, MIT selection, deletion, and the task empty state. The feature consumes TasksRepository and DailyCheckinsRepository through the injected `StorageAdapter` and does not import Dexie. Health advice, Home dashboard data, recurring tasks, notifications, analytics, backup, AI, and cross-feature workflows remain unavailable. TypeScript validation and the production build pass.
 
@@ -105,6 +106,8 @@ Stage 25 completion is evidenced by the local global search page and topbar entr
 Stage 26 completion is evidenced by search result links that now carry a lightweight `focusId` query parameter into Inbox, Today, Projects, Journal, and Knowledge routes. Each target page can scroll the matching loaded item into view and show a subtle focused state without opening edit mode or mutating data. If a focused item is not visible because of filtering or similar page state, AliOS shows a non-blocking notice and otherwise stays safe. This stage added no schema migration, new table, new field, backup-format change, backend, sync, cloud, dependency, AI, or semantic search behavior.
 
 Stage 27 completion is evidenced by the active topbar appearance control, localStorage-backed light/dark/system preference handling, document theme-class updates on load and preference change, the active local profile menu with inline local display name editing, generated initials, and the Settings page appearance controls. The new local preference data stays outside Dexie and no new table, migration, backup-format change, backend, sync, cloud, dependency, AI, or authentication behavior was added.
+
+Stage 28 completion is evidenced by the Home dashboard monthly calendar foundation, which reads existing local task data, builds a month grid with today highlighting and date indicators, allows month navigation, and shows a simple per-day task preview without adding calendar events or new storage. The calendar uses the existing ISO/Gregorian task dates, display-only Jalali/Gregorian formatting, and the current repository/storage boundaries. No schema migration, backend, sync, cloud, dependency, AI, official holidays database, reminder system, or backup-format change was added.
 
 ## Next Stage
 
