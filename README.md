@@ -1,6 +1,6 @@
 # AliOS
 
-AliOS is a bilingual, local-first personal life-management system. It brings quick capture, Today planning, projects, journaling, personal knowledge, a read-only dashboard, monthly calendar and upcoming-task views, manual backup/restore, and local data controls into one static web application.
+AliOS is a bilingual, local-first personal life-management system. It brings quick capture, Today planning, projects, journaling, personal knowledge, a read-only dashboard, monthly calendar and upcoming-task views, routine templates, manual backup/restore, and local data controls into one static web application.
 
 AliOS is designed for one person and stores its data in the browser through IndexedDB. It requires no backend, account, authentication, subscription, paid API, or hosted AI service.
 
@@ -8,6 +8,7 @@ AliOS is designed for one person and stores its data in the browser through Inde
 
 - Home dashboard with Today, project, journal, and knowledge summaries
 - Monthly calendar view on Home with local task indicators and simple day previews
+- Routine templates section on Home with built-in local-only previews
 - Upcoming tasks foundation on Home with overdue, today, tomorrow, this week, and later groupings
 - Simple morning warm-up reminder on Home that appears only in a local time window
 - Mobile-first Quick Capture Inbox with note, task, idea, link, and other item types
@@ -151,12 +152,13 @@ Version 1.0 is intentionally single-user and local-only. It does not include:
 - Accounts, authentication, backend services, or automatic multi-device sync
 - Cloud or scheduled backup, encryption, compression, or attachments
 - Full routines and wellness engines, Weekly Review, Decision Log, or Personal Manual
+- Routine templates are preview-only foundations and do not create recurring routines
 - AI features or hosted AI providers
 - Google Calendar, ICS export, notifications, analytics, or charts
 - UI automation or end-to-end browser tests
 
 Dates remain stored as ISO/Gregorian strings; Jalali support is display-only. User-generated content is never automatically translated.
-The Home dashboard also includes a small local-only morning reminder that can be dismissed for the day or disabled in Settings, plus an upcoming tasks summary that helps separate overdue, today, tomorrow, this week, and later work.
+The Home dashboard also includes a small local-only morning reminder that can be dismissed for the day or disabled in Settings, a routine templates section with built-in previews, and an upcoming tasks summary that helps separate overdue, today, tomorrow, this week, and later work.
 
 ## After v1.0
 

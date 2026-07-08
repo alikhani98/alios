@@ -24,6 +24,7 @@ AliOS stores data in IndexedDB for the current browser, device, and site origin.
 - Appearance mode and local profile name stay on the current browser or device and do not sync.
 - The Home calendar and its task indicators stay on the current browser or device and do not sync.
 - The Home morning warm-up reminder state stays on the current browser or device and does not sync.
+- The Home routine templates section stays on the current browser or device and does not sync.
 - The Home upcoming tasks summary and future task dates stay on the current browser or device and do not sync.
 - There is no automatic sync, cloud backup, account, or backend in AliOS 1.0.
 - Publishing AliOS to GitHub Pages does not change this device-local storage model.

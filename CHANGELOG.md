@@ -2,6 +2,14 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 31 - Routine Templates Foundation
+
+- Added a compact Home dashboard routine templates section with four built-in local-only templates
+- Added a static routine template registry and helper functions for lookup, category filtering, featured selection, and step validation
+- Connected the Stage 29 morning warm-up nudge to the morning warm-up template preview without adding scheduling or notification behavior
+- Added focused helper tests for template lookup, category filtering, featured stability, duplicate-id safety, and template-step validation
+- Kept the feature local-only with no Dexie schema migration, backup-format change, backend, sync, cloud, dependency, AI, or wellness/medical module
+
 ## Stage 30 - Upcoming / Future Tasks Foundation
 
 - Added a Home dashboard upcoming tasks card that groups existing local tasks into overdue, today, tomorrow, this week, and later sections
