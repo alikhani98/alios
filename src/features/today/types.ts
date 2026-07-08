@@ -9,6 +9,7 @@ export const todayTaskFormSchema = taskSchema
     status: true,
     priority: true,
     isMit: true,
+    dueDate: true,
   })
   .extend({ description: z.string().optional() });
 

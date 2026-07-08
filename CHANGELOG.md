@@ -2,6 +2,14 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 30 - Upcoming / Future Tasks Foundation
+
+- Added a Home dashboard upcoming tasks card that groups existing local tasks into overdue, today, tomorrow, this week, and later sections
+- Added a small task timeline helper that safely groups tasks by existing due dates without introducing a new field or Dexie schema migration
+- Exposed a simple due/planned date input in Today so future-dated tasks can be planned with the existing task date field
+- Added focused helper tests for task grouping, invalid date handling, completed-task behavior, and stable ordering
+- Kept backend services, sync, cloud, AI, push notifications, recurring tasks, event systems, schema changes, and backup-format changes out of scope
+
 ## Stage 29 - Home Time Window Routine Nudges
 
 - Added a calm Home dashboard nudge card that appears only between 05:00 and 07:00 local browser time when enabled

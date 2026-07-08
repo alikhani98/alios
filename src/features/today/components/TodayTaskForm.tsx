@@ -9,6 +9,7 @@ import { todayTaskFormSchema, type TodayTaskFormValues } from "../types";
 
 type TodayTaskFormProps = {
   task?: Task;
+  defaultDueDate: string;
   isSubmitting: boolean;
   onSubmit: (values: TodayTaskFormValues) => Promise<void>;
   onCancel: () => void;
@@ -16,6 +17,7 @@ type TodayTaskFormProps = {
 
 export function TodayTaskForm({
   task,
+  defaultDueDate,
   isSubmitting,
   onSubmit,
   onCancel,
@@ -33,6 +35,7 @@ export function TodayTaskForm({
       status: task?.status ?? "todo",
       priority: task?.priority ?? "medium",
       isMit: task?.isMit ?? false,
+      dueDate: task?.dueDate ?? defaultDueDate,
     },
   });
 
@@ -102,6 +105,28 @@ export function TodayTaskForm({
             ))}
           </select>
         </div>
+      </div>
+
+      <div className="grid gap-2">
+        <label htmlFor="today-task-due-date" className="text-sm font-medium">
+          {t("home.taskDate")}
+        </label>
+        <Input
+          id="today-task-due-date"
+          type="date"
+          aria-describedby="today-task-due-date-help"
+          aria-invalid={Boolean(errors.dueDate)}
+          {...register("dueDate")}
+        />
+        <p
+          id="today-task-due-date-help"
+          className="text-xs leading-5 text-muted-foreground"
+        >
+          {t("home.duePlannedDate")}
+        </p>
+        {errors.dueDate ? (
+          <p className="text-sm text-destructive">{t("common.validation")}</p>
+        ) : null}
       </div>
 
       <label className="flex min-h-11 items-center gap-3 text-sm font-medium">

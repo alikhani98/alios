@@ -3,7 +3,7 @@ import { format } from "date-fns";
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
-import type { CreateTaskInput, UpdateTaskInput } from "@/core/repositories";
+import type { UpdateTaskInput } from "@/core/repositories";
 import type { Task, TaskStatus } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
 import { useDateFormatter } from "@/shared/date";
@@ -114,7 +114,7 @@ export function TodayPage() {
         await updateTask(editingTask.id, updateInput);
         setSuccessMessage(t("today.taskUpdated"));
       } else {
-        await createTask(input as Omit<CreateTaskInput, "dueDate">);
+        await createTask(input);
         setSuccessMessage(t("today.taskCreated"));
       }
       closeTaskForm();
@@ -284,6 +284,7 @@ export function TodayPage() {
             <TodayTaskForm
               key={editingTask?.id ?? "new-task"}
               task={editingTask}
+              defaultDueDate={today}
               isSubmitting={isTaskSubmitting}
               onSubmit={handleTaskSubmit}
               onCancel={closeTaskForm}
