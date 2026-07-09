@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 41 - Finance Review & Budget Guard
+
+- Added a practical local-first Finance review layer that groups current-month expenses by category, shows upcoming obligation pressure, and surfaces obligation progress with remaining amount and paid percentage
+- Added a neutral local budget guard that compares entered income, expenses, and monthly obligations without any banking data, external advice, chart library, or animation library
+- Added Finance filter tabs for all transactions, income, expenses, active obligations, and paid obligations while keeping the repository/storage-adapter boundary intact
+- Kept the additive backup/restore behavior unchanged with no backup-version change and no finance schema migration
+
 ## Stage 40 - Finance Foundation
 
 - Added a local-first Finance module for income, expenses, installments, debts, and a basic monthly liquidity summary

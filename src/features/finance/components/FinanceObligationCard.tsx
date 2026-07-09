@@ -40,6 +40,10 @@ export function FinanceObligationCard({
     obligation.totalAmount - obligation.paidAmount,
     0
   );
+  const paidPercentage =
+    obligation.totalAmount > 0
+      ? Math.min(100, Math.max((obligation.paidAmount / obligation.totalAmount) * 100, 0))
+      : null;
 
   return (
     <SoftPanel className="space-y-4">
@@ -74,7 +78,7 @@ export function FinanceObligationCard({
         </p>
       </div>
 
-      <div className="grid gap-2 text-sm sm:grid-cols-3">
+      <div className="grid gap-2 text-sm sm:grid-cols-2 xl:grid-cols-4">
         <div className="rounded-2xl border bg-background/70 px-4 py-3">
           <p className="text-xs text-muted-foreground">{t("finance.totalAmount")}</p>
           <p className="mt-1 font-medium tabular-nums">
@@ -102,6 +106,16 @@ export function FinanceObligationCard({
             {t("finance.currency")}
           </p>
         </div>
+        {paidPercentage !== null ? (
+          <div className="rounded-2xl border bg-background/70 px-4 py-3">
+            <p className="text-xs text-muted-foreground">{t("finance.paidProgress")}</p>
+            <p className="mt-1 font-medium tabular-nums">
+              {t("finance.paidPercentage", {
+                value: Math.round(paidPercentage),
+              })}
+            </p>
+          </div>
+        ) : null}
       </div>
 
       <div className="grid gap-2 text-sm text-muted-foreground">

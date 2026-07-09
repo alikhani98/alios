@@ -107,6 +107,13 @@ The later version ideas below are directional only. They are not approved stages
 - Finance-specific local storage, repository CRUD, and backward-compatible backup/restore support
 - No banking integration, no advice engine, no chart library, no animation library, no backend, no sync, no cloud, and no AI
 
+## Stage 41
+
+- Finance Review & Budget Guard
+- Local spending-by-category review, upcoming obligation pressure, obligation progress, and a neutral budget guard
+- Finance filters for all transactions, income, expenses, active obligations, and paid obligations
+- No chart library, no animation library, no financial advice engine, no backup-version change, no schema migration, no backend, no sync, no cloud, and no AI
+
 ## Stage 38 Hardening Note
 
 - UI regression QA and release hardening stayed within the existing scope and did not add a new feature

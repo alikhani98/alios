@@ -66,6 +66,9 @@ export const FINANCE_CATEGORY_OPTIONS = [
   { value: "other", labelKey: "finance.categoryOther" },
 ] as const;
 
+export type FinanceCategoryLabelKey =
+  (typeof FINANCE_CATEGORY_OPTIONS)[number]["labelKey"];
+
 export const DEFAULT_FINANCE_TRANSACTION_CATEGORY: Record<
   FinanceTransactionType,
   string
@@ -80,9 +83,11 @@ export const DEFAULT_FINANCE_OBLIGATION_TYPE: FinanceObligationType =
 export const DEFAULT_FINANCE_OBLIGATION_STATUS: FinanceObligationStatus =
   "active";
 
-export function getFinanceTransactionCategoryLabelKey(category: string) {
+export function getFinanceTransactionCategoryLabelKey(
+  category: string
+): FinanceCategoryLabelKey {
   return (
     FINANCE_CATEGORY_OPTIONS.find((option) => option.value === category)
       ?.labelKey ?? "finance.categoryOther"
-  );
+  ) as FinanceCategoryLabelKey;
 }

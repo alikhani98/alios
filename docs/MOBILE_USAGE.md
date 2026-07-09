@@ -8,6 +8,7 @@ Stage 37 adds a denser premium Home showcase and light visual alignment for Toda
 Stage 38 hardened desktop sidebar accessibility for long scrolling pages without changing mobile drawer behavior or adding new product scope.
 Stage 39 moved dashboard controls into the topbar and added a local accent color palette without changing the device-local storage model.
 Stage 40 adds a local Finance module that stays on the current device until you export or restore a backup.
+Stage 41 adds a Finance review layer, budget guard, and obligation pressure summaries that also stay local to the device.
 The Personal Insights section stays local to the device and only reflects stored tasks, projects, inbox items, journal entries, knowledge items, and wellness checklist state.
 
 ## Open or install AliOS
