@@ -17,12 +17,12 @@ export function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) {
   return (
     <aside
       className={cn(
-        "sticky top-0 hidden h-screen shrink-0 p-2 transition-all duration-300 ease-in-out motion-reduce:transition-none md:flex md:flex-col",
+        "sticky top-0 hidden h-dvh shrink-0 p-2 transition-all duration-300 ease-in-out motion-reduce:transition-none md:flex md:flex-col",
         direction === "rtl" ? "md:border-l" : "md:border-r",
         collapsed ? "md:w-[5.25rem]" : "md:w-72"
       )}
     >
-      <div className="flex h-full flex-col overflow-hidden rounded-[2rem] border bg-card/85 shadow-[0_18px_50px_-24px_rgba(15,23,42,0.35)] backdrop-blur-xl">
+      <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-[2rem] border bg-card/85 shadow-[0_18px_50px_-24px_rgba(15,23,42,0.35)] backdrop-blur-xl">
         <div className="flex h-16 items-center justify-between border-b border-border/70 px-4">
           {!collapsed ? (
             <div className="flex min-w-0 flex-col">
@@ -51,7 +51,10 @@ export function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) {
           </Button>
         </div>
 
-        <nav className="flex flex-1 flex-col gap-1.5 overflow-y-auto p-3" aria-label={t("nav.main")}>
+        <nav
+          className="flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto p-3"
+          aria-label={t("nav.main")}
+        >
           {mainNavigation.map((item) => (
             <NavigationLink key={item.href} item={item} collapsed={collapsed} />
           ))}

@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 38 - UI Regression QA & Release Hardening
+
+- Performed a focused QA and release-hardening pass after the Stage 37 UI polish work
+- Hardened the desktop sidebar for long scrolling pages so it stays accessible without changing mobile drawer behavior
+- Verified major routes, responsive behavior, backup/restore compatibility, Persian/English i18n, RTL/LTR behavior, and local preference persistence
+- Kept the stage UI-only with no new feature, no dependency change, no chart library, no animation library, no schema/storage/backup change, no backend, no sync, no cloud, and no AI
+
 ## Stage 37 - Premium Home Showcase + Core Pages Visual Alignment
 
 - Improved the Home dashboard showcase feel with stronger hero composition, denser summary surfaces, a more balanced calendar, and more polished upcoming/routine/wellness sections

@@ -68,7 +68,7 @@ export function AppShell() {
   }, [appearancePreference]);
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-muted/20 text-foreground alios-shell-background">
+    <div className="relative min-h-screen bg-muted/20 text-foreground alios-shell-background">
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,hsl(var(--background)/0.18),transparent_18%,transparent_78%,hsl(var(--background)/0.18))] dark:bg-[linear-gradient(to_bottom,hsl(var(--background)/0.3),transparent_18%,transparent_78%,hsl(var(--background)/0.3))]" />
       <div className="relative flex min-h-screen min-w-0">
         <Sidebar
@@ -81,7 +81,7 @@ export function AppShell() {
           onClose={() => setMobileSidebarOpen(false)}
         />
 
-        <div className="flex min-w-0 flex-1 flex-col">
+        <div className="flex min-w-0 flex-1 flex-col min-h-0 overflow-x-hidden">
           <Topbar
             title={t(currentNavigationItem.titleKey)}
             onOpenMobileSidebar={() => setMobileSidebarOpen(true)}

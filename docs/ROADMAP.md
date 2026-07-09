@@ -93,6 +93,12 @@ The later version ideas below are directional only. They are not approved stages
 - Light visual alignment for Today, Projects, Journal, Knowledge, Inbox, Search, and Settings using the same local-first model
 - No schema/storage/backup change, no new dependency, no chart library, no animation library, no backend, no sync, no cloud, and no AI
 
+## Stage 38 Hardening Note
+
+- UI regression QA and release hardening stayed within the existing scope and did not add a new feature
+- Desktop sidebar accessibility was hardened for long scrolling pages while mobile drawer behavior remained unchanged
+- No schema/storage/backup change, no dependency change, no backend, no sync, no cloud, and no AI
+
 ## Later product candidates
 
 - Decision Engine

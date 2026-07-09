@@ -5,6 +5,7 @@ AliOS can run from a modern mobile browser and can be added to the home screen w
 Visual motion polish stays local to the UI and respects reduced-motion preferences.
 The premium Home dashboard upgrade stays local to the UI and keeps mobile stacking and readability intact.
 Stage 37 adds a denser premium Home showcase and light visual alignment for Today, Projects, Journal, Knowledge, Inbox, Search, and Settings while keeping the same local-only data model.
+Stage 38 hardened desktop sidebar accessibility for long scrolling pages without changing mobile drawer behavior or adding new product scope.
 The Personal Insights section stays local to the device and only reflects stored tasks, projects, inbox items, journal entries, knowledge items, and wellness checklist state.
 
 ## Open or install AliOS

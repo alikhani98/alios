@@ -85,11 +85,10 @@
 
   html {
     scroll-behavior: smooth;
-    overflow-x: hidden;
   }
 
   body {
-    @apply min-w-0 overflow-x-hidden bg-background text-foreground antialiased;
+    @apply min-w-0 bg-background text-foreground antialiased;
     font-family: Vazirmatn, system-ui, sans-serif;
   }
 
