@@ -12,6 +12,7 @@ import {
   FINANCE_OBLIGATION_TYPE_OPTIONS,
   type FinanceObligationFormValues,
 } from "../domain/finance";
+import { getJalaliDatePreview } from "../financeDate";
 import { financeObligationSchema } from "@/shared/types";
 
 type FinanceObligationFormProps = {
@@ -43,9 +44,10 @@ export function FinanceObligationForm({
   onSubmit,
   onCancel,
 }: FinanceObligationFormProps) {
-  const { t } = useI18n();
+  const { language, t } = useI18n();
   const {
     register,
+    watch,
     handleSubmit,
     formState: { errors },
   } = useForm<FinanceObligationFormValues>({
@@ -64,6 +66,8 @@ export function FinanceObligationForm({
       notes: obligation?.notes ?? "",
     },
   });
+  const dueDateValue = watch("dueDate");
+  const jalaliDueDatePreview = getJalaliDatePreview(dueDateValue, language);
 
   return (
     <form
@@ -216,6 +220,14 @@ export function FinanceObligationForm({
               },
             })}
           />
+          <div className="space-y-1 text-xs leading-5 text-muted-foreground">
+            {jalaliDueDatePreview ? (
+              <p>
+                {t("finance.jalaliDueDatePreview")} {jalaliDueDatePreview}
+              </p>
+            ) : null}
+            <p>{t("finance.dueDateStorageNote")}</p>
+          </div>
           {errors.dueDate ? (
             <p className="text-sm text-destructive">{t("common.validation")}</p>
           ) : null}

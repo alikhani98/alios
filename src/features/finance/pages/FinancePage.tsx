@@ -6,11 +6,12 @@ import {
   RotateCcw,
   Wallet,
 } from "lucide-react";
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { useDateFormatter } from "@/shared/date";
 import { useI18n, type TranslationKey } from "@/shared/i18n";
 import {
+  CollapsibleSection,
   HorizontalBarList,
   EmptyState,
   MetricCard,
@@ -36,6 +37,14 @@ import { FinanceObligationCard } from "../components/FinanceObligationCard";
 import { FinanceObligationForm } from "../components/FinanceObligationForm";
 import { FinanceTransactionCard } from "../components/FinanceTransactionCard";
 import { FinanceTransactionForm } from "../components/FinanceTransactionForm";
+import {
+  FINANCE_SECTION_ANCHORS,
+  financeQuickNavItems,
+  getDefaultFinanceCollapsedSectionIds,
+  readStoredFinanceCollapsedSectionIds,
+  type FinanceCollapsibleSectionId,
+  writeStoredFinanceCollapsedSectionIds,
+} from "../financeSections";
 import { getFinanceTransactionCategoryLabelKey } from "../domain/finance";
 import { useFinance } from "../hooks/useFinance";
 import type {
@@ -161,6 +170,24 @@ export function FinancePage() {
   const [editingObligation, setEditingObligation] = useState<
     FinanceObligation | undefined
   >();
+  const [collapsedSectionIds, setCollapsedSectionIds] = useState<
+    FinanceCollapsibleSectionId[]
+  >(() => {
+    const storedSectionIds = readStoredFinanceCollapsedSectionIds();
+    if (storedSectionIds !== null) {
+      return storedSectionIds;
+    }
+
+    const isMobile =
+      typeof window !== "undefined" &&
+      window.matchMedia("(max-width: 767px)").matches;
+
+    return getDefaultFinanceCollapsedSectionIds(isMobile);
+  });
+
+  useEffect(() => {
+    writeStoredFinanceCollapsedSectionIds(collapsedSectionIds);
+  }, [collapsedSectionIds]);
 
   const review = useMemo(
     () => calculateFinanceReview(transactions, obligations, referenceDate),
@@ -373,28 +400,114 @@ export function FinancePage() {
     selectedFilter === "paidObligations"
       ? "finance.paidObligationsDescription"
       : "finance.activeObligationsDescription";
+  const isCollapsedSection = (sectionId: FinanceCollapsibleSectionId) =>
+    collapsedSectionIds.includes(sectionId);
+  const setCollapsedSectionOpen = (
+    sectionId: FinanceCollapsibleSectionId,
+    open: boolean
+  ) => {
+    setCollapsedSectionIds((currentValue) => {
+      if (open) {
+        return currentValue.filter((value) => value !== sectionId);
+      }
+
+      return currentValue.includes(sectionId)
+        ? currentValue
+        : [...currentValue, sectionId];
+    });
+  };
+  const scrollToSection = (anchorId: string) => {
+    const element = document.getElementById(anchorId);
+
+    if (!element) {
+      return;
+    }
+
+    const behavior =
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "auto"
+        : "smooth";
+
+    window.requestAnimationFrame(() => {
+      element.scrollIntoView({
+        behavior,
+        block: "start",
+      });
+    });
+  };
+  const handleQuickNav = (anchorId: string) => {
+    if (anchorId === FINANCE_SECTION_ANCHORS.charts) {
+      setCollapsedSectionOpen("charts", true);
+    } else if (anchorId === FINANCE_SECTION_ANCHORS.review) {
+      setCollapsedSectionOpen("review", true);
+    } else if (anchorId === FINANCE_SECTION_ANCHORS.obligations) {
+      setCollapsedSectionOpen("obligations", true);
+    } else if (anchorId === FINANCE_SECTION_ANCHORS.transactions) {
+      setCollapsedSectionOpen("transactions", true);
+    }
+
+    window.setTimeout(() => {
+      scrollToSection(anchorId);
+    }, 0);
+  };
 
   return (
     <section className="alios-page space-y-6">
-      <PremiumCard className="border-primary/15 bg-gradient-to-br from-primary/10 via-background to-background shadow-sm">
-        <div className="p-5 sm:p-6">
-          <SectionHeader
-            icon={<Landmark className="h-5 w-5" />}
-            eyebrow={t("finance.title")}
-            title={t("finance.title")}
-            description={t("finance.description")}
-            status={<StatusChip tone="neutral">{t("finance.localSummaryNote")}</StatusChip>}
-          />
-          <div className="mt-4 max-w-3xl space-y-2 text-sm leading-7 text-muted-foreground">
-            <p>{t("finance.reviewIntro")}</p>
-            <p>{t("finance.reviewLiquidityExplanation")}</p>
-            <p>{t("finance.noAdviceNote")}</p>
+      <section id={FINANCE_SECTION_ANCHORS.summary} className="scroll-mt-32 space-y-4">
+        <PremiumCard className="border-primary/15 bg-gradient-to-br from-primary/10 via-background to-background shadow-sm">
+          <div className="p-5 sm:p-6">
+            <SectionHeader
+              icon={<Landmark className="h-5 w-5" />}
+              eyebrow={t("finance.title")}
+              title={t("finance.title")}
+              description={t("finance.description")}
+              status={
+                <StatusChip tone="neutral">{t("finance.localSummaryNote")}</StatusChip>
+              }
+            />
+            <div className="mt-4 max-w-3xl space-y-2 text-sm leading-7 text-muted-foreground">
+              <p>{t("finance.reviewIntro")}</p>
+              <p>{t("finance.reviewLiquidityExplanation")}</p>
+              <p>{t("finance.noAdviceNote")}</p>
+            </div>
           </div>
+        </PremiumCard>
+
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {summaryCards.map((card) => (
+            <MetricCard
+              key={card.label}
+              icon={card.icon}
+              label={card.label}
+              value={card.value}
+              description={card.description}
+              status={card.status}
+            />
+          ))}
         </div>
-      </PremiumCard>
+      </section>
+
+      <div className="sticky top-[calc(4rem+env(safe-area-inset-top))] z-20 rounded-3xl border border-border/70 bg-background/95 px-3 py-2 backdrop-blur-xl sm:px-4 md:top-20">
+        <nav className="flex gap-2 overflow-x-auto pb-1" aria-label={t("finance.quickNavigation")}>
+          {financeQuickNavItems.map((item) => (
+            <Button
+              key={item.id}
+              type="button"
+              variant="outline"
+              className="shrink-0 rounded-full px-4 py-2 text-xs sm:text-sm"
+              onClick={() => handleQuickNav(item.anchorId)}
+            >
+              {t(item.labelKey)}
+            </Button>
+          ))}
+        </nav>
+      </div>
 
       {successMessage ? (
-        <div role="status" className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm">
+        <div
+          role="status"
+          className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm"
+        >
           {successMessage}
         </div>
       ) : null}
@@ -421,126 +534,139 @@ export function FinancePage() {
         </div>
       ) : null}
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {summaryCards.map((card) => (
-          <MetricCard
-            key={card.label}
-            icon={card.icon}
-            label={card.label}
-            value={card.value}
-            description={card.description}
-            status={card.status}
-          />
-        ))}
-      </div>
-
-      <PremiumCard>
-        <div className="p-5 sm:p-6">
-          <SectionHeader
-            title={t("finance.chartsTitle")}
-            description={t("finance.chartsDescription")}
-            status={<StatusChip tone="neutral">{t("finance.localOnlyData")}</StatusChip>}
-          />
-          <div className="mt-5 grid gap-4 xl:grid-cols-3">
-            <SoftPanel className="space-y-4">
-              <div className="space-y-1">
-                <h3 className="text-lg font-semibold">{t("finance.monthlySpendingByCategory")}</h3>
-                <p className="text-sm leading-7 text-muted-foreground">
-                  {t("finance.basedOnEnteredData")}
-                </p>
+      <CollapsibleSection
+        id={FINANCE_SECTION_ANCHORS.charts}
+        title={t("finance.sectionCharts")}
+        description={t("finance.chartsDescription")}
+        status={<StatusChip tone="neutral">{t("finance.localOnlyData")}</StatusChip>}
+        open={!isCollapsedSection("charts")}
+        onOpenChange={(open) => setCollapsedSectionOpen("charts", open)}
+        className="scroll-mt-32"
+        contentClassName="space-y-4"
+      >
+        <div className="grid gap-4 xl:grid-cols-3">
+          <SoftPanel className="space-y-4">
+            <div className="space-y-1">
+              <h3 className="text-lg font-semibold">
+                {t("finance.monthlySpendingByCategory")}
+              </h3>
+              <p className="text-sm leading-7 text-muted-foreground">
+                {t("finance.basedOnEnteredData")}
+              </p>
+            </div>
+            {expenseCategoryChartData.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-border/70 bg-background/60 px-4 py-6 text-sm leading-7 text-muted-foreground">
+                {t("finance.noChartDataEmptyState")}
               </div>
-              {expenseCategoryChartData.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-border/70 bg-background/60 px-4 py-6 text-sm leading-7 text-muted-foreground">
-                  {t("finance.noChartDataEmptyState")}
-                </div>
-              ) : (
-                <HorizontalBarList
-                  aria-label={t("finance.monthlySpendingByCategory")}
-                  items={expenseCategoryChartData.map((item) => ({
-                    id: item.category,
-                    label: t(getFinanceTransactionCategoryLabelKey(item.category)),
-                    amount: formatAmount(item.amount),
-                    percent: item.percentageOfExpenses,
-                    meta: t("finance.chartCategoryMeta", {
-                      count: item.transactionCount,
-                    }),
-                  }))}
-                />
-              )}
-            </SoftPanel>
+            ) : (
+              <HorizontalBarList
+                aria-label={t("finance.monthlySpendingByCategory")}
+                items={expenseCategoryChartData.map((item) => ({
+                  id: item.category,
+                  label: t(getFinanceTransactionCategoryLabelKey(item.category)),
+                  amount: formatAmount(item.amount),
+                  percent: item.percentageOfExpenses,
+                  meta: t("finance.chartCategoryMeta", {
+                    count: item.transactionCount,
+                  }),
+                }))}
+              />
+            )}
+          </SoftPanel>
 
-            <SoftPanel className="space-y-4">
-              <div className="space-y-1">
-                <h3 className="text-lg font-semibold">{t("finance.monthlyCashflowChart")}</h3>
-                <p className="text-sm leading-7 text-muted-foreground">
-                  {t("finance.basedOnEnteredData")}
-                </p>
+          <SoftPanel className="space-y-4">
+            <div className="space-y-1">
+              <h3 className="text-lg font-semibold">{t("finance.monthlyCashflowChart")}</h3>
+              <p className="text-sm leading-7 text-muted-foreground">
+                {t("finance.basedOnEnteredData")}
+              </p>
+            </div>
+            {monthlyCashflowSeries.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-border/70 bg-background/60 px-4 py-6 text-sm leading-7 text-muted-foreground">
+                {t("finance.notEnoughData")}
               </div>
-              {monthlyCashflowSeries.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-border/70 bg-background/60 px-4 py-6 text-sm leading-7 text-muted-foreground">
-                  {t("finance.notEnoughData")}
-                </div>
-              ) : (
-                <MiniCashflowBars
-                  incomeLabel={t("finance.chartIncome")}
-                  expensesLabel={t("finance.chartExpenses")}
-                  obligationsLabel={t("finance.chartObligations")}
-                  remainingLiquidityLabel={t("finance.chartRemainingLiquidity")}
-                  formatValue={(value) => formatFinanceAmount(value, currencyLocale)}
-                  items={monthlyCashflowSeries.map((item) => ({
-                    id: item.monthKey,
-                    label: formatFinanceMonthLabel(item.monthStart, currencyLocale, calendarLocale),
-                    income: item.income,
-                    expenses: item.expenses,
-                    obligations: item.obligations,
-                    remainingLiquidity: item.remainingLiquidity,
-                  }))}
-                />
-              )}
-            </SoftPanel>
+            ) : (
+              <MiniCashflowBars
+                incomeLabel={t("finance.chartIncome")}
+                expensesLabel={t("finance.chartExpenses")}
+                obligationsLabel={t("finance.chartObligations")}
+                remainingLiquidityLabel={t("finance.chartRemainingLiquidity")}
+                formatValue={(value) => formatFinanceAmount(value, currencyLocale)}
+                items={monthlyCashflowSeries.map((item) => ({
+                  id: item.monthKey,
+                  label: formatFinanceMonthLabel(
+                    item.monthStart,
+                    currencyLocale,
+                    calendarLocale
+                  ),
+                  income: item.income,
+                  expenses: item.expenses,
+                  obligations: item.obligations,
+                  remainingLiquidity: item.remainingLiquidity,
+                }))}
+              />
+            )}
+          </SoftPanel>
 
-            <SoftPanel className="space-y-4">
-              <div className="space-y-1">
-                <h3 className="text-lg font-semibold">{t("finance.obligationProgressChart")}</h3>
-                <p className="text-sm leading-7 text-muted-foreground">
-                  {t("finance.basedOnEnteredData")}
-                </p>
+          <SoftPanel className="space-y-4">
+            <div className="space-y-1">
+              <h3 className="text-lg font-semibold">
+                {t("finance.obligationProgressChart")}
+              </h3>
+              <p className="text-sm leading-7 text-muted-foreground">
+                {t("finance.basedOnEnteredData")}
+              </p>
+            </div>
+            {obligationProgressChartData.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-border/70 bg-background/60 px-4 py-6 text-sm leading-7 text-muted-foreground">
+                {t("finance.noChartDataEmptyState")}
               </div>
-              {obligationProgressChartData.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-border/70 bg-background/60 px-4 py-6 text-sm leading-7 text-muted-foreground">
-                  {t("finance.noChartDataEmptyState")}
-                </div>
-              ) : (
-                <ProgressBarList
-                  paidLabel={t("finance.paidProgress")}
-                  remainingLabel={t("finance.remainingAmount")}
-                  items={obligationProgressChartData.map((item) => ({
-                    id: item.obligation.id,
-                    label: item.obligation.title,
-                    remainingAmount: formatAmount(item.remainingAmount),
-                    paidPercentage: item.paidPercentage,
-                    meta: t(
-                      item.obligation.status === "paused"
-                        ? "finance.statusPaused"
-                        : "finance.statusActive"
-                    ),
-                  }))}
-                />
-              )}
-            </SoftPanel>
-          </div>
+            ) : (
+              <ProgressBarList
+                paidLabel={t("finance.paidProgress")}
+                remainingLabel={t("finance.remainingAmount")}
+                items={obligationProgressChartData.map((item) => ({
+                  id: item.obligation.id,
+                  label: item.obligation.title,
+                  remainingAmount: formatAmount(item.remainingAmount),
+                  paidPercentage: item.paidPercentage,
+                  meta: t(
+                    item.obligation.status === "paused"
+                      ? "finance.statusPaused"
+                      : "finance.statusActive"
+                  ),
+                }))}
+              />
+            )}
+          </SoftPanel>
         </div>
-      </PremiumCard>
+      </CollapsibleSection>
 
-      <div className="grid gap-4 xl:grid-cols-3">
-        <PremiumCard>
-          <div className="p-5 sm:p-6">
-            <SectionHeader
-              title={t("finance.monthlySpendingByCategory")}
-              description={t("finance.monthlySpendingByCategoryDescription")}
-              status={<StatusChip tone="neutral">{review.expenseCategoryBreakdown.length}</StatusChip>}
-            />
-            <div className="mt-5 space-y-3">
+      <CollapsibleSection
+        id={FINANCE_SECTION_ANCHORS.review}
+        title={t("finance.sectionReview")}
+        description={t("finance.reviewIntro")}
+        status={
+          <StatusChip tone={getBudgetGuardTone(budgetGuard.status)}>
+            {t(getBudgetGuardLabelKey(budgetGuard.status))}
+          </StatusChip>
+        }
+        open={!isCollapsedSection("review")}
+        onOpenChange={(open) => setCollapsedSectionOpen("review", open)}
+        className="scroll-mt-32"
+        contentClassName="space-y-4"
+      >
+        <div className="grid gap-4 xl:grid-cols-2">
+          <SoftPanel className="space-y-3">
+            <div className="space-y-1">
+              <h3 className="text-lg font-semibold">
+                {t("finance.monthlySpendingByCategory")}
+              </h3>
+              <p className="text-sm leading-7 text-muted-foreground">
+                {t("finance.monthlySpendingByCategoryDescription")}
+              </p>
+            </div>
+            <div className="space-y-3">
               {review.expenseCategoryBreakdown.length === 0 ? (
                 <SoftPanel>
                   <p className="text-sm text-muted-foreground">
@@ -576,21 +702,16 @@ export function FinancePage() {
                 ))
               )}
             </div>
-          </div>
-        </PremiumCard>
+          </SoftPanel>
 
-        <PremiumCard>
-          <div className="p-5 sm:p-6">
-            <SectionHeader
-              title={t("finance.budgetGuard")}
-              description={t("finance.budgetGuardDescription")}
-              status={
-                <StatusChip tone={getBudgetGuardTone(budgetGuard.status)}>
-                  {t(getBudgetGuardLabelKey(budgetGuard.status))}
-                </StatusChip>
-              }
-            />
-            <div className="mt-5 space-y-4">
+          <SoftPanel className="space-y-4">
+            <div className="space-y-1">
+              <h3 className="text-lg font-semibold">{t("finance.budgetGuard")}</h3>
+              <p className="text-sm leading-7 text-muted-foreground">
+                {t("finance.budgetGuardDescription")}
+              </p>
+            </div>
+            <div className="space-y-4">
               <SoftPanel className="space-y-3">
                 <p className="text-sm leading-7">
                   {t(getBudgetGuardSummaryKey(budgetGuard.status))}
@@ -601,7 +722,9 @@ export function FinancePage() {
               </SoftPanel>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="rounded-2xl border bg-background/70 px-4 py-3">
-                  <p className="text-xs text-muted-foreground">{t("finance.incomeThisMonth")}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {t("finance.incomeThisMonth")}
+                  </p>
                   <p className="mt-1 text-base font-semibold tabular-nums">
                     {formatAmount(budgetGuard.incomeThisMonth)}
                   </p>
@@ -619,254 +742,277 @@ export function FinancePage() {
                 </div>
               </div>
             </div>
-          </div>
-        </PremiumCard>
+          </SoftPanel>
+        </div>
+      </CollapsibleSection>
 
+      <CollapsibleSection
+        id={FINANCE_SECTION_ANCHORS.obligations}
+        title={t("finance.sectionObligations")}
+        description={t("finance.upcomingObligationPressureDescription")}
+        status={
+          <StatusChip tone="neutral">{review.upcomingObligations.length}</StatusChip>
+        }
+        open={!isCollapsedSection("obligations")}
+        onOpenChange={(open) => setCollapsedSectionOpen("obligations", open)}
+        className="scroll-mt-32"
+        contentClassName="space-y-4"
+      >
+        <div className="space-y-3">
+          {review.upcomingObligations.length === 0 ? (
+            <SoftPanel>
+              <p className="text-sm text-muted-foreground">
+                {t("finance.noUpcomingObligationsYet")}
+              </p>
+            </SoftPanel>
+          ) : (
+            review.upcomingObligations.map((item) => (
+              <SoftPanel key={item.obligation.id} className="space-y-3">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="min-w-0 space-y-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <StatusChip tone={item.label === "dueSoon" ? "warning" : "neutral"}>
+                        {t(
+                          item.label === "dueSoon"
+                            ? "finance.dueSoon"
+                            : item.label === "dueThisMonth"
+                              ? "finance.dueThisMonth"
+                              : "finance.noDueDate"
+                        )}
+                      </StatusChip>
+                      <StatusChip tone="neutral">
+                        {t(
+                          item.obligation.type === "installment"
+                            ? "finance.obligationTypeInstallment"
+                            : "finance.obligationTypeDebt"
+                        )}
+                      </StatusChip>
+                    </div>
+                    <h3 className="text-base font-semibold leading-7">
+                      {item.obligation.title}
+                    </h3>
+                    <p className="text-xs text-muted-foreground">
+                      {item.nextDueDate ? formatDate(item.nextDueDate) : t("finance.noDueDate")}
+                    </p>
+                  </div>
+                  <p className="text-base font-semibold tabular-nums">
+                    {formatAmount(item.remainingAmount)}
+                  </p>
+                </div>
+                {item.paidPercentage !== null ? (
+                  <p className="text-xs text-muted-foreground">
+                    {t("finance.paidPercentage", {
+                      value: Math.round(item.paidPercentage),
+                    })}
+                  </p>
+                ) : null}
+              </SoftPanel>
+            ))
+          )}
+        </div>
+      </CollapsibleSection>
+
+      <CollapsibleSection
+        id={FINANCE_SECTION_ANCHORS.transactions}
+        title={t("finance.sectionTransactions")}
+        description={t("finance.recordFiltersDescription")}
+        status={<StatusChip tone="neutral">{t("finance.localOnlyData")}</StatusChip>}
+        open={!isCollapsedSection("transactions")}
+        onOpenChange={(open) => setCollapsedSectionOpen("transactions", open)}
+        className="scroll-mt-32"
+        contentClassName="space-y-4"
+      >
+        <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
+          {FINANCE_VIEW_FILTERS.map((option) => {
+            const isSelected = selectedFilter === option.value;
+
+            return (
+              <Button
+                key={option.value}
+                type="button"
+                variant={isSelected ? "default" : "outline"}
+                className="flex items-center justify-between gap-3"
+                onClick={() => setSelectedFilter(option.value)}
+              >
+                <span>{t(option.labelKey)}</span>
+                <StatusChip tone={isSelected ? "primary" : "neutral"}>
+                  {filterCounts[option.value]}
+                </StatusChip>
+              </Button>
+            );
+          })}
+        </div>
+
+        <div className="space-y-4">
+          {isLoading ? (
+            <div className="grid gap-4 xl:grid-cols-2" aria-label={t("finance.loading")}>
+              {[0, 1].map((index) => (
+                <div
+                  key={index}
+                  className="h-80 animate-pulse rounded-2xl border bg-muted/60"
+                />
+              ))}
+            </div>
+          ) : !hasRecords ? (
+            <EmptyState
+              icon={<Wallet className="h-6 w-6" />}
+              title={t("finance.emptyTitle")}
+              description={t("finance.emptyDescription")}
+            />
+          ) : (
+            <div className={selectedFilter === "all" ? "grid gap-4 xl:grid-cols-2" : "space-y-4"}>
+              {showTransactionSection ? (
+                <PremiumCard>
+                  <div className="p-5 sm:p-6">
+                    <SectionHeader
+                      title={t(transactionSectionTitleKey)}
+                      description={t(transactionSectionDescriptionKey)}
+                      status={
+                        <StatusChip tone="neutral">{filteredTransactions.length}</StatusChip>
+                      }
+                    />
+                    <div className="mt-5 space-y-4">
+                      {filteredTransactions.length === 0 ? (
+                        <SoftPanel>
+                          <p className="text-sm text-muted-foreground">
+                            {selectedFilter === "income"
+                              ? t("finance.noIncomeTransactionsYet")
+                              : selectedFilter === "expenses"
+                                ? t("finance.noExpenseTransactionsYet")
+                                : t("finance.noTransactionsYet")}
+                          </p>
+                        </SoftPanel>
+                      ) : (
+                        filteredTransactions.map((transaction) => (
+                          <FinanceTransactionCard
+                            key={transaction.id}
+                            transaction={transaction}
+                            isBusy={transactionBusyId === transaction.id}
+                            onEdit={() => setEditingTransaction(transaction)}
+                            onDelete={() =>
+                              runTransactionAction(
+                                transaction,
+                                () => deleteTransaction(transaction.id),
+                                setTransactionBusyId,
+                                setTransactionError
+                              )
+                            }
+                          />
+                        ))
+                      )}
+                    </div>
+                  </div>
+                </PremiumCard>
+              ) : null}
+
+              {showObligationSection ? (
+                <PremiumCard>
+                  <div className="p-5 sm:p-6">
+                    <SectionHeader
+                      title={t(obligationSectionTitleKey)}
+                      description={t(obligationSectionDescriptionKey)}
+                      status={
+                        selectedFilter === "paidObligations" ? (
+                          <StatusChip tone="neutral">{filteredObligations.length}</StatusChip>
+                        ) : (
+                          <StatusChip tone="neutral">
+                            {t("finance.remainingObligationTotal")}:{" "}
+                            {formatAmount(summary.totalRemainingObligation)}
+                          </StatusChip>
+                        )
+                      }
+                    />
+                    <div className="mt-5 space-y-4">
+                      {filteredObligations.length === 0 ? (
+                        <SoftPanel>
+                          <p className="text-sm text-muted-foreground">
+                            {selectedFilter === "paidObligations"
+                              ? t("finance.noPaidObligationsYet")
+                              : t("finance.noObligationsYet")}
+                          </p>
+                        </SoftPanel>
+                      ) : (
+                        filteredObligations.map((obligation) => (
+                          <FinanceObligationCard
+                            key={obligation.id}
+                            obligation={obligation}
+                            isBusy={obligationBusyId === obligation.id}
+                            onEdit={() => setEditingObligation(obligation)}
+                            onDelete={() =>
+                              runObligationAction(
+                                obligation,
+                                () => deleteObligation(obligation.id),
+                                setObligationBusyId,
+                                setObligationError
+                              )
+                            }
+                          />
+                        ))
+                      )}
+                    </div>
+                  </div>
+                </PremiumCard>
+              ) : null}
+            </div>
+          )}
+        </div>
+      </CollapsibleSection>
+
+      <section id={FINANCE_SECTION_ANCHORS.add} className="scroll-mt-32 space-y-4">
         <PremiumCard>
           <div className="p-5 sm:p-6">
             <SectionHeader
-              title={t("finance.upcomingObligationPressure")}
-              description={t("finance.upcomingObligationPressureDescription")}
-              status={<StatusChip tone="neutral">{review.upcomingObligations.length}</StatusChip>}
+              title={t("finance.sectionAdd")}
+              description={t("finance.quickAddDescription")}
+              status={<StatusChip tone="neutral">{t("finance.localOnlyData")}</StatusChip>}
             />
-            <div className="mt-5 space-y-3">
-              {review.upcomingObligations.length === 0 ? (
-                <SoftPanel>
-                  <p className="text-sm text-muted-foreground">
-                    {t("finance.noUpcomingObligationsYet")}
-                  </p>
-                </SoftPanel>
-              ) : (
-                review.upcomingObligations.map((item) => (
-                  <SoftPanel key={item.obligation.id} className="space-y-3">
-                    <div className="flex flex-wrap items-start justify-between gap-3">
-                      <div className="min-w-0 space-y-2">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <StatusChip
-                            tone={item.label === "dueSoon" ? "warning" : "neutral"}
-                          >
-                            {t(
-                              item.label === "dueSoon"
-                                ? "finance.dueSoon"
-                                : item.label === "dueThisMonth"
-                                  ? "finance.dueThisMonth"
-                                  : "finance.noDueDate"
-                            )}
-                          </StatusChip>
-                          <StatusChip tone="neutral">
-                            {t(
-                              item.obligation.type === "installment"
-                                ? "finance.obligationTypeInstallment"
-                                : "finance.obligationTypeDebt"
-                            )}
-                          </StatusChip>
-                        </div>
-                        <h3 className="text-base font-semibold leading-7">
-                          {item.obligation.title}
-                        </h3>
-                        <p className="text-xs text-muted-foreground">
-                          {item.nextDueDate ? formatDate(item.nextDueDate) : t("finance.noDueDate")}
-                        </p>
-                      </div>
-                      <p className="text-base font-semibold tabular-nums">
-                        {formatAmount(item.remainingAmount)}
-                      </p>
-                    </div>
-                    {item.paidPercentage !== null ? (
-                      <p className="text-xs text-muted-foreground">
-                        {t("finance.paidPercentage", {
-                          value: Math.round(item.paidPercentage),
-                        })}
-                      </p>
-                    ) : null}
-                  </SoftPanel>
-                ))
-              )}
-            </div>
           </div>
         </PremiumCard>
-      </div>
 
-      <PremiumCard>
-        <div className="p-5 sm:p-6">
-          <SectionHeader
-            title={t("finance.quickAdd")}
-            description={t("finance.quickAddDescription")}
-          />
-          <div className="mt-5 grid gap-4 xl:grid-cols-2">
-            <SoftPanel className="space-y-4">
-              <div>
-                <p className="text-lg font-semibold">{t("finance.addTransaction")}</p>
-                <p className="text-sm text-muted-foreground">{t("finance.transactionFormDescription")}</p>
-              </div>
-              <FinanceTransactionForm
-                key={editingTransaction?.id ?? "finance-transaction-form"}
-                transaction={editingTransaction}
-                isSubmitting={isTransactionSubmitting}
-                onSubmit={handleTransactionSubmit}
-                onCancel={
-                  editingTransaction ? () => setEditingTransaction(undefined) : undefined
-                }
-              />
-            </SoftPanel>
-
-            <SoftPanel className="space-y-4">
-              <div>
-                <p className="text-lg font-semibold">{t("finance.addObligation")}</p>
-                <p className="text-sm text-muted-foreground">{t("finance.obligationFormDescription")}</p>
-              </div>
-              <FinanceObligationForm
-                key={editingObligation?.id ?? "finance-obligation-form"}
-                obligation={editingObligation}
-                isSubmitting={isObligationSubmitting}
-                onSubmit={handleObligationSubmit}
-                onCancel={
-                  editingObligation ? () => setEditingObligation(undefined) : undefined
-                }
-              />
-            </SoftPanel>
-          </div>
-        </div>
-      </PremiumCard>
-
-      <PremiumCard>
-        <div className="p-5 sm:p-6">
-          <SectionHeader
-            title={t("finance.recordFilters")}
-            description={t("finance.recordFiltersDescription")}
+        <div className="grid gap-4 xl:grid-cols-2">
+          <CollapsibleSection
+            id={FINANCE_SECTION_ANCHORS.addTransaction}
+            title={t("finance.addTransaction")}
+            description={t("finance.transactionFormDescription")}
             status={<StatusChip tone="neutral">{t("finance.localOnlyData")}</StatusChip>}
-          />
-          <div className="mt-5 grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
-            {FINANCE_VIEW_FILTERS.map((option) => {
-              const isSelected = selectedFilter === option.value;
+            open={!isCollapsedSection("addTransaction")}
+            onOpenChange={(open) => setCollapsedSectionOpen("addTransaction", open)}
+            className="h-full"
+            contentClassName="space-y-4"
+          >
+            <FinanceTransactionForm
+              key={editingTransaction?.id ?? "finance-transaction-form"}
+              transaction={editingTransaction}
+              isSubmitting={isTransactionSubmitting}
+              onSubmit={handleTransactionSubmit}
+              onCancel={
+                editingTransaction ? () => setEditingTransaction(undefined) : undefined
+              }
+            />
+          </CollapsibleSection>
 
-              return (
-                <Button
-                  key={option.value}
-                  type="button"
-                  variant={isSelected ? "default" : "outline"}
-                  className="flex items-center justify-between gap-3"
-                  onClick={() => setSelectedFilter(option.value)}
-                >
-                  <span>{t(option.labelKey)}</span>
-                  <StatusChip tone={isSelected ? "primary" : "neutral"}>
-                    {filterCounts[option.value]}
-                  </StatusChip>
-                </Button>
-              );
-            })}
-          </div>
-
-          <div className="mt-6 space-y-4">
-            {isLoading ? (
-              <div className="grid gap-4 xl:grid-cols-2" aria-label={t("finance.loading")}>
-                {[0, 1].map((index) => (
-                  <div key={index} className="h-80 animate-pulse rounded-2xl border bg-muted/60" />
-                ))}
-              </div>
-            ) : !hasRecords ? (
-              <EmptyState
-                icon={<Wallet className="h-6 w-6" />}
-                title={t("finance.emptyTitle")}
-                description={t("finance.emptyDescription")}
-              />
-            ) : (
-              <div className={selectedFilter === "all" ? "grid gap-4 xl:grid-cols-2" : "space-y-4"}>
-                {showTransactionSection ? (
-                  <PremiumCard>
-                    <div className="p-5 sm:p-6">
-                      <SectionHeader
-                        title={t(transactionSectionTitleKey)}
-                        description={t(transactionSectionDescriptionKey)}
-                        status={<StatusChip tone="neutral">{filteredTransactions.length}</StatusChip>}
-                      />
-                      <div className="mt-5 space-y-4">
-                        {filteredTransactions.length === 0 ? (
-                          <SoftPanel>
-                            <p className="text-sm text-muted-foreground">
-                              {selectedFilter === "income"
-                                ? t("finance.noIncomeTransactionsYet")
-                                : selectedFilter === "expenses"
-                                  ? t("finance.noExpenseTransactionsYet")
-                                  : t("finance.noTransactionsYet")}
-                            </p>
-                          </SoftPanel>
-                        ) : (
-                          filteredTransactions.map((transaction) => (
-                            <FinanceTransactionCard
-                              key={transaction.id}
-                              transaction={transaction}
-                              isBusy={transactionBusyId === transaction.id}
-                              onEdit={() => setEditingTransaction(transaction)}
-                              onDelete={() =>
-                                runTransactionAction(
-                                  transaction,
-                                  () => deleteTransaction(transaction.id),
-                                  setTransactionBusyId,
-                                  setTransactionError
-                                )
-                              }
-                            />
-                          ))
-                        )}
-                      </div>
-                    </div>
-                  </PremiumCard>
-                ) : null}
-
-                {showObligationSection ? (
-                  <PremiumCard>
-                    <div className="p-5 sm:p-6">
-                      <SectionHeader
-                        title={t(obligationSectionTitleKey)}
-                        description={t(obligationSectionDescriptionKey)}
-                        status={
-                          selectedFilter === "paidObligations" ? (
-                            <StatusChip tone="neutral">{filteredObligations.length}</StatusChip>
-                          ) : (
-                            <StatusChip tone="neutral">
-                              {t("finance.remainingObligationTotal")}: {formatAmount(summary.totalRemainingObligation)}
-                            </StatusChip>
-                          )
-                        }
-                      />
-                      <div className="mt-5 space-y-4">
-                        {filteredObligations.length === 0 ? (
-                          <SoftPanel>
-                            <p className="text-sm text-muted-foreground">
-                              {selectedFilter === "paidObligations"
-                                ? t("finance.noPaidObligationsYet")
-                                : t("finance.noObligationsYet")}
-                            </p>
-                          </SoftPanel>
-                        ) : (
-                          filteredObligations.map((obligation) => (
-                            <FinanceObligationCard
-                              key={obligation.id}
-                              obligation={obligation}
-                              isBusy={obligationBusyId === obligation.id}
-                              onEdit={() => setEditingObligation(obligation)}
-                              onDelete={() =>
-                                runObligationAction(
-                                  obligation,
-                                  () => deleteObligation(obligation.id),
-                                  setObligationBusyId,
-                                  setObligationError
-                                )
-                              }
-                            />
-                          ))
-                        )}
-                      </div>
-                    </div>
-                  </PremiumCard>
-                ) : null}
-              </div>
-            )}
-          </div>
+          <CollapsibleSection
+            id={FINANCE_SECTION_ANCHORS.addObligation}
+            title={t("finance.addObligation")}
+            description={t("finance.obligationFormDescription")}
+            status={<StatusChip tone="neutral">{t("finance.localOnlyData")}</StatusChip>}
+            open={!isCollapsedSection("addObligation")}
+            onOpenChange={(open) => setCollapsedSectionOpen("addObligation", open)}
+            className="h-full"
+            contentClassName="space-y-4"
+          >
+            <FinanceObligationForm
+              key={editingObligation?.id ?? "finance-obligation-form"}
+              obligation={editingObligation}
+              isSubmitting={isObligationSubmitting}
+              onSubmit={handleObligationSubmit}
+              onCancel={
+                editingObligation ? () => setEditingObligation(undefined) : undefined
+              }
+            />
+          </CollapsibleSection>
         </div>
-      </PremiumCard>
-
+      </section>
     </section>
   );
 }

@@ -104,3 +104,17 @@ Reason:
 - Lightweight interaction polish improves perceived quality without changing the data model or adding runtime complexity
 - Keeping motion in CSS preserves the static-hosting model and the existing local-first stack
 - Respecting reduced-motion preferences keeps the interface accessible while still allowing subtle premium feedback for other users
+
+## ADR-011: Keep Finance mobile navigation single-page and local-only
+
+Decision:
+
+- Finance section navigation stays on the single `/finance` route with in-page anchors and local scroll behavior
+- Finance collapse state, when persisted, lives in `localStorage` only and is not exported in backups
+- Jalali/Shamsi due-date previews are display-only and do not change ISO/Gregorian storage or calculations
+
+Reason:
+
+- The Finance page needs better mobile usability without fragmenting the page into separate routes
+- Local-only collapse state keeps the feature lightweight and avoids a schema or backup change
+- Display-only Jalali previews preserve the approved storage model and keep date calculations deterministic

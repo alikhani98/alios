@@ -127,6 +127,13 @@ The later version ideas below are directional only. They are not approved stages
 - Subtle CSS-only hover, focus, active, popover, and chart-motion polish across the shell and major pages
 - Reduced-motion users are respected and no animation library, chart library, schema/storage change, backup change, backend, sync, cloud, or AI is added
 
+## Stage 44
+
+- Finance Mobile UX & Section Navigation
+- Sticky Finance quick navigation, collapsible Finance sections, and compact in-page anchors for the long Finance page
+- Jalali/Shamsi due-date previews with ISO/Gregorian storage preserved, plus the accent palette moved into the profile popover
+- No schema/storage/backup change, no dependency, no backend, no sync, no cloud, no AI, no chart library, no animation library, and no route-heavy redesign
+
 ## Stage 38 Hardening Note
 
 - UI regression QA and release hardening stayed within the existing scope and did not add a new feature

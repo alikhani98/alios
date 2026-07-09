@@ -379,77 +379,7 @@ export function Topbar({
                   onReset={handleResetLayout}
                 />
               </div>
-
-              <div className="space-y-3 rounded-2xl border border-border/70 bg-background/70 p-3">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0 space-y-1">
-                    <p className="text-sm font-semibold">
-                      {t("home.accentColorSection")}
-                    </p>
-                    <p className="text-xs leading-5 text-muted-foreground">
-                      {t("home.accentColorSectionDescription")}
-                    </p>
-                  </div>
-                  <Badge variant="outline" className="shrink-0">
-                    {t("settings.appearance")}
-                  </Badge>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                  {accentColorOptions.map(({ value, labelKey }) => {
-                    const palette = getAccentColorThemeVariables(
-                      value,
-                      currentAppearance === "dark"
-                    );
-                    const isSelected = accentColorPreference === value;
-
-                    return (
-                      <Button
-                        key={value}
-                        type="button"
-                        variant={isSelected ? "secondary" : "outline"}
-                        className="h-auto justify-start gap-3 rounded-2xl px-3 py-3 text-start"
-                        onClick={() => handleSelectAccentColor(value)}
-                        aria-pressed={isSelected}
-                      >
-                        <span
-                          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/50 shadow-sm"
-                          style={{ backgroundColor: `hsl(${palette.primary})` }}
-                        >
-                          {isSelected ? (
-                            <Check
-                              className={`h-4 w-4 ${
-                                value === "amber" ? "text-slate-900" : "text-white"
-                              }`}
-                            />
-                          ) : null}
-                        </span>
-                        <span className="min-w-0 flex-1">
-                          <span className="block text-sm font-medium">
-                            {t(labelKey)}
-                          </span>
-                          <span className="block text-xs text-muted-foreground">
-                            {isSelected
-                              ? t("home.currentAccentColor")
-                              : t("home.selectAccentColor")}
-                          </span>
-                        </span>
-                      </Button>
-                    );
-                  })}
-                </div>
-              </div>
             </div>
-
-            {savedMessage ? (
-              <div
-                className="mt-3 rounded-2xl border border-primary/20 bg-primary/10 px-3 py-2 text-xs font-medium text-primary shadow-sm"
-                role="status"
-                aria-live="polite"
-              >
-                {savedMessage}
-              </div>
-            ) : null}
           </div>
         ) : null}
 
@@ -514,6 +444,66 @@ export function Topbar({
               </div>
             </form>
 
+            <div className="mt-4 space-y-3 rounded-2xl border border-border/70 bg-background/70 p-3">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0 space-y-1">
+                  <p className="text-sm font-semibold">
+                    {t("settings.accentColor")}
+                  </p>
+                  <p className="text-xs leading-5 text-muted-foreground">
+                    {t("settings.accentColorDescription")}
+                  </p>
+                </div>
+                <Badge variant="outline" className="shrink-0">
+                  {t("settings.appearance")}
+                </Badge>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                {accentColorOptions.map(({ value, labelKey }) => {
+                  const palette = getAccentColorThemeVariables(
+                    value,
+                    currentAppearance === "dark"
+                  );
+                  const isSelected = accentColorPreference === value;
+
+                  return (
+                    <Button
+                      key={value}
+                      type="button"
+                      variant={isSelected ? "secondary" : "outline"}
+                      className="h-auto justify-start gap-3 rounded-2xl px-3 py-3 text-start"
+                      onClick={() => handleSelectAccentColor(value)}
+                      aria-pressed={isSelected}
+                    >
+                      <span
+                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/50 shadow-sm"
+                        style={{ backgroundColor: `hsl(${palette.primary})` }}
+                      >
+                        {isSelected ? (
+                          <Check
+                            className={`h-4 w-4 ${
+                              value === "amber" ? "text-slate-900" : "text-white"
+                            }`}
+                          />
+                        ) : null}
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-sm font-medium">
+                          {t(labelKey)}
+                        </span>
+                        <span className="block text-xs text-muted-foreground">
+                          {isSelected
+                            ? t("home.currentAccentColor")
+                            : t("home.selectAccentColor")}
+                        </span>
+                      </span>
+                    </Button>
+                  );
+                })}
+              </div>
+            </div>
+
             <Button
               asChild
               variant="ghost"
@@ -521,6 +511,16 @@ export function Topbar({
             >
               <Link to="/settings">{t("nav.settings")}</Link>
             </Button>
+          </div>
+        ) : null}
+
+        {savedMessage ? (
+          <div
+            className="absolute top-full mt-2 rounded-2xl border border-primary/20 bg-primary/10 px-3 py-2 text-xs font-medium text-primary shadow-sm"
+            role="status"
+            aria-live="polite"
+          >
+            {savedMessage}
           </div>
         ) : null}
       </div>

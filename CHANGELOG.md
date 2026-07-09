@@ -2,6 +2,14 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 44 - Finance Mobile UX & Section Navigation
+
+- Added mobile-friendly collapsible Finance sections with stable local anchors and a sticky quick navigation strip
+- Added compact in-page Finance jumps for summary, charts, review, obligations, transactions, and add flows without changing routes
+- Added Jalali/Shamsi due-date previews in the obligation form while keeping stored dates as ISO/Gregorian strings
+- Moved the accent color palette out of the dashboard controls popover and into the profile popover as a global local preference
+- Kept the schema, backup format, backup version, repository boundaries, and local-first architecture unchanged
+
 ## Stage 43 - Lightweight Motion & Interaction Polish
 
 - Added subtle dependency-free motion and interaction polish across the app shell, topbar popovers, premium cards, shared chart primitives, and major feature pages
