@@ -34,6 +34,8 @@ import {
 } from "@/shared/preferences";
 import { Badge, Button, SectionHeader } from "@/shared/ui";
 import { Input } from "@/shared/ui";
+import { aliosPopoverMotion, aliosSurfaceMotion } from "@/shared/ui/motion";
+import { cn } from "@/shared/utils";
 
 import { HomeDashboardCustomizer } from "@/features/home/components/HomeDashboardCustomizer";
 import { useHomeDashboardLayout } from "@/features/home/hooks/useHomeDashboardLayout";
@@ -238,7 +240,10 @@ export function Topbar({
 
       <div
         ref={panelRef}
-        className="relative flex items-center gap-1 rounded-full border border-border/70 bg-card/70 p-1 shadow-sm backdrop-blur-sm"
+        className={cn(
+          "relative flex items-center gap-1 rounded-full border border-border/70 bg-card/70 p-1 shadow-sm backdrop-blur-sm",
+          aliosSurfaceMotion
+        )}
       >
         {showDashboardControls ? (
           <div className="group relative">
@@ -305,9 +310,11 @@ export function Topbar({
 
         {activePanel === "theme" ? (
           <div
-            className={`absolute top-full z-50 mt-2 w-64 rounded-2xl border bg-card p-2 shadow-aliosFloating ${
+            className={cn(
+              "absolute top-full z-50 mt-2 max-h-[calc(100vh-6rem)] w-64 overflow-y-auto rounded-2xl border bg-card p-2 shadow-aliosFloating",
+              aliosPopoverMotion,
               direction === "rtl" ? "left-0" : "right-0"
-            }`}
+            )}
             role="menu"
             aria-label={t("settings.appearance")}
           >
@@ -343,9 +350,11 @@ export function Topbar({
         {activePanel === "dashboard" ? (
           <div
             id="topbar-dashboard-controls"
-            className={`absolute top-full z-50 mt-2 max-h-[calc(100vh-7rem)] w-[min(30rem,calc(100vw-1rem))] max-w-[calc(100vw-1rem)] overflow-y-auto rounded-2xl border bg-card p-3 shadow-aliosFloating ${
+            className={cn(
+              "absolute top-full z-50 mt-2 max-h-[calc(100vh-7rem)] w-[min(30rem,calc(100vw-1rem))] max-w-[calc(100vw-1rem)] overflow-y-auto rounded-2xl border bg-card p-3 shadow-aliosFloating",
+              aliosPopoverMotion,
               direction === "rtl" ? "left-0" : "right-0"
-            }`}
+            )}
             role="dialog"
             aria-label={t("home.dashboardControlsTitle")}
           >
@@ -446,9 +455,11 @@ export function Topbar({
 
         {activePanel === "profile" ? (
           <div
-            className={`absolute top-full z-50 mt-2 w-[22rem] max-w-[calc(100vw-1.5rem)] rounded-2xl border bg-card p-4 shadow-aliosFloating ${
+            className={cn(
+              "absolute top-full z-50 mt-2 max-h-[calc(100vh-6rem)] w-[22rem] max-w-[calc(100vw-1.5rem)] overflow-y-auto rounded-2xl border bg-card p-4 shadow-aliosFloating",
+              aliosPopoverMotion,
               direction === "rtl" ? "left-0" : "right-0"
-            }`}
+            )}
             role="dialog"
             aria-label={t("settings.localProfile")}
           >

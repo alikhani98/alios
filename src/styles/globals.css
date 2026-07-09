@@ -16,6 +16,18 @@
   }
 }
 
+@keyframes alios-popover-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -81,6 +93,12 @@
 
   * {
     @apply border-border;
+  }
+
+  input,
+  select,
+  textarea {
+    @apply transition-[transform,border-color,box-shadow,background-color,color,opacity] duration-200 ease-out motion-reduce:transition-none motion-reduce:transform-none;
   }
 
   html {

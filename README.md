@@ -7,6 +7,7 @@ Stage 39 moves dashboard customization into the topbar and adds a local-only acc
 Stage 40 adds a local-first Finance module for income, expenses, installments, debts, and a simple monthly liquidity summary.
 Stage 41 adds a local Finance review layer with spending-by-category review, upcoming obligation pressure, obligation progress, and a neutral budget guard.
 Stage 42 adds a lightweight Finance chart foundation with dependency-free spending, cashflow, and obligation progress visuals.
+Stage 43 adds lightweight motion and interaction polish across the shell, premium cards, charts, and major pages using CSS-only transitions that respect reduced-motion preferences.
 
 AliOS is designed for one person and stores its data in the browser through IndexedDB. It requires no backend, account, authentication, subscription, paid API, or hosted AI service.
 

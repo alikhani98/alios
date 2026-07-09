@@ -41,7 +41,10 @@ export function HorizontalBarList({
         const width = clampPercent(item.percent);
 
         return (
-          <li key={item.id} className="space-y-3 rounded-2xl border border-border/70 bg-background/70 p-4">
+          <li
+            key={item.id}
+            className="group space-y-3 rounded-2xl border border-border/70 bg-background/70 p-4 transition-[transform,box-shadow,border-color,background-color] duration-200 ease-out motion-reduce:transition-none hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-sm"
+          >
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="min-w-0 space-y-1">
                 <p className="break-words font-medium leading-6">{item.label}</p>
@@ -56,7 +59,7 @@ export function HorizontalBarList({
             </div>
             <div className="h-2 overflow-hidden rounded-full bg-muted">
               <div
-                className="h-full rounded-full bg-primary transition-[width] duration-300 ease-out motion-reduce:transition-none"
+                className="h-full rounded-full bg-primary transition-[width,opacity] duration-300 ease-out motion-reduce:transition-none"
                 style={{ width: `${width}%` }}
               />
             </div>
@@ -133,7 +136,7 @@ export function MiniCashflowBars({
         return (
           <div
             key={item.id}
-            className="space-y-3 rounded-2xl border border-border/70 bg-background/70 p-4"
+            className="group space-y-3 rounded-2xl border border-border/70 bg-background/70 p-4 transition-[transform,box-shadow,border-color,background-color] duration-200 ease-out motion-reduce:transition-none hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-sm"
           >
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="min-w-0 space-y-1">
@@ -183,7 +186,7 @@ function BarRow({ label, value, scale, tone }: BarRowProps) {
       <span className="min-w-0 truncate text-muted-foreground">{label}</span>
       <div className="h-2 overflow-hidden rounded-full bg-muted">
         <div
-          className={cn("h-full rounded-full transition-[width] duration-300 ease-out motion-reduce:transition-none", tone)}
+          className={cn("h-full rounded-full transition-[width,opacity] duration-300 ease-out motion-reduce:transition-none", tone)}
           style={{ width: `${width}%` }}
         />
       </div>
@@ -225,7 +228,10 @@ export function ProgressBarList({
         const width = clampPercent(item.paidPercentage ?? 0);
 
         return (
-          <li key={item.id} className="space-y-3 rounded-2xl border border-border/70 bg-background/70 p-4">
+          <li
+            key={item.id}
+            className="group space-y-3 rounded-2xl border border-border/70 bg-background/70 p-4 transition-[transform,box-shadow,border-color,background-color] duration-200 ease-out motion-reduce:transition-none hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-sm"
+          >
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="min-w-0 space-y-1">
                 <p className="break-words font-medium leading-6">{item.label}</p>
@@ -243,7 +249,7 @@ export function ProgressBarList({
             </div>
             <div className="h-2 overflow-hidden rounded-full bg-muted">
               <div
-                className="h-full rounded-full bg-primary transition-[width] duration-300 ease-out motion-reduce:transition-none"
+                className="h-full rounded-full bg-primary transition-[width,opacity] duration-300 ease-out motion-reduce:transition-none"
                 style={{ width: `${width}%` }}
               />
             </div>

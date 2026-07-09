@@ -26,11 +26,13 @@ import {
   SectionHeader,
   SoftPanel,
 } from "@/shared/ui";
+import { aliosSurfaceMotion } from "@/shared/ui/motion";
 import {
   dismissMorningWarmupForToday,
   parseDismissedDate,
   shouldShowMorningWarmupNudge,
 } from "@/shared/preferences";
+import { cn } from "@/shared/utils";
 import type { RoutineTemplateId } from "@/features/routines";
 
 const checklistItems = [
@@ -110,7 +112,11 @@ export function HomeRoutineNudgeCard({
           {checklistItems.map((key) => (
             <div
               key={key}
-              className="flex items-start gap-2 rounded-2xl px-2 py-1.5 text-sm leading-6 transition-colors duration-200 ease-out motion-reduce:transition-none"
+              className={cn(
+                "flex items-start gap-2 rounded-2xl px-2 py-1.5 text-sm leading-6 transition-colors duration-200 ease-out motion-reduce:transition-none",
+                aliosSurfaceMotion,
+                "hover:bg-background"
+              )}
             >
               <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
               <span>{t(key)}</span>

@@ -10,6 +10,7 @@ Stage 39 moved dashboard controls into the topbar and added a local accent color
 Stage 40 adds a local Finance module that stays on the current device until you export or restore a backup.
 Stage 41 adds a Finance review layer, budget guard, and obligation pressure summaries that also stay local to the device.
 Stage 42 adds lightweight Finance charts that stay local to the device and summarize only the entered Finance records.
+Stage 43 adds lightweight motion and interaction polish that stays local to the UI and respects reduced-motion preferences.
 The Personal Insights section stays local to the device and only reflects stored tasks, projects, inbox items, journal entries, knowledge items, and wellness checklist state.
 
 ## Open or install AliOS

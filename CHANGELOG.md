@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 43 - Lightweight Motion & Interaction Polish
+
+- Added subtle dependency-free motion and interaction polish across the app shell, topbar popovers, premium cards, shared chart primitives, and major feature pages
+- Tightened hover, focus, active, and panel open states with CSS-only transitions while respecting `prefers-reduced-motion`
+- Polished finance chart bars, list rows, dashboard customizer items, and shared card surfaces without changing data behavior or adding an animation library
+- Kept the schema, backup format, backup version, repository boundaries, and local-first architecture unchanged
+
 ## Stage 42 - Lightweight Finance Charts Foundation
 
 - Added dependency-free Finance chart primitives and page panels for spending by category, monthly cashflow, and obligation progress using React plus CSS/SVG only
