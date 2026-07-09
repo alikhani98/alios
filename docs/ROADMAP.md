@@ -51,6 +51,14 @@ The later version ideas below are directional only. They are not approved stages
 - Morning warm-up nudge linked to the morning warm-up template preview
 - No schema migration, backend, sync, cloud, dependency, AI, push notification, recurring task engine, event system, wellness module, medical advice, or backup-format change
 
+## Version 1.14
+
+- Wellness / Badminton Routine Foundation
+- Home Wellness / Badminton routine card with warm-up, water, cool-down, and reflection checklists
+- Local-only daily checklist and simple reflection state using localStorage only
+- Settings toggle to enable or disable the card
+- No schema migration, backup-format change, backend, sync, cloud, dependency, AI, push notification, service worker, medical module, medical advice, medication guidance, lithium guidance, or charts
+
 ## Later product candidates
 
 - Decision Engine

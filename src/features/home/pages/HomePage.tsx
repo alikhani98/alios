@@ -31,6 +31,7 @@ import { HomeRoutineNudgeCard } from "../components/HomeRoutineNudgeCard";
 import { HomeUpcomingTasksCard } from "../components/HomeUpcomingTasksCard";
 import { useHomeDashboard } from "../hooks/useHomeDashboard";
 import { RoutineTemplatesCard, type RoutineTemplateId } from "@/features/routines";
+import { WellnessBadmintonCard } from "@/features/wellness";
 
 const levelLabelKeys: Record<Level3, TranslationKey> = {
   low: "common.low",
@@ -134,6 +135,10 @@ export function HomePage() {
 
           <HomeRoutineNudgeCard
             onViewRoutine={setSelectedRoutineTemplateId}
+          />
+
+          <WellnessBadmintonCard
+            onOpenRoutineTemplate={setSelectedRoutineTemplateId}
           />
 
           <RoutineTemplatesCard

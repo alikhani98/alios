@@ -2,6 +2,15 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 32 - Wellness / Badminton Routine Foundation
+
+- Added a compact Home dashboard Wellness / Badminton routine card with warm-up, water, cool-down, and reflection checklists
+- Added a static local-only park badminton routine template and connected it to the existing routine template registry
+- Added localStorage-backed daily checklist, energy, and fatigue reflection state with safe reset and date rollover behavior
+- Added a Settings toggle to enable or disable the wellness card, with clear local-only and not-medical-advice copy
+- Added focused helper tests for state creation, date resets, safe toggles, level validation, section coverage, and storage failure handling
+- Kept Dexie schema, backup format, backend, sync, cloud, AI, notifications, service workers, medical guidance, and coach-style advice out of scope
+
 ## Stage 31 - Routine Templates Foundation
 
 - Added a compact Home dashboard routine templates section with four built-in local-only templates

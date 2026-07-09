@@ -5,6 +5,7 @@ import {
   Clock3,
   ListChecks,
   MoonStar,
+  Trees,
   Sunrise,
 } from "lucide-react";
 
@@ -35,6 +36,7 @@ type RoutineTemplatesCardProps = {
 
 const iconMap: Record<RoutineTemplateIconName, typeof Sunrise> = {
   sunrise: Sunrise,
+  trees: Trees,
   "calendar-check": CalendarCheck2,
   "book-open-text": BookOpenText,
   "moon-star": MoonStar,
