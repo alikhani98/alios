@@ -13,6 +13,7 @@ Stage 42 adds lightweight Finance charts that stay local to the device and summa
 Stage 43 adds lightweight motion and interaction polish that stays local to the UI and respects reduced-motion preferences.
 Stage 44 adds Finance mobile quick navigation, collapsible sections, and Jalali due-date previews while keeping all stored dates as ISO/Gregorian strings.
 Stage 45 keeps the same mobile UX but trims a little avoidable work in the shell and Finance page so mobile interactions stay smooth without changing behavior.
+Stage 47 adds a beginner-friendly Settings Help Center with static bilingual guidance for first-time use, data safety, backup, Home collapsible sections, and Finance basics.
 The Personal Insights section stays local to the device and only reflects stored tasks, projects, inbox items, journal entries, knowledge items, and wellness checklist state.
 
 ## Open or install AliOS
