@@ -64,3 +64,16 @@ Reason:
 
 - The first Finance module should be useful without turning into banking, accounting, or advice software
 - Keeping the model small preserves the existing local-first architecture and leaves room for later budgeting or debt tools if they are explicitly approved
+
+## ADR-008: Keep Finance review informational and non-advisory
+
+Decision:
+
+- Finance review panels may summarize current-month spending, obligations, remaining liquidity, and simple budget pressure from entered local data
+- Finance review must stay deterministic, local-only, and neutral
+- Finance review must not become a chart system, automation engine, financial advice engine, or bank-integrated workflow
+
+Reason:
+
+- The review layer should help the user understand their own local data without implying financial advice
+- A neutral summary keeps the feature aligned with the local-first, single-user, static-hosting model
