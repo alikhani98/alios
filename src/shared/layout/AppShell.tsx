@@ -68,8 +68,9 @@ export function AppShell() {
   }, [appearancePreference]);
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-muted/30 text-foreground">
-      <div className="flex min-h-screen min-w-0">
+    <div className="relative min-h-screen overflow-x-hidden bg-muted/20 text-foreground alios-shell-background">
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,hsl(var(--background)/0.18),transparent_18%,transparent_78%,hsl(var(--background)/0.18))] dark:bg-[linear-gradient(to_bottom,hsl(var(--background)/0.3),transparent_18%,transparent_78%,hsl(var(--background)/0.3))]" />
+      <div className="relative flex min-h-screen min-w-0">
         <Sidebar
           collapsed={sidebarCollapsed}
           onToggleCollapsed={toggleSidebarCollapsed}
@@ -86,7 +87,7 @@ export function AppShell() {
             onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
           />
 
-          <main className="min-w-0 flex-1 overflow-x-hidden">
+          <main className="min-w-0 flex-1 overflow-x-hidden px-2 pb-3 pt-2 sm:px-3 sm:pb-4 sm:pt-3 lg:px-4 lg:pb-6">
             <div key={location.pathname} className="alios-page-transition min-h-full">
               <Outlet />
             </div>

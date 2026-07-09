@@ -72,6 +72,13 @@ The later version ideas below are directional only. They are not approved stages
 - Calmer Home hero composition, stronger card hierarchy, and improved dashboard rhythm
 - No new dependency, chart library, animation library, schema/storage change, backup-format change, backend, sync, cloud, AI, push notification, or service worker
 
+## Version 1.17
+
+- Premium App Shell + Home Dashboard Customization
+- Premium sidebar, topbar, page background, and mobile drawer polish
+- Home dashboard section visibility and ordering controls with localStorage-only persistence
+- No drag-and-drop yet, no new dependency, no chart library, no animation library, no schema/storage change, no backup-format change, no backend, no sync, no cloud, and no AI
+
 ## Later product candidates
 
 - Decision Engine

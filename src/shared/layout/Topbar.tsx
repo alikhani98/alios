@@ -111,7 +111,7 @@ export function Topbar({ title, onOpenMobileSidebar }: TopbarProps) {
   };
 
   return (
-    <header className="sticky top-0 z-30 flex min-h-16 items-center gap-2 border-b bg-background/95 px-3 pt-[env(safe-area-inset-top)] backdrop-blur supports-[backdrop-filter]:bg-background/75 sm:px-4 md:gap-3 md:px-6">
+    <header className="sticky top-0 z-30 flex min-h-16 items-center gap-2 border-b border-border/70 bg-background/80 px-3 pt-[env(safe-area-inset-top)] shadow-sm backdrop-blur-xl supports-[backdrop-filter]:bg-background/70 sm:px-4 md:gap-3 md:px-6">
       <Button
         type="button"
         variant="ghost"
@@ -128,7 +128,7 @@ export function Topbar({ title, onOpenMobileSidebar }: TopbarProps) {
           <h1 className="truncate text-lg font-semibold tracking-tight md:text-xl">
             {title}
           </h1>
-          <Badge variant="secondary" className="hidden md:inline-flex">
+          <Badge variant="secondary" className="hidden rounded-full md:inline-flex">
             {appConfig.version}
           </Badge>
         </div>
@@ -138,7 +138,7 @@ export function Topbar({ title, onOpenMobileSidebar }: TopbarProps) {
         <Button
           type="button"
           variant="outline"
-          className="h-9 w-full justify-start gap-2 text-muted-foreground"
+          className="h-10 w-full justify-start gap-2 rounded-2xl border-border/70 bg-card/80 text-muted-foreground shadow-sm"
           onClick={() => navigate("/search")}
           aria-label={t("nav.search")}
         >
@@ -149,12 +149,13 @@ export function Topbar({ title, onOpenMobileSidebar }: TopbarProps) {
 
       <div
         ref={panelRef}
-        className="relative flex items-center gap-1"
+        className="relative flex items-center gap-1 rounded-full border border-border/70 bg-card/70 p-1 shadow-sm backdrop-blur-sm"
       >
         <Button
           type="button"
           variant="ghost"
           size="icon"
+          className="rounded-full"
           aria-label={t("settings.appearance")}
           title={t("settings.appearance")}
           onClick={() =>
@@ -170,6 +171,7 @@ export function Topbar({ title, onOpenMobileSidebar }: TopbarProps) {
           type="button"
           variant="ghost"
           size="icon"
+          className="rounded-full"
           aria-label={t("settings.localProfile")}
           title={t("settings.localProfile")}
           onClick={handleOpenProfilePanel}

@@ -25,6 +25,7 @@ AliOS stores data in IndexedDB for the current browser, device, and site origin.
 - Moving the deployment to a different domain or path may create a separate storage origin.
 - Clearing browser/site data can permanently remove AliOS records.
 - Appearance mode and local profile name stay on the current browser or device and do not sync.
+- Home dashboard layout preferences stay on the current browser or device and do not sync.
 - The Home calendar and its task indicators stay on the current browser or device and do not sync.
 - The Home morning warm-up reminder state stays on the current browser or device and does not sync.
 - The Home Wellness / Badminton routine card and its daily checklist state stay on the current browser or device and do not sync.

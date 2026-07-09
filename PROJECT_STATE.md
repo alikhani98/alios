@@ -4,8 +4,8 @@
 
 - Project name: AliOS
 - Architecture version: AliOS 1.0
-- Current status: AliOS includes validated mobile-first Inbox capture, processing, global search, focused search-result navigation, filters, bulk triage, local appearance switching, local profile preferences, calendar month view foundation, home time-window routine nudges, upcoming task grouping, routine templates foundation, Wellness / Badminton Routine foundation, visual motion polish, premium Home dashboard visual upgrade, and hardened backup/restore safety and remains ready for static GitHub Pages deployment.
-- Current Stage: Stage 34 Completed
+- Current status: AliOS includes validated mobile-first Inbox capture, processing, global search, focused search-result navigation, filters, bulk triage, local appearance switching, local profile preferences, calendar month view foundation, home time-window routine nudges, upcoming task grouping, routine templates foundation, Wellness / Badminton Routine foundation, visual motion polish, premium Home dashboard visual upgrade, premium app shell polish, Home dashboard customization, and hardened backup/restore safety and remains ready for static GitHub Pages deployment.
+- Current Stage: Stage 35 Completed
 
 ## Architecture References
 
@@ -38,7 +38,7 @@
 
 ## Completed Stages
 
-Stages 1–34 are complete.
+Stages 1–35 are complete.
 
 - Stage 1 â€” Foundation
 - Stage 2 â€” App Shell
@@ -74,6 +74,7 @@ Stages 1–34 are complete.
 - Stage 32 â€” Wellness / Badminton Routine Foundation
 - Stage 33 â€” Visual Motion Polish
 - Stage 34 â€” Premium Home Dashboard Visual Upgrade
+- Stage 35 â€” Premium App Shell + Home Dashboard Customization
 
 Stage 9 completion is evidenced by the Today page, daily check-in create/update form, date-scoped task CRUD, all approved task statuses, completed timestamps, and single-MIT selection synchronized with todayâ€™s check-in. Browser validation confirmed task and check-in persistence across refresh, task editing, status updates, MIT selection, deletion, and the task empty state. The feature consumes TasksRepository and DailyCheckinsRepository through the injected `StorageAdapter` and does not import Dexie. Health advice, Home dashboard data, recurring tasks, notifications, analytics, backup, AI, and cross-feature workflows remain unavailable. TypeScript validation and the production build pass.
 
@@ -127,13 +128,15 @@ Stage 33 completion is evidenced by the subtle motion and surface polish across 
 
 Stage 34 completion is evidenced by the premium Home dashboard composition, calmer hero, stronger card hierarchy, upgraded visual rhythm, and more polished Home-specific summary surfaces. The stage stays visual-only, uses existing CSS/Tailwind only, and adds no dependency, chart library, animation library, schema/storage change, backup-format change, backend, sync, cloud, AI, push notification, or service worker change. TypeScript validation, automated tests, and the production build pass.
 
+Stage 35 completion is evidenced by the premium app shell polish across the sidebar, topbar, page background, navigation states, shell spacing, and mobile drawer feel, plus the new local-only Home dashboard customization foundation. Home now supports show/hide and up/down ordering for existing dashboard sections with localStorage persistence and a reset-to-default action. The stage remains UI-only and adds no dependency, no drag-and-drop library, no chart library, no animation library, no package.json change, no Dexie schema or backup-format change, no backend, no sync, no cloud, and no AI. TypeScript validation, automated tests, and the production build pass.
+
 ## Next Stage
 
 The next stage is intentionally undefined pending explicit approval. Project conversion, bulk conversion, tags, attachments, reminders, AI classification, semantic search, offline service-worker caching, automatic sync, cloud backup, and further visual redesign remain deferred. Advanced wellness coaching, medical guidance, treatment logic, and charts remain deferred beyond the simple Stage 32 checklist foundation.
 
 ## Git Latest Recommended Commit
 
-`feat(wellness): add badminton routine foundation`
+`feat(ui): add premium shell and dashboard customization`
 
 ## Build Status
 
@@ -141,7 +144,7 @@ The next stage is intentionally undefined pending explicit approval. Project con
 - Automated tests: passing (`.\\node_modules\\.bin\\vitest.CMD run`)
 - Production build: passing (`.\\node_modules\\.bin\\vite.CMD build`)
 - Production preview: passed locally at `http://127.0.0.1:4173/alios/`
-- Automated test count: 155 passing across 17 suites
+- Automated test count: 187 passing across 18 suites
 - Last verified: 2026-07-09
 
 ## Rules Before Modifying the Project
