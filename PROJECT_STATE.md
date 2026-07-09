@@ -4,8 +4,8 @@
 
 - Project name: AliOS
 - Architecture version: AliOS 1.0
-- Current status: AliOS includes validated mobile-first Inbox capture, processing, global search, focused search-result navigation, filters, bulk triage, local appearance switching, local profile preferences, calendar month view foundation, home time-window routine nudges, upcoming task grouping, routine templates foundation, Wellness / Badminton Routine foundation, visual motion polish, premium Home dashboard visual upgrade, premium app shell polish, Home dashboard customization, premium reusable components, lightweight Personal Insights, Stage 37 premium Home showcase polish, light core-page visual alignment, hardened backup/restore safety, Stage 38 UI regression QA and release hardening with desktop sticky sidebar accessibility improvements, Stage 39 topbar dashboard controls plus accent color personalization, Stage 40 finance foundation, Stage 41 finance review and budget guard, Stage 42 lightweight finance charts foundation, and remains ready for static GitHub Pages deployment.
-- Current Stage: Stage 42 Completed
+- Current status: AliOS includes validated mobile-first Inbox capture, processing, global search, focused search-result navigation, filters, bulk triage, local appearance switching, local profile preferences, calendar month view foundation, home time-window routine nudges, upcoming task grouping, routine templates foundation, Wellness / Badminton Routine foundation, visual motion polish, premium Home dashboard visual upgrade, premium app shell polish, Home dashboard customization, premium reusable components, lightweight Personal Insights, Stage 37 premium Home showcase polish, light core-page visual alignment, hardened backup/restore safety, Stage 38 UI regression QA and release hardening with desktop sticky sidebar accessibility improvements, Stage 39 topbar dashboard controls plus accent color personalization, Stage 40 finance foundation, Stage 41 finance review and budget guard, Stage 42 lightweight finance charts foundation, Stage 43 lightweight motion and interaction polish, and remains ready for static GitHub Pages deployment.
+- Current Stage: Stage 43 Completed
 
 ## Architecture References
 
@@ -38,7 +38,7 @@
 
 ## Completed Stages
 
-Stages 1–42 are complete.
+Stages 1–43 are complete.
 
 - Stage 1 â€” Foundation
 - Stage 2 â€” App Shell
@@ -82,12 +82,15 @@ Stages 1–42 are complete.
 - Stage 40 â€” Finance Foundation
 - Stage 41 â€” Finance Review & Budget Guard
 - Stage 42 â€” Lightweight Finance Charts Foundation
+- Stage 43 â€” Lightweight Motion & Interaction Polish
 
 Stage 40 completion is evidenced by the first local-first Finance module, which adds finance transactions and obligations through the existing feature/repository/storage-adapter boundary, keeps Dexie access out of UI code, and stores all finance data locally in finance-specific IndexedDB tables. The stage covers income, expenses, installments, debts, a simple monthly liquidity summary, additive backup/restore support, and a calm mobile-friendly Finance page with local CRUD flows. No backend, sync, cloud, AI, bank integration, recommendation engine, chart library, animation library, or accounting system was added. TypeScript validation passed, the repository tests were expanded, and the stage remains aligned with static GitHub Pages deployment.
 
 Stage 41 completion is evidenced by the Finance review layer on top of the Stage 40 foundation. The page now groups current-month spending by category, shows a neutral budget guard status, highlights upcoming obligation pressure, and presents obligation progress with remaining amount and paid percentage while keeping the records local and deterministic. The budget guard is informational only, uses no banking data or external advice, and does not turn Finance into a chart system, automation engine, or financial advice tool. No backup version changed, no schema migration was added, and the UI still keeps Dexie behind the repository boundary.
 
 Stage 42 completion is evidenced by the lightweight Finance chart foundation, which adds dependency-free visual summaries for spending by category, monthly cashflow, and obligation progress using React plus CSS/SVG only. The charts summarize local entered finance data only, stay descriptive and non-advisory, and keep the feature within the existing UI → hook → repository → storage-adapter → Dexie boundary. No chart library, animation library, schema migration, backup-version change, backup-format change, backend, sync, cloud, AI, or financial advice engine was added.
+
+Stage 43 completion is evidenced by lightweight motion and interaction polish across the shared shell, premium cards, shared chart primitives, dashboard customizer, topbar popovers, and major feature pages using dependency-free CSS-only transitions and mount animations. The stage keeps all interaction feedback subtle, respects `prefers-reduced-motion`, and avoids schema/storage, backup, backend, sync, cloud, AI, chart-library, or animation-library changes.
 
 Stage 39 completion is evidenced by moving Home dashboard layout controls into a compact Topbar popover, adding a local-only accent color palette that updates UI highlights through CSS variables, and keeping the Home surface cleaner without changing dashboard persistence, backup format, Dexie schema, or storage boundaries. The stage preserved show/hide, reorder, and reset behavior, added small saved-feedback messaging, and kept the app local-first with no backend, sync, cloud, AI, dependency, schema, or backup-format change. TypeScript validation, automated tests, and the production build pass.
 
@@ -157,11 +160,11 @@ Stage 35 completion is evidenced by the premium app shell polish across the side
 
 ## Next Stage
 
-The next stage is intentionally undefined pending explicit approval. Project conversion, bulk conversion, tags, attachments, reminders, AI classification, semantic search, offline service-worker caching, automatic sync, cloud backup, and further visual redesign remain deferred. Advanced wellness coaching, medical guidance, treatment logic, and charts remain deferred beyond the simple Stage 32 checklist foundation.
+The next stage is intentionally undefined pending explicit approval. Project conversion, bulk conversion, tags, attachments, reminders, AI classification, semantic search, offline service-worker caching, automatic sync, cloud backup, and further visual redesign remain deferred. Advanced wellness coaching, medical guidance, treatment logic, charts, and deeper interaction systems remain deferred beyond the approved local-first model.
 
 ## Git Latest Recommended Commit
 
-`feat(finance): add lightweight finance charts`
+`feat(ui): add lightweight motion and interaction polish`
 
 ## Build Status
 

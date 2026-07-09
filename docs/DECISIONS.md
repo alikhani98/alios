@@ -90,3 +90,17 @@ Reason:
 
 - Lightweight charts keep the Finance module compatible with static hosting and the existing UI stack
 - Avoiding a chart library preserves the local-first boundary and reduces maintenance overhead for a small visualization foundation
+
+## ADR-010: Keep motion dependency-free and reduced-motion-safe
+
+Decision:
+
+- UI motion should use existing CSS and Tailwind primitives only
+- Motion should remain subtle, non-essential, and safe to disable for reduced-motion users
+- AliOS should not introduce an animation library, route transition framework, or JavaScript animation engine for routine polish
+
+Reason:
+
+- Lightweight interaction polish improves perceived quality without changing the data model or adding runtime complexity
+- Keeping motion in CSS preserves the static-hosting model and the existing local-first stack
+- Respecting reduced-motion preferences keeps the interface accessible while still allowing subtle premium feedback for other users

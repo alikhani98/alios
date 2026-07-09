@@ -23,6 +23,8 @@ import {
   SoftPanel,
   StatusChip,
 } from "@/shared/ui";
+import { aliosSurfaceMotion } from "@/shared/ui/motion";
+import { cn } from "@/shared/utils";
 import { buildTaskTimeline, TASK_TIMELINE_SECTION_KEYS, type TaskTimelineSection } from "../taskTimeline";
 
 type HomeUpcomingTasksCardProps = {
@@ -94,7 +96,11 @@ function SectionPreview({
         {previewTasks.map((task) => (
           <div
             key={task.id}
-            className="rounded-2xl border border-dashed px-3 py-2 text-sm"
+            className={cn(
+              "rounded-2xl border border-dashed px-3 py-2 text-sm",
+              aliosSurfaceMotion,
+              "hover:border-primary/20 hover:bg-background hover:shadow-sm"
+            )}
           >
             <p className="font-medium leading-6">{task.title}</p>
           </div>

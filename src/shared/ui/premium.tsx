@@ -1,6 +1,10 @@
 import * as React from "react";
 
 import { cn } from "@/shared/utils";
+import {
+  aliosSectionMotion,
+  aliosSubtleOutlineMotion,
+} from "./motion";
 
 import { Card, CardContent } from "./card";
 
@@ -29,6 +33,7 @@ export function PremiumCard({ className, ...props }: PremiumCardProps) {
     <Card
       className={cn(
         "overflow-hidden border-primary/10 bg-gradient-to-br from-background via-background to-primary/5 shadow-sm backdrop-blur-sm",
+        "hover:border-primary/20 hover:shadow-lg",
         className
       )}
       {...props}
@@ -43,6 +48,8 @@ export function SoftPanel({ className, ...props }: SoftPanelProps) {
     <div
       className={cn(
         "rounded-3xl border border-border/70 bg-background/90 p-4 shadow-sm",
+        aliosSubtleOutlineMotion,
+        "hover:border-border/90 hover:bg-background",
         className
       )}
       {...props}
@@ -73,6 +80,7 @@ export function SectionHeader({
     <div
       className={cn(
         "flex flex-wrap items-start justify-between gap-4",
+        aliosSectionMotion,
         className
       )}
     >
@@ -113,6 +121,8 @@ export function StatusChip({
     <span
       className={cn(
         "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold leading-none",
+        aliosSubtleOutlineMotion,
+        "hover:border-border/80",
         toneClassName(tone),
         className
       )}

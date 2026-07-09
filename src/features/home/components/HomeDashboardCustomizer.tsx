@@ -12,6 +12,7 @@ import {
   Button,
   SectionHeader,
 } from "@/shared/ui";
+import { aliosSurfaceMotion } from "@/shared/ui/motion";
 import { cn } from "@/shared/utils";
 
 import {
@@ -63,6 +64,8 @@ export function HomeDashboardCustomizer({
               key={sectionId}
               className={cn(
                 "flex flex-col gap-2.5 rounded-2xl border bg-background/90 p-3 shadow-sm sm:flex-row sm:items-center sm:justify-between",
+                aliosSurfaceMotion,
+                "hover:border-primary/20 hover:bg-background hover:shadow-md",
                 !isVisible && "border-dashed bg-muted/20"
               )}
             >

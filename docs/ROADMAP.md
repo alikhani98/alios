@@ -121,6 +121,12 @@ The later version ideas below are directional only. They are not approved stages
 - Charts summarize entered local data only, stay descriptive, and avoid forecasting or advice logic
 - No chart library, no animation library, no schema migration, no backup-version change, no backend, no sync, no cloud, and no AI
 
+## Stage 43
+
+- Lightweight Motion & Interaction Polish
+- Subtle CSS-only hover, focus, active, popover, and chart-motion polish across the shell and major pages
+- Reduced-motion users are respected and no animation library, chart library, schema/storage change, backup change, backend, sync, cloud, or AI is added
+
 ## Stage 38 Hardening Note
 
 - UI regression QA and release hardening stayed within the existing scope and did not add a new feature
