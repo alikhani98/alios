@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 34 - Premium Home Dashboard Visual Upgrade
+
+- Upgraded the Home dashboard hero, section spacing, card hierarchy, and visual rhythm for a more premium calm feel
+- Added stronger Home summary surfaces while keeping task, calendar, routine, and wellness behavior unchanged
+- Kept the upgrade visual-only with no new dependency, chart library, animation library, schema/storage change, or backup-format change
+- Preserved reduced-motion, keyboard focus, mobile widths, and RTL/LTR behavior
+
 ## Stage 33 - Visual Motion Polish
 
 - Added subtle UI motion polish across shared cards, buttons, navigation links, route transitions, calendar cells, and checklist rows

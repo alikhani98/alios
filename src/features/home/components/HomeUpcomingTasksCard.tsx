@@ -68,7 +68,7 @@ function SectionPreview({
   const extraCount = tasks.length - previewTasks.length;
 
   return (
-    <div className="rounded-2xl border bg-background/80 p-4">
+    <div className="rounded-3xl border bg-background/90 p-4 shadow-sm">
       <div className="flex items-center justify-between gap-3">
         <p className="flex items-center gap-2 text-sm font-semibold">
           <Icon className="h-4 w-4 text-primary" />
@@ -108,12 +108,14 @@ export function HomeUpcomingTasksCard({ tasks }: HomeUpcomingTasksCardProps) {
   const hasUpcomingTasks = totalUpcoming > 0;
 
   return (
-    <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/5 via-background to-background">
-      <CardHeader className="gap-3">
+    <Card className="overflow-hidden border-primary/10 bg-gradient-to-br from-primary/5 via-background to-background shadow-sm">
+      <CardHeader className="gap-3 border-b border-border/60 bg-background/70 pb-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-1">
             <CardTitle className="flex items-center gap-2">
-              <Sunrise className="h-5 w-5 text-primary" />
+              <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-sm">
+                <Sunrise className="h-5 w-5" />
+              </span>
               {t("home.upcomingTasks")}
             </CardTitle>
             <CardDescription>{t("home.futureTasks")}</CardDescription>
@@ -127,7 +129,7 @@ export function HomeUpcomingTasksCard({ tasks }: HomeUpcomingTasksCardProps) {
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 pt-5">
         {hasUpcomingTasks ? (
           <>
             <div className="grid gap-3 md:grid-cols-2">
@@ -151,7 +153,7 @@ export function HomeUpcomingTasksCard({ tasks }: HomeUpcomingTasksCardProps) {
             </div>
           </>
         ) : (
-          <div className="rounded-2xl border border-dashed bg-background/70 p-6 text-center">
+          <div className="rounded-3xl border border-dashed bg-background/80 p-6 text-center shadow-sm">
             <p className="text-sm font-medium">{t("home.noUpcomingTasks")}</p>
             <p className="mt-2 text-sm leading-7 text-muted-foreground">
               {t("home.planForLater")}

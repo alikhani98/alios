@@ -3,6 +3,7 @@
 AliOS can run from a modern mobile browser and can be added to the home screen where the browser and operating system support web-app installation.
 
 Visual motion polish stays local to the UI and respects reduced-motion preferences.
+The premium Home dashboard upgrade stays local to the UI and keeps mobile stacking and readability intact.
 
 ## Open or install AliOS
 

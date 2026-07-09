@@ -63,12 +63,14 @@ export function HomeCalendarCard({ tasks }: HomeCalendarCardProps) {
   const NextIcon = direction === "rtl" ? ChevronLeft : ChevronRight;
 
   return (
-    <Card className="overflow-hidden">
-      <CardHeader className="gap-4">
+    <Card className="overflow-hidden border-primary/10 bg-gradient-to-br from-background via-background to-primary/5 shadow-sm">
+      <CardHeader className="gap-4 border-b border-border/60 bg-background/70 pb-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-1">
             <CardTitle className="flex items-center gap-2">
-              <CalendarDays className="h-5 w-5 text-primary" />
+              <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-sm">
+                <CalendarDays className="h-5 w-5" />
+              </span>
               {t("home.calendar")}
             </CardTitle>
             <CardDescription>{monthTitle}</CardDescription>
@@ -109,7 +111,7 @@ export function HomeCalendarCard({ tasks }: HomeCalendarCardProps) {
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 pt-5">
         <div className="grid grid-cols-7 gap-1 text-center text-[0.7rem] font-medium uppercase tracking-wide text-muted-foreground sm:text-xs">
           {weekdayLabels.map((label) => (
             <div key={label} className="px-1 py-2">
@@ -179,7 +181,7 @@ export function HomeCalendarCard({ tasks }: HomeCalendarCardProps) {
           })}
         </div>
 
-        <div className="rounded-2xl border bg-muted/20 p-4">
+        <div className="rounded-3xl border bg-background/85 p-4 shadow-sm">
           <div className="flex flex-wrap items-start justify-between gap-2">
             <div>
               <p className="text-sm font-semibold">{t("home.itemsForThisDay")}</p>
@@ -199,7 +201,7 @@ export function HomeCalendarCard({ tasks }: HomeCalendarCardProps) {
                 {selectedTasks.map((task) => (
                   <div
                     key={task.id}
-                    className="rounded-xl border bg-background px-3 py-2"
+                    className="rounded-2xl border bg-background px-3 py-2 shadow-sm"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <p className="min-w-0 flex-1 text-sm font-medium leading-6">
