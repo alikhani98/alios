@@ -87,7 +87,9 @@ export function AppShell() {
           />
 
           <main className="min-w-0 flex-1 overflow-x-hidden">
-            <Outlet />
+            <div key={location.pathname} className="alios-page-transition min-h-full">
+              <Outlet />
+            </div>
           </main>
         </div>
       </div>

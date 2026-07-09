@@ -12,6 +12,7 @@ AliOS is designed for one person and stores its data in the browser through Inde
 - Upcoming tasks foundation on Home with overdue, today, tomorrow, this week, and later groupings
 - Simple morning warm-up reminder on Home that appears only in a local time window
 - Wellness / Badminton routine card on Home with local-only warm-up, water, cool-down, and reflection checklists
+- Subtle visual motion polish across the shared UI with reduced-motion support
 - Mobile-first Quick Capture Inbox with note, task, idea, link, and other item types
 - Process captured items into Today tasks, Journal entries, or Knowledge items while retaining Inbox history
 - Search captured content and combine status and type filters locally

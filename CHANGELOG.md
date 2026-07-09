@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 33 - Visual Motion Polish
+
+- Added subtle UI motion polish across shared cards, buttons, navigation links, route transitions, calendar cells, and checklist rows
+- Added calm page-surface movement with reduced-motion support and no animation-library dependency
+- Kept the feature set, data schema, backup format, and storage boundaries unchanged
+- Kept accessibility and keyboard focus clarity intact while preserving the mobile and RTL/LTR experience
+
 ## Stage 32 - Wellness / Badminton Routine Foundation
 
 - Added a compact Home dashboard Wellness / Badminton routine card with warm-up, water, cool-down, and reflection checklists

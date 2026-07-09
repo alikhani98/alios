@@ -113,13 +113,13 @@ function WellnessStepGroup({
             <label
               key={stepId}
               className={cn(
-                "flex cursor-pointer items-start gap-3 rounded-xl border px-3 py-2 text-sm leading-6 transition-colors",
-                checked ? "border-primary/30 bg-primary/5" : "bg-background"
+                "flex cursor-pointer items-start gap-3 rounded-xl border px-3 py-2 text-sm leading-6 transition-[transform,box-shadow,border-color,background-color,color] duration-200 ease-out motion-reduce:transition-none motion-reduce:transform-none hover:-translate-y-0.5 hover:shadow-sm",
+                checked ? "border-primary/30 bg-primary/5 shadow-sm" : "bg-background"
               )}
             >
               <input
                 type="checkbox"
-                className="mt-1 h-4 w-4 shrink-0 rounded border-muted-foreground/30 text-primary focus:ring-primary"
+                className="mt-1 h-4 w-4 shrink-0 rounded border-muted-foreground/30 text-primary transition-colors duration-200 ease-out focus:ring-primary motion-reduce:transition-none"
                 checked={checked}
                 onChange={() => onToggleStep(stepId)}
               />

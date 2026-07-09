@@ -59,6 +59,13 @@ The later version ideas below are directional only. They are not approved stages
 - Settings toggle to enable or disable the card
 - No schema migration, backup-format change, backend, sync, cloud, dependency, AI, push notification, service worker, medical module, medical advice, medication guidance, lithium guidance, or charts
 
+## Version 1.15
+
+- Visual Motion Polish
+- Subtle shared UI motion and route-surface transitions using existing CSS/Tailwind only
+- Reduced-motion accessibility respected
+- No new dependency, animation library, schema/storage change, backup-format change, backend, sync, cloud, AI, push notification, service worker, or charts
+
 ## Later product candidates
 
 - Decision Engine

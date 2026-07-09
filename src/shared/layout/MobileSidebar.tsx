@@ -24,7 +24,7 @@ export function MobileSidebar({ open, onClose }: MobileSidebarProps) {
     >
       <div
         className={cn(
-          "absolute inset-0 bg-background/80 backdrop-blur-sm transition-opacity",
+          "absolute inset-0 bg-background/80 backdrop-blur-sm transition-opacity duration-200 ease-out motion-reduce:transition-none",
           open ? "opacity-100" : "opacity-0"
         )}
         onClick={onClose}
@@ -32,7 +32,7 @@ export function MobileSidebar({ open, onClose }: MobileSidebarProps) {
 
       <aside
         className={cn(
-          "absolute top-0 flex h-full w-72 max-w-[88vw] flex-col bg-card pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)] shadow-aliosFloating transition-transform duration-300 ease-in-out",
+          "absolute top-0 flex h-full w-72 max-w-[88vw] flex-col bg-card pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)] shadow-aliosFloating transition-transform duration-300 ease-out motion-reduce:transition-none",
           direction === "rtl" ? "right-0 border-l" : "left-0 border-r",
           open ? "translate-x-0" : direction === "rtl" ? "translate-x-full" : "-translate-x-full"
         )}

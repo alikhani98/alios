@@ -2,6 +2,8 @@
 
 AliOS can run from a modern mobile browser and can be added to the home screen where the browser and operating system support web-app installation.
 
+Visual motion polish stays local to the UI and respects reduced-motion preferences.
+
 ## Open or install AliOS
 
 The expected GitHub Pages URL is `https://alikhani98.github.io/alios/` after Pages is enabled and the deployment workflow succeeds.

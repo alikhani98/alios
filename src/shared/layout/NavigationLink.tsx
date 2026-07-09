@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom";
 import type { NavItem } from "@/shared/constants/navigation";
 import { useI18n } from "@/shared/i18n";
 import { cn } from "@/shared/utils";
+import { aliosFocusRing, aliosInteractiveLift, aliosInteractiveMotion } from "@/shared/ui/motion";
 
 import { navigationIcons } from "./navigation-icons";
 
@@ -28,8 +29,10 @@ export function NavigationLink({
       onClick={onNavigate}
       className={({ isActive }) =>
         cn(
-          "group flex min-h-11 items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium transition-colors",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+          "group flex min-h-11 items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium",
+          aliosFocusRing,
+          aliosInteractiveMotion,
+          aliosInteractiveLift,
           isActive
             ? "bg-primary text-primary-foreground shadow-sm"
             : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",

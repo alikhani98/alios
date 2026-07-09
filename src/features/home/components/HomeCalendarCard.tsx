@@ -137,7 +137,7 @@ export function HomeCalendarCard({ tasks }: HomeCalendarCardProps) {
                 aria-pressed={isSelected}
                 aria-label={formatDate(cell.date)}
                 className={cn(
-                  "flex min-h-20 flex-col justify-between rounded-2xl border p-2 text-start transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+                  "flex min-h-20 flex-col justify-between rounded-2xl border p-2 text-start transition-[transform,box-shadow,border-color,background-color,color] duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 motion-reduce:transition-none motion-reduce:transform-none hover:-translate-y-0.5 hover:shadow-sm",
                   cell.isCurrentMonth
                     ? "bg-background hover:border-primary/50"
                     : "bg-muted/40 text-muted-foreground hover:bg-muted/60",

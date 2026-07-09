@@ -17,7 +17,7 @@ export function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) {
   return (
     <aside
       className={cn(
-        "hidden min-h-screen bg-card transition-all duration-300 ease-in-out md:flex md:flex-col",
+        "hidden min-h-screen bg-card transition-all duration-300 ease-in-out motion-reduce:transition-none md:flex md:flex-col",
         direction === "rtl" ? "border-l" : "border-r",
         collapsed ? "w-[4.75rem]" : "w-64"
       )}
