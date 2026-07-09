@@ -40,6 +40,8 @@ import {
   CardHeader,
   CardTitle,
   Input,
+  PremiumCard,
+  SectionHeader,
 } from "@/shared/ui";
 import {
   WELLNESS_BADMINTON_ROUTINE_ENABLED_STORAGE_KEY,
@@ -148,10 +150,14 @@ export function SettingsPage() {
 
   return (
     <section className="alios-page space-y-6">
-      <div className="alios-page-header">
-        <h2 className="alios-page-title">{t("settings.title")}</h2>
-        <p className="alios-page-description">{t("settings.description")}</p>
-      </div>
+      <PremiumCard>
+        <CardContent className="p-5 sm:p-6">
+          <SectionHeader
+            title={t("settings.title")}
+            description={t("settings.description")}
+          />
+        </CardContent>
+      </PremiumCard>
 
       {backup.success || dataManagement.success ? (
         <div

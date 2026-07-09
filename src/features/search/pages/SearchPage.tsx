@@ -7,12 +7,14 @@ import { useI18n } from "@/shared/i18n";
 import {
   Badge,
   Button,
-  Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
+  EmptyState,
   Input,
+  PremiumCard,
+  SectionHeader,
 } from "@/shared/ui";
 import { cn } from "@/shared/utils";
 
@@ -24,7 +26,7 @@ function SearchResultCard({ result }: { result: SearchResult }) {
   const { formatDate } = useDateFormatter();
 
   return (
-    <Card className="group transition-shadow hover:shadow-md">
+    <PremiumCard className="group transition-shadow hover:shadow-md">
       <CardHeader className="space-y-3">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="min-w-0">
@@ -63,7 +65,7 @@ function SearchResultCard({ result }: { result: SearchResult }) {
           </Link>
         </Button>
       </CardContent>
-    </Card>
+    </PremiumCard>
   );
 }
 
@@ -77,12 +79,17 @@ export function SearchPage() {
 
   return (
     <section className="alios-page space-y-6">
-      <div className="alios-page-header">
-        <h2 className="alios-page-title">{t("search.title")}</h2>
-        <p className="alios-page-description">{t("search.description")}</p>
-      </div>
+      <PremiumCard>
+        <CardContent className="p-5 sm:p-6">
+          <SectionHeader
+            icon={<Search className="h-5 w-5" />}
+            title={t("search.title")}
+            description={t("search.description")}
+          />
+        </CardContent>
+      </PremiumCard>
 
-      <Card>
+      <PremiumCard>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Search className="h-5 w-5 text-primary" />
@@ -107,10 +114,10 @@ export function SearchPage() {
             />
           </div>
         </CardContent>
-      </Card>
+      </PremiumCard>
 
       {hasError ? (
-        <Card className="border-destructive/40">
+        <PremiumCard className="border-destructive/40">
           <CardContent className="flex flex-col items-start gap-4 px-6 py-8">
             <div className="flex items-start gap-2 text-sm text-destructive">
               <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" />
@@ -120,7 +127,7 @@ export function SearchPage() {
               {t("common.tryAgain")}
             </Button>
           </CardContent>
-        </Card>
+        </PremiumCard>
       ) : null}
 
       {isLoading ? (
@@ -136,29 +143,17 @@ export function SearchPage() {
           ))}
         </div>
       ) : !hasError && !hasQuery ? (
-        <Card className="border-dashed">
-          <CardContent className="flex flex-col items-center px-6 py-14 text-center">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-              <Search className="h-6 w-6" />
-            </div>
-            <h3 className="text-lg font-semibold">{t("search.emptyTitle")}</h3>
-            <p className="mt-2 max-w-xl text-sm leading-7 text-muted-foreground">
-              {t("search.emptyDescription")}
-            </p>
-          </CardContent>
-        </Card>
+        <EmptyState
+          icon={<Search className="h-6 w-6" />}
+          title={t("search.emptyTitle")}
+          description={t("search.emptyDescription")}
+        />
       ) : !hasError && hasQuery && results.length === 0 ? (
-        <Card className="border-dashed">
-          <CardContent className="flex flex-col items-center px-6 py-14 text-center">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-              <Search className="h-6 w-6" />
-            </div>
-            <h3 className="text-lg font-semibold">{t("search.noResultsTitle")}</h3>
-            <p className="mt-2 max-w-xl text-sm leading-7 text-muted-foreground">
-              {t("search.noResultsDescription")}
-            </p>
-          </CardContent>
-        </Card>
+        <EmptyState
+          icon={<Search className="h-6 w-6" />}
+          title={t("search.noResultsTitle")}
+          description={t("search.noResultsDescription")}
+        />
       ) : (
         <div className="space-y-4">
           <p className="text-sm text-muted-foreground">

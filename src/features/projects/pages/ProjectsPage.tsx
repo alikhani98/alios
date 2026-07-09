@@ -11,6 +11,9 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  EmptyState,
+  PremiumCard,
+  SectionHeader,
 } from "@/shared/ui";
 import { cn } from "@/shared/utils";
 import { ProjectCard } from "../components/ProjectCard";
@@ -144,21 +147,21 @@ export function ProjectsPage() {
 
   return (
     <section className="alios-page space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="alios-page-header mb-0">
-          <h2 className="alios-page-title">{t("projects.title")}</h2>
-          <p className="alios-page-description">
-            {t("projects.description")}
-          </p>
-        </div>
-        <Button type="button" onClick={openCreateForm}>
-          <Plus className="me-2 h-4 w-4" />
-          {t("projects.new")}
-        </Button>
-      </div>
+      <PremiumCard>
+        <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+          <SectionHeader
+            title={t("projects.title")}
+            description={t("projects.description")}
+          />
+          <Button type="button" onClick={openCreateForm}>
+            <Plus className="me-2 h-4 w-4" />
+            {t("projects.new")}
+          </Button>
+        </CardContent>
+      </PremiumCard>
 
       {formOpen ? (
-        <Card>
+        <PremiumCard>
           <CardHeader>
             <CardTitle>
               {editingProject ? t("projects.edit") : t("projects.create")}
@@ -173,7 +176,7 @@ export function ProjectsPage() {
               onCancel={closeForm}
             />
           </CardContent>
-        </Card>
+        </PremiumCard>
       ) : null}
 
       {successMessage ? (
@@ -221,21 +224,17 @@ export function ProjectsPage() {
           ))}
         </div>
       ) : projects.length === 0 ? (
-        <Card className="border-dashed">
-          <CardContent className="flex flex-col items-center px-6 py-14 text-center">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-              <FolderKanban className="h-6 w-6" />
-            </div>
-            <h3 className="text-lg font-semibold">{t("projects.emptyTitle")}</h3>
-            <p className="mt-2 max-w-md text-sm leading-7 text-muted-foreground">
-              {t("projects.emptyDescription")}
-            </p>
-            <Button type="button" className="mt-5" onClick={openCreateForm}>
+        <EmptyState
+          icon={<FolderKanban className="h-6 w-6" />}
+          title={t("projects.emptyTitle")}
+          description={t("projects.emptyDescription")}
+          actions={
+            <Button type="button" onClick={openCreateForm}>
               <Plus className="me-2 h-4 w-4" />
               {t("projects.emptyAction")}
             </Button>
-          </CardContent>
-        </Card>
+          }
+        />
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {projects.map((project) => (

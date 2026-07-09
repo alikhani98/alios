@@ -13,6 +13,9 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  EmptyState,
+  PremiumCard,
+  SectionHeader,
 } from "@/shared/ui";
 import { cn } from "@/shared/utils";
 import { DailyCheckinForm } from "../components/DailyCheckinForm";
@@ -198,16 +201,21 @@ export function TodayPage() {
 
   return (
     <section className="alios-page space-y-6">
-      <div className="alios-page-header">
-        <h2 className="alios-page-title">{t("today.title")}</h2>
-        <p className="alios-page-description">
-          {t("today.description")}
-        </p>
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <CalendarDays className="h-4 w-4" />
-          <span>{formatDate(today)}</span>
-        </div>
-      </div>
+      <PremiumCard>
+        <CardContent className="p-5 sm:p-6">
+          <SectionHeader
+            icon={<CalendarDays className="h-5 w-5" />}
+            title={t("today.title")}
+            description={t("today.description")}
+            actions={
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <CalendarDays className="h-4 w-4" />
+                <span>{formatDate(today)}</span>
+              </div>
+            }
+          />
+        </CardContent>
+      </PremiumCard>
 
       {successMessage ? (
         <div
@@ -244,7 +252,7 @@ export function TodayPage() {
         </div>
       ) : null}
 
-      <Card>
+      <PremiumCard>
         <CardHeader>
           <CardTitle>{t("today.checkin")}</CardTitle>
         </CardHeader>
@@ -260,23 +268,23 @@ export function TodayPage() {
             />
           )}
         </CardContent>
-      </Card>
+      </PremiumCard>
 
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h3 className="text-xl font-semibold">{t("today.tasks")}</h3>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {t("today.tasksDescription")}
-          </p>
-        </div>
-        <Button type="button" onClick={openCreateTask}>
-          <Plus className="me-2 h-4 w-4" />
-          {t("today.newTask")}
-        </Button>
-      </div>
+      <PremiumCard>
+        <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+          <SectionHeader
+            title={t("today.tasks")}
+            description={t("today.tasksDescription")}
+          />
+          <Button type="button" onClick={openCreateTask}>
+            <Plus className="me-2 h-4 w-4" />
+            {t("today.newTask")}
+          </Button>
+        </CardContent>
+      </PremiumCard>
 
       {taskFormOpen ? (
-        <Card>
+        <PremiumCard>
           <CardHeader>
             <CardTitle>{editingTask ? t("today.editTask") : t("today.createTask")}</CardTitle>
           </CardHeader>
@@ -290,7 +298,7 @@ export function TodayPage() {
               onCancel={closeTaskForm}
             />
           </CardContent>
-        </Card>
+        </PremiumCard>
       ) : null}
 
       {isLoading ? (
@@ -300,21 +308,17 @@ export function TodayPage() {
           ))}
         </div>
       ) : tasks.length === 0 ? (
-        <Card className="border-dashed">
-          <CardContent className="flex flex-col items-center px-6 py-12 text-center">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-              <CheckSquare2 className="h-6 w-6" />
-            </div>
-            <h3 className="text-lg font-semibold">{t("today.noTasks")}</h3>
-            <p className="mt-2 text-sm leading-7 text-muted-foreground">
-              {t("today.noTasksDescription")}
-            </p>
-            <Button type="button" className="mt-5" onClick={openCreateTask}>
+        <EmptyState
+          icon={<CheckSquare2 className="h-6 w-6" />}
+          title={t("today.noTasks")}
+          description={t("today.noTasksDescription")}
+          actions={
+            <Button type="button" onClick={openCreateTask}>
               <Plus className="me-2 h-4 w-4" />
               {t("today.firstTask")}
             </Button>
-          </CardContent>
-        </Card>
+          }
+        />
       ) : (
         <div className="space-y-3">
           {tasks.map((task) => (

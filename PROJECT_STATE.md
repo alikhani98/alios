@@ -4,8 +4,8 @@
 
 - Project name: AliOS
 - Architecture version: AliOS 1.0
-- Current status: AliOS includes validated mobile-first Inbox capture, processing, global search, focused search-result navigation, filters, bulk triage, local appearance switching, local profile preferences, calendar month view foundation, home time-window routine nudges, upcoming task grouping, routine templates foundation, Wellness / Badminton Routine foundation, visual motion polish, premium Home dashboard visual upgrade, premium app shell polish, Home dashboard customization, premium reusable components, lightweight Personal Insights, and hardened backup/restore safety and remains ready for static GitHub Pages deployment.
-- Current Stage: Stage 36 Completed
+- Current status: AliOS includes validated mobile-first Inbox capture, processing, global search, focused search-result navigation, filters, bulk triage, local appearance switching, local profile preferences, calendar month view foundation, home time-window routine nudges, upcoming task grouping, routine templates foundation, Wellness / Badminton Routine foundation, visual motion polish, premium Home dashboard visual upgrade, premium app shell polish, Home dashboard customization, premium reusable components, lightweight Personal Insights, Stage 37 premium Home showcase polish, light core-page visual alignment, and hardened backup/restore safety and remains ready for static GitHub Pages deployment.
+- Current Stage: Stage 37 Completed
 
 ## Architecture References
 
@@ -38,7 +38,7 @@
 
 ## Completed Stages
 
-Stages 1–36 are complete.
+Stages 1–37 are complete.
 
 - Stage 1 â€” Foundation
 - Stage 2 â€” App Shell
@@ -76,6 +76,9 @@ Stages 1–36 are complete.
 - Stage 34 â€” Premium Home Dashboard Visual Upgrade
 - Stage 35 â€” Premium App Shell + Home Dashboard Customization
 - Stage 36 â€” Premium Components + Lightweight Personal Insights
+- Stage 37 â€” Premium Home Showcase + Core Pages Visual Alignment
+
+Stage 37 completion is evidenced by a denser premium Home showcase with stronger hero composition, richer summary and insight surfaces, a more balanced calendar layout, more polished upcoming/routine/wellness sections, and a light visual alignment pass on Today, Projects, Journal, Knowledge, Inbox, Search, and Settings. The stage stayed UI-only, used existing local data only, preserved dashboard customization, did not add a chart library, animation library, dependency, schema migration, backup-format change, backend, sync, cloud, AI, or any new workflow, and passed TypeScript, automated tests, and the production build.
 
 Stage 36 completion is evidenced by reusable premium Home-facing card surfaces, a compact Personal Insights section on Home, CSS/Tailwind-only micro-visuals, and insight calculations derived only from existing local task, project, inbox, journal, knowledge, and wellness checklist state. The stage did not add a chart library, dependency, schema migration, Dexie table or field, backup-format change, backend, sync, cloud, AI, or medical interpretation. TypeScript validation, automated tests, and the production build pass.
 

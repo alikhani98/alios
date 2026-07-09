@@ -16,7 +16,17 @@ import { Link } from "react-router-dom";
 import { useDateFormatter } from "@/shared/date";
 import { useI18n, type TranslationKey } from "@/shared/i18n";
 import type { Level3 } from "@/shared/types";
-import { Badge, Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui";
+import {
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  EmptyState,
+  MetricCard,
+} from "@/shared/ui";
 
 import { HomeCalendarCard } from "../components/HomeCalendarCard";
 import { HomeDashboardCustomizer } from "../components/HomeDashboardCustomizer";
@@ -32,13 +42,6 @@ import { useHomeDashboard } from "../hooks/useHomeDashboard";
 import { useHomeDashboardLayout } from "../hooks/useHomeDashboardLayout";
 import { RoutineTemplatesCard, type RoutineTemplateId } from "@/features/routines";
 import { WellnessBadmintonCard } from "@/features/wellness";
-import { MetricCard } from "@/shared/ui";
-
-const levelLabelKeys: Record<Level3, TranslationKey> = {
-  low: "common.low",
-  medium: "common.medium",
-  good: "common.good",
-};
 
 const quickLinks: ReadonlyArray<{ to: string; labelKey: TranslationKey }> = [
   { to: "/today", labelKey: "home.goToday" },
@@ -86,17 +89,11 @@ export function HomePage() {
     ) : null,
     emptyState:
       data && data.isEmpty ? (
-        <Card className="overflow-hidden border-dashed border-primary/20 bg-gradient-to-br from-background via-background to-primary/5">
-          <CardContent className="flex flex-col items-center px-6 py-12 text-center">
-            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-sm">
-              <Sparkles className="h-6 w-6" />
-            </div>
-            <h3 className="text-lg font-semibold">{t("home.emptyTitle")}</h3>
-            <p className="mt-2 max-w-xl text-sm leading-7 text-muted-foreground">
-              {t("home.emptyDescription")}
-            </p>
-          </CardContent>
-        </Card>
+        <EmptyState
+          icon={<Sparkles className="h-6 w-6" />}
+          title={t("home.emptyTitle")}
+          description={t("home.emptyDescription")}
+        />
       ) : null,
     routineNudge: data ? (
       <HomeRoutineNudgeCard onViewRoutine={setSelectedRoutineTemplateId} />
@@ -117,7 +114,7 @@ export function HomePage() {
     ) : null,
     calendar: data ? <HomeCalendarCard tasks={data.tasks} /> : null,
     summaryStats: data ? (
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         <SummaryCard
           icon={<CalendarCheck2 className="h-5 w-5" />}
           label={t("home.todayTasks")}

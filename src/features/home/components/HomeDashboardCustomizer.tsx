@@ -8,7 +8,16 @@ import {
 } from "lucide-react";
 
 import { useI18n } from "@/shared/i18n";
-import { Badge, Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui";
+import {
+  Badge,
+  Button,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  PremiumCard,
+  SectionHeader,
+} from "@/shared/ui";
 import { cn } from "@/shared/utils";
 
 import {
@@ -35,28 +44,24 @@ export function HomeDashboardCustomizer({
   const { t } = useI18n();
 
   return (
-    <Card className="overflow-hidden border-primary/10 bg-gradient-to-br from-background via-background to-primary/5 shadow-sm">
+    <PremiumCard className="overflow-hidden border-primary/10 bg-gradient-to-br from-background via-background to-primary/5 shadow-sm">
       <CardHeader className="gap-3 border-b border-border/60 bg-background/70 pb-5">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="space-y-1">
-            <CardTitle className="flex items-center gap-2">
-              <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-sm">
-                <SlidersHorizontal className="h-5 w-5" />
-              </span>
-              {t("home.customizeDashboard")}
-            </CardTitle>
-            <CardDescription>{t("home.customizeDashboardDescription")}</CardDescription>
-          </div>
-          <div className="flex flex-col items-end gap-2">
-            <Badge variant="secondary" className="w-fit">
-              {t("home.localOnlyDashboardPreference")}
-            </Badge>
-            <Button type="button" variant="outline" size="sm" onClick={onReset}>
-              <RotateCcw className="me-2 h-4 w-4" />
-              {t("home.resetDashboardLayout")}
-            </Button>
-          </div>
-        </div>
+        <SectionHeader
+          icon={<SlidersHorizontal className="h-5 w-5" />}
+          title={t("home.customizeDashboard")}
+          description={t("home.customizeDashboardDescription")}
+          actions={
+            <div className="flex flex-col items-end gap-2">
+              <Badge variant="secondary" className="w-fit">
+                {t("home.localOnlyDashboardPreference")}
+              </Badge>
+              <Button type="button" variant="outline" size="sm" onClick={onReset}>
+                <RotateCcw className="me-2 h-4 w-4" />
+                {t("home.resetDashboardLayout")}
+              </Button>
+            </div>
+          }
+        />
       </CardHeader>
 
       <CardContent className="pt-5">
@@ -135,6 +140,6 @@ export function HomeDashboardCustomizer({
           })}
         </div>
       </CardContent>
-    </Card>
+    </PremiumCard>
   );
 }

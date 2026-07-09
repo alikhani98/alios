@@ -15,7 +15,17 @@ import {
 } from "@/shared/constants";
 import { usePersistentBoolean, usePersistentString } from "@/shared/hooks";
 import { useI18n } from "@/shared/i18n";
-import { Badge, Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui";
+import {
+  Badge,
+  Button,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  PremiumCard,
+  SectionHeader,
+  SoftPanel,
+} from "@/shared/ui";
 import {
   dismissMorningWarmupForToday,
   parseDismissedDate,
@@ -76,31 +86,27 @@ export function HomeRoutineNudgeCard({
   };
 
   return (
-    <Card className="overflow-hidden border-primary/10 bg-gradient-to-br from-primary/5 via-background to-background shadow-sm">
+    <PremiumCard className="overflow-hidden border-primary/10 bg-gradient-to-br from-primary/5 via-background to-background shadow-sm">
       <CardHeader className="gap-3 border-b border-border/60 bg-background/70 pb-5">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="space-y-1">
-            <CardTitle className="flex items-center gap-2">
-              <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-sm">
-                <Sunrise className="h-5 w-5" />
+        <SectionHeader
+          icon={<Sunrise className="h-5 w-5" />}
+          title={t("home.morningWarmupTitle")}
+          description={t("home.morningWarmupDescription")}
+          actions={
+            <div className="flex flex-col items-end gap-2">
+              <Badge variant="secondary" className="w-fit">
+                {t("settings.localInAppReminder")}
+              </Badge>
+              <span className="text-xs text-muted-foreground">
+                {t("settings.noPushNotification")}
               </span>
-              {t("home.morningWarmupTitle")}
-            </CardTitle>
-            <CardDescription>{t("home.morningWarmupDescription")}</CardDescription>
-          </div>
-          <div className="flex flex-col items-end gap-2">
-            <Badge variant="secondary" className="w-fit">
-              {t("settings.localInAppReminder")}
-            </Badge>
-            <span className="text-xs text-muted-foreground">
-              {t("settings.noPushNotification")}
-            </span>
-          </div>
-        </div>
+            </div>
+          }
+        />
       </CardHeader>
 
       <CardContent className="space-y-4 pt-5">
-        <div className="grid gap-3 rounded-3xl border bg-background/90 p-4 shadow-sm sm:grid-cols-2">
+        <SoftPanel className="grid gap-3 sm:grid-cols-2">
           {checklistItems.map((key) => (
             <div
               key={key}
@@ -110,7 +116,7 @@ export function HomeRoutineNudgeCard({
               <span>{t(key)}</span>
             </div>
           ))}
-        </div>
+        </SoftPanel>
 
         <div className="flex flex-wrap gap-2">
           <Button
@@ -147,6 +153,6 @@ export function HomeRoutineNudgeCard({
           </Button>
         </div>
       </CardContent>
-    </Card>
+    </PremiumCard>
   );
 }

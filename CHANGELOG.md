@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 37 - Premium Home Showcase + Core Pages Visual Alignment
+
+- Improved the Home dashboard showcase feel with stronger hero composition, denser summary surfaces, a more balanced calendar, and more polished upcoming/routine/wellness sections
+- Applied a light visual alignment pass to Today, Projects, Journal, Knowledge, Inbox, Search, and Settings so they better match the premium Home and app shell language
+- Refined shared premium surfaces so metric, insight, empty-state, and soft-panel treatments feel more consistent across the app
+- Kept the stage UI-only with no dependency change, no chart library, no animation library, no schema/storage/backup change, no backend, no sync, no cloud, and no AI
+
 ## Stage 36 - Premium Components + Lightweight Personal Insights
 
 - Added reusable premium Home-facing card surfaces for metric, insight, status, empty-state, and soft-panel layouts using CSS/Tailwind only

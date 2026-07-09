@@ -28,7 +28,7 @@ export function PremiumCard({ className, ...props }: PremiumCardProps) {
   return (
     <Card
       className={cn(
-        "overflow-hidden border-primary/10 bg-gradient-to-br from-background via-background to-primary/5 shadow-sm",
+        "overflow-hidden border-primary/10 bg-gradient-to-br from-background via-background to-primary/5 shadow-sm backdrop-blur-sm",
         className
       )}
       {...props}
@@ -42,7 +42,7 @@ export function SoftPanel({ className, ...props }: SoftPanelProps) {
   return (
     <div
       className={cn(
-        "rounded-3xl border bg-background/90 p-4 shadow-sm",
+        "rounded-3xl border border-border/70 bg-background/90 p-4 shadow-sm",
         className
       )}
       {...props}
@@ -70,8 +70,13 @@ export function SectionHeader({
   className,
 }: SectionHeaderProps) {
   return (
-    <div className={cn("flex flex-wrap items-start justify-between gap-3", className)}>
-      <div className="space-y-1">
+    <div
+      className={cn(
+        "flex flex-wrap items-start justify-between gap-4",
+        className
+      )}
+    >
+      <div className="min-w-0 space-y-1">
         {eyebrow ? (
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
             {eyebrow}
@@ -79,11 +84,13 @@ export function SectionHeader({
         ) : null}
         <div className="flex flex-wrap items-center gap-2">
           {icon ? <span className="text-primary">{icon}</span> : null}
-          <h3 className="text-lg font-semibold tracking-tight">{title}</h3>
+          <h3 className="text-xl font-semibold tracking-tight sm:text-[1.35rem]">
+            {title}
+          </h3>
           {status ? <div className="shrink-0">{status}</div> : null}
         </div>
         {description ? (
-          <p className="max-w-2xl text-sm leading-7 text-muted-foreground">
+          <p className="max-w-3xl text-sm leading-7 text-muted-foreground">
             {description}
           </p>
         ) : null}
@@ -159,17 +166,19 @@ export function MetricCard({
   className,
 }: MetricCardProps) {
   return (
-    <PremiumCard className={cn("h-full", className)}>
-      <CardContent className="flex h-full flex-col justify-between gap-4 p-5">
+    <PremiumCard className={cn("h-full min-h-40", className)}>
+      <CardContent className="flex h-full flex-col justify-between gap-5 p-5 sm:p-6">
         <div className="flex items-center justify-between gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-sm">
+          <div className="flex h-12 w-12 items-center justify-center rounded-[1.15rem] border border-primary/10 bg-primary/10 text-primary shadow-sm">
             {icon}
           </div>
           {status ? <div className="shrink-0">{status}</div> : null}
         </div>
         <div className="space-y-1">
-          <p className="text-sm font-medium text-muted-foreground">{label}</p>
-          <p className="text-3xl font-semibold tabular-nums tracking-tight">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+            {label}
+          </p>
+          <p className="text-[2rem] font-semibold tabular-nums tracking-tight sm:text-[2.25rem]">
             {value}
           </p>
           {description ? (
@@ -205,18 +214,20 @@ export function InsightStatCard({
   const hasProgress = typeof progress === "number" && Number.isFinite(progress);
 
   return (
-    <PremiumCard className={cn("h-full", className)}>
-      <CardContent className="flex h-full flex-col gap-4 p-5">
+    <PremiumCard className={cn("h-full min-h-44", className)}>
+      <CardContent className="flex h-full flex-col gap-5 p-5 sm:p-6">
         <div className="flex items-start justify-between gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-sm">
+          <div className="flex h-11 w-11 items-center justify-center rounded-[1.15rem] border border-primary/10 bg-primary/10 text-primary shadow-sm">
             {icon}
           </div>
           {status ? <div className="shrink-0">{status}</div> : null}
         </div>
 
         <div className="space-y-1">
-          <p className="text-sm font-medium text-muted-foreground">{label}</p>
-          <p className="text-3xl font-semibold tabular-nums tracking-tight">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+            {label}
+          </p>
+          <p className="text-[2rem] font-semibold tabular-nums tracking-tight sm:text-[2.25rem]">
             {value}
           </p>
           {description ? (
@@ -249,9 +260,9 @@ export function EmptyState({
 }: EmptyStateProps) {
   return (
     <PremiumCard className={cn("border-dashed", className)}>
-      <CardContent className="flex flex-col items-center px-6 py-12 text-center">
+      <CardContent className="flex flex-col items-center px-6 py-12 text-center sm:px-8">
         {icon ? (
-          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-sm">
+          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-[1.25rem] border border-primary/10 bg-primary/10 text-primary shadow-sm">
             {icon}
           </div>
         ) : null}

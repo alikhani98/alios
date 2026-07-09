@@ -11,7 +11,18 @@ import { Link } from "react-router-dom";
 import { useDateFormatter } from "@/shared/date";
 import { useI18n, type TranslationKey } from "@/shared/i18n";
 import type { Task } from "@/shared/types";
-import { Badge, Button, Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/shared/ui";
+import {
+  Badge,
+  Button,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  PremiumCard,
+  SoftPanel,
+  SectionHeader,
+} from "@/shared/ui";
 import { cn } from "@/shared/utils";
 
 import {
@@ -63,125 +74,122 @@ export function HomeCalendarCard({ tasks }: HomeCalendarCardProps) {
   const NextIcon = direction === "rtl" ? ChevronLeft : ChevronRight;
 
   return (
-    <Card className="overflow-hidden border-primary/10 bg-gradient-to-br from-background via-background to-primary/5 shadow-sm">
+    <PremiumCard className="border-primary/10 bg-gradient-to-br from-background via-background to-primary/5 shadow-sm">
       <CardHeader className="gap-4 border-b border-border/60 bg-background/70 pb-5">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="space-y-1">
-            <CardTitle className="flex items-center gap-2">
-              <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-sm">
-                <CalendarDays className="h-5 w-5" />
-              </span>
-              {t("home.calendar")}
-            </CardTitle>
-            <CardDescription>{monthTitle}</CardDescription>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={() =>
-                setSelectedDate((currentDate) => shiftMonth(currentDate, -1))
-              }
-            >
-              <PreviousIcon className="me-2 h-4 w-4" />
-              {t("home.previousMonth")}
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={() => setSelectedDate(() => new Date())}
-            >
-              {t("home.currentMonth")}
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={() =>
-                setSelectedDate((currentDate) => shiftMonth(currentDate, 1))
-              }
-            >
-              {t("home.nextMonth")}
-              <NextIcon className="ms-2 h-4 w-4" />
-            </Button>
-          </div>
-        </div>
+        <SectionHeader
+          icon={<CalendarDays className="h-5 w-5" />}
+          title={t("home.calendar")}
+          description={monthTitle}
+          actions={
+            <div className="flex flex-wrap items-center gap-2">
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() =>
+                  setSelectedDate((currentDate) => shiftMonth(currentDate, -1))
+                }
+              >
+                <PreviousIcon className="me-2 h-4 w-4" />
+                {t("home.previousMonth")}
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => setSelectedDate(() => new Date())}
+              >
+                {t("home.currentMonth")}
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() =>
+                  setSelectedDate((currentDate) => shiftMonth(currentDate, 1))
+                }
+              >
+                {t("home.nextMonth")}
+                <NextIcon className="ms-2 h-4 w-4" />
+              </Button>
+            </div>
+          }
+        />
       </CardHeader>
 
-      <CardContent className="space-y-4 pt-5">
-        <div className="grid grid-cols-7 gap-1 text-center text-[0.7rem] font-medium uppercase tracking-wide text-muted-foreground sm:text-xs">
-          {weekdayLabels.map((label) => (
-            <div key={label} className="px-1 py-2">
-              {label}
-            </div>
-          ))}
-        </div>
+      <CardContent className="grid gap-5 pt-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)]">
+        <div className="space-y-4">
+          <div className="grid grid-cols-7 gap-1 text-center text-[0.7rem] font-medium uppercase tracking-wide text-muted-foreground sm:text-xs">
+            {weekdayLabels.map((label) => (
+              <div key={label} className="px-1 py-2">
+                {label}
+              </div>
+            ))}
+          </div>
 
-        <div className="grid grid-cols-7 gap-1">
-          {calendarCells.map((cell) => {
-            const isSelected = cell.isoDate === selectedIsoDate;
-            const secondaryLabel =
-              resolvedCalendar === "jalali"
-                ? formatDayNumber(cell.date, {
-                    language,
-                    calendar: "gregorian",
-                  })
-                : null;
+          <div className="grid grid-cols-7 gap-1">
+            {calendarCells.map((cell) => {
+              const isSelected = cell.isoDate === selectedIsoDate;
+              const secondaryLabel =
+                resolvedCalendar === "jalali"
+                  ? formatDayNumber(cell.date, {
+                      language,
+                      calendar: "gregorian",
+                    })
+                  : null;
 
-            return (
-              <button
-                key={cell.isoDate}
-                type="button"
-                onClick={() => setSelectedDate(cell.date)}
-                aria-pressed={isSelected}
-                aria-label={formatDate(cell.date)}
-                className={cn(
-                  "flex min-h-20 flex-col justify-between rounded-2xl border p-2 text-start transition-[transform,box-shadow,border-color,background-color,color] duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 motion-reduce:transition-none motion-reduce:transform-none hover:-translate-y-0.5 hover:shadow-sm",
-                  cell.isCurrentMonth
-                    ? "bg-background hover:border-primary/50"
-                    : "bg-muted/40 text-muted-foreground hover:bg-muted/60",
-                  cell.isToday && "border-primary/60 ring-1 ring-primary/25",
-                  isSelected && "border-primary bg-primary/5 shadow-sm"
-                )}
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <div className="space-y-0.5">
-                    <span className="block text-sm font-semibold leading-none">
-                      {formatDayNumber(cell.date, {
-                        language,
-                        calendar: resolvedCalendar,
-                      })}
-                    </span>
-                    {secondaryLabel ? (
-                      <span className="block text-[0.65rem] leading-none text-muted-foreground">
-                        {secondaryLabel}
+              return (
+                <button
+                  key={cell.isoDate}
+                  type="button"
+                  onClick={() => setSelectedDate(cell.date)}
+                  aria-pressed={isSelected}
+                  aria-label={formatDate(cell.date)}
+                  className={cn(
+                    "flex min-h-20 flex-col justify-between rounded-2xl border p-2 text-start transition-[transform,box-shadow,border-color,background-color,color] duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 motion-reduce:transition-none motion-reduce:transform-none hover:-translate-y-0.5 hover:shadow-sm",
+                    cell.isCurrentMonth
+                      ? "bg-background hover:border-primary/50"
+                      : "bg-muted/40 text-muted-foreground hover:bg-muted/60",
+                    cell.isToday && "border-primary/60 ring-1 ring-primary/25",
+                    isSelected && "border-primary bg-primary/5 shadow-sm"
+                  )}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="space-y-0.5">
+                      <span className="block text-sm font-semibold leading-none">
+                        {formatDayNumber(cell.date, {
+                          language,
+                          calendar: resolvedCalendar,
+                        })}
                       </span>
+                      {secondaryLabel ? (
+                        <span className="block text-[0.65rem] leading-none text-muted-foreground">
+                          {secondaryLabel}
+                        </span>
+                      ) : null}
+                    </div>
+                    {cell.taskCount > 0 ? (
+                      <Badge variant="secondary" className="shrink-0 px-2 py-0.5">
+                        {cell.taskCount}
+                      </Badge>
                     ) : null}
                   </div>
-                  {cell.taskCount > 0 ? (
-                    <Badge variant="secondary" className="shrink-0 px-2 py-0.5">
-                      {cell.taskCount}
-                    </Badge>
-                  ) : null}
-                </div>
-                {cell.isToday ? (
-                  <span className="mt-2 inline-flex w-fit rounded-full bg-primary/10 px-2 py-0.5 text-[0.65rem] font-medium text-primary">
-                    {t("home.today")}
-                  </span>
-                ) : (
-                  <span aria-hidden className="mt-2 block text-[0.65rem] text-transparent">
-                    .
-                  </span>
-                )}
-              </button>
-            );
-          })}
+                  {cell.isToday ? (
+                    <span className="mt-2 inline-flex w-fit rounded-full bg-primary/10 px-2 py-0.5 text-[0.65rem] font-medium text-primary">
+                      {t("home.today")}
+                    </span>
+                  ) : (
+                    <span aria-hidden className="mt-2 block text-[0.65rem] text-transparent">
+                      .
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
-        <div className="rounded-3xl border bg-background/85 p-4 shadow-sm">
+        <SoftPanel className="space-y-4 border-primary/10 bg-background/85 lg:self-start">
           <div className="flex flex-wrap items-start justify-between gap-2">
             <div>
               <p className="text-sm font-semibold">{t("home.itemsForThisDay")}</p>
@@ -193,7 +201,7 @@ export function HomeCalendarCard({ tasks }: HomeCalendarCardProps) {
           </div>
 
           {selectedTasks.length > 0 ? (
-            <div className="mt-4 space-y-3">
+            <div className="space-y-3">
               <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                 {t("home.tasksOnThisDay")}
               </p>
@@ -219,11 +227,11 @@ export function HomeCalendarCard({ tasks }: HomeCalendarCardProps) {
               </div>
             </div>
           ) : (
-            <p className="mt-4 text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground">
               {t("home.noItemsForThisDay")}
             </p>
           )}
-        </div>
+        </SoftPanel>
       </CardContent>
 
       <CardFooter className="flex flex-wrap justify-end gap-2">
@@ -234,6 +242,6 @@ export function HomeCalendarCard({ tasks }: HomeCalendarCardProps) {
           </Link>
         </Button>
       </CardFooter>
-    </Card>
+    </PremiumCard>
   );
 }

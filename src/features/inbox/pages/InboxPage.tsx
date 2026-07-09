@@ -4,7 +4,17 @@ import { useSearchParams } from "react-router-dom";
 
 import { useI18n } from "@/shared/i18n";
 import { INBOX_ITEM_TYPE_VALUES } from "@/shared/types";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input } from "@/shared/ui";
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  EmptyState,
+  Input,
+  PremiumCard,
+  SectionHeader,
+} from "@/shared/ui";
 import { cn } from "@/shared/utils";
 import { InboxItemCard } from "../components/InboxItemCard";
 import { InboxItemForm } from "../components/InboxItemForm";
@@ -183,19 +193,23 @@ export function InboxPage() {
 
   return (
     <section className="alios-page space-y-6">
-      <div className="alios-page-header">
-        <h2 className="alios-page-title">{t("inbox.title")}</h2>
-        <p className="alios-page-description">{t("inbox.description")}</p>
-      </div>
+      <PremiumCard>
+        <CardContent className="p-5 sm:p-6">
+          <SectionHeader
+            title={t("inbox.title")}
+            description={t("inbox.description")}
+          />
+        </CardContent>
+      </PremiumCard>
 
-      <Card>
+      <PremiumCard>
         <CardHeader><CardTitle>{t("inbox.quickCapture")}</CardTitle></CardHeader>
         <CardContent>
           <InboxItemForm isSubmitting={isCapturing} onSubmit={capture} />
         </CardContent>
-      </Card>
+      </PremiumCard>
 
-      <Card>
+      <PremiumCard>
         <CardHeader><CardTitle>{t("inbox.searchInbox")}</CardTitle></CardHeader>
         <CardContent className="grid gap-4">
           <div className="relative">
@@ -243,7 +257,7 @@ export function InboxPage() {
             </div>
           ) : null}
         </CardContent>
-      </Card>
+      </PremiumCard>
 
       {message ? (
         <div role="status" className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm">{message}</div>
@@ -271,7 +285,7 @@ export function InboxPage() {
       ) : null}
 
       {selectedVisibleCount > 0 ? (
-        <Card>
+        <PremiumCard>
           <CardContent className="grid gap-3 p-4">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-sm font-medium">
@@ -343,7 +357,7 @@ export function InboxPage() {
               )}
             </div>
           </CardContent>
-        </Card>
+        </PremiumCard>
       ) : null}
 
       {isLoading ? (
@@ -351,21 +365,17 @@ export function InboxPage() {
           {[0, 1].map((index) => <div key={index} className="h-48 animate-pulse rounded-2xl border bg-muted/60" />)}
         </div>
       ) : items.length === 0 ? (
-        <Card className="border-dashed">
-          <CardContent className="flex flex-col items-center px-6 py-14 text-center">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary"><Inbox className="h-6 w-6" /></div>
-            <h3 className="text-lg font-semibold">{t("inbox.emptyTitle")}</h3>
-            <p className="mt-2 max-w-md text-sm leading-7 text-muted-foreground">{t("inbox.emptyDescription")}</p>
-          </CardContent>
-        </Card>
+        <EmptyState
+          icon={<Inbox className="h-6 w-6" />}
+          title={t("inbox.emptyTitle")}
+          description={t("inbox.emptyDescription")}
+        />
       ) : filteredItems.length === 0 ? (
-        <Card className="border-dashed">
-          <CardContent className="flex flex-col items-center px-6 py-14 text-center">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-muted text-muted-foreground"><SearchX className="h-6 w-6" /></div>
-            <h3 className="text-lg font-semibold">{t("inbox.noMatchingItems")}</h3>
-            <p className="mt-2 max-w-md text-sm leading-7 text-muted-foreground">{t("inbox.tryChangingFilters")}</p>
-          </CardContent>
-        </Card>
+        <EmptyState
+          icon={<SearchX className="h-6 w-6" />}
+          title={t("inbox.noMatchingItems")}
+          description={t("inbox.tryChangingFilters")}
+        />
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
           {filteredItems.map((item) => (
