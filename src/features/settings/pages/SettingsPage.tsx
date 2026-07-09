@@ -10,6 +10,7 @@ import {
   MonitorSmartphone,
   RotateCcw,
   ShieldCheck,
+  SlidersHorizontal,
   Sunrise,
   Trash2,
   Upload,
@@ -17,7 +18,7 @@ import {
   SunMedium,
   Trees,
 } from "lucide-react";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 import {
   APPEARANCE_STORAGE_KEY,
@@ -43,6 +44,7 @@ import {
 import {
   WELLNESS_BADMINTON_ROUTINE_ENABLED_STORAGE_KEY,
 } from "@/features/wellness";
+import { resetHomeDashboardLayoutPreference } from "@/features/home/hooks/useHomeDashboardLayout";
 import { createBackupPreview } from "../backupPreview";
 import { useBackupRestore } from "../hooks/useBackupRestore";
 import { useLocalDataManagement } from "../hooks/useLocalDataManagement";
@@ -125,6 +127,9 @@ export function SettingsPage() {
       key: WELLNESS_BADMINTON_ROUTINE_ENABLED_STORAGE_KEY,
       defaultValue: true,
     });
+  const [homeLayoutResetMessage, setHomeLayoutResetMessage] = useState<
+    string | null
+  >(null);
   const dataManagement = useLocalDataManagement();
   const backup = useBackupRestore(dataManagement.loadSummary);
   const restorePreview = backup.pendingBackup
@@ -195,6 +200,45 @@ export function SettingsPage() {
               </Button>
             ))}
           </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <SlidersHorizontal className="h-5 w-5 text-primary" />
+            {t("home.homeLayout")}
+          </CardTitle>
+          <CardDescription>{t("home.localOnlyDashboardPreference")}</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="rounded-xl border bg-muted/30 p-4">
+            <p className="text-sm leading-7 text-muted-foreground">
+              {t("home.customizeDashboardDescription")}
+            </p>
+            <p className="mt-2 text-xs leading-5 text-muted-foreground">
+              {t("home.dashboardSections")}
+            </p>
+          </div>
+          {homeLayoutResetMessage ? (
+            <div
+              role="status"
+              className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-primary"
+            >
+              {homeLayoutResetMessage}
+            </div>
+          ) : null}
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              resetHomeDashboardLayoutPreference();
+              setHomeLayoutResetMessage(t("home.dashboardLayoutReset"));
+            }}
+          >
+            <RotateCcw className="me-2 h-4 w-4" />
+            {t("home.resetDashboardLayout")}
+          </Button>
         </CardContent>
       </Card>
 

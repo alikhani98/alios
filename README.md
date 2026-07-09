@@ -14,6 +14,8 @@ AliOS is designed for one person and stores its data in the browser through Inde
 - Wellness / Badminton routine card on Home with local-only warm-up, water, cool-down, and reflection checklists
 - Subtle visual motion polish across the shared UI with reduced-motion support
 - Premium Home dashboard visual upgrade with calmer hero composition and stronger card hierarchy
+- Premium app shell with calmer sidebar, topbar, page background, and mobile drawer feel
+- Home dashboard customization with local show/hide and move up/down controls for existing sections
 - Mobile-first Quick Capture Inbox with note, task, idea, link, and other item types
 - Process captured items into Today tasks, Journal entries, or Knowledge items while retaining Inbox history
 - Search captured content and combine status and type filters locally
@@ -160,6 +162,7 @@ Version 1.0 is intentionally single-user and local-only. It does not include:
 - Google Calendar, ICS export, notifications, analytics, or charts
 - UI automation or end-to-end browser tests
 - Advanced routines and wellness engines beyond the simple local checklist foundation
+- Local-only Home dashboard layout preferences with no drag-and-drop builder yet
 
 Dates remain stored as ISO/Gregorian strings; Jalali support is display-only. User-generated content is never automatically translated.
 The Home dashboard also includes a small local-only morning reminder that can be dismissed for the day or disabled in Settings, a routine templates section with built-in previews, a local Wellness / Badminton routine card with daily checklist state, and an upcoming tasks summary that helps separate overdue, today, tomorrow, this week, and later work.

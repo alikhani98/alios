@@ -12,9 +12,11 @@ import { useDateFormatter } from "@/shared/date";
 import { useI18n } from "@/shared/i18n";
 import { Badge, Card, CardContent } from "@/shared/ui";
 import type { HomeDashboardData } from "../types";
+import type { ReactNode } from "react";
 
 type HomeDashboardHeroProps = {
   data: HomeDashboardData;
+  actions?: ReactNode;
 };
 
 const levelLabelKeys = {
@@ -54,7 +56,7 @@ function HeroMetricTile({ icon: Icon, label, value, tone }: HeroMetric) {
   );
 }
 
-export function HomeDashboardHero({ data }: HomeDashboardHeroProps) {
+export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
   const { t } = useI18n();
   const { formatDate } = useDateFormatter();
   const todayCount = data.today.tasks.length;
@@ -103,9 +105,12 @@ export function HomeDashboardHero({ data }: HomeDashboardHeroProps) {
 
         <div className="relative grid gap-6 xl:grid-cols-[1.3fr_0.95fr] xl:items-end">
           <div className="space-y-5">
-            <div className="inline-flex items-center gap-2 rounded-full border bg-background/80 px-3 py-1 text-xs font-medium text-muted-foreground shadow-sm backdrop-blur">
-              <Sparkles className="h-3.5 w-3.5 text-primary" />
-              {formatDate(new Date())}
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="inline-flex items-center gap-2 rounded-full border bg-background/80 px-3 py-1 text-xs font-medium text-muted-foreground shadow-sm backdrop-blur">
+                <Sparkles className="h-3.5 w-3.5 text-primary" />
+                {formatDate(new Date())}
+              </div>
+              {actions ? <div className="flex flex-wrap gap-2">{actions}</div> : null}
             </div>
 
             <div className="max-w-2xl space-y-3">

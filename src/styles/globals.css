@@ -92,6 +92,20 @@
     @apply min-w-0 overflow-x-hidden bg-background text-foreground antialiased;
     font-family: Vazirmatn, system-ui, sans-serif;
   }
+
+  .alios-shell-background {
+    background-image:
+      radial-gradient(circle at top left, hsl(var(--primary) / 0.12), transparent 28%),
+      radial-gradient(circle at top right, hsl(var(--secondary) / 0.24), transparent 24%),
+      linear-gradient(to bottom, hsl(var(--background)), hsl(var(--muted) / 0.16));
+  }
+
+  .dark .alios-shell-background {
+    background-image:
+      radial-gradient(circle at top left, hsl(var(--primary) / 0.18), transparent 26%),
+      radial-gradient(circle at top right, hsl(var(--secondary) / 0.12), transparent 22%),
+      linear-gradient(to bottom, hsl(var(--background)), hsl(var(--background)));
+  }
 }
 
 @layer components {
@@ -100,7 +114,7 @@
   }
 
   .alios-page {
-    @apply mx-auto w-full max-w-7xl px-4 py-4 sm:px-6 sm:py-6;
+    @apply mx-auto w-full max-w-[88rem] px-3 py-4 sm:px-5 sm:py-6 lg:px-6 lg:py-8;
   }
 
   .alios-page-header {

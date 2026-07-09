@@ -2,6 +2,14 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 35 - Premium App Shell + Home Dashboard Customization
+
+- Upgraded the app shell with a calmer premium sidebar, topbar, page background, spacing, and mobile drawer feel
+- Added a lightweight Home dashboard customization foundation with show/hide, move up/down, and reset controls for existing sections
+- Persisted Home dashboard layout preferences locally with `localStorage` only
+- Added focused helper tests for default layout, normalization, visibility toggles, reordering, boundary behavior, reset, and visible-section filtering
+- Kept the stage UI-only with no new dependency, no drag-and-drop library, no chart library, no animation library, no Dexie schema change, no backup-format change, and no backend/sync/cloud/AI change
+
 ## Stage 34 - Premium Home Dashboard Visual Upgrade
 
 - Upgraded the Home dashboard hero, section spacing, card hierarchy, and visual rhythm for a more premium calm feel
