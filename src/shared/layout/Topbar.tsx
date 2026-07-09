@@ -1,5 +1,6 @@
 import {
   Check,
+  LayoutDashboard,
   Menu,
   Moon,
   MonitorSmartphone,
@@ -26,13 +27,18 @@ import { useI18n } from "@/shared/i18n";
 import {
   DEFAULT_APPEARANCE_PREFERENCE,
   getDisplayNameInitials,
+  getAccentColorThemeVariables,
   normalizeDisplayName,
   parseAppearancePreference,
+  useAccentColorPreference,
 } from "@/shared/preferences";
-import { Badge, Button } from "@/shared/ui";
+import { Badge, Button, SectionHeader } from "@/shared/ui";
 import { Input } from "@/shared/ui";
 
-type ActivePanel = "theme" | "profile" | null;
+import { HomeDashboardCustomizer } from "@/features/home/components/HomeDashboardCustomizer";
+import { useHomeDashboardLayout } from "@/features/home/hooks/useHomeDashboardLayout";
+
+type ActivePanel = "dashboard" | "theme" | "profile" | null;
 
 const appearanceOptions = [
   { value: "light", icon: SunMedium, labelKey: "settings.light" },
@@ -43,9 +49,23 @@ const appearanceOptions = [
 type TopbarProps = {
   title: string;
   onOpenMobileSidebar: () => void;
+  showDashboardControls?: boolean;
 };
 
-export function Topbar({ title, onOpenMobileSidebar }: TopbarProps) {
+const accentColorOptions = [
+  { value: "default", labelKey: "settings.accentDefault" },
+  { value: "violet", labelKey: "settings.accentViolet" },
+  { value: "rose", labelKey: "settings.accentRose" },
+  { value: "amber", labelKey: "settings.accentAmber" },
+  { value: "emerald", labelKey: "settings.accentEmerald" },
+  { value: "slate", labelKey: "settings.accentSlate" },
+] as const;
+
+export function Topbar({
+  title,
+  onOpenMobileSidebar,
+  showDashboardControls = false,
+}: TopbarProps) {
   const { direction, t } = useI18n();
   const navigate = useNavigate();
   const panelRef = useRef<HTMLDivElement>(null);
@@ -58,11 +78,28 @@ export function Topbar({ title, onOpenMobileSidebar }: TopbarProps) {
     key: DISPLAY_NAME_STORAGE_KEY,
     defaultValue: "",
   });
+  const { value: accentColorPreference, setValue: setAccentColorPreference } =
+    useAccentColorPreference();
+  const {
+    layout,
+    moveSectionUp,
+    moveSectionDown,
+    toggleSectionVisibility,
+    resetLayout,
+  } = useHomeDashboardLayout();
   const [activePanel, setActivePanel] = useState<ActivePanel>(null);
   const [draftDisplayName, setDraftDisplayName] = useState(displayName);
+  const [savedMessage, setSavedMessage] = useState<string | null>(null);
+  const savedMessageTimer = useRef<number | null>(null);
   const currentAppearance = parseAppearancePreference(appearancePreference);
   const hasDisplayName = displayName.trim().length > 0;
   const initials = getDisplayNameInitials(displayName);
+
+  useEffect(() => {
+    if (!showDashboardControls && activePanel === "dashboard") {
+      setActivePanel(null);
+    }
+  }, [activePanel, showDashboardControls]);
 
   useEffect(() => {
     const handlePointerDown = (event: MouseEvent | TouchEvent) => {
@@ -92,9 +129,61 @@ export function Topbar({ title, onOpenMobileSidebar }: TopbarProps) {
     };
   }, []);
 
+  useEffect(() => {
+    return () => {
+      if (savedMessageTimer.current !== null) {
+        window.clearTimeout(savedMessageTimer.current);
+      }
+    };
+  }, []);
+
   const handleSelectAppearance = (value: string) => {
     setAppearancePreference(value);
     setActivePanel(null);
+  };
+
+  const showSavedFeedback = () => {
+    setSavedMessage(t("common.changesSaved"));
+
+    if (savedMessageTimer.current !== null) {
+      window.clearTimeout(savedMessageTimer.current);
+    }
+
+    savedMessageTimer.current = window.setTimeout(() => {
+      setSavedMessage(null);
+      savedMessageTimer.current = null;
+    }, 1800);
+  };
+
+  const handleMoveSectionUp = (sectionId: Parameters<typeof moveSectionUp>[0]) => {
+    moveSectionUp(sectionId);
+    showSavedFeedback();
+  };
+
+  const handleMoveSectionDown = (
+    sectionId: Parameters<typeof moveSectionDown>[0]
+  ) => {
+    moveSectionDown(sectionId);
+    showSavedFeedback();
+  };
+
+  const handleToggleSectionVisibility = (
+    sectionId: Parameters<typeof toggleSectionVisibility>[0]
+  ) => {
+    toggleSectionVisibility(sectionId);
+    showSavedFeedback();
+  };
+
+  const handleResetLayout = () => {
+    resetLayout();
+    showSavedFeedback();
+  };
+
+  const handleSelectAccentColor = (
+    value: (typeof accentColorOptions)[number]["value"]
+  ) => {
+    setAccentColorPreference(value);
+    showSavedFeedback();
   };
 
   const handleOpenProfilePanel = () => {
@@ -151,6 +240,35 @@ export function Topbar({ title, onOpenMobileSidebar }: TopbarProps) {
         ref={panelRef}
         className="relative flex items-center gap-1 rounded-full border border-border/70 bg-card/70 p-1 shadow-sm backdrop-blur-sm"
       >
+        {showDashboardControls ? (
+          <div className="group relative">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="rounded-full"
+              aria-label={t("home.dashboardLayoutTooltip")}
+              aria-expanded={activePanel === "dashboard"}
+              aria-controls="topbar-dashboard-controls"
+              title={t("home.dashboardLayoutTooltip")}
+              onClick={() =>
+                setActivePanel((currentValue) =>
+                  currentValue === "dashboard" ? null : "dashboard"
+                )
+              }
+            >
+              <LayoutDashboard className="h-5 w-5" />
+            </Button>
+
+            <span
+              role="tooltip"
+              className="pointer-events-none absolute -top-9 left-1/2 z-50 -translate-x-1/2 whitespace-nowrap rounded-full border border-border/70 bg-popover px-3 py-1 text-xs font-medium text-popover-foreground opacity-0 shadow-md transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100"
+            >
+              {t("home.dashboardLayoutTooltip")}
+            </span>
+          </div>
+        ) : null}
+
         <Button
           type="button"
           variant="ghost"
@@ -219,6 +337,110 @@ export function Topbar({ title, onOpenMobileSidebar }: TopbarProps) {
                 </Button>
               ))}
             </div>
+          </div>
+        ) : null}
+
+        {activePanel === "dashboard" ? (
+          <div
+            id="topbar-dashboard-controls"
+            className={`absolute top-full z-50 mt-2 max-h-[calc(100vh-7rem)] w-[min(30rem,calc(100vw-1rem))] max-w-[calc(100vw-1rem)] overflow-y-auto rounded-2xl border bg-card p-3 shadow-aliosFloating ${
+              direction === "rtl" ? "left-0" : "right-0"
+            }`}
+            role="dialog"
+            aria-label={t("home.dashboardControlsTitle")}
+          >
+            <div className="space-y-4">
+              <SectionHeader
+                icon={<LayoutDashboard className="h-5 w-5" />}
+                title={t("home.dashboardControlsTitle")}
+                description={t("home.dashboardControlsDescription")}
+                status={
+                  <Badge variant="secondary" className="shrink-0">
+                    {t("home.localOnlyDashboardPreference")}
+                  </Badge>
+                }
+              />
+
+              <div className="rounded-2xl border border-border/70 bg-background/70 p-3">
+                <HomeDashboardCustomizer
+                  layout={layout}
+                  onMoveUp={handleMoveSectionUp}
+                  onMoveDown={handleMoveSectionDown}
+                  onToggleVisibility={handleToggleSectionVisibility}
+                  onReset={handleResetLayout}
+                />
+              </div>
+
+              <div className="space-y-3 rounded-2xl border border-border/70 bg-background/70 p-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 space-y-1">
+                    <p className="text-sm font-semibold">
+                      {t("home.accentColorSection")}
+                    </p>
+                    <p className="text-xs leading-5 text-muted-foreground">
+                      {t("home.accentColorSectionDescription")}
+                    </p>
+                  </div>
+                  <Badge variant="outline" className="shrink-0">
+                    {t("settings.appearance")}
+                  </Badge>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                  {accentColorOptions.map(({ value, labelKey }) => {
+                    const palette = getAccentColorThemeVariables(
+                      value,
+                      currentAppearance === "dark"
+                    );
+                    const isSelected = accentColorPreference === value;
+
+                    return (
+                      <Button
+                        key={value}
+                        type="button"
+                        variant={isSelected ? "secondary" : "outline"}
+                        className="h-auto justify-start gap-3 rounded-2xl px-3 py-3 text-start"
+                        onClick={() => handleSelectAccentColor(value)}
+                        aria-pressed={isSelected}
+                      >
+                        <span
+                          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/50 shadow-sm"
+                          style={{ backgroundColor: `hsl(${palette.primary})` }}
+                        >
+                          {isSelected ? (
+                            <Check
+                              className={`h-4 w-4 ${
+                                value === "amber" ? "text-slate-900" : "text-white"
+                              }`}
+                            />
+                          ) : null}
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block text-sm font-medium">
+                            {t(labelKey)}
+                          </span>
+                          <span className="block text-xs text-muted-foreground">
+                            {isSelected
+                              ? t("home.currentAccentColor")
+                              : t("home.selectAccentColor")}
+                          </span>
+                        </span>
+                      </Button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {savedMessage ? (
+              <div
+                className="mt-3 rounded-2xl border border-primary/20 bg-primary/10 px-3 py-2 text-xs font-medium text-primary shadow-sm"
+                role="status"
+                aria-live="polite"
+              >
+                {savedMessage}
+              </div>
+            ) : null}
           </div>
         ) : null}
 

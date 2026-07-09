@@ -6,6 +6,7 @@ Visual motion polish stays local to the UI and respects reduced-motion preferenc
 The premium Home dashboard upgrade stays local to the UI and keeps mobile stacking and readability intact.
 Stage 37 adds a denser premium Home showcase and light visual alignment for Today, Projects, Journal, Knowledge, Inbox, Search, and Settings while keeping the same local-only data model.
 Stage 38 hardened desktop sidebar accessibility for long scrolling pages without changing mobile drawer behavior or adding new product scope.
+Stage 39 moved dashboard controls into the topbar and added a local accent color palette without changing the device-local storage model.
 The Personal Insights section stays local to the device and only reflects stored tasks, projects, inbox items, journal entries, knowledge items, and wellness checklist state.
 
 ## Open or install AliOS
@@ -28,6 +29,8 @@ AliOS stores data in IndexedDB for the current browser, device, and site origin.
 - Moving the deployment to a different domain or path may create a separate storage origin.
 - Clearing browser/site data can permanently remove AliOS records.
 - Appearance mode and local profile name stay on the current browser or device and do not sync.
+- Home dashboard layout controls now live in the topbar and stay on the current browser or device.
+- Home accent color preference stays on the current browser or device and does not sync.
 - Home dashboard layout preferences stay on the current browser or device and do not sync.
 - The Home calendar and its task indicators stay on the current browser or device and do not sync.
 - The Home morning warm-up reminder state stays on the current browser or device and does not sync.

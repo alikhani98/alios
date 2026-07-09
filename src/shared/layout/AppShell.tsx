@@ -6,9 +6,11 @@ import { usePersistentBoolean, usePersistentString } from "@/shared/hooks";
 import { useI18n } from "@/shared/i18n";
 import { APPEARANCE_STORAGE_KEY } from "@/shared/constants";
 import {
+  applyAccentColorThemeVariables,
   DEFAULT_APPEARANCE_PREFERENCE,
   parseAppearancePreference,
   resolveAppearance,
+  useAccentColorPreference,
 } from "@/shared/preferences";
 
 import { MobileSidebar } from "./MobileSidebar";
@@ -26,6 +28,7 @@ export function AppShell() {
     key: APPEARANCE_STORAGE_KEY,
     defaultValue: DEFAULT_APPEARANCE_PREFERENCE,
   });
+  const { value: accentColorPreference } = useAccentColorPreference();
 
   const {
     value: sidebarCollapsed,
@@ -52,6 +55,10 @@ export function AppShell() {
         "dark",
         resolvedAppearance === "dark"
       );
+      applyAccentColorThemeVariables(
+        accentColorPreference,
+        resolvedAppearance === "dark"
+      );
     };
 
     applyTheme();
@@ -65,7 +72,7 @@ export function AppShell() {
     return () => {
       mediaQuery.removeEventListener("change", applyTheme);
     };
-  }, [appearancePreference]);
+  }, [appearancePreference, accentColorPreference]);
 
   return (
     <div className="relative min-h-screen bg-muted/20 text-foreground alios-shell-background">
@@ -85,6 +92,7 @@ export function AppShell() {
           <Topbar
             title={t(currentNavigationItem.titleKey)}
             onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
+            showDashboardControls={location.pathname === "/"}
           />
 
           <main className="min-w-0 flex-1 overflow-x-hidden px-2 pb-3 pt-2 sm:px-3 sm:pb-4 sm:pt-3 lg:px-4 lg:pb-6">

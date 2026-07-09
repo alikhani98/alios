@@ -8,7 +8,6 @@ import {
   Inbox,
   RotateCcw,
   Sparkles,
-  SlidersHorizontal,
 } from "lucide-react";
 import { type ReactNode, useState } from "react";
 import { Link } from "react-router-dom";
@@ -29,7 +28,6 @@ import {
 } from "@/shared/ui";
 
 import { HomeCalendarCard } from "../components/HomeCalendarCard";
-import { HomeDashboardCustomizer } from "../components/HomeDashboardCustomizer";
 import { HomeDashboardHero } from "../components/HomeDashboardHero";
 import { HomePersonalInsightsCard } from "../components/HomePersonalInsightsCard";
 import { HomeRoutineNudgeCard } from "../components/HomeRoutineNudgeCard";
@@ -66,16 +64,9 @@ export function HomePage() {
   const { t } = useI18n();
   const { formatDate } = useDateFormatter();
   const { data, isLoading, hasError, loadDashboard } = useHomeDashboard();
-  const {
-    layout,
-    moveSectionUp,
-    moveSectionDown,
-    toggleSectionVisibility,
-    resetLayout,
-  } = useHomeDashboardLayout();
+  const { layout } = useHomeDashboardLayout();
   const [selectedRoutineTemplateId, setSelectedRoutineTemplateId] =
     useState<RoutineTemplateId | null>(null);
-  const [customizerOpen, setCustomizerOpen] = useState(false);
 
   const visibleSectionIds = getVisibleDashboardSections(layout);
 
@@ -304,41 +295,7 @@ export function HomePage() {
         </div>
       ) : data ? (
         <>
-          <div className="flex flex-col gap-3 rounded-3xl border bg-card/85 p-4 shadow-sm backdrop-blur sm:flex-row sm:items-center sm:justify-between">
-            <div className="space-y-1">
-              <div className="flex flex-wrap items-center gap-2">
-                <p className="text-sm font-semibold">{t("home.homeLayout")}</p>
-                <Badge variant="secondary">
-                  {t("home.localOnlyDashboardPreference")}
-                </Badge>
-              </div>
-              <p className="text-sm leading-6 text-muted-foreground">
-                {t("home.customizeDashboardDescription")}
-              </p>
-            </div>
-            <Button
-              type="button"
-              variant={customizerOpen ? "secondary" : "outline"}
-              size="sm"
-              aria-expanded={customizerOpen}
-              aria-controls="home-dashboard-customizer"
-              onClick={() => setCustomizerOpen((currentValue) => !currentValue)}
-            >
-              <SlidersHorizontal className="me-2 h-4 w-4" />
-              {t("home.customizeDashboard")}
-            </Button>
-          </div>
-
           {renderedSections[0]?.content ?? null}
-          {customizerOpen ? (
-            <HomeDashboardCustomizer
-              layout={layout}
-              onMoveUp={moveSectionUp}
-              onMoveDown={moveSectionDown}
-              onToggleVisibility={toggleSectionVisibility}
-              onReset={resetLayout}
-            />
-          ) : null}
           {renderedSections.slice(1).map(({ sectionId, content }) => (
             <div key={sectionId} className="min-w-0">
               {content}

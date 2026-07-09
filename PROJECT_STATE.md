@@ -4,8 +4,8 @@
 
 - Project name: AliOS
 - Architecture version: AliOS 1.0
-- Current status: AliOS includes validated mobile-first Inbox capture, processing, global search, focused search-result navigation, filters, bulk triage, local appearance switching, local profile preferences, calendar month view foundation, home time-window routine nudges, upcoming task grouping, routine templates foundation, Wellness / Badminton Routine foundation, visual motion polish, premium Home dashboard visual upgrade, premium app shell polish, Home dashboard customization, premium reusable components, lightweight Personal Insights, Stage 37 premium Home showcase polish, light core-page visual alignment, hardened backup/restore safety, and Stage 38 UI regression QA and release hardening with desktop sticky sidebar accessibility improvements, and remains ready for static GitHub Pages deployment.
-- Current Stage: Stage 38 Completed
+- Current status: AliOS includes validated mobile-first Inbox capture, processing, global search, focused search-result navigation, filters, bulk triage, local appearance switching, local profile preferences, calendar month view foundation, home time-window routine nudges, upcoming task grouping, routine templates foundation, Wellness / Badminton Routine foundation, visual motion polish, premium Home dashboard visual upgrade, premium app shell polish, Home dashboard customization, premium reusable components, lightweight Personal Insights, Stage 37 premium Home showcase polish, light core-page visual alignment, hardened backup/restore safety, Stage 38 UI regression QA and release hardening with desktop sticky sidebar accessibility improvements, and Stage 39 topbar dashboard controls plus accent color personalization, and remains ready for static GitHub Pages deployment.
+- Current Stage: Stage 39 Completed
 
 ## Architecture References
 
@@ -38,7 +38,7 @@
 
 ## Completed Stages
 
-Stages 1–38 are complete.
+Stages 1–39 are complete.
 
 - Stage 1 â€” Foundation
 - Stage 2 â€” App Shell
@@ -78,6 +78,9 @@ Stages 1–38 are complete.
 - Stage 36 â€” Premium Components + Lightweight Personal Insights
 - Stage 37 â€” Premium Home Showcase + Core Pages Visual Alignment
 - Stage 38 â€” UI Regression QA & Release Hardening
+- Stage 39 â€” Topbar Dashboard Controls & Accent Color Palette
+
+Stage 39 completion is evidenced by moving Home dashboard layout controls into a compact Topbar popover, adding a local-only accent color palette that updates UI highlights through CSS variables, and keeping the Home surface cleaner without changing dashboard persistence, backup format, Dexie schema, or storage boundaries. The stage preserved show/hide, reorder, and reset behavior, added small saved-feedback messaging, and kept the app local-first with no backend, sync, cloud, AI, dependency, schema, or backup-format change. TypeScript validation, automated tests, and the production build pass.
 
 Stage 38 completion is evidenced by a focused UI regression QA and release hardening pass after the Stage 37 polish work. The stage kept product scope unchanged, hardened desktop sidebar accessibility for long scrolling pages, preserved mobile drawer behavior, verified major routes and responsive behavior, and did not add a chart library, animation library, dependency, schema migration, backup-format change, backend, sync, cloud, AI, or any new workflow. TypeScript validation, automated tests, and the production build pass.
 
@@ -147,7 +150,7 @@ The next stage is intentionally undefined pending explicit approval. Project con
 
 ## Git Latest Recommended Commit
 
-`feat(ui): add premium shell and dashboard customization`
+`feat(ui): add topbar dashboard controls and accent palette`
 
 ## Build Status
 
@@ -155,7 +158,7 @@ The next stage is intentionally undefined pending explicit approval. Project con
 - Automated tests: passing (`.\\node_modules\\.bin\\vitest.CMD run`)
 - Production build: passing (`.\\node_modules\\.bin\\vite.CMD build`)
 - Production preview: passed locally at `http://127.0.0.1:4173/alios/`
-- Automated test count: 187 passing across 18 suites
+- Automated test count: 225 passing across 20 suites
 - Last verified: 2026-07-09
 
 ## Rules Before Modifying the Project
