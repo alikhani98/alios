@@ -34,6 +34,7 @@ describe("home dashboard layout helpers", () => {
       "routineTemplates",
       "upcomingTasks",
       "summaryStats",
+      "personalInsights",
       "projectsOverview",
       "journalOverview",
       "knowledgeOverview",
@@ -47,6 +48,7 @@ describe("home dashboard layout helpers", () => {
       "hero",
       "calendar",
       "summaryStats",
+      "personalInsights",
     ] as const;
 
     const layout = normalizeDashboardLayout(
@@ -61,6 +63,7 @@ describe("home dashboard layout helpers", () => {
       "calendar",
       "hero",
       "summaryStats",
+      "personalInsights",
     ]);
   });
 

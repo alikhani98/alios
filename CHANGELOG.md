@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 36 - Premium Components + Lightweight Personal Insights
+
+- Added reusable premium Home-facing card surfaces for metric, insight, status, empty-state, and soft-panel layouts using CSS/Tailwind only
+- Added a compact Home Personal Insights section that uses existing local task, project, inbox, journal, knowledge, and wellness checklist state only
+- Added pure insight helpers and focused tests for completion percentage, overdue/upcoming counts, active projects, inbox counts, and safe empty-state handling
+- Kept the stage local-first with no chart library, no new dependency, no Dexie schema or backup-format change, no backend, no sync, no cloud, no AI, and no medical interpretation
+
 ## Stage 35 - Premium App Shell + Home Dashboard Customization
 
 - Upgraded the app shell with a calmer premium sidebar, topbar, page background, spacing, and mobile drawer feel

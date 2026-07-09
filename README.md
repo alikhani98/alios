@@ -16,6 +16,8 @@ AliOS is designed for one person and stores its data in the browser through Inde
 - Premium Home dashboard visual upgrade with calmer hero composition and stronger card hierarchy
 - Premium app shell with calmer sidebar, topbar, page background, and mobile drawer feel
 - Home dashboard customization with local show/hide and move up/down controls for existing sections
+- Reusable premium metric, insight, status, empty-state, and soft-panel surfaces for Home
+- Compact Personal Insights on Home using only existing local task, project, inbox, journal, knowledge, and wellness checklist data
 - Mobile-first Quick Capture Inbox with note, task, idea, link, and other item types
 - Process captured items into Today tasks, Journal entries, or Knowledge items while retaining Inbox history
 - Search captured content and combine status and type filters locally

@@ -21,6 +21,7 @@ import { Badge, Button, Card, CardContent, CardDescription, CardHeader, CardTitl
 import { HomeCalendarCard } from "../components/HomeCalendarCard";
 import { HomeDashboardCustomizer } from "../components/HomeDashboardCustomizer";
 import { HomeDashboardHero } from "../components/HomeDashboardHero";
+import { HomePersonalInsightsCard } from "../components/HomePersonalInsightsCard";
 import { HomeRoutineNudgeCard } from "../components/HomeRoutineNudgeCard";
 import { HomeUpcomingTasksCard } from "../components/HomeUpcomingTasksCard";
 import {
@@ -31,6 +32,7 @@ import { useHomeDashboard } from "../hooks/useHomeDashboard";
 import { useHomeDashboardLayout } from "../hooks/useHomeDashboardLayout";
 import { RoutineTemplatesCard, type RoutineTemplateId } from "@/features/routines";
 import { WellnessBadmintonCard } from "@/features/wellness";
+import { MetricCard } from "@/shared/ui";
 
 const levelLabelKeys: Record<Level3, TranslationKey> = {
   low: "common.low",
@@ -54,21 +56,7 @@ type SummaryCardProps = {
 };
 
 function SummaryCard({ icon, label, value }: SummaryCardProps) {
-  return (
-    <Card className="overflow-hidden border-primary/10 bg-gradient-to-br from-background via-background to-primary/5 shadow-sm">
-      <CardContent className="flex items-center gap-4 p-5">
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-sm">
-          {icon}
-        </div>
-        <div>
-          <p className="text-2xl font-semibold tabular-nums tracking-tight">
-            {value}
-          </p>
-          <p className="text-sm text-muted-foreground">{label}</p>
-        </div>
-      </CardContent>
-    </Card>
-  );
+  return <MetricCard icon={icon} label={label} value={value} />;
 }
 
 export function HomePage() {
@@ -157,6 +145,7 @@ export function HomePage() {
         />
       </div>
     ) : null,
+    personalInsights: data ? <HomePersonalInsightsCard data={data} /> : null,
     projectsOverview: data ? (
       <Card className="overflow-hidden border-primary/10 bg-gradient-to-br from-background via-background to-primary/5 shadow-sm">
         <CardHeader className="gap-3 border-b border-border/60 bg-background/70 pb-5">
