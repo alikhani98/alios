@@ -24,6 +24,20 @@ export type FinanceExpenseCategoryBreakdown = {
   percentageOfExpenses: number;
 };
 
+export type FinanceExpenseCategoryChartData = FinanceExpenseCategoryBreakdown;
+
+export type FinanceCashflowSeriesPoint = {
+  monthKey: string;
+  monthStart: string;
+  income: number;
+  expenses: number;
+  obligations: number;
+  remainingLiquidity: number;
+};
+
+export type FinanceMonthLabelLocale = "en-US" | "fa-IR";
+export type FinanceMonthLabelCalendar = "gregory" | "persian";
+
 export type FinanceBudgetGuardStatus = "calm" | "watch" | "pressure";
 
 export type FinanceBudgetGuard = {
@@ -165,6 +179,26 @@ function getStatusOrder(status: FinanceObligation["status"]): number {
   }
 }
 
+function getMonthStart(value: Date): Date {
+  return new Date(value.getFullYear(), value.getMonth(), 1);
+}
+
+function getMonthLabelLocale(locale: FinanceMonthLabelLocale): string {
+  return locale === "fa-IR" ? "fa-IR" : "en-US";
+}
+
+function getMonthCalendarName(calendar: FinanceMonthLabelCalendar): string {
+  return calendar === "persian" ? "persian" : "gregory";
+}
+
+function getMonthKey(monthStart: Date): string {
+  return format(monthStart, "yyyy-MM");
+}
+
+function getMonthSeriesStart(referenceDate: Date, monthCount: number): Date {
+  return addMonths(getMonthStart(referenceDate), 1 - monthCount);
+}
+
 export function getCurrentMonthTransactions(
   transactions: FinanceTransaction[],
   referenceDate = new Date()
@@ -216,6 +250,13 @@ export function calculateExpenseCategoryBreakdown(
     .sort((left, right) => right.amount - left.amount || left.category.localeCompare(right.category));
 }
 
+export function calculateExpenseCategoryChartData(
+  transactions: FinanceTransaction[],
+  referenceDate = new Date()
+): FinanceExpenseCategoryChartData[] {
+  return calculateExpenseCategoryBreakdown(transactions, referenceDate);
+}
+
 export function calculateRemainingObligationTotal(
   obligations: FinanceObligation[]
 ): number {
@@ -251,6 +292,53 @@ export function calculateMonthlyObligationEstimate(
 
     return total + toSafeAmount(obligation.dueAmount);
   }, 0);
+}
+
+export function calculateMonthlyCashflowSeries(
+  transactions: FinanceTransaction[],
+  obligations: FinanceObligation[],
+  referenceDate = new Date(),
+  monthCount = 6
+): FinanceCashflowSeriesPoint[] {
+  const safeMonthCount = Number.isFinite(monthCount)
+    ? Math.max(1, Math.floor(monthCount))
+    : 6;
+  const firstMonthStart = getMonthSeriesStart(referenceDate, safeMonthCount);
+
+  return Array.from({ length: safeMonthCount }, (_, index) => {
+    const monthStart = addMonths(firstMonthStart, index);
+    const currentMonthTransactions = getCurrentMonthTransactions(
+      transactions,
+      monthStart
+    );
+    const income = currentMonthTransactions
+      .filter((transaction) => transaction.type === "income")
+      .reduce((total, transaction) => total + toSafeAmount(transaction.amount), 0);
+    const expenses = currentMonthTransactions
+      .filter((transaction) => transaction.type === "expense")
+      .reduce((total, transaction) => total + toSafeAmount(transaction.amount), 0);
+    const obligationsEstimate = calculateMonthlyObligationEstimate(
+      obligations,
+      monthStart
+    );
+
+    return {
+      monthKey: getMonthKey(monthStart),
+      monthStart: format(monthStart, "yyyy-MM-dd"),
+      income,
+      expenses,
+      obligations: obligationsEstimate,
+      remainingLiquidity: income - expenses - obligationsEstimate,
+    };
+  });
+}
+
+export function calculateLastMonthsFinanceSeries(
+  transactions: FinanceTransaction[],
+  obligations: FinanceObligation[],
+  referenceDate = new Date()
+): FinanceCashflowSeriesPoint[] {
+  return calculateMonthlyCashflowSeries(transactions, obligations, referenceDate, 6);
 }
 
 export function calculateFinanceSummary(
@@ -433,6 +521,16 @@ export function calculateObligationProgress(
     });
 }
 
+export function calculateObligationProgressChartData(
+  obligations: FinanceObligation[],
+  referenceDate = new Date()
+): FinanceObligationProgress[] {
+  return calculateObligationProgress(
+    obligations.filter((obligation) => obligation.status !== "paid"),
+    referenceDate
+  );
+}
+
 export function calculateFinanceReview(
   transactions: FinanceTransaction[],
   obligations: FinanceObligation[],
@@ -459,6 +557,22 @@ export function formatFinanceAmount(
   return new Intl.NumberFormat(locale, {
     maximumFractionDigits: 0,
   }).format(amount);
+}
+
+export function formatFinanceMonthLabel(
+  value: string | Date,
+  locale: FinanceMonthLabelLocale,
+  calendar: FinanceMonthLabelCalendar
+): string {
+  const parsed = parseDate(typeof value === "string" ? value : format(value, "yyyy-MM-dd"));
+  if (!parsed) {
+    return typeof value === "string" ? value : "";
+  }
+
+  return new Intl.DateTimeFormat(`${getMonthLabelLocale(locale)}-u-ca-${getMonthCalendarName(calendar)}`, {
+    month: "short",
+    year: "numeric",
+  }).format(parsed);
 }
 
 export type { FinanceSummary };

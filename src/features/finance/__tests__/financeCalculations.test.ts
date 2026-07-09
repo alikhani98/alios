@@ -4,12 +4,17 @@ import type { FinanceObligation, FinanceTransaction } from "@/shared/types";
 import {
   calculateBudgetGuard,
   calculateExpenseCategoryBreakdown,
+  calculateExpenseCategoryChartData,
   calculateFinanceReview,
   calculateFinanceSummary,
+  calculateLastMonthsFinanceSeries,
+  calculateMonthlyCashflowSeries,
   calculateObligationProgress,
+  calculateObligationProgressChartData,
   calculateMonthlyObligationEstimate,
   calculateRemainingObligationTotal,
   formatFinanceAmount,
+  formatFinanceMonthLabel,
   getActiveFinanceObligations,
   getCurrentMonthTransactions,
   getRecentFinanceTransactions,
@@ -164,11 +169,171 @@ describe("finance calculations", () => {
     ]);
   });
 
+  it("builds zero-safe expense category chart data in descending order", () => {
+    expect(
+      calculateExpenseCategoryChartData(
+        [
+          {
+            id: "expense-5",
+            type: "expense",
+            title: "Transport",
+            amount: 500,
+            category: "transport",
+            occurredAt: "2026-07-08",
+            createdAt: "2026-07-08T08:30:00.000Z",
+            updatedAt: "2026-07-08T08:30:00.000Z",
+          },
+          {
+            id: "expense-6",
+            type: "expense",
+            title: "Groceries",
+            amount: 300,
+            category: "groceries",
+            occurredAt: "2026-07-07",
+            createdAt: "2026-07-07T08:30:00.000Z",
+            updatedAt: "2026-07-07T08:30:00.000Z",
+          },
+        ],
+        new Date("2026-07-09T12:00:00.000Z")
+      )
+    ).toEqual([
+      {
+        category: "transport",
+        amount: 500,
+        transactionCount: 1,
+        percentageOfExpenses: 62.5,
+      },
+      {
+        category: "groceries",
+        amount: 300,
+        transactionCount: 1,
+        percentageOfExpenses: 37.5,
+      },
+    ]);
+
+    expect(calculateExpenseCategoryChartData([], new Date("2026-07-09T12:00:00.000Z"))).toEqual([]);
+    expect(
+      calculateExpenseCategoryChartData(
+        [
+          {
+            id: "expense-7",
+            type: "expense",
+            title: "Zero expense",
+            amount: 0,
+            category: "other",
+            occurredAt: "2026-07-09",
+            createdAt: "2026-07-09T08:30:00.000Z",
+            updatedAt: "2026-07-09T08:30:00.000Z",
+          },
+        ],
+        new Date("2026-07-09T12:00:00.000Z")
+      )
+    ).toEqual([
+      {
+        category: "other",
+        amount: 0,
+        transactionCount: 1,
+        percentageOfExpenses: 0,
+      },
+    ]);
+  });
+
   it("keeps paused obligations out of the monthly estimate but in the remaining total", () => {
     expect(
       calculateMonthlyObligationEstimate(obligations, new Date("2026-07-09T12:00:00.000Z"))
     ).toBe(1100);
     expect(calculateRemainingObligationTotal(obligations)).toBe(5050);
+  });
+
+  it("builds the last six months cashflow series from local records only", () => {
+    expect(
+      calculateMonthlyCashflowSeries(
+        transactions,
+        obligations,
+        new Date("2026-07-09T12:00:00.000Z")
+      )
+    ).toEqual([
+      {
+        monthKey: "2026-02",
+        monthStart: "2026-02-01",
+        income: 0,
+        expenses: 0,
+        obligations: 400,
+        remainingLiquidity: -400,
+      },
+      {
+        monthKey: "2026-03",
+        monthStart: "2026-03-01",
+        income: 0,
+        expenses: 0,
+        obligations: 400,
+        remainingLiquidity: -400,
+      },
+      {
+        monthKey: "2026-04",
+        monthStart: "2026-04-01",
+        income: 0,
+        expenses: 0,
+        obligations: 400,
+        remainingLiquidity: -400,
+      },
+      {
+        monthKey: "2026-05",
+        monthStart: "2026-05-01",
+        income: 0,
+        expenses: 0,
+        obligations: 400,
+        remainingLiquidity: -400,
+      },
+      {
+        monthKey: "2026-06",
+        monthStart: "2026-06-01",
+        income: 800,
+        expenses: 0,
+        obligations: 400,
+        remainingLiquidity: 400,
+      },
+      {
+        monthKey: "2026-07",
+        monthStart: "2026-07-01",
+        income: 5000,
+        expenses: 1200,
+        obligations: 1100,
+        remainingLiquidity: 2700,
+      },
+    ]);
+
+    expect(
+      calculateLastMonthsFinanceSeries(
+        [
+          {
+            id: "invalid-date-income",
+            type: "income",
+            title: "Invalid date",
+            amount: 300,
+            category: "salary",
+            occurredAt: "not-a-date",
+            createdAt: "2026-07-09T08:30:00.000Z",
+            updatedAt: "2026-07-09T08:30:00.000Z",
+          },
+        ],
+        [
+          {
+            id: "invalid-due-date",
+            type: "debt",
+            title: "Invalid due date",
+            totalAmount: 1000,
+            paidAmount: 100,
+            dueAmount: 200,
+            dueDate: "not-a-date",
+            status: "active",
+            createdAt: "2026-07-09T08:30:00.000Z",
+            updatedAt: "2026-07-09T08:30:00.000Z",
+          },
+        ],
+        new Date("2026-07-09T12:00:00.000Z")
+      ).every((point) => point.income === 0)
+    ).toBe(true);
   });
 
   it("orders active obligations by the closest due date and skips paid items", () => {
@@ -257,6 +422,75 @@ describe("finance calculations", () => {
     ]);
   });
 
+  it("clamps obligation progress and excludes paid obligations from the chart data", () => {
+    expect(
+      calculateObligationProgressChartData(
+        [
+          {
+            id: "overpaid",
+            type: "debt",
+            title: "Overpaid debt",
+            totalAmount: 100,
+            paidAmount: 150,
+            status: "active",
+            createdAt: "2026-07-09T08:30:00.000Z",
+            updatedAt: "2026-07-09T08:30:00.000Z",
+          },
+          {
+            id: "paused",
+            type: "installment",
+            title: "Paused installment",
+            totalAmount: 200,
+            paidAmount: 50,
+            status: "paused",
+            createdAt: "2026-07-09T08:30:00.000Z",
+            updatedAt: "2026-07-09T08:30:00.000Z",
+          },
+          {
+            id: "paid",
+            type: "debt",
+            title: "Paid debt",
+            totalAmount: 100,
+            paidAmount: 100,
+            status: "paid",
+            createdAt: "2026-07-09T08:30:00.000Z",
+            updatedAt: "2026-07-09T08:30:00.000Z",
+          },
+        ],
+        new Date("2026-07-09T12:00:00.000Z")
+      )
+    ).toEqual([
+      {
+        obligation: {
+          id: "overpaid",
+          type: "debt",
+          title: "Overpaid debt",
+          totalAmount: 100,
+          paidAmount: 150,
+          status: "active",
+          createdAt: "2026-07-09T08:30:00.000Z",
+          updatedAt: "2026-07-09T08:30:00.000Z",
+        },
+        remainingAmount: 0,
+        paidPercentage: 100,
+      },
+      {
+        obligation: {
+          id: "paused",
+          type: "installment",
+          title: "Paused installment",
+          totalAmount: 200,
+          paidAmount: 50,
+          status: "paused",
+          createdAt: "2026-07-09T08:30:00.000Z",
+          updatedAt: "2026-07-09T08:30:00.000Z",
+        },
+        remainingAmount: 150,
+        paidPercentage: 25,
+      },
+    ]);
+  });
+
   it("returns the most recent transactions and active obligations", () => {
     expect(getCurrentMonthTransactions(transactions, new Date("2026-07-09T12:00:00.000Z"))).toHaveLength(2);
     expect(getRecentFinanceTransactions(transactions, 2).map((item) => item.id)).toEqual([
@@ -273,6 +507,11 @@ describe("finance calculations", () => {
   it("formats finance amounts with the selected locale", () => {
     expect(formatFinanceAmount(12345, "en-US")).toBe("12,345");
     expect(formatFinanceAmount(12345, "fa-IR")).toBeTruthy();
+  });
+
+  it("formats finance month labels for the active calendar", () => {
+    expect(formatFinanceMonthLabel("2026-07-01", "en-US", "gregory")).toBeTruthy();
+    expect(formatFinanceMonthLabel("2026-07-01", "fa-IR", "persian")).toBeTruthy();
   });
 
   it("builds a combined finance review from the current data", () => {
