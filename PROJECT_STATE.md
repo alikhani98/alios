@@ -4,8 +4,8 @@
 
 - Project name: AliOS
 - Architecture version: AliOS 1.0
-- Current status: AliOS includes validated mobile-first Inbox capture, processing, global search, focused search-result navigation, filters, bulk triage, local appearance switching, local profile preferences, calendar month view foundation, home time-window routine nudges, upcoming task grouping, routine templates foundation, and hardened backup/restore safety and remains ready for static GitHub Pages deployment.
-- Current Stage: Stage 31 Completed
+- Current status: AliOS includes validated mobile-first Inbox capture, processing, global search, focused search-result navigation, filters, bulk triage, local appearance switching, local profile preferences, calendar month view foundation, home time-window routine nudges, upcoming task grouping, routine templates foundation, Wellness / Badminton Routine foundation, and hardened backup/restore safety and remains ready for static GitHub Pages deployment.
+- Current Stage: Stage 32 Completed
 
 ## Architecture References
 
@@ -38,7 +38,7 @@
 
 ## Completed Stages
 
-Stages 1–31 are complete.
+Stages 1–32 are complete.
 
 - Stage 1 â€” Foundation
 - Stage 2 â€” App Shell
@@ -71,6 +71,7 @@ Stages 1–31 are complete.
 - Stage 29 â€” Home Time Window Routine Nudges
 - Stage 30 â€” Upcoming / Future Tasks Foundation
 - Stage 31 â€” Routine Templates Foundation
+- Stage 32 â€” Wellness / Badminton Routine Foundation
 
 Stage 9 completion is evidenced by the Today page, daily check-in create/update form, date-scoped task CRUD, all approved task statuses, completed timestamps, and single-MIT selection synchronized with todayâ€™s check-in. Browser validation confirmed task and check-in persistence across refresh, task editing, status updates, MIT selection, deletion, and the task empty state. The feature consumes TasksRepository and DailyCheckinsRepository through the injected `StorageAdapter` and does not import Dexie. Health advice, Home dashboard data, recurring tasks, notifications, analytics, backup, AI, and cross-feature workflows remain unavailable. TypeScript validation and the production build pass.
 
@@ -118,13 +119,15 @@ Stage 30 completion is evidenced by the Home upcoming tasks foundation and its t
 
 Stage 31 completion is evidenced by the routine template registry, the Home routine templates section, and the morning warm-up nudge link into the same local template preview. The feature stays static and local-only, stores no template data in Dexie, adds no recurring engine or notification behavior, and keeps the morning warm-up checklist in gentle, non-medical language. TypeScript validation, automated tests, and the production build pass.
 
+Stage 32 completion is evidenced by the local-only Wellness / Badminton routine foundation on Home and Settings, the new park preparation template, the date-scoped checklist and reflection state stored in localStorage only, the simple Settings toggle for the card, and the Home nudge/template links into the new routine. The feature adds no Dexie schema migration, backup-format change, backend, sync, cloud, AI, push notifications, service worker, medical module, diagnosis, medication guidance, lithium guidance, charts, or animation library. TypeScript validation, automated tests, and the production build pass.
+
 ## Next Stage
 
-The next stage is intentionally undefined pending explicit approval. Project conversion, bulk conversion, tags, attachments, reminders, routines, wellness, AI classification, semantic search, offline service-worker caching, automatic sync, and cloud backup remain deferred.
+The next stage is intentionally undefined pending explicit approval. Project conversion, bulk conversion, tags, attachments, reminders, AI classification, semantic search, offline service-worker caching, automatic sync, and cloud backup remain deferred. Advanced wellness coaching, medical guidance, treatment logic, and charts remain deferred beyond the simple Stage 32 checklist foundation.
 
 ## Git Latest Recommended Commit
 
-`feat(routines): add routine templates foundation`
+`feat(wellness): add badminton routine foundation`
 
 ## Build Status
 
@@ -132,8 +135,8 @@ The next stage is intentionally undefined pending explicit approval. Project con
 - Automated tests: passing (`.\\node_modules\\.bin\\vitest.CMD run`)
 - Production build: passing (`.\\node_modules\\.bin\\vite.CMD build`)
 - Production preview: passed locally at `http://127.0.0.1:4173/alios/`
-- Automated test count: 145 passing across 16 suites
-- Last verified: 2026-07-08
+- Automated test count: 155 passing across 17 suites
+- Last verified: 2026-07-09
 
 ## Rules Before Modifying the Project
 

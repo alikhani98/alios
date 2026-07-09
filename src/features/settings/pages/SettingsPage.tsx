@@ -15,6 +15,7 @@ import {
   Upload,
   SunMoon,
   SunMedium,
+  Trees,
 } from "lucide-react";
 import { useRef } from "react";
 
@@ -39,6 +40,9 @@ import {
   CardTitle,
   Input,
 } from "@/shared/ui";
+import {
+  WELLNESS_BADMINTON_ROUTINE_ENABLED_STORAGE_KEY,
+} from "@/features/wellness";
 import { createBackupPreview } from "../backupPreview";
 import { useBackupRestore } from "../hooks/useBackupRestore";
 import { useLocalDataManagement } from "../hooks/useLocalDataManagement";
@@ -114,6 +118,11 @@ export function SettingsPage() {
   const { value: morningWarmupEnabled, setValue: setMorningWarmupEnabled } =
     usePersistentBoolean({
       key: MORNING_WARMUP_ENABLED_STORAGE_KEY,
+      defaultValue: true,
+    });
+  const { value: wellnessRoutineEnabled, setValue: setWellnessRoutineEnabled } =
+    usePersistentBoolean({
+      key: WELLNESS_BADMINTON_ROUTINE_ENABLED_STORAGE_KEY,
       defaultValue: true,
     });
   const dataManagement = useLocalDataManagement();
@@ -220,6 +229,40 @@ export function SettingsPage() {
             {morningWarmupEnabled
               ? t("home.disableReminder")
               : t("settings.enableMorningWarmupReminder")}
+          </Button>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Trees className="h-5 w-5 text-primary" />
+            {t("settings.wellnessBadmintonRoutineCard")}
+          </CardTitle>
+          <CardDescription>
+            {t("settings.wellnessBadmintonRoutineCardDescription")}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="rounded-xl border bg-muted/30 p-4">
+            <p className="text-sm leading-7 text-muted-foreground">
+              {t("settings.localOnlyChecklist")}
+            </p>
+            <p className="mt-2 text-xs leading-5 text-muted-foreground">
+              {t("settings.notMedicalAdvice")}
+            </p>
+            <p className="text-xs leading-5 text-muted-foreground">
+              {t("settings.noPushNotification")}
+            </p>
+          </div>
+          <Button
+            type="button"
+            variant={wellnessRoutineEnabled ? "default" : "outline"}
+            aria-pressed={wellnessRoutineEnabled}
+            onClick={() => setWellnessRoutineEnabled(!wellnessRoutineEnabled)}
+          >
+            {wellnessRoutineEnabled
+              ? t("settings.disableBadmintonRoutineCard")
+              : t("settings.enableBadmintonRoutineCard")}
           </Button>
         </CardContent>
       </Card>

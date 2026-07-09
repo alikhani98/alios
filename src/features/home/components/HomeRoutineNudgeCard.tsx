@@ -3,6 +3,7 @@ import {
   Clock3,
   Settings2,
   Sunrise,
+  Trees,
   X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -115,6 +116,15 @@ export function HomeRoutineNudgeCard({
           >
             <Sunrise className="me-2 h-4 w-4" />
             {t("routines.viewRoutine")}
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => onViewRoutine("parkBadmintonRoutine")}
+          >
+            <Trees className="me-2 h-4 w-4" />
+            {t("wellness.badmintonRoutineTitle")}
           </Button>
           <Button type="button" size="sm" onClick={handleDismissForToday}>
             <Clock3 className="me-2 h-4 w-4" />

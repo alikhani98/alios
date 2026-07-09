@@ -1,5 +1,7 @@
 import type { TranslationKey } from "@/shared/i18n";
 
+import { WELLNESS_BADMINTON_ROUTINE_TEMPLATE } from "@/features/wellness/badmintonRoutine";
+
 export type RoutineTemplateCategory =
   | "wellness"
   | "planning"
@@ -8,12 +10,14 @@ export type RoutineTemplateCategory =
 
 export type RoutineTemplateId =
   | "morningWarmup"
+  | "parkBadmintonRoutine"
   | "dailyPlanning"
   | "studyFocus"
   | "eveningReview";
 
 export type RoutineTemplateIconName =
   | "sunrise"
+  | "trees"
   | "calendar-check"
   | "book-open-text"
   | "moon-star";
@@ -33,6 +37,21 @@ const MORNING_WARMUP_STEPS = [
   "routines.gentleMovement",
   "routines.takeWaterBottle",
   "routines.startSlowly",
+] as const satisfies readonly TranslationKey[];
+
+const PARK_BADMINTON_ROUTINE_STEPS = [
+  "wellness.gentleShoulderMovement",
+  "wellness.gentleWristMovement",
+  "wellness.gentleAnkleMovement",
+  "wellness.lightWalking",
+  "wellness.waterNearby",
+  "wellness.startSlowly",
+  "wellness.shortBreak",
+  "wellness.slowWalk",
+  "wellness.gentleStretching",
+  "wellness.energyToday",
+  "wellness.fatigueToday",
+  "wellness.discomfortNote",
 ] as const satisfies readonly TranslationKey[];
 
 const DAILY_PLANNING_STEPS = [
@@ -63,6 +82,16 @@ export const ROUTINE_TEMPLATES = [
     stepKeys: MORNING_WARMUP_STEPS,
     iconName: "sunrise",
     featured: true,
+  },
+  {
+    id: WELLNESS_BADMINTON_ROUTINE_TEMPLATE.id,
+    category: "wellness",
+    titleKey: WELLNESS_BADMINTON_ROUTINE_TEMPLATE.titleKey,
+    descriptionKey: WELLNESS_BADMINTON_ROUTINE_TEMPLATE.descriptionKey,
+    durationKey: WELLNESS_BADMINTON_ROUTINE_TEMPLATE.durationKey,
+    stepKeys: PARK_BADMINTON_ROUTINE_STEPS,
+    iconName: WELLNESS_BADMINTON_ROUTINE_TEMPLATE.iconName,
+    featured: WELLNESS_BADMINTON_ROUTINE_TEMPLATE.featured,
   },
   {
     id: "dailyPlanning",

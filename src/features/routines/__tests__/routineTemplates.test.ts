@@ -12,6 +12,7 @@ describe("routine template helpers", () => {
   it("returns all built-in templates through the featured helper", () => {
     expect(getFeaturedRoutineTemplates().map((template) => template.id)).toEqual([
       "morningWarmup",
+      "parkBadmintonRoutine",
       "dailyPlanning",
       "studyFocus",
       "eveningReview",
@@ -20,13 +21,14 @@ describe("routine template helpers", () => {
 
   it("finds templates by id and fails safely for missing ids", () => {
     expect(getRoutineTemplateById("morningWarmup")?.id).toBe("morningWarmup");
+    expect(getRoutineTemplateById("parkBadmintonRoutine")?.id).toBe("parkBadmintonRoutine");
     expect(getRoutineTemplateById("missing-template")).toBeUndefined();
   });
 
   it("filters templates by category", () => {
     expect(
       getRoutineTemplatesByCategory("wellness").map((template) => template.id)
-    ).toEqual(["morningWarmup"]);
+    ).toEqual(["morningWarmup", "parkBadmintonRoutine"]);
     expect(
       getRoutineTemplatesByCategory("planning").map((template) => template.id)
     ).toEqual(["dailyPlanning"]);
