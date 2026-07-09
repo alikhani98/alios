@@ -100,6 +100,13 @@ The later version ideas below are directional only. They are not approved stages
 - Local-only accent palette with restrained color presets stored in browser localStorage only
 - No schema/storage/backup change, no dependency, no backend, no sync, no cloud, no AI, no chart library, and no animation library
 
+## Stage 40
+
+- Finance Foundation
+- Local Finance module for income, expenses, installments, debts, and a simple monthly liquidity summary
+- Finance-specific local storage, repository CRUD, and backward-compatible backup/restore support
+- No banking integration, no advice engine, no chart library, no animation library, no backend, no sync, no cloud, and no AI
+
 ## Stage 38 Hardening Note
 
 - UI regression QA and release hardening stayed within the existing scope and did not add a new feature

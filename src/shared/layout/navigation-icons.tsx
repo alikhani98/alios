@@ -7,6 +7,7 @@ import {
   Inbox,
   Search,
   Settings,
+  Wallet,
   type LucideIcon,
 } from "lucide-react";
 
@@ -19,6 +20,7 @@ export const navigationIcons: Record<NavIconName, LucideIcon> = {
   inbox: Inbox,
   "folder-kanban": FolderKanban,
   "book-open": BookOpen,
+  wallet: Wallet,
   database: Database,
   settings: Settings,
 };

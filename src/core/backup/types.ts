@@ -2,6 +2,8 @@ import { z } from "zod";
 
 import {
   dailyCheckinSchema,
+  financeObligationSchema,
+  financeTransactionSchema,
   journalEntrySchema,
   inboxItemSchema,
   knowledgeItemSchema,
@@ -17,6 +19,8 @@ export const ALIOS_BACKUP_VERSION = 1 as const;
 export const aliosBackupDataSchema = z.object({
   dailyCheckins: z.array(dailyCheckinSchema),
   tasks: z.array(taskSchema),
+  financeTransactions: z.array(financeTransactionSchema).default([]),
+  financeObligations: z.array(financeObligationSchema).default([]),
   projects: z.array(projectSchema),
   journalEntries: z.array(journalEntrySchema),
   knowledgeItems: z.array(knowledgeItemSchema),

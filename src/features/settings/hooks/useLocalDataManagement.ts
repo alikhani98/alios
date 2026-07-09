@@ -48,6 +48,8 @@ export function useLocalDataManagement() {
       setSummary({
         dailyCheckins: 0,
         tasks: 0,
+        financeTransactions: 0,
+        financeObligations: 0,
         projects: 0,
         journalEntries: 0,
         knowledgeItems: 0,

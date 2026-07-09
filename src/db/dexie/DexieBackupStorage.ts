@@ -14,6 +14,8 @@ export class DexieBackupStorage implements BackupStorage {
       const [
         dailyCheckins,
         tasks,
+        financeTransactions,
+        financeObligations,
         projects,
         journalEntries,
         knowledgeItems,
@@ -22,6 +24,8 @@ export class DexieBackupStorage implements BackupStorage {
       ] = await Promise.all([
         this.database.dailyCheckins.toArray(),
         this.database.tasks.toArray(),
+        this.database.financeTransactions.toArray(),
+        this.database.financeObligations.toArray(),
         this.database.projects.toArray(),
         this.database.journalEntries.toArray(),
         this.database.knowledgeItems.toArray(),
@@ -32,6 +36,8 @@ export class DexieBackupStorage implements BackupStorage {
       return {
         dailyCheckins,
         tasks,
+        financeTransactions,
+        financeObligations,
         projects,
         journalEntries,
         knowledgeItems,
@@ -49,6 +55,8 @@ export class DexieBackupStorage implements BackupStorage {
     const tables = [
       this.database.dailyCheckins,
       this.database.tasks,
+      this.database.financeTransactions,
+      this.database.financeObligations,
       this.database.projects,
       this.database.journalEntries,
       this.database.knowledgeItems,
@@ -60,11 +68,13 @@ export class DexieBackupStorage implements BackupStorage {
       await this.database.transaction("rw", tables, async () => {
         await Promise.all(tables.map((table) => table.clear()));
         await Promise.all([
-          this.database.dailyCheckins.bulkPut(data.dailyCheckins),
-          this.database.tasks.bulkPut(data.tasks),
-          this.database.projects.bulkPut(data.projects),
-          this.database.journalEntries.bulkPut(data.journalEntries),
-          this.database.knowledgeItems.bulkPut(data.knowledgeItems),
+        this.database.dailyCheckins.bulkPut(data.dailyCheckins),
+        this.database.tasks.bulkPut(data.tasks),
+        this.database.financeTransactions.bulkPut(data.financeTransactions),
+        this.database.financeObligations.bulkPut(data.financeObligations),
+        this.database.projects.bulkPut(data.projects),
+        this.database.journalEntries.bulkPut(data.journalEntries),
+        this.database.knowledgeItems.bulkPut(data.knowledgeItems),
           this.database.settings.bulkPut(data.settings),
           this.database.inboxItems.bulkPut(data.inboxItems),
         ]);
@@ -82,6 +92,8 @@ export class DexieBackupStorage implements BackupStorage {
       const [
         dailyCheckins,
         tasks,
+        financeTransactions,
+        financeObligations,
         projects,
         journalEntries,
         knowledgeItems,
@@ -90,6 +102,8 @@ export class DexieBackupStorage implements BackupStorage {
       ] = await Promise.all([
         this.database.dailyCheckins.count(),
         this.database.tasks.count(),
+        this.database.financeTransactions.count(),
+        this.database.financeObligations.count(),
         this.database.projects.count(),
         this.database.journalEntries.count(),
         this.database.knowledgeItems.count(),
@@ -100,6 +114,8 @@ export class DexieBackupStorage implements BackupStorage {
       return {
         dailyCheckins,
         tasks,
+        financeTransactions,
+        financeObligations,
         projects,
         journalEntries,
         knowledgeItems,
@@ -117,6 +133,8 @@ export class DexieBackupStorage implements BackupStorage {
     const tables = [
       this.database.dailyCheckins,
       this.database.tasks,
+      this.database.financeTransactions,
+      this.database.financeObligations,
       this.database.projects,
       this.database.journalEntries,
       this.database.knowledgeItems,

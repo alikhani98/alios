@@ -51,3 +51,16 @@ Reason:
 - Future flexibility alone is not enough reason to introduce another boundary.
 - The existing Repository and Storage Adapter layers remain approved and in place.
 - New abstractions should be minimized and tied to demonstrable present requirements.
+
+## ADR-007: Keep Finance local, small, and additive
+
+Decision:
+
+- Finance stores only transactions and obligations in local IndexedDB tables
+- Finance UI talks to storage through the existing feature, repository, and storage-adapter boundaries
+- Backup/restore must remain backward-compatible with older backups that do not contain finance arrays
+
+Reason:
+
+- The first Finance module should be useful without turning into banking, accounting, or advice software
+- Keeping the model small preserves the existing local-first architecture and leaves room for later budgeting or debt tools if they are explicitly approved

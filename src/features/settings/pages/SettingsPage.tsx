@@ -76,6 +76,8 @@ function InfoItem({ label, value }: InfoItemProps) {
 const backupTableLabelKeys = [
   "settings.checkinsCount",
   "settings.tasksCount",
+  "settings.financeTransactionsCount",
+  "settings.financeObligationsCount",
   "settings.projectsCount",
   "settings.journalCount",
   "settings.knowledgeCount",
@@ -92,6 +94,8 @@ const appearanceOptions = [
 function getTotalRecords(summary: {
   dailyCheckins: number;
   tasks: number;
+  financeTransactions: number;
+  financeObligations: number;
   projects: number;
   journalEntries: number;
   knowledgeItems: number;
@@ -101,6 +105,8 @@ function getTotalRecords(summary: {
   return (
     summary.dailyCheckins +
     summary.tasks +
+    summary.financeTransactions +
+    summary.financeObligations +
     summary.projects +
     summary.journalEntries +
     summary.knowledgeItems +
@@ -414,7 +420,7 @@ export function SettingsPage() {
               className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
               aria-label={t("settings.dataSummaryLoading")}
             >
-              {[0, 1, 2, 3, 4, 5, 6].map((item) => (
+              {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
                 <div
                   key={item}
                   className="h-20 animate-pulse rounded-xl border bg-muted/60"
@@ -435,6 +441,14 @@ export function SettingsPage() {
                 <CountItem
                   label={t("settings.tasksCount")}
                   value={dataManagement.summary.tasks}
+                />
+                <CountItem
+                  label={t("settings.financeTransactionsCount")}
+                  value={dataManagement.summary.financeTransactions}
+                />
+                <CountItem
+                  label={t("settings.financeObligationsCount")}
+                  value={dataManagement.summary.financeObligations}
                 />
                 <CountItem
                   label={t("settings.journalCount")}

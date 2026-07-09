@@ -5,6 +5,8 @@ import type { AliosDatabase, DexieStorageAdapter } from "@/db/dexie";
 import { LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
 import {
   dailyCheckinInput,
+  financeObligationInput,
+  financeTransactionInput,
   journalEntryInput,
   inboxItemInput,
   knowledgeItemInput,
@@ -34,6 +36,12 @@ describe("BackupService with DexieBackupStorage", () => {
   it("exports, clears, and restores every supported data table", async () => {
     const project = await storage.projects.create(projectInput);
     const task = await storage.tasks.create(taskInput);
+    const financeTransaction = await storage.finance.createTransaction(
+      financeTransactionInput
+    );
+    const financeObligation = await storage.finance.createObligation(
+      financeObligationInput
+    );
     const journalEntry = await storage.journal.create(journalEntryInput);
     const knowledgeItem = await storage.knowledge.create(knowledgeItemInput);
     const dailyCheckin = await storage.dailyCheckins.create(dailyCheckinInput);
@@ -49,6 +57,8 @@ describe("BackupService with DexieBackupStorage", () => {
       [
         "dailyCheckins",
         "tasks",
+        "financeTransactions",
+        "financeObligations",
         "projects",
         "journalEntries",
         "knowledgeItems",
@@ -58,6 +68,8 @@ describe("BackupService with DexieBackupStorage", () => {
     );
     expect(backup.data.projects).toEqual([project]);
     expect(backup.data.tasks).toEqual([task]);
+    expect(backup.data.financeTransactions).toEqual([financeTransaction]);
+    expect(backup.data.financeObligations).toEqual([financeObligation]);
     expect(backup.data.journalEntries).toEqual([journalEntry]);
     expect(backup.data.knowledgeItems).toEqual([knowledgeItem]);
     expect(backup.data.dailyCheckins).toEqual([dailyCheckin]);
@@ -75,6 +87,8 @@ describe("BackupService with DexieBackupStorage", () => {
     expect(await storage.backup.getSummary()).toEqual({
       dailyCheckins: 0,
       tasks: 0,
+      financeTransactions: 0,
+      financeObligations: 0,
       projects: 0,
       journalEntries: 0,
       knowledgeItems: 0,
@@ -87,6 +101,12 @@ describe("BackupService with DexieBackupStorage", () => {
 
     expect(await storage.projects.getById(project.id)).toEqual(project);
     expect(await storage.tasks.getById(task.id)).toEqual(task);
+    expect(await storage.finance.getTransactionById(financeTransaction.id)).toEqual(
+      financeTransaction
+    );
+    expect(await storage.finance.getObligationById(financeObligation.id)).toEqual(
+      financeObligation
+    );
     expect(await storage.journal.getById(journalEntry.id)).toEqual(journalEntry);
     expect(await storage.knowledge.getById(knowledgeItem.id)).toEqual(
       knowledgeItem
@@ -101,9 +121,16 @@ describe("BackupService with DexieBackupStorage", () => {
   it("restores an older valid backup without inboxItems as an empty inbox", async () => {
     await storage.inbox.create(inboxItemInput);
     const backup = await service.createBackup();
-    const { inboxItems: _omitted, ...oldData } = backup.data;
+    const {
+      inboxItems: _omittedInbox,
+      financeTransactions: _omittedFinanceTransactions,
+      financeObligations: _omittedFinanceObligations,
+      ...oldData
+    } = backup.data;
     const oldBackup = service.parseBackup(JSON.stringify({ ...backup, data: oldData }));
 
+    expect(oldBackup.data.financeTransactions).toEqual([]);
+    expect(oldBackup.data.financeObligations).toEqual([]);
     expect(oldBackup.data.inboxItems).toEqual([]);
     await service.restoreBackup(oldBackup);
     expect(await storage.inbox.list()).toEqual([]);
