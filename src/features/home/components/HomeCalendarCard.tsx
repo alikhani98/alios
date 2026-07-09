@@ -14,14 +14,8 @@ import type { Task } from "@/shared/types";
 import {
   Badge,
   Button,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  PremiumCard,
+  CollapsibleSection,
   SoftPanel,
-  SectionHeader,
 } from "@/shared/ui";
 import { cn } from "@/shared/utils";
 
@@ -34,9 +28,13 @@ import {
   groupTasksByDate,
   shiftMonth,
 } from "../calendarMonth";
+import type { HomeCollapsibleSectionId } from "../homeCollapsedSections";
 
 type HomeCalendarCardProps = {
   tasks: Task[];
+  sectionId: HomeCollapsibleSectionId;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 };
 
 const taskStatusLabelKeys: Record<Task["status"], TranslationKey> = {
@@ -47,7 +45,12 @@ const taskStatusLabelKeys: Record<Task["status"], TranslationKey> = {
   cancelled: "today.cancelled",
 };
 
-export function HomeCalendarCard({ tasks }: HomeCalendarCardProps) {
+export function HomeCalendarCard({
+  tasks,
+  sectionId,
+  open,
+  onOpenChange,
+}: HomeCalendarCardProps) {
   const { t, language, direction } = useI18n();
   const { formatDate, resolvedCalendar } = useDateFormatter();
   const [selectedDate, setSelectedDate] = useState(() => new Date());
@@ -72,52 +75,55 @@ export function HomeCalendarCard({ tasks }: HomeCalendarCardProps) {
   const isTodaySelected = format(today, "yyyy-MM-dd") === selectedIsoDate;
   const PreviousIcon = direction === "rtl" ? ChevronRight : ChevronLeft;
   const NextIcon = direction === "rtl" ? ChevronLeft : ChevronRight;
+  const monthTaskCount = calendarCells.reduce(
+    (count, cell) => count + cell.taskCount,
+    0
+  );
 
   return (
-    <PremiumCard className="border-primary/10 bg-gradient-to-br from-background via-background to-primary/5 shadow-sm">
-      <CardHeader className="gap-4 border-b border-border/60 bg-background/70 pb-5">
-        <SectionHeader
-          icon={<CalendarDays className="h-5 w-5" />}
-          title={t("home.calendar")}
-          description={monthTitle}
-          actions={
-            <div className="flex flex-wrap items-center gap-2">
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                onClick={() =>
-                  setSelectedDate((currentDate) => shiftMonth(currentDate, -1))
-                }
-              >
-                <PreviousIcon className="me-2 h-4 w-4" />
-                {t("home.previousMonth")}
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                onClick={() => setSelectedDate(() => new Date())}
-              >
-                {t("home.currentMonth")}
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                onClick={() =>
-                  setSelectedDate((currentDate) => shiftMonth(currentDate, 1))
-                }
-              >
-                {t("home.nextMonth")}
-                <NextIcon className="ms-2 h-4 w-4" />
-              </Button>
-            </div>
-          }
-        />
-      </CardHeader>
+    <CollapsibleSection
+      id={`home-${sectionId}`}
+      title={t("home.calendar")}
+      description={monthTitle}
+      icon={<CalendarDays className="h-5 w-5" />}
+      status={<Badge variant="secondary">{monthTaskCount}</Badge>}
+      open={open}
+      onOpenChange={onOpenChange}
+      expandLabel={t("common.expandSection")}
+      collapseLabel={t("common.collapseSection")}
+      className="overflow-hidden border-primary/10 bg-gradient-to-br from-background via-background to-primary/5 shadow-sm"
+      contentClassName="space-y-5"
+    >
+      <div className="flex flex-wrap items-center gap-2">
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          onClick={() => setSelectedDate((currentDate) => shiftMonth(currentDate, -1))}
+        >
+          <PreviousIcon className="me-2 h-4 w-4" />
+          {t("home.previousMonth")}
+        </Button>
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          onClick={() => setSelectedDate(() => new Date())}
+        >
+          {t("home.currentMonth")}
+        </Button>
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          onClick={() => setSelectedDate((currentDate) => shiftMonth(currentDate, 1))}
+        >
+          {t("home.nextMonth")}
+          <NextIcon className="ms-2 h-4 w-4" />
+        </Button>
+      </div>
 
-      <CardContent className="grid gap-5 pt-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)]">
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)]">
         <div className="space-y-4">
           <div className="grid grid-cols-7 gap-1 text-center text-[0.7rem] font-medium uppercase tracking-wide text-muted-foreground sm:text-xs">
             {weekdayLabels.map((label) => (
@@ -179,7 +185,10 @@ export function HomeCalendarCard({ tasks }: HomeCalendarCardProps) {
                       {t("home.today")}
                     </span>
                   ) : (
-                    <span aria-hidden className="mt-2 block text-[0.65rem] text-transparent">
+                    <span
+                      aria-hidden
+                      className="mt-2 block text-[0.65rem] text-transparent"
+                    >
                       .
                     </span>
                   )}
@@ -232,16 +241,16 @@ export function HomeCalendarCard({ tasks }: HomeCalendarCardProps) {
             </p>
           )}
         </SoftPanel>
-      </CardContent>
+      </div>
 
-      <CardFooter className="flex flex-wrap justify-end gap-2">
+      <div className="flex flex-wrap justify-end gap-2">
         <Button asChild variant="outline" size="sm">
           <Link to="/today">
             {t("home.goToday")}
             <ArrowUpLeft className="ms-2 h-4 w-4" />
           </Link>
         </Button>
-      </CardFooter>
-    </PremiumCard>
+      </div>
+    </CollapsibleSection>
   );
 }

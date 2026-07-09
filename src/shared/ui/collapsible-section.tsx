@@ -11,6 +11,8 @@ type CollapsibleSectionProps = {
   description?: ReactNode;
   status?: ReactNode;
   icon?: ReactNode;
+  expandLabel?: ReactNode;
+  collapseLabel?: ReactNode;
   children: ReactNode;
   className?: string;
   contentClassName?: string;
@@ -25,6 +27,8 @@ export function CollapsibleSection({
   description,
   status,
   icon,
+  expandLabel = "Expand section",
+  collapseLabel = "Collapse section",
   children,
   className,
   contentClassName,
@@ -93,6 +97,7 @@ export function CollapsibleSection({
 
         <span className="flex shrink-0 items-center gap-2">
           {status ? <span className="shrink-0">{status}</span> : null}
+          <span className="sr-only">{isOpen ? collapseLabel : expandLabel}</span>
           <ChevronDown
             className={cn(
               "h-5 w-5 shrink-0 text-muted-foreground transition-transform duration-200 ease-out motion-reduce:transition-none",

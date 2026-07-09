@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { usePersistentBoolean, usePersistentString } from "@/shared/hooks";
 import { useI18n } from "@/shared/i18n";
 import { getLocalDateKey } from "@/shared/preferences";
-import { Badge, Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui";
+import { Badge, Button, CollapsibleSection } from "@/shared/ui";
 import { cn } from "@/shared/utils";
 
 import {
@@ -33,7 +33,10 @@ import {
 } from "../badmintonRoutine";
 
 type WellnessBadmintonCardProps = {
+  id: string;
   onOpenRoutineTemplate: (templateId: WellnessBadmintonRoutineTemplateId) => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 };
 
 const energyChoices: ReadonlyArray<{
@@ -69,7 +72,11 @@ function WellnessStepGroup({
   onToggleStep,
 }: {
   sectionId: WellnessRoutineSectionId;
-  labelKey: "wellness.beforePlay" | "wellness.duringPlay" | "wellness.afterPlay" | "wellness.reflection";
+  labelKey:
+    | "wellness.beforePlay"
+    | "wellness.duringPlay"
+    | "wellness.afterPlay"
+    | "wellness.reflection";
   checkedStepIds: WellnessRoutineStepId[];
   onToggleStep: (stepId: WellnessRoutineStepId) => void;
 }) {
@@ -133,7 +140,10 @@ function WellnessStepGroup({
 }
 
 export function WellnessBadmintonCard({
+  id,
   onOpenRoutineTemplate,
+  open,
+  onOpenChange,
 }: WellnessBadmintonCardProps) {
   const { t } = useI18n();
   const { value: routineEnabled, setValue: setRoutineEnabled } =
@@ -199,7 +209,11 @@ export function WellnessBadmintonCard({
     };
 
     setStoredDate(storageState.date);
-    setStoredCheckedSteps(JSON.stringify(normalizeWellnessRoutineCheckedStepIds(storageState.checkedStepIds)));
+    setStoredCheckedSteps(
+      JSON.stringify(
+        normalizeWellnessRoutineCheckedStepIds(storageState.checkedStepIds)
+      )
+    );
     setStoredEnergy(storageState.energy ?? "");
     setStoredFatigue(storageState.fatigue ?? "");
 
@@ -239,140 +253,135 @@ export function WellnessBadmintonCard({
   };
 
   return (
-    <Card className="overflow-hidden border-primary/10 bg-gradient-to-br from-primary/5 via-background to-background shadow-sm">
-      <CardHeader className="gap-3 border-b border-border/60 bg-background/70 pb-5">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="space-y-1">
-            <CardTitle className="flex items-center gap-2">
-              <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-sm">
-                <Trees className="h-5 w-5" />
-              </span>
-              {t("wellness.badmintonRoutineTitle")}
-            </CardTitle>
-            <CardDescription>{t("wellness.badmintonRoutineDescription")}</CardDescription>
-          </div>
-          <div className="flex flex-col items-end gap-2">
-            <Badge variant="secondary" className="w-fit">
-              {t("wellness.localOnlyChecklist")}
-            </Badge>
-            <span className="text-xs text-muted-foreground">
-              {t("wellness.notMedicalAdvice")}
-            </span>
-          </div>
-        </div>
-      </CardHeader>
-
-      <CardContent className="space-y-4 pt-5">
-        <div className="grid gap-3 lg:grid-cols-2">
-          <WellnessStepGroup
-            sectionId="beforePlay"
-            labelKey="wellness.beforePlay"
-            checkedStepIds={effectiveCheckedStepIds}
-            onToggleStep={handleToggleStep}
-          />
-          <WellnessStepGroup
-            sectionId="duringPlay"
-            labelKey="wellness.duringPlay"
-            checkedStepIds={effectiveCheckedStepIds}
-            onToggleStep={handleToggleStep}
-          />
-          <WellnessStepGroup
-            sectionId="afterPlay"
-            labelKey="wellness.afterPlay"
-            checkedStepIds={effectiveCheckedStepIds}
-            onToggleStep={handleToggleStep}
-          />
-          <div className="rounded-3xl border bg-background/90 p-4 shadow-sm">
-            <div className="flex items-start justify-between gap-3">
-              <div className="space-y-1">
-                <p className="text-sm font-semibold">{t("wellness.reflection")}</p>
-                <p className="text-xs leading-5 text-muted-foreground">
-                  {t("wellness.anyDiscomfortNote")}
-                </p>
-              </div>
-              <Badge variant="secondary" className="shrink-0">
-                {t("wellness.markDone")}
-              </Badge>
-            </div>
-
-            <div className="mt-4 space-y-4">
-              <div>
-                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                  {t("wellness.energyToday")}
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {energyChoices.map(({ value, labelKey }) => (
-                    <Button
-                      key={value}
-                      type="button"
-                      size="sm"
-                      variant={dailyState.energy === value ? "default" : "outline"}
-                      aria-pressed={dailyState.energy === value}
-                      onClick={() => handleSetEnergy(value)}
-                    >
-                      {t(labelKey)}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                  {t("wellness.fatigueToday")}
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {fatigueChoices.map(({ value, labelKey }) => (
-                    <Button
-                      key={value}
-                      type="button"
-                      size="sm"
-                      variant={dailyState.fatigue === value ? "default" : "outline"}
-                      aria-pressed={dailyState.fatigue === value}
-                      onClick={() => handleSetFatigue(value)}
-                    >
-                      {t(labelKey)}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
+    <CollapsibleSection
+      id={id}
+      title={t("wellness.badmintonRoutineTitle")}
+      description={t("wellness.badmintonRoutineDescription")}
+      icon={<Trees className="h-5 w-5" />}
+      status={
+        <span className="flex flex-col items-end gap-2">
+          <Badge variant="secondary" className="w-fit">
+            {t("wellness.localOnlyChecklist")}
+          </Badge>
+          <span className="text-xs text-muted-foreground">
+            {t("wellness.notMedicalAdvice")}
+          </span>
+        </span>
+      }
+      open={open}
+      onOpenChange={onOpenChange}
+      expandLabel={t("common.expandSection")}
+      collapseLabel={t("common.collapseSection")}
+      className="overflow-hidden border-primary/10 bg-gradient-to-br from-primary/5 via-background to-background shadow-sm"
+      contentClassName="space-y-4"
+    >
+      <div className="grid gap-3 lg:grid-cols-2">
+        <WellnessStepGroup
+          sectionId="beforePlay"
+          labelKey="wellness.beforePlay"
+          checkedStepIds={effectiveCheckedStepIds}
+          onToggleStep={handleToggleStep}
+        />
+        <WellnessStepGroup
+          sectionId="duringPlay"
+          labelKey="wellness.duringPlay"
+          checkedStepIds={effectiveCheckedStepIds}
+          onToggleStep={handleToggleStep}
+        />
+        <WellnessStepGroup
+          sectionId="afterPlay"
+          labelKey="wellness.afterPlay"
+          checkedStepIds={effectiveCheckedStepIds}
+          onToggleStep={handleToggleStep}
+        />
         <div className="rounded-3xl border bg-background/90 p-4 shadow-sm">
-          <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-start justify-between gap-3">
             <div className="space-y-1">
-              <p className="text-sm font-semibold">{t("wellness.parkPreparation")}</p>
-              <p className="text-sm leading-6 text-muted-foreground">
-                {t("wellness.perspectiveSafeReminder")}
+              <p className="text-sm font-semibold">{t("wellness.reflection")}</p>
+              <p className="text-xs leading-5 text-muted-foreground">
+                {t("wellness.anyDiscomfortNote")}
               </p>
             </div>
-            <div className="flex flex-wrap gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() =>
-                  onOpenRoutineTemplate("parkBadmintonRoutine")
-                }
-              >
-                <Wind className="me-2 h-4 w-4" />
-                {t("routines.viewRoutine")}
-              </Button>
-              <Button type="button" variant="ghost" onClick={handleResetToday}>
-                <RefreshCcw className="me-2 h-4 w-4" />
-                {t("wellness.resetToday")}
-              </Button>
-            </div>
+            <Badge variant="secondary" className="shrink-0">
+              {t("wellness.markDone")}
+            </Badge>
           </div>
 
-          <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-            <Badge variant="outline">{t("wellness.beforePlay")}</Badge>
-            <Badge variant="outline">{t("wellness.duringPlay")}</Badge>
-            <Badge variant="outline">{t("wellness.afterPlay")}</Badge>
-            <Badge variant="outline">{t("wellness.reflection")}</Badge>
+          <div className="mt-4 space-y-4">
+            <div>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                {t("wellness.energyToday")}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {energyChoices.map(({ value, labelKey }) => (
+                  <Button
+                    key={value}
+                    type="button"
+                    size="sm"
+                    variant={dailyState.energy === value ? "default" : "outline"}
+                    aria-pressed={dailyState.energy === value}
+                    onClick={() => handleSetEnergy(value)}
+                  >
+                    {t(labelKey)}
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                {t("wellness.fatigueToday")}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {fatigueChoices.map(({ value, labelKey }) => (
+                  <Button
+                    key={value}
+                    type="button"
+                    size="sm"
+                    variant={dailyState.fatigue === value ? "default" : "outline"}
+                    aria-pressed={dailyState.fatigue === value}
+                    onClick={() => handleSetFatigue(value)}
+                  >
+                    {t(labelKey)}
+                  </Button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+
+      <div className="rounded-3xl border bg-background/90 p-4 shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="space-y-1">
+            <p className="text-sm font-semibold">{t("wellness.parkPreparation")}</p>
+            <p className="text-sm leading-6 text-muted-foreground">
+              {t("wellness.perspectiveSafeReminder")}
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenRoutineTemplate("parkBadmintonRoutine")}
+            >
+              <Wind className="me-2 h-4 w-4" />
+              {t("routines.viewRoutine")}
+            </Button>
+            <Button type="button" variant="ghost" onClick={handleResetToday}>
+              <RefreshCcw className="me-2 h-4 w-4" />
+              {t("wellness.resetToday")}
+            </Button>
+          </div>
+        </div>
+
+        <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+          <Badge variant="outline">{t("wellness.beforePlay")}</Badge>
+          <Badge variant="outline">{t("wellness.duringPlay")}</Badge>
+          <Badge variant="outline">{t("wellness.afterPlay")}</Badge>
+          <Badge variant="outline">{t("wellness.reflection")}</Badge>
+        </div>
+      </div>
+    </CollapsibleSection>
   );
 }

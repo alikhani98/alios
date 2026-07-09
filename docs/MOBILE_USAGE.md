@@ -36,6 +36,7 @@ AliOS stores data in IndexedDB for the current browser, device, and site origin.
 - Clearing browser/site data can permanently remove AliOS records.
 - Appearance mode and local profile name stay on the current browser or device and do not sync.
 - Home dashboard layout controls now live in the topbar and stay on the current browser or device.
+- Home dashboard collapse state stays on the current browser or device and is separate from layout visibility and ordering.
 - Home accent color preference stays on the current browser or device and does not sync.
 - Home dashboard layout preferences stay on the current browser or device and do not sync.
 - The Home calendar and its task indicators stay on the current browser or device and do not sync.

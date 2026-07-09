@@ -1,36 +1,44 @@
 import { CalendarCheck2, Inbox, Sparkles, TrendingUp, Users } from "lucide-react";
 import { useMemo } from "react";
 
+import { usePersistentString } from "@/shared/hooks";
+import { useI18n } from "@/shared/i18n";
+import { getLocalDateKey } from "@/shared/preferences";
+import {
+  CollapsibleSection,
+  EmptyState,
+  InsightStatCard,
+  MiniProgressBar,
+  SoftPanel,
+  StatusChip,
+} from "@/shared/ui";
+
 import {
   WELLNESS_BADMINTON_ROUTINE_CHECKED_STEPS_STORAGE_KEY,
   WELLNESS_BADMINTON_ROUTINE_DATE_STORAGE_KEY,
   getWellnessRoutineDailyState,
   getWellnessRoutineStepIds,
 } from "@/features/wellness";
-import { getLocalDateKey } from "@/shared/preferences";
-import { useI18n } from "@/shared/i18n";
-import { usePersistentString } from "@/shared/hooks";
+import type { HomeCollapsibleSectionId } from "../homeCollapsedSections";
 import type { HomeDashboardData } from "../types";
 import {
   buildPersonalInsightsSnapshot,
   getWellnessChecklistProgress,
 } from "../personalInsights";
-import {
-  EmptyState,
-  InsightStatCard,
-  MiniProgressBar,
-  PremiumCard,
-  SectionHeader,
-  SoftPanel,
-  StatusChip,
-} from "@/shared/ui";
-import { CardContent } from "@/shared/ui";
 
 type HomePersonalInsightsCardProps = {
   data: HomeDashboardData;
+  sectionId: HomeCollapsibleSectionId;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 };
 
-export function HomePersonalInsightsCard({ data }: HomePersonalInsightsCardProps) {
+export function HomePersonalInsightsCard({
+  data,
+  sectionId,
+  open,
+  onOpenChange,
+}: HomePersonalInsightsCardProps) {
   const { t } = useI18n();
   const currentDate = getLocalDateKey(new Date());
   const wellnessStepCount = getWellnessRoutineStepIds().length;
@@ -57,7 +65,10 @@ export function HomePersonalInsightsCard({ data }: HomePersonalInsightsCardProps
 
   const wellnessProgress = useMemo(
     () =>
-      getWellnessChecklistProgress(wellnessDailyState.checkedStepIds, wellnessStepCount),
+      getWellnessChecklistProgress(
+        wellnessDailyState.checkedStepIds,
+        wellnessStepCount
+      ),
     [wellnessDailyState.checkedStepIds, wellnessStepCount]
   );
 
@@ -78,88 +89,96 @@ export function HomePersonalInsightsCard({ data }: HomePersonalInsightsCardProps
     <StatusChip tone="neutral">{t("home.notEnoughDataYet")}</StatusChip>
   );
 
-  if (!snapshot.hasAnyData) {
-    return (
-      <EmptyState
-        icon={<Sparkles className="h-6 w-6" />}
-        title={t("home.notEnoughDataYet")}
-        description={t("home.keepUsingAliOSToSeeMoreInsights")}
-      />
-    );
-  }
-
   return (
-    <PremiumCard>
-      <CardContent className="space-y-5 p-5 sm:p-6">
-        <SectionHeader
-          eyebrow={t("home.dailyInsights")}
-          title={t("home.personalInsights")}
+    <CollapsibleSection
+      id={`home-${sectionId}`}
+      title={t("home.personalInsights")}
+      description={t("home.keepUsingAliOSToSeeMoreInsights")}
+      icon={<Sparkles className="h-5 w-5" />}
+      status={<StatusChip tone="neutral">{t("settings.localOnlyChecklist")}</StatusChip>}
+      open={open}
+      onOpenChange={onOpenChange}
+      expandLabel={t("common.expandSection")}
+      collapseLabel={t("common.collapseSection")}
+      className="overflow-hidden border-primary/10 bg-gradient-to-br from-background via-background to-primary/5 shadow-sm"
+      contentClassName="space-y-5"
+    >
+      {!snapshot.hasAnyData ? (
+        <EmptyState
+          icon={<Sparkles className="h-6 w-6" />}
+          title={t("home.notEnoughDataYet")}
           description={t("home.keepUsingAliOSToSeeMoreInsights")}
-          status={<StatusChip tone="neutral">{t("settings.localOnlyChecklist")}</StatusChip>}
+          className="border-border/50 bg-background/80"
         />
+      ) : (
+        <>
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            <InsightStatCard
+              icon={<CalendarCheck2 className="h-5 w-5" />}
+              label={t("home.completedTasks")}
+              value={`${snapshot.taskCompletion.completedCount}/${snapshot.taskCompletion.totalCount}`}
+              description={`${t("home.remainingTasks")}: ${snapshot.taskCompletion.remainingCount}`}
+              progress={snapshot.taskCompletion.progress}
+              progressLabel={t("home.completion")}
+              status={
+                <StatusChip tone="primary">
+                  {Math.round(snapshot.taskCompletion.progress)}%
+                </StatusChip>
+              }
+            />
 
-        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          <InsightStatCard
-            icon={<CalendarCheck2 className="h-5 w-5" />}
-            label={t("home.completedTasks")}
-            value={`${snapshot.taskCompletion.completedCount}/${snapshot.taskCompletion.totalCount}`}
-            description={`${t("home.remainingTasks")}: ${snapshot.taskCompletion.remainingCount}`}
-            progress={snapshot.taskCompletion.progress}
-            progressLabel={t("home.completion")}
-            status={
-              <StatusChip tone="primary">
-                {Math.round(snapshot.taskCompletion.progress)}%
-              </StatusChip>
-            }
-          />
+            <InsightStatCard
+              icon={<TrendingUp className="h-5 w-5" />}
+              label={t("home.overdue")}
+              value={snapshot.overdueCount}
+              description={t("home.keepUsingAliOSToSeeMoreInsights")}
+              status={
+                <StatusChip tone={snapshot.overdueCount > 0 ? "danger" : "neutral"}>
+                  {t("home.overdue")}
+                </StatusChip>
+              }
+            />
 
-          <InsightStatCard
-            icon={<TrendingUp className="h-5 w-5" />}
-            label={t("home.overdue")}
-            value={snapshot.overdueCount}
-            description={t("home.keepUsingAliOSToSeeMoreInsights")}
-            status={
-              <StatusChip tone={snapshot.overdueCount > 0 ? "danger" : "neutral"}>
-                {t("home.overdue")}
-              </StatusChip>
-            }
-          />
+            <InsightStatCard
+              icon={<Sparkles className="h-5 w-5" />}
+              label={t("home.upcoming")}
+              value={snapshot.upcomingCount}
+              description={t("home.keepUsingAliOSToSeeMoreInsights")}
+              status={<StatusChip tone="primary">{t("home.upcoming")}</StatusChip>}
+            />
 
-          <InsightStatCard
-            icon={<Sparkles className="h-5 w-5" />}
-            label={t("home.upcoming")}
-            value={snapshot.upcomingCount}
-            description={t("home.keepUsingAliOSToSeeMoreInsights")}
-            status={<StatusChip tone="primary">{t("home.upcoming")}</StatusChip>}
-          />
+            <InsightStatCard
+              icon={<Users className="h-5 w-5" />}
+              label={t("home.activeProjects")}
+              value={snapshot.activeProjectCount}
+              description={
+                snapshot.totalProjectCount > 0
+                  ? `${t("home.totalProjects")}: ${snapshot.totalProjectCount}`
+                  : t("home.keepUsingAliOSToSeeMoreInsights")
+              }
+              status={<StatusChip tone="neutral">{t("home.activeProjects")}</StatusChip>}
+            />
 
-          <InsightStatCard
-            icon={<Users className="h-5 w-5" />}
-            label={t("home.activeProjects")}
-            value={snapshot.activeProjectCount}
-            description={
-              snapshot.totalProjectCount > 0
-                ? `${t("home.totalProjects")}: ${snapshot.totalProjectCount}`
-                : t("home.keepUsingAliOSToSeeMoreInsights")
-            }
-            status={<StatusChip tone="neutral">{t("home.activeProjects")}</StatusChip>}
-          />
+            <InsightStatCard
+              icon={<Inbox className="h-5 w-5" />}
+              label={t("home.inboxItems")}
+              value={snapshot.unprocessedInboxCount}
+              description={t("home.keepUsingAliOSToSeeMoreInsights")}
+              status={<StatusChip tone="neutral">{t("home.inboxItems")}</StatusChip>}
+            />
 
-          <InsightStatCard
-            icon={<Inbox className="h-5 w-5" />}
-            label={t("home.inboxItems")}
-            value={snapshot.unprocessedInboxCount}
-            description={t("home.keepUsingAliOSToSeeMoreInsights")}
-            status={<StatusChip tone="neutral">{t("home.inboxItems")}</StatusChip>}
-          />
-
-          <PremiumCard className="h-full">
-            <CardContent className="flex h-full flex-col gap-4 p-5">
-              <SectionHeader
-                title={t("home.journalActivity")}
-                description={t("home.keepUsingAliOSToSeeMoreInsights")}
-                status={wellnessStatus}
-              />
+            <SoftPanel className="flex h-full flex-col gap-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="space-y-1">
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                    {t("home.journalActivity")}
+                  </p>
+                  <h3 className="text-xl font-semibold tracking-tight">
+                    {t("home.personalInsights")}
+                  </h3>
+                </div>
+                {wellnessStatus}
+              </div>
 
               <div className="grid gap-2 sm:grid-cols-2">
                 <SoftPanel className="space-y-1">
@@ -205,10 +224,10 @@ export function HomePersonalInsightsCard({ data }: HomePersonalInsightsCardProps
                   {t("home.knowledgeItems")}: {snapshot.knowledgeCount}
                 </StatusChip>
               </div>
-            </CardContent>
-          </PremiumCard>
-        </div>
-      </CardContent>
-    </PremiumCard>
+            </SoftPanel>
+          </div>
+        </>
+      )}
+    </CollapsibleSection>
   );
 }

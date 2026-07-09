@@ -64,6 +64,8 @@ export const messagesEn = {
   "common.later": "Later",
   "common.completed": "Completed",
   "common.archived": "Archived",
+  "common.expandSection": "Expand section",
+  "common.collapseSection": "Collapse section",
   "common.validation": "Please check this field.",
   "home.title": "Home",
   "home.description": "See what matters today and return quickly to your recent work.",

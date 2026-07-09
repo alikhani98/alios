@@ -140,6 +140,12 @@ The later version ideas below are directional only. They are not approved stages
 - Safe local-only memoization and shell lazy-loading improvements focused on initial bundle cost and Finance render cost
 - No feature change, no new dependency, no schema/storage/backup change, no backend, no sync, no cloud, no AI, no route redesign, and no config rewrite
 
+## Stage 46
+
+- Home Collapsible Dashboard Sections
+- Local-only Home dashboard collapse state separate from layout visibility and ordering
+- No schema/storage/backup change, no new dependency, no backend, no sync, no cloud, no AI, no route redesign, and no dashboard layout format change
+
 ## Stage 38 Hardening Note
 
 - UI regression QA and release hardening stayed within the existing scope and did not add a new feature

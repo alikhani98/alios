@@ -10,6 +10,7 @@ Stage 42 adds a lightweight Finance chart foundation with dependency-free spendi
 Stage 43 adds lightweight motion and interaction polish across the shell, premium cards, charts, and major pages using CSS-only transitions that respect reduced-motion preferences.
 Stage 44 adds Finance mobile UX and section navigation polish with collapsible sections, sticky quick navigation, Jalali due-date previews, and the accent palette moved into the profile popover.
 Stage 45 performs a safe performance audit and bundle optimization pass that keeps behavior unchanged while trimming a little avoidable work from the shared shell and Finance page.
+Stage 46 adds Home dashboard collapsible sections with local-only open/closed persistence separate from dashboard layout customization.
 
 AliOS is designed for one person and stores its data in the browser through IndexedDB. It requires no backend, account, authentication, subscription, paid API, or hosted AI service.
 
@@ -26,6 +27,7 @@ AliOS is designed for one person and stores its data in the browser through Inde
 - Premium Home showcase polish with denser summary surfaces, a more balanced calendar, and lighter visual alignment for core pages
 - Premium app shell with calmer sidebar, topbar, page background, and mobile drawer feel
 - Home dashboard customization with local show/hide and move up/down controls for existing sections, now accessible from a compact topbar popover
+- Home dashboard collapsible sections with local-only open/closed persistence separate from layout customization
 - Local accent color personalization with six restrained presets stored only on this device
 - Reusable premium metric, insight, status, empty-state, and soft-panel surfaces for Home
 - Compact Personal Insights on Home using only existing local task, project, inbox, journal, knowledge, and wellness checklist data
@@ -179,6 +181,7 @@ Version 1.0 is intentionally single-user and local-only. It does not include:
 - UI automation or end-to-end browser tests
 - Advanced routines and wellness engines beyond the simple local checklist foundation
 - Local-only Home dashboard layout preferences with no drag-and-drop builder yet
+- Local-only Home dashboard collapse preferences separate from visibility and ordering
 
 Dates remain stored as ISO/Gregorian strings; Jalali support is display-only. User-generated content is never automatically translated.
 The Home dashboard also includes a small local-only morning reminder that can be dismissed for the day or disabled in Settings, a routine templates section with built-in previews, a local Wellness / Badminton routine card with daily checklist state, and an upcoming tasks summary that helps separate overdue, today, tomorrow, this week, and later work.
