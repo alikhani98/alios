@@ -146,6 +146,12 @@ The later version ideas below are directional only. They are not approved stages
 - Local-only Home dashboard collapse state separate from layout visibility and ordering
 - No schema/storage/backup change, no new dependency, no backend, no sync, no cloud, no AI, no route redesign, and no dashboard layout format change
 
+## Stage 47
+
+- Settings Help Center Foundation
+- Static in-app guide for beginners, module roles, local-first storage, backup/restore, Home collapsible sections, and Finance basics
+- No chatbot, no backend docs system, no CMS, no schema/storage/backup-format change, no new dependency, no backend, no sync, no cloud, no AI, and no route redesign
+
 ## Stage 38 Hardening Note
 
 - UI regression QA and release hardening stayed within the existing scope and did not add a new feature

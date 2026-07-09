@@ -2,6 +2,11 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 47 - Settings Help Center Foundation
+
+- Added a beginner-friendly Help Center inside Settings with static bilingual guidance for getting started, the main AliOS modules, local-first data safety, backup and restore, Home collapsible sections, and Finance basics
+- Kept the help content in the UI layer as a local-only documentation aid with no chatbot, backend docs service, schema migration, backup-format change, or new dependency
+
 ## Stage 46 - Home Collapsible Dashboard Sections
 
 - Added local-only collapsible Home dashboard sections using the existing shared collapsible pattern

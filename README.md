@@ -1,6 +1,6 @@
 # AliOS
 
-AliOS is a bilingual, local-first personal life-management system. It brings quick capture, Today planning, projects, journaling, personal knowledge, a read-only dashboard, monthly calendar and upcoming-task views, routine templates, manual backup/restore, local data controls, a compact topbar dashboard customizer with a local accent palette, and a Finance foundation with a local review layer, budget guard, lightweight local charts, mobile quick navigation, collapsible sections, and Jalali due-date previews into one static web application.
+AliOS is a bilingual, local-first personal life-management system. It brings quick capture, Today planning, projects, journaling, personal knowledge, a read-only dashboard, monthly calendar and upcoming-task views, routine templates, manual backup/restore, local data controls, a compact topbar dashboard customizer with a local accent palette, a Finance foundation with a local review layer, budget guard, lightweight local charts, mobile quick navigation, collapsible sections, Jalali due-date previews, and a beginner-friendly Help Center inside Settings into one static web application.
 
 Stage 38 was a UI regression QA and release-hardening pass. It did not add a new feature; it kept the existing local-first scope intact and hardened desktop sidebar accessibility on long scrolling pages.
 Stage 39 moves dashboard customization into the topbar and adds a local-only accent color palette for restrained visual personalization.
@@ -11,6 +11,7 @@ Stage 43 adds lightweight motion and interaction polish across the shell, premiu
 Stage 44 adds Finance mobile UX and section navigation polish with collapsible sections, sticky quick navigation, Jalali due-date previews, and the accent palette moved into the profile popover.
 Stage 45 performs a safe performance audit and bundle optimization pass that keeps behavior unchanged while trimming a little avoidable work from the shared shell and Finance page.
 Stage 46 adds Home dashboard collapsible sections with local-only open/closed persistence separate from dashboard layout customization.
+Stage 47 adds a Settings Help Center with static bilingual guidance for first-time use, module roles, local-first storage, backup/restore, Home collapsible sections, and Finance basics.
 
 AliOS is designed for one person and stores its data in the browser through IndexedDB. It requires no backend, account, authentication, subscription, paid API, or hosted AI service.
 
@@ -34,6 +35,7 @@ AliOS is designed for one person and stores its data in the browser through Inde
 - Local-first Finance foundation with income, expenses, installments, debts, a simple monthly liquidity summary, category review, a neutral budget guard, and lightweight charts
 - Finance mobile quick navigation, collapsible sections, and Jalali due-date previews while keeping ISO/Gregorian storage
 - Local accent color personalization in the profile popover and compact dashboard layout controls in the topbar
+- Beginner-friendly Help Center inside Settings with static guidance for first-time use, data safety, backup, Home sections, and Finance usage
 - Mobile-first Quick Capture Inbox with note, task, idea, link, and other item types
 - Process captured items into Today tasks, Journal entries, or Knowledge items while retaining Inbox history
 - Search captured content and combine status and type filters locally

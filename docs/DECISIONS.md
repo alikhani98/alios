@@ -144,3 +144,17 @@ Reason:
 - Collapsed Home sections are a user-interface preference, not a stored data model
 - Keeping collapse state separate preserves the Stage 35 dashboard customization format and avoids unnecessary backup or schema changes
 - A local-only preference keeps the feature simple, static-hosting compatible, and easy to reset by clearing browser storage
+
+## ADR-014: Keep Help Center guidance static and in-app
+
+Decision:
+
+- The Help Center lives inside Settings as static UI guidance
+- Help content is bilingual and local-only, with no chatbot, AI assistant, backend documentation service, or CMS
+- Help content may explain local-first storage, backup/restore behavior, and module usage, but it does not change schemas, backup formats, or storage adapters
+
+Reason:
+
+- Beginner guidance belongs where users already manage local preferences and data safety
+- Static in-app guidance keeps AliOS aligned with the local-first, single-user, static-hosting model
+- Avoiding a chatbot or external docs system prevents unnecessary dependencies and architecture changes
