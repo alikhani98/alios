@@ -1,6 +1,7 @@
 import {
   BookOpen,
   CalendarCheck,
+  CalendarRange,
   Database,
   FolderKanban,
   Home,
@@ -17,6 +18,7 @@ export const navigationIcons: Record<NavIconName, LucideIcon> = {
   home: Home,
   search: Search,
   "calendar-check": CalendarCheck,
+  "calendar-range": CalendarRange,
   inbox: Inbox,
   "folder-kanban": FolderKanban,
   "book-open": BookOpen,

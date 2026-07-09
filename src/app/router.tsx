@@ -49,6 +49,11 @@ const SearchPage = lazy(() =>
     default: module.SearchPage,
   }))
 );
+const WeeklyReviewPage = lazy(() =>
+  import("@/features/weeklyReview/pages/WeeklyReviewPage").then((module) => ({
+    default: module.WeeklyReviewPage,
+  }))
+);
 
 const router = createHashRouter([
   {
@@ -124,6 +129,14 @@ const router = createHashRouter([
         element: (
           <Suspense fallback={<RouteLoadingFallback />}>
             <SearchPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "weekly-review",
+        element: (
+          <Suspense fallback={<RouteLoadingFallback />}>
+            <WeeklyReviewPage />
           </Suspense>
         ),
       },

@@ -14,6 +14,7 @@ Stage 43 adds lightweight motion and interaction polish that stays local to the 
 Stage 44 adds Finance mobile quick navigation, collapsible sections, and Jalali due-date previews while keeping all stored dates as ISO/Gregorian strings.
 Stage 45 keeps the same mobile UX but trims a little avoidable work in the shell and Finance page so mobile interactions stay smooth without changing behavior.
 Stage 47 adds a beginner-friendly Settings Help Center with static bilingual guidance for first-time use, data safety, backup, Home collapsible sections, and Finance basics.
+Stage 48 adds a Weekly Review foundation that summarizes the last 7 days of local data only and stays read-only on the current device.
 The Personal Insights section stays local to the device and only reflects stored tasks, projects, inbox items, journal entries, knowledge items, and wellness checklist state.
 
 ## Open or install AliOS
@@ -40,6 +41,7 @@ AliOS stores data in IndexedDB for the current browser, device, and site origin.
 - Home dashboard collapse state stays on the current browser or device and is separate from layout visibility and ordering.
 - Home accent color preference stays on the current browser or device and does not sync.
 - Home dashboard layout preferences stay on the current browser or device and do not sync.
+- Weekly Review summaries stay on the current browser or device and are derived only from the last 7 days of existing local data.
 - The Home calendar and its task indicators stay on the current browser or device and do not sync.
 - The Home morning warm-up reminder state stays on the current browser or device and does not sync.
 - The Home Wellness / Badminton routine card and its daily checklist state stay on the current browser or device and do not sync.

@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 48 - Weekly Review Foundation
+
+- Added a local-first Weekly Review page and navigation entry that summarize the last 7 days of existing AliOS data only
+- Added deterministic review helpers for tasks, projects, inbox, journal, knowledge, finance, wellness, and routine awareness without storing new review data
+- Added calm rule-based observations and suggested focus guidance while keeping finance and wellness wording awareness-only and non-advisory
+- Kept the stage derived-only with no schema migration, backup-format change, backend, sync, cloud, AI, or new dependency
+
 ## Stage 47 - Settings Help Center Foundation
 
 - Added a beginner-friendly Help Center inside Settings with static bilingual guidance for getting started, the main AliOS modules, local-first data safety, backup and restore, Home collapsible sections, and Finance basics
