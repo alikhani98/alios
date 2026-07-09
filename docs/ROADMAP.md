@@ -86,6 +86,13 @@ The later version ideas below are directional only. They are not approved stages
 - Compact Personal Insights on Home using only existing local task, project, inbox, journal, knowledge, and wellness checklist state
 - CSS/Tailwind micro-visuals only, with no chart library, no new dependency, no schema/storage/backup change, no backend, no sync, no cloud, and no AI
 
+## Version 1.19
+
+- Premium Home Showcase + Core Pages Visual Alignment
+- Denser Home composition with stronger hero, balanced calendar, richer summary surfaces, and more polished routine/upcoming sections
+- Light visual alignment for Today, Projects, Journal, Knowledge, Inbox, Search, and Settings using the same local-first model
+- No schema/storage/backup change, no new dependency, no chart library, no animation library, no backend, no sync, no cloud, and no AI
+
 ## Later product candidates
 
 - Decision Engine

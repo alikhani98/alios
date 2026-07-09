@@ -11,7 +11,18 @@ import { Link } from "react-router-dom";
 
 import { useI18n, type TranslationKey } from "@/shared/i18n";
 import type { Task } from "@/shared/types";
-import { Badge, Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui";
+import {
+  Badge,
+  Button,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  PremiumCard,
+  SectionHeader,
+  SoftPanel,
+  StatusChip,
+} from "@/shared/ui";
 import { buildTaskTimeline, TASK_TIMELINE_SECTION_KEYS, type TaskTimelineSection } from "../taskTimeline";
 
 type HomeUpcomingTasksCardProps = {
@@ -68,22 +79,22 @@ function SectionPreview({
   const extraCount = tasks.length - previewTasks.length;
 
   return (
-    <div className="rounded-3xl border bg-background/90 p-4 shadow-sm">
+    <SoftPanel className="space-y-3 bg-background/90">
       <div className="flex items-center justify-between gap-3">
         <p className="flex items-center gap-2 text-sm font-semibold">
           <Icon className="h-4 w-4 text-primary" />
           {t(labelKey)}
         </p>
-        <Badge variant={section === "overdue" ? "destructive" : "secondary"}>
+        <StatusChip tone={section === "overdue" ? "danger" : "neutral"}>
           {tasks.length}
-        </Badge>
+        </StatusChip>
       </div>
 
       <div className="mt-3 space-y-2">
         {previewTasks.map((task) => (
           <div
             key={task.id}
-            className="rounded-xl border border-dashed px-3 py-2 text-sm"
+            className="rounded-2xl border border-dashed px-3 py-2 text-sm"
           >
             <p className="font-medium leading-6">{task.title}</p>
           </div>
@@ -94,7 +105,7 @@ function SectionPreview({
           </p>
         ) : null}
       </div>
-    </div>
+    </SoftPanel>
   );
 }
 
@@ -108,31 +119,27 @@ export function HomeUpcomingTasksCard({ tasks }: HomeUpcomingTasksCardProps) {
   const hasUpcomingTasks = totalUpcoming > 0;
 
   return (
-    <Card className="overflow-hidden border-primary/10 bg-gradient-to-br from-primary/5 via-background to-background shadow-sm">
+    <PremiumCard className="overflow-hidden border-primary/10 bg-gradient-to-br from-primary/5 via-background to-background shadow-sm">
       <CardHeader className="gap-3 border-b border-border/60 bg-background/70 pb-5">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="space-y-1">
-            <CardTitle className="flex items-center gap-2">
-              <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-sm">
-                <Sunrise className="h-5 w-5" />
+        <SectionHeader
+          icon={<Sunrise className="h-5 w-5" />}
+          title={t("home.upcomingTasks")}
+          description={t("home.futureTasks")}
+          actions={
+            <div className="flex flex-col items-end gap-1">
+              <Badge variant="secondary">{totalUpcoming}</Badge>
+              <span className="text-xs text-muted-foreground">
+                {t("home.planForLater")}
               </span>
-              {t("home.upcomingTasks")}
-            </CardTitle>
-            <CardDescription>{t("home.futureTasks")}</CardDescription>
-          </div>
-          <div className="flex flex-col items-end gap-1">
-            <Badge variant="secondary">{totalUpcoming}</Badge>
-            <span className="text-xs text-muted-foreground">
-              {t("home.planForLater")}
-            </span>
-          </div>
-        </div>
+            </div>
+          }
+        />
       </CardHeader>
 
       <CardContent className="space-y-4 pt-5">
         {hasUpcomingTasks ? (
           <>
-            <div className="grid gap-3 md:grid-cols-2">
+            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
               {TASK_TIMELINE_SECTION_KEYS.map((section) =>
                 timeline[section].length > 0 ? (
                   <SectionPreview
@@ -153,7 +160,7 @@ export function HomeUpcomingTasksCard({ tasks }: HomeUpcomingTasksCardProps) {
             </div>
           </>
         ) : (
-          <div className="rounded-3xl border border-dashed bg-background/80 p-6 text-center shadow-sm">
+          <SoftPanel className="border-dashed bg-background/80 px-6 py-8 text-center">
             <p className="text-sm font-medium">{t("home.noUpcomingTasks")}</p>
             <p className="mt-2 text-sm leading-7 text-muted-foreground">
               {t("home.planForLater")}
@@ -164,9 +171,9 @@ export function HomeUpcomingTasksCard({ tasks }: HomeUpcomingTasksCardProps) {
                 <ArrowUpLeft className="ms-2 h-4 w-4" />
               </Link>
             </Button>
-          </div>
+          </SoftPanel>
         )}
       </CardContent>
-    </Card>
+    </PremiumCard>
   );
 }

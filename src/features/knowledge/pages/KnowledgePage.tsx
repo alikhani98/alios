@@ -12,6 +12,9 @@ import {
   CardHeader,
   CardTitle,
   Input,
+  EmptyState,
+  PremiumCard,
+  SectionHeader,
 } from "@/shared/ui";
 import { cn } from "@/shared/utils";
 import { KnowledgeItemCard } from "../components/KnowledgeItemCard";
@@ -174,21 +177,21 @@ export function KnowledgePage() {
 
   return (
     <section className="alios-page space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="alios-page-header mb-0">
-          <h2 className="alios-page-title">{t("knowledge.title")}</h2>
-          <p className="alios-page-description">
-            {t("knowledge.description")}
-          </p>
-        </div>
-        <Button type="button" onClick={openCreateForm}>
-          <Plus className="me-2 h-4 w-4" />
-          {t("knowledge.new")}
-        </Button>
-      </div>
+      <PremiumCard>
+        <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+          <SectionHeader
+            title={t("knowledge.title")}
+            description={t("knowledge.description")}
+          />
+          <Button type="button" onClick={openCreateForm}>
+            <Plus className="me-2 h-4 w-4" />
+            {t("knowledge.new")}
+          </Button>
+        </CardContent>
+      </PremiumCard>
 
       {formOpen ? (
-        <Card>
+        <PremiumCard>
           <CardHeader>
             <CardTitle>
               {editingItem ? t("knowledge.edit") : t("knowledge.create")}
@@ -203,10 +206,10 @@ export function KnowledgePage() {
               onCancel={closeForm}
             />
           </CardContent>
-        </Card>
+        </PremiumCard>
       ) : null}
 
-      <Card>
+      <PremiumCard>
         <CardContent className="pt-6">
           <form
             className="grid gap-3 md:grid-cols-[1fr_12rem_auto]"
@@ -251,7 +254,7 @@ export function KnowledgePage() {
             </div>
           </form>
         </CardContent>
-      </Card>
+      </PremiumCard>
 
       {successMessage ? (
         <div
@@ -303,27 +306,27 @@ export function KnowledgePage() {
           ))}
         </div>
       ) : visibleItems.length === 0 ? (
-        <Card className="border-dashed">
-          <CardContent className="flex flex-col items-center px-6 py-14 text-center">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-              <BookOpen className="h-6 w-6" />
-            </div>
-            <h3 className="text-lg font-semibold">
-              {hasActiveSearch ? t("knowledge.noResultsTitle") : t("knowledge.emptyTitle")}
-            </h3>
-            <p className="mt-2 max-w-md text-sm leading-7 text-muted-foreground">
-              {hasActiveSearch
-                ? t("knowledge.noResultsDescription")
-                : t("knowledge.emptyDescription")}
-            </p>
-            {!hasActiveSearch ? (
-              <Button type="button" className="mt-5" onClick={openCreateForm}>
+        <EmptyState
+          icon={<BookOpen className="h-6 w-6" />}
+          title={
+            hasActiveSearch
+              ? t("knowledge.noResultsTitle")
+              : t("knowledge.emptyTitle")
+          }
+          description={
+            hasActiveSearch
+              ? t("knowledge.noResultsDescription")
+              : t("knowledge.emptyDescription")
+          }
+          actions={
+            !hasActiveSearch ? (
+              <Button type="button" onClick={openCreateForm}>
                 <Plus className="me-2 h-4 w-4" />
                 {t("knowledge.emptyAction")}
               </Button>
-            ) : null}
-          </CardContent>
-        </Card>
+            ) : null
+          }
+        />
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {visibleItems.map((item) => (

@@ -6,11 +6,18 @@ import {
   Inbox,
   Sparkles,
 } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
 
 import { useDateFormatter } from "@/shared/date";
 import { useI18n } from "@/shared/i18n";
-import { Badge, Card, CardContent } from "@/shared/ui";
+import {
+  Badge,
+  MetricCard,
+  MiniProgressBar,
+  PremiumCard,
+  SoftPanel,
+  StatusChip,
+  CardContent,
+} from "@/shared/ui";
 import type { HomeDashboardData } from "../types";
 import type { ReactNode } from "react";
 
@@ -25,42 +32,13 @@ const levelLabelKeys = {
   good: "common.good",
 } as const;
 
-type HeroMetric = {
-  icon: LucideIcon;
-  label: string;
-  value: string;
-  tone: "primary" | "secondary" | "muted";
-};
-
-function HeroMetricTile({ icon: Icon, label, value, tone }: HeroMetric) {
-  const toneClasses: Record<HeroMetric["tone"], string> = {
-    primary: "bg-primary/10 text-primary",
-    secondary: "bg-secondary text-secondary-foreground",
-    muted: "bg-muted text-muted-foreground",
-  };
-
-  return (
-    <div className="rounded-3xl border bg-background/85 p-4 shadow-sm">
-      <div className="flex items-center justify-between gap-3">
-        <div className={`flex h-10 w-10 items-center justify-center rounded-2xl ${toneClasses[tone]}`}>
-          <Icon className="h-5 w-5" />
-        </div>
-        <Badge variant="outline" className="shrink-0">
-          {label}
-        </Badge>
-      </div>
-      <p className="mt-4 text-3xl font-semibold tabular-nums tracking-tight">
-        {value}
-      </p>
-    </div>
-  );
-}
-
 export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
   const { t } = useI18n();
   const { formatDate } = useDateFormatter();
   const todayCount = data.today.tasks.length;
   const completedCount = data.today.completedTaskCount;
+  const taskCompletionProgress =
+    todayCount > 0 ? (completedCount / todayCount) * 100 : 0;
   const checkinSummary = data.today.checkin
     ? t("home.checkinSummary", {
         mood: t(levelLabelKeys[data.today.checkin.moodLevel]),
@@ -69,41 +47,60 @@ export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
     : t("home.noCheckin");
   const mitLabel = data.today.mitTask?.title ?? t("home.noMit");
 
-  const heroMetrics: HeroMetric[] = [
+  const heroMetrics = [
     {
-      icon: CalendarCheck2,
+      icon: <CalendarCheck2 className="h-5 w-5" />,
       label: t("home.todayTasks"),
       value: String(todayCount),
-      tone: "primary",
+      description:
+        todayCount > 0
+          ? `${t("home.completedTasks")}: ${completedCount}`
+          : t("home.keepUsingAliOSToSeeMoreInsights"),
+      status:
+        todayCount > 0 ? (
+          <StatusChip tone="primary">
+            {Math.round(taskCompletionProgress)}%
+          </StatusChip>
+        ) : (
+          <StatusChip tone="neutral">
+            {t("home.keepUsingAliOSToSeeMoreInsights")}
+          </StatusChip>
+        ),
     },
     {
-      icon: Inbox,
+      icon: <Inbox className="h-5 w-5" />,
       label: t("home.unprocessedInbox"),
       value: String(data.inbox.unprocessedCount),
-      tone: "secondary",
+      description: t("home.inboxItems"),
+      status: <StatusChip tone="neutral">{t("home.inboxItems")}</StatusChip>,
     },
     {
-      icon: FolderKanban,
+      icon: <FolderKanban className="h-5 w-5" />,
       label: t("home.activeProjects"),
       value: String(data.projects.activeCount),
-      tone: "muted",
+      description:
+        data.projects.totalCount > 0
+          ? `${t("home.totalProjects")}: ${data.projects.totalCount}`
+          : t("home.noRecentProjects"),
+      status: <StatusChip tone="neutral">{t("home.activeProjects")}</StatusChip>,
     },
     {
-      icon: Brain,
+      icon: <Brain className="h-5 w-5" />,
       label: t("home.knowledgeItems"),
       value: String(data.knowledge.totalCount),
-      tone: "muted",
+      description: t("home.knowledgeOverview"),
+      status: <StatusChip tone="neutral">{t("home.knowledgeItems")}</StatusChip>,
     },
   ];
 
   return (
-    <Card className="overflow-hidden border-primary/15 bg-gradient-to-br from-primary/10 via-background to-background shadow-sm">
+    <PremiumCard className="border-primary/15 bg-gradient-to-br from-primary/10 via-background to-background shadow-sm">
       <CardContent className="relative p-5 sm:p-6 lg:p-8">
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
         <div className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-primary/10 blur-3xl" />
         <div className="absolute -bottom-24 left-0 h-56 w-56 rounded-full bg-secondary/40 blur-3xl" />
 
-        <div className="relative grid gap-6 xl:grid-cols-[1.3fr_0.95fr] xl:items-end">
+        <div className="relative grid gap-6 xl:grid-cols-[1.1fr_0.9fr] xl:items-end">
           <div className="space-y-5">
             <div className="flex flex-wrap items-center gap-2">
               <div className="inline-flex items-center gap-2 rounded-full border bg-background/80 px-3 py-1 text-xs font-medium text-muted-foreground shadow-sm backdrop-blur">
@@ -140,36 +137,45 @@ export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
                 {t("home.journalEntries")}: {data.journal.totalCount}
               </Badge>
             </div>
-          </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
-            {heroMetrics.map((metric) => (
-              <HeroMetricTile key={metric.label} {...metric} />
-            ))}
-
-            <div className="rounded-3xl border border-primary/15 bg-background/90 p-4 shadow-sm sm:col-span-2">
-              <div className="flex flex-wrap items-start justify-between gap-3">
+            <SoftPanel className="space-y-3 border-primary/10 bg-background/85">
+              <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="space-y-1">
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                     {t("home.todayOverview")}
                   </p>
                   <p className="text-sm font-medium">{t("home.mit")}</p>
                 </div>
                 <Badge variant={data.today.checkin ? "secondary" : "outline"}>
-                  {data.today.completedTaskCount} / {todayCount}
+                  {completedCount} / {todayCount}
                 </Badge>
               </div>
 
-              <p className="mt-3 text-sm leading-7 text-muted-foreground">
+              <p className="text-sm leading-7 text-muted-foreground">
                 {mitLabel}
               </p>
-              <p className="mt-2 text-sm leading-7 text-muted-foreground">
-                {checkinSummary}
-              </p>
-            </div>
+              <MiniProgressBar
+                value={taskCompletionProgress}
+                label={t("home.completion")}
+              />
+              <div className="flex flex-wrap gap-2">
+                <StatusChip tone={data.today.checkin ? "primary" : "neutral"}>
+                  {checkinSummary}
+                </StatusChip>
+                <StatusChip tone="neutral">
+                  {t("home.completedTasks")}: {completedCount}
+                </StatusChip>
+              </div>
+            </SoftPanel>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            {heroMetrics.map((metric) => (
+              <MetricCard key={metric.label} {...metric} />
+            ))}
           </div>
         </div>
       </CardContent>
-    </Card>
+    </PremiumCard>
   );
 }

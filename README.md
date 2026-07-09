@@ -14,6 +14,7 @@ AliOS is designed for one person and stores its data in the browser through Inde
 - Wellness / Badminton routine card on Home with local-only warm-up, water, cool-down, and reflection checklists
 - Subtle visual motion polish across the shared UI with reduced-motion support
 - Premium Home dashboard visual upgrade with calmer hero composition and stronger card hierarchy
+- Premium Home showcase polish with denser summary surfaces, a more balanced calendar, and lighter visual alignment for core pages
 - Premium app shell with calmer sidebar, topbar, page background, and mobile drawer feel
 - Home dashboard customization with local show/hide and move up/down controls for existing sections
 - Reusable premium metric, insight, status, empty-state, and soft-panel surfaces for Home

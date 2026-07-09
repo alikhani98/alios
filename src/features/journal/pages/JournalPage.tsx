@@ -11,6 +11,9 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  EmptyState,
+  PremiumCard,
+  SectionHeader,
 } from "@/shared/ui";
 import { cn } from "@/shared/utils";
 import { JournalEntryCard } from "../components/JournalEntryCard";
@@ -144,21 +147,21 @@ export function JournalPage() {
 
   return (
     <section className="alios-page space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="alios-page-header mb-0">
-          <h2 className="alios-page-title">{t("journal.title")}</h2>
-          <p className="alios-page-description">
-            {t("journal.description")}
-          </p>
-        </div>
-        <Button type="button" onClick={openCreateForm}>
-          <Plus className="me-2 h-4 w-4" />
-          {t("journal.new")}
-        </Button>
-      </div>
+      <PremiumCard>
+        <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+          <SectionHeader
+            title={t("journal.title")}
+            description={t("journal.description")}
+          />
+          <Button type="button" onClick={openCreateForm}>
+            <Plus className="me-2 h-4 w-4" />
+            {t("journal.new")}
+          </Button>
+        </CardContent>
+      </PremiumCard>
 
       {formOpen ? (
-        <Card>
+        <PremiumCard>
           <CardHeader>
             <CardTitle>
               {editingEntry ? t("journal.edit") : t("journal.create")}
@@ -173,7 +176,7 @@ export function JournalPage() {
               onCancel={closeForm}
             />
           </CardContent>
-        </Card>
+        </PremiumCard>
       ) : null}
 
       {successMessage ? (
@@ -226,21 +229,17 @@ export function JournalPage() {
           ))}
         </div>
       ) : entries.length === 0 ? (
-        <Card className="border-dashed">
-          <CardContent className="flex flex-col items-center px-6 py-14 text-center">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-              <BookOpenText className="h-6 w-6" />
-            </div>
-            <h3 className="text-lg font-semibold">{t("journal.emptyTitle")}</h3>
-            <p className="mt-2 max-w-md text-sm leading-7 text-muted-foreground">
-              {t("journal.emptyDescription")}
-            </p>
-            <Button type="button" className="mt-5" onClick={openCreateForm}>
+        <EmptyState
+          icon={<BookOpenText className="h-6 w-6" />}
+          title={t("journal.emptyTitle")}
+          description={t("journal.emptyDescription")}
+          actions={
+            <Button type="button" onClick={openCreateForm}>
               <Plus className="me-2 h-4 w-4" />
               {t("journal.emptyAction")}
             </Button>
-          </CardContent>
-        </Card>
+          }
+        />
       ) : (
         <div className="space-y-4">
           {entries.map((entry) => (
