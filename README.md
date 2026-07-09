@@ -1,8 +1,9 @@
 # AliOS
 
-AliOS is a bilingual, local-first personal life-management system. It brings quick capture, Today planning, projects, journaling, personal knowledge, a read-only dashboard, monthly calendar and upcoming-task views, routine templates, manual backup/restore, and local data controls into one static web application.
+AliOS is a bilingual, local-first personal life-management system. It brings quick capture, Today planning, projects, journaling, personal knowledge, a read-only dashboard, monthly calendar and upcoming-task views, routine templates, manual backup/restore, local data controls, and a compact topbar dashboard customizer with a local accent palette into one static web application.
 
 Stage 38 was a UI regression QA and release-hardening pass. It did not add a new feature; it kept the existing local-first scope intact and hardened desktop sidebar accessibility on long scrolling pages.
+Stage 39 moves dashboard customization into the topbar and adds a local-only accent color palette for restrained visual personalization.
 
 AliOS is designed for one person and stores its data in the browser through IndexedDB. It requires no backend, account, authentication, subscription, paid API, or hosted AI service.
 
@@ -18,7 +19,8 @@ AliOS is designed for one person and stores its data in the browser through Inde
 - Premium Home dashboard visual upgrade with calmer hero composition and stronger card hierarchy
 - Premium Home showcase polish with denser summary surfaces, a more balanced calendar, and lighter visual alignment for core pages
 - Premium app shell with calmer sidebar, topbar, page background, and mobile drawer feel
-- Home dashboard customization with local show/hide and move up/down controls for existing sections
+- Home dashboard customization with local show/hide and move up/down controls for existing sections, now accessible from a compact topbar popover
+- Local accent color personalization with six restrained presets stored only on this device
 - Reusable premium metric, insight, status, empty-state, and soft-panel surfaces for Home
 - Compact Personal Insights on Home using only existing local task, project, inbox, journal, knowledge, and wellness checklist data
 - Mobile-first Quick Capture Inbox with note, task, idea, link, and other item types

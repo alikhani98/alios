@@ -93,6 +93,13 @@ The later version ideas below are directional only. They are not approved stages
 - Light visual alignment for Today, Projects, Journal, Knowledge, Inbox, Search, and Settings using the same local-first model
 - No schema/storage/backup change, no new dependency, no chart library, no animation library, no backend, no sync, no cloud, and no AI
 
+## Version 1.20
+
+- Topbar Dashboard Controls & Accent Color Palette
+- Compact Home dashboard controls moved into the topbar with local show/hide, reorder, and reset actions
+- Local-only accent palette with restrained color presets stored in browser localStorage only
+- No schema/storage/backup change, no dependency, no backend, no sync, no cloud, no AI, no chart library, and no animation library
+
 ## Stage 38 Hardening Note
 
 - UI regression QA and release hardening stayed within the existing scope and did not add a new feature

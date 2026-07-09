@@ -1,4 +1,5 @@
 export const APPEARANCE_STORAGE_KEY = "alios.appearance";
+export const ACCENT_COLOR_STORAGE_KEY = "alios.preferences.accentColor";
 export const DISPLAY_NAME_STORAGE_KEY = "alios.displayName";
 export const MORNING_WARMUP_ENABLED_STORAGE_KEY =
   "alios.routineNudges.morningWarmup.enabled";

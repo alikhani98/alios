@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 39 - Topbar Dashboard Controls & Accent Color Palette
+
+- Moved Home dashboard customization controls out of the main Home surface and into a compact Topbar popover
+- Added a local-only accent color palette with restrained presets stored in browser localStorage only
+- Added a small saved-confirmation message for dashboard layout and accent changes
+- Kept dashboard persistence, backup format, Dexie schema, and the local-first architecture unchanged
+
 ## Stage 38 - UI Regression QA & Release Hardening
 
 - Performed a focused QA and release-hardening pass after the Stage 37 UI polish work
