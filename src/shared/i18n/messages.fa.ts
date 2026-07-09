@@ -67,6 +67,8 @@ export const messagesFa: Record<TranslationKey, string> = {
   "common.later": "بعداً",
   "common.completed": "تکمیل‌شده",
   "common.archived": "بایگانی‌شده",
+  "common.expandSection": "بخش را باز کن",
+  "common.collapseSection": "بخش را ببند",
   "common.validation": "این فیلد را بررسی کنید.",
   "home.title": "خانه",
   "home.description": "آنچه امروز مهم است ببینید و سریع به کارهای اخیر برگردید.",

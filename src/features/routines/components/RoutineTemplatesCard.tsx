@@ -10,15 +10,7 @@ import {
 } from "lucide-react";
 
 import { useI18n, type TranslationKey } from "@/shared/i18n";
-import {
-  Badge,
-  Button,
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/shared/ui";
+import { Badge, Button, CollapsibleSection } from "@/shared/ui";
 
 import {
   getFeaturedRoutineTemplates,
@@ -30,8 +22,11 @@ import {
 } from "../routineTemplates";
 
 type RoutineTemplatesCardProps = {
+  id: string;
   selectedTemplateId: RoutineTemplateId | null;
   onSelectTemplate: (templateId: RoutineTemplateId) => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 };
 
 const iconMap: Record<RoutineTemplateIconName, typeof Sunrise> = {
@@ -106,8 +101,11 @@ function TemplatePreview({
 }
 
 export function RoutineTemplatesCard({
+  id,
   selectedTemplateId,
   onSelectTemplate,
+  open,
+  onOpenChange,
 }: RoutineTemplatesCardProps) {
   const { t } = useI18n();
   const templates = getFeaturedRoutineTemplates();
@@ -117,72 +115,68 @@ export function RoutineTemplatesCard({
       : undefined;
 
   return (
-    <Card className="overflow-hidden border-primary/10 bg-gradient-to-br from-primary/5 via-background to-background shadow-sm">
-      <CardHeader className="gap-3 border-b border-border/60 bg-background/70 pb-5">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="space-y-1">
-            <CardTitle className="flex items-center gap-2">
-              <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-sm">
-                <CheckCircle2 className="h-5 w-5" />
-              </span>
-              {t("routines.title")}
-            </CardTitle>
-            <CardDescription>{t("routines.description")}</CardDescription>
-          </div>
-          <Badge variant="secondary" className="w-fit">
-            {t("routines.localOnlyTemplate")}
-          </Badge>
-        </div>
-      </CardHeader>
+    <CollapsibleSection
+      id={id}
+      title={t("routines.title")}
+      description={t("routines.description")}
+      icon={<CheckCircle2 className="h-5 w-5" />}
+      status={<Badge variant="secondary">{t("routines.localOnlyTemplate")}</Badge>}
+      open={open}
+      onOpenChange={onOpenChange}
+      expandLabel={t("common.expandSection")}
+      collapseLabel={t("common.collapseSection")}
+      className="overflow-hidden border-primary/10 bg-gradient-to-br from-primary/5 via-background to-background shadow-sm"
+      contentClassName="space-y-4"
+    >
+      <div className="grid gap-3 md:grid-cols-2">
+        {templates.map((template) => (
+          <TemplatePreview
+            key={template.id}
+            template={template}
+            onSelectTemplate={onSelectTemplate}
+          />
+        ))}
+      </div>
 
-      <CardContent className="space-y-4 pt-5">
-        <div className="grid gap-3 md:grid-cols-2">
-          {templates.map((template) => (
-            <TemplatePreview
-              key={template.id}
-              template={template}
-              onSelectTemplate={onSelectTemplate}
-            />
-          ))}
-        </div>
-
-        {selectedTemplate ? (
-          <div className="rounded-3xl border border-primary/15 bg-background/90 p-4 shadow-sm">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div className="space-y-1">
-                <p className="text-sm font-semibold">{t("routines.startPreview")}</p>
-                <p className="text-sm text-muted-foreground">
-                  {t(selectedTemplate.titleKey)}
-                </p>
-              </div>
-              <Button
-                type="button"
-                size="sm"
-                onClick={() => onSelectTemplate(selectedTemplate.id)}
-              >
-                {t("routines.startPreview")}
-              </Button>
-            </div>
-
-            <div className="mt-4 space-y-2 rounded-3xl border bg-muted/20 p-4">
-              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                {t("routines.steps")}
+      {selectedTemplate ? (
+        <div className="rounded-3xl border border-primary/15 bg-background/90 p-4 shadow-sm">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="space-y-1">
+              <p className="text-sm font-semibold">{t("routines.startPreview")}</p>
+              <p className="text-sm text-muted-foreground">
+                {t(selectedTemplate.titleKey)}
               </p>
-              <div className="grid gap-2 sm:grid-cols-2">
-                {selectedTemplate.stepKeys.map((stepKey) => (
-                  <div key={stepKey} className="rounded-2xl border bg-background px-3 py-2 text-sm leading-6 shadow-sm">
-                    {t(stepKey)}
-                  </div>
-                ))}
-              </div>
+            </div>
+            <Button
+              type="button"
+              size="sm"
+              onClick={() => onSelectTemplate(selectedTemplate.id)}
+            >
+              {t("routines.startPreview")}
+            </Button>
+          </div>
+
+          <div className="mt-4 space-y-2 rounded-3xl border bg-muted/20 p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              {t("routines.steps")}
+            </p>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {selectedTemplate.stepKeys.map((stepKey) => (
+                <div
+                  key={stepKey}
+                  className="rounded-2xl border bg-background px-3 py-2 text-sm leading-6 shadow-sm"
+                >
+                  {t(stepKey)}
+                </div>
+              ))}
             </div>
           </div>
-        ) : (
-          <div className="rounded-3xl border border-dashed bg-background/80 p-4 text-sm text-muted-foreground shadow-sm">
-            {t("routines.selectTemplateHint")}
-          </div>
-        )}
-      </CardContent>
-    </Card>
+        </div>
+      ) : (
+        <div className="rounded-3xl border border-dashed bg-background/80 p-4 text-sm text-muted-foreground shadow-sm">
+          {t("routines.selectTemplateHint")}
+        </div>
+      )}
+    </CollapsibleSection>
   );
 }

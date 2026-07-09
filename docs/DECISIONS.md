@@ -130,3 +130,17 @@ Reason:
 
 - The shared app shell is part of the initial experience on every route, so keeping Home-only controls out of the default shell chunk reduces avoidable startup work
 - A small lazy boundary preserves the existing architecture and avoids risky route or bundling config changes
+
+## ADR-013: Keep Home dashboard collapse state local-only and separate
+
+Decision:
+
+- Home dashboard collapse state lives in `localStorage` only
+- Home collapse state is separate from Home dashboard show/hide and reorder customization
+- Backup/restore does not include Home collapse state
+
+Reason:
+
+- Collapsed Home sections are a user-interface preference, not a stored data model
+- Keeping collapse state separate preserves the Stage 35 dashboard customization format and avoids unnecessary backup or schema changes
+- A local-only preference keeps the feature simple, static-hosting compatible, and easy to reset by clearing browser storage

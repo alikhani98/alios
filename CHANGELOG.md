@@ -2,6 +2,12 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 46 - Home Collapsible Dashboard Sections
+
+- Added local-only collapsible Home dashboard sections using the existing shared collapsible pattern
+- Persisted Home section open/closed state in browser `localStorage` only, separate from dashboard show/hide and reorder preferences
+- Kept Finance collapsible sections working with the shared primitive and avoided any schema, backup, dependency, backend, sync, cloud, or AI change
+
 ## Stage 45 - Performance Audit & Bundle Optimization
 
 - Performed a focused performance audit after the Finance, chart, motion, and mobile UX stages

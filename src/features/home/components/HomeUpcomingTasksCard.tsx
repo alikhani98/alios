@@ -11,24 +11,22 @@ import { Link } from "react-router-dom";
 
 import { useI18n, type TranslationKey } from "@/shared/i18n";
 import type { Task } from "@/shared/types";
-import {
-  Badge,
-  Button,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  PremiumCard,
-  SectionHeader,
-  SoftPanel,
-  StatusChip,
-} from "@/shared/ui";
+import { Badge, Button, CollapsibleSection, SoftPanel, StatusChip } from "@/shared/ui";
 import { aliosSurfaceMotion } from "@/shared/ui/motion";
 import { cn } from "@/shared/utils";
-import { buildTaskTimeline, TASK_TIMELINE_SECTION_KEYS, type TaskTimelineSection } from "../taskTimeline";
+
+import {
+  buildTaskTimeline,
+  TASK_TIMELINE_SECTION_KEYS,
+  type TaskTimelineSection,
+} from "../taskTimeline";
+import type { HomeCollapsibleSectionId } from "../homeCollapsedSections";
 
 type HomeUpcomingTasksCardProps = {
   tasks: Task[];
+  sectionId: HomeCollapsibleSectionId;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 };
 
 const sectionMeta: Record<
@@ -115,7 +113,12 @@ function SectionPreview({
   );
 }
 
-export function HomeUpcomingTasksCard({ tasks }: HomeUpcomingTasksCardProps) {
+export function HomeUpcomingTasksCard({
+  tasks,
+  sectionId,
+  open,
+  onOpenChange,
+}: HomeUpcomingTasksCardProps) {
   const { t } = useI18n();
   const timeline = buildTaskTimeline(tasks);
   const totalUpcoming = TASK_TIMELINE_SECTION_KEYS.reduce(
@@ -125,61 +128,55 @@ export function HomeUpcomingTasksCard({ tasks }: HomeUpcomingTasksCardProps) {
   const hasUpcomingTasks = totalUpcoming > 0;
 
   return (
-    <PremiumCard className="overflow-hidden border-primary/10 bg-gradient-to-br from-primary/5 via-background to-background shadow-sm">
-      <CardHeader className="gap-3 border-b border-border/60 bg-background/70 pb-5">
-        <SectionHeader
-          icon={<Sunrise className="h-5 w-5" />}
-          title={t("home.upcomingTasks")}
-          description={t("home.futureTasks")}
-          actions={
-            <div className="flex flex-col items-end gap-1">
-              <Badge variant="secondary">{totalUpcoming}</Badge>
-              <span className="text-xs text-muted-foreground">
-                {t("home.planForLater")}
-              </span>
-            </div>
-          }
-        />
-      </CardHeader>
-
-      <CardContent className="space-y-4 pt-5">
-        {hasUpcomingTasks ? (
-          <>
-            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-              {TASK_TIMELINE_SECTION_KEYS.map((section) =>
-                timeline[section].length > 0 ? (
-                  <SectionPreview
-                    key={section}
-                    section={section}
-                    tasks={timeline[section]}
-                  />
-                ) : null
-              )}
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <Button asChild variant="outline" size="sm">
-                <Link to="/today">
-                  {t("home.planForLater")}
-                  <ArrowUpLeft className="ms-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
-          </>
-        ) : (
-          <SoftPanel className="border-dashed bg-background/80 px-6 py-8 text-center">
-            <p className="text-sm font-medium">{t("home.noUpcomingTasks")}</p>
-            <p className="mt-2 text-sm leading-7 text-muted-foreground">
-              {t("home.planForLater")}
-            </p>
-            <Button asChild className="mt-4" variant="outline">
+    <CollapsibleSection
+      id={`home-${sectionId}`}
+      title={t("home.upcomingTasks")}
+      description={t("home.futureTasks")}
+      icon={<Sunrise className="h-5 w-5" />}
+      status={<Badge variant="secondary">{totalUpcoming}</Badge>}
+      open={open}
+      onOpenChange={onOpenChange}
+      expandLabel={t("common.expandSection")}
+      collapseLabel={t("common.collapseSection")}
+      className="overflow-hidden border-primary/10 bg-gradient-to-br from-primary/5 via-background to-background shadow-sm"
+      contentClassName="space-y-4"
+    >
+      {hasUpcomingTasks ? (
+        <>
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {TASK_TIMELINE_SECTION_KEYS.map((section) =>
+              timeline[section].length > 0 ? (
+                <SectionPreview
+                  key={section}
+                  section={section}
+                  tasks={timeline[section]}
+                />
+              ) : null
+            )}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button asChild variant="outline" size="sm">
               <Link to="/today">
                 {t("home.planForLater")}
                 <ArrowUpLeft className="ms-2 h-4 w-4" />
               </Link>
             </Button>
-          </SoftPanel>
-        )}
-      </CardContent>
-    </PremiumCard>
+          </div>
+        </>
+      ) : (
+        <SoftPanel className="border-dashed bg-background/80 px-6 py-8 text-center">
+          <p className="text-sm font-medium">{t("home.noUpcomingTasks")}</p>
+          <p className="mt-2 text-sm leading-7 text-muted-foreground">
+            {t("home.planForLater")}
+          </p>
+          <Button asChild className="mt-4" variant="outline">
+            <Link to="/today">
+              {t("home.planForLater")}
+              <ArrowUpLeft className="ms-2 h-4 w-4" />
+            </Link>
+          </Button>
+        </SoftPanel>
+      )}
+    </CollapsibleSection>
   );
 }

@@ -582,12 +582,14 @@ export function FinancePage() {
         id={FINANCE_SECTION_ANCHORS.charts}
         title={t("finance.sectionCharts")}
         description={t("finance.chartsDescription")}
-        status={<StatusChip tone="neutral">{t("finance.localOnlyData")}</StatusChip>}
-        open={!isCollapsedSection("charts")}
-        onOpenChange={(open) => setCollapsedSectionOpen("charts", open)}
-        className="scroll-mt-32"
-        contentClassName="space-y-4"
-      >
+      status={<StatusChip tone="neutral">{t("finance.localOnlyData")}</StatusChip>}
+      open={!isCollapsedSection("charts")}
+      onOpenChange={(open) => setCollapsedSectionOpen("charts", open)}
+      expandLabel={t("common.expandSection")}
+      collapseLabel={t("common.collapseSection")}
+      className="scroll-mt-32"
+      contentClassName="space-y-4"
+    >
         <div className="grid gap-4 xl:grid-cols-3">
           <SoftPanel className="space-y-4">
             <div className="space-y-1">
@@ -668,6 +670,8 @@ export function FinancePage() {
         }
         open={!isCollapsedSection("review")}
         onOpenChange={(open) => setCollapsedSectionOpen("review", open)}
+        expandLabel={t("common.expandSection")}
+        collapseLabel={t("common.collapseSection")}
         className="scroll-mt-32"
         contentClassName="space-y-4"
       >
@@ -770,6 +774,8 @@ export function FinancePage() {
         }
         open={!isCollapsedSection("obligations")}
         onOpenChange={(open) => setCollapsedSectionOpen("obligations", open)}
+        expandLabel={t("common.expandSection")}
+        collapseLabel={t("common.collapseSection")}
         className="scroll-mt-32"
         contentClassName="space-y-4"
       >
@@ -834,6 +840,8 @@ export function FinancePage() {
         status={<StatusChip tone="neutral">{t("finance.localOnlyData")}</StatusChip>}
         open={!isCollapsedSection("transactions")}
         onOpenChange={(open) => setCollapsedSectionOpen("transactions", open)}
+        expandLabel={t("common.expandSection")}
+        collapseLabel={t("common.collapseSection")}
         className="scroll-mt-32"
         contentClassName="space-y-4"
       >
@@ -992,6 +1000,8 @@ export function FinancePage() {
             status={<StatusChip tone="neutral">{t("finance.localOnlyData")}</StatusChip>}
             open={!isCollapsedSection("addTransaction")}
             onOpenChange={(open) => setCollapsedSectionOpen("addTransaction", open)}
+            expandLabel={t("common.expandSection")}
+            collapseLabel={t("common.collapseSection")}
             className="h-full"
             contentClassName="space-y-4"
           >
@@ -1013,6 +1023,8 @@ export function FinancePage() {
             status={<StatusChip tone="neutral">{t("finance.localOnlyData")}</StatusChip>}
             open={!isCollapsedSection("addObligation")}
             onOpenChange={(open) => setCollapsedSectionOpen("addObligation", open)}
+            expandLabel={t("common.expandSection")}
+            collapseLabel={t("common.collapseSection")}
             className="h-full"
             contentClassName="space-y-4"
           >

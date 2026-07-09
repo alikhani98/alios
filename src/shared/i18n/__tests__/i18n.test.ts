@@ -23,6 +23,8 @@ describe("i18n utilities", () => {
     "nav.knowledge",
     "nav.settings",
     "common.changesSaved",
+    "common.expandSection",
+    "common.collapseSection",
     "home.homeLayout",
     "home.customizeDashboard",
     "home.customizeDashboardDescription",
