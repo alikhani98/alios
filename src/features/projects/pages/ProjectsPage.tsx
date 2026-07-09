@@ -245,7 +245,7 @@ export function ProjectsPage() {
                 projectRefs.current[project.id] = node;
               }}
               className={cn(
-                "scroll-mt-24 rounded-2xl transition-shadow",
+                "scroll-mt-24 rounded-2xl transition-[transform,box-shadow,border-color] duration-200 ease-out motion-reduce:transition-none motion-reduce:transform-none",
                 focusedProjectId === project.id
                   ? "ring-2 ring-primary/50 ring-offset-2 ring-offset-background shadow-lg shadow-primary/10"
                   : null

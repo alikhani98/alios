@@ -100,7 +100,10 @@ export function HomeRoutineNudgeCard({
       <CardContent className="space-y-4">
         <div className="grid gap-3 rounded-2xl border bg-background/80 p-4 sm:grid-cols-2">
           {checklistItems.map((key) => (
-            <div key={key} className="flex items-start gap-2 text-sm leading-6">
+            <div
+              key={key}
+              className="flex items-start gap-2 rounded-xl px-2 py-1.5 text-sm leading-6 transition-colors duration-200 ease-out motion-reduce:transition-none"
+            >
               <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
               <span>{t(key)}</span>
             </div>
