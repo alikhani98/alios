@@ -134,6 +134,8 @@ describe("i18n utilities", () => {
     "routines.whatToImproveTomorrow",
     "settings.appearance",
     "settings.localProfile",
+    "settings.accentColor",
+    "settings.accentColorDescription",
     "settings.accentDefault",
     "settings.accentViolet",
     "settings.accentRose",
@@ -147,6 +149,13 @@ describe("i18n utilities", () => {
     "settings.noPushNotification",
     "finance.reviewIntro",
     "finance.reviewLiquidityExplanation",
+    "finance.quickNavigation",
+    "finance.sectionSummary",
+    "finance.sectionCharts",
+    "finance.sectionReview",
+    "finance.sectionObligations",
+    "finance.sectionTransactions",
+    "finance.sectionAdd",
     "finance.monthlySpendingByCategory",
     "finance.monthlySpendingByCategoryDescription",
     "finance.monthlySpendingShare",
@@ -180,6 +189,8 @@ describe("i18n utilities", () => {
     "finance.filterExpenseTransactions",
     "finance.filterActiveObligations",
     "finance.filterPaidObligations",
+    "finance.jalaliDueDatePreview",
+    "finance.dueDateStorageNote",
   ] as const)("defines %s in both message catalogs", (key) => {
     expect(messagesEn[key]).toBeTruthy();
     expect(messagesFa[key]).toBeTruthy();
