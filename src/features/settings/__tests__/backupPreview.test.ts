@@ -3,6 +3,8 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { AliosDatabase, DexieStorageAdapter } from "@/db/dexie";
 import {
   dailyCheckinInput,
+  financeObligationInput,
+  financeTransactionInput,
   inboxItemInput,
   journalEntryInput,
   knowledgeItemInput,
@@ -31,6 +33,8 @@ describe("backup preview", () => {
   it("summarizes record counts for the restore preview", async () => {
     await storage.projects.create(projectInput);
     await storage.tasks.create(taskInput);
+    await storage.finance.createTransaction(financeTransactionInput);
+    await storage.finance.createObligation(financeObligationInput);
     await storage.journal.create(journalEntryInput);
     await storage.knowledge.create(knowledgeItemInput);
     await storage.dailyCheckins.create(dailyCheckinInput);
@@ -41,10 +45,12 @@ describe("backup preview", () => {
 
     expect(preview.backupVersion).toBe(1);
     expect(new Date(preview.exportedAt).toISOString()).toBe(preview.exportedAt);
-    expect(preview.totalRecords).toBe(7);
+    expect(preview.totalRecords).toBe(9);
     expect(preview.tableCounts).toEqual([
       { key: "dailyCheckins", count: 1 },
       { key: "tasks", count: 1 },
+      { key: "financeTransactions", count: 1 },
+      { key: "financeObligations", count: 1 },
       { key: "projects", count: 1 },
       { key: "journalEntries", count: 1 },
       { key: "knowledgeItems", count: 1 },

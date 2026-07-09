@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 40 - Finance Foundation
+
+- Added a local-first Finance module for income, expenses, installments, debts, and a basic monthly liquidity summary
+- Added finance-specific Dexie tables, repository CRUD, backup/restore support, and focused tests while keeping UI code away from Dexie
+- Added a calm mobile-friendly Finance page with quick local CRUD flows, summary cards, recent transactions, active obligations, and empty state guidance
+- Kept the feature intentionally simple with no backend, sync, cloud, AI, bank integration, advice engine, chart library, animation library, or accounting system
+
 ## Stage 39 - Topbar Dashboard Controls & Accent Color Palette
 
 - Moved Home dashboard customization controls out of the main Home surface and into a compact Topbar popover

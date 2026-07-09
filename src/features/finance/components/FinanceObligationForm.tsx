@@ -1,0 +1,280 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import { format } from "date-fns";
+import { useForm } from "react-hook-form";
+
+import type { FinanceObligation } from "@/shared/types";
+import { useI18n } from "@/shared/i18n";
+import { Button, Input, Textarea } from "@/shared/ui";
+import {
+  DEFAULT_FINANCE_OBLIGATION_STATUS,
+  DEFAULT_FINANCE_OBLIGATION_TYPE,
+  FINANCE_OBLIGATION_STATUS_OPTIONS,
+  FINANCE_OBLIGATION_TYPE_OPTIONS,
+  type FinanceObligationFormValues,
+} from "../domain/finance";
+import { financeObligationSchema } from "@/shared/types";
+
+type FinanceObligationFormProps = {
+  obligation?: FinanceObligation;
+  isSubmitting: boolean;
+  onSubmit: (values: FinanceObligationFormValues) => Promise<void>;
+  onCancel?: () => void;
+};
+
+const financeObligationFormSchema = financeObligationSchema.omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+function toOptionalString(value: string): string | undefined {
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : undefined;
+}
+
+function toOptionalNumber(value: string): number | undefined {
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? Number(trimmed) : undefined;
+}
+
+export function FinanceObligationForm({
+  obligation,
+  isSubmitting,
+  onSubmit,
+  onCancel,
+}: FinanceObligationFormProps) {
+  const { t } = useI18n();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FinanceObligationFormValues>({
+    resolver: zodResolver(financeObligationFormSchema),
+    defaultValues: {
+      type: obligation?.type ?? DEFAULT_FINANCE_OBLIGATION_TYPE,
+      title: obligation?.title ?? "",
+      totalAmount: obligation?.totalAmount ?? 0,
+      paidAmount: obligation?.paidAmount ?? 0,
+      dueAmount: obligation?.dueAmount,
+      monthlyAmount: obligation?.monthlyAmount,
+      dueDay: obligation?.dueDay,
+      dueDate: obligation?.dueDate ?? "",
+      counterparty: obligation?.counterparty ?? "",
+      status: obligation?.status ?? DEFAULT_FINANCE_OBLIGATION_STATUS,
+      notes: obligation?.notes ?? "",
+    },
+  });
+
+  return (
+    <form
+      className="grid gap-5"
+      onSubmit={handleSubmit((values) => void onSubmit(values))}
+    >
+      <div className="grid gap-4 md:grid-cols-[2fr_1fr]">
+        <div className="grid gap-2">
+          <label htmlFor="finance-obligation-title" className="text-sm font-medium">
+            {t("common.title")}
+          </label>
+          <Input
+            id="finance-obligation-title"
+            autoFocus
+            placeholder={t("finance.obligationTitlePlaceholder")}
+            aria-invalid={Boolean(errors.title)}
+            {...register("title")}
+          />
+          {errors.title ? (
+            <p className="text-sm text-destructive">{t("common.validation")}</p>
+          ) : null}
+        </div>
+
+        <div className="grid gap-2">
+          <label htmlFor="finance-obligation-type" className="text-sm font-medium">
+            {t("common.type")}
+          </label>
+          <select
+            id="finance-obligation-type"
+            className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:text-sm"
+            {...register("type")}
+          >
+            {FINANCE_OBLIGATION_TYPE_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {t(option.labelKey)}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-2">
+          <label htmlFor="finance-obligation-total" className="text-sm font-medium">
+            {t("finance.totalAmount")}
+          </label>
+          <Input
+            id="finance-obligation-total"
+            type="number"
+            min="0"
+            step="1"
+            inputMode="numeric"
+            aria-invalid={Boolean(errors.totalAmount)}
+            {...register("totalAmount", { valueAsNumber: true })}
+          />
+          {errors.totalAmount ? (
+            <p className="text-sm text-destructive">{t("finance.amountValidation")}</p>
+          ) : null}
+        </div>
+
+        <div className="grid gap-2">
+          <label htmlFor="finance-obligation-paid" className="text-sm font-medium">
+            {t("finance.paidAmount")}
+          </label>
+          <Input
+            id="finance-obligation-paid"
+            type="number"
+            min="0"
+            step="1"
+            inputMode="numeric"
+            aria-invalid={Boolean(errors.paidAmount)}
+            {...register("paidAmount", { valueAsNumber: true })}
+          />
+          {errors.paidAmount ? (
+            <p className="text-sm text-destructive">{t("finance.amountValidation")}</p>
+          ) : null}
+        </div>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-2">
+          <label htmlFor="finance-obligation-due-amount" className="text-sm font-medium">
+            {t("finance.dueAmount")}
+          </label>
+          <Input
+            id="finance-obligation-due-amount"
+            type="number"
+            min="0"
+            step="1"
+            inputMode="numeric"
+            aria-invalid={Boolean(errors.dueAmount)}
+            {...register("dueAmount", { setValueAs: toOptionalNumber })}
+          />
+          {errors.dueAmount ? (
+            <p className="text-sm text-destructive">{t("finance.amountValidation")}</p>
+          ) : null}
+        </div>
+
+        <div className="grid gap-2">
+          <label htmlFor="finance-obligation-monthly-amount" className="text-sm font-medium">
+            {t("finance.monthlyAmount")}
+          </label>
+          <Input
+            id="finance-obligation-monthly-amount"
+            type="number"
+            min="0"
+            step="1"
+            inputMode="numeric"
+            aria-invalid={Boolean(errors.monthlyAmount)}
+            {...register("monthlyAmount", { setValueAs: toOptionalNumber })}
+          />
+          {errors.monthlyAmount ? (
+            <p className="text-sm text-destructive">{t("finance.amountValidation")}</p>
+          ) : null}
+        </div>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-2">
+          <label htmlFor="finance-obligation-due-day" className="text-sm font-medium">
+            {t("finance.dueDay")}
+          </label>
+          <Input
+            id="finance-obligation-due-day"
+            type="number"
+            min="1"
+            max="31"
+            step="1"
+            inputMode="numeric"
+            aria-invalid={Boolean(errors.dueDay)}
+            {...register("dueDay", { setValueAs: toOptionalNumber })}
+          />
+          {errors.dueDay ? (
+            <p className="text-sm text-destructive">{t("finance.dueDayValidation")}</p>
+          ) : null}
+        </div>
+
+        <div className="grid gap-2">
+          <label htmlFor="finance-obligation-due-date" className="text-sm font-medium">
+            {t("finance.dueDate")}
+          </label>
+          <Input
+            id="finance-obligation-due-date"
+            type="date"
+            aria-invalid={Boolean(errors.dueDate)}
+            {...register("dueDate", {
+              setValueAs: (value: string) => {
+                const trimmed = value.trim();
+                return trimmed.length > 0 ? trimmed : undefined;
+              },
+            })}
+          />
+          {errors.dueDate ? (
+            <p className="text-sm text-destructive">{t("common.validation")}</p>
+          ) : null}
+        </div>
+      </div>
+
+      <div className="grid gap-2">
+        <label htmlFor="finance-obligation-counterparty" className="text-sm font-medium">
+          {t("finance.counterparty")}
+        </label>
+        <Input
+          id="finance-obligation-counterparty"
+          placeholder={t("finance.counterpartyPlaceholder")}
+          {...register("counterparty", { setValueAs: toOptionalString })}
+        />
+      </div>
+
+      <div className="grid gap-2">
+        <label htmlFor="finance-obligation-status" className="text-sm font-medium">
+          {t("common.status")}
+        </label>
+        <select
+          id="finance-obligation-status"
+          className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:text-sm"
+          {...register("status")}
+        >
+          {FINANCE_OBLIGATION_STATUS_OPTIONS.map((option) => (
+            <option key={option.value} value={option.value}>
+              {t(option.labelKey)}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="grid gap-2">
+        <label htmlFor="finance-obligation-notes" className="text-sm font-medium">
+          {t("common.notes")}
+        </label>
+        <Textarea
+          id="finance-obligation-notes"
+          placeholder={t("finance.notesPlaceholder")}
+          {...register("notes", { setValueAs: toOptionalString })}
+        />
+      </div>
+
+      <div className="flex flex-wrap gap-3">
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting
+            ? t("common.saving")
+            : obligation
+              ? t("common.saveChanges")
+              : t("finance.addObligation")}
+        </Button>
+        {onCancel ? (
+          <Button type="button" variant="outline" onClick={onCancel}>
+            {t("common.cancel")}
+          </Button>
+        ) : null}
+      </div>
+    </form>
+  );
+}

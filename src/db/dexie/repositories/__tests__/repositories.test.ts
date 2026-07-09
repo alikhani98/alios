@@ -4,6 +4,8 @@ import { ValidationError } from "@/core/errors";
 import type { AliosDatabase, DexieStorageAdapter } from "@/db/dexie";
 import {
   dailyCheckinInput,
+  financeObligationInput,
+  financeTransactionInput,
   journalEntryInput,
   inboxItemInput,
   knowledgeItemInput,
@@ -142,6 +144,48 @@ describe("Dexie repositories", () => {
     await storage.settings.delete(created.id);
     expect(await storage.settings.list()).toEqual([]);
     expect(await storage.settings.getByKey(created.key)).toBeUndefined();
+  });
+
+  it("supports the complete Finance transaction CRUD lifecycle", async () => {
+    const created = await storage.finance.createTransaction(financeTransactionInput);
+
+    expect(created.id).toMatch(/^[0-9a-f-]{36}$/i);
+    expect(await storage.finance.listTransactions()).toEqual([created]);
+    expect(await storage.finance.getTransactionById(created.id)).toEqual(created);
+
+    const updated = await storage.finance.updateTransaction(created.id, {
+      title: "Updated salary",
+    });
+    expect(updated.title).toBe("Updated salary");
+    expect((await storage.finance.getTransactionById(created.id))?.title).toBe(
+      "Updated salary"
+    );
+
+    await storage.finance.deleteTransaction(created.id);
+    expect(await storage.finance.listTransactions()).toEqual([]);
+    expect(await storage.finance.getTransactionById(created.id)).toBeUndefined();
+  });
+
+  it("supports the complete Finance obligation CRUD lifecycle", async () => {
+    const created = await storage.finance.createObligation(financeObligationInput);
+
+    expect(created.id).toMatch(/^[0-9a-f-]{36}$/i);
+    expect(await storage.finance.listObligations()).toEqual([created]);
+    expect(await storage.finance.getObligationById(created.id)).toEqual(created);
+
+    const updated = await storage.finance.updateObligation(created.id, {
+      paidAmount: 1000,
+      status: "paused",
+    });
+    expect(updated.paidAmount).toBe(1000);
+    expect(updated.status).toBe("paused");
+    expect((await storage.finance.getObligationById(created.id))?.paidAmount).toBe(
+      1000
+    );
+
+    await storage.finance.deleteObligation(created.id);
+    expect(await storage.finance.listObligations()).toEqual([]);
+    expect(await storage.finance.getObligationById(created.id)).toBeUndefined();
   });
 
   it("supports the complete Inbox CRUD and status lifecycle", async () => {

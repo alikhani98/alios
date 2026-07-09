@@ -1,5 +1,7 @@
 import type {
   CreateDailyCheckinInput,
+  CreateFinanceObligationInput,
+  CreateFinanceTransactionInput,
   CreateJournalEntryInput,
   CreateInboxItemInput,
   CreateKnowledgeItemInput,
@@ -9,6 +11,8 @@ import type {
 } from "@/core/repositories";
 import type {
   DailyCheckin,
+  FinanceObligation,
+  FinanceTransaction,
   JournalEntry,
   InboxItem,
   KnowledgeItem,
@@ -75,6 +79,29 @@ export const inboxItemInput: CreateInboxItemInput = {
   type: "idea",
 };
 
+export const financeTransactionInput: CreateFinanceTransactionInput = {
+  type: "income",
+  title: "Monthly salary",
+  amount: 5000,
+  category: "salary",
+  occurredAt: "2026-07-05",
+  notes: "Primary local income",
+};
+
+export const financeObligationInput: CreateFinanceObligationInput = {
+  type: "installment",
+  title: "Phone installment",
+  totalAmount: 2400,
+  paidAmount: 600,
+  dueAmount: 400,
+  monthlyAmount: 400,
+  dueDay: 12,
+  dueDate: "2026-07-12",
+  counterparty: "Vendor",
+  status: "active",
+  notes: "Monthly installment for the phone",
+};
+
 const metadata = {
   id: "fixture-id",
   createdAt: timestamp,
@@ -99,5 +126,13 @@ export const settingRecord: Setting = { ...settingInput, ...metadata };
 export const inboxItemRecord: InboxItem = {
   ...inboxItemInput,
   status: "unprocessed",
+  ...metadata,
+};
+export const financeTransactionRecord: FinanceTransaction = {
+  ...financeTransactionInput,
+  ...metadata,
+};
+export const financeObligationRecord: FinanceObligation = {
+  ...financeObligationInput,
   ...metadata,
 };

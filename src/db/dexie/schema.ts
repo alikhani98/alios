@@ -1,5 +1,6 @@
 export const DEXIE_DATABASE_NAME = "AliOS";
 export const DEXIE_SCHEMA_VERSION = 2;
+export const DEXIE_SCHEMA_VERSION_3 = 3;
 
 export const DEXIE_TABLE_NAMES = {
   dailyCheckins: "dailyCheckins",
@@ -9,6 +10,8 @@ export const DEXIE_TABLE_NAMES = {
   knowledgeItems: "knowledgeItems",
   settings: "settings",
   inboxItems: "inboxItems",
+  financeTransactions: "financeTransactions",
+  financeObligations: "financeObligations",
 } as const;
 
 export type DexieTableName =
@@ -31,4 +34,23 @@ export const DEXIE_SCHEMA_V2 = {
   ...DEXIE_SCHEMA_V1,
   [DEXIE_TABLE_NAMES.inboxItems]:
     "id, status, type, createdAt, updatedAt",
+} satisfies Partial<Record<DexieTableName, string>>;
+
+export const DEXIE_SCHEMA_V3 = {
+  [DEXIE_TABLE_NAMES.dailyCheckins]: "id, &date, createdAt, updatedAt",
+  [DEXIE_TABLE_NAMES.tasks]:
+    "id, status, dueDate, projectId, isMit, createdAt, updatedAt",
+  [DEXIE_TABLE_NAMES.projects]:
+    "id, status, priority, reviewDate, createdAt, updatedAt",
+  [DEXIE_TABLE_NAMES.journalEntries]:
+    "id, date, type, createdAt, updatedAt",
+  [DEXIE_TABLE_NAMES.knowledgeItems]:
+    "id, type, title, createdAt, updatedAt",
+  [DEXIE_TABLE_NAMES.settings]: "id, &key, createdAt, updatedAt",
+  [DEXIE_TABLE_NAMES.inboxItems]:
+    "id, status, type, createdAt, updatedAt",
+  [DEXIE_TABLE_NAMES.financeTransactions]:
+    "id, type, category, occurredAt, createdAt, updatedAt",
+  [DEXIE_TABLE_NAMES.financeObligations]:
+    "id, type, status, dueDate, dueDay, createdAt, updatedAt",
 } satisfies Record<DexieTableName, string>;

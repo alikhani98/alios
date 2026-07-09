@@ -7,6 +7,7 @@ The premium Home dashboard upgrade stays local to the UI and keeps mobile stacki
 Stage 37 adds a denser premium Home showcase and light visual alignment for Today, Projects, Journal, Knowledge, Inbox, Search, and Settings while keeping the same local-only data model.
 Stage 38 hardened desktop sidebar accessibility for long scrolling pages without changing mobile drawer behavior or adding new product scope.
 Stage 39 moved dashboard controls into the topbar and added a local accent color palette without changing the device-local storage model.
+Stage 40 adds a local Finance module that stays on the current device until you export or restore a backup.
 The Personal Insights section stays local to the device and only reflects stored tasks, projects, inbox items, journal entries, knowledge items, and wellness checklist state.
 
 ## Open or install AliOS
@@ -49,6 +50,7 @@ AliOS stores data in IndexedDB for the current browser, device, and site origin.
 5. AliOS validates the file and shows a restore preview with the backup version, export time, and table counts.
 6. Confirm only after reading the warning: restore replaces every supported local AliOS table on that device.
 7. Verify Inbox, Today, Projects, Journal, Knowledge, and Settings after restore.
+8. Verify Finance transactions and obligations after restore if you used the Finance module.
 
 The Settings screen also shows the local data safety summary, including total local records and the last successful backup and restore times.
 
