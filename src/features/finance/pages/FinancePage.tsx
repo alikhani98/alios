@@ -24,10 +24,8 @@ import {
   Button,
 } from "@/shared/ui";
 import {
-  calculateExpenseCategoryChartData,
   calculateFinanceReview,
   calculateLastMonthsFinanceSeries,
-  calculateObligationProgressChartData,
   formatFinanceMonthLabel,
   formatFinanceAmount,
   getActiveFinanceObligations,
@@ -189,21 +187,72 @@ export function FinancePage() {
     writeStoredFinanceCollapsedSectionIds(collapsedSectionIds);
   }, [collapsedSectionIds]);
 
+  const currencyLocale = language === "fa" ? "fa-IR" : "en-US";
+  const calendarLocale = resolvedCalendar === "jalali" ? "persian" : "gregory";
+  const formatAmount = useMemo(
+    () => (value: number) =>
+      `${formatFinanceAmount(value, currencyLocale)} ${t("finance.currency")}`,
+    [currencyLocale, t]
+  );
+
   const review = useMemo(
     () => calculateFinanceReview(transactions, obligations, referenceDate),
     [obligations, referenceDate, transactions]
-  );
-  const expenseCategoryChartData = useMemo(
-    () => calculateExpenseCategoryChartData(transactions, referenceDate),
-    [referenceDate, transactions]
   );
   const monthlyCashflowSeries = useMemo(
     () => calculateLastMonthsFinanceSeries(transactions, obligations, referenceDate),
     [obligations, referenceDate, transactions]
   );
   const obligationProgressChartData = useMemo(
-    () => calculateObligationProgressChartData(obligations, referenceDate),
-    [obligations, referenceDate]
+    () =>
+      review.obligationProgress.filter(
+        ({ obligation }) => obligation.status !== "paid"
+      ),
+    [review.obligationProgress]
+  );
+  const expenseCategoryChartItems = useMemo(
+    () =>
+      review.expenseCategoryBreakdown.map((item) => ({
+        id: item.category,
+        label: t(getFinanceTransactionCategoryLabelKey(item.category)),
+        amount: formatAmount(item.amount),
+        percent: item.percentageOfExpenses,
+        meta: t("finance.chartCategoryMeta", {
+          count: item.transactionCount,
+        }),
+      })),
+    [formatAmount, review.expenseCategoryBreakdown, t]
+  );
+  const monthlyCashflowChartItems = useMemo(
+    () =>
+      monthlyCashflowSeries.map((item) => ({
+        id: item.monthKey,
+        label: formatFinanceMonthLabel(
+          item.monthStart,
+          currencyLocale,
+          calendarLocale
+        ),
+        income: item.income,
+        expenses: item.expenses,
+        obligations: item.obligations,
+        remainingLiquidity: item.remainingLiquidity,
+      })),
+    [calendarLocale, currencyLocale, monthlyCashflowSeries]
+  );
+  const obligationProgressChartItems = useMemo(
+    () =>
+      obligationProgressChartData.map((item) => ({
+        id: item.obligation.id,
+        label: item.obligation.title,
+        remainingAmount: formatAmount(item.remainingAmount),
+        paidPercentage: item.paidPercentage,
+        meta: t(
+          item.obligation.status === "paused"
+            ? "finance.statusPaused"
+            : "finance.statusActive"
+        ),
+      })),
+    [formatAmount, obligationProgressChartData, t]
   );
   const summary = review.summary;
   const sortedTransactions = useMemo(
@@ -229,11 +278,6 @@ export function FinancePage() {
         .map(({ obligation }) => obligation),
     [review.obligationProgress]
   );
-
-  const currencyLocale = language === "fa" ? "fa-IR" : "en-US";
-  const calendarLocale = resolvedCalendar === "jalali" ? "persian" : "gregory";
-  const formatAmount = (value: number) =>
-    `${formatFinanceAmount(value, currencyLocale)} ${t("finance.currency")}`;
   const budgetGuard = review.budgetGuard;
 
   type SummaryCard = {
@@ -554,22 +598,14 @@ export function FinancePage() {
                 {t("finance.basedOnEnteredData")}
               </p>
             </div>
-            {expenseCategoryChartData.length === 0 ? (
+            {expenseCategoryChartItems.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-border/70 bg-background/60 px-4 py-6 text-sm leading-7 text-muted-foreground">
                 {t("finance.noChartDataEmptyState")}
               </div>
             ) : (
               <HorizontalBarList
                 aria-label={t("finance.monthlySpendingByCategory")}
-                items={expenseCategoryChartData.map((item) => ({
-                  id: item.category,
-                  label: t(getFinanceTransactionCategoryLabelKey(item.category)),
-                  amount: formatAmount(item.amount),
-                  percent: item.percentageOfExpenses,
-                  meta: t("finance.chartCategoryMeta", {
-                    count: item.transactionCount,
-                  }),
-                }))}
+                items={expenseCategoryChartItems}
               />
             )}
           </SoftPanel>
@@ -592,18 +628,7 @@ export function FinancePage() {
                 obligationsLabel={t("finance.chartObligations")}
                 remainingLiquidityLabel={t("finance.chartRemainingLiquidity")}
                 formatValue={(value) => formatFinanceAmount(value, currencyLocale)}
-                items={monthlyCashflowSeries.map((item) => ({
-                  id: item.monthKey,
-                  label: formatFinanceMonthLabel(
-                    item.monthStart,
-                    currencyLocale,
-                    calendarLocale
-                  ),
-                  income: item.income,
-                  expenses: item.expenses,
-                  obligations: item.obligations,
-                  remainingLiquidity: item.remainingLiquidity,
-                }))}
+                items={monthlyCashflowChartItems}
               />
             )}
           </SoftPanel>
@@ -625,17 +650,7 @@ export function FinancePage() {
               <ProgressBarList
                 paidLabel={t("finance.paidProgress")}
                 remainingLabel={t("finance.remainingAmount")}
-                items={obligationProgressChartData.map((item) => ({
-                  id: item.obligation.id,
-                  label: item.obligation.title,
-                  remainingAmount: formatAmount(item.remainingAmount),
-                  paidPercentage: item.paidPercentage,
-                  meta: t(
-                    item.obligation.status === "paused"
-                      ? "finance.statusPaused"
-                      : "finance.statusActive"
-                  ),
-                }))}
+                items={obligationProgressChartItems}
               />
             )}
           </SoftPanel>

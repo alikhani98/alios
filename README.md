@@ -9,6 +9,7 @@ Stage 41 adds a local Finance review layer with spending-by-category review, upc
 Stage 42 adds a lightweight Finance chart foundation with dependency-free spending, cashflow, and obligation progress visuals.
 Stage 43 adds lightweight motion and interaction polish across the shell, premium cards, charts, and major pages using CSS-only transitions that respect reduced-motion preferences.
 Stage 44 adds Finance mobile UX and section navigation polish with collapsible sections, sticky quick navigation, Jalali due-date previews, and the accent palette moved into the profile popover.
+Stage 45 performs a safe performance audit and bundle optimization pass that keeps behavior unchanged while trimming a little avoidable work from the shared shell and Finance page.
 
 AliOS is designed for one person and stores its data in the browser through IndexedDB. It requires no backend, account, authentication, subscription, paid API, or hosted AI service.
 

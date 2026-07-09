@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 45 - Performance Audit & Bundle Optimization
+
+- Performed a focused performance audit after the Finance, chart, motion, and mobile UX stages
+- Lazy-loaded the Home dashboard customizer out of the always-loaded shell chunk so Home-only controls are fetched on demand
+- Reused existing Finance review data for chart rendering instead of recalculating those derived chart inputs separately
+- Kept the stage safe and dependency-free with no config rewrite, schema/storage/backup change, backend, sync, cloud, or AI
+
 ## Stage 44 - Finance Mobile UX & Section Navigation
 
 - Added mobile-friendly collapsible Finance sections with stable local anchors and a sticky quick navigation strip

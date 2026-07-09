@@ -10,6 +10,8 @@ import {
   UserCircle,
 } from "lucide-react";
 import {
+  lazy,
+  Suspense,
   FormEvent,
   useEffect,
   useRef,
@@ -37,10 +39,15 @@ import { Input } from "@/shared/ui";
 import { aliosPopoverMotion, aliosSurfaceMotion } from "@/shared/ui/motion";
 import { cn } from "@/shared/utils";
 
-import { HomeDashboardCustomizer } from "@/features/home/components/HomeDashboardCustomizer";
 import { useHomeDashboardLayout } from "@/features/home/hooks/useHomeDashboardLayout";
 
 type ActivePanel = "dashboard" | "theme" | "profile" | null;
+
+const HomeDashboardCustomizer = lazy(() =>
+  import("@/features/home/components/HomeDashboardCustomizer").then((module) => ({
+    default: module.HomeDashboardCustomizer,
+  }))
+);
 
 const appearanceOptions = [
   { value: "light", icon: SunMedium, labelKey: "settings.light" },
@@ -358,28 +365,48 @@ export function Topbar({
             role="dialog"
             aria-label={t("home.dashboardControlsTitle")}
           >
-            <div className="space-y-4">
-              <SectionHeader
-                icon={<LayoutDashboard className="h-5 w-5" />}
-                title={t("home.dashboardControlsTitle")}
-                description={t("home.dashboardControlsDescription")}
-                status={
-                  <Badge variant="secondary" className="shrink-0">
-                    {t("home.localOnlyDashboardPreference")}
-                  </Badge>
-                }
-              />
-
-              <div className="rounded-2xl border border-border/70 bg-background/70 p-3">
-                <HomeDashboardCustomizer
-                  layout={layout}
-                  onMoveUp={handleMoveSectionUp}
-                  onMoveDown={handleMoveSectionDown}
-                  onToggleVisibility={handleToggleSectionVisibility}
-                  onReset={handleResetLayout}
+            <Suspense
+              fallback={
+                <div className="space-y-4">
+                  <SectionHeader
+                    icon={<LayoutDashboard className="h-5 w-5" />}
+                    title={t("home.dashboardControlsTitle")}
+                    description={t("home.dashboardControlsDescription")}
+                    status={
+                      <Badge variant="secondary" className="shrink-0">
+                        {t("common.loading")}
+                      </Badge>
+                    }
+                  />
+                  <div className="rounded-2xl border border-dashed border-border/70 bg-background/70 p-3 text-sm text-muted-foreground">
+                    {t("common.loading")}
+                  </div>
+                </div>
+              }
+            >
+              <div className="space-y-4">
+                <SectionHeader
+                  icon={<LayoutDashboard className="h-5 w-5" />}
+                  title={t("home.dashboardControlsTitle")}
+                  description={t("home.dashboardControlsDescription")}
+                  status={
+                    <Badge variant="secondary" className="shrink-0">
+                      {t("home.localOnlyDashboardPreference")}
+                    </Badge>
+                  }
                 />
+
+                <div className="rounded-2xl border border-border/70 bg-background/70 p-3">
+                  <HomeDashboardCustomizer
+                    layout={layout}
+                    onMoveUp={handleMoveSectionUp}
+                    onMoveDown={handleMoveSectionDown}
+                    onToggleVisibility={handleToggleSectionVisibility}
+                    onReset={handleResetLayout}
+                  />
+                </div>
               </div>
-            </div>
+            </Suspense>
           </div>
         ) : null}
 

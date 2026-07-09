@@ -118,3 +118,15 @@ Reason:
 - The Finance page needs better mobile usability without fragmenting the page into separate routes
 - Local-only collapse state keeps the feature lightweight and avoids a schema or backup change
 - Display-only Jalali previews preserve the approved storage model and keep date calculations deterministic
+
+## ADR-012: Keep Home-only shell controls lazy when practical
+
+Decision:
+
+- Shared shell code should not eagerly import Home-only dashboard customization UI when a small lazy boundary is sufficient
+- Feature pages may still be lazy-loaded at the route level, but Home-specific shell affordances should stay on demand when they are not part of the default route chrome
+
+Reason:
+
+- The shared app shell is part of the initial experience on every route, so keeping Home-only controls out of the default shell chunk reduces avoidable startup work
+- A small lazy boundary preserves the existing architecture and avoids risky route or bundling config changes

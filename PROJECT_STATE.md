@@ -4,8 +4,8 @@
 
 - Project name: AliOS
 - Architecture version: AliOS 1.0
-- Current status: AliOS includes validated mobile-first Inbox capture, processing, global search, focused search-result navigation, filters, bulk triage, local appearance switching, local profile preferences, calendar month view foundation, home time-window routine nudges, upcoming task grouping, routine templates foundation, Wellness / Badminton Routine foundation, visual motion polish, premium Home dashboard visual upgrade, premium app shell polish, Home dashboard customization, premium reusable components, lightweight Personal Insights, Stage 37 premium Home showcase polish, light core-page visual alignment, hardened backup/restore safety, Stage 38 UI regression QA and release hardening with desktop sticky sidebar accessibility improvements, Stage 39 topbar dashboard controls plus accent color personalization, Stage 40 finance foundation, Stage 41 finance review and budget guard, Stage 42 lightweight finance charts foundation, Stage 43 lightweight motion and interaction polish, Stage 44 finance mobile UX and section navigation, and remains ready for static GitHub Pages deployment.
-- Current Stage: Stage 44 Completed
+- Current status: AliOS includes validated mobile-first Inbox capture, processing, global search, focused search-result navigation, filters, bulk triage, local appearance switching, local profile preferences, calendar month view foundation, home time-window routine nudges, upcoming task grouping, routine templates foundation, Wellness / Badminton Routine foundation, visual motion polish, premium Home dashboard visual upgrade, premium app shell polish, Home dashboard customization, premium reusable components, lightweight Personal Insights, Stage 37 premium Home showcase polish, light core-page visual alignment, hardened backup/restore safety, Stage 38 UI regression QA and release hardening with desktop sticky sidebar accessibility improvements, Stage 39 topbar dashboard controls plus accent color personalization, Stage 40 finance foundation, Stage 41 finance review and budget guard, Stage 42 lightweight finance charts foundation, Stage 43 lightweight motion and interaction polish, Stage 44 finance mobile UX and section navigation, Stage 45 performance audit and bundle optimization, and remains ready for static GitHub Pages deployment.
+- Current Stage: Stage 45 Completed
 
 ## Architecture References
 
@@ -38,7 +38,7 @@
 
 ## Completed Stages
 
-Stages 1–44 are complete.
+Stages 1–45 are complete.
 
 - Stage 1 â€” Foundation
 - Stage 2 â€” App Shell
@@ -84,6 +84,7 @@ Stages 1–44 are complete.
 - Stage 42 â€” Lightweight Finance Charts Foundation
 - Stage 43 â€” Lightweight Motion & Interaction Polish
 - Stage 44 â€” Finance Mobile UX & Section Navigation
+- Stage 45 â€” Performance Audit & Bundle Optimization
 
 Stage 40 completion is evidenced by the first local-first Finance module, which adds finance transactions and obligations through the existing feature/repository/storage-adapter boundary, keeps Dexie access out of UI code, and stores all finance data locally in finance-specific IndexedDB tables. The stage covers income, expenses, installments, debts, a simple monthly liquidity summary, additive backup/restore support, and a calm mobile-friendly Finance page with local CRUD flows. No backend, sync, cloud, AI, bank integration, recommendation engine, chart library, animation library, or accounting system was added. TypeScript validation passed, the repository tests were expanded, and the stage remains aligned with static GitHub Pages deployment.
 
@@ -94,6 +95,8 @@ Stage 42 completion is evidenced by the lightweight Finance chart foundation, wh
 Stage 43 completion is evidenced by lightweight motion and interaction polish across the shared shell, premium cards, shared chart primitives, dashboard customizer, topbar popovers, and major feature pages using dependency-free CSS-only transitions and mount animations. The stage keeps all interaction feedback subtle, respects `prefers-reduced-motion`, and avoids schema/storage, backup, backend, sync, cloud, AI, chart-library, or animation-library changes.
 
 Stage 44 completion is evidenced by the Finance mobile UX and section-navigation polish, which adds a sticky quick navigation strip, collapsible Finance sections, stable in-page anchors, compact mobile form behavior, and Jalali/Shamsi due-date previews while keeping stored dates as ISO/Gregorian strings. The accent color palette now lives in the profile popover as a global local preference, and the Finance page remains single-page, local-only, dependency-free, and behind the existing UI → hook → repository → storage-adapter → Dexie boundary. No schema migration, backup-version change, backup-format change, backend, sync, cloud, AI, chart library, animation library, or route-heavy redesign was added.
+
+Stage 45 completion is evidenced by a focused performance audit and safe optimization pass that left user-facing behavior intact while trimming a little avoidable work in the shared shell and Finance page. The shared topbar now lazy-loads the Home dashboard customizer so Home-only controls do not stay in the always-loaded shell chunk, and Finance now reuses review data for chart rendering instead of recalculating those derived arrays separately. The remaining bundle warning is documented for future safe follow-up rather than chased with risky config or dependency changes. No dependency, schema, backup-format, route redesign, backend, sync, cloud, AI, Vite config, or Dexie storage change was added.
 
 Stage 39 completion is evidenced by moving Home dashboard layout controls into a compact Topbar popover, adding a local-only accent color palette that updates UI highlights through CSS variables, and keeping the Home surface cleaner without changing dashboard persistence, backup format, Dexie schema, or storage boundaries. The stage preserved show/hide, reorder, and reset behavior, added small saved-feedback messaging, and kept the app local-first with no backend, sync, cloud, AI, dependency, schema, or backup-format change. TypeScript validation, automated tests, and the production build pass.
 
@@ -167,16 +170,17 @@ The next stage is intentionally undefined pending explicit approval. Project con
 
 ## Git Latest Recommended Commit
 
-`feat(finance): improve mobile section navigation`
+`perf(app): audit and optimize bundle and finance rendering`
 
 ## Build Status
 
 - TypeScript: passing (`.\\node_modules\\.bin\\tsc.CMD --noEmit`)
 - Automated tests: passing (`.\\node_modules\\.bin\\vitest.CMD run`)
 - Production build: passing (`.\\node_modules\\.bin\\vite.CMD build`)
+- Production build warning: main chunk remains above the 500 kB warning threshold and is documented for safe follow-up
 - Production preview: passed locally at `http://127.0.0.1:4173/alios/`
 - Automated test count: 293 passing across 24 suites
-- Last verified: 2026-07-09
+- Last verified: 2026-07-10
 
 ## Rules Before Modifying the Project
 
