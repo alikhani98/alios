@@ -4,6 +4,7 @@ AliOS can run from a modern mobile browser and can be added to the home screen w
 
 Visual motion polish stays local to the UI and respects reduced-motion preferences.
 The premium Home dashboard upgrade stays local to the UI and keeps mobile stacking and readability intact.
+The Personal Insights section stays local to the device and only reflects stored tasks, projects, inbox items, journal entries, knowledge items, and wellness checklist state.
 
 ## Open or install AliOS
 

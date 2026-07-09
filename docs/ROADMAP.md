@@ -79,6 +79,13 @@ The later version ideas below are directional only. They are not approved stages
 - Home dashboard section visibility and ordering controls with localStorage-only persistence
 - No drag-and-drop yet, no new dependency, no chart library, no animation library, no schema/storage change, no backup-format change, no backend, no sync, no cloud, and no AI
 
+## Version 1.18
+
+- Premium Components + Lightweight Personal Insights
+- Reusable premium Home surfaces for metric, insight, status, empty-state, and soft-panel layouts
+- Compact Personal Insights on Home using only existing local task, project, inbox, journal, knowledge, and wellness checklist state
+- CSS/Tailwind micro-visuals only, with no chart library, no new dependency, no schema/storage/backup change, no backend, no sync, no cloud, and no AI
+
 ## Later product candidates
 
 - Decision Engine

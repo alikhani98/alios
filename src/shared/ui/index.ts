@@ -2,6 +2,7 @@ export * from "./badge";
 export * from "./button";
 export * from "./card";
 export * from "./input";
+export * from "./premium";
 export * from "./page-placeholder";
 export * from "./route-loading-fallback";
 export * from "./separator";

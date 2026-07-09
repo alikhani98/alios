@@ -4,8 +4,8 @@
 
 - Project name: AliOS
 - Architecture version: AliOS 1.0
-- Current status: AliOS includes validated mobile-first Inbox capture, processing, global search, focused search-result navigation, filters, bulk triage, local appearance switching, local profile preferences, calendar month view foundation, home time-window routine nudges, upcoming task grouping, routine templates foundation, Wellness / Badminton Routine foundation, visual motion polish, premium Home dashboard visual upgrade, premium app shell polish, Home dashboard customization, and hardened backup/restore safety and remains ready for static GitHub Pages deployment.
-- Current Stage: Stage 35 Completed
+- Current status: AliOS includes validated mobile-first Inbox capture, processing, global search, focused search-result navigation, filters, bulk triage, local appearance switching, local profile preferences, calendar month view foundation, home time-window routine nudges, upcoming task grouping, routine templates foundation, Wellness / Badminton Routine foundation, visual motion polish, premium Home dashboard visual upgrade, premium app shell polish, Home dashboard customization, premium reusable components, lightweight Personal Insights, and hardened backup/restore safety and remains ready for static GitHub Pages deployment.
+- Current Stage: Stage 36 Completed
 
 ## Architecture References
 
@@ -38,7 +38,7 @@
 
 ## Completed Stages
 
-Stages 1–35 are complete.
+Stages 1–36 are complete.
 
 - Stage 1 â€” Foundation
 - Stage 2 â€” App Shell
@@ -75,6 +75,11 @@ Stages 1–35 are complete.
 - Stage 33 â€” Visual Motion Polish
 - Stage 34 â€” Premium Home Dashboard Visual Upgrade
 - Stage 35 â€” Premium App Shell + Home Dashboard Customization
+- Stage 36 â€” Premium Components + Lightweight Personal Insights
+
+Stage 36 completion is evidenced by reusable premium Home-facing card surfaces, a compact Personal Insights section on Home, CSS/Tailwind-only micro-visuals, and insight calculations derived only from existing local task, project, inbox, journal, knowledge, and wellness checklist state. The stage did not add a chart library, dependency, schema migration, Dexie table or field, backup-format change, backend, sync, cloud, AI, or medical interpretation. TypeScript validation, automated tests, and the production build pass.
+
+Next stage: intentionally undefined pending approval.
 
 Stage 9 completion is evidenced by the Today page, daily check-in create/update form, date-scoped task CRUD, all approved task statuses, completed timestamps, and single-MIT selection synchronized with todayâ€™s check-in. Browser validation confirmed task and check-in persistence across refresh, task editing, status updates, MIT selection, deletion, and the task empty state. The feature consumes TasksRepository and DailyCheckinsRepository through the injected `StorageAdapter` and does not import Dexie. Health advice, Home dashboard data, recurring tasks, notifications, analytics, backup, AI, and cross-feature workflows remain unavailable. TypeScript validation and the production build pass.
 
