@@ -4,8 +4,8 @@
 
 - Project name: AliOS
 - Architecture version: AliOS 1.0
-- Current status: AliOS includes validated mobile-first Inbox capture, processing, global search, focused search-result navigation, filters, bulk triage, local appearance switching, local profile preferences, calendar month view foundation, home time-window routine nudges, upcoming task grouping, routine templates foundation, Wellness / Badminton Routine foundation, visual motion polish, and hardened backup/restore safety and remains ready for static GitHub Pages deployment.
-- Current Stage: Stage 33 Completed
+- Current status: AliOS includes validated mobile-first Inbox capture, processing, global search, focused search-result navigation, filters, bulk triage, local appearance switching, local profile preferences, calendar month view foundation, home time-window routine nudges, upcoming task grouping, routine templates foundation, Wellness / Badminton Routine foundation, visual motion polish, premium Home dashboard visual upgrade, and hardened backup/restore safety and remains ready for static GitHub Pages deployment.
+- Current Stage: Stage 34 Completed
 
 ## Architecture References
 
@@ -38,7 +38,7 @@
 
 ## Completed Stages
 
-Stages 1–33 are complete.
+Stages 1–34 are complete.
 
 - Stage 1 â€” Foundation
 - Stage 2 â€” App Shell
@@ -73,6 +73,7 @@ Stages 1–33 are complete.
 - Stage 31 â€” Routine Templates Foundation
 - Stage 32 â€” Wellness / Badminton Routine Foundation
 - Stage 33 â€” Visual Motion Polish
+- Stage 34 â€” Premium Home Dashboard Visual Upgrade
 
 Stage 9 completion is evidenced by the Today page, daily check-in create/update form, date-scoped task CRUD, all approved task statuses, completed timestamps, and single-MIT selection synchronized with todayâ€™s check-in. Browser validation confirmed task and check-in persistence across refresh, task editing, status updates, MIT selection, deletion, and the task empty state. The feature consumes TasksRepository and DailyCheckinsRepository through the injected `StorageAdapter` and does not import Dexie. Health advice, Home dashboard data, recurring tasks, notifications, analytics, backup, AI, and cross-feature workflows remain unavailable. TypeScript validation and the production build pass.
 
@@ -123,6 +124,8 @@ Stage 31 completion is evidenced by the routine template registry, the Home rout
 Stage 32 completion is evidenced by the local-only Wellness / Badminton routine foundation on Home and Settings, the new park preparation template, the date-scoped checklist and reflection state stored in localStorage only, the simple Settings toggle for the card, and the Home nudge/template links into the new routine. The feature adds no Dexie schema migration, backup-format change, backend, sync, cloud, AI, push notifications, service worker, medical module, diagnosis, medication guidance, lithium guidance, charts, or animation library. TypeScript validation, automated tests, and the production build pass.
 
 Stage 33 completion is evidenced by the subtle motion and surface polish across the shared cards, buttons, navigation links, route changes, calendar cells, checklist rows, and other high-traffic UI surfaces. The polish uses existing CSS/Tailwind only, respects reduced-motion users, and adds no dependency, animation library, schema/storage change, backup-format change, backend, sync, cloud, AI, push notification, service worker, or product-scope change. TypeScript validation, automated tests, and the production build pass.
+
+Stage 34 completion is evidenced by the premium Home dashboard composition, calmer hero, stronger card hierarchy, upgraded visual rhythm, and more polished Home-specific summary surfaces. The stage stays visual-only, uses existing CSS/Tailwind only, and adds no dependency, chart library, animation library, schema/storage change, backup-format change, backend, sync, cloud, AI, push notification, or service worker change. TypeScript validation, automated tests, and the production build pass.
 
 ## Next Stage
 

@@ -76,12 +76,14 @@ export function HomeRoutineNudgeCard({
   };
 
   return (
-    <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/5 via-background to-background">
-      <CardHeader className="gap-3">
+    <Card className="overflow-hidden border-primary/10 bg-gradient-to-br from-primary/5 via-background to-background shadow-sm">
+      <CardHeader className="gap-3 border-b border-border/60 bg-background/70 pb-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-1">
             <CardTitle className="flex items-center gap-2">
-              <Sunrise className="h-5 w-5 text-primary" />
+              <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-sm">
+                <Sunrise className="h-5 w-5" />
+              </span>
               {t("home.morningWarmupTitle")}
             </CardTitle>
             <CardDescription>{t("home.morningWarmupDescription")}</CardDescription>
@@ -97,12 +99,12 @@ export function HomeRoutineNudgeCard({
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4">
-        <div className="grid gap-3 rounded-2xl border bg-background/80 p-4 sm:grid-cols-2">
+      <CardContent className="space-y-4 pt-5">
+        <div className="grid gap-3 rounded-3xl border bg-background/90 p-4 shadow-sm sm:grid-cols-2">
           {checklistItems.map((key) => (
             <div
               key={key}
-              className="flex items-start gap-2 rounded-xl px-2 py-1.5 text-sm leading-6 transition-colors duration-200 ease-out motion-reduce:transition-none"
+              className="flex items-start gap-2 rounded-2xl px-2 py-1.5 text-sm leading-6 transition-colors duration-200 ease-out motion-reduce:transition-none"
             >
               <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
               <span>{t(key)}</span>

@@ -63,7 +63,7 @@ function TemplatePreview({
     : 0;
 
   return (
-    <div className="rounded-2xl border bg-background/80 p-4 shadow-sm">
+    <div className="rounded-3xl border bg-background/90 p-4 shadow-sm">
       <div className="flex items-start justify-between gap-3">
         <div className="space-y-1">
           <p className="flex items-center gap-2 text-sm font-semibold">
@@ -117,12 +117,14 @@ export function RoutineTemplatesCard({
       : undefined;
 
   return (
-    <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/5 via-background to-background">
-      <CardHeader className="gap-3">
+    <Card className="overflow-hidden border-primary/10 bg-gradient-to-br from-primary/5 via-background to-background shadow-sm">
+      <CardHeader className="gap-3 border-b border-border/60 bg-background/70 pb-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-1">
             <CardTitle className="flex items-center gap-2">
-              <CheckCircle2 className="h-5 w-5 text-primary" />
+              <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-sm">
+                <CheckCircle2 className="h-5 w-5" />
+              </span>
               {t("routines.title")}
             </CardTitle>
             <CardDescription>{t("routines.description")}</CardDescription>
@@ -133,7 +135,7 @@ export function RoutineTemplatesCard({
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 pt-5">
         <div className="grid gap-3 md:grid-cols-2">
           {templates.map((template) => (
             <TemplatePreview
@@ -145,7 +147,7 @@ export function RoutineTemplatesCard({
         </div>
 
         {selectedTemplate ? (
-          <div className="rounded-2xl border border-primary/20 bg-background/90 p-4">
+          <div className="rounded-3xl border border-primary/15 bg-background/90 p-4 shadow-sm">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="space-y-1">
                 <p className="text-sm font-semibold">{t("routines.startPreview")}</p>
@@ -162,13 +164,13 @@ export function RoutineTemplatesCard({
               </Button>
             </div>
 
-            <div className="mt-4 space-y-2 rounded-xl border bg-muted/20 p-4">
+            <div className="mt-4 space-y-2 rounded-3xl border bg-muted/20 p-4">
               <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                 {t("routines.steps")}
               </p>
               <div className="grid gap-2 sm:grid-cols-2">
                 {selectedTemplate.stepKeys.map((stepKey) => (
-                  <div key={stepKey} className="rounded-xl border bg-background px-3 py-2 text-sm leading-6">
+                  <div key={stepKey} className="rounded-2xl border bg-background px-3 py-2 text-sm leading-6 shadow-sm">
                     {t(stepKey)}
                   </div>
                 ))}
@@ -176,7 +178,7 @@ export function RoutineTemplatesCard({
             </div>
           </div>
         ) : (
-          <div className="rounded-2xl border border-dashed bg-background/70 p-4 text-sm text-muted-foreground">
+          <div className="rounded-3xl border border-dashed bg-background/80 p-4 text-sm text-muted-foreground shadow-sm">
             {t("routines.selectTemplateHint")}
           </div>
         )}

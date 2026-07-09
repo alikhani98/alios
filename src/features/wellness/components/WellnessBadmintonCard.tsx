@@ -81,7 +81,7 @@ function WellnessStepGroup({
   }
 
   return (
-    <div className="rounded-2xl border bg-background/80 p-4">
+    <div className="rounded-3xl border bg-background/90 p-4 shadow-sm">
       <div className="flex items-start justify-between gap-3">
         <div className="space-y-1">
           <p className="text-sm font-semibold">{t(labelKey)}</p>
@@ -239,12 +239,14 @@ export function WellnessBadmintonCard({
   };
 
   return (
-    <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/5 via-background to-background">
-      <CardHeader className="gap-3">
+    <Card className="overflow-hidden border-primary/10 bg-gradient-to-br from-primary/5 via-background to-background shadow-sm">
+      <CardHeader className="gap-3 border-b border-border/60 bg-background/70 pb-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="space-y-1">
             <CardTitle className="flex items-center gap-2">
-              <Trees className="h-5 w-5 text-primary" />
+              <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-sm">
+                <Trees className="h-5 w-5" />
+              </span>
               {t("wellness.badmintonRoutineTitle")}
             </CardTitle>
             <CardDescription>{t("wellness.badmintonRoutineDescription")}</CardDescription>
@@ -260,7 +262,7 @@ export function WellnessBadmintonCard({
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 pt-5">
         <div className="grid gap-3 lg:grid-cols-2">
           <WellnessStepGroup
             sectionId="beforePlay"
@@ -280,7 +282,7 @@ export function WellnessBadmintonCard({
             checkedStepIds={effectiveCheckedStepIds}
             onToggleStep={handleToggleStep}
           />
-          <div className="rounded-2xl border bg-background/80 p-4">
+          <div className="rounded-3xl border bg-background/90 p-4 shadow-sm">
             <div className="flex items-start justify-between gap-3">
               <div className="space-y-1">
                 <p className="text-sm font-semibold">{t("wellness.reflection")}</p>
@@ -337,7 +339,7 @@ export function WellnessBadmintonCard({
           </div>
         </div>
 
-        <div className="rounded-2xl border bg-background/80 p-4">
+        <div className="rounded-3xl border bg-background/90 p-4 shadow-sm">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="space-y-1">
               <p className="text-sm font-semibold">{t("wellness.parkPreparation")}</p>
