@@ -134,6 +134,12 @@ The later version ideas below are directional only. They are not approved stages
 - Jalali/Shamsi due-date previews with ISO/Gregorian storage preserved, plus the accent palette moved into the profile popover
 - No schema/storage/backup change, no dependency, no backend, no sync, no cloud, no AI, no chart library, no animation library, and no route-heavy redesign
 
+## Stage 45
+
+- Performance Audit & Bundle Optimization
+- Safe local-only memoization and shell lazy-loading improvements focused on initial bundle cost and Finance render cost
+- No feature change, no new dependency, no schema/storage/backup change, no backend, no sync, no cloud, no AI, no route redesign, and no config rewrite
+
 ## Stage 38 Hardening Note
 
 - UI regression QA and release hardening stayed within the existing scope and did not add a new feature
