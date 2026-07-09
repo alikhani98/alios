@@ -11,16 +11,23 @@ import { useMemo, useState, type ReactNode } from "react";
 import { useDateFormatter } from "@/shared/date";
 import { useI18n, type TranslationKey } from "@/shared/i18n";
 import {
+  HorizontalBarList,
   EmptyState,
   MetricCard,
   PremiumCard,
   SectionHeader,
   SoftPanel,
+  MiniCashflowBars,
   StatusChip,
+  ProgressBarList,
   Button,
 } from "@/shared/ui";
 import {
+  calculateExpenseCategoryChartData,
   calculateFinanceReview,
+  calculateLastMonthsFinanceSeries,
+  calculateObligationProgressChartData,
+  formatFinanceMonthLabel,
   formatFinanceAmount,
   getActiveFinanceObligations,
   getRecentFinanceTransactions,
@@ -124,7 +131,8 @@ function getFinanceSectionDescriptionKey(filter: FinanceViewFilter) {
 
 export function FinancePage() {
   const { language, t } = useI18n();
-  const { formatDate } = useDateFormatter();
+  const { formatDate, resolvedCalendar } = useDateFormatter();
+  const referenceDate = useMemo(() => new Date(), []);
   const {
     transactions,
     obligations,
@@ -155,8 +163,20 @@ export function FinancePage() {
   >();
 
   const review = useMemo(
-    () => calculateFinanceReview(transactions, obligations),
-    [obligations, transactions]
+    () => calculateFinanceReview(transactions, obligations, referenceDate),
+    [obligations, referenceDate, transactions]
+  );
+  const expenseCategoryChartData = useMemo(
+    () => calculateExpenseCategoryChartData(transactions, referenceDate),
+    [referenceDate, transactions]
+  );
+  const monthlyCashflowSeries = useMemo(
+    () => calculateLastMonthsFinanceSeries(transactions, obligations, referenceDate),
+    [obligations, referenceDate, transactions]
+  );
+  const obligationProgressChartData = useMemo(
+    () => calculateObligationProgressChartData(obligations, referenceDate),
+    [obligations, referenceDate]
   );
   const summary = review.summary;
   const sortedTransactions = useMemo(
@@ -184,6 +204,7 @@ export function FinancePage() {
   );
 
   const currencyLocale = language === "fa" ? "fa-IR" : "en-US";
+  const calendarLocale = resolvedCalendar === "jalali" ? "persian" : "gregory";
   const formatAmount = (value: number) =>
     `${formatFinanceAmount(value, currencyLocale)} ${t("finance.currency")}`;
   const budgetGuard = review.budgetGuard;
@@ -412,6 +433,104 @@ export function FinancePage() {
           />
         ))}
       </div>
+
+      <PremiumCard>
+        <div className="p-5 sm:p-6">
+          <SectionHeader
+            title={t("finance.chartsTitle")}
+            description={t("finance.chartsDescription")}
+            status={<StatusChip tone="neutral">{t("finance.localOnlyData")}</StatusChip>}
+          />
+          <div className="mt-5 grid gap-4 xl:grid-cols-3">
+            <SoftPanel className="space-y-4">
+              <div className="space-y-1">
+                <h3 className="text-lg font-semibold">{t("finance.monthlySpendingByCategory")}</h3>
+                <p className="text-sm leading-7 text-muted-foreground">
+                  {t("finance.basedOnEnteredData")}
+                </p>
+              </div>
+              {expenseCategoryChartData.length === 0 ? (
+                <div className="rounded-2xl border border-dashed border-border/70 bg-background/60 px-4 py-6 text-sm leading-7 text-muted-foreground">
+                  {t("finance.noChartDataEmptyState")}
+                </div>
+              ) : (
+                <HorizontalBarList
+                  aria-label={t("finance.monthlySpendingByCategory")}
+                  items={expenseCategoryChartData.map((item) => ({
+                    id: item.category,
+                    label: t(getFinanceTransactionCategoryLabelKey(item.category)),
+                    amount: formatAmount(item.amount),
+                    percent: item.percentageOfExpenses,
+                    meta: t("finance.chartCategoryMeta", {
+                      count: item.transactionCount,
+                    }),
+                  }))}
+                />
+              )}
+            </SoftPanel>
+
+            <SoftPanel className="space-y-4">
+              <div className="space-y-1">
+                <h3 className="text-lg font-semibold">{t("finance.monthlyCashflowChart")}</h3>
+                <p className="text-sm leading-7 text-muted-foreground">
+                  {t("finance.basedOnEnteredData")}
+                </p>
+              </div>
+              {monthlyCashflowSeries.length === 0 ? (
+                <div className="rounded-2xl border border-dashed border-border/70 bg-background/60 px-4 py-6 text-sm leading-7 text-muted-foreground">
+                  {t("finance.notEnoughData")}
+                </div>
+              ) : (
+                <MiniCashflowBars
+                  incomeLabel={t("finance.chartIncome")}
+                  expensesLabel={t("finance.chartExpenses")}
+                  obligationsLabel={t("finance.chartObligations")}
+                  remainingLiquidityLabel={t("finance.chartRemainingLiquidity")}
+                  formatValue={(value) => formatFinanceAmount(value, currencyLocale)}
+                  items={monthlyCashflowSeries.map((item) => ({
+                    id: item.monthKey,
+                    label: formatFinanceMonthLabel(item.monthStart, currencyLocale, calendarLocale),
+                    income: item.income,
+                    expenses: item.expenses,
+                    obligations: item.obligations,
+                    remainingLiquidity: item.remainingLiquidity,
+                  }))}
+                />
+              )}
+            </SoftPanel>
+
+            <SoftPanel className="space-y-4">
+              <div className="space-y-1">
+                <h3 className="text-lg font-semibold">{t("finance.obligationProgressChart")}</h3>
+                <p className="text-sm leading-7 text-muted-foreground">
+                  {t("finance.basedOnEnteredData")}
+                </p>
+              </div>
+              {obligationProgressChartData.length === 0 ? (
+                <div className="rounded-2xl border border-dashed border-border/70 bg-background/60 px-4 py-6 text-sm leading-7 text-muted-foreground">
+                  {t("finance.noChartDataEmptyState")}
+                </div>
+              ) : (
+                <ProgressBarList
+                  paidLabel={t("finance.paidProgress")}
+                  remainingLabel={t("finance.remainingAmount")}
+                  items={obligationProgressChartData.map((item) => ({
+                    id: item.obligation.id,
+                    label: item.obligation.title,
+                    remainingAmount: formatAmount(item.remainingAmount),
+                    paidPercentage: item.paidPercentage,
+                    meta: t(
+                      item.obligation.status === "paused"
+                        ? "finance.statusPaused"
+                        : "finance.statusActive"
+                    ),
+                  }))}
+                />
+              )}
+            </SoftPanel>
+          </div>
+        </div>
+      </PremiumCard>
 
       <div className="grid gap-4 xl:grid-cols-3">
         <PremiumCard>

@@ -114,6 +114,13 @@ The later version ideas below are directional only. They are not approved stages
 - Finance filters for all transactions, income, expenses, active obligations, and paid obligations
 - No chart library, no animation library, no financial advice engine, no backup-version change, no schema migration, no backend, no sync, no cloud, and no AI
 
+## Stage 42
+
+- Lightweight Finance Charts Foundation
+- Dependency-free Finance chart primitives and panels for spending by category, monthly cashflow, and obligation progress
+- Charts summarize entered local data only, stay descriptive, and avoid forecasting or advice logic
+- No chart library, no animation library, no schema migration, no backup-version change, no backend, no sync, no cloud, and no AI
+
 ## Stage 38 Hardening Note
 
 - UI regression QA and release hardening stayed within the existing scope and did not add a new feature

@@ -77,3 +77,16 @@ Reason:
 
 - The review layer should help the user understand their own local data without implying financial advice
 - A neutral summary keeps the feature aligned with the local-first, single-user, static-hosting model
+
+## ADR-009: Keep Finance charts lightweight and dependency-free
+
+Decision:
+
+- Finance charts use existing React, CSS, and SVG patterns only
+- Finance charts summarize local entered Finance data only and remain descriptive
+- Finance charts must not introduce a chart library, animation library, forecasting layer, or advice engine
+
+Reason:
+
+- Lightweight charts keep the Finance module compatible with static hosting and the existing UI stack
+- Avoiding a chart library preserves the local-first boundary and reduces maintenance overhead for a small visualization foundation

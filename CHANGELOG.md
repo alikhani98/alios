@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 42 - Lightweight Finance Charts Foundation
+
+- Added dependency-free Finance chart primitives and page panels for spending by category, monthly cashflow, and obligation progress using React plus CSS/SVG only
+- Added deterministic local Finance chart helpers that summarize entered data only, stay zero-safe, and avoid forecasting or advice logic
+- Added Persian and English chart text plus responsive empty states while keeping the existing Finance review panels and CRUD flows intact
+- Kept the finance schema, backup format, backup version, repository boundaries, and local-first architecture unchanged
+
 ## Stage 41 - Finance Review & Budget Guard
 
 - Added a practical local-first Finance review layer that groups current-month expenses by category, shows upcoming obligation pressure, and surfaces obligation progress with remaining amount and paid percentage

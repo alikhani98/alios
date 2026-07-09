@@ -1,6 +1,7 @@
 export * from "./badge";
 export * from "./button";
 export * from "./card";
+export * from "./charts";
 export * from "./input";
 export * from "./premium";
 export * from "./page-placeholder";

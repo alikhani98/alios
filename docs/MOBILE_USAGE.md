@@ -9,6 +9,7 @@ Stage 38 hardened desktop sidebar accessibility for long scrolling pages without
 Stage 39 moved dashboard controls into the topbar and added a local accent color palette without changing the device-local storage model.
 Stage 40 adds a local Finance module that stays on the current device until you export or restore a backup.
 Stage 41 adds a Finance review layer, budget guard, and obligation pressure summaries that also stay local to the device.
+Stage 42 adds lightweight Finance charts that stay local to the device and summarize only the entered Finance records.
 The Personal Insights section stays local to the device and only reflects stored tasks, projects, inbox items, journal entries, knowledge items, and wellness checklist state.
 
 ## Open or install AliOS
@@ -39,6 +40,7 @@ AliOS stores data in IndexedDB for the current browser, device, and site origin.
 - The Home Wellness / Badminton routine card and its daily checklist state stay on the current browser or device and do not sync.
 - The Home routine templates section stays on the current browser or device and does not sync.
 - The Home upcoming tasks summary and future task dates stay on the current browser or device and do not sync.
+- The Finance charts, review panels, and liquidity summaries stay on the current browser or device and do not sync.
 - There is no automatic sync, cloud backup, account, or backend in AliOS 1.0.
 - Publishing AliOS to GitHub Pages does not change this device-local storage model.
 

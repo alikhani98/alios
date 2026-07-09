@@ -18,7 +18,7 @@ AliOS 1.0 is a local-first static web app.
 
 - Finance data lives in finance-specific Dexie tables for transactions and obligations only
 - UI code reads and writes finance data through the feature hook, repository interface, and storage adapter boundary
-- Finance calculations stay deterministic and local, with no advice engine, bank integration, or cloud dependency
+- Finance calculations and visual summaries stay deterministic and local, with no advice engine, bank integration, chart library, or cloud dependency
 - Backup and restore include finance data additively without breaking older backups that do not contain the finance arrays
 
 ## Runtime Rule
