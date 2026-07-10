@@ -261,3 +261,18 @@ Reason:
 - A recovery surface should help the user regain confidence without risking their local data
 - Keeping the mode non-destructive preserves AliOS's manual-backup model and the existing storage boundaries
 - A local-only flag keeps the recovery UI simple, static-hosting friendly, and easy to exit
+
+## ADR-022: Keep Personal Manual local, user-authored, and additive
+
+Decision:
+
+- Personal Manual stores local user-authored reference entries such as principles, values, rules, preferences, boundaries, routines, lessons, and identity notes
+- Personal Manual stays behind the existing feature, repository, and storage-adapter boundaries
+- Personal Manual backup and restore are additive and must remain backward-compatible with older backups that do not contain the manual arrays
+- Personal Manual stays non-advisory and must not become an assistant, recommendation engine, or semantic search layer
+
+Reason:
+
+- The manual is meant to help the user keep their own written references in one place without changing the architecture
+- Additive backup compatibility preserves older backups and keeps the local-first recovery model simple
+- Keeping the feature user-authored and non-advisory avoids turning it into a decision engine or AI-driven helper

@@ -13,6 +13,7 @@ export const homeCollapsibleSectionIds = [
   "projectsOverview",
   "journalOverview",
   "knowledgeOverview",
+  "manualOverview",
   "quickActions",
 ] as const;
 

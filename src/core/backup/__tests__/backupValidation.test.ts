@@ -9,6 +9,7 @@ import {
   inboxItemRecord,
   journalEntryRecord,
   knowledgeItemRecord,
+  manualEntryRecord,
   projectRecord,
   settingRecord,
   taskRecord,
@@ -35,6 +36,7 @@ describe("backup validation and migration", () => {
       data: {
         dailyCheckins: [dailyCheckinRecord],
         tasks: [taskRecord],
+        decisionLogEntries: [decisionLogRecord],
         projects: [projectRecord],
         journalEntries: [journalEntryRecord],
         knowledgeItems: [knowledgeItemRecord],
@@ -48,7 +50,8 @@ describe("backup validation and migration", () => {
     expect(payload).toEqual(snapshot);
     expect(migrated.data.dailyCheckins).toEqual([dailyCheckinRecord]);
     expect(migrated.data.tasks).toEqual([taskRecord]);
-    expect(migrated.data.decisionLogEntries).toEqual([]);
+    expect(migrated.data.decisionLogEntries).toEqual([decisionLogRecord]);
+    expect(migrated.data.manualEntries).toEqual([]);
     expect(migrated.data.financeTransactions).toEqual([]);
     expect(migrated.data.financeObligations).toEqual([]);
     expect(migrated.data.inboxItems).toEqual([]);
@@ -63,6 +66,7 @@ describe("backup validation and migration", () => {
       data: {
         dailyCheckins: [dailyCheckinRecord],
         tasks: [taskRecord],
+        decisionLogEntries: [decisionLogRecord],
         projects: [projectRecord],
         journalEntries: [journalEntryRecord],
         knowledgeItems: [knowledgeItemRecord],
@@ -70,7 +74,8 @@ describe("backup validation and migration", () => {
       },
     });
 
-    expect(backup.data.decisionLogEntries).toEqual([]);
+    expect(backup.data.decisionLogEntries).toEqual([decisionLogRecord]);
+    expect(backup.data.manualEntries).toEqual([]);
     expect(backup.data.financeTransactions).toEqual([]);
     expect(backup.data.financeObligations).toEqual([]);
     expect(backup.data.inboxItems).toEqual([]);
@@ -156,6 +161,7 @@ describe("backup validation and migration", () => {
       dailyCheckins: [dailyCheckinRecord],
       tasks: [taskRecord],
       decisionLogEntries: [decisionLogRecord],
+      manualEntries: [manualEntryRecord],
       financeTransactions: [financeTransactionRecord],
       financeObligations: [financeObligationRecord],
       projects: [projectRecord],

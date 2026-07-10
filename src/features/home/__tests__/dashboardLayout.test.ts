@@ -38,6 +38,7 @@ describe("home dashboard layout helpers", () => {
       "projectsOverview",
       "journalOverview",
       "knowledgeOverview",
+      "manualOverview",
       "quickActions",
     ]);
     expect(layout.hiddenSectionIds).toEqual(["hero"]);
@@ -49,6 +50,7 @@ describe("home dashboard layout helpers", () => {
       "calendar",
       "summaryStats",
       "personalInsights",
+      "manualOverview",
     ] as const;
 
     const layout = normalizeDashboardLayout(
@@ -64,6 +66,7 @@ describe("home dashboard layout helpers", () => {
       "hero",
       "summaryStats",
       "personalInsights",
+      "manualOverview",
     ]);
   });
 

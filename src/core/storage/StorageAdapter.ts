@@ -3,6 +3,7 @@ import type {
   DecisionLogRepository,
   FinanceRepository,
   JournalRepository,
+  ManualRepository,
   InboxRepository,
   KnowledgeRepository,
   ProjectsRepository,
@@ -18,6 +19,7 @@ export interface StorageAdapter {
   tasks: TasksRepository;
   decisions: DecisionLogRepository;
   finance: FinanceRepository;
+  manual: ManualRepository;
   projects: ProjectsRepository;
   journal: JournalRepository;
   knowledge: KnowledgeRepository;

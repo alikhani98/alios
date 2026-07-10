@@ -18,7 +18,7 @@
 
 ## Real-world usage period
 
-AliOS v1.0 should be used with real personal data before more product scope is approved. Full routines and wellness engines, Personal Manual, AI, Google Calendar, ICS export, cloud sync, and notifications remain deferred until observed usage justifies them. Weekly Review and Decision Log are now available as local-first foundations.
+AliOS v1.0 should be used with real personal data before more product scope is approved. Full routines and wellness engines, AI, Google Calendar, ICS export, cloud sync, and notifications remain deferred until observed usage justifies them. Weekly Review and Decision Log are now available as local-first foundations, and Personal Manual is now available as a local-first foundation.
 
 The later version ideas below are directional only. They are not approved stages and may change after real-world use.
 
@@ -30,6 +30,7 @@ Stage 55 adds a local-only backup reminder and last-backup-status foundation tha
 Stage 56 adds a readable export center foundation for finance CSV, decision log Markdown, journal Markdown, and knowledge Markdown without changing the backup format, backup version, storage schema, or import behavior.
 Stage 57 adds a local-only Recovery Mode / Safe Mode foundation that can surface calm access to Settings, Backup/Restore, Export Center, and Local Error Log without changing the backup format, backup version, storage schema, or route architecture.
 Stage 58 adds a derived-only Finance Monthly Plan foundation that summarizes recorded income, spending, obligations, remaining estimate, and daily remaining pace without changing storage, backup format, backup version, or route architecture.
+Stage 59 adds a Personal Manual foundation that stores local user-authored reference notes with review timing, Home visibility, and additive backup support without changing the local-first storage model.
 
 ## Version 1.1
 

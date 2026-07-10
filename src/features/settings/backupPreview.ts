@@ -4,6 +4,7 @@ export const BACKUP_TABLE_KEYS = [
   "dailyCheckins",
   "tasks",
   "decisionLogEntries",
+  "manualEntries",
   "financeTransactions",
   "financeObligations",
   "projects",

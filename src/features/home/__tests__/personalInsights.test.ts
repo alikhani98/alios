@@ -77,6 +77,12 @@ function createHomeData(overrides: Partial<HomeDashboardData> = {}): HomeDashboa
       totalCount: 0,
       latest: undefined,
     },
+    manual: {
+      totalCount: 0,
+      activeCount: 0,
+      reviewDueCount: 0,
+      latest: undefined,
+    },
     inbox: {
       unprocessedCount: 0,
     },

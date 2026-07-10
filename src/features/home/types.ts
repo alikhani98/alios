@@ -2,6 +2,7 @@ import type {
   DailyCheckin,
   JournalEntry,
   KnowledgeItem,
+  ManualEntry,
   Project,
   Task,
 } from "@/shared/types";
@@ -26,6 +27,12 @@ export type HomeDashboardData = {
   knowledge: {
     totalCount: number;
     latest?: KnowledgeItem;
+  };
+  manual: {
+    totalCount: number;
+    activeCount: number;
+    reviewDueCount: number;
+    latest?: ManualEntry;
   };
   inbox: {
     unprocessedCount: number;

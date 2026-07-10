@@ -49,6 +49,7 @@ export function useLocalDataManagement() {
         dailyCheckins: 0,
         tasks: 0,
         decisionLogEntries: 0,
+        manualEntries: 0,
         financeTransactions: 0,
         financeObligations: 0,
         projects: 0,

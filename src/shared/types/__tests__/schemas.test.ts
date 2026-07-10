@@ -6,6 +6,7 @@ import {
   journalEntrySchema,
   inboxItemSchema,
   knowledgeItemSchema,
+  manualEntrySchema,
   projectSchema,
   taskSchema,
 } from "@/shared/types";
@@ -15,6 +16,7 @@ import {
   journalEntryRecord,
   inboxItemRecord,
   knowledgeItemRecord,
+  manualEntryRecord,
   projectRecord,
   taskRecord,
 } from "@/test/factories";
@@ -25,6 +27,7 @@ describe("core domain schemas", () => {
     ["task", taskSchema, taskRecord],
     ["journal entry", journalEntrySchema, journalEntryRecord],
     ["knowledge item", knowledgeItemSchema, knowledgeItemRecord],
+    ["manual entry", manualEntrySchema, manualEntryRecord],
     ["daily check-in", dailyCheckinSchema, dailyCheckinRecord],
     ["decision log entry", decisionLogEntrySchema, decisionLogRecord],
     ["inbox item", inboxItemSchema, inboxItemRecord],
@@ -37,6 +40,7 @@ describe("core domain schemas", () => {
     ["task", taskSchema, { ...taskRecord, status: "unknown" }],
     ["journal entry", journalEntrySchema, { ...journalEntryRecord, content: "" }],
     ["knowledge item", knowledgeItemSchema, { ...knowledgeItemRecord, type: "unknown" }],
+    ["manual entry", manualEntrySchema, { ...manualEntryRecord, category: "unknown" }],
     ["daily check-in", dailyCheckinSchema, { ...dailyCheckinRecord, date: "05/07/2026" }],
     ["decision log entry", decisionLogEntrySchema, { ...decisionLogRecord, status: "maybe" }],
   ])("rejects an invalid %s", (_name, schema, value) => {

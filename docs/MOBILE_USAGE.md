@@ -60,6 +60,7 @@ AliOS stores data in IndexedDB for the current browser, device, and site origin.
 - The export center files stay on the current browser or device until you download them, and they do not change the full backup file format.
 - The recovery mode flag stays on the current browser or device in localStorage only and does not sync.
 - The Decision Log entries, review dates, and reflection fields stay on the current browser or device and do not sync.
+- The Personal Manual entries, review timing, and user-authored notes stay on the current browser or device and do not sync.
 - Finance due-date fields store ISO/Gregorian values only; the Jalali preview is display-only.
 - There is no automatic sync, cloud backup, account, or backend in AliOS 1.0.
 - Publishing AliOS to GitHub Pages does not change this device-local storage model.
@@ -72,9 +73,9 @@ AliOS stores data in IndexedDB for the current browser, device, and site origin.
 4. On the destination device, open **Settings** and choose the backup file.
 5. AliOS validates the file and shows a restore preview with the backup version, export time, and table counts.
 6. Confirm only after reading the warning: restore replaces every supported local AliOS table on that device.
-7. Verify Inbox, Today, Projects, Journal, Knowledge, and Settings after restore.
+7. Verify Inbox, Today, Projects, Journal, Knowledge, Personal Manual, and Settings after restore.
 8. Verify Finance transactions and obligations after restore if you used the Finance module.
-9. Older additive backups that omit `inboxItems`, `financeTransactions`, `financeObligations`, or `decisionLogEntries` are restored as empty arrays for those tables.
+9. Older additive backups that omit `inboxItems`, `financeTransactions`, `financeObligations`, `decisionLogEntries`, or `manualEntries` are restored as empty arrays for those tables.
 
 For readable, module-focused exports, use the new Settings export center. It produces finance CSV plus Markdown exports for the Decision Log, Journal, and Knowledge modules without changing the backup flow.
 

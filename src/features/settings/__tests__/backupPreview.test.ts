@@ -9,6 +9,7 @@ import {
   inboxItemInput,
   journalEntryInput,
   knowledgeItemInput,
+  manualEntryInput,
   projectInput,
   settingInput,
   taskInput,
@@ -35,6 +36,7 @@ describe("backup preview", () => {
     await storage.projects.create(projectInput);
     await storage.tasks.create(taskInput);
     await storage.decisions.create(decisionLogInput);
+    await storage.manual.create(manualEntryInput);
     await storage.finance.createTransaction(financeTransactionInput);
     await storage.finance.createObligation(financeObligationInput);
     await storage.journal.create(journalEntryInput);
@@ -47,11 +49,12 @@ describe("backup preview", () => {
 
     expect(preview.backupVersion).toBe(1);
     expect(new Date(preview.exportedAt).toISOString()).toBe(preview.exportedAt);
-    expect(preview.totalRecords).toBe(10);
+    expect(preview.totalRecords).toBe(11);
     expect(preview.tableCounts).toEqual([
       { key: "dailyCheckins", count: 1 },
       { key: "tasks", count: 1 },
       { key: "decisionLogEntries", count: 1 },
+      { key: "manualEntries", count: 1 },
       { key: "financeTransactions", count: 1 },
       { key: "financeObligations", count: 1 },
       { key: "projects", count: 1 },
