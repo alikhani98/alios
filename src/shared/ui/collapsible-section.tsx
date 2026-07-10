@@ -69,7 +69,7 @@ export function CollapsibleSection({
       <button
         type="button"
         className={cn(
-          "flex w-full items-start justify-between gap-4 p-5 text-start sm:p-6",
+          "flex w-full flex-col items-start justify-between gap-3 p-5 text-start sm:flex-row sm:items-start sm:gap-4 sm:p-6",
           aliosFocusRing,
           "focus-visible:-m-px focus-visible:rounded-[1.65rem]"
         )}
@@ -77,25 +77,25 @@ export function CollapsibleSection({
         aria-controls={contentId}
         onClick={handleToggle}
       >
-        <span className="flex min-w-0 items-start gap-3 text-start">
+        <span className="flex w-full min-w-0 items-start gap-3 text-start sm:w-auto">
           {icon ? (
             <span className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-primary/10 bg-primary/10 text-primary">
               {icon}
             </span>
           ) : null}
           <span className="min-w-0 space-y-1">
-            <span className="block text-lg font-semibold leading-7 sm:text-xl">
+            <span className="block break-words text-lg font-semibold leading-7 sm:text-xl">
               {title}
             </span>
             {description ? (
-              <span className="block text-sm leading-6 text-muted-foreground">
+              <span className="block break-words text-sm leading-6 text-muted-foreground">
                 {description}
               </span>
             ) : null}
           </span>
         </span>
 
-        <span className="flex shrink-0 items-center gap-2">
+        <span className="flex w-full items-center justify-between gap-2 sm:w-auto sm:justify-end">
           {status ? <span className="shrink-0">{status}</span> : null}
           <span className="sr-only">{isOpen ? collapseLabel : expandLabel}</span>
           <ChevronDown

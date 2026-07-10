@@ -209,7 +209,13 @@ export function WeeklyReviewPage() {
             <CircleAlert className="mt-0.5 h-4 w-4 shrink-0" />
             <span>{error}</span>
           </div>
-          <Button type="button" size="sm" variant="outline" onClick={() => void loadWeeklyReview()}>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            className="w-full sm:w-auto"
+            onClick={() => void loadWeeklyReview()}
+          >
             <RefreshCcw className="me-2 h-4 w-4" />
             {t("common.tryAgain")}
           </Button>
@@ -679,9 +685,9 @@ export function WeeklyReviewPage() {
                     </SoftPanel>
                   ))}
 
-                  <div className="flex flex-wrap gap-3 pt-2">
+                  <div className="grid gap-3 pt-2 sm:flex sm:flex-wrap">
                     {quickLinks.map(({ to, labelKey }) => (
-                      <Button key={to} asChild variant="outline" className="shadow-sm">
+                      <Button key={to} asChild variant="outline" className="w-full justify-start shadow-sm sm:w-auto">
                         <Link to={to}>
                           {t(labelKey)}
                           <ArrowUpRight className="ms-2 h-4 w-4" />

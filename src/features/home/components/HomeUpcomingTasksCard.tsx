@@ -154,8 +154,8 @@ export function HomeUpcomingTasksCard({
               ) : null
             )}
           </div>
-          <div className="flex flex-wrap gap-2">
-            <Button asChild variant="outline" size="sm">
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+            <Button asChild variant="outline" size="sm" className="w-full sm:w-auto">
               <Link to="/today">
                 {t("home.planForLater")}
                 <ArrowUpLeft className="ms-2 h-4 w-4" />
@@ -169,7 +169,7 @@ export function HomeUpcomingTasksCard({
           <p className="mt-2 text-sm leading-7 text-muted-foreground">
             {t("home.planForLater")}
           </p>
-          <Button asChild className="mt-4" variant="outline">
+          <Button asChild className="mt-4 w-full sm:w-auto" variant="outline">
             <Link to="/today">
               {t("home.planForLater")}
               <ArrowUpLeft className="ms-2 h-4 w-4" />

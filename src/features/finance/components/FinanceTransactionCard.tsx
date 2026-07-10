@@ -53,7 +53,7 @@ export function FinanceTransactionCard({
         </div>
         <p
           className={cn(
-            "text-lg font-semibold tabular-nums",
+            "max-w-[10rem] break-words text-end text-lg font-semibold tabular-nums leading-7",
             transaction.type === "income"
               ? "text-emerald-700 dark:text-emerald-300"
               : "text-destructive"
@@ -67,8 +67,15 @@ export function FinanceTransactionCard({
         <p className="text-sm leading-7 text-muted-foreground">{transaction.notes}</p>
       ) : null}
 
-      <div className="flex flex-wrap gap-2">
-        <Button type="button" size="sm" variant="outline" disabled={isBusy} onClick={onEdit}>
+      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          className="w-full sm:w-auto"
+          disabled={isBusy}
+          onClick={onEdit}
+        >
           <Pencil className="me-2 h-4 w-4" />
           {t("common.edit")}
         </Button>
@@ -77,6 +84,7 @@ export function FinanceTransactionCard({
             type="button"
             size="sm"
             variant="destructive"
+            className="w-full sm:w-auto"
             disabled={isBusy}
             onClick={() => void onDelete()}
           >
@@ -88,7 +96,7 @@ export function FinanceTransactionCard({
             type="button"
             size="sm"
             variant="ghost"
-            className="text-destructive hover:text-destructive"
+            className="w-full text-destructive hover:text-destructive sm:w-auto"
             disabled={isBusy}
             onClick={() => setConfirmingDelete(true)}
           >
@@ -101,6 +109,7 @@ export function FinanceTransactionCard({
             type="button"
             size="sm"
             variant="outline"
+            className="w-full sm:w-auto"
             disabled={isBusy}
             onClick={() => setConfirmingDelete(false)}
           >

@@ -35,11 +35,11 @@ function ErrorEntryCard({
     <div className="rounded-2xl border bg-muted/30 p-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-2">
-          <p className="text-sm font-medium text-foreground">{entry.message}</p>
+          <p className="break-words text-sm font-medium text-foreground">{entry.message}</p>
           <div className="space-y-1 text-xs leading-5 text-muted-foreground">
-            <p>{t("settings.errorLoggedAt", { date: formatDateTime(entry.createdAt) })}</p>
-            {entry.source ? <p>{t("settings.errorSource", { source: entry.source })}</p> : null}
-            {entry.route ? <p>{t("settings.errorRoute", { route: entry.route })}</p> : null}
+            <p className="break-words">{t("settings.errorLoggedAt", { date: formatDateTime(entry.createdAt) })}</p>
+            {entry.source ? <p className="break-words">{t("settings.errorSource", { source: entry.source })}</p> : null}
+            {entry.route ? <p className="break-words">{t("settings.errorRoute", { route: entry.route })}</p> : null}
             {entry.stackPreview ? (
               <p className="break-words">{entry.stackPreview}</p>
             ) : null}
@@ -49,6 +49,7 @@ function ErrorEntryCard({
           type="button"
           variant="outline"
           size="sm"
+          className="w-full sm:w-auto"
           onClick={() => onCopy(entry)}
         >
           <Copy className="me-2 h-4 w-4" />
@@ -106,7 +107,7 @@ export function LocalErrorLogSection() {
               ))}
             </div>
             <div className="flex flex-wrap gap-3">
-              <Button type="button" variant="outline" onClick={handleClear}>
+              <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={handleClear}>
                 <Trash2 className="me-2 h-4 w-4" />
                 {t("settings.clearLocalErrorLog")}
               </Button>

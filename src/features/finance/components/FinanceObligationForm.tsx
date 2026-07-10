@@ -222,7 +222,7 @@ export function FinanceObligationForm({
           />
           <div className="space-y-1 text-xs leading-5 text-muted-foreground">
             {jalaliDueDatePreview ? (
-              <p>
+              <p className="break-words">
                 {t("finance.jalaliDueDatePreview")} {jalaliDueDatePreview}
               </p>
             ) : null}
@@ -273,8 +273,8 @@ export function FinanceObligationForm({
         />
       </div>
 
-      <div className="flex flex-wrap gap-3">
-        <Button type="submit" disabled={isSubmitting}>
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+        <Button type="submit" className="w-full sm:w-auto" disabled={isSubmitting}>
           {isSubmitting
             ? t("common.saving")
             : obligation
@@ -282,7 +282,7 @@ export function FinanceObligationForm({
               : t("finance.addObligation")}
         </Button>
         {onCancel ? (
-          <Button type="button" variant="outline" onClick={onCancel}>
+          <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={onCancel}>
             {t("common.cancel")}
           </Button>
         ) : null}

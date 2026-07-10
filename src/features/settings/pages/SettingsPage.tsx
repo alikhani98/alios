@@ -58,8 +58,8 @@ type CountItemProps = { label: string; value: number };
 function CountItem({ label, value }: CountItemProps) {
   return (
     <div className="rounded-xl border bg-background px-4 py-3">
-      <p className="text-2xl font-bold tabular-nums">{value}</p>
-      <p className="mt-1 text-sm text-muted-foreground">{label}</p>
+      <p className="text-2xl font-bold tabular-nums leading-none">{value}</p>
+      <p className="mt-1 break-words text-sm text-muted-foreground">{label}</p>
     </div>
   );
 }
@@ -69,8 +69,8 @@ type InfoItemProps = { label: string; value: string };
 function InfoItem({ label, value }: InfoItemProps) {
   return (
     <div className="flex flex-col items-start gap-1 border-b py-3 last:border-0 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-      <span className="text-sm text-muted-foreground">{label}</span>
-      <span className="text-sm font-medium">{value}</span>
+      <span className="min-w-0 break-words text-sm text-muted-foreground">{label}</span>
+      <span className="min-w-0 break-words text-sm font-medium">{value}</span>
     </div>
   );
 }
@@ -288,6 +288,7 @@ export function SettingsPage() {
           <Button
             type="button"
             variant={morningWarmupEnabled ? "default" : "outline"}
+            className="w-full sm:w-auto"
             aria-pressed={morningWarmupEnabled}
             onClick={() => setMorningWarmupEnabled(!morningWarmupEnabled)}
           >
@@ -322,6 +323,7 @@ export function SettingsPage() {
           <Button
             type="button"
             variant={wellnessRoutineEnabled ? "default" : "outline"}
+            className="w-full sm:w-auto"
             aria-pressed={wellnessRoutineEnabled}
             onClick={() => setWellnessRoutineEnabled(!wellnessRoutineEnabled)}
           >
@@ -349,6 +351,7 @@ export function SettingsPage() {
             <Button
               type="button"
               variant={language === "fa" ? "default" : "outline"}
+              className="w-full sm:w-auto"
               aria-pressed={language === "fa"}
               onClick={() => setLanguage("fa")}
             >
@@ -357,6 +360,7 @@ export function SettingsPage() {
             <Button
               type="button"
               variant={language === "en" ? "default" : "outline"}
+              className="w-full sm:w-auto"
               aria-pressed={language === "en"}
               onClick={() => setLanguage("en")}
             >
@@ -383,6 +387,7 @@ export function SettingsPage() {
             <Button
               type="button"
               variant={calendarDisplay === "auto" ? "default" : "outline"}
+              className="w-full sm:w-auto"
               aria-pressed={calendarDisplay === "auto"}
               onClick={() => setCalendarDisplay("auto")}
             >
@@ -393,6 +398,7 @@ export function SettingsPage() {
               variant={
                 calendarDisplay === "gregorian" ? "default" : "outline"
               }
+              className="w-full sm:w-auto"
               aria-pressed={calendarDisplay === "gregorian"}
               onClick={() => setCalendarDisplay("gregorian")}
             >
@@ -401,6 +407,7 @@ export function SettingsPage() {
             <Button
               type="button"
               variant={calendarDisplay === "jalali" ? "default" : "outline"}
+              className="w-full sm:w-auto"
               aria-pressed={calendarDisplay === "jalali"}
               onClick={() => setCalendarDisplay("jalali")}
             >
@@ -512,6 +519,7 @@ export function SettingsPage() {
             <Button
               type="button"
               variant="outline"
+              className="w-full sm:w-auto"
               onClick={() => void dataManagement.loadSummary()}
             >
               <RotateCcw className="me-2 h-4 w-4" />
@@ -536,6 +544,7 @@ export function SettingsPage() {
             <Button
               type="button"
               disabled={backup.isExporting || backup.isRestoring}
+              className="w-full sm:w-auto"
               onClick={() => void backup.exportBackup()}
             >
               <Download className="me-2 h-4 w-4" />
@@ -620,6 +629,7 @@ export function SettingsPage() {
               <Button
                 type="button"
                 variant="destructive"
+                className="w-full sm:w-auto"
                 disabled={backup.isRestoring}
                 onClick={() => void backup.confirmRestore()}
               >
@@ -630,6 +640,7 @@ export function SettingsPage() {
               <Button
                 type="button"
                 variant="outline"
+                className="w-full sm:w-auto"
                 disabled={backup.isRestoring}
                 onClick={() => {
                   backup.cancelRestore();
@@ -682,24 +693,26 @@ export function SettingsPage() {
                 {t("settings.clearConfirmDescription")}
               </p>
               <div className="mt-4 flex flex-wrap gap-3">
-                <Button
-                  type="button"
-                  variant="destructive"
-                  disabled={dataManagement.isClearing}
-                  onClick={() => void dataManagement.confirmClear()}
-                >
-                  <Trash2 className="me-2 h-4 w-4" />
+              <Button
+                type="button"
+                variant="destructive"
+                className="w-full sm:w-auto"
+                disabled={dataManagement.isClearing}
+                onClick={() => void dataManagement.confirmClear()}
+              >
+                <Trash2 className="me-2 h-4 w-4" />
                   {dataManagement.isClearing
                     ? t("settings.clearing")
                     : t("settings.clearConfirmAction")}
                 </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  disabled={dataManagement.isClearing}
-                  onClick={dataManagement.cancelClear}
-                >
-                  {t("common.cancel")}
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full sm:w-auto"
+                disabled={dataManagement.isClearing}
+                onClick={dataManagement.cancelClear}
+              >
+                {t("common.cancel")}
                 </Button>
               </div>
             </div>
@@ -707,6 +720,7 @@ export function SettingsPage() {
             <Button
               type="button"
               variant="destructive"
+              className="w-full sm:w-auto"
               onClick={dataManagement.requestClear}
             >
               <Trash2 className="me-2 h-4 w-4" />

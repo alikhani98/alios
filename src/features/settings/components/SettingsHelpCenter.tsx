@@ -68,7 +68,7 @@ function ModuleCard({
 }) {
   return (
     <div className="rounded-2xl border border-border/70 bg-background/80 p-4 shadow-sm">
-      <h4 className="text-base font-semibold leading-7">
+      <h4 className="break-words text-base font-semibold leading-7">
         {getLocalizedText(language, module.title)}
       </h4>
       <dl className="mt-3 space-y-3 text-sm leading-7 text-muted-foreground">
@@ -76,19 +76,19 @@ function ModuleCard({
           <dt className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground/80">
             {language === "fa" ? "برای چه" : "What it is for"}
           </dt>
-          <dd>{getLocalizedText(language, module.purpose)}</dd>
+          <dd className="break-words">{getLocalizedText(language, module.purpose)}</dd>
         </div>
         <div className="space-y-1">
           <dt className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground/80">
             {language === "fa" ? "چه وقت" : "When to use it"}
           </dt>
-          <dd>{getLocalizedText(language, module.whenToUse)}</dd>
+          <dd className="break-words">{getLocalizedText(language, module.whenToUse)}</dd>
         </div>
         <div className="space-y-1">
           <dt className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground/80">
             {language === "fa" ? "نمونه" : "Example"}
           </dt>
-          <dd>{getLocalizedText(language, module.example)}</dd>
+          <dd className="break-words">{getLocalizedText(language, module.example)}</dd>
         </div>
       </dl>
     </div>

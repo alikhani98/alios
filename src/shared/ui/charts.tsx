@@ -182,11 +182,14 @@ function BarRow({ label, value, scale, tone }: BarRowProps) {
   const width = getBarWidth(value, scale);
 
   return (
-    <div className="grid grid-cols-[minmax(0,7.5rem)_minmax(0,1fr)_auto] items-center gap-3 text-xs sm:grid-cols-[minmax(0,8.5rem)_minmax(0,1fr)_auto]">
-      <span className="min-w-0 truncate text-muted-foreground">{label}</span>
+    <div className="grid grid-cols-[minmax(0,5.75rem)_minmax(0,1fr)_auto] items-start gap-2 text-xs sm:grid-cols-[minmax(0,8.5rem)_minmax(0,1fr)_auto] sm:items-center sm:gap-3">
+      <span className="min-w-0 break-words leading-5 text-muted-foreground">{label}</span>
       <div className="h-2 overflow-hidden rounded-full bg-muted">
         <div
-          className={cn("h-full rounded-full transition-[width,opacity] duration-300 ease-out motion-reduce:transition-none", tone)}
+          className={cn(
+            "h-full rounded-full transition-[width,opacity] duration-300 ease-out motion-reduce:transition-none",
+            tone
+          )}
           style={{ width: `${width}%` }}
         />
       </div>

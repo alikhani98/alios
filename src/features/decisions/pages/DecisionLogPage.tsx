@@ -306,10 +306,10 @@ export function DecisionLogPage() {
               key={filter.value}
               type="button"
               variant={isSelected ? "default" : "outline"}
-              className="flex items-center justify-between gap-3"
+              className="flex w-full items-start justify-between gap-3 text-start"
               onClick={() => setSelectedFilter(filter.value)}
             >
-              <span>{t(filter.labelKey)}</span>
+              <span className="min-w-0 flex-1 break-words">{t(filter.labelKey)}</span>
               <StatusChip tone={isSelected ? "primary" : "neutral"}>
                 {filterCounts[filter.value]}
               </StatusChip>
