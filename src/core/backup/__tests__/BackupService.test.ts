@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ValidationError } from "@/core/errors";
 import type { AliosDatabase, DexieStorageAdapter } from "@/db/dexie";
@@ -150,5 +150,25 @@ describe("BackupService with DexieBackupStorage", () => {
     expect(() =>
       service.parseBackup(JSON.stringify({ app: "AliOS", backupVersion: 99 }))
     ).toThrow(ValidationError);
+  });
+
+  it("does not write anything when restore validation fails", async () => {
+    const replaceAll = vi.fn();
+    const invalidStorage = {
+      readAll: vi.fn(),
+      replaceAll,
+      getSummary: vi.fn(),
+      clearAll: vi.fn(),
+    };
+    const invalidService = new BackupService(invalidStorage);
+
+    await expect(
+      invalidService.restoreBackup({
+        app: "AliOS",
+        backupVersion: 1,
+        exportedAt: "2026-07-05T08:30:00.000Z",
+      } as never)
+    ).rejects.toBeInstanceOf(ValidationError);
+    expect(replaceAll).not.toHaveBeenCalled();
   });
 });

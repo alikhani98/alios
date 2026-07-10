@@ -22,6 +22,8 @@ AliOS v1.0 should be used with real personal data before more product scope is a
 
 The later version ideas below are directional only. They are not approved stages and may change after real-world use.
 
+Stage 50 hardens manual backup and restore with validation and additive migration normalization, but it remains a local-only maintenance improvement rather than a new product surface.
+
 ## Version 1.1
 
 - Mobile-responsive polish
