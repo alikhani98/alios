@@ -21,6 +21,7 @@ Stage 54 improves empty states and first-run guidance across Home, Finance, Deci
 Stage 55 adds a local-only backup status foundation with calm reminder copy in Settings and an optional Home hint while keeping manual backup export and restore unchanged.
 Stage 56 adds a readable export center foundation for finance CSV, decision log Markdown, journal Markdown, and knowledge Markdown without changing backup behavior.
 Stage 57 adds a local-only Recovery Mode / Safe Mode foundation with a calm shell banner, a Settings recovery section, and an error-boundary recovery action without changing storage schemas or backup behavior.
+Stage 58 adds a derived-only Finance Monthly Plan foundation that summarizes current-month income, spending, obligations, remaining estimate, and daily remaining pace without changing storage, backup format, backup version, or route architecture.
 
 AliOS is designed for one person and stores its data in the browser through IndexedDB. It requires no backend, account, authentication, subscription, paid API, or hosted AI service.
 

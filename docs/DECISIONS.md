@@ -72,6 +72,7 @@ Decision:
 - Finance review panels may summarize current-month spending, obligations, remaining liquidity, and simple budget pressure from entered local data
 - Finance review must stay deterministic, local-only, and neutral
 - Finance review must not become a chart system, automation engine, financial advice engine, or bank-integrated workflow
+- The Finance Monthly Plan may derive a calm monthly estimate from recorded local transactions and obligations, but it must not store budget rules or imply advice
 
 Reason:
 

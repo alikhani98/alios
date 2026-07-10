@@ -29,6 +29,7 @@ Stage 54 adds calmer empty states and first-run guidance across the key modules 
 Stage 55 adds a local-only backup reminder and last-backup-status foundation that tracks manual backup freshness without changing the backup format, backup version, or storage schema.
 Stage 56 adds a readable export center foundation for finance CSV, decision log Markdown, journal Markdown, and knowledge Markdown without changing the backup format, backup version, storage schema, or import behavior.
 Stage 57 adds a local-only Recovery Mode / Safe Mode foundation that can surface calm access to Settings, Backup/Restore, Export Center, and Local Error Log without changing the backup format, backup version, storage schema, or route architecture.
+Stage 58 adds a derived-only Finance Monthly Plan foundation that summarizes recorded income, spending, obligations, remaining estimate, and daily remaining pace without changing storage, backup format, backup version, or route architecture.
 
 ## Version 1.1
 

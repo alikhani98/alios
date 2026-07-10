@@ -2,6 +2,12 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 58 - Finance Monthly Plan Foundation
+
+- Added a derived-only Finance Monthly Plan that summarizes current-month income, spending, obligation pressure, remaining estimate, and daily remaining estimate from recorded local finance data only
+- Added a calm low-data state and simple pressure/focus hints without storing monthly budget rules or changing existing finance storage
+- Kept the stage local-first, deterministic, non-advisory, dependency-free, and free of backend, sync, cloud, AI, telemetry, schema, or backup-format changes
+
 ## Stage 57 - Recovery Mode / Safe Mode Foundation
 
 - Added a local-only recovery mode flag stored in browser localStorage with safe URL flag detection for `?recovery=1` and `?safe=1`

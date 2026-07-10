@@ -31,6 +31,7 @@ import {
   getActiveFinanceObligations,
   getRecentFinanceTransactions,
 } from "../financeCalculations";
+import { calculateFinanceMonthlyPlan } from "../financeMonthlyPlan";
 import { FinanceObligationCard } from "../components/FinanceObligationCard";
 import { FinanceObligationForm } from "../components/FinanceObligationForm";
 import { FinanceTransactionCard } from "../components/FinanceTransactionCard";
@@ -101,6 +102,18 @@ function getBudgetGuardSummaryKey(status: "calm" | "watch" | "pressure") {
     case "calm":
     default:
       return "finance.guardCalmSummary";
+  }
+}
+
+function getMonthlyPlanFocusTone(status: "calm" | "watch" | "pressure") {
+  switch (status) {
+    case "watch":
+      return "warning";
+    case "pressure":
+      return "danger";
+    case "calm":
+    default:
+      return "success";
   }
 }
 
@@ -197,6 +210,10 @@ export function FinancePage() {
 
   const review = useMemo(
     () => calculateFinanceReview(transactions, obligations, referenceDate),
+    [obligations, referenceDate, transactions]
+  );
+  const monthlyPlan = useMemo(
+    () => calculateFinanceMonthlyPlan(transactions, obligations, referenceDate),
     [obligations, referenceDate, transactions]
   );
   const monthlyCashflowSeries = useMemo(
@@ -546,6 +563,145 @@ export function FinancePage() {
           ))}
         </nav>
       </div>
+
+      <section id={FINANCE_SECTION_ANCHORS.monthlyPlan} className="scroll-mt-32 space-y-4">
+        <PremiumCard className="border-primary/15 bg-gradient-to-br from-primary/10 via-background to-background shadow-sm">
+          <div className="p-5 sm:p-6">
+            <SectionHeader
+              icon={<Wallet className="h-5 w-5" />}
+              eyebrow={t("finance.sectionMonthlyPlan")}
+              title={t("finance.sectionMonthlyPlan")}
+              description={t("finance.monthlyPlanDescription")}
+              status={
+                <StatusChip tone={getMonthlyPlanFocusTone(monthlyPlan.pressureLevel)}>
+                  {t(
+                    monthlyPlan.pressureLevel === "pressure"
+                      ? "finance.guardPressure"
+                      : monthlyPlan.pressureLevel === "watch"
+                        ? "finance.guardWatch"
+                        : "finance.guardCalm"
+                  )}
+                </StatusChip>
+              }
+            />
+
+            <div className="mt-4 max-w-3xl space-y-2 text-sm leading-7 text-muted-foreground">
+              <p>{t("finance.monthlyPlanRecordedDataNote")}</p>
+              <p>{t("finance.monthlyPlanAdviceNote")}</p>
+              <p>{t("finance.monthlyPlanIncompleteDataNote")}</p>
+            </div>
+
+            <div className="mt-5">
+              {!monthlyPlan.hasUsefulData ? (
+                <EmptyState
+                  icon={<Wallet className="h-6 w-6" />}
+                  title={t("finance.monthlyPlanLowDataTitle")}
+                  description={t("finance.monthlyPlanLowDataDescription")}
+                  note={t("finance.monthlyPlanLowDataNote")}
+                  actions={
+                    <>
+                      <Button
+                        type="button"
+                        onClick={() => handleQuickNav(FINANCE_SECTION_ANCHORS.addTransaction)}
+                      >
+                        {t("finance.addTransaction")}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => handleQuickNav(FINANCE_SECTION_ANCHORS.addObligation)}
+                      >
+                        {t("finance.addObligation")}
+                      </Button>
+                    </>
+                  }
+                />
+              ) : (
+                <div className="space-y-4">
+                  <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                    <MetricCard
+                      icon={<CircleDollarSign className="h-5 w-5" />}
+                      label={t("finance.monthlyPlanIncome")}
+                      value={formatAmount(monthlyPlan.incomeThisMonth)}
+                      description={t("finance.monthlyPlanIncomeDescription")}
+                    />
+                    <MetricCard
+                      icon={<BadgeDollarSign className="h-5 w-5" />}
+                      label={t("finance.monthlyPlanExpenses")}
+                      value={formatAmount(monthlyPlan.expenseThisMonth)}
+                      description={t("finance.monthlyPlanExpensesDescription")}
+                    />
+                    <MetricCard
+                      icon={<ReceiptText className="h-5 w-5" />}
+                      label={t("finance.monthlyPlanObligations")}
+                      value={formatAmount(monthlyPlan.monthlyObligationsEstimate)}
+                      description={t("finance.monthlyPlanObligationsDescription", {
+                        count: monthlyPlan.activeObligationCount,
+                      })}
+                      status={
+                        <StatusChip tone="neutral">
+                          {t("finance.monthlyPlanRemainingObligationTotal", {
+                            amount: formatAmount(monthlyPlan.activeObligationRemaining),
+                          })}
+                        </StatusChip>
+                      }
+                    />
+                    <MetricCard
+                      icon={<Wallet className="h-5 w-5" />}
+                      label={t("finance.monthlyPlanRemaining")}
+                      value={formatAmount(monthlyPlan.estimatedRemaining)}
+                      description={t("finance.monthlyPlanRemainingDescription")}
+                    />
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <MetricCard
+                      icon={<Landmark className="h-5 w-5" />}
+                      label={t("finance.monthlyPlanDailyRemaining")}
+                      value={formatAmount(monthlyPlan.dailyRemainingEstimate)}
+                      description={t("finance.monthlyPlanDailyRemainingDescription", {
+                        days: monthlyPlan.daysRemaining,
+                      })}
+                    />
+                    <MetricCard
+                      icon={<RotateCcw className="h-5 w-5" />}
+                      label={t("finance.monthlyPlanDaysRemaining")}
+                      value={String(monthlyPlan.daysRemaining)}
+                      description={t("finance.monthlyPlanMonthProgressDescription", {
+                        elapsed: monthlyPlan.daysElapsed,
+                        total: monthlyPlan.daysInMonth,
+                      })}
+                    />
+                  </div>
+
+                  <SoftPanel className="space-y-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <StatusChip tone={getMonthlyPlanFocusTone(monthlyPlan.pressureLevel)}>
+                        {t(
+                          monthlyPlan.pressureLevel === "pressure"
+                            ? "finance.guardPressure"
+                            : monthlyPlan.pressureLevel === "watch"
+                              ? "finance.guardWatch"
+                              : "finance.guardCalm"
+                        )}
+                      </StatusChip>
+                      <span className="text-sm font-medium text-foreground">
+                        {t(monthlyPlan.focusKey)}
+                      </span>
+                    </div>
+                    <p className="text-sm leading-7 text-muted-foreground">
+                      {t("finance.monthlyPlanRecordedDataNote")}
+                    </p>
+                    <p className="text-xs leading-6 text-muted-foreground">
+                      {t("finance.monthlyPlanIncompleteDataNote")}
+                    </p>
+                  </SoftPanel>
+                </div>
+              )}
+            </div>
+          </div>
+        </PremiumCard>
+      </section>
 
       {successMessage ? (
         <div
