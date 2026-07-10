@@ -47,6 +47,7 @@ import {
   WELLNESS_BADMINTON_ROUTINE_ENABLED_STORAGE_KEY,
 } from "@/features/wellness";
 import { SettingsHelpCenter } from "../components/SettingsHelpCenter";
+import { LocalErrorLogSection } from "../components/LocalErrorLogSection";
 import { resetHomeDashboardLayoutPreference } from "@/features/home/hooks/useHomeDashboardLayout";
 import { createBackupPreview } from "../backupPreview";
 import { useBackupRestore } from "../hooks/useBackupRestore";
@@ -190,6 +191,8 @@ export function SettingsPage() {
       ) : null}
 
       <SettingsHelpCenter />
+
+      <LocalErrorLogSection />
 
       <Card>
         <CardHeader>

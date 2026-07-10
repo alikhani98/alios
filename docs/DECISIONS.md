@@ -202,3 +202,18 @@ Reason:
 - Manual backup and restore is AliOS' primary disaster-recovery path, so restore safety needs to fail early and clearly
 - Normalizing additive arrays keeps older files usable without forcing a backup-format bump or schema migration
 - Keeping the migration helper pure makes the restore path easier to test and safer to maintain
+
+## ADR-018: Keep app error recovery local-only and bounded
+
+Decision:
+
+- Route-content render errors may be caught by a calm app error boundary while the rest of the shell stays available
+- Recent error summaries may be stored in browser localStorage only, capped to the most recent 10 entries
+- Error logging must remain local-only and must not send telemetry, analytics, or external reports
+- The feature must not require a Dexie schema change, backup-format change, backup-version bump, backend, sync, cloud, AI, or new dependency
+
+Reason:
+
+- A local-first app should fail gracefully when one page breaks without forcing a blank screen for the whole shell
+- A bounded error log gives the user enough context to inspect or copy a recent failure without turning the app into a monitoring system
+- Keeping the recovery path outside Dexie and backups preserves the existing local-first data model

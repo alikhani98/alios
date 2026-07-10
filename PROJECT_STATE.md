@@ -4,8 +4,8 @@
 
 - Project name: AliOS
 - Architecture version: AliOS 1.0
-- Current status: AliOS includes validated mobile-first Inbox capture, processing, global search, focused search-result navigation, filters, bulk triage, local appearance switching, local profile preferences, calendar month view foundation, home time-window routine nudges, upcoming task grouping, routine templates foundation, Wellness / Badminton Routine foundation, visual motion polish, premium Home dashboard visual upgrade, premium app shell polish, Home dashboard customization, premium reusable components, lightweight Personal Insights, Stage 37 premium Home showcase polish, light core-page visual alignment, hardened backup/restore safety, Stage 38 UI regression QA and release hardening with desktop sticky sidebar accessibility improvements, Stage 39 topbar dashboard controls plus accent color personalization, Stage 40 finance foundation, Stage 41 finance review and budget guard, Stage 42 lightweight finance charts foundation, Stage 43 lightweight motion and interaction polish, Stage 44 finance mobile UX and section navigation, Stage 45 performance audit and bundle optimization, Stage 46 Home collapsible dashboard sections, Stage 47 Settings Help Center Foundation, Stage 48 Weekly Review Foundation, Stage 49 Decision Log Foundation, Stage 50 Backup / Restore Safety & Migration Foundation, and remains ready for static GitHub Pages deployment.
-- Current Stage: Stage 50 Completed
+- Current status: AliOS includes validated mobile-first Inbox capture, processing, global search, focused search-result navigation, filters, bulk triage, local appearance switching, local profile preferences, calendar month view foundation, home time-window routine nudges, upcoming task grouping, routine templates foundation, Wellness / Badminton Routine foundation, visual motion polish, premium Home dashboard visual upgrade, premium app shell polish, Home dashboard customization, premium reusable components, lightweight Personal Insights, Stage 37 premium Home showcase polish, light core-page visual alignment, hardened backup/restore safety, Stage 38 UI regression QA and release hardening with desktop sticky sidebar accessibility improvements, Stage 39 topbar dashboard controls plus accent color personalization, Stage 40 finance foundation, Stage 41 finance review and budget guard, Stage 42 lightweight finance charts foundation, Stage 43 lightweight motion and interaction polish, Stage 44 finance mobile UX and section navigation, Stage 45 performance audit and bundle optimization, Stage 46 Home collapsible dashboard sections, Stage 47 Settings Help Center Foundation, Stage 48 Weekly Review Foundation, Stage 49 Decision Log Foundation, Stage 50 Backup / Restore Safety & Migration Foundation, Stage 51 App Error Boundary & Local Error Log Foundation, and remains ready for static GitHub Pages deployment.
+- Current Stage: Stage 51 Completed
 
 ## Architecture References
 
@@ -38,7 +38,7 @@
 
 ## Completed Stages
 
-Stages 1–50 are complete.
+Stages 1–51 are complete.
 
 - Stage 1 â€” Foundation
 - Stage 2 â€” App Shell
@@ -90,11 +90,14 @@ Stages 1–50 are complete.
 - Stage 48 â€” Weekly Review Foundation
 - Stage 49 â€” Decision Log Foundation
 - Stage 50 â€” Backup / Restore Safety & Migration Foundation
+- Stage 51 â€” App Error Boundary & Local Error Log Foundation
 Stage 48 completion is evidenced by the derived-only Weekly Review foundation, which summarizes the last seven days of existing local tasks, projects, inbox items, journal entries, knowledge items, finance records, wellness/check-in data, and routine signals where available. The stage adds deterministic observations and suggested focus rules, keeps the review window local and read-only, and stores no new weekly-review data. It uses the existing feature/repository/storage-adapter boundaries, adds no schema migration, no backup-format change, no new dependency, no backend, no sync, no cloud, and no AI, and it remains aligned with static GitHub Pages deployment.
 
 Stage 49 completion is evidenced by the local-first Decision Log foundation, which stores decision entries with title, date, status, context, options, chosen option, reasoning, expected outcome, review date, actual outcome, lesson, confidence, importance, tags, and timestamps. The stage keeps decisions editable in a calm CRUD page, surfaces deterministic review-due summaries, extends backup/restore additively with `decisionLogEntries`, and keeps the UI behind the repository/storage-adapter boundary. AliOS still does not decide for the user, and the stage adds no AI, backend, sync, cloud, paid API, or recommendation engine.
 
 Stage 50 completion is evidenced by the backup and restore safety foundation, which validates JSON and AliOS backup shape before any restore write, normalizes older additive backups with missing `inboxItems`, `financeTransactions`, `financeObligations`, and `decisionLogEntries` arrays to empty arrays, and keeps restore operations local-only and deterministic. The stage adds clearer bilingual restore errors, preserves backup version 1, avoids Dexie schema changes, and keeps backward-compatible backup behavior without adding backend, sync, cloud, AI, or new dependencies.
+
+Stage 51 completion is evidenced by the app-level route-content error boundary and local error log foundation. The stage keeps the shell calm when a page fails to render, records only local error summaries in bounded browser storage, and adds a minimal Settings section for reviewing or clearing recent local errors. The feature stays local-only and does not send telemetry, does not change Dexie schema, does not change backup format or backup version, and does not add backend, sync, cloud, AI, or a new dependency.
 
 Stage 40 completion is evidenced by the first local-first Finance module, which adds finance transactions and obligations through the existing feature/repository/storage-adapter boundary, keeps Dexie access out of UI code, and stores all finance data locally in finance-specific IndexedDB tables. The stage covers income, expenses, installments, debts, a simple monthly liquidity summary, additive backup/restore support, and a calm mobile-friendly Finance page with local CRUD flows. No backend, sync, cloud, AI, bank integration, recommendation engine, chart library, animation library, or accounting system was added. TypeScript validation passed, the repository tests were expanded, and the stage remains aligned with static GitHub Pages deployment.
 

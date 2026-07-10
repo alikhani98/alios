@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 51 - App Error Boundary & Local Error Log Foundation
+
+- Added a calm route-content error boundary so a failing page can fall back without taking down the shell
+- Added local-only recent error summaries in browser storage with a bounded last-10 log and copy/clear actions in Settings
+- Added bilingual fallback copy and settings text while keeping the feature local, static-hosting friendly, and telemetry-free
+- Kept Dexie, backup format, backup version, backend, sync, cloud, AI, and new dependencies unchanged
+
 ## Stage 50 - Backup / Restore Safety & Migration Foundation
 
 - Added explicit backup validation and deterministic migration helpers before restore writes anything

@@ -5,6 +5,7 @@ import { getNavigationItemByPath } from "@/shared/constants/navigation";
 import { usePersistentBoolean, usePersistentString } from "@/shared/hooks";
 import { useI18n } from "@/shared/i18n";
 import { APPEARANCE_STORAGE_KEY } from "@/shared/constants";
+import { ErrorBoundary } from "@/shared/error";
 import {
   applyAccentColorThemeVariables,
   DEFAULT_APPEARANCE_PREFERENCE,
@@ -97,7 +98,9 @@ export function AppShell() {
 
           <main className="min-w-0 flex-1 overflow-x-hidden px-2 pb-3 pt-2 sm:px-3 sm:pb-4 sm:pt-3 lg:px-4 lg:pb-6">
             <div key={location.pathname} className="alios-page-transition min-h-full">
-              <Outlet />
+              <ErrorBoundary resetKey={`${location.pathname}${location.search}${location.hash}`}>
+                <Outlet />
+              </ErrorBoundary>
             </div>
           </main>
         </div>
