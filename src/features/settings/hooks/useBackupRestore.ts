@@ -5,6 +5,7 @@ import {
   createBackupFilename,
   type AliosBackup,
 } from "@/core/backup";
+import { BACKUP_ERROR_CODES } from "@/core/backup/backupValidation";
 import { useStorageAdapter } from "@/core/storage";
 import { AppError } from "@/core/errors";
 import { useI18n } from "@/shared/i18n";
@@ -15,11 +16,29 @@ const LAST_RESTORED_AT_KEY = "alios.lastRestoredAt";
 function getErrorMessage(
   error: unknown,
   fallback: string,
-  validationMessage: string,
-  storageMessage: string
+  messages: {
+    invalidJson: string;
+    notAlios: string;
+    unsupportedVersion: string;
+    invalidData: string;
+  },
+  storageErrorMessage: string
 ): string {
   if (error instanceof AppError) {
-    return error.code === "VALIDATION_ERROR" ? validationMessage : storageMessage;
+    switch (error.code) {
+      case BACKUP_ERROR_CODES.invalidJson:
+        return messages.invalidJson;
+      case BACKUP_ERROR_CODES.notAlios:
+        return messages.notAlios;
+      case BACKUP_ERROR_CODES.unsupportedVersion:
+        return messages.unsupportedVersion;
+      case BACKUP_ERROR_CODES.invalidData:
+        return messages.invalidData;
+      case "STORAGE_ERROR":
+        return storageErrorMessage;
+      default:
+        return storageErrorMessage;
+    }
   }
   return error instanceof Error ? error.message : fallback;
 }
@@ -72,7 +91,19 @@ export function useBackupRestore(onRestored?: () => Promise<void> | void) {
       setLastBackupExportedAt(backup.exportedAt);
       setSuccess(t("backup.exported"));
     } catch (exportError) {
-      setError(getErrorMessage(exportError, t("backup.unexpectedError"), t("backup.invalid"), t("backup.storageError")));
+      setError(
+        getErrorMessage(
+          exportError,
+          t("backup.unexpectedError"),
+          {
+            invalidJson: t("backup.invalidJson"),
+            notAlios: t("backup.notAlios"),
+            unsupportedVersion: t("backup.unsupportedVersion"),
+            invalidData: t("backup.invalidData"),
+          },
+          t("backup.storageError")
+        )
+      );
     } finally {
       setIsExporting(false);
     }
@@ -89,7 +120,19 @@ export function useBackupRestore(onRestored?: () => Promise<void> | void) {
       setPendingBackup(backup);
       setPendingFilename(file.name);
     } catch (validationError) {
-      setError(getErrorMessage(validationError, t("backup.unexpectedError"), t("backup.invalid"), t("backup.storageError")));
+      setError(
+        getErrorMessage(
+          validationError,
+          t("backup.unexpectedError"),
+          {
+            invalidJson: t("backup.invalidJson"),
+            notAlios: t("backup.notAlios"),
+            unsupportedVersion: t("backup.unsupportedVersion"),
+            invalidData: t("backup.invalidData"),
+          },
+          t("backup.storageError")
+        )
+      );
     }
   };
 
@@ -117,7 +160,19 @@ export function useBackupRestore(onRestored?: () => Promise<void> | void) {
       setPendingFilename(null);
       setSuccess(t("backup.restored"));
     } catch (restoreError) {
-      setError(getErrorMessage(restoreError, t("backup.unexpectedError"), t("backup.invalid"), t("backup.storageError")));
+      setError(
+        getErrorMessage(
+          restoreError,
+          t("backup.unexpectedError"),
+          {
+            invalidJson: t("backup.invalidJson"),
+            notAlios: t("backup.notAlios"),
+            unsupportedVersion: t("backup.unsupportedVersion"),
+            invalidData: t("backup.invalidData"),
+          },
+          t("backup.restoreFailed")
+        )
+      );
     } finally {
       setIsRestoring(false);
     }

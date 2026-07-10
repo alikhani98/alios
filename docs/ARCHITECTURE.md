@@ -28,6 +28,13 @@ AliOS 1.0 is a local-first static web app.
 - Decision Log review-due logic is deterministic and local, and the feature stays non-advisory
 - Backup and restore include decision log data additively without breaking older backups that do not contain the decision arrays
 
+## Backup / Restore Safety Boundary
+
+- Backup export is assembled from the existing repository and storage-adapter boundaries, then validated as AliOS JSON before download
+- Restore validates the selected file, normalizes older additive arrays such as `inboxItems`, `financeTransactions`, `financeObligations`, and `decisionLogEntries`, and only then calls the destructive storage replacement path
+- Backup migration is pure and deterministic so malformed records fail before any local data is overwritten
+- The backup format stays version 1 and does not require a Dexie schema migration for Stage 50
+
 ## Runtime Rule
 
 AliOS does not require a Node.js server in production. Node.js is allowed for development, dependency installation, and building static assets.

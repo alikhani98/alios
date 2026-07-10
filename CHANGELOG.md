@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 50 - Backup / Restore Safety & Migration Foundation
+
+- Added explicit backup validation and deterministic migration helpers before restore writes anything
+- Added safer handling for older additive backups by normalizing missing inbox, finance, and decision arrays to empty arrays
+- Added clearer bilingual restore errors for invalid JSON, non-AliOS files, unsupported versions, invalid backup data, and restore write failures
+- Kept the backup version at 1, avoided Dexie schema changes, and preserved backward-compatible backup behavior
+
 ## Stage 49 - Decision Log Foundation
 
 - Added a local-first Decision Log page and navigation entry for recording, revisiting, and reflecting on important decisions

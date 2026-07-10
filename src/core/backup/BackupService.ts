@@ -1,6 +1,10 @@
 import { StorageError, ValidationError } from "@/core/errors";
 import type { BackupStorage } from "./BackupStorage";
 import {
+  BACKUP_ERROR_CODES,
+  validateAndMigrateBackup,
+} from "./backupValidation";
+import {
   ALIOS_BACKUP_APP,
   ALIOS_BACKUP_VERSION,
   aliosBackupSchema,
@@ -22,31 +26,14 @@ export class BackupService {
   }
 
   parseBackup(content: string): AliosBackup {
-    let input: unknown;
-
-    try {
-      input = JSON.parse(content);
-    } catch (error) {
-      throw new ValidationError("The selected file is not valid JSON.", {
-        cause: error,
-      });
-    }
-
-    const result = aliosBackupSchema.safeParse(input);
-    if (!result.success) {
-      throw new ValidationError(
-        "This file is not a valid AliOS version 1 backup.",
-        { cause: result.error }
-      );
-    }
-
-    return result.data;
+    return validateAndMigrateBackup(content);
   }
 
   async restoreBackup(backup: AliosBackup): Promise<void> {
     const result = aliosBackupSchema.safeParse(backup);
     if (!result.success) {
-      throw new ValidationError("The backup is no longer valid.", {
+      throw new ValidationError("The backup data is not valid anymore.", {
+        code: BACKUP_ERROR_CODES.invalidData,
         cause: result.error,
       });
     }

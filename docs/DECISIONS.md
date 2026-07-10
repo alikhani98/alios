@@ -188,3 +188,17 @@ Reason:
 - The feature should help the user learn from decisions without making decisions for them
 - Deterministic review behavior keeps the model simple, understandable, and compatible with the local-first architecture
 - Additive backup compatibility preserves older files and avoids unnecessary breaking changes
+
+## ADR-017: Validate backup restore before writing local data
+
+Decision:
+
+- Backup restore must validate the selected JSON, confirm the AliOS app identity, confirm the supported backup version, and normalize additive arrays before any destructive write occurs
+- Missing additive arrays may be normalized to empty arrays, but malformed records must fail the restore before storage replacement begins
+- Backup version 1 remains the compatibility target unless a future stage explicitly approves a breaking change
+
+Reason:
+
+- Manual backup and restore is AliOS' primary disaster-recovery path, so restore safety needs to fail early and clearly
+- Normalizing additive arrays keeps older files usable without forcing a backup-format bump or schema migration
+- Keeping the migration helper pure makes the restore path easier to test and safer to maintain

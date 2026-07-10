@@ -16,6 +16,7 @@ Stage 45 keeps the same mobile UX but trims a little avoidable work in the shell
 Stage 47 adds a beginner-friendly Settings Help Center with static bilingual guidance for first-time use, data safety, backup, Home collapsible sections, and Finance basics.
 Stage 48 adds a Weekly Review foundation that summarizes the last 7 days of local data only and stays read-only on the current device.
 Stage 49 adds a Decision Log foundation that records local decisions, review dates, outcomes, and reflections while staying non-advisory and backup-compatible.
+Stage 50 hardens backup and restore so mobile users see clearer validation errors, older additive backups normalize safely, and malformed files are rejected before any local data changes.
 The Personal Insights section stays local to the device and only reflects stored tasks, projects, inbox items, journal entries, knowledge items, and wellness checklist state.
 
 ## Open or install AliOS
@@ -65,6 +66,7 @@ AliOS stores data in IndexedDB for the current browser, device, and site origin.
 6. Confirm only after reading the warning: restore replaces every supported local AliOS table on that device.
 7. Verify Inbox, Today, Projects, Journal, Knowledge, and Settings after restore.
 8. Verify Finance transactions and obligations after restore if you used the Finance module.
+9. Older additive backups that omit `inboxItems`, `financeTransactions`, `financeObligations`, or `decisionLogEntries` are restored as empty arrays for those tables.
 
 The Settings screen also shows the local data safety summary, including total local records and the last successful backup and restore times.
 
