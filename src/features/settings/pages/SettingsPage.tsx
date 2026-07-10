@@ -48,6 +48,7 @@ import {
   WELLNESS_BADMINTON_ROUTINE_ENABLED_STORAGE_KEY,
 } from "@/features/wellness";
 import { SettingsHelpCenter } from "../components/SettingsHelpCenter";
+import { ExportCenterSection } from "../components/ExportCenterSection";
 import { LocalErrorLogSection } from "../components/LocalErrorLogSection";
 import { resetHomeDashboardLayoutPreference } from "@/features/home/hooks/useHomeDashboardLayout";
 import { createBackupPreview } from "../backupPreview";
@@ -582,6 +583,8 @@ export function SettingsPage() {
           )}
         </CardContent>
       </Card>
+
+      <ExportCenterSection />
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>

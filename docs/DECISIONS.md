@@ -231,3 +231,17 @@ Reason:
 - Manual backup status helps users remember when they last protected their data without introducing auto-backup or cloud sync
 - Keeping the reminder metadata separate from backup contents preserves the existing local-first backup format and repository/storage-adapter boundary
 - A local-only metadata record keeps the feature simple, calm, and static-hosting friendly
+
+## ADR-020: Keep readable exports separate from backup/restore
+
+Decision:
+
+- The export center may create manual readable exports for finance CSV, decision log Markdown, journal Markdown, and knowledge Markdown
+- Readable exports must stay separate from backup/restore and must not change the backup format, backup version, or storage schema
+- The export center must not add import behavior, backend services, sync, cloud, AI, or a new dependency
+
+Reason:
+
+- Users need focused human-readable exports for review, sharing, or spreadsheet use without losing the clear distinction between a recovery backup and a module export
+- Keeping the export center repository-backed and local-only preserves the static-hosting and local-first architecture
+- Separate readable exports reduce backup-format pressure while still giving the user more than one way to move or inspect their own data

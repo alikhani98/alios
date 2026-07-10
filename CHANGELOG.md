@@ -2,6 +2,12 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 56 - Export Center Foundation
+
+- Added a Settings export center with manual readable exports for finance CSV, decision log Markdown, journal Markdown, and knowledge Markdown
+- Kept the export center separate from backup/restore, with no import flow, no backup-format change, no backup-version bump, no Dexie schema change, and no new dependency
+- Kept export generation local-first and repository-backed so the UI stays independent from storage internals
+
 ## Stage 55 - Backup Reminder & Last Backup Status Foundation
 
 - Added a local-only backup status model that tracks the last manual backup time, backup version, and metadata update time in browser localStorage

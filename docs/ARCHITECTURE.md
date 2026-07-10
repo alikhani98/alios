@@ -36,6 +36,12 @@ AliOS 1.0 is a local-first static web app.
 - The backup format stays version 1 and does not require a Dexie schema migration for Stage 50
 - Backup reminder metadata lives separately in browser localStorage, stores only the last manual backup timestamp/version/update time, and never stores backup contents
 
+## Export Center Boundary
+
+- Manual readable exports for finance, decision log, journal, and knowledge data are generated from the existing repository boundary and downloaded as text files
+- The export center stays separate from backup/restore, uses no import flow, and does not change the backup format, backup version, or Dexie schema
+- Empty exports remain valid so the user can create a readable file even before a module has records
+
 ## App Error Boundary / Local Error Log Boundary
 
 - Route-content error handling may catch render-time failures inside the app shell so the sidebar and topbar can stay available
