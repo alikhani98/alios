@@ -36,11 +36,25 @@ function ErrorEntryCard({
     <div className="rounded-2xl border bg-muted/30 p-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-2">
-          <p className="break-words text-sm font-medium text-foreground">{entry.message}</p>
+          <p className="break-words text-sm font-medium text-foreground">
+            {entry.message}
+          </p>
           <div className="space-y-1 text-xs leading-5 text-muted-foreground">
-            <p className="break-words">{t("settings.errorLoggedAt", { date: formatDateTime(entry.createdAt) })}</p>
-            {entry.source ? <p className="break-words">{t("settings.errorSource", { source: entry.source })}</p> : null}
-            {entry.route ? <p className="break-words">{t("settings.errorRoute", { route: entry.route })}</p> : null}
+            <p className="break-words">
+              {t("settings.errorLoggedAt", {
+                date: formatDateTime(entry.createdAt),
+              })}
+            </p>
+            {entry.source ? (
+              <p className="break-words">
+                {t("settings.errorSource", { source: entry.source })}
+              </p>
+            ) : null}
+            {entry.route ? (
+              <p className="break-words">
+                {t("settings.errorRoute", { route: entry.route })}
+              </p>
+            ) : null}
             {entry.stackPreview ? (
               <p className="break-words">{entry.stackPreview}</p>
             ) : null}
@@ -54,14 +68,20 @@ function ErrorEntryCard({
           onClick={() => onCopy(entry)}
         >
           <Copy className="me-2 h-4 w-4" />
-          {copiedId === entry.id ? t("settings.errorCopied") : t("settings.copyError")}
+          {copiedId === entry.id
+            ? t("settings.errorCopied")
+            : t("settings.copyError")}
         </Button>
       </div>
     </div>
   );
 }
 
-export function LocalErrorLogSection() {
+type LocalErrorLogSectionProps = {
+  id?: string;
+};
+
+export function LocalErrorLogSection({ id }: LocalErrorLogSectionProps) {
   const { t } = useI18n();
   const [entries, setEntries] = useState(() => readRecentLocalErrors());
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -86,7 +106,7 @@ export function LocalErrorLogSection() {
   };
 
   return (
-    <Card>
+    <Card id={id}>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <ClipboardList className="h-5 w-5 text-primary" />
@@ -108,7 +128,12 @@ export function LocalErrorLogSection() {
               ))}
             </div>
             <div className="flex flex-wrap gap-3">
-              <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={handleClear}>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full sm:w-auto"
+                onClick={handleClear}
+              >
                 <Trash2 className="me-2 h-4 w-4" />
                 {t("settings.clearLocalErrorLog")}
               </Button>

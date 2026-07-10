@@ -22,6 +22,7 @@ import { useRef, useState } from "react";
 
 import {
   APPEARANCE_STORAGE_KEY,
+  RECOVERY_MODE_ENABLED_STORAGE_KEY,
   MORNING_WARMUP_ENABLED_STORAGE_KEY,
 } from "@/shared/constants";
 import { appConfig } from "@/shared/constants/app";
@@ -48,6 +49,7 @@ import {
   WELLNESS_BADMINTON_ROUTINE_ENABLED_STORAGE_KEY,
 } from "@/features/wellness";
 import { SettingsHelpCenter } from "../components/SettingsHelpCenter";
+import { RecoveryModeSection } from "../components/RecoveryModeSection";
 import { ExportCenterSection } from "../components/ExportCenterSection";
 import { LocalErrorLogSection } from "../components/LocalErrorLogSection";
 import { resetHomeDashboardLayoutPreference } from "@/features/home/hooks/useHomeDashboardLayout";
@@ -175,6 +177,11 @@ export function SettingsPage() {
       key: WELLNESS_BADMINTON_ROUTINE_ENABLED_STORAGE_KEY,
       defaultValue: true,
     });
+  const { value: recoveryModeEnabled, setValue: setRecoveryModeEnabled } =
+    usePersistentBoolean({
+      key: RECOVERY_MODE_ENABLED_STORAGE_KEY,
+      defaultValue: false,
+    });
   const [homeLayoutResetMessage, setHomeLayoutResetMessage] = useState<
     string | null
   >(null);
@@ -192,6 +199,17 @@ export function SettingsPage() {
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
+  };
+
+  const scrollToSection = (id: string) => {
+    if (typeof document === "undefined") {
+      return;
+    }
+
+    document.getElementById(id)?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
   };
 
   return (
@@ -227,7 +245,15 @@ export function SettingsPage() {
 
       <SettingsHelpCenter />
 
-      <LocalErrorLogSection />
+      <RecoveryModeSection
+        enabled={recoveryModeEnabled}
+        onToggle={() => setRecoveryModeEnabled(!recoveryModeEnabled)}
+        onGoToBackupRestore={() => scrollToSection("settings-backup-restore")}
+        onGoToExportCenter={() => scrollToSection("settings-export-center")}
+        onGoToLocalErrorLog={() => scrollToSection("settings-local-error-log")}
+      />
+
+      <LocalErrorLogSection id="settings-local-error-log" />
 
       <Card>
         <CardHeader>
@@ -584,9 +610,9 @@ export function SettingsPage() {
         </CardContent>
       </Card>
 
-      <ExportCenterSection />
+      <ExportCenterSection id="settings-export-center" />
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div id="settings-backup-restore" className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">

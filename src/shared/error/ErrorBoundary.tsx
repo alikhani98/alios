@@ -1,11 +1,12 @@
 import React, { useEffect, useState, type ReactNode } from "react";
-import { AlertTriangle, Home, RefreshCcw, RotateCcw } from "lucide-react";
+import { AlertTriangle, Home, RefreshCcw, RotateCcw, ShieldCheck } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { useI18n } from "@/shared/i18n";
 import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui";
 
 import { appendRecentLocalError } from "./localErrorLog";
+import { setRecoveryModeEnabled } from "@/shared/recovery";
 
 type ErrorBoundaryProps = {
   children: ReactNode;
@@ -96,6 +97,18 @@ export function ErrorFallback({
             <Button type="button" variant="ghost" onClick={onReload}>
               <RotateCcw className="me-2 h-4 w-4" />
               {t("errorBoundary.reload")}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setRecoveryModeEnabled(true);
+                onReset();
+                void navigate("/settings");
+              }}
+            >
+              <ShieldCheck className="me-2 h-4 w-4" />
+              {t("errorBoundary.openRecoveryMode")}
             </Button>
           </div>
 
