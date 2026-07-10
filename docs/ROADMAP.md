@@ -24,6 +24,7 @@ The later version ideas below are directional only. They are not approved stages
 
 Stage 50 hardens manual backup and restore with validation and additive migration normalization, but it remains a local-only maintenance improvement rather than a new product surface.
 Stage 51 adds an app error boundary and bounded local error log so a failed route can fall back calmly without telemetry, schema changes, or backup changes.
+Stage 52 adds a Jalali/Shamsi display preview under the Finance transaction date field while keeping transaction storage ISO/Gregorian only.
 
 ## Version 1.1
 

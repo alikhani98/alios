@@ -11,6 +11,7 @@ import {
   FINANCE_TRANSACTION_TYPE_OPTIONS,
   type FinanceTransactionFormValues,
 } from "../domain/finance";
+import { getJalaliDatePreview } from "../financeDate";
 import { financeTransactionSchema } from "@/shared/types";
 
 type FinanceTransactionFormProps = {
@@ -37,9 +38,10 @@ export function FinanceTransactionForm({
   onSubmit,
   onCancel,
 }: FinanceTransactionFormProps) {
-  const { t } = useI18n();
+  const { language, t } = useI18n();
   const {
     register,
+    watch,
     handleSubmit,
     formState: { errors },
   } = useForm<FinanceTransactionFormValues>({
@@ -55,6 +57,8 @@ export function FinanceTransactionForm({
       notes: transaction?.notes ?? "",
     },
   });
+  const occurredAtValue = watch("occurredAt");
+  const jalaliOccurredAtPreview = getJalaliDatePreview(occurredAtValue, language);
 
   return (
     <form
@@ -142,6 +146,14 @@ export function FinanceTransactionForm({
             aria-invalid={Boolean(errors.occurredAt)}
             {...register("occurredAt")}
           />
+          <div className="space-y-1 text-xs leading-5 text-muted-foreground">
+            {jalaliOccurredAtPreview ? (
+              <p>
+                {t("finance.jalaliDueDatePreview")} {jalaliOccurredAtPreview}
+              </p>
+            ) : null}
+            <p>{t("finance.dueDateStorageNote")}</p>
+          </div>
           {errors.occurredAt ? (
             <p className="text-sm text-destructive">{t("common.validation")}</p>
           ) : null}
