@@ -16,6 +16,7 @@ export const homeDashboardSectionIds = [
   "projectsOverview",
   "journalOverview",
   "knowledgeOverview",
+  "manualOverview",
   "quickActions",
 ] as const;
 
@@ -47,6 +48,7 @@ export const homeDashboardSectionMeta: Record<
   projectsOverview: { titleKey: "home.sectionProjectsOverview" },
   journalOverview: { titleKey: "home.sectionJournalOverview" },
   knowledgeOverview: { titleKey: "home.sectionKnowledgeOverview" },
+  manualOverview: { titleKey: "home.sectionManualOverview" },
   quickActions: { titleKey: "home.sectionQuickActions" },
 };
 

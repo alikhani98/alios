@@ -1,6 +1,6 @@
 # AliOS
 
-AliOS is a bilingual, local-first personal life-management system. It brings quick capture, Today planning, projects, journaling, personal knowledge, a read-only dashboard, monthly calendar and upcoming-task views, routine templates, manual backup/restore, local data controls, a compact topbar dashboard customizer with a local accent palette, a Finance foundation with a local review layer, budget guard, lightweight local charts, mobile quick navigation, collapsible sections, Jalali due-date previews, a Weekly Review foundation, a Decision Log foundation, a readable Settings export center, an app error boundary with a local error log foundation, backup/restore safety and migration validation, a beginner-friendly Help Center inside Settings, a Recovery Mode / Safe Mode foundation, Stage 53 mobile UX hardening for dense pages, Stage 54 empty-state and first-run guidance polish, Stage 55 backup reminder and last backup status foundation, Stage 56 export center foundation, and Stage 57 recovery mode foundation into one static web application.
+AliOS is a bilingual, local-first personal life-management system. It brings quick capture, Today planning, projects, journaling, personal knowledge, a read-only dashboard, monthly calendar and upcoming-task views, routine templates, Personal Manual, manual backup/restore, local data controls, a compact topbar dashboard customizer with a local accent palette, a Finance foundation with a local review layer, budget guard, lightweight local charts, mobile quick navigation, collapsible sections, Jalali due-date previews, a Weekly Review foundation, a Decision Log foundation, a readable Settings export center, an app error boundary with a local error log foundation, backup/restore safety and migration validation, a beginner-friendly Help Center inside Settings, a Recovery Mode / Safe Mode foundation, Stage 53 mobile UX hardening for dense pages, Stage 54 empty-state and first-run guidance polish, Stage 55 backup reminder and last backup status foundation, Stage 56 export center foundation, Stage 57 recovery mode foundation, and Stage 59 Personal Manual foundation into one static web application.
 
 Stage 38 was a UI regression QA and release-hardening pass. It did not add a new feature; it kept the existing local-first scope intact and hardened desktop sidebar accessibility on long scrolling pages.
 Stage 39 moves dashboard customization into the topbar and adds a local-only accent color palette for restrained visual personalization.
@@ -22,6 +22,7 @@ Stage 55 adds a local-only backup status foundation with calm reminder copy in S
 Stage 56 adds a readable export center foundation for finance CSV, decision log Markdown, journal Markdown, and knowledge Markdown without changing backup behavior.
 Stage 57 adds a local-only Recovery Mode / Safe Mode foundation with a calm shell banner, a Settings recovery section, and an error-boundary recovery action without changing storage schemas or backup behavior.
 Stage 58 adds a derived-only Finance Monthly Plan foundation that summarizes current-month income, spending, obligations, remaining estimate, and daily remaining pace without changing storage, backup format, backup version, or route architecture.
+Stage 59 adds a Personal Manual foundation that stores user-authored local notes, summary counts, and review pressure without changing storage boundaries or backup compatibility.
 
 AliOS is designed for one person and stores its data in the browser through IndexedDB. It requires no backend, account, authentication, subscription, paid API, or hosted AI service.
 
@@ -30,6 +31,7 @@ AliOS is designed for one person and stores its data in the browser through Inde
 - Home dashboard with Today, project, journal, and knowledge summaries
 - Monthly calendar view on Home with local task indicators and simple day previews
 - Routine templates section on Home with built-in local-only previews
+- Personal Manual for local user-authored principles, values, rules, preferences, boundaries, routines, lessons, and identity notes
 - Upcoming tasks foundation on Home with overdue, today, tomorrow, this week, and later groupings
 - Simple morning warm-up reminder on Home that appears only in a local time window
 - Wellness / Badminton routine card on Home with local-only warm-up, water, cool-down, and reflection checklists
@@ -190,7 +192,7 @@ Version 1.0 is intentionally single-user and local-only. It does not include:
 
 - Accounts, authentication, backend services, or automatic multi-device sync
 - Cloud or scheduled backup, encryption, compression, or attachments
-- Full routines and wellness engines or Personal Manual
+- Full routines and wellness engines
 - Routine templates are preview-only foundations and do not create recurring routines
 - Decision Log is a local-first foundation and does not decide for the user
 - AI features or hosted AI providers

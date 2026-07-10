@@ -33,6 +33,7 @@ import { RoutineTemplatesCard, type RoutineTemplateId } from "@/features/routine
 import { WellnessBadmintonCard } from "@/features/wellness";
 import { HomeCalendarCard } from "../components/HomeCalendarCard";
 import { HomeDashboardHero } from "../components/HomeDashboardHero";
+import { HomeManualCard } from "../components/HomeManualCard";
 import { HomePersonalInsightsCard } from "../components/HomePersonalInsightsCard";
 import { HomeRoutineNudgeCard } from "../components/HomeRoutineNudgeCard";
 import { HomeUpcomingTasksCard } from "../components/HomeUpcomingTasksCard";
@@ -50,6 +51,7 @@ const quickLinks: ReadonlyArray<{ to: string; labelKey: TranslationKey }> = [
   { to: "/projects", labelKey: "home.goProjects" },
   { to: "/journal", labelKey: "home.goJournal" },
   { to: "/knowledge", labelKey: "home.goKnowledge" },
+  { to: "/manual", labelKey: "home.goManual" },
   { to: "/settings", labelKey: "home.goSettings" },
 ];
 
@@ -322,6 +324,13 @@ export function HomePage() {
           )}
         </OverviewPanel>
       </CollapsibleSection>
+    ) : null,
+    manualOverview: data ? (
+      <HomeManualCard
+        data={data}
+        sectionId="manualOverview"
+        {...sectionOpenProps("manualOverview")}
+      />
     ) : null,
     quickActions: (
       <CollapsibleSection

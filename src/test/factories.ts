@@ -6,6 +6,7 @@ import type {
   CreateJournalEntryInput,
   CreateInboxItemInput,
   CreateKnowledgeItemInput,
+  CreateManualEntryInput,
   CreateProjectInput,
   CreateSettingInput,
   CreateTaskInput,
@@ -18,6 +19,7 @@ import type {
   JournalEntry,
   InboxItem,
   KnowledgeItem,
+  ManualEntry,
   Project,
   Setting,
   Task,
@@ -125,6 +127,19 @@ export const decisionLogInput: CreateDecisionLogEntryInput = {
   tags: ["release", "product"],
 };
 
+export const manualEntryInput: Omit<
+  CreateManualEntryInput,
+  "lastReviewedAt"
+> = {
+  title: "Personal planning rule",
+  body: "Keep the next action small and local when energy is low.",
+  category: "principles",
+  importance: "high",
+  status: "active",
+  tags: ["planning", "energy"],
+  reviewIntervalDays: 7,
+};
+
 const metadata = {
   id: "fixture-id",
   createdAt: timestamp,
@@ -161,5 +176,10 @@ export const financeObligationRecord: FinanceObligation = {
 };
 export const decisionLogRecord: DecisionLogEntry = {
   ...decisionLogInput,
+  ...metadata,
+};
+export const manualEntryRecord: ManualEntry = {
+  ...manualEntryInput,
+  lastReviewedAt: "2026-07-04T08:30:00.000Z",
   ...metadata,
 };

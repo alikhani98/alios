@@ -4,6 +4,7 @@ export type LocalDataSummary = {
   dailyCheckins: number;
   tasks: number;
   decisionLogEntries: number;
+  manualEntries: number;
   financeTransactions: number;
   financeObligations: number;
   projects: number;

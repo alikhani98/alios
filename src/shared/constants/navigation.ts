@@ -7,6 +7,7 @@ export type NavIconName =
   | "inbox"
   | "folder-kanban"
   | "book-open"
+  | "notebook-text"
   | "wallet"
   | "database"
   | "settings";
@@ -57,6 +58,11 @@ export const mainNavigation: NavItem[] = [
     titleKey: "nav.journal",
     href: "/journal",
     icon: "book-open",
+  },
+  {
+    titleKey: "nav.manual",
+    href: "/manual",
+    icon: "notebook-text",
   },
   {
     titleKey: "nav.knowledge",

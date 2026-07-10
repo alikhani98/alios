@@ -10,6 +10,7 @@ import {
   journalEntryInput,
   inboxItemInput,
   knowledgeItemInput,
+  manualEntryInput,
   projectInput,
   settingInput,
   taskInput,
@@ -205,6 +206,25 @@ describe("Dexie repositories", () => {
 
     await storage.decisions.delete(created.id);
     expect(await storage.decisions.list()).toEqual([]);
+  });
+
+  it("supports the complete Personal Manual CRUD lifecycle", async () => {
+    const created = await storage.manual.create(manualEntryInput);
+
+    expect(created.id).toMatch(/^[0-9a-f-]{36}$/i);
+    expect(await storage.manual.list()).toEqual([created]);
+    expect(await storage.manual.getById(created.id)).toEqual(created);
+
+    const updated = await storage.manual.update(created.id, {
+      title: "Updated planning rule",
+      lastReviewedAt: "2026-07-06T08:30:00.000Z",
+    });
+    expect(updated.title).toBe("Updated planning rule");
+    expect(updated.lastReviewedAt).toBe("2026-07-06T08:30:00.000Z");
+
+    await storage.manual.delete(created.id);
+    expect(await storage.manual.list()).toEqual([]);
+    expect(await storage.manual.getById(created.id)).toBeUndefined();
   });
 
   it("supports the complete Inbox CRUD and status lifecycle", async () => {

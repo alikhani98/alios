@@ -18,6 +18,26 @@ export const PROJECT_STATUS_VALUES = [
 ] as const;
 export const PROJECT_PRIORITY_VALUES = PRIORITY_VALUES;
 
+export const MANUAL_CATEGORY_VALUES = [
+  "principles",
+  "values",
+  "decisionRules",
+  "routines",
+  "preferences",
+  "boundaries",
+  "lessons",
+  "identity",
+  "other",
+] as const;
+
+export const MANUAL_STATUS_VALUES = [
+  "active",
+  "draft",
+  "archived",
+] as const;
+
+export const MANUAL_IMPORTANCE_VALUES = PRIORITY_VALUES;
+
 export const LEVEL_3_VALUES = ["low", "medium", "good"] as const;
 export const STRESS_LEVEL_VALUES = PRIORITY_VALUES;
 export const SMOKING_STATUS_VALUES = [

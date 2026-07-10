@@ -2,6 +2,7 @@ export const DEXIE_DATABASE_NAME = "AliOS";
 export const DEXIE_SCHEMA_VERSION = 2;
 export const DEXIE_SCHEMA_VERSION_3 = 3;
 export const DEXIE_SCHEMA_VERSION_4 = 4;
+export const DEXIE_SCHEMA_VERSION_5 = 5;
 
 export const DEXIE_TABLE_NAMES = {
   dailyCheckins: "dailyCheckins",
@@ -10,6 +11,7 @@ export const DEXIE_TABLE_NAMES = {
   journalEntries: "journalEntries",
   knowledgeItems: "knowledgeItems",
   decisionLogEntries: "decisionLogEntries",
+  manualEntries: "manualEntries",
   settings: "settings",
   inboxItems: "inboxItems",
   financeTransactions: "financeTransactions",
@@ -57,8 +59,14 @@ export const DEXIE_SCHEMA_V3 = {
     "id, type, status, dueDate, dueDay, createdAt, updatedAt",
   [DEXIE_TABLE_NAMES.decisionLogEntries]:
     "id, decisionDate, status, reviewDate, updatedAt",
-} satisfies Record<DexieTableName, string>;
+} satisfies Partial<Record<DexieTableName, string>>;
 
 export const DEXIE_SCHEMA_V4 = {
   ...DEXIE_SCHEMA_V3,
+} satisfies Partial<Record<DexieTableName, string>>;
+
+export const DEXIE_SCHEMA_V5 = {
+  ...DEXIE_SCHEMA_V4,
+  [DEXIE_TABLE_NAMES.manualEntries]:
+    "id, category, status, importance, reviewIntervalDays, updatedAt",
 } satisfies Record<DexieTableName, string>;

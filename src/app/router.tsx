@@ -29,6 +29,11 @@ const KnowledgePage = lazy(() =>
     default: module.KnowledgePage,
   }))
 );
+const PersonalManualPage = lazy(() =>
+  import("@/features/manual/pages/PersonalManualPage").then((module) => ({
+    default: module.PersonalManualPage,
+  }))
+);
 const FinancePage = lazy(() =>
   import("@/features/finance/pages/FinancePage").then((module) => ({
     default: module.FinancePage,
@@ -110,6 +115,14 @@ const router = createHashRouter([
         element: (
           <Suspense fallback={<RouteLoadingFallback />}>
             <KnowledgePage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "manual",
+        element: (
+          <Suspense fallback={<RouteLoadingFallback />}>
+            <PersonalManualPage />
           </Suspense>
         ),
       },

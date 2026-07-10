@@ -2,6 +2,12 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 59 - Personal Manual Foundation
+
+- Added a dedicated Personal Manual module for local user-authored principles, values, rules, preferences, boundaries, routines, lessons, and identity notes
+- Added repository, Dexie table, Home summary card, Settings record count, navigation entry, backup/restore support, and a calm CRUD page for manual entries
+- Kept the stage local-first, additive, non-advisory, and free of backend, sync, cloud, AI, telemetry, semantic search, or new dependencies
+
 ## Stage 58 - Finance Monthly Plan Foundation
 
 - Added a derived-only Finance Monthly Plan that summarizes current-month income, spending, obligation pressure, remaining estimate, and daily remaining estimate from recorded local finance data only

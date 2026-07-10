@@ -2,6 +2,7 @@ import { format } from "date-fns";
 import { useCallback, useEffect, useState } from "react";
 
 import { useStorageAdapter } from "@/core/storage";
+import { getManualEntrySummary } from "@/features/manual";
 import type { HomeDashboardData } from "../types";
 
 function byUpdatedAtDescending<T extends { updatedAt: string }>(a: T, b: T) {
@@ -9,7 +10,7 @@ function byUpdatedAtDescending<T extends { updatedAt: string }>(a: T, b: T) {
 }
 
 export function useHomeDashboard() {
-  const { tasks, dailyCheckins, projects, journal, knowledge, inbox } =
+  const { tasks, dailyCheckins, projects, journal, knowledge, manual, inbox } =
     useStorageAdapter();
   const [data, setData] = useState<HomeDashboardData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -21,13 +22,22 @@ export function useHomeDashboard() {
 
     try {
       const today = format(new Date(), "yyyy-MM-dd");
-      const [allTasks, checkin, allProjects, journalEntries, knowledgeItems, inboxItems] =
+      const [
+        allTasks,
+        checkin,
+        allProjects,
+        journalEntries,
+        knowledgeItems,
+        manualEntries,
+        inboxItems,
+      ] =
         await Promise.all([
           tasks.list(),
           dailyCheckins.getByDate(today),
           projects.list(),
           journal.list(),
           knowledge.list(),
+          manual.list(),
           inbox.list(),
         ]);
 
@@ -37,6 +47,7 @@ export function useHomeDashboard() {
         .slice(0, 3);
       const latestJournal = [...journalEntries].sort(byUpdatedAtDescending)[0];
       const latestKnowledge = [...knowledgeItems].sort(byUpdatedAtDescending)[0];
+      const manualSummary = getManualEntrySummary(manualEntries, new Date());
 
       setData({
         tasks: allTasks,
@@ -63,6 +74,12 @@ export function useHomeDashboard() {
           totalCount: knowledgeItems.length,
           latest: latestKnowledge,
         },
+        manual: {
+          totalCount: manualSummary.totalCount,
+          activeCount: manualSummary.activeCount,
+          reviewDueCount: manualSummary.reviewDueCount,
+          latest: manualSummary.latestUpdatedEntry,
+        },
         inbox: {
           unprocessedCount: inboxItems.filter((item) => item.status === "unprocessed").length,
         },
@@ -72,6 +89,7 @@ export function useHomeDashboard() {
           allProjects.length === 0 &&
           journalEntries.length === 0 &&
           knowledgeItems.length === 0 &&
+          manualEntries.length === 0 &&
           inboxItems.length === 0,
       });
     } catch {
@@ -79,7 +97,7 @@ export function useHomeDashboard() {
     } finally {
       setIsLoading(false);
     }
-  }, [dailyCheckins, inbox, journal, knowledge, projects, tasks]);
+  }, [dailyCheckins, inbox, journal, knowledge, manual, projects, tasks]);
 
   useEffect(() => {
     void loadDashboard();
