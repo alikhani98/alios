@@ -1,5 +1,6 @@
 import {
   ArrowUpRight,
+  BookText,
   Brain,
   CircleAlert,
   CircleCheckBig,
@@ -18,7 +19,9 @@ import { Link } from "react-router-dom";
 
 import { useDateFormatter } from "@/shared/date";
 import { useI18n, type TranslationKey } from "@/shared/i18n";
+import type { ManualEntry } from "@/shared/types";
 import {
+  Badge,
   Button,
   CollapsibleSection,
   EmptyState,
@@ -29,6 +32,10 @@ import {
   StatusChip,
 } from "@/shared/ui";
 import { formatFinanceAmount } from "@/features/finance/financeCalculations";
+import {
+  MANUAL_CATEGORY_LABEL_KEYS,
+  MANUAL_IMPORTANCE_LABEL_KEYS,
+} from "@/features/manual/constants";
 
 import { useWeeklyReview } from "../hooks/useWeeklyReview";
 import type {
@@ -41,6 +48,7 @@ const quickLinks: ReadonlyArray<{ to: string; labelKey: TranslationKey }> = [
   { to: "/inbox", labelKey: "nav.inbox" },
   { to: "/projects", labelKey: "nav.projects" },
   { to: "/journal", labelKey: "nav.journal" },
+  { to: "/manual", labelKey: "nav.manual" },
   { to: "/decisions", labelKey: "nav.decisions" },
   { to: "/finance", labelKey: "nav.finance" },
 ];
@@ -114,10 +122,28 @@ function hasEmptyState(
   return emptyStates.some((item) => item.sectionId === sectionId);
 }
 
+function getManualReviewContext(
+  entry: ManualEntry,
+  formatDateTime: (value: string) => string,
+  t: (key: TranslationKey) => string
+) {
+  if (entry.lastReviewedAt) {
+    return `${t("weeklyReview.manualLastReviewed")}: ${formatDateTime(entry.lastReviewedAt)}`;
+  }
+
+  return `${t("weeklyReview.manualLastUpdated")}: ${formatDateTime(entry.updatedAt)}`;
+}
+
 export function WeeklyReviewPage() {
   const { language, t } = useI18n();
-  const { formatDate } = useDateFormatter();
-  const { summary, isLoading, error, loadWeeklyReview } = useWeeklyReview();
+  const { formatDate, formatDateTime } = useDateFormatter();
+  const {
+    summary,
+    isLoading,
+    error,
+    loadWeeklyReview,
+    markManualEntryReviewed,
+  } = useWeeklyReview();
 
   const currencyLocale = language === "fa" ? "fa-IR" : "en-US";
   const formatAmount = useMemo(
@@ -179,6 +205,19 @@ export function WeeklyReviewPage() {
               {summary.decisionSummary.needsReviewCount > 0
                 ? t("weeklyReview.needsReview")
                 : t("weeklyReview.goodSignal")}
+            </StatusChip>
+          ),
+        },
+        {
+          icon: <BookText className="h-5 w-5" />,
+          label: t("weeklyReview.manualReviewDue"),
+          value: summary.manualSummary.dueCount,
+          description: t("weeklyReview.manualSectionDescription"),
+          status: (
+            <StatusChip tone={summary.manualSummary.dueCount > 0 ? "warning" : "neutral"}>
+              {summary.manualSummary.dueCount > 0
+                ? t("weeklyReview.manualDue")
+                : t("weeklyReview.manualClear")}
             </StatusChip>
           ),
         },
@@ -538,6 +577,86 @@ export function WeeklyReviewPage() {
                   description={t("weeklyReview.decisionsEmptyDescription")}
                 />
               ) : null}
+            </CollapsibleSection>
+
+            <CollapsibleSection
+              id="weekly-review-manual"
+              title={t("weeklyReview.manualSection")}
+              description={t("weeklyReview.manualSectionDescription")}
+              icon={<BookText className="h-5 w-5" />}
+              status={
+                <StatusChip
+                  tone={summary.manualSummary.dueCount > 0 ? "warning" : "neutral"}
+                >
+                  {summary.manualSummary.dueCount}
+                </StatusChip>
+              }
+              contentClassName="space-y-3"
+            >
+              <SoftPanel className="space-y-2">
+                <p className="text-sm leading-7 text-muted-foreground">
+                  {t("weeklyReview.manualSectionNote")}
+                </p>
+                <Button asChild variant="outline" className="w-full justify-start sm:w-auto">
+                  <Link to="/manual">{t("weeklyReview.openManual")}</Link>
+                </Button>
+              </SoftPanel>
+
+              {hasEmptyState(summary.emptyStates, "manual") ? (
+                <EmptyState
+                  icon={<BookText className="h-6 w-6" />}
+                  title={t("weeklyReview.manualEmptyTitle")}
+                  description={t("weeklyReview.manualEmptyDescription")}
+                  note={t("weeklyReview.manualEmptyNote")}
+                  actions={
+                    <Button asChild variant="outline">
+                      <Link to="/manual">{t("weeklyReview.openManual")}</Link>
+                    </Button>
+                  }
+                />
+              ) : (
+                <div className="grid gap-3 lg:grid-cols-2">
+                  {summary.manualSummary.dueEntries.map((entry) => (
+                    <SoftPanel key={entry.id} className="space-y-3">
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div className="space-y-1">
+                          <p className="font-semibold leading-7">{entry.title}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {getManualReviewContext(entry, formatDateTime, t)}
+                          </p>
+                        </div>
+                        <StatusChip tone="warning">{t("manual.reviewDue")}</StatusChip>
+                      </div>
+
+                      <div className="flex flex-wrap gap-2">
+                        <Badge variant="secondary">
+                          {t(MANUAL_CATEGORY_LABEL_KEYS[entry.category])}
+                        </Badge>
+                        <Badge variant="outline">
+                          {t(MANUAL_IMPORTANCE_LABEL_KEYS[entry.importance])}
+                        </Badge>
+                        <Badge variant="outline">
+                          {t("manual.reviewIntervalDays")}: {entry.reviewIntervalDays ?? t("common.notRecorded")}
+                        </Badge>
+                      </div>
+
+                      <div className="flex flex-wrap gap-2">
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => void markManualEntryReviewed(entry.id)}
+                        >
+                          {t("weeklyReview.manualMarkReviewed")}
+                        </Button>
+                        <Button asChild size="sm" variant="ghost">
+                          <Link to="/manual">{t("weeklyReview.openManual")}</Link>
+                        </Button>
+                      </div>
+                    </SoftPanel>
+                  ))}
+                </div>
+              )}
             </CollapsibleSection>
 
             <CollapsibleSection

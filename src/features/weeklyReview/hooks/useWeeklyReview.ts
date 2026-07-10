@@ -2,7 +2,10 @@ import { useCallback, useEffect, useState } from "react";
 
 import { useStorageAdapter } from "@/core/storage";
 
-import { buildWeeklyReviewSummary, type WeeklyReviewSummary } from "../weeklyReviewCalculations";
+import {
+  buildWeeklyReviewSummary,
+  type WeeklyReviewSummary,
+} from "../weeklyReviewCalculations";
 
 function getErrorMessage(error: unknown): string {
   return error instanceof Error
@@ -18,6 +21,7 @@ export function useWeeklyReview() {
     journal,
     knowledge,
     decisions,
+    manual,
     finance,
     dailyCheckins,
   } = useStorageAdapter();
@@ -38,6 +42,7 @@ export function useWeeklyReview() {
         loadedJournalEntries,
         loadedKnowledgeItems,
         loadedDecisionLogEntries,
+        loadedManualEntries,
         loadedTransactions,
         loadedObligations,
         loadedCheckins,
@@ -48,6 +53,7 @@ export function useWeeklyReview() {
         journal.list(),
         knowledge.list(),
         decisions.list(),
+        manual.list(),
         finance.listTransactions(),
         finance.listObligations(),
         dailyCheckins.list(),
@@ -62,6 +68,7 @@ export function useWeeklyReview() {
           journalEntries: loadedJournalEntries,
           knowledgeItems: loadedKnowledgeItems,
           decisionLogEntries: loadedDecisionLogEntries,
+          manualEntries: loadedManualEntries,
           financeTransactions: loadedTransactions,
           financeObligations: loadedObligations,
           dailyCheckins: loadedCheckins,
@@ -74,11 +81,23 @@ export function useWeeklyReview() {
     } finally {
       setIsLoading(false);
     }
-  }, [dailyCheckins, decisions, finance, inbox, journal, knowledge, projects, tasks]);
+  }, [dailyCheckins, decisions, finance, inbox, journal, manual, knowledge, projects, tasks]);
 
   useEffect(() => {
     void loadWeeklyReview();
   }, [loadWeeklyReview]);
 
-  return { summary, isLoading, error, loadWeeklyReview };
+  const markManualEntryReviewed = useCallback(
+    async (id: string) => {
+      try {
+        await manual.update(id, { lastReviewedAt: new Date().toISOString() });
+        await loadWeeklyReview();
+      } catch (updateError) {
+        setError(getErrorMessage(updateError));
+      }
+    },
+    [loadWeeklyReview, manual]
+  );
+
+  return { summary, isLoading, error, loadWeeklyReview, markManualEntryReviewed };
 }

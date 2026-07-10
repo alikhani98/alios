@@ -34,6 +34,7 @@ Stage 59 adds a Personal Manual foundation that stores local user-authored refer
 Stage 60 hardens the Personal Manual release with small QA fixes, better edge-case tests, and backup/restore confidence checks without changing the storage model or public routes.
 Stage 61 integrates Personal Manual into the existing Export Center with a readable Markdown export, while leaving the backup format, backup version, storage schema, and storage adapters unchanged.
 Stage 62 reduces initial load cost by moving the Dexie storage adapter behind an async bootstrap path with a calm loading fallback, while keeping routes, hash routing, and the storage model unchanged.
+Stage 63 integrates Personal Manual review-due awareness into Weekly Review with a calm empty state, a mark-reviewed action, and a link back to the manual page, while keeping the review logic derived-only.
 
 ## Version 1.1
 
