@@ -94,11 +94,12 @@ export function HomeCalendarCard({
       className="overflow-hidden border-primary/10 bg-gradient-to-br from-background via-background to-primary/5 shadow-sm"
       contentClassName="space-y-5"
     >
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="grid gap-2 sm:flex sm:flex-wrap sm:items-center">
         <Button
           type="button"
           size="sm"
           variant="outline"
+          className="w-full sm:w-auto"
           onClick={() => setSelectedDate((currentDate) => shiftMonth(currentDate, -1))}
         >
           <PreviousIcon className="me-2 h-4 w-4" />
@@ -108,6 +109,7 @@ export function HomeCalendarCard({
           type="button"
           size="sm"
           variant="outline"
+          className="w-full sm:w-auto"
           onClick={() => setSelectedDate(() => new Date())}
         >
           {t("home.currentMonth")}
@@ -116,6 +118,7 @@ export function HomeCalendarCard({
           type="button"
           size="sm"
           variant="outline"
+          className="w-full sm:w-auto"
           onClick={() => setSelectedDate((currentDate) => shiftMonth(currentDate, 1))}
         >
           {t("home.nextMonth")}
@@ -243,8 +246,8 @@ export function HomeCalendarCard({
         </SoftPanel>
       </div>
 
-      <div className="flex flex-wrap justify-end gap-2">
-        <Button asChild variant="outline" size="sm">
+      <div className="flex flex-col justify-end gap-2 sm:flex-row sm:flex-wrap">
+        <Button asChild variant="outline" size="sm" className="w-full sm:w-auto">
           <Link to="/today">
             {t("home.goToday")}
             <ArrowUpLeft className="ms-2 h-4 w-4" />

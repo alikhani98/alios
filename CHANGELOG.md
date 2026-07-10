@@ -2,6 +2,12 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 53 - Mobile UX Hardening for Dense Pages
+
+- Improved mobile stacking, wrapping, and section readability on Finance, Weekly Review, Decision Log, Settings, and Home
+- Tightened shared card, collapsible section, chart row, and action-button behavior so 360px to 430px widths stay usable without changing app behavior
+- Kept routes, storage models, backup format, dependencies, backend, sync, cloud, AI, and navigation architecture unchanged
+
 ## Stage 51 - App Error Boundary & Local Error Log Foundation
 
 - Added a calm route-content error boundary so a failing page can fall back without taking down the shell

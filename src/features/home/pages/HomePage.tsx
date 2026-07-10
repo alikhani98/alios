@@ -306,9 +306,9 @@ export function HomePage() {
         contentClassName="space-y-4"
         {...sectionOpenProps("quickActions")}
       >
-        <div className="flex flex-wrap gap-3">
+        <div className="grid gap-3 sm:flex sm:flex-wrap">
           {quickLinks.map(({ to, labelKey }) => (
-            <Button key={to} asChild variant="outline" className="shadow-sm">
+            <Button key={to} asChild variant="outline" className="w-full justify-start shadow-sm sm:w-auto">
               <Link to={to}>
                 {t(labelKey)}
                 <ArrowUpLeft className="ms-2 h-4 w-4" />

@@ -4,8 +4,8 @@
 
 - Project name: AliOS
 - Architecture version: AliOS 1.0
-- Current status: AliOS includes validated mobile-first Inbox capture, processing, global search, focused search-result navigation, filters, bulk triage, local appearance switching, local profile preferences, calendar month view foundation, home time-window routine nudges, upcoming task grouping, routine templates foundation, Wellness / Badminton Routine foundation, visual motion polish, premium Home dashboard visual upgrade, premium app shell polish, Home dashboard customization, premium reusable components, lightweight Personal Insights, Stage 37 premium Home showcase polish, light core-page visual alignment, hardened backup/restore safety, Stage 38 UI regression QA and release hardening with desktop sticky sidebar accessibility improvements, Stage 39 topbar dashboard controls plus accent color personalization, Stage 40 finance foundation, Stage 41 finance review and budget guard, Stage 42 lightweight finance charts foundation, Stage 43 lightweight motion and interaction polish, Stage 44 finance mobile UX and section navigation, Stage 45 performance audit and bundle optimization, Stage 46 Home collapsible dashboard sections, Stage 47 Settings Help Center Foundation, Stage 48 Weekly Review Foundation, Stage 49 Decision Log Foundation, Stage 50 Backup / Restore Safety & Migration Foundation, Stage 51 App Error Boundary & Local Error Log Foundation, and remains ready for static GitHub Pages deployment.
-- Current Stage: Stage 51 Completed
+- Current status: AliOS includes validated mobile-first Inbox capture, processing, global search, focused search-result navigation, filters, bulk triage, local appearance switching, local profile preferences, calendar month view foundation, home time-window routine nudges, upcoming task grouping, routine templates foundation, Wellness / Badminton Routine foundation, visual motion polish, premium Home dashboard visual upgrade, premium app shell polish, Home dashboard customization, premium reusable components, lightweight Personal Insights, Stage 37 premium Home showcase polish, light core-page visual alignment, hardened backup/restore safety, Stage 38 UI regression QA and release hardening with desktop sticky sidebar accessibility improvements, Stage 39 topbar dashboard controls plus accent color personalization, Stage 40 finance foundation, Stage 41 finance review and budget guard, Stage 42 lightweight finance charts foundation, Stage 43 lightweight motion and interaction polish, Stage 44 finance mobile UX and section navigation, Stage 45 performance audit and bundle optimization, Stage 46 Home collapsible dashboard sections, Stage 47 Settings Help Center Foundation, Stage 48 Weekly Review Foundation, Stage 49 Decision Log Foundation, Stage 50 Backup / Restore Safety & Migration Foundation, Stage 51 App Error Boundary & Local Error Log Foundation, Stage 53 Mobile UX Hardening for dense pages, and remains ready for static GitHub Pages deployment.
+- Current Stage: Stage 53 Completed
 
 ## Architecture References
 
@@ -38,7 +38,7 @@
 
 ## Completed Stages
 
-Stages 1–51 are complete.
+Stages 1–53 are complete.
 
 - Stage 1 â€” Foundation
 - Stage 2 â€” App Shell
@@ -91,6 +91,9 @@ Stages 1–51 are complete.
 - Stage 49 â€” Decision Log Foundation
 - Stage 50 â€” Backup / Restore Safety & Migration Foundation
 - Stage 51 â€” App Error Boundary & Local Error Log Foundation
+- Stage 53 â€” Mobile UX Hardening for dense pages
+
+Stage 53 completion is evidenced by the mobile-focused readability and overflow hardening pass across the dense Finance, Weekly Review, Decision Log, Settings, and Home surfaces. The stage keeps the existing product behavior intact while improving small-screen stacking, wrapping, button usability, and section readability on 360px, 390px, and 430px class devices. It does not change routes, storage, schemas, backup format, dependencies, or navigation architecture, and it remains aligned with static GitHub Pages deployment.
 Stage 48 completion is evidenced by the derived-only Weekly Review foundation, which summarizes the last seven days of existing local tasks, projects, inbox items, journal entries, knowledge items, finance records, wellness/check-in data, and routine signals where available. The stage adds deterministic observations and suggested focus rules, keeps the review window local and read-only, and stores no new weekly-review data. It uses the existing feature/repository/storage-adapter boundaries, adds no schema migration, no backup-format change, no new dependency, no backend, no sync, no cloud, and no AI, and it remains aligned with static GitHub Pages deployment.
 
 Stage 49 completion is evidenced by the local-first Decision Log foundation, which stores decision entries with title, date, status, context, options, chosen option, reasoning, expected outcome, review date, actual outcome, lesson, confidence, importance, tags, and timestamps. The stage keeps decisions editable in a calm CRUD page, surfaces deterministic review-due summaries, extends backup/restore additively with `decisionLogEntries`, and keeps the UI behind the repository/storage-adapter boundary. AliOS still does not decide for the user, and the stage adds no AI, backend, sync, cloud, paid API, or recommendation engine.
@@ -187,7 +190,7 @@ The next stage is intentionally undefined pending explicit approval. Project con
 
 ## Git Latest Recommended Commit
 
-`chore(backup): add restore validation and migration safety`
+`fix(ui): harden dense pages on mobile`
 
 ## Build Status
 
@@ -196,7 +199,7 @@ The next stage is intentionally undefined pending explicit approval. Project con
 - Production build: passing (`node --input-type=module ... build({ configFile: false, root, base: '/alios/', ... })`)
 - Production build warning: main chunk remains above the 500 kB warning threshold and is documented for safe follow-up
 - Production preview: responded with HTTP 200 at `http://127.0.0.1:4173/alios/`
-- Automated test count: 343 passing across 29 suites
+- Automated test count: 366 passing across 31 suites
 - Last verified: 2026-07-10
 
 ## Rules Before Modifying the Project

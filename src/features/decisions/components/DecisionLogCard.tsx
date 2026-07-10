@@ -171,13 +171,14 @@ export function DecisionLogCard({
         </div>
       </CardContent>
 
-      <CardFooter className="flex-wrap gap-2 border-t pt-4">
+      <CardFooter className="flex flex-col gap-2 border-t pt-4 sm:flex-row sm:flex-wrap sm:items-center">
         {confirmingDelete ? (
           <>
             <Button
               type="button"
               size="sm"
               variant="destructive"
+              className="w-full sm:w-auto"
               disabled={isDeleting}
               onClick={() => void onDelete()}
             >
@@ -187,6 +188,7 @@ export function DecisionLogCard({
               type="button"
               size="sm"
               variant="ghost"
+              className="w-full sm:w-auto"
               onClick={() => setConfirmingDelete(false)}
             >
               {t("common.cancel")}
@@ -194,18 +196,18 @@ export function DecisionLogCard({
           </>
         ) : (
           <>
-            <Button type="button" size="sm" variant="outline" onClick={onEdit}>
+            <Button type="button" size="sm" variant="outline" className="w-full sm:w-auto" onClick={onEdit}>
               <Pencil className="me-2 h-4 w-4" />
               {t("common.edit")}
             </Button>
             {decision.status !== "reviewed" && decision.status !== "archived" ? (
-              <Button type="button" size="sm" variant="outline" onClick={() => void onMarkReviewed()}>
+              <Button type="button" size="sm" variant="outline" className="w-full sm:w-auto" onClick={() => void onMarkReviewed()}>
                 <CheckCircle2 className="me-2 h-4 w-4" />
                 {t("decisions.markReviewed")}
               </Button>
             ) : null}
             {decision.status !== "archived" ? (
-              <Button type="button" size="sm" variant="ghost" onClick={() => void onArchive()}>
+              <Button type="button" size="sm" variant="ghost" className="w-full sm:w-auto" onClick={() => void onArchive()}>
                 <Archive className="me-2 h-4 w-4" />
                 {t("decisions.archive")}
               </Button>
@@ -214,7 +216,7 @@ export function DecisionLogCard({
               type="button"
               size="sm"
               variant="ghost"
-              className="text-destructive hover:text-destructive"
+              className="w-full text-destructive hover:text-destructive sm:w-auto"
               onClick={() => setConfirmingDelete(true)}
             >
               <Trash2 className="me-2 h-4 w-4" />

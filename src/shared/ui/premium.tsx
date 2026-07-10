@@ -79,7 +79,7 @@ export function SectionHeader({
   return (
     <div
       className={cn(
-        "flex flex-wrap items-start justify-between gap-4",
+        "flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4",
         aliosSectionMotion,
         className
       )}
@@ -92,13 +92,13 @@ export function SectionHeader({
         ) : null}
         <div className="flex flex-wrap items-center gap-2">
           {icon ? <span className="text-primary">{icon}</span> : null}
-          <h3 className="text-xl font-semibold tracking-tight sm:text-[1.35rem]">
+          <h3 className="break-words text-xl font-semibold tracking-tight sm:text-[1.35rem]">
             {title}
           </h3>
           {status ? <div className="shrink-0">{status}</div> : null}
         </div>
         {description ? (
-          <p className="max-w-3xl text-sm leading-7 text-muted-foreground">
+          <p className="max-w-3xl break-words text-sm leading-7 text-muted-foreground">
             {description}
           </p>
         ) : null}
@@ -184,15 +184,17 @@ export function MetricCard({
           </div>
           {status ? <div className="shrink-0">{status}</div> : null}
         </div>
-        <div className="space-y-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+        <div className="min-w-0 space-y-1">
+          <p className="break-words text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
             {label}
           </p>
-          <p className="text-[2rem] font-semibold tabular-nums tracking-tight sm:text-[2.25rem]">
+          <p className="text-[1.85rem] font-semibold tabular-nums leading-none tracking-tight sm:text-[2.25rem]">
             {value}
           </p>
           {description ? (
-            <p className="text-sm leading-6 text-muted-foreground">{description}</p>
+            <p className="break-words text-sm leading-6 text-muted-foreground">
+              {description}
+            </p>
           ) : null}
         </div>
       </CardContent>
@@ -276,9 +278,9 @@ export function EmptyState({
             {icon}
           </div>
         ) : null}
-        <h3 className="text-lg font-semibold">{title}</h3>
+        <h3 className="break-words text-lg font-semibold">{title}</h3>
         {description ? (
-          <p className="mt-2 max-w-2xl text-sm leading-7 text-muted-foreground">
+          <p className="mt-2 max-w-2xl break-words text-sm leading-7 text-muted-foreground">
             {description}
           </p>
         ) : null}

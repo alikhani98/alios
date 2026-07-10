@@ -159,8 +159,8 @@ export function FinanceTransactionForm({
         />
       </div>
 
-      <div className="flex flex-wrap gap-3">
-        <Button type="submit" disabled={isSubmitting}>
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+        <Button type="submit" className="w-full sm:w-auto" disabled={isSubmitting}>
           {isSubmitting
             ? t("common.saving")
             : transaction
@@ -168,7 +168,7 @@ export function FinanceTransactionForm({
               : t("finance.addTransaction")}
         </Button>
         {onCancel ? (
-          <Button type="button" variant="outline" onClick={onCancel}>
+          <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={onCancel}>
             {t("common.cancel")}
           </Button>
         ) : null}
