@@ -1,5 +1,6 @@
 import type {
   DailyCheckinsRepository,
+  DecisionLogRepository,
   FinanceRepository,
   JournalRepository,
   InboxRepository,
@@ -15,6 +16,7 @@ export interface StorageAdapter {
   inbox: InboxRepository;
   dailyCheckins: DailyCheckinsRepository;
   tasks: TasksRepository;
+  decisions: DecisionLogRepository;
   finance: FinanceRepository;
   projects: ProjectsRepository;
   journal: JournalRepository;

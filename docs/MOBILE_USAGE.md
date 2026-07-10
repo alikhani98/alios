@@ -15,6 +15,7 @@ Stage 44 adds Finance mobile quick navigation, collapsible sections, and Jalali 
 Stage 45 keeps the same mobile UX but trims a little avoidable work in the shell and Finance page so mobile interactions stay smooth without changing behavior.
 Stage 47 adds a beginner-friendly Settings Help Center with static bilingual guidance for first-time use, data safety, backup, Home collapsible sections, and Finance basics.
 Stage 48 adds a Weekly Review foundation that summarizes the last 7 days of local data only and stays read-only on the current device.
+Stage 49 adds a Decision Log foundation that records local decisions, review dates, outcomes, and reflections while staying non-advisory and backup-compatible.
 The Personal Insights section stays local to the device and only reflects stored tasks, projects, inbox items, journal entries, knowledge items, and wellness checklist state.
 
 ## Open or install AliOS
@@ -49,6 +50,7 @@ AliOS stores data in IndexedDB for the current browser, device, and site origin.
 - The Home upcoming tasks summary and future task dates stay on the current browser or device and do not sync.
 - The Finance charts, review panels, and liquidity summaries stay on the current browser or device and do not sync.
 - The Finance section collapse state and quick navigation stay on the current browser or device and do not sync.
+- The Decision Log entries, review dates, and reflection fields stay on the current browser or device and do not sync.
 - Finance due-date fields store ISO/Gregorian values only; the Jalali preview is display-only.
 - There is no automatic sync, cloud backup, account, or backend in AliOS 1.0.
 - Publishing AliOS to GitHub Pages does not change this device-local storage model.

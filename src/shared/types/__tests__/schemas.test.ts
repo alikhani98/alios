@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   dailyCheckinSchema,
+  decisionLogEntrySchema,
   journalEntrySchema,
   inboxItemSchema,
   knowledgeItemSchema,
@@ -10,6 +11,7 @@ import {
 } from "@/shared/types";
 import {
   dailyCheckinRecord,
+  decisionLogRecord,
   journalEntryRecord,
   inboxItemRecord,
   knowledgeItemRecord,
@@ -24,6 +26,7 @@ describe("core domain schemas", () => {
     ["journal entry", journalEntrySchema, journalEntryRecord],
     ["knowledge item", knowledgeItemSchema, knowledgeItemRecord],
     ["daily check-in", dailyCheckinSchema, dailyCheckinRecord],
+    ["decision log entry", decisionLogEntrySchema, decisionLogRecord],
     ["inbox item", inboxItemSchema, inboxItemRecord],
   ])("accepts a valid %s", (_name, schema, value) => {
     expect(schema.safeParse(value).success).toBe(true);
@@ -35,6 +38,7 @@ describe("core domain schemas", () => {
     ["journal entry", journalEntrySchema, { ...journalEntryRecord, content: "" }],
     ["knowledge item", knowledgeItemSchema, { ...knowledgeItemRecord, type: "unknown" }],
     ["daily check-in", dailyCheckinSchema, { ...dailyCheckinRecord, date: "05/07/2026" }],
+    ["decision log entry", decisionLogEntrySchema, { ...decisionLogRecord, status: "maybe" }],
   ])("rejects an invalid %s", (_name, schema, value) => {
     expect(schema.safeParse(value).success).toBe(false);
   });

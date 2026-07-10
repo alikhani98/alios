@@ -173,3 +173,18 @@ Reason:
 - The review page should help the user reflect on their own local activity without changing the storage model
 - A derived-only design keeps the feature compatible with static hosting, local-first persistence, and the existing repository boundaries
 - Rule-based summaries avoid the scope creep of AI, financial advice, medical guidance, or a general analytics engine
+
+## ADR-016: Keep Decision Log local, deterministic, and non-advisory
+
+Decision:
+
+- Decision Log stores local decision entries with context, options, chosen outcome, expected outcome, review date, and later reflection fields
+- Decision Log review-due logic is deterministic and based on the stored review date and status only
+- Decision Log must not become a recommendation engine, AI assistant, financial advice tool, legal advice tool, medical advice tool, or scoring system
+- Backup/restore includes Decision Log entries additively and must remain backward-compatible with older backups that do not contain them
+
+Reason:
+
+- The feature should help the user learn from decisions without making decisions for them
+- Deterministic review behavior keeps the model simple, understandable, and compatible with the local-first architecture
+- Additive backup compatibility preserves older files and avoids unnecessary breaking changes

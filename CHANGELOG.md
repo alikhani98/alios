@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 49 - Decision Log Foundation
+
+- Added a local-first Decision Log page and navigation entry for recording, revisiting, and reflecting on important decisions
+- Added Decision Log repository, Dexie storage, backup/restore support, review-due summaries, and deterministic weekly-review awareness
+- Added calm create/edit/delete flows with review dates, outcomes, lessons, confidence, importance, tags, and status handling
+- Kept the stage local-only, non-advisory, additive, and free of new dependency, backend, sync, cloud, AI, or recommendation logic
+
 ## Stage 48 - Weekly Review Foundation
 
 - Added a local-first Weekly Review page and navigation entry that summarize the last 7 days of existing AliOS data only

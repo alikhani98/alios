@@ -18,7 +18,7 @@
 
 ## Real-world usage period
 
-AliOS v1.0 should be used with real personal data before more product scope is approved. Full routines and wellness engines, Weekly Review, Decision Log, Personal Manual, AI, Google Calendar, ICS export, cloud sync, and notifications remain deferred until observed usage justifies them.
+AliOS v1.0 should be used with real personal data before more product scope is approved. Full routines and wellness engines, Personal Manual, AI, Google Calendar, ICS export, cloud sync, and notifications remain deferred until observed usage justifies them. Weekly Review and Decision Log are now available as local-first foundations.
 
 The later version ideas below are directional only. They are not approved stages and may change after real-world use.
 
@@ -159,6 +159,13 @@ The later version ideas below are directional only. They are not approved stages
 - Deterministic observations and suggested focus using simple rules only
 - No stored weekly-review data, no schema/storage/backup-format change, no new dependency, no backend, no sync, no cloud, no AI, no financial advice engine, and no medical advice engine
 
+## Stage 49
+
+- Decision Log Foundation
+- Local decision records with review dates, outcomes, and reflection fields
+- Deterministic review-due awareness and additive backup/restore support
+- No AI, no recommendation engine, no backend, no sync, no cloud, no new dependency, and no advice engine
+
 ## Stage 38 Hardening Note
 
 - UI regression QA and release hardening stayed within the existing scope and did not add a new feature
@@ -167,8 +174,8 @@ The later version ideas below are directional only. They are not approved stages
 
 ## Later product candidates
 
-- Decision Engine
 - Personal Manual
+- Decision Engine
 - Master Prompt
 - Better dashboard
 

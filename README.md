@@ -1,6 +1,6 @@
 # AliOS
 
-AliOS is a bilingual, local-first personal life-management system. It brings quick capture, Today planning, projects, journaling, personal knowledge, a read-only dashboard, monthly calendar and upcoming-task views, routine templates, manual backup/restore, local data controls, a compact topbar dashboard customizer with a local accent palette, a Finance foundation with a local review layer, budget guard, lightweight local charts, mobile quick navigation, collapsible sections, Jalali due-date previews, a Weekly Review foundation, and a beginner-friendly Help Center inside Settings into one static web application.
+AliOS is a bilingual, local-first personal life-management system. It brings quick capture, Today planning, projects, journaling, personal knowledge, a read-only dashboard, monthly calendar and upcoming-task views, routine templates, manual backup/restore, local data controls, a compact topbar dashboard customizer with a local accent palette, a Finance foundation with a local review layer, budget guard, lightweight local charts, mobile quick navigation, collapsible sections, Jalali due-date previews, a Weekly Review foundation, a Decision Log foundation, and a beginner-friendly Help Center inside Settings into one static web application.
 
 Stage 38 was a UI regression QA and release-hardening pass. It did not add a new feature; it kept the existing local-first scope intact and hardened desktop sidebar accessibility on long scrolling pages.
 Stage 39 moves dashboard customization into the topbar and adds a local-only accent color palette for restrained visual personalization.
@@ -13,6 +13,7 @@ Stage 45 performs a safe performance audit and bundle optimization pass that kee
 Stage 46 adds Home dashboard collapsible sections with local-only open/closed persistence separate from dashboard layout customization.
 Stage 47 adds a Settings Help Center with static bilingual guidance for first-time use, module roles, local-first storage, backup/restore, Home collapsible sections, and Finance basics.
 Stage 48 adds a Weekly Review foundation that summarizes the last 7 days of existing local data with deterministic observations and suggested focus rules.
+Stage 49 adds a Decision Log foundation that records local decisions, review dates, outcomes, and reflections with deterministic review-due awareness.
 
 AliOS is designed for one person and stores its data in the browser through IndexedDB. It requires no backend, account, authentication, subscription, paid API, or hosted AI service.
 
@@ -35,6 +36,7 @@ AliOS is designed for one person and stores its data in the browser through Inde
 - Compact Personal Insights on Home using only existing local task, project, inbox, journal, knowledge, and wellness checklist data
 - Local-first Finance foundation with income, expenses, installments, debts, a simple monthly liquidity summary, category review, a neutral budget guard, and lightweight charts
 - Finance mobile quick navigation, collapsible sections, and Jalali due-date previews while keeping ISO/Gregorian storage
+- Decision Log foundation with local decision entries, review dates, outcome fields, and deterministic review-due awareness
 - Local accent color personalization in the profile popover and compact dashboard layout controls in the topbar
 - Beginner-friendly Help Center inside Settings with static guidance for first-time use, data safety, backup, Home sections, and Finance usage
 - Mobile-first Quick Capture Inbox with note, task, idea, link, and other item types
@@ -177,8 +179,9 @@ Version 1.0 is intentionally single-user and local-only. It does not include:
 
 - Accounts, authentication, backend services, or automatic multi-device sync
 - Cloud or scheduled backup, encryption, compression, or attachments
-- Full routines and wellness engines, Decision Log, or Personal Manual
+- Full routines and wellness engines or Personal Manual
 - Routine templates are preview-only foundations and do not create recurring routines
+- Decision Log is a local-first foundation and does not decide for the user
 - AI features or hosted AI providers
 - Google Calendar, ICS export, notifications, and analytics
 - UI automation or end-to-end browser tests

@@ -77,6 +77,7 @@ function InfoItem({ label, value }: InfoItemProps) {
 const backupTableLabelKeys = [
   "settings.checkinsCount",
   "settings.tasksCount",
+  "settings.decisionLogsCount",
   "settings.financeTransactionsCount",
   "settings.financeObligationsCount",
   "settings.projectsCount",
@@ -95,6 +96,7 @@ const appearanceOptions = [
 function getTotalRecords(summary: {
   dailyCheckins: number;
   tasks: number;
+  decisionLogEntries: number;
   financeTransactions: number;
   financeObligations: number;
   projects: number;
@@ -106,6 +108,7 @@ function getTotalRecords(summary: {
   return (
     summary.dailyCheckins +
     summary.tasks +
+    summary.decisionLogEntries +
     summary.financeTransactions +
     summary.financeObligations +
     summary.projects +
@@ -444,6 +447,10 @@ export function SettingsPage() {
                 <CountItem
                   label={t("settings.tasksCount")}
                   value={dataManagement.summary.tasks}
+                />
+                <CountItem
+                  label={t("settings.decisionLogsCount")}
+                  value={dataManagement.summary.decisionLogEntries}
                 />
                 <CountItem
                   label={t("settings.financeTransactionsCount")}

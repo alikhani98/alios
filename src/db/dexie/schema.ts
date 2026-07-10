@@ -1,6 +1,7 @@
 export const DEXIE_DATABASE_NAME = "AliOS";
 export const DEXIE_SCHEMA_VERSION = 2;
 export const DEXIE_SCHEMA_VERSION_3 = 3;
+export const DEXIE_SCHEMA_VERSION_4 = 4;
 
 export const DEXIE_TABLE_NAMES = {
   dailyCheckins: "dailyCheckins",
@@ -8,6 +9,7 @@ export const DEXIE_TABLE_NAMES = {
   projects: "projects",
   journalEntries: "journalEntries",
   knowledgeItems: "knowledgeItems",
+  decisionLogEntries: "decisionLogEntries",
   settings: "settings",
   inboxItems: "inboxItems",
   financeTransactions: "financeTransactions",
@@ -53,4 +55,10 @@ export const DEXIE_SCHEMA_V3 = {
     "id, type, category, occurredAt, createdAt, updatedAt",
   [DEXIE_TABLE_NAMES.financeObligations]:
     "id, type, status, dueDate, dueDay, createdAt, updatedAt",
+  [DEXIE_TABLE_NAMES.decisionLogEntries]:
+    "id, decisionDate, status, reviewDate, updatedAt",
+} satisfies Record<DexieTableName, string>;
+
+export const DEXIE_SCHEMA_V4 = {
+  ...DEXIE_SCHEMA_V3,
 } satisfies Record<DexieTableName, string>;
