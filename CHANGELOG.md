@@ -2,6 +2,12 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 61 - Personal Manual Export Center Integration
+
+- Added a readable Markdown export path for Personal Manual entries inside the existing Settings export center
+- Kept the export flow local-only and repository-backed, with no backup-format change, no backup-version bump, no Dexie schema change, and no new dependency
+- Kept the stage separate from backup / restore while preserving TypeScript, Vitest, and production build success
+
 ## Stage 60 - Personal Manual QA & Release Hardening
 
 - Tightened Personal Manual review-due behavior, added edge-case helper coverage, and confirmed archived, empty-state, and case-insensitive search behavior remain stable

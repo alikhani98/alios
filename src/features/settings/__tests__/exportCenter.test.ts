@@ -5,6 +5,7 @@ import {
   createFinanceCsvExport,
   createJournalMarkdownExport,
   createKnowledgeMarkdownExport,
+  createManualMarkdownExport,
   createReadableExportFilename,
 } from "../exportCenter";
 import {
@@ -13,6 +14,7 @@ import {
   financeTransactionRecord,
   journalEntryRecord,
   knowledgeItemRecord,
+  manualEntryRecord,
 } from "@/test/factories";
 
 describe("export center helpers", () => {
@@ -62,6 +64,28 @@ describe("export center helpers", () => {
     );
   });
 
+  it("creates a readable personal manual markdown export", () => {
+    const markdown = createManualMarkdownExport([manualEntryRecord]);
+
+    expect(
+      createReadableExportFilename(
+        "personal-manual",
+        "md",
+        new Date("2026-07-10T09:30:00.000Z")
+      )
+    ).toBe("alios-personal-manual-export-2026-07-10-09-30.md");
+    expect(markdown).toContain("# AliOS Personal Manual Export");
+    expect(markdown).toContain("Entries: 1");
+    expect(markdown).toContain("## Personal planning rule");
+    expect(markdown).toContain("- Category: principles");
+    expect(markdown).toContain("- Status: active");
+    expect(markdown).toContain("- Importance: high");
+    expect(markdown).toContain("- Tags: planning, energy");
+    expect(markdown).toContain("- Review interval (days): 7");
+    expect(markdown).toContain("- Last reviewed at: 2026-07-04T08:30:00.000Z");
+    expect(markdown).toContain("> Keep the next action small and local when energy is low.");
+  });
+
   it("describes empty exports clearly", () => {
     expect(createDecisionLogMarkdownExport([])).toContain(
       "No decision log entries were recorded yet."
@@ -71,6 +95,9 @@ describe("export center helpers", () => {
     );
     expect(createKnowledgeMarkdownExport([])).toContain(
       "No knowledge items were recorded yet."
+    );
+    expect(createManualMarkdownExport([])).toContain(
+      "No manual entries were recorded yet."
     );
   });
 });
