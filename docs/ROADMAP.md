@@ -32,6 +32,7 @@ Stage 57 adds a local-only Recovery Mode / Safe Mode foundation that can surface
 Stage 58 adds a derived-only Finance Monthly Plan foundation that summarizes recorded income, spending, obligations, remaining estimate, and daily remaining pace without changing storage, backup format, backup version, or route architecture.
 Stage 59 adds a Personal Manual foundation that stores local user-authored reference notes with review timing, Home visibility, and additive backup support without changing the local-first storage model.
 Stage 60 hardens the Personal Manual release with small QA fixes, better edge-case tests, and backup/restore confidence checks without changing the storage model or public routes.
+Stage 61 integrates Personal Manual into the existing Export Center with a readable Markdown export, while leaving the backup format, backup version, storage schema, and storage adapters unchanged.
 
 ## Version 1.1
 

@@ -99,6 +99,16 @@ export function ExportCenterSection({ id }: ExportCenterSectionProps) {
             }
             onClick={() => void exportCenter.exportKnowledgeMarkdown()}
           />
+          <ExportButton
+            disabled={exportCenter.isExporting}
+            isActive={exportCenter.activeExport === "manual"}
+            label={
+              exportCenter.activeExport === "manual"
+                ? t("settings.exportingManualMarkdown")
+                : t("settings.exportManualMarkdown")
+            }
+            onClick={() => void exportCenter.exportManualMarkdown()}
+          />
         </div>
 
         <div className="rounded-xl border bg-muted/30 p-4">
@@ -120,6 +130,7 @@ export function ExportCenterSection({ id }: ExportCenterSectionProps) {
             <Badge variant="secondary">
               {t("settings.exportKnowledgeMarkdown")}
             </Badge>
+            <Badge variant="secondary">{t("settings.exportManualMarkdown")}</Badge>
           </div>
         </div>
 

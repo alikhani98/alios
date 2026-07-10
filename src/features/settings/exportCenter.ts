@@ -1,6 +1,18 @@
-import type { DecisionLogEntry, FinanceObligation, FinanceTransaction, JournalEntry, KnowledgeItem } from "@/shared/types";
+import type {
+  DecisionLogEntry,
+  FinanceObligation,
+  FinanceTransaction,
+  JournalEntry,
+  KnowledgeItem,
+  ManualEntry,
+} from "@/shared/types";
 
-export type ExportCenterAction = "finance" | "decisionLog" | "journal" | "knowledge";
+export type ExportCenterAction =
+  | "finance"
+  | "decisionLog"
+  | "journal"
+  | "knowledge"
+  | "manual";
 
 const CSV_HEADER = [
   "recordType",
@@ -219,6 +231,41 @@ export function createKnowledgeMarkdownExport(items: KnowledgeItem[]): string {
       `- Updated at: ${item.updatedAt}`,
       "",
       formatBlock(item.content, "Not recorded"),
+      ""
+    );
+  }
+
+  return lines.join("\n").trimEnd();
+}
+
+export function createManualMarkdownExport(entries: ManualEntry[]): string {
+  const lines = [
+    "# AliOS Personal Manual Export",
+    "",
+    `Exported at: ${new Date().toISOString()}`,
+    `Entries: ${entries.length}`,
+    "",
+  ];
+
+  if (entries.length === 0) {
+    lines.push("No manual entries were recorded yet.");
+    return lines.join("\n");
+  }
+
+  for (const entry of entries) {
+    lines.push(
+      `## ${entry.title}`,
+      "",
+      `- Category: ${entry.category}`,
+      `- Status: ${entry.status}`,
+      `- Importance: ${entry.importance}`,
+      `- Tags: ${entry.tags.length > 0 ? entry.tags.join(", ") : "Not recorded"}`,
+      `- Review interval (days): ${entry.reviewIntervalDays ?? "Not recorded"}`,
+      `- Last reviewed at: ${entry.lastReviewedAt ?? "Not recorded"}`,
+      `- Created at: ${entry.createdAt}`,
+      `- Updated at: ${entry.updatedAt}`,
+      "",
+      formatBlock(entry.body, "Not recorded"),
       ""
     );
   }
