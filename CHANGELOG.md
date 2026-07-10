@@ -2,6 +2,12 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 52 - Finance Transaction Jalali Date Preview
+
+- Added a Jalali/Shamsi preview under the Finance income/expense transaction date field so it matches the existing obligation due-date UX
+- Kept the transaction date value stored as ISO/Gregorian while showing Jalali/Shamsi only as display text
+- Kept the stage local-only, dependency-free, and free of schema, backup, backend, sync, cloud, or AI changes
+
 ## Stage 51 - App Error Boundary & Local Error Log Foundation
 
 - Added a calm route-content error boundary so a failing page can fall back without taking down the shell
