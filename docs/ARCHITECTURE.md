@@ -35,6 +35,13 @@ AliOS 1.0 is a local-first static web app.
 - Backup migration is pure and deterministic so malformed records fail before any local data is overwritten
 - The backup format stays version 1 and does not require a Dexie schema migration for Stage 50
 
+## App Error Boundary / Local Error Log Boundary
+
+- Route-content error handling may catch render-time failures inside the app shell so the sidebar and topbar can stay available
+- Error fallback UI stays calm, bilingual, and local-only, and it does not send telemetry or expose stack traces by default
+- Recent error summaries may be stored only in browser localStorage, capped to a small bounded list, and used only for local review or copy actions
+- The error boundary and error log stay separate from Dexie, backup export, backup restore, backend, sync, cloud, AI, and new dependencies
+
 ## Runtime Rule
 
 AliOS does not require a Node.js server in production. Node.js is allowed for development, dependency installation, and building static assets.
