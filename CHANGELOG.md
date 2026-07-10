@@ -2,6 +2,12 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 60 - Personal Manual QA & Release Hardening
+
+- Tightened Personal Manual review-due behavior, added edge-case helper coverage, and confirmed archived, empty-state, and case-insensitive search behavior remain stable
+- Verified backup preview, backup export, restore normalization, and repository coverage continue to include manual entries without changing backup format or storage shape
+- Kept the stage local-first, defensive, and dependency-free while preserving TypeScript, Vitest, and production build success
+
 ## Stage 59 - Personal Manual Foundation
 
 - Added a dedicated Personal Manual module for local user-authored principles, values, rules, preferences, boundaries, routines, lessons, and identity notes
