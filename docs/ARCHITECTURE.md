@@ -49,6 +49,13 @@ AliOS 1.0 is a local-first static web app.
 - Recent error summaries may be stored only in browser localStorage, capped to a small bounded list, and used only for local review or copy actions
 - The error boundary and error log stay separate from Dexie, backup export, backup restore, backend, sync, cloud, AI, and new dependencies
 
+## Recovery Mode / Safe Mode Boundary
+
+- Recovery mode is a local-only browser preference stored in `localStorage` and may be enabled from a safe URL flag or from Settings
+- Recovery mode does not delete data, does not change Dexie storage, and does not change backup contents or backup version
+- Recovery UI may surface calm access to Settings, backup/restore, readable exports, and the local error log without adding routing complexity or a global modal system
+- The recovery surface stays separate from backend, sync, cloud, AI, telemetry, notifications, service workers, and new dependencies
+
 ## Runtime Rule
 
 AliOS does not require a Node.js server in production. Node.js is allowed for development, dependency installation, and building static assets.

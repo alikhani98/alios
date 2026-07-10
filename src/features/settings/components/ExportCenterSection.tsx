@@ -40,12 +40,16 @@ function ExportButton({
   );
 }
 
-export function ExportCenterSection() {
+type ExportCenterSectionProps = {
+  id?: string;
+};
+
+export function ExportCenterSection({ id }: ExportCenterSectionProps) {
   const { t } = useI18n();
   const exportCenter = useExportCenter();
 
   return (
-    <Card>
+    <Card id={id}>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Download className="h-5 w-5 text-primary" />

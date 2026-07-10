@@ -2,6 +2,12 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 57 - Recovery Mode / Safe Mode Foundation
+
+- Added a local-only recovery mode flag stored in browser localStorage with safe URL flag detection for `?recovery=1` and `?safe=1`
+- Added a calm recovery banner in the shell, a recovery section in Settings, and an error-boundary recovery action that keep access to Settings, backup/restore, readable exports, and the local error log close at hand
+- Kept the feature non-destructive, with no Dexie schema change, no backup-format change, no backup-version change, no automatic deletion, no backend, no sync, no cloud, no AI, no telemetry, and no new dependency
+
 ## Stage 56 - Export Center Foundation
 
 - Added a Settings export center with manual readable exports for finance CSV, decision log Markdown, journal Markdown, and knowledge Markdown

@@ -245,3 +245,18 @@ Reason:
 - Users need focused human-readable exports for review, sharing, or spreadsheet use without losing the clear distinction between a recovery backup and a module export
 - Keeping the export center repository-backed and local-only preserves the static-hosting and local-first architecture
 - Separate readable exports reduce backup-format pressure while still giving the user more than one way to move or inspect their own data
+
+## ADR-021: Keep recovery mode local-only and non-destructive
+
+Decision:
+
+- Recovery mode may be enabled from a safe URL flag or a Settings action, but it remains a browser-local preference only
+- Recovery mode may surface calm access to Settings, backup/restore, readable exports, and the local error log
+- Recovery mode must not delete data, must not alter Dexie storage, and must not change the backup format or backup version
+- Recovery mode must not add backend services, sync, cloud, AI, telemetry, notifications, service workers, or new dependencies
+
+Reason:
+
+- A recovery surface should help the user regain confidence without risking their local data
+- Keeping the mode non-destructive preserves AliOS's manual-backup model and the existing storage boundaries
+- A local-only flag keeps the recovery UI simple, static-hosting friendly, and easy to exit
