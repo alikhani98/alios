@@ -105,13 +105,27 @@ export function HomePage() {
           contentClassName="space-y-4"
           {...sectionOpenProps("emptyState")}
         >
-          <EmptyState
-            icon={<Sparkles className="h-6 w-6" />}
-            title={t("home.emptyTitle")}
-            description={t("home.emptyDescription")}
-          />
-        </CollapsibleSection>
-      ) : null,
+        <EmptyState
+          icon={<Sparkles className="h-6 w-6" />}
+          title={t("home.emptyTitle")}
+          description={t("home.emptyDescription")}
+          note={t("home.emptyNote")}
+          actions={
+            <>
+              <Button asChild variant="default">
+                <Link to="/inbox">{t("nav.inbox")}</Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link to="/finance">{t("nav.finance")}</Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link to="/decisions">{t("nav.decisions")}</Link>
+              </Button>
+            </>
+          }
+        />
+      </CollapsibleSection>
+    ) : null,
     routineNudge: data ? (
       <HomeRoutineNudgeCard
         id="home-routineNudge"

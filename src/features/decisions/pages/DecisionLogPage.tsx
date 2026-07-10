@@ -88,6 +88,7 @@ export function DecisionLogPage() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const formRef = useRef<HTMLDivElement | null>(null);
   const referenceDate = useMemo(() => new Date(), []);
+  const hasActiveFilter = selectedFilter !== "all";
 
   const filterCounts = useMemo(
     () => getDecisionLogFilterCounts(entries, referenceDate),
@@ -361,13 +362,21 @@ export function DecisionLogPage() {
       ) : filteredEntries.length === 0 ? (
         <EmptyState
           icon={<GitBranch className="h-6 w-6" />}
-          title={t("decisions.emptyTitle")}
-          description={t("decisions.emptyDescription")}
+          title={hasActiveFilter ? t("decisions.noResultsTitle") : t("decisions.emptyTitle")}
+          description={
+            hasActiveFilter ? t("decisions.noResultsDescription") : t("decisions.emptyDescription")
+          }
           actions={
-            <Button type="button" onClick={() => setEditingDecision(undefined)}>
-              <Plus className="me-2 h-4 w-4" />
-              {t("decisions.emptyAction")}
-            </Button>
+            hasActiveFilter ? (
+              <Button type="button" variant="outline" onClick={() => setSelectedFilter("all")}>
+                {t("decisions.filterAll")}
+              </Button>
+            ) : (
+              <Button type="button" onClick={() => setEditingDecision(undefined)}>
+                <Plus className="me-2 h-4 w-4" />
+                {t("decisions.emptyAction")}
+              </Button>
+            )
           }
         />
       ) : (

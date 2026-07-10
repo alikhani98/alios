@@ -259,6 +259,7 @@ export type EmptyStateProps = {
   icon?: React.ReactNode;
   title: React.ReactNode;
   description?: React.ReactNode;
+  note?: React.ReactNode;
   actions?: React.ReactNode;
   className?: string;
 };
@@ -267,6 +268,7 @@ export function EmptyState({
   icon,
   title,
   description,
+  note,
   actions,
   className,
 }: EmptyStateProps) {
@@ -282,6 +284,11 @@ export function EmptyState({
         {description ? (
           <p className="mt-2 max-w-2xl break-words text-sm leading-7 text-muted-foreground">
             {description}
+          </p>
+        ) : null}
+        {note ? (
+          <p className="mt-3 max-w-2xl break-words text-xs leading-6 text-muted-foreground">
+            {note}
           </p>
         ) : null}
         {actions ? <div className="mt-5 flex flex-wrap gap-2">{actions}</div> : null}

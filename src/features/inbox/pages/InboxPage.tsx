@@ -369,12 +369,19 @@ export function InboxPage() {
           icon={<Inbox className="h-6 w-6" />}
           title={t("inbox.emptyTitle")}
           description={t("inbox.emptyDescription")}
+          note={t("inbox.emptyNote")}
         />
       ) : filteredItems.length === 0 ? (
         <EmptyState
           icon={<SearchX className="h-6 w-6" />}
           title={t("inbox.noMatchingItems")}
           description={t("inbox.tryChangingFilters")}
+          note={t("inbox.noMatchingNote")}
+          actions={
+            <Button type="button" variant="outline" onClick={clearFilters}>
+              {t("inbox.clearFilters")}
+            </Button>
+          }
         />
       ) : (
         <div className="grid gap-4 md:grid-cols-2">

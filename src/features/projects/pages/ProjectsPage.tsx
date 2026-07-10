@@ -228,6 +228,7 @@ export function ProjectsPage() {
           icon={<FolderKanban className="h-6 w-6" />}
           title={t("projects.emptyTitle")}
           description={t("projects.emptyDescription")}
+          note={t("projects.emptyNote")}
           actions={
             <Button type="button" onClick={openCreateForm}>
               <Plus className="me-2 h-4 w-4" />
