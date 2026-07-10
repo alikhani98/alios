@@ -318,13 +318,18 @@ export function KnowledgePage() {
               ? t("knowledge.noResultsDescription")
               : t("knowledge.emptyDescription")
           }
+          note={hasActiveSearch ? undefined : t("knowledge.emptyNote")}
           actions={
             !hasActiveSearch ? (
               <Button type="button" onClick={openCreateForm}>
                 <Plus className="me-2 h-4 w-4" />
                 {t("knowledge.emptyAction")}
               </Button>
-            ) : null
+            ) : (
+              <Button type="button" variant="outline" onClick={() => void clearSearch()}>
+                {t("knowledge.clear")}
+              </Button>
+            )
           }
         />
       ) : (

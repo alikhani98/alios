@@ -10,6 +10,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  EmptyState,
 } from "@/shared/ui";
 
 import {
@@ -114,11 +115,12 @@ export function LocalErrorLogSection() {
             </div>
           </>
         ) : (
-          <div className="rounded-2xl border bg-muted/30 p-4">
-            <p className="text-sm leading-7 text-muted-foreground">
-              {t("settings.noLocalErrorsYet")}
-            </p>
-          </div>
+          <EmptyState
+            icon={<ClipboardList className="h-6 w-6" />}
+            title={t("settings.noLocalErrorsYet")}
+            description={t("settings.localErrorLogEmptyDescription")}
+            className="border-border/60 bg-background/80"
+          />
         )}
       </CardContent>
     </Card>

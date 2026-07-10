@@ -881,6 +881,24 @@ export function FinancePage() {
               icon={<Wallet className="h-6 w-6" />}
               title={t("finance.emptyTitle")}
               description={t("finance.emptyDescription")}
+              note={t("finance.emptyNote")}
+              actions={
+                <>
+                  <Button
+                    type="button"
+                    onClick={() => handleQuickNav(FINANCE_SECTION_ANCHORS.addTransaction)}
+                  >
+                    {t("finance.addTransaction")}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => handleQuickNav(FINANCE_SECTION_ANCHORS.addObligation)}
+                  >
+                    {t("finance.addObligation")}
+                  </Button>
+                </>
+              }
             />
           ) : (
             <div className={selectedFilter === "all" ? "grid gap-4 xl:grid-cols-2" : "space-y-4"}>
@@ -896,14 +914,25 @@ export function FinancePage() {
                     />
                     <div className="mt-5 space-y-4">
                       {filteredTransactions.length === 0 ? (
-                        <SoftPanel>
-                          <p className="text-sm text-muted-foreground">
+                        <SoftPanel className="space-y-3">
+                          <p className="text-sm leading-7 text-muted-foreground">
                             {selectedFilter === "income"
                               ? t("finance.noIncomeTransactionsYet")
                               : selectedFilter === "expenses"
                                 ? t("finance.noExpenseTransactionsYet")
                                 : t("finance.noTransactionsYet")}
                           </p>
+                          <p className="text-xs leading-6 text-muted-foreground">
+                            {t("finance.transactionsEmptyNote")}
+                          </p>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className="w-full sm:w-auto"
+                            onClick={() => handleQuickNav(FINANCE_SECTION_ANCHORS.addTransaction)}
+                          >
+                            {t("finance.addTransaction")}
+                          </Button>
                         </SoftPanel>
                       ) : (
                         filteredTransactions.map((transaction) => (
@@ -947,12 +976,23 @@ export function FinancePage() {
                     />
                     <div className="mt-5 space-y-4">
                       {filteredObligations.length === 0 ? (
-                        <SoftPanel>
-                          <p className="text-sm text-muted-foreground">
+                        <SoftPanel className="space-y-3">
+                          <p className="text-sm leading-7 text-muted-foreground">
                             {selectedFilter === "paidObligations"
                               ? t("finance.noPaidObligationsYet")
                               : t("finance.noObligationsYet")}
                           </p>
+                          <p className="text-xs leading-6 text-muted-foreground">
+                            {t("finance.obligationsEmptyNote")}
+                          </p>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className="w-full sm:w-auto"
+                            onClick={() => handleQuickNav(FINANCE_SECTION_ANCHORS.addObligation)}
+                          >
+                            {t("finance.addObligation")}
+                          </Button>
                         </SoftPanel>
                       ) : (
                         filteredObligations.map((obligation) => (

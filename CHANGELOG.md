@@ -2,6 +2,11 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 54 - Empty States & First-Run Guidance Foundation
+
+- Added calmer bilingual empty states and first-run hints across Home, Finance, Decisions, Weekly Review, Inbox, Projects, Journal, Knowledge, and Settings
+- Kept the stage UI-only with no schema, storage, backup, route, dependency, backend, sync, cloud, AI, or telemetry change
+
 ## Stage 53 - Mobile UX Hardening for Dense Pages
 
 - Improved mobile stacking, wrapping, and section readability on Finance, Weekly Review, Decision Log, Settings, and Home

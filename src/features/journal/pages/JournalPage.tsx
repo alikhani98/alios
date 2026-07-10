@@ -233,6 +233,7 @@ export function JournalPage() {
           icon={<BookOpenText className="h-6 w-6" />}
           title={t("journal.emptyTitle")}
           description={t("journal.emptyDescription")}
+          note={t("journal.emptyNote")}
           actions={
             <Button type="button" onClick={openCreateForm}>
               <Plus className="me-2 h-4 w-4" />

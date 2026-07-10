@@ -295,6 +295,9 @@ export function WeeklyReviewPage() {
                   <Button asChild variant="outline">
                     <Link to="/inbox">{t("nav.inbox")}</Link>
                   </Button>
+                  <Button asChild variant="outline">
+                    <Link to="/finance">{t("nav.finance")}</Link>
+                  </Button>
                 </>
               }
             />

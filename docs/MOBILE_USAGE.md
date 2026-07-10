@@ -18,6 +18,7 @@ Stage 48 adds a Weekly Review foundation that summarizes the last 7 days of loca
 Stage 49 adds a Decision Log foundation that records local decisions, review dates, outcomes, and reflections while staying non-advisory and backup-compatible.
 Stage 50 hardens backup and restore so mobile users see clearer validation errors, older additive backups normalize safely, and malformed files are rejected before any local data changes.
 Stage 53 hardens dense mobile pages like Finance, Weekly Review, Decision Log, Settings, and Home so 360px to 430px screens keep readable cards, wrapped buttons, and sane section spacing without changing data, routes, or storage.
+Stage 54 improves empty states and first-run guidance on the same mobile-friendly surfaces so low-data users still get a clear next step without any onboarding modal or tour.
 The Personal Insights section stays local to the device and only reflects stored tasks, projects, inbox items, journal entries, knowledge items, and wellness checklist state.
 
 ## Open or install AliOS
