@@ -33,9 +33,10 @@ describe("manual entry helpers", () => {
       ...manualEntryRecord,
       id: "manual-draft",
       title: "Draft rule",
+      body: "This is a calmer draft rule for testing.",
       status: "draft" as const,
       category: "values" as const,
-      tags: ["draft"],
+      tags: ["Draft", "calm"],
     };
 
     const result = filterManualEntries(
@@ -43,7 +44,7 @@ describe("manual entry helpers", () => {
       {
         category: "values",
         status: "draft",
-        query: "draft",
+        query: "CALM",
       }
     );
 
@@ -57,6 +58,26 @@ describe("manual entry helpers", () => {
     expect(isManualEntryReviewDue(manualEntryRecord, new Date("2026-07-09T12:00:00.000Z"))).toBe(
       false
     );
+    expect(
+      isManualEntryReviewDue(
+        {
+          ...manualEntryRecord,
+          status: "archived",
+          id: "manual-archived",
+        },
+        new Date("2026-07-20T12:00:00.000Z")
+      )
+    ).toBe(false);
+    expect(
+      isManualEntryReviewDue(
+        {
+          ...manualEntryRecord,
+          id: "manual-invalid-interval",
+          reviewIntervalDays: 0 as never,
+        },
+        new Date("2026-07-20T12:00:00.000Z")
+      )
+    ).toBe(false);
   });
 
   it("summarizes manual entries for Home", () => {
@@ -66,5 +87,14 @@ describe("manual entry helpers", () => {
     expect(summary.activeCount).toBe(1);
     expect(summary.reviewDueCount).toBe(1);
     expect(summary.latestUpdatedEntry?.id).toBe(manualEntryRecord.id);
+  });
+
+  it("summarizes empty manual data safely", () => {
+    const summary = getManualEntrySummary([]);
+
+    expect(summary.totalCount).toBe(0);
+    expect(summary.activeCount).toBe(0);
+    expect(summary.reviewDueCount).toBe(0);
+    expect(summary.latestUpdatedEntry).toBeUndefined();
   });
 });

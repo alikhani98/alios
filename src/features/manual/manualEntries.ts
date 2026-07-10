@@ -18,7 +18,11 @@ export function isManualEntryReviewDue(
   entry: ManualEntry,
   referenceDate = new Date()
 ): boolean {
-  if (entry.status === "archived" || !entry.reviewIntervalDays) {
+  if (
+    entry.status === "archived" ||
+    !entry.reviewIntervalDays ||
+    entry.reviewIntervalDays <= 0
+  ) {
     return false;
   }
 
