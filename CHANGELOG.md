@@ -2,6 +2,12 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 62 - Bundle Size Audit & Initial Load Hardening
+
+- Moved the Dexie storage adapter behind an async app bootstrap load so the initial bundle no longer has to carry the storage layer eagerly
+- Kept a calm local loading fallback while the app boots, preserving routes, hash routing, and static-hosting compatibility
+- Reduced the production initial `index` chunk from 587.95 kB to 466.31 kB without changing package, Vite, Vitest, backup, or storage contracts
+
 ## Stage 61 - Personal Manual Export Center Integration
 
 - Added a readable Markdown export path for Personal Manual entries inside the existing Settings export center
