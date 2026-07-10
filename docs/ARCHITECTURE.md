@@ -35,6 +35,7 @@ AliOS 1.0 is a local-first static web app.
 - UI code reads and writes manual data through the feature hook, repository interface, and storage adapter boundary
 - Personal Manual review timing is deterministic and local, and the feature stays user-authored rather than advisory
 - Backup and restore include manual data additively without breaking older backups that do not contain the manual arrays
+- Global search may surface Personal Manual entries and route them through the same stable `focusId` query parameter pattern used by the other content pages, so a search result can jump to the exact local entry without a new routing model
 
 ## Backup / Restore Safety Boundary
 

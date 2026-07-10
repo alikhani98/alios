@@ -35,6 +35,7 @@ Stage 60 hardens the Personal Manual release with small QA fixes, better edge-ca
 Stage 61 integrates Personal Manual into the existing Export Center with a readable Markdown export, while leaving the backup format, backup version, storage schema, and storage adapters unchanged.
 Stage 62 reduces initial load cost by moving the Dexie storage adapter behind an async bootstrap path with a calm loading fallback, while keeping routes, hash routing, and the storage model unchanged.
 Stage 63 integrates Personal Manual review-due awareness into Weekly Review with a calm empty state, a mark-reviewed action, and a link back to the manual page, while keeping the review logic derived-only.
+Stage 64 integrates Personal Manual into Global Search and adds focus navigation back into the manual page using the existing local `focusId` query-parameter pattern.
 
 ## Version 1.1
 
