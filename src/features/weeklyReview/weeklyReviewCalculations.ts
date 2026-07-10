@@ -10,6 +10,7 @@ import {
 
 import type {
   DailyCheckin,
+  DecisionLogEntry,
   FinanceObligation,
   FinanceTransaction,
   InboxItem,
@@ -66,6 +67,13 @@ export type WeeklyReviewKnowledgeSummary = {
   createdInWindowCount: number;
 };
 
+export type WeeklyReviewDecisionSummary = {
+  totalCount: number;
+  createdInWindowCount: number;
+  needsReviewCount: number;
+  reviewedInWindowCount: number;
+};
+
 export type WeeklyReviewFinanceSummary = {
   transactionCount: number;
   incomeInWindow: number;
@@ -90,6 +98,7 @@ export type WeeklyReviewSectionId =
   | "inbox"
   | "journal"
   | "knowledge"
+  | "decisions"
   | "finance"
   | "wellness";
 
@@ -108,6 +117,7 @@ export type WeeklyReviewObservationKind =
   | "journalReflection"
   | "financeBalance"
   | "projectProgress"
+  | "decisionReview"
   | "wellnessCheckins"
   | "noData";
 
@@ -123,6 +133,7 @@ export type WeeklyReviewFocusKind =
   | "reviewOverdueTasks"
   | "writeJournalEntry"
   | "recordFinanceData"
+  | "reviewDecisions"
   | "refineProjectNextAction"
   | "addFirstTask";
 
@@ -138,6 +149,7 @@ export type WeeklyReviewSummary = {
   inboxSummary: WeeklyReviewInboxSummary;
   journalSummary: WeeklyReviewJournalSummary;
   knowledgeSummary: WeeklyReviewKnowledgeSummary;
+  decisionSummary: WeeklyReviewDecisionSummary;
   financeSummary: WeeklyReviewFinanceSummary;
   wellnessSummary: WeeklyReviewWellnessSummary;
   focusObservations: WeeklyReviewObservation[];
@@ -152,6 +164,7 @@ export type WeeklyReviewData = {
   inboxItems: ReadonlyArray<InboxItem>;
   journalEntries: ReadonlyArray<JournalEntry>;
   knowledgeItems: ReadonlyArray<KnowledgeItem>;
+  decisionLogEntries: ReadonlyArray<DecisionLogEntry>;
   financeTransactions: ReadonlyArray<FinanceTransaction>;
   financeObligations: ReadonlyArray<FinanceObligation>;
   dailyCheckins: ReadonlyArray<DailyCheckin>;
@@ -275,6 +288,7 @@ function buildEmptyStates(summary: {
   inboxSummary: WeeklyReviewInboxSummary;
   journalSummary: WeeklyReviewJournalSummary;
   knowledgeSummary: WeeklyReviewKnowledgeSummary;
+  decisionSummary: WeeklyReviewDecisionSummary;
   financeSummary: WeeklyReviewFinanceSummary;
   wellnessSummary: WeeklyReviewWellnessSummary;
 }): WeeklyReviewEmptyState[] {
@@ -298,6 +312,10 @@ function buildEmptyStates(summary: {
 
   if (summary.knowledgeSummary.totalCount === 0) {
     emptyStates.push({ sectionId: "knowledge" });
+  }
+
+  if (summary.decisionSummary.totalCount === 0) {
+    emptyStates.push({ sectionId: "decisions" });
   }
 
   if (
@@ -360,6 +378,14 @@ function buildObservations(summary: WeeklyReviewSummary): WeeklyReviewObservatio
     });
   }
 
+  if (summary.decisionSummary.needsReviewCount > 0) {
+    observations.push({
+      kind: "decisionReview",
+      tone: "needs-review",
+      count: summary.decisionSummary.needsReviewCount,
+    });
+  }
+
   if (summary.wellnessSummary.checkinCountInWindow > 0) {
     observations.push({
       kind: "wellnessCheckins",
@@ -393,6 +419,10 @@ function buildSuggestedFocus(summary: WeeklyReviewSummary): WeeklyReviewFocusSug
 
   if (summary.journalSummary.entriesInWindowCount === 0) {
     return [{ kind: "writeJournalEntry", tone: "next-focus" }];
+  }
+
+  if (summary.decisionSummary.needsReviewCount > 0) {
+    return [{ kind: "reviewDecisions", tone: "next-focus" }];
   }
 
   if (summary.financeSummary.transactionCount === 0) {
@@ -479,6 +509,31 @@ export function buildWeeklyReviewSummary(
     ).length,
   };
 
+  const decisionEntriesInWindow = data.decisionLogEntries.filter((entry) =>
+    isWithinRange(entry.createdAt, boundaries.start, boundaries.end)
+  );
+  const decisionSummary: WeeklyReviewDecisionSummary = {
+    totalCount: data.decisionLogEntries.length,
+    createdInWindowCount: decisionEntriesInWindow.length,
+    needsReviewCount: data.decisionLogEntries.filter((entry) =>
+      entry.status !== "reviewed" &&
+      entry.status !== "archived" &&
+      entry.reviewDate !== undefined &&
+      isWithinRange(entry.reviewDate, boundaries.start, boundaries.end)
+    ).length,
+    reviewedInWindowCount: data.decisionLogEntries.filter((entry) => {
+      if (entry.status !== "reviewed") {
+        return false;
+      }
+
+      const hasReflection = Boolean(
+        entry.actualOutcome?.trim().length || entry.lesson?.trim().length
+      );
+
+      return hasReflection && isWithinRange(entry.updatedAt, boundaries.start, boundaries.end);
+    }).length,
+  };
+
   const upcomingObligations = getUpcomingObligations(
     financeObligations,
     referenceDate
@@ -533,6 +588,7 @@ export function buildWeeklyReviewSummary(
     inboxSummary,
     journalSummary,
     knowledgeSummary,
+    decisionSummary,
     financeSummary,
     wellnessSummary,
     focusObservations: [],
@@ -547,6 +603,7 @@ export function buildWeeklyReviewSummary(
     summary.inboxSummary.totalCount > 0 ||
     summary.journalSummary.totalCount > 0 ||
     summary.knowledgeSummary.totalCount > 0 ||
+    summary.decisionSummary.totalCount > 0 ||
     summary.financeSummary.transactionCount > 0 ||
     summary.financeSummary.activeObligationsCount > 0 ||
     summary.wellnessSummary.checkinCountInWindow > 0;

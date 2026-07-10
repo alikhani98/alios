@@ -40,6 +40,7 @@ import type { HomeCollapsibleSectionId } from "../homeCollapsedSections";
 const quickLinks: ReadonlyArray<{ to: string; labelKey: TranslationKey }> = [
   { to: "/today", labelKey: "home.goToday" },
   { to: "/weekly-review", labelKey: "home.goWeeklyReview" },
+  { to: "/decisions", labelKey: "home.goDecisions" },
   { to: "/inbox", labelKey: "home.goInbox" },
   { to: "/projects", labelKey: "home.goProjects" },
   { to: "/journal", labelKey: "home.goJournal" },

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type {
   DailyCheckin,
+  DecisionLogEntry,
   FinanceObligation,
   FinanceTransaction,
   InboxItem,
@@ -135,6 +136,24 @@ function createCheckin(id: string, overrides: Partial<DailyCheckin> = {}): Daily
   };
 }
 
+function createDecision(
+  id: string,
+  overrides: Partial<DecisionLogEntry> = {}
+): DecisionLogEntry {
+  return {
+    id,
+    title: `Decision ${id}`,
+    decisionDate: "2026-07-01",
+    status: "open",
+    context: `Decision context ${id}`,
+    options: ["Option A", "Option B"],
+    tags: [],
+    createdAt: "2026-07-01T08:00:00.000Z",
+    updatedAt: "2026-07-01T08:00:00.000Z",
+    ...overrides,
+  };
+}
+
 describe("weekly review calculations", () => {
   it("builds a safe zero summary for empty data", () => {
     const summary = buildWeeklyReviewSummary(
@@ -144,6 +163,7 @@ describe("weekly review calculations", () => {
         inboxItems: [],
         journalEntries: [],
         knowledgeItems: [],
+        decisionLogEntries: [],
         financeTransactions: [],
         financeObligations: [],
         dailyCheckins: [],
@@ -186,6 +206,12 @@ describe("weekly review calculations", () => {
       totalCount: 0,
       createdInWindowCount: 0,
     });
+    expect(summary.decisionSummary).toEqual({
+      totalCount: 0,
+      createdInWindowCount: 0,
+      needsReviewCount: 0,
+      reviewedInWindowCount: 0,
+    });
     expect(summary.financeSummary).toEqual({
       transactionCount: 0,
       incomeInWindow: 0,
@@ -214,6 +240,7 @@ describe("weekly review calculations", () => {
       "inbox",
       "journal",
       "knowledge",
+      "decisions",
       "finance",
       "wellness",
     ]);
@@ -270,6 +297,7 @@ describe("weekly review calculations", () => {
             updatedAt: "2026-07-03T12:00:00.000Z",
           }),
         ],
+        decisionLogEntries: [],
         financeTransactions: [],
         financeObligations: [],
         dailyCheckins: [],
@@ -314,6 +342,7 @@ describe("weekly review calculations", () => {
         inboxItems: [],
         journalEntries: [],
         knowledgeItems: [],
+        decisionLogEntries: [],
         financeTransactions: [],
         financeObligations: [],
         dailyCheckins: [],
@@ -337,6 +366,7 @@ describe("weekly review calculations", () => {
         inboxItems: [],
         journalEntries: [],
         knowledgeItems: [],
+        decisionLogEntries: [],
         financeTransactions: [
           createTransaction("income", {
             type: "income",
@@ -412,6 +442,11 @@ describe("weekly review calculations", () => {
           updatedAt: "2026-07-08T08:00:00.000Z",
         }),
       ],
+      decisionLogEntries: [
+        createDecision("decision", {
+          reviewDate: "2026-07-09",
+        }),
+      ],
       financeTransactions: [
         createTransaction("expense", {
           type: "expense",
@@ -440,6 +475,12 @@ describe("weekly review calculations", () => {
       "journalReflection",
       "financeBalance",
     ]);
+    expect(first.decisionSummary).toMatchObject({
+      totalCount: 1,
+      createdInWindowCount: 0,
+      needsReviewCount: 1,
+      reviewedInWindowCount: 0,
+    });
     expect(first.suggestedFocus).toEqual([
       { kind: "processInbox", tone: "next-focus" },
     ]);
@@ -460,6 +501,7 @@ describe("weekly review calculations", () => {
         inboxItems: [],
         journalEntries: [],
         knowledgeItems: [],
+        decisionLogEntries: [],
         financeTransactions: [
           createTransaction("future-income", {
             type: "income",

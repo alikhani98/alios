@@ -54,6 +54,11 @@ const WeeklyReviewPage = lazy(() =>
     default: module.WeeklyReviewPage,
   }))
 );
+const DecisionLogPage = lazy(() =>
+  import("@/features/decisions/pages/DecisionLogPage").then((module) => ({
+    default: module.DecisionLogPage,
+  }))
+);
 
 const router = createHashRouter([
   {
@@ -137,6 +142,14 @@ const router = createHashRouter([
         element: (
           <Suspense fallback={<RouteLoadingFallback />}>
             <WeeklyReviewPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "decisions",
+        element: (
+          <Suspense fallback={<RouteLoadingFallback />}>
+            <DecisionLogPage />
           </Suspense>
         ),
       },

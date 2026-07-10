@@ -1,5 +1,6 @@
 import type {
   CreateDailyCheckinInput,
+  CreateDecisionLogEntryInput,
   CreateFinanceObligationInput,
   CreateFinanceTransactionInput,
   CreateJournalEntryInput,
@@ -11,6 +12,7 @@ import type {
 } from "@/core/repositories";
 import type {
   DailyCheckin,
+  DecisionLogEntry,
   FinanceObligation,
   FinanceTransaction,
   JournalEntry,
@@ -102,6 +104,27 @@ export const financeObligationInput: CreateFinanceObligationInput = {
   notes: "Monthly installment for the phone",
 };
 
+export const decisionLogInput: CreateDecisionLogEntryInput = {
+  title: "Choose release focus",
+  decisionDate: "2026-07-05",
+  status: "open",
+  category: "release",
+  context: "We need to decide whether to prioritize review polish or dashboard tweaks.",
+  options: [
+    "Ship Decision Log foundation",
+    "Polish weekly review first",
+  ],
+  chosenOption: "Ship Decision Log foundation",
+  reasoning: "The new decision module supports the next stage of personal operating system work.",
+  expectedOutcome: "A practical local place to capture and revisit important decisions.",
+  reviewDate: "2026-07-08",
+  actualOutcome: "The feature shipped successfully.",
+  lesson: "Keeping the form focused made the page much easier to use.",
+  confidence: 4,
+  importance: 5,
+  tags: ["release", "product"],
+};
+
 const metadata = {
   id: "fixture-id",
   createdAt: timestamp,
@@ -134,5 +157,9 @@ export const financeTransactionRecord: FinanceTransaction = {
 };
 export const financeObligationRecord: FinanceObligation = {
   ...financeObligationInput,
+  ...metadata,
+};
+export const decisionLogRecord: DecisionLogEntry = {
+  ...decisionLogInput,
   ...metadata,
 };

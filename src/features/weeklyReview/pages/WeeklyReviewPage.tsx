@@ -5,6 +5,7 @@ import {
   CircleCheckBig,
   CalendarDays,
   ClipboardList,
+  GitBranch,
   FolderKanban,
   Inbox,
   NotebookPen,
@@ -40,6 +41,7 @@ const quickLinks: ReadonlyArray<{ to: string; labelKey: TranslationKey }> = [
   { to: "/inbox", labelKey: "nav.inbox" },
   { to: "/projects", labelKey: "nav.projects" },
   { to: "/journal", labelKey: "nav.journal" },
+  { to: "/decisions", labelKey: "nav.decisions" },
   { to: "/finance", labelKey: "nav.finance" },
 ];
 
@@ -75,6 +77,8 @@ function getObservationMessageKey(observation: WeeklyReviewObservation) {
       return "weeklyReview.observationFinanceBalance";
     case "projectProgress":
       return "weeklyReview.observationProjectProgress";
+    case "decisionReview":
+      return "weeklyReview.observationDecisionReview";
     case "wellnessCheckins":
       return "weeklyReview.observationWellnessCheckins";
     case "noData":
@@ -93,6 +97,8 @@ function getFocusMessageKey(suggestion: WeeklyReviewFocusSuggestion) {
       return "weeklyReview.focusWriteJournalEntry";
     case "recordFinanceData":
       return "weeklyReview.focusRecordFinanceData";
+    case "reviewDecisions":
+      return "weeklyReview.focusReviewDecisions";
     case "refineProjectNextAction":
       return "weeklyReview.focusRefineProjectNextAction";
     case "addFirstTask":
@@ -160,6 +166,21 @@ export function WeeklyReviewPage() {
           label: t("weeklyReview.activeProjects"),
           value: summary.projectSummary.activeCount,
           description: t("weeklyReview.activeProjectsDescription"),
+        },
+        {
+          icon: <GitBranch className="h-5 w-5" />,
+          label: t("weeklyReview.needsReviewDecisions"),
+          value: summary.decisionSummary.needsReviewCount,
+          description: t("weeklyReview.decisionWindowDescription"),
+          status: (
+            <StatusChip
+              tone={summary.decisionSummary.needsReviewCount > 0 ? "warning" : "neutral"}
+            >
+              {summary.decisionSummary.needsReviewCount > 0
+                ? t("weeklyReview.needsReview")
+                : t("weeklyReview.goodSignal")}
+            </StatusChip>
+          ),
         },
         {
           icon: <Wallet className="h-5 w-5" />,
@@ -460,6 +481,54 @@ export function WeeklyReviewPage() {
                   ) : null}
                 </SoftPanel>
               </div>
+            </CollapsibleSection>
+
+            <CollapsibleSection
+              id="weekly-review-decisions"
+              title={t("weeklyReview.decisionsSection")}
+              description={t("weeklyReview.decisionsSectionDescription")}
+              icon={<GitBranch className="h-5 w-5" />}
+              status={
+                <StatusChip tone={summary.decisionSummary.needsReviewCount > 0 ? "warning" : "neutral"}>
+                  {summary.decisionSummary.needsReviewCount}
+                </StatusChip>
+              }
+              contentClassName="space-y-3"
+            >
+              <div className="grid gap-3 sm:grid-cols-2">
+                <SoftPanel>
+                  <p className="text-xs text-muted-foreground">{t("weeklyReview.decisionsCreated")}</p>
+                  <p className="mt-1 text-lg font-semibold tabular-nums">{summary.decisionSummary.createdInWindowCount}</p>
+                </SoftPanel>
+                <SoftPanel>
+                  <p className="text-xs text-muted-foreground">{t("weeklyReview.decisionReviewDue")}</p>
+                  <p className="mt-1 text-lg font-semibold tabular-nums">{summary.decisionSummary.needsReviewCount}</p>
+                </SoftPanel>
+                <SoftPanel>
+                  <p className="text-xs text-muted-foreground">{t("weeklyReview.reviewedDecisions")}</p>
+                  <p className="mt-1 text-lg font-semibold tabular-nums">{summary.decisionSummary.reviewedInWindowCount}</p>
+                </SoftPanel>
+                <SoftPanel>
+                  <p className="text-xs text-muted-foreground">{t("weeklyReview.totalDecisions")}</p>
+                  <p className="mt-1 text-lg font-semibold tabular-nums">{summary.decisionSummary.totalCount}</p>
+                </SoftPanel>
+              </div>
+              <SoftPanel className="space-y-2">
+                <p className="text-sm leading-7 text-muted-foreground">
+                  {t("weeklyReview.decisionWindowDescription")}
+                </p>
+                <p className="text-xs leading-6 text-muted-foreground">
+                  {t("weeklyReview.decisionAwarenessNote")}
+                </p>
+              </SoftPanel>
+
+              {hasEmptyState(summary.emptyStates, "decisions") ? (
+                <EmptyState
+                  icon={<GitBranch className="h-6 w-6" />}
+                  title={t("weeklyReview.decisionsEmptyTitle")}
+                  description={t("weeklyReview.decisionsEmptyDescription")}
+                />
+              ) : null}
             </CollapsibleSection>
 
             <CollapsibleSection

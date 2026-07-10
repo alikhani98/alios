@@ -17,6 +17,7 @@ export function useWeeklyReview() {
     inbox,
     journal,
     knowledge,
+    decisions,
     finance,
     dailyCheckins,
   } = useStorageAdapter();
@@ -36,6 +37,7 @@ export function useWeeklyReview() {
         loadedInboxItems,
         loadedJournalEntries,
         loadedKnowledgeItems,
+        loadedDecisionLogEntries,
         loadedTransactions,
         loadedObligations,
         loadedCheckins,
@@ -45,6 +47,7 @@ export function useWeeklyReview() {
         inbox.list(),
         journal.list(),
         knowledge.list(),
+        decisions.list(),
         finance.listTransactions(),
         finance.listObligations(),
         dailyCheckins.list(),
@@ -54,13 +57,14 @@ export function useWeeklyReview() {
         buildWeeklyReviewSummary(
           {
             tasks: loadedTasks,
-            projects: loadedProjects,
-            inboxItems: loadedInboxItems,
-            journalEntries: loadedJournalEntries,
-            knowledgeItems: loadedKnowledgeItems,
-            financeTransactions: loadedTransactions,
-            financeObligations: loadedObligations,
-            dailyCheckins: loadedCheckins,
+          projects: loadedProjects,
+          inboxItems: loadedInboxItems,
+          journalEntries: loadedJournalEntries,
+          knowledgeItems: loadedKnowledgeItems,
+          decisionLogEntries: loadedDecisionLogEntries,
+          financeTransactions: loadedTransactions,
+          financeObligations: loadedObligations,
+          dailyCheckins: loadedCheckins,
           },
           referenceDate
         )
@@ -70,7 +74,7 @@ export function useWeeklyReview() {
     } finally {
       setIsLoading(false);
     }
-  }, [dailyCheckins, finance, inbox, journal, knowledge, projects, tasks]);
+  }, [dailyCheckins, decisions, finance, inbox, journal, knowledge, projects, tasks]);
 
   useEffect(() => {
     void loadWeeklyReview();

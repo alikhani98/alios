@@ -4,6 +4,7 @@ import { ValidationError } from "@/core/errors";
 import type { AliosDatabase, DexieStorageAdapter } from "@/db/dexie";
 import {
   dailyCheckinInput,
+  decisionLogInput,
   financeObligationInput,
   financeTransactionInput,
   journalEntryInput,
@@ -186,6 +187,24 @@ describe("Dexie repositories", () => {
     await storage.finance.deleteObligation(created.id);
     expect(await storage.finance.listObligations()).toEqual([]);
     expect(await storage.finance.getObligationById(created.id)).toBeUndefined();
+  });
+
+  it("supports the complete Decision Log CRUD lifecycle", async () => {
+    const created = await storage.decisions.create(decisionLogInput);
+
+    expect(created.id).toMatch(/^[0-9a-f-]{36}$/i);
+    expect(await storage.decisions.list()).toEqual([created]);
+
+    const updated = await storage.decisions.update(created.id, {
+      status: "reviewed",
+      actualOutcome: "It worked well.",
+      lesson: "Keep the page calm.",
+    });
+    expect(updated.status).toBe("reviewed");
+    expect(updated.actualOutcome).toBe("It worked well.");
+
+    await storage.decisions.delete(created.id);
+    expect(await storage.decisions.list()).toEqual([]);
   });
 
   it("supports the complete Inbox CRUD and status lifecycle", async () => {

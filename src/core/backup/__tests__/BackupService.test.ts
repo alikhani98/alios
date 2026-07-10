@@ -5,6 +5,7 @@ import type { AliosDatabase, DexieStorageAdapter } from "@/db/dexie";
 import { LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
 import {
   dailyCheckinInput,
+  decisionLogInput,
   financeObligationInput,
   financeTransactionInput,
   journalEntryInput,
@@ -42,6 +43,7 @@ describe("BackupService with DexieBackupStorage", () => {
     const financeObligation = await storage.finance.createObligation(
       financeObligationInput
     );
+    const decisionLogEntry = await storage.decisions.create(decisionLogInput);
     const journalEntry = await storage.journal.create(journalEntryInput);
     const knowledgeItem = await storage.knowledge.create(knowledgeItemInput);
     const dailyCheckin = await storage.dailyCheckins.create(dailyCheckinInput);
@@ -57,6 +59,7 @@ describe("BackupService with DexieBackupStorage", () => {
       [
         "dailyCheckins",
         "tasks",
+        "decisionLogEntries",
         "financeTransactions",
         "financeObligations",
         "projects",
@@ -73,6 +76,7 @@ describe("BackupService with DexieBackupStorage", () => {
     expect(backup.data.journalEntries).toEqual([journalEntry]);
     expect(backup.data.knowledgeItems).toEqual([knowledgeItem]);
     expect(backup.data.dailyCheckins).toEqual([dailyCheckin]);
+    expect(backup.data.decisionLogEntries).toEqual([decisionLogEntry]);
     expect(backup.data.settings).toEqual([setting]);
     expect(backup.data.inboxItems).toEqual([inboxItem]);
     expect(
@@ -87,6 +91,7 @@ describe("BackupService with DexieBackupStorage", () => {
     expect(await storage.backup.getSummary()).toEqual({
       dailyCheckins: 0,
       tasks: 0,
+      decisionLogEntries: 0,
       financeTransactions: 0,
       financeObligations: 0,
       projects: 0,
@@ -111,6 +116,7 @@ describe("BackupService with DexieBackupStorage", () => {
     expect(await storage.knowledge.getById(knowledgeItem.id)).toEqual(
       knowledgeItem
     );
+    expect(await storage.decisions.list()).toEqual([decisionLogEntry]);
     expect(await storage.dailyCheckins.getByDate(dailyCheckin.date)).toEqual(
       dailyCheckin
     );
@@ -123,6 +129,7 @@ describe("BackupService with DexieBackupStorage", () => {
     const backup = await service.createBackup();
     const {
       inboxItems: _omittedInbox,
+      decisionLogEntries: _omittedDecisionLogEntries,
       financeTransactions: _omittedFinanceTransactions,
       financeObligations: _omittedFinanceObligations,
       ...oldData
@@ -131,6 +138,7 @@ describe("BackupService with DexieBackupStorage", () => {
 
     expect(oldBackup.data.financeTransactions).toEqual([]);
     expect(oldBackup.data.financeObligations).toEqual([]);
+    expect(oldBackup.data.decisionLogEntries).toEqual([]);
     expect(oldBackup.data.inboxItems).toEqual([]);
     await service.restoreBackup(oldBackup);
     expect(await storage.inbox.list()).toEqual([]);

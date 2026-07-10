@@ -21,6 +21,13 @@ AliOS 1.0 is a local-first static web app.
 - Finance calculations and visual summaries stay deterministic and local, with no advice engine, bank integration, chart library, or cloud dependency
 - Backup and restore include finance data additively without breaking older backups that do not contain the finance arrays
 
+## Decision Log Module Boundary
+
+- Decision Log data lives in a dedicated Dexie table for local decision entries
+- UI code reads and writes decision data through the feature hook, repository interface, and storage adapter boundary
+- Decision Log review-due logic is deterministic and local, and the feature stays non-advisory
+- Backup and restore include decision log data additively without breaking older backups that do not contain the decision arrays
+
 ## Runtime Rule
 
 AliOS does not require a Node.js server in production. Node.js is allowed for development, dependency installation, and building static assets.
