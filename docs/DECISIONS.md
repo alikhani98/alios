@@ -158,3 +158,18 @@ Reason:
 - Beginner guidance belongs where users already manage local preferences and data safety
 - Static in-app guidance keeps AliOS aligned with the local-first, single-user, static-hosting model
 - Avoiding a chatbot or external docs system prevents unnecessary dependencies and architecture changes
+
+## ADR-015: Keep Weekly Review derived-only and rule-based
+
+Decision:
+
+- Weekly Review summarizes the last 7 days of existing local data only
+- Weekly Review is read-only and stores no new weekly-review snapshot, cache, or summary table
+- Weekly Review observations and suggested focus use deterministic rules, not AI or predictive analytics
+- Finance and wellness wording in Weekly Review stays awareness-only and non-advisory
+
+Reason:
+
+- The review page should help the user reflect on their own local activity without changing the storage model
+- A derived-only design keeps the feature compatible with static hosting, local-first persistence, and the existing repository boundaries
+- Rule-based summaries avoid the scope creep of AI, financial advice, medical guidance, or a general analytics engine

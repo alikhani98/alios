@@ -1,0 +1,558 @@
+import {
+  addDays,
+  endOfDay,
+  format,
+  isValid,
+  parseISO,
+  startOfDay,
+  subDays,
+} from "date-fns";
+
+import type {
+  DailyCheckin,
+  FinanceObligation,
+  FinanceTransaction,
+  InboxItem,
+  JournalEntry,
+  KnowledgeItem,
+  Project,
+  Task,
+} from "@/shared/types";
+
+import {
+  calculateMonthlyObligationEstimate,
+  calculateRemainingObligationTotal,
+  getUpcomingObligations,
+} from "../finance/financeCalculations";
+
+export type WeeklyReviewWindow = {
+  days: number;
+  startDate: string;
+  endDate: string;
+};
+
+export type WeeklyReviewTaskSummary = {
+  totalCount: number;
+  completedCount: number;
+  openCount: number;
+  overdueCount: number;
+  dueSoonCount: number;
+  completedInWindowCount: number;
+};
+
+export type WeeklyReviewProjectSummary = {
+  totalCount: number;
+  activeCount: number;
+  projectsWithNextActionCount: number;
+  needsAttentionCount: number;
+};
+
+export type WeeklyReviewInboxSummary = {
+  totalCount: number;
+  pendingCount: number;
+  processedCount: number;
+  capturedInWindowCount: number;
+};
+
+export type WeeklyReviewJournalSummary = {
+  totalCount: number;
+  entriesInWindowCount: number;
+  averageMoodLevel: number | null;
+  averageEnergyLevel: number | null;
+};
+
+export type WeeklyReviewKnowledgeSummary = {
+  totalCount: number;
+  createdInWindowCount: number;
+};
+
+export type WeeklyReviewFinanceSummary = {
+  transactionCount: number;
+  incomeInWindow: number;
+  expensesInWindow: number;
+  netCashflowInWindow: number;
+  activeObligationsCount: number;
+  upcomingObligationsCount: number;
+  remainingObligationTotal: number;
+  monthlyObligationsEstimate: number;
+};
+
+export type WeeklyReviewWellnessSummary = {
+  checkinCountInWindow: number;
+  notesCountInWindow: number;
+  averageMoodLevel: number | null;
+  averageEnergyLevel: number | null;
+};
+
+export type WeeklyReviewSectionId =
+  | "tasks"
+  | "projects"
+  | "inbox"
+  | "journal"
+  | "knowledge"
+  | "finance"
+  | "wellness";
+
+export type WeeklyReviewEmptyState = {
+  sectionId: WeeklyReviewSectionId;
+};
+
+export type WeeklyReviewObservationTone =
+  | "awareness"
+  | "needs-review"
+  | "good-signal";
+
+export type WeeklyReviewObservationKind =
+  | "overdueTasks"
+  | "pendingInbox"
+  | "journalReflection"
+  | "financeBalance"
+  | "projectProgress"
+  | "wellnessCheckins"
+  | "noData";
+
+export type WeeklyReviewObservation = {
+  kind: WeeklyReviewObservationKind;
+  tone: WeeklyReviewObservationTone;
+  count?: number;
+  amount?: number;
+};
+
+export type WeeklyReviewFocusKind =
+  | "processInbox"
+  | "reviewOverdueTasks"
+  | "writeJournalEntry"
+  | "recordFinanceData"
+  | "refineProjectNextAction"
+  | "addFirstTask";
+
+export type WeeklyReviewFocusSuggestion = {
+  kind: WeeklyReviewFocusKind;
+  tone: "next-focus";
+};
+
+export type WeeklyReviewSummary = {
+  reviewWindow: WeeklyReviewWindow;
+  taskSummary: WeeklyReviewTaskSummary;
+  projectSummary: WeeklyReviewProjectSummary;
+  inboxSummary: WeeklyReviewInboxSummary;
+  journalSummary: WeeklyReviewJournalSummary;
+  knowledgeSummary: WeeklyReviewKnowledgeSummary;
+  financeSummary: WeeklyReviewFinanceSummary;
+  wellnessSummary: WeeklyReviewWellnessSummary;
+  focusObservations: WeeklyReviewObservation[];
+  suggestedFocus: WeeklyReviewFocusSuggestion[];
+  emptyStates: WeeklyReviewEmptyState[];
+  hasAnyData: boolean;
+};
+
+export type WeeklyReviewData = {
+  tasks: ReadonlyArray<Task>;
+  projects: ReadonlyArray<Project>;
+  inboxItems: ReadonlyArray<InboxItem>;
+  journalEntries: ReadonlyArray<JournalEntry>;
+  knowledgeItems: ReadonlyArray<KnowledgeItem>;
+  financeTransactions: ReadonlyArray<FinanceTransaction>;
+  financeObligations: ReadonlyArray<FinanceObligation>;
+  dailyCheckins: ReadonlyArray<DailyCheckin>;
+};
+
+type ReviewWindowBoundaries = {
+  start: Date;
+  end: Date;
+  upcomingStart: Date;
+  upcomingEnd: Date;
+};
+
+const LEVEL_MAP: Record<"low" | "medium" | "good", number> = {
+  low: 1,
+  medium: 2,
+  good: 3,
+};
+
+function parseDate(value: string): Date | null {
+  const parsed = parseISO(value);
+  return isValid(parsed) ? parsed : null;
+}
+
+function isWithinRange(value: string, start: Date, end: Date): boolean {
+  const parsed = parseDate(value);
+  return parsed !== null && parsed.getTime() >= start.getTime() && parsed.getTime() <= end.getTime();
+}
+
+function isOpenTask(task: Task): boolean {
+  return task.status !== "done" && task.status !== "cancelled";
+}
+
+function isTaskCompleted(task: Task): boolean {
+  return task.status === "done";
+}
+
+function getWeeklyReviewBoundaries(referenceDate: Date): ReviewWindowBoundaries {
+  const start = startOfDay(subDays(referenceDate, 6));
+  const end = endOfDay(referenceDate);
+  const upcomingStart = startOfDay(addDays(referenceDate, 1));
+  const upcomingEnd = endOfDay(addDays(referenceDate, 7));
+
+  return {
+    start,
+    end,
+    upcomingStart,
+    upcomingEnd,
+  };
+}
+
+export function getWeeklyReviewWindow(referenceDate = new Date()): WeeklyReviewWindow {
+  const boundaries = getWeeklyReviewBoundaries(referenceDate);
+
+  return {
+    days: 7,
+    startDate: format(boundaries.start, "yyyy-MM-dd"),
+    endDate: format(boundaries.end, "yyyy-MM-dd"),
+  };
+}
+
+function calculateAverageLevel(
+  values: ReadonlyArray<"low" | "medium" | "good">
+): number | null {
+  if (values.length === 0) {
+    return null;
+  }
+
+  const total = values.reduce((sum, value) => sum + LEVEL_MAP[value], 0);
+  return total / values.length;
+}
+
+function getTaskCompletionTimestamp(task: Task): Date | null {
+  const source = task.completedAt ?? task.updatedAt;
+  return parseDate(source);
+}
+
+function isTaskDueSoon(task: Task, boundaries: ReviewWindowBoundaries): boolean {
+  if (!isOpenTask(task) || !task.dueDate) {
+    return false;
+  }
+
+  const parsedDueDate = parseDate(task.dueDate);
+  return (
+    parsedDueDate !== null &&
+    parsedDueDate.getTime() >= boundaries.upcomingStart.getTime() &&
+    parsedDueDate.getTime() <= boundaries.upcomingEnd.getTime()
+  );
+}
+
+function isTaskOverdue(task: Task, referenceDate: Date): boolean {
+  if (!isOpenTask(task) || !task.dueDate) {
+    return false;
+  }
+
+  const parsedDueDate = parseDate(task.dueDate);
+  return parsedDueDate !== null && parsedDueDate.getTime() < startOfDay(referenceDate).getTime();
+}
+
+function hasProjectNextAction(project: Project): boolean {
+  return project.nextAction !== undefined && project.nextAction.trim().length > 0;
+}
+
+function needsProjectAttention(project: Project, referenceDate: Date): boolean {
+  if (project.status !== "active") {
+    return false;
+  }
+
+  const hasNextAction = hasProjectNextAction(project);
+  const reviewDate = project.reviewDate ? parseDate(project.reviewDate) : null;
+
+  if (!hasNextAction) {
+    return true;
+  }
+
+  return reviewDate !== null && reviewDate.getTime() <= endOfDay(referenceDate).getTime();
+}
+
+function buildEmptyStates(summary: {
+  taskSummary: WeeklyReviewTaskSummary;
+  projectSummary: WeeklyReviewProjectSummary;
+  inboxSummary: WeeklyReviewInboxSummary;
+  journalSummary: WeeklyReviewJournalSummary;
+  knowledgeSummary: WeeklyReviewKnowledgeSummary;
+  financeSummary: WeeklyReviewFinanceSummary;
+  wellnessSummary: WeeklyReviewWellnessSummary;
+}): WeeklyReviewEmptyState[] {
+  const emptyStates: WeeklyReviewEmptyState[] = [];
+
+  if (summary.taskSummary.totalCount === 0) {
+    emptyStates.push({ sectionId: "tasks" });
+  }
+
+  if (summary.projectSummary.totalCount === 0) {
+    emptyStates.push({ sectionId: "projects" });
+  }
+
+  if (summary.inboxSummary.totalCount === 0) {
+    emptyStates.push({ sectionId: "inbox" });
+  }
+
+  if (summary.journalSummary.totalCount === 0) {
+    emptyStates.push({ sectionId: "journal" });
+  }
+
+  if (summary.knowledgeSummary.totalCount === 0) {
+    emptyStates.push({ sectionId: "knowledge" });
+  }
+
+  if (
+    summary.financeSummary.transactionCount === 0 &&
+    summary.financeSummary.activeObligationsCount === 0
+  ) {
+    emptyStates.push({ sectionId: "finance" });
+  }
+
+  if (summary.wellnessSummary.checkinCountInWindow === 0) {
+    emptyStates.push({ sectionId: "wellness" });
+  }
+
+  return emptyStates;
+}
+
+function buildObservations(summary: WeeklyReviewSummary): WeeklyReviewObservation[] {
+  const observations: WeeklyReviewObservation[] = [];
+
+  if (summary.taskSummary.overdueCount > 0) {
+    observations.push({
+      kind: "overdueTasks",
+      tone: "needs-review",
+      count: summary.taskSummary.overdueCount,
+    });
+  }
+
+  if (summary.inboxSummary.pendingCount > 0) {
+    observations.push({
+      kind: "pendingInbox",
+      tone: "needs-review",
+      count: summary.inboxSummary.pendingCount,
+    });
+  }
+
+  if (summary.journalSummary.entriesInWindowCount > 0) {
+    observations.push({
+      kind: "journalReflection",
+      tone: "good-signal",
+      count: summary.journalSummary.entriesInWindowCount,
+    });
+  }
+
+  if (
+    summary.financeSummary.transactionCount > 0 &&
+    summary.financeSummary.expensesInWindow > summary.financeSummary.incomeInWindow
+  ) {
+    observations.push({
+      kind: "financeBalance",
+      tone: "awareness",
+      amount: summary.financeSummary.expensesInWindow - summary.financeSummary.incomeInWindow,
+    });
+  }
+
+  if (summary.projectSummary.projectsWithNextActionCount > 0) {
+    observations.push({
+      kind: "projectProgress",
+      tone: "good-signal",
+      count: summary.projectSummary.projectsWithNextActionCount,
+    });
+  }
+
+  if (summary.wellnessSummary.checkinCountInWindow > 0) {
+    observations.push({
+      kind: "wellnessCheckins",
+      tone: "good-signal",
+      count: summary.wellnessSummary.checkinCountInWindow,
+    });
+  }
+
+  if (observations.length === 0) {
+    observations.push({
+      kind: "noData",
+      tone: "awareness",
+    });
+  }
+
+  return observations.slice(0, 4);
+}
+
+function buildSuggestedFocus(summary: WeeklyReviewSummary): WeeklyReviewFocusSuggestion[] {
+  if (!summary.hasAnyData) {
+    return [{ kind: "addFirstTask", tone: "next-focus" }];
+  }
+
+  if (summary.inboxSummary.pendingCount > 0) {
+    return [{ kind: "processInbox", tone: "next-focus" }];
+  }
+
+  if (summary.taskSummary.overdueCount > 0) {
+    return [{ kind: "reviewOverdueTasks", tone: "next-focus" }];
+  }
+
+  if (summary.journalSummary.entriesInWindowCount === 0) {
+    return [{ kind: "writeJournalEntry", tone: "next-focus" }];
+  }
+
+  if (summary.financeSummary.transactionCount === 0) {
+    return [{ kind: "recordFinanceData", tone: "next-focus" }];
+  }
+
+  if (summary.projectSummary.needsAttentionCount > 0) {
+    return [{ kind: "refineProjectNextAction", tone: "next-focus" }];
+  }
+
+  return [{ kind: "addFirstTask", tone: "next-focus" }];
+}
+
+function getMeanLevel(values: Array<"low" | "medium" | "good">): number | null {
+  return calculateAverageLevel(values);
+}
+
+export function buildWeeklyReviewSummary(
+  data: WeeklyReviewData,
+  referenceDate = new Date()
+): WeeklyReviewSummary {
+  const boundaries = getWeeklyReviewBoundaries(referenceDate);
+  const reviewWindow = getWeeklyReviewWindow(referenceDate);
+  const financeTransactions = [...data.financeTransactions];
+  const financeObligations = [...data.financeObligations];
+
+  const taskSummary: WeeklyReviewTaskSummary = {
+    totalCount: data.tasks.length,
+    completedCount: data.tasks.filter(isTaskCompleted).length,
+    openCount: data.tasks.filter(isOpenTask).length,
+    overdueCount: data.tasks.filter((task) => isTaskOverdue(task, referenceDate)).length,
+    dueSoonCount: data.tasks.filter((task) => isTaskDueSoon(task, boundaries)).length,
+    completedInWindowCount: data.tasks.filter((task) => {
+      if (!isTaskCompleted(task)) {
+        return false;
+      }
+
+      const completedAt = getTaskCompletionTimestamp(task);
+      return completedAt !== null && completedAt.getTime() >= boundaries.start.getTime() && completedAt.getTime() <= boundaries.end.getTime();
+    }).length,
+  };
+
+  const projectSummary: WeeklyReviewProjectSummary = {
+    totalCount: data.projects.length,
+    activeCount: data.projects.filter((project) => project.status === "active").length,
+    projectsWithNextActionCount: data.projects.filter(
+      (project) => project.status === "active" && hasProjectNextAction(project)
+    ).length,
+    needsAttentionCount: data.projects.filter((project) =>
+      needsProjectAttention(project, referenceDate)
+    ).length,
+  };
+
+  const inboxSummary: WeeklyReviewInboxSummary = {
+    totalCount: data.inboxItems.length,
+    pendingCount: data.inboxItems.filter((item) => item.status === "unprocessed").length,
+    processedCount: data.inboxItems.filter((item) => item.status === "processed").length,
+    capturedInWindowCount: data.inboxItems.filter((item) =>
+      isWithinRange(item.createdAt, boundaries.start, boundaries.end)
+    ).length,
+  };
+
+  const journalMoodValues = data.journalEntries
+    .filter((entry) => isWithinRange(entry.date, boundaries.start, boundaries.end))
+    .flatMap((entry) => (entry.moodLevel ? [entry.moodLevel] : []));
+  const journalEnergyValues = data.journalEntries
+    .filter((entry) => isWithinRange(entry.date, boundaries.start, boundaries.end))
+    .flatMap((entry) => (entry.energyLevel ? [entry.energyLevel] : []));
+  const journalEntriesInWindow = data.journalEntries.filter((entry) =>
+    isWithinRange(entry.date, boundaries.start, boundaries.end)
+  );
+
+  const journalSummary: WeeklyReviewJournalSummary = {
+    totalCount: data.journalEntries.length,
+    entriesInWindowCount: journalEntriesInWindow.length,
+    averageMoodLevel: getMeanLevel(journalMoodValues),
+    averageEnergyLevel: getMeanLevel(journalEnergyValues),
+  };
+
+  const knowledgeSummary: WeeklyReviewKnowledgeSummary = {
+    totalCount: data.knowledgeItems.length,
+    createdInWindowCount: data.knowledgeItems.filter((item) =>
+      isWithinRange(item.createdAt, boundaries.start, boundaries.end)
+    ).length,
+  };
+
+  const upcomingObligations = getUpcomingObligations(
+    financeObligations,
+    referenceDate
+  );
+  const weeklyTransactions = financeTransactions.filter((transaction) =>
+    isWithinRange(transaction.occurredAt, boundaries.start, boundaries.end)
+  );
+  const incomeInWindow = weeklyTransactions
+    .filter((transaction) => transaction.type === "income")
+    .reduce((total, transaction) => total + transaction.amount, 0);
+  const expensesInWindow = weeklyTransactions
+    .filter((transaction) => transaction.type === "expense")
+    .reduce((total, transaction) => total + transaction.amount, 0);
+
+  const financeSummary: WeeklyReviewFinanceSummary = {
+    transactionCount: weeklyTransactions.length,
+    incomeInWindow,
+    expensesInWindow,
+    netCashflowInWindow: incomeInWindow - expensesInWindow,
+    activeObligationsCount: financeObligations.filter((obligation) => obligation.status === "active").length,
+    upcomingObligationsCount: upcomingObligations.filter((item) => item.label === "dueSoon").length,
+    remainingObligationTotal: calculateRemainingObligationTotal(financeObligations),
+    monthlyObligationsEstimate: calculateMonthlyObligationEstimate(
+      financeObligations,
+      referenceDate
+    ),
+  };
+
+  const wellnessCheckinsInWindow = data.dailyCheckins.filter((checkin) =>
+    isWithinRange(checkin.date, boundaries.start, boundaries.end)
+  );
+  const wellnessMoodValues = wellnessCheckinsInWindow.flatMap((checkin) =>
+    checkin.moodLevel ? [checkin.moodLevel] : []
+  );
+  const wellnessEnergyValues = wellnessCheckinsInWindow.flatMap((checkin) =>
+    checkin.energyLevel ? [checkin.energyLevel] : []
+  );
+
+  const wellnessSummary: WeeklyReviewWellnessSummary = {
+    checkinCountInWindow: wellnessCheckinsInWindow.length,
+    notesCountInWindow: wellnessCheckinsInWindow.filter(
+      (checkin) => checkin.notes?.trim().length
+    ).length,
+    averageMoodLevel: getMeanLevel(wellnessMoodValues),
+    averageEnergyLevel: getMeanLevel(wellnessEnergyValues),
+  };
+
+  const summary: WeeklyReviewSummary = {
+    reviewWindow,
+    taskSummary,
+    projectSummary,
+    inboxSummary,
+    journalSummary,
+    knowledgeSummary,
+    financeSummary,
+    wellnessSummary,
+    focusObservations: [],
+    suggestedFocus: [],
+    emptyStates: [],
+    hasAnyData: false,
+  };
+
+  summary.hasAnyData =
+    summary.taskSummary.totalCount > 0 ||
+    summary.projectSummary.totalCount > 0 ||
+    summary.inboxSummary.totalCount > 0 ||
+    summary.journalSummary.totalCount > 0 ||
+    summary.knowledgeSummary.totalCount > 0 ||
+    summary.financeSummary.transactionCount > 0 ||
+    summary.financeSummary.activeObligationsCount > 0 ||
+    summary.wellnessSummary.checkinCountInWindow > 0;
+  summary.focusObservations = buildObservations(summary);
+  summary.suggestedFocus = buildSuggestedFocus(summary);
+  summary.emptyStates = buildEmptyStates(summary);
+
+  return summary;
+}

@@ -152,6 +152,13 @@ The later version ideas below are directional only. They are not approved stages
 - Static in-app guide for beginners, module roles, local-first storage, backup/restore, Home collapsible sections, and Finance basics
 - No chatbot, no backend docs system, no CMS, no schema/storage/backup-format change, no new dependency, no backend, no sync, no cloud, no AI, and no route redesign
 
+## Stage 48
+
+- Weekly Review Foundation
+- Local-first review page summarizing the last 7 days of existing tasks, projects, inbox items, journal entries, knowledge items, finance records, wellness logs, and routine signals
+- Deterministic observations and suggested focus using simple rules only
+- No stored weekly-review data, no schema/storage/backup-format change, no new dependency, no backend, no sync, no cloud, no AI, no financial advice engine, and no medical advice engine
+
 ## Stage 38 Hardening Note
 
 - UI regression QA and release hardening stayed within the existing scope and did not add a new feature
@@ -163,7 +170,6 @@ The later version ideas below are directional only. They are not approved stages
 - Decision Engine
 - Personal Manual
 - Master Prompt
-- Weekly Review
 - Better dashboard
 
 ## Version 1.2

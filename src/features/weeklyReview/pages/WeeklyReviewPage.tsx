@@ -1,0 +1,631 @@
+import {
+  ArrowUpRight,
+  Brain,
+  CircleAlert,
+  CircleCheckBig,
+  CalendarDays,
+  ClipboardList,
+  FolderKanban,
+  Inbox,
+  NotebookPen,
+  RefreshCcw,
+  Sparkles,
+  Wallet,
+} from "lucide-react";
+import { useMemo } from "react";
+import { Link } from "react-router-dom";
+
+import { useDateFormatter } from "@/shared/date";
+import { useI18n, type TranslationKey } from "@/shared/i18n";
+import {
+  Button,
+  CollapsibleSection,
+  EmptyState,
+  MetricCard,
+  PremiumCard,
+  SectionHeader,
+  SoftPanel,
+  StatusChip,
+} from "@/shared/ui";
+import { formatFinanceAmount } from "@/features/finance/financeCalculations";
+
+import { useWeeklyReview } from "../hooks/useWeeklyReview";
+import type {
+  WeeklyReviewFocusSuggestion,
+  WeeklyReviewObservation,
+} from "../weeklyReviewCalculations";
+
+const quickLinks: ReadonlyArray<{ to: string; labelKey: TranslationKey }> = [
+  { to: "/today", labelKey: "nav.today" },
+  { to: "/inbox", labelKey: "nav.inbox" },
+  { to: "/projects", labelKey: "nav.projects" },
+  { to: "/journal", labelKey: "nav.journal" },
+  { to: "/finance", labelKey: "nav.finance" },
+];
+
+function formatAverage(value: number | null) {
+  if (value === null) {
+    return "—";
+  }
+
+  return value.toFixed(1);
+}
+
+function getObservationTone(observation: WeeklyReviewObservation) {
+  switch (observation.tone) {
+    case "good-signal":
+      return "success";
+    case "needs-review":
+      return "warning";
+    case "awareness":
+    default:
+      return "neutral";
+  }
+}
+
+function getObservationMessageKey(observation: WeeklyReviewObservation) {
+  switch (observation.kind) {
+    case "overdueTasks":
+      return "weeklyReview.observationOverdueTasks";
+    case "pendingInbox":
+      return "weeklyReview.observationPendingInbox";
+    case "journalReflection":
+      return "weeklyReview.observationJournalReflection";
+    case "financeBalance":
+      return "weeklyReview.observationFinanceBalance";
+    case "projectProgress":
+      return "weeklyReview.observationProjectProgress";
+    case "wellnessCheckins":
+      return "weeklyReview.observationWellnessCheckins";
+    case "noData":
+    default:
+      return "weeklyReview.observationNoData";
+  }
+}
+
+function getFocusMessageKey(suggestion: WeeklyReviewFocusSuggestion) {
+  switch (suggestion.kind) {
+    case "processInbox":
+      return "weeklyReview.focusProcessInbox";
+    case "reviewOverdueTasks":
+      return "weeklyReview.focusReviewOverdueTasks";
+    case "writeJournalEntry":
+      return "weeklyReview.focusWriteJournalEntry";
+    case "recordFinanceData":
+      return "weeklyReview.focusRecordFinanceData";
+    case "refineProjectNextAction":
+      return "weeklyReview.focusRefineProjectNextAction";
+    case "addFirstTask":
+    default:
+      return "weeklyReview.focusAddFirstTask";
+  }
+}
+
+function hasEmptyState(
+  emptyStates: Array<{ sectionId: string }>,
+  sectionId: string
+) {
+  return emptyStates.some((item) => item.sectionId === sectionId);
+}
+
+export function WeeklyReviewPage() {
+  const { language, t } = useI18n();
+  const { formatDate } = useDateFormatter();
+  const { summary, isLoading, error, loadWeeklyReview } = useWeeklyReview();
+
+  const currencyLocale = language === "fa" ? "fa-IR" : "en-US";
+  const formatAmount = useMemo(
+    () => (value: number) => `${formatFinanceAmount(value, currencyLocale)} ${t("finance.currency")}`,
+    [currencyLocale, t]
+  );
+
+  const windowLabel = summary
+    ? `${t("weeklyReview.last7Days")} · ${formatDate(summary.reviewWindow.startDate)} - ${formatDate(summary.reviewWindow.endDate)}`
+    : t("weeklyReview.last7Days");
+
+  const overviewMetrics = summary
+    ? [
+        {
+          icon: <CircleCheckBig className="h-5 w-5" />,
+          label: t("weeklyReview.completedTasks"),
+          value: summary.taskSummary.completedInWindowCount,
+          description: t("weeklyReview.completedTasksDescription"),
+        },
+        {
+          icon: <ClipboardList className="h-5 w-5" />,
+          label: t("weeklyReview.openTasks"),
+          value: summary.taskSummary.openCount,
+          description: t("weeklyReview.openTasksDescription"),
+        },
+        {
+          icon: <CircleAlert className="h-5 w-5" />,
+          label: t("weeklyReview.overdueTasks"),
+          value: summary.taskSummary.overdueCount,
+          description: t("weeklyReview.overdueTasksDescription"),
+        },
+        {
+          icon: <Inbox className="h-5 w-5" />,
+          label: t("weeklyReview.pendingInbox"),
+          value: summary.inboxSummary.pendingCount,
+          description: t("weeklyReview.pendingInboxDescription"),
+        },
+        {
+          icon: <NotebookPen className="h-5 w-5" />,
+          label: t("weeklyReview.journalEntries"),
+          value: summary.journalSummary.entriesInWindowCount,
+          description: t("weeklyReview.journalEntriesDescription"),
+        },
+        {
+          icon: <FolderKanban className="h-5 w-5" />,
+          label: t("weeklyReview.activeProjects"),
+          value: summary.projectSummary.activeCount,
+          description: t("weeklyReview.activeProjectsDescription"),
+        },
+        {
+          icon: <Wallet className="h-5 w-5" />,
+          label: t("weeklyReview.netCashflow"),
+          value: formatAmount(summary.financeSummary.netCashflowInWindow),
+          description: t("weeklyReview.financeWindowDescription"),
+          status: (
+            <StatusChip tone={summary.financeSummary.netCashflowInWindow >= 0 ? "success" : "warning"}>
+              {summary.financeSummary.netCashflowInWindow >= 0
+                ? t("weeklyReview.goodSignal")
+                : t("weeklyReview.needsReview")}
+            </StatusChip>
+          ),
+        },
+      ]
+    : [];
+
+  return (
+    <section className="alios-page space-y-6">
+      {error ? (
+        <div
+          role="alert"
+          className="flex flex-col gap-3 rounded-xl border border-destructive/30 bg-destructive/5 p-4 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div className="flex items-start gap-2 text-sm text-destructive">
+            <CircleAlert className="mt-0.5 h-4 w-4 shrink-0" />
+            <span>{error}</span>
+          </div>
+          <Button type="button" size="sm" variant="outline" onClick={() => void loadWeeklyReview()}>
+            <RefreshCcw className="me-2 h-4 w-4" />
+            {t("common.tryAgain")}
+          </Button>
+        </div>
+      ) : null}
+
+      <PremiumCard className="border-primary/15 bg-gradient-to-br from-primary/10 via-background to-background shadow-sm">
+        <div className="p-5 sm:p-6">
+          <SectionHeader
+            eyebrow={t("weeklyReview.title")}
+            icon={<Sparkles className="h-5 w-5" />}
+            title={t("weeklyReview.title")}
+            description={t("weeklyReview.description")}
+            status={
+              <StatusChip tone="neutral">{t("weeklyReview.localOnlyNote")}</StatusChip>
+            }
+          />
+
+          <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
+            <div className="space-y-3">
+              <div className="rounded-2xl border border-border/70 bg-background/70 px-4 py-3">
+                <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
+                  {t("weeklyReview.reviewWindow")}
+                </p>
+                <p className="mt-1 text-sm font-medium">{windowLabel}</p>
+              </div>
+              <p className="max-w-3xl text-sm leading-7 text-muted-foreground">
+                {t("weeklyReview.windowDescription")}
+              </p>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              <SoftPanel className="space-y-1">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                  {t("weeklyReview.reviewScope")}
+                </p>
+                <p className="text-base font-semibold">{t("weeklyReview.scopeSubtitle")}</p>
+                <p className="text-sm leading-6 text-muted-foreground">
+                  {t("weeklyReview.scopeDescription")}
+                </p>
+              </SoftPanel>
+              <SoftPanel className="space-y-1">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                  {t("weeklyReview.localFirst")}
+                </p>
+                <p className="text-base font-semibold">{t("weeklyReview.localFirstValue")}</p>
+                <p className="text-sm leading-6 text-muted-foreground">
+                  {t("weeklyReview.localFirstDescription")}
+                </p>
+              </SoftPanel>
+            </div>
+          </div>
+        </div>
+      </PremiumCard>
+
+      {isLoading ? (
+        <div className="space-y-4" aria-label={t("common.loading")}>
+          <div className="h-64 animate-pulse rounded-[2rem] border bg-muted/60" />
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {[0, 1, 2, 3].map((item) => (
+              <div key={item} className="h-40 animate-pulse rounded-[2rem] border bg-muted/60" />
+            ))}
+          </div>
+        </div>
+      ) : summary ? (
+        <>
+          {summary.hasAnyData ? null : (
+            <EmptyState
+              icon={<Sparkles className="h-6 w-6" />}
+              title={t("weeklyReview.noDataTitle")}
+              description={t("weeklyReview.noDataDescription")}
+              actions={
+                <>
+                  <Button asChild variant="default">
+                    <Link to="/today">{t("nav.today")}</Link>
+                  </Button>
+                  <Button asChild variant="outline">
+                    <Link to="/inbox">{t("nav.inbox")}</Link>
+                  </Button>
+                </>
+              }
+            />
+          )}
+
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {overviewMetrics.map((metric) => (
+              <MetricCard
+                key={metric.label}
+                icon={metric.icon}
+                label={metric.label}
+                value={metric.value}
+                description={metric.description}
+                status={metric.status}
+              />
+            ))}
+          </div>
+
+          <div className="grid gap-4 xl:grid-cols-2">
+            <CollapsibleSection
+              id="weekly-review-tasks"
+              title={t("weeklyReview.tasksSection")}
+              description={t("weeklyReview.tasksSectionDescription")}
+              icon={<ClipboardList className="h-5 w-5" />}
+              status={<StatusChip tone="neutral">{summary.taskSummary.totalCount}</StatusChip>}
+              contentClassName="space-y-3"
+            >
+              <div className="grid gap-3 sm:grid-cols-2">
+                <SoftPanel>
+                  <p className="text-xs text-muted-foreground">{t("weeklyReview.completedTasks")}</p>
+                  <p className="mt-1 text-lg font-semibold tabular-nums">{summary.taskSummary.completedInWindowCount}</p>
+                </SoftPanel>
+                <SoftPanel>
+                  <p className="text-xs text-muted-foreground">{t("weeklyReview.overdueTasks")}</p>
+                  <p className="mt-1 text-lg font-semibold tabular-nums">{summary.taskSummary.overdueCount}</p>
+                </SoftPanel>
+                <SoftPanel>
+                  <p className="text-xs text-muted-foreground">{t("weeklyReview.openTasks")}</p>
+                  <p className="mt-1 text-lg font-semibold tabular-nums">{summary.taskSummary.openCount}</p>
+                </SoftPanel>
+                <SoftPanel>
+                  <p className="text-xs text-muted-foreground">{t("weeklyReview.dueSoonTasks")}</p>
+                  <p className="mt-1 text-lg font-semibold tabular-nums">{summary.taskSummary.dueSoonCount}</p>
+                </SoftPanel>
+              </div>
+
+              {hasEmptyState(summary.emptyStates, "tasks") ? (
+                <EmptyState
+                  icon={<ClipboardList className="h-6 w-6" />}
+                  title={t("weeklyReview.tasksEmptyTitle")}
+                  description={t("weeklyReview.tasksEmptyDescription")}
+                />
+              ) : null}
+            </CollapsibleSection>
+
+            <CollapsibleSection
+              id="weekly-review-projects"
+              title={t("weeklyReview.projectsSection")}
+              description={t("weeklyReview.projectsSectionDescription")}
+              icon={<FolderKanban className="h-5 w-5" />}
+              status={<StatusChip tone="neutral">{summary.projectSummary.activeCount}</StatusChip>}
+              contentClassName="space-y-3"
+            >
+              <div className="grid gap-3 sm:grid-cols-2">
+                <SoftPanel>
+                  <p className="text-xs text-muted-foreground">{t("weeklyReview.activeProjects")}</p>
+                  <p className="mt-1 text-lg font-semibold tabular-nums">{summary.projectSummary.activeCount}</p>
+                </SoftPanel>
+                <SoftPanel>
+                  <p className="text-xs text-muted-foreground">{t("weeklyReview.projectsWithNextAction")}</p>
+                  <p className="mt-1 text-lg font-semibold tabular-nums">{summary.projectSummary.projectsWithNextActionCount}</p>
+                </SoftPanel>
+                <SoftPanel>
+                  <p className="text-xs text-muted-foreground">{t("weeklyReview.projectsNeedsAttention")}</p>
+                  <p className="mt-1 text-lg font-semibold tabular-nums">{summary.projectSummary.needsAttentionCount}</p>
+                </SoftPanel>
+                <SoftPanel>
+                  <p className="text-xs text-muted-foreground">{t("weeklyReview.reviewWindow")}</p>
+                  <p className="mt-1 text-sm font-medium">{windowLabel}</p>
+                </SoftPanel>
+              </div>
+
+              {hasEmptyState(summary.emptyStates, "projects") ? (
+                <EmptyState
+                  icon={<FolderKanban className="h-6 w-6" />}
+                  title={t("weeklyReview.projectsEmptyTitle")}
+                  description={t("weeklyReview.projectsEmptyDescription")}
+                />
+              ) : null}
+            </CollapsibleSection>
+
+            <CollapsibleSection
+              id="weekly-review-inbox"
+              title={t("weeklyReview.inboxSection")}
+              description={t("weeklyReview.inboxSectionDescription")}
+              icon={<Inbox className="h-5 w-5" />}
+              status={<StatusChip tone="neutral">{summary.inboxSummary.pendingCount}</StatusChip>}
+              contentClassName="space-y-3"
+            >
+              <div className="grid gap-3 sm:grid-cols-2">
+                <SoftPanel>
+                  <p className="text-xs text-muted-foreground">{t("weeklyReview.pendingInbox")}</p>
+                  <p className="mt-1 text-lg font-semibold tabular-nums">{summary.inboxSummary.pendingCount}</p>
+                </SoftPanel>
+                <SoftPanel>
+                  <p className="text-xs text-muted-foreground">{t("weeklyReview.processedInbox")}</p>
+                  <p className="mt-1 text-lg font-semibold tabular-nums">{summary.inboxSummary.processedCount}</p>
+                </SoftPanel>
+                <SoftPanel>
+                  <p className="text-xs text-muted-foreground">{t("weeklyReview.capturedInWindow")}</p>
+                  <p className="mt-1 text-lg font-semibold tabular-nums">{summary.inboxSummary.capturedInWindowCount}</p>
+                </SoftPanel>
+                <SoftPanel>
+                  <p className="text-xs text-muted-foreground">{t("weeklyReview.totalInbox")}</p>
+                  <p className="mt-1 text-lg font-semibold tabular-nums">{summary.inboxSummary.totalCount}</p>
+                </SoftPanel>
+              </div>
+
+              {hasEmptyState(summary.emptyStates, "inbox") ? (
+                <EmptyState
+                  icon={<Inbox className="h-6 w-6" />}
+                  title={t("weeklyReview.inboxEmptyTitle")}
+                  description={t("weeklyReview.inboxEmptyDescription")}
+                />
+              ) : null}
+            </CollapsibleSection>
+
+            <CollapsibleSection
+              id="weekly-review-journal-knowledge"
+              title={t("weeklyReview.journalKnowledgeSection")}
+              description={t("weeklyReview.journalKnowledgeSectionDescription")}
+              icon={<Brain className="h-5 w-5" />}
+              status={<StatusChip tone="neutral">{summary.journalSummary.entriesInWindowCount + summary.knowledgeSummary.createdInWindowCount}</StatusChip>}
+              contentClassName="space-y-4"
+            >
+              <div className="grid gap-4 lg:grid-cols-2">
+                <SoftPanel className="space-y-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="font-semibold">{t("weeklyReview.journalSection")}</p>
+                    <StatusChip tone="neutral">{summary.journalSummary.entriesInWindowCount}</StatusChip>
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <SoftPanel>
+                      <p className="text-xs text-muted-foreground">{t("weeklyReview.journalEntries")}</p>
+                      <p className="mt-1 text-lg font-semibold tabular-nums">{summary.journalSummary.entriesInWindowCount}</p>
+                    </SoftPanel>
+                    <SoftPanel>
+                      <p className="text-xs text-muted-foreground">{t("weeklyReview.averageMood")}</p>
+                      <p className="mt-1 text-lg font-semibold tabular-nums">{formatAverage(summary.journalSummary.averageMoodLevel)}</p>
+                    </SoftPanel>
+                    <SoftPanel>
+                      <p className="text-xs text-muted-foreground">{t("weeklyReview.averageEnergy")}</p>
+                      <p className="mt-1 text-lg font-semibold tabular-nums">{formatAverage(summary.journalSummary.averageEnergyLevel)}</p>
+                    </SoftPanel>
+                    <SoftPanel>
+                      <p className="text-xs text-muted-foreground">{t("weeklyReview.journalTotal")}</p>
+                      <p className="mt-1 text-lg font-semibold tabular-nums">{summary.journalSummary.totalCount}</p>
+                    </SoftPanel>
+                  </div>
+                  {hasEmptyState(summary.emptyStates, "journal") ? (
+                    <EmptyState
+                      icon={<NotebookPen className="h-6 w-6" />}
+                      title={t("weeklyReview.journalEmptyTitle")}
+                      description={t("weeklyReview.journalEmptyDescription")}
+                    />
+                  ) : null}
+                </SoftPanel>
+
+                <SoftPanel className="space-y-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="font-semibold">{t("weeklyReview.knowledgeSection")}</p>
+                    <StatusChip tone="neutral">{summary.knowledgeSummary.createdInWindowCount}</StatusChip>
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <SoftPanel>
+                      <p className="text-xs text-muted-foreground">{t("weeklyReview.knowledgeItems")}</p>
+                      <p className="mt-1 text-lg font-semibold tabular-nums">{summary.knowledgeSummary.totalCount}</p>
+                    </SoftPanel>
+                    <SoftPanel>
+                      <p className="text-xs text-muted-foreground">{t("weeklyReview.knowledgeCreatedInWindow")}</p>
+                      <p className="mt-1 text-lg font-semibold tabular-nums">{summary.knowledgeSummary.createdInWindowCount}</p>
+                    </SoftPanel>
+                  </div>
+                  {hasEmptyState(summary.emptyStates, "knowledge") ? (
+                    <EmptyState
+                      icon={<Brain className="h-6 w-6" />}
+                      title={t("weeklyReview.knowledgeEmptyTitle")}
+                      description={t("weeklyReview.knowledgeEmptyDescription")}
+                    />
+                  ) : null}
+                </SoftPanel>
+              </div>
+            </CollapsibleSection>
+
+            <CollapsibleSection
+              id="weekly-review-finance"
+              title={t("weeklyReview.financeSection")}
+              description={t("weeklyReview.financeSectionDescription")}
+              icon={<Wallet className="h-5 w-5" />}
+              status={<StatusChip tone={summary.financeSummary.netCashflowInWindow >= 0 ? "success" : "warning"}>{formatAmount(summary.financeSummary.netCashflowInWindow)}</StatusChip>}
+              contentClassName="space-y-3"
+            >
+              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                <SoftPanel>
+                  <p className="text-xs text-muted-foreground">{t("weeklyReview.income")}</p>
+                  <p className="mt-1 text-lg font-semibold tabular-nums">{formatAmount(summary.financeSummary.incomeInWindow)}</p>
+                </SoftPanel>
+                <SoftPanel>
+                  <p className="text-xs text-muted-foreground">{t("weeklyReview.expenses")}</p>
+                  <p className="mt-1 text-lg font-semibold tabular-nums">{formatAmount(summary.financeSummary.expensesInWindow)}</p>
+                </SoftPanel>
+                <SoftPanel>
+                  <p className="text-xs text-muted-foreground">{t("weeklyReview.activeObligations")}</p>
+                  <p className="mt-1 text-lg font-semibold tabular-nums">{summary.financeSummary.activeObligationsCount}</p>
+                </SoftPanel>
+                <SoftPanel>
+                  <p className="text-xs text-muted-foreground">{t("weeklyReview.remainingObligationTotal")}</p>
+                  <p className="mt-1 text-lg font-semibold tabular-nums">{formatAmount(summary.financeSummary.remainingObligationTotal)}</p>
+                </SoftPanel>
+              </div>
+              <SoftPanel className="space-y-2">
+                <p className="text-sm leading-7 text-muted-foreground">
+                  {t("weeklyReview.financeWindowDescription")}
+                </p>
+                <p className="text-xs leading-6 text-muted-foreground">
+                  {t("weeklyReview.financeAwarenessNote")}
+                </p>
+              </SoftPanel>
+
+              {hasEmptyState(summary.emptyStates, "finance") ? (
+                <EmptyState
+                  icon={<Wallet className="h-6 w-6" />}
+                  title={t("weeklyReview.financeEmptyTitle")}
+                  description={t("weeklyReview.financeEmptyDescription")}
+                />
+              ) : null}
+            </CollapsibleSection>
+
+            <CollapsibleSection
+              id="weekly-review-wellness"
+              title={t("weeklyReview.wellnessSection")}
+              description={t("weeklyReview.wellnessSectionDescription")}
+              icon={<CalendarDays className="h-5 w-5" />}
+              status={<StatusChip tone="neutral">{summary.wellnessSummary.checkinCountInWindow}</StatusChip>}
+              contentClassName="space-y-3"
+            >
+              <div className="grid gap-3 sm:grid-cols-2">
+                <SoftPanel>
+                  <p className="text-xs text-muted-foreground">{t("weeklyReview.checkins")}</p>
+                  <p className="mt-1 text-lg font-semibold tabular-nums">{summary.wellnessSummary.checkinCountInWindow}</p>
+                </SoftPanel>
+                <SoftPanel>
+                  <p className="text-xs text-muted-foreground">{t("weeklyReview.notesCount")}</p>
+                  <p className="mt-1 text-lg font-semibold tabular-nums">{summary.wellnessSummary.notesCountInWindow}</p>
+                </SoftPanel>
+                <SoftPanel>
+                  <p className="text-xs text-muted-foreground">{t("weeklyReview.averageMood")}</p>
+                  <p className="mt-1 text-lg font-semibold tabular-nums">{formatAverage(summary.wellnessSummary.averageMoodLevel)}</p>
+                </SoftPanel>
+                <SoftPanel>
+                  <p className="text-xs text-muted-foreground">{t("weeklyReview.averageEnergy")}</p>
+                  <p className="mt-1 text-lg font-semibold tabular-nums">{formatAverage(summary.wellnessSummary.averageEnergyLevel)}</p>
+                </SoftPanel>
+              </div>
+              <SoftPanel className="space-y-2">
+                <p className="text-sm leading-7 text-muted-foreground">
+                  {t("weeklyReview.wellnessAwarenessNote")}
+                </p>
+                <p className="text-xs leading-6 text-muted-foreground">
+                  {t("weeklyReview.wellnessNeutralNote")}
+                </p>
+              </SoftPanel>
+
+              {hasEmptyState(summary.emptyStates, "wellness") ? (
+                <EmptyState
+                  icon={<CalendarDays className="h-6 w-6" />}
+                  title={t("weeklyReview.wellnessEmptyTitle")}
+                  description={t("weeklyReview.wellnessEmptyDescription")}
+                />
+              ) : null}
+            </CollapsibleSection>
+          </div>
+
+          <div className="grid gap-4 xl:grid-cols-2">
+            <PremiumCard className="border-primary/10">
+              <div className="p-5 sm:p-6">
+                <SectionHeader
+                  icon={<Sparkles className="h-5 w-5" />}
+                  title={t("weeklyReview.focusObservationsTitle")}
+                  description={t("weeklyReview.focusObservationsDescription")}
+                  status={<StatusChip tone="neutral">{summary.focusObservations.length}</StatusChip>}
+                />
+                <div className="mt-5 space-y-3">
+                  {summary.focusObservations.map((observation, index) => (
+                    <SoftPanel key={`${observation.kind}-${index}`} className="space-y-2">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <StatusChip tone={getObservationTone(observation) as "neutral" | "success" | "warning"}>
+                          {t(
+                            observation.tone === "good-signal"
+                              ? "weeklyReview.goodSignal"
+                              : observation.tone === "needs-review"
+                                ? "weeklyReview.needsReview"
+                                : "weeklyReview.awareness"
+                          )}
+                        </StatusChip>
+                        {observation.count !== undefined ? (
+                          <StatusChip tone="neutral">{observation.count}</StatusChip>
+                        ) : null}
+                        {observation.amount !== undefined ? (
+                          <StatusChip tone="neutral">{formatAmount(observation.amount)}</StatusChip>
+                        ) : null}
+                      </div>
+                      <p className="text-sm leading-7 text-muted-foreground">
+                        {t(getObservationMessageKey(observation))}
+                      </p>
+                    </SoftPanel>
+                  ))}
+                </div>
+              </div>
+            </PremiumCard>
+
+            <PremiumCard className="border-primary/10">
+              <div className="p-5 sm:p-6">
+                <SectionHeader
+                  icon={<ArrowUpRight className="h-5 w-5" />}
+                  title={t("weeklyReview.nextFocusTitle")}
+                  description={t("weeklyReview.nextFocusDescription")}
+                  status={<StatusChip tone="neutral">{summary.suggestedFocus.length}</StatusChip>}
+                />
+                <div className="mt-5 space-y-3">
+                  {summary.suggestedFocus.map((suggestion, index) => (
+                    <SoftPanel key={`${suggestion.kind}-${index}`} className="space-y-2">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <StatusChip tone="primary">{t("weeklyReview.nextFocusLabel")}</StatusChip>
+                        <StatusChip tone="neutral">{t("weeklyReview.localOnlyNote")}</StatusChip>
+                      </div>
+                      <p className="text-sm leading-7 text-muted-foreground">
+                        {t(getFocusMessageKey(suggestion))}
+                      </p>
+                    </SoftPanel>
+                  ))}
+
+                  <div className="flex flex-wrap gap-3 pt-2">
+                    {quickLinks.map(({ to, labelKey }) => (
+                      <Button key={to} asChild variant="outline" className="shadow-sm">
+                        <Link to={to}>
+                          {t(labelKey)}
+                          <ArrowUpRight className="ms-2 h-4 w-4" />
+                        </Link>
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </PremiumCard>
+          </div>
+        </>
+      ) : null}
+    </section>
+  );
+}

@@ -1,6 +1,6 @@
 # AliOS
 
-AliOS is a bilingual, local-first personal life-management system. It brings quick capture, Today planning, projects, journaling, personal knowledge, a read-only dashboard, monthly calendar and upcoming-task views, routine templates, manual backup/restore, local data controls, a compact topbar dashboard customizer with a local accent palette, a Finance foundation with a local review layer, budget guard, lightweight local charts, mobile quick navigation, collapsible sections, Jalali due-date previews, and a beginner-friendly Help Center inside Settings into one static web application.
+AliOS is a bilingual, local-first personal life-management system. It brings quick capture, Today planning, projects, journaling, personal knowledge, a read-only dashboard, monthly calendar and upcoming-task views, routine templates, manual backup/restore, local data controls, a compact topbar dashboard customizer with a local accent palette, a Finance foundation with a local review layer, budget guard, lightweight local charts, mobile quick navigation, collapsible sections, Jalali due-date previews, a Weekly Review foundation, and a beginner-friendly Help Center inside Settings into one static web application.
 
 Stage 38 was a UI regression QA and release-hardening pass. It did not add a new feature; it kept the existing local-first scope intact and hardened desktop sidebar accessibility on long scrolling pages.
 Stage 39 moves dashboard customization into the topbar and adds a local-only accent color palette for restrained visual personalization.
@@ -12,6 +12,7 @@ Stage 44 adds Finance mobile UX and section navigation polish with collapsible s
 Stage 45 performs a safe performance audit and bundle optimization pass that keeps behavior unchanged while trimming a little avoidable work from the shared shell and Finance page.
 Stage 46 adds Home dashboard collapsible sections with local-only open/closed persistence separate from dashboard layout customization.
 Stage 47 adds a Settings Help Center with static bilingual guidance for first-time use, module roles, local-first storage, backup/restore, Home collapsible sections, and Finance basics.
+Stage 48 adds a Weekly Review foundation that summarizes the last 7 days of existing local data with deterministic observations and suggested focus rules.
 
 AliOS is designed for one person and stores its data in the browser through IndexedDB. It requires no backend, account, authentication, subscription, paid API, or hosted AI service.
 
@@ -176,7 +177,7 @@ Version 1.0 is intentionally single-user and local-only. It does not include:
 
 - Accounts, authentication, backend services, or automatic multi-device sync
 - Cloud or scheduled backup, encryption, compression, or attachments
-- Full routines and wellness engines, Weekly Review, Decision Log, or Personal Manual
+- Full routines and wellness engines, Decision Log, or Personal Manual
 - Routine templates are preview-only foundations and do not create recurring routines
 - AI features or hosted AI providers
 - Google Calendar, ICS export, notifications, and analytics
@@ -184,6 +185,7 @@ Version 1.0 is intentionally single-user and local-only. It does not include:
 - Advanced routines and wellness engines beyond the simple local checklist foundation
 - Local-only Home dashboard layout preferences with no drag-and-drop builder yet
 - Local-only Home dashboard collapse preferences separate from visibility and ordering
+- Derived-only Weekly Review summaries for the last 7 days with no stored review snapshots
 
 Dates remain stored as ISO/Gregorian strings; Jalali support is display-only. User-generated content is never automatically translated.
 The Home dashboard also includes a small local-only morning reminder that can be dismissed for the day or disabled in Settings, a routine templates section with built-in previews, a local Wellness / Badminton routine card with daily checklist state, and an upcoming tasks summary that helps separate overdue, today, tomorrow, this week, and later work.
