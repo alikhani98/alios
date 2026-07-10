@@ -34,6 +34,7 @@ AliOS 1.0 is a local-first static web app.
 - Restore validates the selected file, normalizes older additive arrays such as `inboxItems`, `financeTransactions`, `financeObligations`, and `decisionLogEntries`, and only then calls the destructive storage replacement path
 - Backup migration is pure and deterministic so malformed records fail before any local data is overwritten
 - The backup format stays version 1 and does not require a Dexie schema migration for Stage 50
+- Backup reminder metadata lives separately in browser localStorage, stores only the last manual backup timestamp/version/update time, and never stores backup contents
 
 ## App Error Boundary / Local Error Log Boundary
 

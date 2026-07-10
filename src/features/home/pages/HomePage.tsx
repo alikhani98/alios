@@ -8,17 +8,22 @@ import {
   Inbox,
   RotateCcw,
   Sparkles,
+  ShieldCheck,
 } from "lucide-react";
 import { type ReactNode, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { useDateFormatter } from "@/shared/date";
+import { useBackupStatus } from "@/shared/hooks";
 import { useI18n, type TranslationKey } from "@/shared/i18n";
 import {
   Badge,
   Button,
   Card,
   CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
   CollapsibleSection,
   EmptyState,
   MetricCard,
@@ -73,6 +78,7 @@ function OverviewPanel({
 export function HomePage() {
   const { t } = useI18n();
   const { formatDate } = useDateFormatter();
+  const { freshness: backupFreshness } = useBackupStatus();
   const { data, isLoading, hasError, loadDashboard } = useHomeDashboard();
   const { layout } = useHomeDashboardLayout();
   const { isSectionCollapsed, setSectionOpen } = useHomeCollapsedSections();
@@ -80,6 +86,15 @@ export function HomePage() {
     useState<RoutineTemplateId | null>(null);
 
   const visibleSectionIds = getVisibleDashboardSections(layout);
+  const showBackupReminder =
+    !isLoading &&
+    !hasError &&
+    (backupFreshness === "never" || backupFreshness === "overdue");
+
+  const backupReminderBodyKey =
+    backupFreshness === "never"
+      ? "home.backupReminderNever"
+      : "home.backupReminderOverdue";
 
   if (!data && !isLoading && !hasError) {
     return null;
@@ -369,6 +384,35 @@ export function HomePage() {
             {t("common.tryAgain")}
           </Button>
         </div>
+      ) : null}
+
+      {showBackupReminder ? (
+        <Card className="overflow-hidden border-primary/10 bg-gradient-to-br from-background via-background to-primary/5 shadow-sm">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2">
+              <ShieldCheck className="h-5 w-5 text-primary" />
+              {t("home.backupReminderTitle")}
+            </CardTitle>
+            <CardDescription>{t("home.backupReminderDescription")}</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex flex-wrap items-center gap-3">
+              <Badge variant="secondary">
+                {t(
+                  backupFreshness === "never"
+                    ? "settings.backupStatusNever"
+                    : "settings.backupStatusOverdue"
+                )}
+              </Badge>
+              <span className="text-sm text-muted-foreground">
+                {t(backupReminderBodyKey)}
+              </span>
+            </div>
+            <Button asChild variant="outline" className="w-full sm:w-auto">
+              <Link to="/settings">{t("home.backupReminderAction")}</Link>
+            </Button>
+          </CardContent>
+        </Card>
       ) : null}
 
       {isLoading ? (
