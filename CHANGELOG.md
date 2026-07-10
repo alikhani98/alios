@@ -2,6 +2,12 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 63 - Personal Manual Weekly Review Integration
+
+- Surfaced Personal Manual review-due awareness inside Weekly Review with a dedicated manual summary, calm empty state, and entry cards for due items
+- Added a safe mark-reviewed action from Weekly Review plus a navigation affordance back to Personal Manual
+- Kept the stage local-only, bilingual, repository-backed, and unchanged in package/config, backup format, backup version, and Dexie schema
+
 ## Stage 62 - Bundle Size Audit & Initial Load Hardening
 
 - Moved the Dexie storage adapter behind an async app bootstrap load so the initial bundle no longer has to carry the storage layer eagerly

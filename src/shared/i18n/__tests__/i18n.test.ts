@@ -395,6 +395,19 @@ describe("i18n utilities", () => {
     "weeklyReview.decisionsSection",
     "weeklyReview.focusReviewDecisions",
     "weeklyReview.observationDecisionReview",
+    "weeklyReview.manualSection",
+    "weeklyReview.manualSectionDescription",
+    "weeklyReview.manualSectionNote",
+    "weeklyReview.manualReviewDue",
+    "weeklyReview.manualDue",
+    "weeklyReview.manualClear",
+    "weeklyReview.manualEmptyTitle",
+    "weeklyReview.manualEmptyDescription",
+    "weeklyReview.manualEmptyNote",
+    "weeklyReview.manualLastReviewed",
+    "weeklyReview.manualLastUpdated",
+    "weeklyReview.manualMarkReviewed",
+    "weeklyReview.openManual",
   ] as const)("defines %s in both message catalogs", (key) => {
     expect(messagesEn[key]).toBeTruthy();
     expect(messagesFa[key]).toBeTruthy();

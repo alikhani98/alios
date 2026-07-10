@@ -8,12 +8,14 @@ import type {
   InboxItem,
   JournalEntry,
   KnowledgeItem,
+  ManualEntry,
   Project,
   Task,
 } from "@/shared/types";
 
 import {
   buildWeeklyReviewSummary,
+  getWeeklyReviewManualDueEntries,
   getWeeklyReviewWindow,
 } from "../weeklyReviewCalculations";
 
@@ -154,6 +156,25 @@ function createDecision(
   };
 }
 
+function createManualEntry(
+  id: string,
+  overrides: Partial<ManualEntry> = {}
+): ManualEntry {
+  return {
+    id,
+    title: `Manual ${id}`,
+    body: `Manual body ${id}`,
+    category: "principles",
+    importance: "medium",
+    status: "active",
+    tags: [],
+    reviewIntervalDays: 7,
+    createdAt: "2026-07-01T08:00:00.000Z",
+    updatedAt: "2026-07-01T08:00:00.000Z",
+    ...overrides,
+  };
+}
+
 describe("weekly review calculations", () => {
   it("builds a safe zero summary for empty data", () => {
     const summary = buildWeeklyReviewSummary(
@@ -164,6 +185,7 @@ describe("weekly review calculations", () => {
         journalEntries: [],
         knowledgeItems: [],
         decisionLogEntries: [],
+        manualEntries: [],
         financeTransactions: [],
         financeObligations: [],
         dailyCheckins: [],
@@ -212,6 +234,11 @@ describe("weekly review calculations", () => {
       needsReviewCount: 0,
       reviewedInWindowCount: 0,
     });
+    expect(summary.manualSummary).toEqual({
+      totalCount: 0,
+      dueCount: 0,
+      dueEntries: [],
+    });
     expect(summary.financeSummary).toEqual({
       transactionCount: 0,
       incomeInWindow: 0,
@@ -241,6 +268,7 @@ describe("weekly review calculations", () => {
       "journal",
       "knowledge",
       "decisions",
+      "manual",
       "finance",
       "wellness",
     ]);
@@ -298,6 +326,7 @@ describe("weekly review calculations", () => {
           }),
         ],
         decisionLogEntries: [],
+        manualEntries: [],
         financeTransactions: [],
         financeObligations: [],
         dailyCheckins: [],
@@ -343,6 +372,7 @@ describe("weekly review calculations", () => {
         journalEntries: [],
         knowledgeItems: [],
         decisionLogEntries: [],
+        manualEntries: [],
         financeTransactions: [],
         financeObligations: [],
         dailyCheckins: [],
@@ -367,6 +397,7 @@ describe("weekly review calculations", () => {
         journalEntries: [],
         knowledgeItems: [],
         decisionLogEntries: [],
+        manualEntries: [],
         financeTransactions: [
           createTransaction("income", {
             type: "income",
@@ -447,6 +478,7 @@ describe("weekly review calculations", () => {
           reviewDate: "2026-07-09",
         }),
       ],
+      manualEntries: [],
       financeTransactions: [
         createTransaction("expense", {
           type: "expense",
@@ -486,6 +518,91 @@ describe("weekly review calculations", () => {
     ]);
   });
 
+  it("includes only active manual entries that are due for review", () => {
+    const referenceDate = new Date(2026, 6, 12);
+    const dueActive = createManualEntry("due-active", {
+      updatedAt: "2026-07-04T08:30:00.000Z",
+      reviewIntervalDays: 7,
+    });
+    const dueDraft = createManualEntry("due-draft", {
+      status: "draft",
+      updatedAt: "2026-07-04T08:30:00.000Z",
+      reviewIntervalDays: 7,
+    });
+    const dueArchived = createManualEntry("due-archived", {
+      status: "archived",
+      updatedAt: "2026-07-04T08:30:00.000Z",
+      reviewIntervalDays: 7,
+    });
+    const notDueActive = createManualEntry("not-due-active", {
+      updatedAt: "2026-07-09T08:30:00.000Z",
+      reviewIntervalDays: 7,
+    });
+
+    const dueEntries = getWeeklyReviewManualDueEntries(
+      [notDueActive, dueArchived, dueActive, dueDraft],
+      referenceDate
+    );
+
+    expect(dueEntries.map((entry) => entry.id)).toEqual(["due-active"]);
+
+    const summary = buildWeeklyReviewSummary(
+      {
+        tasks: [],
+        projects: [],
+        inboxItems: [],
+        journalEntries: [],
+        knowledgeItems: [],
+        decisionLogEntries: [],
+        manualEntries: [notDueActive, dueArchived, dueActive, dueDraft],
+        financeTransactions: [],
+        financeObligations: [],
+        dailyCheckins: [],
+      },
+      referenceDate
+    );
+
+    expect(summary.manualSummary).toEqual({
+      totalCount: 4,
+      dueCount: 1,
+      dueEntries: [dueActive],
+    });
+    expect(summary.emptyStates.map((item) => item.sectionId)).not.toContain(
+      "manual"
+    );
+  });
+
+  it("shows the manual empty state when nothing is due", () => {
+    const summary = buildWeeklyReviewSummary(
+      {
+        tasks: [],
+        projects: [],
+        inboxItems: [],
+        journalEntries: [],
+        knowledgeItems: [],
+        decisionLogEntries: [],
+        manualEntries: [
+          createManualEntry("fresh", {
+            updatedAt: "2026-07-10T08:30:00.000Z",
+            reviewIntervalDays: 7,
+          }),
+          createManualEntry("draft", {
+            status: "draft",
+            updatedAt: "2026-07-04T08:30:00.000Z",
+            reviewIntervalDays: 7,
+          }),
+        ],
+        financeTransactions: [],
+        financeObligations: [],
+        dailyCheckins: [],
+      },
+      new Date(2026, 6, 10)
+    );
+
+    expect(summary.manualSummary.dueCount).toBe(0);
+    expect(summary.emptyStates.map((item) => item.sectionId)).toContain("manual");
+  });
+
   it("does not count future data unless it is intentionally due soon", () => {
     const summary = buildWeeklyReviewSummary(
       {
@@ -502,6 +619,7 @@ describe("weekly review calculations", () => {
         journalEntries: [],
         knowledgeItems: [],
         decisionLogEntries: [],
+        manualEntries: [],
         financeTransactions: [
           createTransaction("future-income", {
             type: "income",

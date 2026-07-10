@@ -16,6 +16,7 @@ import type {
   InboxItem,
   JournalEntry,
   KnowledgeItem,
+  ManualEntry,
   Project,
   Task,
 } from "@/shared/types";
@@ -25,6 +26,7 @@ import {
   calculateRemainingObligationTotal,
   getUpcomingObligations,
 } from "../finance/financeCalculations";
+import { isManualEntryReviewDue } from "../manual/manualEntries";
 
 export type WeeklyReviewWindow = {
   days: number;
@@ -74,6 +76,12 @@ export type WeeklyReviewDecisionSummary = {
   reviewedInWindowCount: number;
 };
 
+export type WeeklyReviewManualSummary = {
+  totalCount: number;
+  dueCount: number;
+  dueEntries: ManualEntry[];
+};
+
 export type WeeklyReviewFinanceSummary = {
   transactionCount: number;
   incomeInWindow: number;
@@ -99,6 +107,7 @@ export type WeeklyReviewSectionId =
   | "journal"
   | "knowledge"
   | "decisions"
+  | "manual"
   | "finance"
   | "wellness";
 
@@ -150,6 +159,7 @@ export type WeeklyReviewSummary = {
   journalSummary: WeeklyReviewJournalSummary;
   knowledgeSummary: WeeklyReviewKnowledgeSummary;
   decisionSummary: WeeklyReviewDecisionSummary;
+  manualSummary: WeeklyReviewManualSummary;
   financeSummary: WeeklyReviewFinanceSummary;
   wellnessSummary: WeeklyReviewWellnessSummary;
   focusObservations: WeeklyReviewObservation[];
@@ -165,6 +175,7 @@ export type WeeklyReviewData = {
   journalEntries: ReadonlyArray<JournalEntry>;
   knowledgeItems: ReadonlyArray<KnowledgeItem>;
   decisionLogEntries: ReadonlyArray<DecisionLogEntry>;
+  manualEntries: ReadonlyArray<ManualEntry>;
   financeTransactions: ReadonlyArray<FinanceTransaction>;
   financeObligations: ReadonlyArray<FinanceObligation>;
   dailyCheckins: ReadonlyArray<DailyCheckin>;
@@ -267,6 +278,19 @@ function hasProjectNextAction(project: Project): boolean {
   return project.nextAction !== undefined && project.nextAction.trim().length > 0;
 }
 
+export function getWeeklyReviewManualDueEntries(
+  entries: ReadonlyArray<ManualEntry>,
+  referenceDate = new Date()
+): ManualEntry[] {
+  return entries
+    .filter(
+      (entry) =>
+        entry.status === "active" &&
+        isManualEntryReviewDue(entry, referenceDate)
+    )
+    .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+}
+
 function needsProjectAttention(project: Project, referenceDate: Date): boolean {
   if (project.status !== "active") {
     return false;
@@ -289,6 +313,7 @@ function buildEmptyStates(summary: {
   journalSummary: WeeklyReviewJournalSummary;
   knowledgeSummary: WeeklyReviewKnowledgeSummary;
   decisionSummary: WeeklyReviewDecisionSummary;
+  manualSummary: WeeklyReviewManualSummary;
   financeSummary: WeeklyReviewFinanceSummary;
   wellnessSummary: WeeklyReviewWellnessSummary;
 }): WeeklyReviewEmptyState[] {
@@ -316,6 +341,10 @@ function buildEmptyStates(summary: {
 
   if (summary.decisionSummary.totalCount === 0) {
     emptyStates.push({ sectionId: "decisions" });
+  }
+
+  if (summary.manualSummary.dueCount === 0) {
+    emptyStates.push({ sectionId: "manual" });
   }
 
   if (
@@ -534,6 +563,16 @@ export function buildWeeklyReviewSummary(
     }).length,
   };
 
+  const manualDueEntries = getWeeklyReviewManualDueEntries(
+    data.manualEntries,
+    referenceDate
+  );
+  const manualSummary: WeeklyReviewManualSummary = {
+    totalCount: data.manualEntries.length,
+    dueCount: manualDueEntries.length,
+    dueEntries: manualDueEntries,
+  };
+
   const upcomingObligations = getUpcomingObligations(
     financeObligations,
     referenceDate
@@ -589,6 +628,7 @@ export function buildWeeklyReviewSummary(
     journalSummary,
     knowledgeSummary,
     decisionSummary,
+    manualSummary,
     financeSummary,
     wellnessSummary,
     focusObservations: [],
@@ -604,6 +644,7 @@ export function buildWeeklyReviewSummary(
     summary.journalSummary.totalCount > 0 ||
     summary.knowledgeSummary.totalCount > 0 ||
     summary.decisionSummary.totalCount > 0 ||
+    summary.manualSummary.totalCount > 0 ||
     summary.financeSummary.transactionCount > 0 ||
     summary.financeSummary.activeObligationsCount > 0 ||
     summary.wellnessSummary.checkinCountInWindow > 0;
