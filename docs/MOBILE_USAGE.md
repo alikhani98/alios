@@ -20,6 +20,7 @@ Stage 50 hardens backup and restore so mobile users see clearer validation error
 Stage 53 hardens dense mobile pages like Finance, Weekly Review, Decision Log, Settings, and Home so 360px to 430px screens keep readable cards, wrapped buttons, and sane section spacing without changing data, routes, or storage.
 Stage 54 improves empty states and first-run guidance on the same mobile-friendly surfaces so low-data users still get a clear next step without any onboarding modal or tour.
 Stage 55 adds a calm backup reminder and last-backup-status foundation so Settings can show fresh/due-soon/overdue guidance without changing the manual backup flow.
+Stage 56 adds a readable export center in Settings for finance CSV, decision log Markdown, journal Markdown, and knowledge Markdown while keeping backup/restore separate.
 The Personal Insights section stays local to the device and only reflects stored tasks, projects, inbox items, journal entries, knowledge items, and wellness checklist state.
 
 ## Open or install AliOS
@@ -55,6 +56,7 @@ AliOS stores data in IndexedDB for the current browser, device, and site origin.
 - The Finance charts, review panels, and liquidity summaries stay on the current browser or device and do not sync.
 - The Finance section collapse state and quick navigation stay on the current browser or device and do not sync.
 - The backup status metadata and reminder state stay on the current browser or device in localStorage only and do not sync.
+- The export center files stay on the current browser or device until you download them, and they do not change the full backup file format.
 - The Decision Log entries, review dates, and reflection fields stay on the current browser or device and do not sync.
 - Finance due-date fields store ISO/Gregorian values only; the Jalali preview is display-only.
 - There is no automatic sync, cloud backup, account, or backend in AliOS 1.0.
@@ -71,6 +73,8 @@ AliOS stores data in IndexedDB for the current browser, device, and site origin.
 7. Verify Inbox, Today, Projects, Journal, Knowledge, and Settings after restore.
 8. Verify Finance transactions and obligations after restore if you used the Finance module.
 9. Older additive backups that omit `inboxItems`, `financeTransactions`, `financeObligations`, or `decisionLogEntries` are restored as empty arrays for those tables.
+
+For readable, module-focused exports, use the new Settings export center. It produces finance CSV plus Markdown exports for the Decision Log, Journal, and Knowledge modules without changing the backup flow.
 
 The Settings screen also shows the local data safety summary, including total local records and the last successful backup and restore times.
 

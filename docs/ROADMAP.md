@@ -27,6 +27,7 @@ Stage 51 adds an app error boundary and bounded local error log so a failed rout
 Stage 53 hardens dense mobile pages for Finance, Weekly Review, Decision Log, Settings, and Home with safer stacking and wrapping, but it remains a UI-only polish pass rather than a new product surface.
 Stage 54 adds calmer empty states and first-run guidance across the key modules without changing the data model, routes, backup format, or local-first storage boundaries.
 Stage 55 adds a local-only backup reminder and last-backup-status foundation that tracks manual backup freshness without changing the backup format, backup version, or storage schema.
+Stage 56 adds a readable export center foundation for finance CSV, decision log Markdown, journal Markdown, and knowledge Markdown without changing the backup format, backup version, storage schema, or import behavior.
 
 ## Version 1.1
 
