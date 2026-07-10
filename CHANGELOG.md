@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 55 - Backup Reminder & Last Backup Status Foundation
+
+- Added a local-only backup status model that tracks the last manual backup time, backup version, and metadata update time in browser localStorage
+- Added backup freshness logic plus calm Settings and Home reminder copy so users can see whether the last backup is fresh, due soon, or overdue
+- Kept manual backup export and restore behavior unchanged, with no automatic backup, no cloud, no sync, no backend, no schema change, and no backup-format change
+- Kept the stage dependency-free and local-first while preserving the repository/storage-adapter boundary
+
 ## Stage 54 - Empty States & First-Run Guidance Foundation
 
 - Added calmer bilingual empty states and first-run hints across Home, Finance, Decisions, Weekly Review, Inbox, Projects, Journal, Knowledge, and Settings

@@ -217,3 +217,17 @@ Reason:
 - A local-first app should fail gracefully when one page breaks without forcing a blank screen for the whole shell
 - A bounded error log gives the user enough context to inspect or copy a recent failure without turning the app into a monitoring system
 - Keeping the recovery path outside Dexie and backups preserves the existing local-first data model
+
+## ADR-019: Keep backup reminder metadata local-only and separate
+
+Decision:
+
+- Backup reminder status lives in browser localStorage only
+- Backup reminder metadata stores the last manual backup timestamp, backup version, and metadata update time
+- Backup reminder metadata never stores backup contents, never changes the backup format, and never requires a Dexie schema change
+
+Reason:
+
+- Manual backup status helps users remember when they last protected their data without introducing auto-backup or cloud sync
+- Keeping the reminder metadata separate from backup contents preserves the existing local-first backup format and repository/storage-adapter boundary
+- A local-only metadata record keeps the feature simple, calm, and static-hosting friendly

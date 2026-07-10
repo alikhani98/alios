@@ -1,6 +1,6 @@
 # AliOS
 
-AliOS is a bilingual, local-first personal life-management system. It brings quick capture, Today planning, projects, journaling, personal knowledge, a read-only dashboard, monthly calendar and upcoming-task views, routine templates, manual backup/restore, local data controls, a compact topbar dashboard customizer with a local accent palette, a Finance foundation with a local review layer, budget guard, lightweight local charts, mobile quick navigation, collapsible sections, Jalali due-date previews, a Weekly Review foundation, a Decision Log foundation, an app error boundary with a local error log foundation, backup/restore safety and migration validation, a beginner-friendly Help Center inside Settings, Stage 53 mobile UX hardening for dense pages, and Stage 54 empty-state and first-run guidance polish into one static web application.
+AliOS is a bilingual, local-first personal life-management system. It brings quick capture, Today planning, projects, journaling, personal knowledge, a read-only dashboard, monthly calendar and upcoming-task views, routine templates, manual backup/restore, local data controls, a compact topbar dashboard customizer with a local accent palette, a Finance foundation with a local review layer, budget guard, lightweight local charts, mobile quick navigation, collapsible sections, Jalali due-date previews, a Weekly Review foundation, a Decision Log foundation, an app error boundary with a local error log foundation, backup/restore safety and migration validation, a beginner-friendly Help Center inside Settings, Stage 53 mobile UX hardening for dense pages, Stage 54 empty-state and first-run guidance polish, and Stage 55 backup reminder and last backup status foundation into one static web application.
 
 Stage 38 was a UI regression QA and release-hardening pass. It did not add a new feature; it kept the existing local-first scope intact and hardened desktop sidebar accessibility on long scrolling pages.
 Stage 39 moves dashboard customization into the topbar and adds a local-only accent color palette for restrained visual personalization.
@@ -18,6 +18,7 @@ Stage 50 adds backup and restore safety with validation before write, additive n
 Stage 51 adds an app error boundary and local error log foundation so a failed page can fall back calmly without sending telemetry or changing the data schema.
 Stage 53 hardens dense pages for mobile with improved wrapping, stacking, and readability on Finance, Weekly Review, Decision Log, Settings, and Home without changing data models, routes, or storage.
 Stage 54 improves empty states and first-run guidance across Home, Finance, Decisions, Weekly Review, Inbox, Projects, Journal, Knowledge, and Settings without changing routes, schemas, storage, or backup behavior.
+Stage 55 adds a local-only backup status foundation with calm reminder copy in Settings and an optional Home hint while keeping manual backup export and restore unchanged.
 
 AliOS is designed for one person and stores its data in the browser through IndexedDB. It requires no backend, account, authentication, subscription, paid API, or hosted AI service.
 
@@ -147,6 +148,7 @@ Local appearance and profile preferences also stay on the current browser or dev
 Open Settings to export all supported IndexedDB tables into one versioned AliOS JSON file. Exported filenames follow `alios-backup-YYYY-MM-DD-HH-mm.json`. Keep exported files somewhere outside the browser profile.
 
 Settings also shows a local data safety summary with table counts, total local records, and the last successful backup and restore times.
+It also shows a local-only backup status reminder with the last manual backup time and a calm freshness hint.
 
 Restore validates the selected file before showing confirmation. The restore preview shows the backup version, export time, and record counts by table before you confirm replacement. Confirming restore replaces all supported local AliOS tables with the backup contents. Invalid JSON or an incompatible backup is rejected before stored data changes.
 

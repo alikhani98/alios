@@ -5,4 +5,5 @@ export const MORNING_WARMUP_ENABLED_STORAGE_KEY =
   "alios.routineNudges.morningWarmup.enabled";
 export const MORNING_WARMUP_DISMISSED_DATE_STORAGE_KEY =
   "alios.routineNudges.morningWarmup.dismissedDate";
+export const BACKUP_STATUS_STORAGE_KEY = "alios.backup.status";
 export const LOCAL_PREFERENCE_CHANGE_EVENT = "alios-local-preference-change";

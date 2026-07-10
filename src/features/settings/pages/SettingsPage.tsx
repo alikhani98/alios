@@ -27,7 +27,7 @@ import {
 import { appConfig } from "@/shared/constants/app";
 import { useDateFormatter } from "@/shared/date";
 import { usePersistentBoolean, usePersistentString } from "@/shared/hooks";
-import { useI18n } from "@/shared/i18n";
+import { useI18n, type TranslationKey } from "@/shared/i18n";
 import {
   DEFAULT_APPEARANCE_PREFERENCE,
   parseAppearancePreference,
@@ -39,6 +39,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  Badge,
   Input,
   PremiumCard,
   SectionHeader,
@@ -52,6 +53,7 @@ import { resetHomeDashboardLayoutPreference } from "@/features/home/hooks/useHom
 import { createBackupPreview } from "../backupPreview";
 import { useBackupRestore } from "../hooks/useBackupRestore";
 import { useLocalDataManagement } from "../hooks/useLocalDataManagement";
+import type { BackupStatusFreshness } from "@/shared/preferences";
 
 type CountItemProps = { label: string; value: number };
 
@@ -118,6 +120,38 @@ function getTotalRecords(summary: {
     summary.settings +
     summary.inboxItems
   );
+}
+
+function getBackupStatusLabelKey(
+  freshness: BackupStatusFreshness
+): TranslationKey {
+  switch (freshness) {
+    case "fresh":
+      return "settings.backupStatusFresh";
+    case "dueSoon":
+      return "settings.backupStatusDueSoon";
+    case "overdue":
+      return "settings.backupStatusOverdue";
+    case "never":
+    default:
+      return "settings.backupStatusNever";
+  }
+}
+
+function getBackupStatusSummaryKey(
+  freshness: BackupStatusFreshness
+): TranslationKey {
+  switch (freshness) {
+    case "fresh":
+      return "settings.backupFreshSummary";
+    case "dueSoon":
+      return "settings.backupDueSoonSummary";
+    case "overdue":
+      return "settings.backupOverdueSummary";
+    case "never":
+    default:
+      return "settings.backupNeverSummary";
+  }
 }
 
 export function SettingsPage() {
@@ -494,6 +528,26 @@ export function SettingsPage() {
               <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
                 <p className="text-sm leading-7 text-muted-foreground">
                   {t("settings.localDataWarning")}
+                </p>
+              </div>
+              <div className="rounded-xl border bg-muted/30 p-4">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium">
+                      {t("settings.backupLastManualBackup")}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {backup.lastBackupExportedAt
+                        ? formatDateTime(backup.lastBackupExportedAt)
+                        : t("common.notRecorded")}
+                    </p>
+                  </div>
+                  <Badge variant="secondary" className="w-fit">
+                    {t(getBackupStatusLabelKey(backup.backupFreshness))}
+                  </Badge>
+                </div>
+                <p className="mt-3 text-sm leading-7 text-muted-foreground">
+                  {t(getBackupStatusSummaryKey(backup.backupFreshness))}
                 </p>
               </div>
               <div className="grid gap-3 md:grid-cols-2">

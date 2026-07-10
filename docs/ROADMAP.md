@@ -26,6 +26,7 @@ Stage 50 hardens manual backup and restore with validation and additive migratio
 Stage 51 adds an app error boundary and bounded local error log so a failed route can fall back calmly without telemetry, schema changes, or backup changes.
 Stage 53 hardens dense mobile pages for Finance, Weekly Review, Decision Log, Settings, and Home with safer stacking and wrapping, but it remains a UI-only polish pass rather than a new product surface.
 Stage 54 adds calmer empty states and first-run guidance across the key modules without changing the data model, routes, backup format, or local-first storage boundaries.
+Stage 55 adds a local-only backup reminder and last-backup-status foundation that tracks manual backup freshness without changing the backup format, backup version, or storage schema.
 
 ## Version 1.1
 
