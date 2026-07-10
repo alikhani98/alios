@@ -10,6 +10,7 @@ describe("finance section helpers", () => {
   it("keeps the finance quick nav aligned with the main section anchors", () => {
     expect(financeQuickNavItems.map((item) => item.anchorId)).toEqual([
       "finance-summary",
+      "finance-monthly-plan",
       "finance-charts",
       "finance-review",
       "finance-obligations",

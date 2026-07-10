@@ -2,6 +2,7 @@ import type { TranslationKey } from "@/shared/i18n";
 
 export const FINANCE_SECTION_ANCHORS = {
   summary: "finance-summary",
+  monthlyPlan: "finance-monthly-plan",
   charts: "finance-charts",
   review: "finance-review",
   obligations: "finance-obligations",
@@ -24,6 +25,11 @@ export const financeQuickNavItems: ReadonlyArray<FinanceQuickNavItem> = [
     id: "summary",
     labelKey: "finance.sectionSummary",
     anchorId: FINANCE_SECTION_ANCHORS.summary,
+  },
+  {
+    id: "monthlyPlan",
+    labelKey: "finance.sectionMonthlyPlan",
+    anchorId: FINANCE_SECTION_ANCHORS.monthlyPlan,
   },
   {
     id: "charts",
