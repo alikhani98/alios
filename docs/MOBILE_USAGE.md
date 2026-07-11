@@ -24,6 +24,8 @@ Stage 56 adds a readable export center in Settings for finance CSV, decision log
 Stage 57 adds a recovery mode foundation so mobile users can surface calm access to Settings, Backup/Restore, Export Center, and Local Error Log without deleting data or changing the backup format.
 Stage 66 polishes Personal Manual for mobile and dense-page use so long notes, tags, and template cards wrap more safely on narrow screens without changing storage or behavior.
 Stage 67 hardens the Personal Manual track so search, review, export, backup, and mobile smoke tests stay clear and repeatable without changing storage or behavior.
+Stage 70 hardens the Goals track so search, review, export, backup, and mobile smoke tests stay clear and repeatable without changing storage or behavior.
+Stage 71 adds static Goals templates and a compact quick-start picker that only prefill the existing form, so narrow screens can start a goal without changing the saved data model.
 The Personal Insights section stays local to the device and only reflects stored tasks, projects, inbox items, journal entries, knowledge items, and wellness checklist state.
 
 ## Personal Manual smoke test
@@ -36,6 +38,18 @@ Use this short checklist after a release-hardening change to the Personal Manual
 4. Open a manual search result from Global Search and confirm it lands on the target entry.
 5. Mark a due manual entry reviewed and confirm the last-reviewed time updates.
 6. Export and restore a backup to confirm manual entries survive the round trip.
+
+## Goals smoke test
+
+Use this short checklist after a release-hardening change to the Goals track:
+
+1. Open Goals with zero entries and confirm the empty state stays calm.
+2. Use a template to prefill the existing form, edit every field, and save the goal manually.
+3. Search for Goals by title, description, tags, area, timeframe, status, importance, progress, and review interval.
+4. Confirm a template selection does not save anything until the form is submitted.
+5. Confirm Goals appear in Home, Weekly Review, Global Search, and the export center.
+6. Export and restore a backup to confirm Goals survive the round trip.
+7. Check a narrow mobile width and confirm the template cards and form do not overflow horizontally.
 
 ## v1.50 release smoke test
 

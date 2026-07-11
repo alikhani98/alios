@@ -2,6 +2,18 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 71 - Goals Templates & Quick Start
+
+- Added static local Goals templates that prefill the existing form with safe starter values for common goal shapes
+- Added a compact Goals quick-start picker on the Goals page so users can choose a template, edit every field, and save manually
+- Kept the stage local-only, template-only, and unchanged in package/config, backup format, backup version, Dexie schema, and persisted storage shape
+
+## Stage 70 - Goals Track QA & Mobile Hardening
+
+- Added focused regression coverage for Goals review timing, search, schema validation, repository CRUD, and summary calculations
+- Added a short Goals smoke-test checklist in the mobile usage docs for backup, restore, search, review, and mobile overflow checks
+- Kept the stage local-only, mobile-safe, repository-backed, and unchanged in package/config, backup format, backup version, and Dexie schema
+
 ## Stage 69 - Goals Track Foundation
 
 - Added a local-first Goals module with repository CRUD, Dexie storage, a calm Goals page, and additive backup/restore support
