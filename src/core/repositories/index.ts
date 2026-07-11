@@ -4,6 +4,7 @@ export * from "./inboxRepository";
 export * from "./knowledgeRepository";
 export * from "./manualRepository";
 export * from "./decisionLogRepository";
+export * from "./goalsRepository";
 export * from "./financeRepository";
 export * from "./projectsRepository";
 export * from "./settingsRepository";

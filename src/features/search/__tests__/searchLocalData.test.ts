@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type {
+  Goal,
   InboxItem,
   JournalEntry,
   KnowledgeItem,
@@ -44,6 +45,38 @@ const projects: Project[] = [
     priority: "medium",
     createdAt: "2026-07-04T09:00:00.000Z",
     updatedAt: "2026-07-05T10:00:00.000Z",
+  },
+];
+
+const goals: Goal[] = [
+  {
+    id: "goal-1",
+    title: "Improve sleep",
+    description: "Keep a regular bedtime and morning routine.",
+    area: "health",
+    timeframe: "quarter",
+    status: "active",
+    importance: "high",
+    progressPercent: 35,
+    reviewIntervalDays: 7,
+    tags: ["Focus", "Reset"],
+    createdAt: "2026-07-04T09:00:00.000Z",
+    updatedAt: "2026-07-05T10:00:00.000Z",
+  },
+  {
+    id: "goal-2",
+    title: "Learn TypeScript",
+    description: "Finish the local type safety checklist.",
+    area: "learning",
+    timeframe: "month",
+    status: "paused",
+    importance: "medium",
+    progressPercent: 60,
+    targetDate: "2026-08-01",
+    reviewIntervalDays: 14,
+    tags: ["study", "code"],
+    createdAt: "2026-07-03T09:00:00.000Z",
+    updatedAt: "2026-07-04T10:00:00.000Z",
   },
 ];
 
@@ -118,6 +151,7 @@ describe("searchLocalData", () => {
           inboxItems,
           tasks,
           projects,
+          goals: [],
           journalEntries,
           knowledgeItems,
           manualEntries: [],
@@ -133,6 +167,7 @@ describe("searchLocalData", () => {
         inboxItems,
         tasks,
         projects,
+        goals: [],
         journalEntries,
         knowledgeItems,
         manualEntries: [],
@@ -150,6 +185,7 @@ describe("searchLocalData", () => {
         inboxItems,
         tasks,
         projects,
+        goals: [],
         journalEntries,
         knowledgeItems,
         manualEntries: [],
@@ -169,6 +205,7 @@ describe("searchLocalData", () => {
           inboxItems,
           tasks,
           projects,
+          goals: [],
           journalEntries,
           knowledgeItems,
           manualEntries: [],
@@ -184,6 +221,7 @@ describe("searchLocalData", () => {
         inboxItems,
         tasks,
         projects,
+        goals: [],
         journalEntries,
         knowledgeItems,
         manualEntries: [],
@@ -191,8 +229,19 @@ describe("searchLocalData", () => {
       "check"
     );
 
-    expect(results.some((result) => result.kind === "knowledge" && result.kindLabelKey === "search.typeKnowledge")).toBe(true);
-    expect(results.some((result) => result.kind === "project" && result.kindLabelKey === "search.typeProject")).toBe(true);
+    expect(
+      results.some(
+        (result) =>
+          result.kind === "knowledge" &&
+          result.kindLabelKey === "search.typeKnowledge"
+      )
+    ).toBe(true);
+    expect(
+      results.some(
+        (result) =>
+          result.kind === "project" && result.kindLabelKey === "search.typeProject"
+      )
+    ).toBe(true);
   });
 
   it("searches manual entries by title, body, tags, and status case-insensitively", () => {
@@ -201,6 +250,7 @@ describe("searchLocalData", () => {
         inboxItems,
         tasks,
         projects,
+        goals: [],
         journalEntries,
         knowledgeItems,
         manualEntries,
@@ -218,6 +268,7 @@ describe("searchLocalData", () => {
         inboxItems,
         tasks,
         projects,
+        goals: [],
         journalEntries,
         knowledgeItems,
         manualEntries,
@@ -225,13 +276,16 @@ describe("searchLocalData", () => {
       "focus"
     );
 
-    expect(tagResults.some((result) => result.href === "/manual?focusId=manual-1")).toBe(true);
+    expect(
+      tagResults.some((result) => result.href === "/manual?focusId=manual-1")
+    ).toBe(true);
 
     const draftResults = searchLocalData(
       {
         inboxItems,
         tasks,
         projects,
+        goals: [],
         journalEntries,
         knowledgeItems,
         manualEntries,
@@ -239,13 +293,16 @@ describe("searchLocalData", () => {
       "boundary"
     );
 
-    expect(draftResults.some((result) => result.href === "/manual?focusId=manual-2")).toBe(true);
+    expect(
+      draftResults.some((result) => result.href === "/manual?focusId=manual-2")
+    ).toBe(true);
 
     const archivedResults = searchLocalData(
       {
         inboxItems,
         tasks,
         projects,
+        goals: [],
         journalEntries,
         knowledgeItems,
         manualEntries,
@@ -253,7 +310,9 @@ describe("searchLocalData", () => {
       "legacy"
     );
 
-    expect(archivedResults.some((result) => result.href === "/manual?focusId=manual-3")).toBe(true);
+    expect(
+      archivedResults.some((result) => result.href === "/manual?focusId=manual-3")
+    ).toBe(true);
   });
 
   it("searches manual entries by importance", () => {
@@ -262,6 +321,7 @@ describe("searchLocalData", () => {
         inboxItems,
         tasks,
         projects,
+        goals: [],
         journalEntries,
         knowledgeItems,
         manualEntries,
@@ -270,5 +330,39 @@ describe("searchLocalData", () => {
     );
 
     expect(results.some((result) => result.href === "/manual?focusId=manual-1")).toBe(true);
+  });
+
+  it("searches goals by title, description, area, status, and tags", () => {
+    const results = searchLocalData(
+      {
+        inboxItems,
+        tasks,
+        projects,
+        goals,
+        journalEntries,
+        knowledgeItems,
+        manualEntries: [],
+      },
+      "sleep"
+    );
+
+    expect(results.some((result) => result.kind === "goal")).toBe(true);
+    expect(results.some((result) => result.kindLabelKey === "search.typeGoal")).toBe(true);
+    expect(results.some((result) => result.href === "/goals?focusId=goal-1")).toBe(true);
+
+    const tagResults = searchLocalData(
+      {
+        inboxItems,
+        tasks,
+        projects,
+        goals,
+        journalEntries,
+        knowledgeItems,
+        manualEntries: [],
+      },
+      "study"
+    );
+
+    expect(tagResults.some((result) => result.href === "/goals?focusId=goal-2")).toBe(true);
   });
 });

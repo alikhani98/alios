@@ -95,6 +95,13 @@ export const settingsHelpCenterSections: readonly HelpCenterSection[] = [
         example: createText("یک پروژه مثل «راه‌اندازی سایت شخصی».", "A project like “Launch my personal website.”"),
       },
       {
+        id: "goals",
+        title: createText("هدف‌ها", "Goals"),
+        purpose: createText("برای هدف‌های دستی، محلی و زمان‌دار است که می‌خواهید آن‌ها را مرور کنید.", "It is for manually managed, local, time-bound goals that you want to review."),
+        whenToUse: createText("وقتی می‌خواهید پیشرفت، مرور و وضعیت یک هدف را ثبت کنید.", "When you want to record the progress, review, and status of a goal."),
+        example: createText("«بهبود خواب در سه ماه آینده».", "“Improve sleep over the next three months.”"),
+      },
+      {
         id: "journal",
         title: createText("ژورنال", "Journal"),
         purpose: createText("برای نوشتن تجربه، احساس و چیزی است که یاد گرفته‌اید.", "It is for recording experiences, feelings, and what you learned."),

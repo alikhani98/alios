@@ -21,6 +21,7 @@ export function useWeeklyReview() {
     journal,
     knowledge,
     decisions,
+    goals,
     manual,
     finance,
     dailyCheckins,
@@ -42,20 +43,22 @@ export function useWeeklyReview() {
         loadedJournalEntries,
         loadedKnowledgeItems,
         loadedDecisionLogEntries,
+        loadedGoals,
         loadedManualEntries,
         loadedTransactions,
         loadedObligations,
         loadedCheckins,
       ] = await Promise.all([
         tasks.list(),
-        projects.list(),
-        inbox.list(),
-        journal.list(),
-        knowledge.list(),
-        decisions.list(),
-        manual.list(),
-        finance.listTransactions(),
-        finance.listObligations(),
+          projects.list(),
+          inbox.list(),
+          journal.list(),
+          knowledge.list(),
+          decisions.list(),
+          goals.list(),
+          manual.list(),
+          finance.listTransactions(),
+          finance.listObligations(),
         dailyCheckins.list(),
       ]);
 
@@ -68,6 +71,7 @@ export function useWeeklyReview() {
           journalEntries: loadedJournalEntries,
           knowledgeItems: loadedKnowledgeItems,
           decisionLogEntries: loadedDecisionLogEntries,
+          goals: loadedGoals,
           manualEntries: loadedManualEntries,
           financeTransactions: loadedTransactions,
           financeObligations: loadedObligations,
@@ -81,7 +85,7 @@ export function useWeeklyReview() {
     } finally {
       setIsLoading(false);
     }
-  }, [dailyCheckins, decisions, finance, inbox, journal, manual, knowledge, projects, tasks]);
+  }, [dailyCheckins, decisions, finance, goals, inbox, journal, manual, knowledge, projects, tasks]);
 
   useEffect(() => {
     void loadWeeklyReview();
@@ -99,5 +103,17 @@ export function useWeeklyReview() {
     [loadWeeklyReview, manual]
   );
 
-  return { summary, isLoading, error, loadWeeklyReview, markManualEntryReviewed };
+  const markGoalReviewed = useCallback(
+    async (id: string) => {
+      try {
+        await goals.markReviewed(id);
+        await loadWeeklyReview();
+      } catch (updateError) {
+        setError(getErrorMessage(updateError));
+      }
+    },
+    [goals, loadWeeklyReview]
+  );
+
+  return { summary, isLoading, error, loadWeeklyReview, markManualEntryReviewed, markGoalReviewed };
 }

@@ -1,5 +1,6 @@
 import type {
   DecisionLogEntry,
+  Goal,
   FinanceObligation,
   FinanceTransaction,
   JournalEntry,
@@ -10,6 +11,7 @@ import type {
 export type ExportCenterAction =
   | "finance"
   | "decisionLog"
+  | "goals"
   | "journal"
   | "knowledge"
   | "manual";
@@ -168,6 +170,44 @@ export function createDecisionLogMarkdownExport(entries: DecisionLogEntry[]): st
       `- Context:\n${formatBlock(entry.context, "Not recorded")}`,
       `- Created at: ${entry.createdAt}`,
       `- Updated at: ${entry.updatedAt}`,
+      ""
+    );
+  }
+
+  return lines.join("\n").trimEnd();
+}
+
+export function createGoalsMarkdownExport(entries: Goal[]): string {
+  const lines = [
+    "# AliOS Goals Export",
+    "",
+    `Exported at: ${new Date().toISOString()}`,
+    `Entries: ${entries.length}`,
+    "",
+  ];
+
+  if (entries.length === 0) {
+    lines.push("No goals were recorded yet.");
+    return lines.join("\n");
+  }
+
+  for (const goal of entries) {
+    lines.push(
+      `## ${goal.title}`,
+      "",
+      `- Area: ${goal.area}`,
+      `- Timeframe: ${goal.timeframe}`,
+      `- Status: ${goal.status}`,
+      `- Importance: ${goal.importance}`,
+      `- Progress: ${goal.progressPercent}%`,
+      `- Tags: ${goal.tags.length > 0 ? goal.tags.join(", ") : "Not recorded"}`,
+      `- Target date: ${goal.targetDate ?? "Not recorded"}`,
+      `- Review interval (days): ${goal.reviewIntervalDays ?? "Not recorded"}`,
+      `- Last reviewed at: ${goal.lastReviewedAt ?? "Not recorded"}`,
+      `- Created at: ${goal.createdAt}`,
+      `- Updated at: ${goal.updatedAt}`,
+      "",
+      formatBlock(goal.description, "Not recorded"),
       ""
     );
   }

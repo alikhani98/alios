@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import type {
   DailyCheckin,
   DecisionLogEntry,
+  Goal,
   FinanceObligation,
   FinanceTransaction,
   InboxItem,
@@ -18,6 +19,7 @@ import {
   getWeeklyReviewManualDueEntries,
   getWeeklyReviewWindow,
 } from "../weeklyReviewCalculations";
+import { getReviewDueGoals } from "@/features/goals";
 
 function createTask(id: string, overrides: Partial<Task> = {}): Task {
   return {
@@ -38,6 +40,24 @@ function createProject(id: string, overrides: Partial<Project> = {}): Project {
     title: `Project ${id}`,
     status: "active",
     priority: "medium",
+    createdAt: "2026-07-01T08:00:00.000Z",
+    updatedAt: "2026-07-01T08:00:00.000Z",
+    ...overrides,
+  };
+}
+
+function createGoal(id: string, overrides: Partial<Goal> = {}): Goal {
+  return {
+    id,
+    title: `Goal ${id}`,
+    description: `Goal description ${id}`,
+    area: "personal",
+    timeframe: "month",
+    status: "active",
+    importance: "medium",
+    progressPercent: 50,
+    reviewIntervalDays: 7,
+    tags: [],
     createdAt: "2026-07-01T08:00:00.000Z",
     updatedAt: "2026-07-01T08:00:00.000Z",
     ...overrides,
@@ -181,6 +201,7 @@ describe("weekly review calculations", () => {
       {
         tasks: [],
         projects: [],
+        goals: [],
         inboxItems: [],
         journalEntries: [],
         knowledgeItems: [],
@@ -234,6 +255,11 @@ describe("weekly review calculations", () => {
       needsReviewCount: 0,
       reviewedInWindowCount: 0,
     });
+    expect(summary.goalSummary).toEqual({
+      totalCount: 0,
+      dueCount: 0,
+      dueEntries: [],
+    });
     expect(summary.manualSummary).toEqual({
       totalCount: 0,
       dueCount: 0,
@@ -268,6 +294,7 @@ describe("weekly review calculations", () => {
       "journal",
       "knowledge",
       "decisions",
+      "goals",
       "manual",
       "finance",
       "wellness",
@@ -297,6 +324,7 @@ describe("weekly review calculations", () => {
           }),
         ],
         projects: [],
+        goals: [],
         inboxItems: [
           createInboxItem("boundary-inbox", {
             createdAt: "2026-07-10T10:00:00.000Z",
@@ -368,6 +396,7 @@ describe("weekly review calculations", () => {
           }),
         ],
         projects: [],
+        goals: [],
         inboxItems: [],
         journalEntries: [],
         knowledgeItems: [],
@@ -393,6 +422,7 @@ describe("weekly review calculations", () => {
       {
         tasks: [],
         projects: [],
+        goals: [],
         inboxItems: [],
         journalEntries: [],
         knowledgeItems: [],
@@ -457,6 +487,7 @@ describe("weekly review calculations", () => {
           reviewDate: "2026-07-09",
         }),
       ],
+      goals: [],
       inboxItems: [
         createInboxItem("pending"),
       ],
@@ -550,6 +581,7 @@ describe("weekly review calculations", () => {
       {
         tasks: [],
         projects: [],
+        goals: [],
         inboxItems: [],
         journalEntries: [],
         knowledgeItems: [],
@@ -577,6 +609,7 @@ describe("weekly review calculations", () => {
       {
         tasks: [],
         projects: [],
+        goals: [],
         inboxItems: [],
         journalEntries: [],
         knowledgeItems: [],
@@ -603,6 +636,53 @@ describe("weekly review calculations", () => {
     expect(summary.emptyStates.map((item) => item.sectionId)).toContain("manual");
   });
 
+  it("includes only active goals that are due for review", () => {
+    const referenceDate = new Date(2026, 6, 12);
+    const dueGoal = createGoal("due-goal", {
+      updatedAt: "2026-07-04T08:30:00.000Z",
+      reviewIntervalDays: 7,
+    });
+    const pausedGoal = createGoal("paused-goal", {
+      status: "paused",
+      updatedAt: "2026-07-04T08:30:00.000Z",
+      reviewIntervalDays: 7,
+    });
+    const freshGoal = createGoal("fresh-goal", {
+      updatedAt: "2026-07-10T08:30:00.000Z",
+      reviewIntervalDays: 7,
+    });
+
+    const dueGoals = getReviewDueGoals([freshGoal, pausedGoal, dueGoal], referenceDate);
+
+    expect(dueGoals.map((goal) => goal.id)).toEqual(["due-goal"]);
+
+    const summary = buildWeeklyReviewSummary(
+      {
+        tasks: [],
+        projects: [],
+        goals: [freshGoal, pausedGoal, dueGoal],
+        inboxItems: [],
+        journalEntries: [],
+        knowledgeItems: [],
+        decisionLogEntries: [],
+        manualEntries: [],
+        financeTransactions: [],
+        financeObligations: [],
+        dailyCheckins: [],
+      },
+      referenceDate
+    );
+
+    expect(summary.goalSummary).toEqual({
+      totalCount: 3,
+      dueCount: 1,
+      dueEntries: [dueGoal],
+    });
+    expect(summary.emptyStates.map((item) => item.sectionId)).not.toContain(
+      "goals"
+    );
+  });
+
   it("does not count future data unless it is intentionally due soon", () => {
     const summary = buildWeeklyReviewSummary(
       {
@@ -615,6 +695,7 @@ describe("weekly review calculations", () => {
           }),
         ],
         projects: [],
+        goals: [],
         inboxItems: [],
         journalEntries: [],
         knowledgeItems: [],

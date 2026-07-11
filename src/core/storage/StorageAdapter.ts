@@ -1,6 +1,7 @@
 import type {
   DailyCheckinsRepository,
   DecisionLogRepository,
+  GoalsRepository,
   FinanceRepository,
   JournalRepository,
   ManualRepository,
@@ -18,6 +19,7 @@ export interface StorageAdapter {
   dailyCheckins: DailyCheckinsRepository;
   tasks: TasksRepository;
   decisions: DecisionLogRepository;
+  goals: GoalsRepository;
   finance: FinanceRepository;
   manual: ManualRepository;
   projects: ProjectsRepository;

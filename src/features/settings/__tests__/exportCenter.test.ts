@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   createDecisionLogMarkdownExport,
   createFinanceCsvExport,
+  createGoalsMarkdownExport,
   createJournalMarkdownExport,
   createKnowledgeMarkdownExport,
   createManualMarkdownExport,
@@ -12,6 +13,7 @@ import {
   decisionLogRecord,
   financeObligationRecord,
   financeTransactionRecord,
+  goalRecord,
   journalEntryRecord,
   knowledgeItemRecord,
   manualEntryRecord,
@@ -64,6 +66,22 @@ describe("export center helpers", () => {
     );
   });
 
+  it("creates a readable goals markdown export", () => {
+    const markdown = createGoalsMarkdownExport([goalRecord]);
+
+    expect(markdown).toContain("# AliOS Goals Export");
+    expect(markdown).toContain("Entries: 1");
+    expect(markdown).toContain("## Improve sleep");
+    expect(markdown).toContain("- Area: health");
+    expect(markdown).toContain("- Timeframe: quarter");
+    expect(markdown).toContain("- Status: active");
+    expect(markdown).toContain("- Importance: high");
+    expect(markdown).toContain("- Progress: 35%");
+    expect(markdown).toContain("- Tags: health, routine");
+    expect(markdown).toContain("- Review interval (days): 7");
+    expect(markdown).toContain("> Keep a regular bedtime and morning routine.");
+  });
+
   it("creates a readable personal manual markdown export", () => {
     const markdown = createManualMarkdownExport([manualEntryRecord]);
 
@@ -95,6 +113,9 @@ describe("export center helpers", () => {
     );
     expect(createKnowledgeMarkdownExport([])).toContain(
       "No knowledge items were recorded yet."
+    );
+    expect(createGoalsMarkdownExport([])).toContain(
+      "No goals were recorded yet."
     );
     expect(createManualMarkdownExport([])).toContain(
       "No manual entries were recorded yet."

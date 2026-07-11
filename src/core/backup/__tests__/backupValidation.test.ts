@@ -4,6 +4,7 @@ import { ValidationError } from "@/core/errors";
 import {
   dailyCheckinRecord,
   decisionLogRecord,
+  goalRecord,
   financeObligationRecord,
   financeTransactionRecord,
   inboxItemRecord,
@@ -36,6 +37,7 @@ describe("backup validation and migration", () => {
       data: {
         dailyCheckins: [dailyCheckinRecord],
         tasks: [taskRecord],
+        goals: [goalRecord],
         decisionLogEntries: [decisionLogRecord],
         projects: [projectRecord],
         journalEntries: [journalEntryRecord],
@@ -50,6 +52,7 @@ describe("backup validation and migration", () => {
     expect(payload).toEqual(snapshot);
     expect(migrated.data.dailyCheckins).toEqual([dailyCheckinRecord]);
     expect(migrated.data.tasks).toEqual([taskRecord]);
+    expect(migrated.data.goals).toEqual([goalRecord]);
     expect(migrated.data.decisionLogEntries).toEqual([decisionLogRecord]);
     expect(migrated.data.manualEntries).toEqual([]);
     expect(migrated.data.financeTransactions).toEqual([]);
@@ -66,6 +69,7 @@ describe("backup validation and migration", () => {
       data: {
         dailyCheckins: [dailyCheckinRecord],
         tasks: [taskRecord],
+        goals: [goalRecord],
         decisionLogEntries: [decisionLogRecord],
         projects: [projectRecord],
         journalEntries: [journalEntryRecord],
@@ -75,6 +79,7 @@ describe("backup validation and migration", () => {
     });
 
     expect(backup.data.decisionLogEntries).toEqual([decisionLogRecord]);
+    expect(backup.data.goals).toEqual([goalRecord]);
     expect(backup.data.manualEntries).toEqual([]);
     expect(backup.data.financeTransactions).toEqual([]);
     expect(backup.data.financeObligations).toEqual([]);
@@ -128,6 +133,7 @@ describe("backup validation and migration", () => {
           data: {
             dailyCheckins: [dailyCheckinRecord],
             tasks: "not-an-array",
+            goals: [goalRecord],
             projects: [projectRecord],
             journalEntries: [journalEntryRecord],
             knowledgeItems: [knowledgeItemRecord],
@@ -146,6 +152,7 @@ describe("backup validation and migration", () => {
           data: {
             dailyCheckins: [dailyCheckinRecord],
             tasks: [{ ...taskRecord, title: 42 }],
+            goals: [goalRecord],
             projects: [projectRecord],
             journalEntries: [journalEntryRecord],
             knowledgeItems: [knowledgeItemRecord],
@@ -160,6 +167,7 @@ describe("backup validation and migration", () => {
     const input = {
       dailyCheckins: [dailyCheckinRecord],
       tasks: [taskRecord],
+      goals: [goalRecord],
       decisionLogEntries: [decisionLogRecord],
       manualEntries: [manualEntryRecord],
       financeTransactions: [financeTransactionRecord],
@@ -177,6 +185,7 @@ describe("backup validation and migration", () => {
     expect(input).toEqual(snapshot);
     expect(normalized).toEqual(input);
     expect(normalized.tasks).not.toBe(input.tasks);
+    expect(normalized.goals).not.toBe(input.goals);
     expect(normalized.inboxItems).not.toBe(input.inboxItems);
   });
 });

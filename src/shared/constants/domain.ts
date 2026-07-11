@@ -38,6 +38,33 @@ export const MANUAL_STATUS_VALUES = [
 
 export const MANUAL_IMPORTANCE_VALUES = PRIORITY_VALUES;
 
+export const GOAL_AREA_VALUES = [
+  "health",
+  "work",
+  "learning",
+  "finance",
+  "relationships",
+  "personal",
+  "other",
+] as const;
+
+export const GOAL_TIMEFRAME_VALUES = [
+  "week",
+  "month",
+  "quarter",
+  "year",
+  "open",
+] as const;
+
+export const GOAL_STATUS_VALUES = [
+  "active",
+  "paused",
+  "completed",
+  "archived",
+] as const;
+
+export const GOAL_IMPORTANCE_VALUES = PRIORITY_VALUES;
+
 export const LEVEL_3_VALUES = ["low", "medium", "good"] as const;
 export const STRESS_LEVEL_VALUES = PRIORITY_VALUES;
 export const SMOKING_STATUS_VALUES = [

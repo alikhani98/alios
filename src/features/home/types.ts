@@ -1,5 +1,6 @@
 import type {
   DailyCheckin,
+  Goal,
   JournalEntry,
   KnowledgeItem,
   ManualEntry,
@@ -27,6 +28,14 @@ export type HomeDashboardData = {
   knowledge: {
     totalCount: number;
     latest?: KnowledgeItem;
+  };
+  goals: {
+    totalCount: number;
+    activeCount: number;
+    reviewDueCount: number;
+    highImportanceActiveCount: number;
+    averageActiveProgress: number | null;
+    latest?: Goal;
   };
   manual: {
     totalCount: number;

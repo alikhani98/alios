@@ -3,6 +3,7 @@ export * from "./DexieJournalRepository";
 export * from "./DexieInboxRepository";
 export * from "./DexieFinanceRepository";
 export * from "./DexieDecisionLogRepository";
+export * from "./DexieGoalsRepository";
 export * from "./DexieKnowledgeRepository";
 export * from "./DexieManualRepository";
 export * from "./DexieProjectsRepository";

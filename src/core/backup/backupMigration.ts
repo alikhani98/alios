@@ -3,6 +3,7 @@ import { z } from "zod";
 import {
   dailyCheckinSchema,
   decisionLogEntrySchema,
+  goalSchema,
   financeObligationSchema,
   financeTransactionSchema,
   inboxItemSchema,
@@ -25,6 +26,7 @@ import {
 export const backupDataInputSchema = z.object({
   dailyCheckins: z.array(dailyCheckinSchema).optional(),
   tasks: z.array(taskSchema).optional(),
+  goals: z.array(goalSchema).optional(),
   decisionLogEntries: z.array(decisionLogEntrySchema).optional(),
   manualEntries: z.array(manualEntrySchema).optional(),
   financeTransactions: z.array(financeTransactionSchema).optional(),
@@ -46,6 +48,7 @@ export function normalizeBackupData(data: BackupDataInput): AliosBackupData {
   return {
     dailyCheckins: cloneRecords(data.dailyCheckins),
     tasks: cloneRecords(data.tasks),
+    goals: cloneRecords(data.goals),
     decisionLogEntries: cloneRecords(data.decisionLogEntries),
     manualEntries: cloneRecords(data.manualEntries),
     financeTransactions: cloneRecords(data.financeTransactions),

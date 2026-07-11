@@ -2,6 +2,11 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 69 - Goals Track Foundation
+
+- Added a local-first Goals module with repository CRUD, Dexie storage, a calm Goals page, and additive backup/restore support
+- Integrated Goals into Home dashboard awareness, Weekly Review due items, Global Search, and the Settings export center while keeping the feature local-only
+- Kept the stage bilingual, repository-backed, and unchanged in package/config, backup format, backup version, and Dexie schema
 ## Stage 68 - v1.50 Release Hardening
 
 - Updated the in-app release metadata to match the v1.50 hardening pass and added a tiny regression guard for the visible app version badge

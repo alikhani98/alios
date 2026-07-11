@@ -1,5 +1,11 @@
 import { JOURNAL_TYPE_LABEL_KEYS } from "@/features/journal/constants";
 import {
+  GOAL_AREA_LABEL_KEYS,
+  GOAL_IMPORTANCE_LABEL_KEYS,
+  GOAL_STATUS_LABEL_KEYS,
+  GOAL_TIMEFRAME_LABEL_KEYS,
+} from "@/features/goals";
+import {
   INBOX_STATUS_LABEL_KEYS,
   INBOX_TYPE_LABEL_KEYS,
 } from "@/features/inbox/constants";
@@ -20,6 +26,7 @@ import {
 import type { TranslationKey } from "@/shared/i18n";
 import type {
   InboxItem,
+  Goal,
   JournalEntry,
   KnowledgeItem,
   ManualEntry,
@@ -33,6 +40,7 @@ export type SearchResultKind =
   | "inbox"
   | "task"
   | "project"
+  | "goal"
   | "journal"
   | "knowledge"
   | "manual";
@@ -58,6 +66,7 @@ export type SearchLocalDataInput = {
   inboxItems: InboxItem[];
   tasks: Task[];
   projects: Project[];
+  goals: Goal[];
   journalEntries: JournalEntry[];
   knowledgeItems: KnowledgeItem[];
   manualEntries: ManualEntry[];
@@ -67,6 +76,7 @@ const kindLabelKeys: Record<SearchResultKind, TranslationKey> = {
   inbox: "search.typeInbox",
   task: "search.typeTask",
   project: "search.typeProject",
+  goal: "search.typeGoal",
   journal: "search.typeJournal",
   knowledge: "search.typeKnowledge",
   manual: "search.typeManual",
@@ -241,6 +251,44 @@ export function searchLocalData(
       ],
       sortKey: item.updatedAt,
       date: item.reviewDate ?? item.createdAt,
+      query: normalizedQuery,
+    });
+    if (result) results.push(result);
+  }
+
+  for (const item of data.goals) {
+    const result = buildResult({
+      kind: "goal",
+      title: item.title,
+      snippetSource: [item.title, item.description, item.tags.join(" ")].join(" "),
+      fields: [
+        item.description,
+        item.area,
+        item.timeframe,
+        item.status,
+        item.importance,
+        String(item.progressPercent),
+        item.tags.join(" "),
+        item.targetDate ?? "",
+      ],
+      href: buildSearchResultHref("goal", item.id),
+      facets: [
+        { labelKey: "goals.areaLabel", valueKey: GOAL_AREA_LABEL_KEYS[item.area] },
+        {
+          labelKey: "goals.timeframeLabel",
+          valueKey: GOAL_TIMEFRAME_LABEL_KEYS[item.timeframe],
+        },
+        {
+          labelKey: "common.status",
+          valueKey: GOAL_STATUS_LABEL_KEYS[item.status],
+        },
+        {
+          labelKey: "goals.importanceLabel",
+          valueKey: GOAL_IMPORTANCE_LABEL_KEYS[item.importance],
+        },
+      ],
+      sortKey: item.updatedAt,
+      date: item.targetDate ?? item.updatedAt,
       query: normalizedQuery,
     });
     if (result) results.push(result);

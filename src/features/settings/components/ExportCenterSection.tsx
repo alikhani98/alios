@@ -81,6 +81,16 @@ export function ExportCenterSection({ id }: ExportCenterSectionProps) {
           />
           <ExportButton
             disabled={exportCenter.isExporting}
+            isActive={exportCenter.activeExport === "goals"}
+            label={
+              exportCenter.activeExport === "goals"
+                ? t("settings.exportingGoalsMarkdown")
+                : t("settings.exportGoalsMarkdown")
+            }
+            onClick={() => void exportCenter.exportGoalsMarkdown()}
+          />
+          <ExportButton
+            disabled={exportCenter.isExporting}
             isActive={exportCenter.activeExport === "journal"}
             label={
               exportCenter.activeExport === "journal"
@@ -126,6 +136,7 @@ export function ExportCenterSection({ id }: ExportCenterSectionProps) {
             <Badge variant="secondary">
               {t("settings.exportDecisionLogMarkdown")}
             </Badge>
+            <Badge variant="secondary">{t("settings.exportGoalsMarkdown")}</Badge>
             <Badge variant="secondary">{t("settings.exportJournalMarkdown")}</Badge>
             <Badge variant="secondary">
               {t("settings.exportKnowledgeMarkdown")}

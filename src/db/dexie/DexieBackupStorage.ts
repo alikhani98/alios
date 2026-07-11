@@ -14,6 +14,7 @@ export class DexieBackupStorage implements BackupStorage {
       const [
         dailyCheckins,
         tasks,
+        goals,
         decisionLogEntries,
         manualEntries,
         financeTransactions,
@@ -26,6 +27,7 @@ export class DexieBackupStorage implements BackupStorage {
       ] = await Promise.all([
         this.database.dailyCheckins.toArray(),
         this.database.tasks.toArray(),
+        this.database.goals.toArray(),
         this.database.decisionLogEntries.toArray(),
         this.database.manualEntries.toArray(),
         this.database.financeTransactions.toArray(),
@@ -40,6 +42,7 @@ export class DexieBackupStorage implements BackupStorage {
       return {
         dailyCheckins,
         tasks,
+        goals,
         decisionLogEntries,
         manualEntries,
         financeTransactions,
@@ -61,6 +64,7 @@ export class DexieBackupStorage implements BackupStorage {
     const tables = [
       this.database.dailyCheckins,
       this.database.tasks,
+      this.database.goals,
       this.database.decisionLogEntries,
       this.database.manualEntries,
       this.database.financeTransactions,
@@ -78,6 +82,7 @@ export class DexieBackupStorage implements BackupStorage {
         await Promise.all([
           this.database.dailyCheckins.bulkPut(data.dailyCheckins),
           this.database.tasks.bulkPut(data.tasks),
+          this.database.goals.bulkPut(data.goals),
           this.database.decisionLogEntries.bulkPut(data.decisionLogEntries),
           this.database.manualEntries.bulkPut(data.manualEntries),
           this.database.financeTransactions.bulkPut(data.financeTransactions),
@@ -102,6 +107,7 @@ export class DexieBackupStorage implements BackupStorage {
       const [
         dailyCheckins,
         tasks,
+        goals,
         decisionLogEntries,
         manualEntries,
         financeTransactions,
@@ -114,6 +120,7 @@ export class DexieBackupStorage implements BackupStorage {
       ] = await Promise.all([
         this.database.dailyCheckins.count(),
         this.database.tasks.count(),
+        this.database.goals.count(),
         this.database.decisionLogEntries.count(),
         this.database.manualEntries.count(),
         this.database.financeTransactions.count(),
@@ -128,6 +135,7 @@ export class DexieBackupStorage implements BackupStorage {
       return {
         dailyCheckins,
         tasks,
+        goals,
         decisionLogEntries,
         manualEntries,
         financeTransactions,
@@ -149,6 +157,7 @@ export class DexieBackupStorage implements BackupStorage {
     const tables = [
       this.database.dailyCheckins,
       this.database.tasks,
+      this.database.goals,
       this.database.decisionLogEntries,
       this.database.manualEntries,
       this.database.financeTransactions,

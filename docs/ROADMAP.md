@@ -40,6 +40,7 @@ Stage 65 adds static Personal Manual templates that seed the existing form with 
 Stage 66 polishes Personal Manual for mobile and dense data scenarios with safer wrapping, tighter spacing, and a calmer compact layout without changing behavior or storage.
 Stage 67 hardens the Personal Manual track with a focused release audit, importance-aware search coverage, and a concise smoke-test checklist without changing behavior or storage.
 Stage 68 hardens the v1.50 release with a tiny app-version metadata fix, a release smoke-test checklist, and defensive QA coverage without changing the product scope, storage, or backup format.
+Stage 69 adds a local-first Goals foundation with repository CRUD, Home visibility, Weekly Review due awareness, Global Search support, and additive backup support without changing the storage model or backup format.
 
 ## Version 1.1
 

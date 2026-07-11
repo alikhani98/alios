@@ -11,6 +11,7 @@ import {
 import type {
   DailyCheckin,
   DecisionLogEntry,
+  Goal,
   FinanceObligation,
   FinanceTransaction,
   InboxItem,
@@ -26,6 +27,7 @@ import {
   calculateRemainingObligationTotal,
   getUpcomingObligations,
 } from "../finance/financeCalculations";
+import { getReviewDueGoals } from "../goals";
 import { isManualEntryReviewDue } from "../manual/manualEntries";
 
 export type WeeklyReviewWindow = {
@@ -76,6 +78,12 @@ export type WeeklyReviewDecisionSummary = {
   reviewedInWindowCount: number;
 };
 
+export type WeeklyReviewGoalSummary = {
+  totalCount: number;
+  dueCount: number;
+  dueEntries: Goal[];
+};
+
 export type WeeklyReviewManualSummary = {
   totalCount: number;
   dueCount: number;
@@ -107,6 +115,7 @@ export type WeeklyReviewSectionId =
   | "journal"
   | "knowledge"
   | "decisions"
+  | "goals"
   | "manual"
   | "finance"
   | "wellness";
@@ -127,6 +136,7 @@ export type WeeklyReviewObservationKind =
   | "financeBalance"
   | "projectProgress"
   | "decisionReview"
+  | "goalReview"
   | "wellnessCheckins"
   | "noData";
 
@@ -143,6 +153,7 @@ export type WeeklyReviewFocusKind =
   | "writeJournalEntry"
   | "recordFinanceData"
   | "reviewDecisions"
+  | "reviewGoals"
   | "refineProjectNextAction"
   | "addFirstTask";
 
@@ -159,6 +170,7 @@ export type WeeklyReviewSummary = {
   journalSummary: WeeklyReviewJournalSummary;
   knowledgeSummary: WeeklyReviewKnowledgeSummary;
   decisionSummary: WeeklyReviewDecisionSummary;
+  goalSummary: WeeklyReviewGoalSummary;
   manualSummary: WeeklyReviewManualSummary;
   financeSummary: WeeklyReviewFinanceSummary;
   wellnessSummary: WeeklyReviewWellnessSummary;
@@ -175,6 +187,7 @@ export type WeeklyReviewData = {
   journalEntries: ReadonlyArray<JournalEntry>;
   knowledgeItems: ReadonlyArray<KnowledgeItem>;
   decisionLogEntries: ReadonlyArray<DecisionLogEntry>;
+  goals: ReadonlyArray<Goal>;
   manualEntries: ReadonlyArray<ManualEntry>;
   financeTransactions: ReadonlyArray<FinanceTransaction>;
   financeObligations: ReadonlyArray<FinanceObligation>;
@@ -313,6 +326,7 @@ function buildEmptyStates(summary: {
   journalSummary: WeeklyReviewJournalSummary;
   knowledgeSummary: WeeklyReviewKnowledgeSummary;
   decisionSummary: WeeklyReviewDecisionSummary;
+  goalSummary: WeeklyReviewGoalSummary;
   manualSummary: WeeklyReviewManualSummary;
   financeSummary: WeeklyReviewFinanceSummary;
   wellnessSummary: WeeklyReviewWellnessSummary;
@@ -341,6 +355,10 @@ function buildEmptyStates(summary: {
 
   if (summary.decisionSummary.totalCount === 0) {
     emptyStates.push({ sectionId: "decisions" });
+  }
+
+  if (summary.goalSummary.totalCount === 0) {
+    emptyStates.push({ sectionId: "goals" });
   }
 
   if (summary.manualSummary.dueCount === 0) {
@@ -415,6 +433,14 @@ function buildObservations(summary: WeeklyReviewSummary): WeeklyReviewObservatio
     });
   }
 
+  if (summary.goalSummary.dueCount > 0) {
+    observations.push({
+      kind: "goalReview",
+      tone: "needs-review",
+      count: summary.goalSummary.dueCount,
+    });
+  }
+
   if (summary.wellnessSummary.checkinCountInWindow > 0) {
     observations.push({
       kind: "wellnessCheckins",
@@ -452,6 +478,10 @@ function buildSuggestedFocus(summary: WeeklyReviewSummary): WeeklyReviewFocusSug
 
   if (summary.decisionSummary.needsReviewCount > 0) {
     return [{ kind: "reviewDecisions", tone: "next-focus" }];
+  }
+
+  if (summary.goalSummary.dueCount > 0) {
+    return [{ kind: "reviewGoals", tone: "next-focus" }];
   }
 
   if (summary.financeSummary.transactionCount === 0) {
@@ -563,6 +593,13 @@ export function buildWeeklyReviewSummary(
     }).length,
   };
 
+  const dueGoals = getReviewDueGoals(data.goals, referenceDate);
+  const goalSummary: WeeklyReviewGoalSummary = {
+    totalCount: data.goals.length,
+    dueCount: dueGoals.length,
+    dueEntries: dueGoals,
+  };
+
   const manualDueEntries = getWeeklyReviewManualDueEntries(
     data.manualEntries,
     referenceDate
@@ -628,6 +665,7 @@ export function buildWeeklyReviewSummary(
     journalSummary,
     knowledgeSummary,
     decisionSummary,
+    goalSummary,
     manualSummary,
     financeSummary,
     wellnessSummary,
@@ -644,6 +682,7 @@ export function buildWeeklyReviewSummary(
     summary.journalSummary.totalCount > 0 ||
     summary.knowledgeSummary.totalCount > 0 ||
     summary.decisionSummary.totalCount > 0 ||
+    summary.goalSummary.totalCount > 0 ||
     summary.manualSummary.totalCount > 0 ||
     summary.financeSummary.transactionCount > 0 ||
     summary.financeSummary.activeObligationsCount > 0 ||
