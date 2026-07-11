@@ -22,6 +22,7 @@ Stage 54 improves empty states and first-run guidance on the same mobile-friendl
 Stage 55 adds a calm backup reminder and last-backup-status foundation so Settings can show fresh/due-soon/overdue guidance without changing the manual backup flow.
 Stage 56 adds a readable export center in Settings for finance CSV, decision log Markdown, journal Markdown, and knowledge Markdown while keeping backup/restore separate.
 Stage 57 adds a recovery mode foundation so mobile users can surface calm access to Settings, Backup/Restore, Export Center, and Local Error Log without deleting data or changing the backup format.
+Stage 66 polishes Personal Manual for mobile and dense-page use so long notes, tags, and template cards wrap more safely on narrow screens without changing storage or behavior.
 The Personal Insights section stays local to the device and only reflects stored tasks, projects, inbox items, journal entries, knowledge items, and wellness checklist state.
 
 ## Open or install AliOS
@@ -61,6 +62,7 @@ AliOS stores data in IndexedDB for the current browser, device, and site origin.
 - The recovery mode flag stays on the current browser or device in localStorage only and does not sync.
 - The Decision Log entries, review dates, and reflection fields stay on the current browser or device and do not sync.
 - The Personal Manual entries, review timing, and user-authored notes stay on the current browser or device and do not sync.
+- The Personal Manual page, template cards, and entry cards stay on the current browser or device and are polished for narrow mobile widths without changing behavior.
 - Finance due-date fields store ISO/Gregorian values only; the Jalali preview is display-only.
 - There is no automatic sync, cloud backup, account, or backend in AliOS 1.0.
 - Publishing AliOS to GitHub Pages does not change this device-local storage model.

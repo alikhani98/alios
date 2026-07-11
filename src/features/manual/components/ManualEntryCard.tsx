@@ -43,11 +43,11 @@ export function ManualEntryCard({
   const reviewDue = isManualEntryReviewDue(entry);
 
   return (
-    <Card className="flex h-full flex-col">
-      <CardHeader className="gap-3">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <CardTitle className="leading-7">{entry.title}</CardTitle>
-          <div className="flex flex-wrap justify-end gap-2">
+    <Card className="flex h-full min-w-0 flex-col">
+      <CardHeader className="min-w-0 gap-3">
+        <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
+          <CardTitle className="break-words leading-7">{entry.title}</CardTitle>
+          <div className="flex min-w-0 flex-wrap justify-end gap-2">
             <StatusChip
               tone={
                 entry.status === "archived"
@@ -64,17 +64,30 @@ export function ManualEntryCard({
             ) : null}
           </div>
         </div>
-        <p className="text-sm leading-7 text-muted-foreground">
+        <p className="break-words text-sm leading-7 whitespace-pre-wrap text-muted-foreground">
           {previewText(entry.body, t("manual.noBodyPreview"))}
         </p>
       </CardHeader>
 
-      <CardContent className="flex-1 space-y-4">
+      <CardContent className="min-w-0 flex-1 space-y-4">
         <div className="flex flex-wrap gap-2">
-          <Badge variant="secondary">{t(MANUAL_CATEGORY_LABEL_KEYS[entry.category])}</Badge>
-          <Badge variant="outline">{t(MANUAL_IMPORTANCE_LABEL_KEYS[entry.importance])}</Badge>
+          <Badge
+            variant="secondary"
+            className="max-w-full break-words whitespace-normal text-start leading-5"
+          >
+            {t(MANUAL_CATEGORY_LABEL_KEYS[entry.category])}
+          </Badge>
+          <Badge
+            variant="outline"
+            className="max-w-full break-words whitespace-normal text-start leading-5"
+          >
+            {t(MANUAL_IMPORTANCE_LABEL_KEYS[entry.importance])}
+          </Badge>
           {entry.reviewIntervalDays ? (
-            <Badge variant="outline">
+            <Badge
+              variant="outline"
+              className="max-w-full break-words whitespace-normal text-start leading-5"
+            >
               {t("manual.reviewIntervalDays")}: {entry.reviewIntervalDays}
             </Badge>
           ) : null}
@@ -96,7 +109,11 @@ export function ManualEntryCard({
         {entry.tags.length > 0 ? (
           <div className="flex flex-wrap gap-2">
             {entry.tags.map((tag) => (
-              <Badge key={tag} variant="outline">
+              <Badge
+                key={tag}
+                variant="outline"
+                className="max-w-full break-words whitespace-normal text-start leading-5"
+              >
                 {tag}
               </Badge>
             ))}

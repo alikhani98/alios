@@ -56,11 +56,11 @@ export function ManualEntryForm({
   return (
     <form
       id="manual-entry-form"
-      className="space-y-4"
+      className="space-y-3 sm:space-y-4"
       onSubmit={(event) => void handleSubmit(event)}
     >
-      <div className="grid gap-4 lg:grid-cols-2">
-        <label className="space-y-1">
+      <div className="grid gap-3 lg:grid-cols-2">
+        <label className="space-y-1.5">
           <span className="text-sm font-medium">{t("common.title")}</span>
           <Input
             name="title"
@@ -70,7 +70,7 @@ export function ManualEntryForm({
           />
         </label>
 
-        <label className="space-y-1">
+        <label className="space-y-1.5">
           <span className="text-sm font-medium">{t("common.type")}</span>
           <select
             name="category"
@@ -88,19 +88,19 @@ export function ManualEntryForm({
         </label>
       </div>
 
-      <label className="space-y-1">
+      <label className="space-y-1.5">
         <span className="text-sm font-medium">{t("common.content")}</span>
         <Textarea
           name="body"
           defaultValue={entry?.body ?? ""}
           placeholder={t("manual.bodyPlaceholder")}
-          className="min-h-40"
+          className="min-h-44"
           required
         />
       </label>
 
-      <div className="grid gap-4 lg:grid-cols-3">
-        <label className="space-y-1">
+      <div className="grid gap-3 lg:grid-cols-3">
+        <label className="space-y-1.5">
           <span className="text-sm font-medium">{t("common.status")}</span>
           <select
             name="status"
@@ -117,7 +117,7 @@ export function ManualEntryForm({
           </select>
         </label>
 
-        <label className="space-y-1">
+        <label className="space-y-1.5">
           <span className="text-sm font-medium">{t("common.priority")}</span>
           <select
             name="importance"
@@ -132,7 +132,7 @@ export function ManualEntryForm({
           </select>
         </label>
 
-        <label className="space-y-1">
+        <label className="space-y-1.5">
           <span className="text-sm font-medium">
             {t("manual.reviewIntervalDays")}
           </span>
@@ -147,7 +147,7 @@ export function ManualEntryForm({
         </label>
       </div>
 
-      <label className="space-y-1">
+      <label className="space-y-1.5">
         <span className="text-sm font-medium">{t("manual.tags")}</span>
         <Input
           name="tagsText"
@@ -156,7 +156,7 @@ export function ManualEntryForm({
         />
       </label>
 
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting ? t("common.saving") : entry ? t("common.saveChanges") : t("manual.createEntry")}
         </Button>

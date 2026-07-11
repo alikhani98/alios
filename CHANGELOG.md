@@ -2,6 +2,12 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 66 - Personal Manual Mobile & Dense Page Polish
+
+- Tightened the Personal Manual page, entry cards, and form spacing so dense content stays readable on narrow screens
+- Improved wrapping for long titles, body previews, badges, and tag chips while keeping template selection and review behavior intact
+- Kept the stage local-only, bilingual, repository-backed, and unchanged in package/config, backup format, backup version, and Dexie schema
+
 ## Stage 65 - Personal Manual Templates Foundation
 
 - Added a compact template picker to Personal Manual with static local starter structures for principles, decision rules, boundaries, lessons, work preferences, routines, values, focus rules, finance rules, health rules, and other notes
