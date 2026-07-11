@@ -37,6 +37,16 @@ Use this short checklist after a release-hardening change to the Personal Manual
 5. Mark a due manual entry reviewed and confirm the last-reviewed time updates.
 6. Export and restore a backup to confirm manual entries survive the round trip.
 
+## v1.50 release smoke test
+
+Use this short checklist before the v1.50 release is marked ready:
+
+1. Open the app on the GitHub Pages-style `/alios/` path and confirm the hash routes still load.
+2. Open Home, Settings, Backup / Restore, Export Center, Recovery Mode, Weekly Review, Finance, and Personal Manual.
+3. Create, edit, delete, search, export, and restore a small sample of local data.
+4. Confirm invalid restore files are rejected and restore preview still appears first.
+5. Check a narrow mobile width and confirm the main screens do not overflow horizontally.
+
 ## Open or install AliOS
 
 The expected GitHub Pages URL is `https://alikhani98.github.io/alios/` after Pages is enabled and the deployment workflow succeeds.

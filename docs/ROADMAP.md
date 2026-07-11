@@ -39,6 +39,7 @@ Stage 64 integrates Personal Manual into Global Search and adds focus navigation
 Stage 65 adds static Personal Manual templates that seed the existing form with starter title, body, category, status, importance, and tags values without changing the storage model or backup format.
 Stage 66 polishes Personal Manual for mobile and dense data scenarios with safer wrapping, tighter spacing, and a calmer compact layout without changing behavior or storage.
 Stage 67 hardens the Personal Manual track with a focused release audit, importance-aware search coverage, and a concise smoke-test checklist without changing behavior or storage.
+Stage 68 hardens the v1.50 release with a tiny app-version metadata fix, a release smoke-test checklist, and defensive QA coverage without changing the product scope, storage, or backup format.
 
 ## Version 1.1
 
