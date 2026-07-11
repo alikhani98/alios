@@ -29,6 +29,14 @@ AliOS 1.0 is a local-first static web app.
 - Decision Log review-due logic is deterministic and local, and the feature stays non-advisory
 - Backup and restore include decision log data additively without breaking older backups that do not contain the decision arrays
 
+## Goals Module Boundary
+
+- Goals data lives in a dedicated Dexie table for local user-managed objectives
+- UI code reads and writes goals data through the feature hook, repository interface, and storage adapter boundary
+- Goals review timing is deterministic and local, and the feature stays user-managed rather than advisory
+- Goals templates are static UI starter constants that prefill the existing form only; they are not persisted records and do not require a Dexie schema change, backup change, or new storage table
+- Backup and restore include goals data additively without breaking older backups that do not contain the goals arrays
+
 ## Personal Manual Module Boundary
 
 - Personal Manual data lives in a dedicated Dexie table for local user-authored reference entries
