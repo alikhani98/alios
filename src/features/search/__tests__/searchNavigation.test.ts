@@ -11,6 +11,7 @@ describe("searchNavigation", () => {
       ["project", "item-3", "/projects?focusId=item-3"],
       ["journal", "item-4", "/journal?focusId=item-4"],
       ["knowledge", "item-5", "/knowledge?focusId=item-5"],
+      ["manual", "item-6", "/manual?focusId=item-6"],
     ];
 
     for (const [kind, focusId, href] of cases) {
@@ -24,5 +25,6 @@ describe("searchNavigation", () => {
     expect(getSearchResultPath("project")).toBe("/projects");
     expect(getSearchResultPath("journal")).toBe("/journal");
     expect(getSearchResultPath("knowledge")).toBe("/knowledge");
+    expect(getSearchResultPath("manual")).toBe("/manual");
   });
 });

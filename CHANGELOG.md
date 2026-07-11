@@ -2,6 +2,12 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 64 - Personal Manual Search & Focus Navigation
+
+- Added Personal Manual entries to Global Search with title, body, category, status, importance, and tag matching
+- Added Personal Manual search-result focus navigation with the same stable local `focusId` pattern used by the other content pages
+- Kept the stage local-only, bilingual, repository-backed, and unchanged in package/config, backup format, backup version, and Dexie schema
+
 ## Stage 63 - Personal Manual Weekly Review Integration
 
 - Surfaced Personal Manual review-due awareness inside Weekly Review with a dedicated manual summary, calm empty state, and entry cards for due items

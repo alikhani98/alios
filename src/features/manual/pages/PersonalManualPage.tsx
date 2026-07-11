@@ -1,5 +1,6 @@
 import { AlertCircle, BookText, Clock3, Plus, RotateCcw, Search, Sparkles, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 import type { CreateManualEntryInput } from "@/core/repositories";
 import { useDateFormatter } from "@/shared/date";
@@ -15,6 +16,7 @@ import {
   SectionHeader,
   StatusChip,
 } from "@/shared/ui";
+import { cn } from "@/shared/utils";
 
 import { MANUAL_CATEGORY_OPTIONS, MANUAL_STATUS_OPTIONS } from "../constants";
 import { filterManualEntries, getManualEntrySummary } from "../manualEntries";
@@ -43,6 +45,7 @@ function parseReviewIntervalDays(value: string): number | undefined {
 export function PersonalManualPage() {
   const { t } = useI18n();
   const { formatDateTime } = useDateFormatter();
+  const [searchParams] = useSearchParams();
   const { entries, isLoading, error, loadEntries, createEntry, updateEntry, deleteEntry } =
     useManualEntries();
   const [formOpen, setFormOpen] = useState(false);
@@ -56,6 +59,10 @@ export function PersonalManualPage() {
   const [query, setQuery] = useState("");
   const [appliedQuery, setAppliedQuery] = useState("");
   const formRef = useRef<HTMLDivElement | null>(null);
+  const entryRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const [focusedEntryId, setFocusedEntryId] = useState<string | null>(null);
+  const [focusMessage, setFocusMessage] = useState<string | null>(null);
+  const focusId = searchParams.get("focusId");
 
   const summary = useMemo(() => getManualEntrySummary(entries), [entries]);
   const filteredEntries = useMemo(
@@ -73,6 +80,33 @@ export function PersonalManualPage() {
 
   const hasActiveFilters =
     categoryFilter !== "all" || statusFilter !== "all" || appliedQuery.length > 0;
+
+  useEffect(() => {
+    if (!focusId) {
+      setFocusedEntryId(null);
+      setFocusMessage(null);
+      return;
+    }
+
+    if (!filteredEntries.some((entry) => entry.id === focusId)) {
+      if (!isLoading && entries.some((entry) => entry.id === focusId)) {
+        setFocusedEntryId(null);
+        setFocusMessage(t("search.focusItemNotVisible"));
+      }
+      return;
+    }
+
+    setFocusMessage(null);
+    setFocusedEntryId(focusId);
+    const node = entryRefs.current[focusId];
+    node?.scrollIntoView({ behavior: "smooth", block: "center" });
+
+    const timeout = window.setTimeout(() => {
+      setFocusedEntryId((current) => (current === focusId ? null : current));
+    }, 2200);
+
+    return () => window.clearTimeout(timeout);
+  }, [entries, filteredEntries, focusId, isLoading, t]);
 
   useEffect(() => {
     if (formOpen) {
@@ -249,6 +283,15 @@ export function PersonalManualPage() {
         </div>
       ) : null}
 
+      {focusMessage ? (
+        <div
+          role="status"
+          className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-foreground"
+        >
+          {focusMessage}
+        </div>
+      ) : null}
+
       <PremiumCard>
         <div className="space-y-4 p-5 sm:p-6">
           <SectionHeader
@@ -366,14 +409,24 @@ export function PersonalManualPage() {
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {filteredEntries.map((entry) => (
-            <ManualEntryCard
+            <div
               key={entry.id}
-              entry={entry}
-              isDeleting={deletingId === entry.id}
-              onEdit={() => openEditForm(entry)}
-              onDelete={() => handleDelete(entry)}
-              onMarkReviewed={() => handleMarkReviewed(entry)}
-            />
+              ref={(node) => {
+                entryRefs.current[entry.id] = node;
+              }}
+              className={cn(
+                "scroll-mt-6 rounded-[1.75rem] transition-shadow",
+                focusedEntryId === entry.id ? "ring-2 ring-primary/20" : null
+              )}
+            >
+              <ManualEntryCard
+                entry={entry}
+                isDeleting={deletingId === entry.id}
+                onEdit={() => openEditForm(entry)}
+                onDelete={() => handleDelete(entry)}
+                onMarkReviewed={() => handleMarkReviewed(entry)}
+              />
+            </div>
           ))}
         </div>
       )}

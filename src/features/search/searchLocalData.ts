@@ -5,6 +5,11 @@ import {
 } from "@/features/inbox/constants";
 import { KNOWLEDGE_TYPE_LABEL_KEYS } from "@/features/knowledge/constants";
 import {
+  MANUAL_CATEGORY_LABEL_KEYS,
+  MANUAL_IMPORTANCE_LABEL_KEYS,
+  MANUAL_STATUS_LABEL_KEYS,
+} from "@/features/manual/constants";
+import {
   PROJECT_PRIORITY_LABEL_KEYS,
   PROJECT_STATUS_LABEL_KEYS,
 } from "@/features/projects/constants";
@@ -17,6 +22,7 @@ import type {
   InboxItem,
   JournalEntry,
   KnowledgeItem,
+  ManualEntry,
   Project,
   Task,
 } from "@/shared/types";
@@ -28,7 +34,8 @@ export type SearchResultKind =
   | "task"
   | "project"
   | "journal"
-  | "knowledge";
+  | "knowledge"
+  | "manual";
 
 export type SearchResultFacet = {
   labelKey: TranslationKey;
@@ -53,6 +60,7 @@ export type SearchLocalDataInput = {
   projects: Project[];
   journalEntries: JournalEntry[];
   knowledgeItems: KnowledgeItem[];
+  manualEntries: ManualEntry[];
 };
 
 const kindLabelKeys: Record<SearchResultKind, TranslationKey> = {
@@ -61,6 +69,7 @@ const kindLabelKeys: Record<SearchResultKind, TranslationKey> = {
   project: "search.typeProject",
   journal: "search.typeJournal",
   knowledge: "search.typeKnowledge",
+  manual: "search.typeManual",
 };
 
 function normalize(value: string): string {
@@ -262,6 +271,40 @@ export function searchLocalData(
       facets: [{ labelKey: "common.type", valueKey: KNOWLEDGE_TYPE_LABEL_KEYS[item.type] }],
       sortKey: item.updatedAt,
       date: item.createdAt,
+      query: normalizedQuery,
+    });
+    if (result) results.push(result);
+  }
+
+  for (const item of data.manualEntries) {
+    const result = buildResult({
+      kind: "manual",
+      title: item.title,
+      snippetSource: [item.title, item.body, item.tags.join(" ")].join(" "),
+      fields: [
+        item.body,
+        item.category,
+        item.status,
+        item.importance,
+        item.tags.join(" "),
+      ],
+      href: buildSearchResultHref("manual", item.id),
+      facets: [
+        {
+          labelKey: "manual.categoryLabel",
+          valueKey: MANUAL_CATEGORY_LABEL_KEYS[item.category],
+        },
+        {
+          labelKey: "manual.importanceLabel",
+          valueKey: MANUAL_IMPORTANCE_LABEL_KEYS[item.importance],
+        },
+        {
+          labelKey: "common.status",
+          valueKey: MANUAL_STATUS_LABEL_KEYS[item.status],
+        },
+      ],
+      sortKey: item.updatedAt,
+      date: item.lastReviewedAt ?? item.updatedAt,
       query: normalizedQuery,
     });
     if (result) results.push(result);

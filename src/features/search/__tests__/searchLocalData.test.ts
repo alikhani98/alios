@@ -4,6 +4,7 @@ import type {
   InboxItem,
   JournalEntry,
   KnowledgeItem,
+  ManualEntry,
   Project,
   Task,
 } from "@/shared/types";
@@ -70,6 +71,45 @@ const knowledgeItems: KnowledgeItem[] = [
   },
 ];
 
+const manualEntries: ManualEntry[] = [
+  {
+    id: "manual-1",
+    title: "Calm rules",
+    body: "Keep the note calm, brief, and practical.",
+    category: "principles",
+    importance: "high",
+    status: "active",
+    tags: ["Focus", "Reset"],
+    reviewIntervalDays: 7,
+    createdAt: "2026-07-02T08:00:00.000Z",
+    updatedAt: "2026-07-05T12:00:00.000Z",
+  },
+  {
+    id: "manual-2",
+    title: "Draft boundary",
+    body: "Draft work boundary note for future review.",
+    category: "boundaries",
+    importance: "medium",
+    status: "draft",
+    tags: ["Work", "Focus"],
+    reviewIntervalDays: 14,
+    createdAt: "2026-07-03T08:00:00.000Z",
+    updatedAt: "2026-07-04T12:00:00.000Z",
+  },
+  {
+    id: "manual-3",
+    title: "Archived lesson",
+    body: "Archived lesson about keeping routines simple.",
+    category: "lessons",
+    importance: "low",
+    status: "archived",
+    tags: ["Legacy"],
+    reviewIntervalDays: 21,
+    createdAt: "2026-07-01T08:00:00.000Z",
+    updatedAt: "2026-07-03T12:00:00.000Z",
+  },
+];
+
 describe("searchLocalData", () => {
   it("returns no results for an empty query", () => {
     expect(
@@ -80,6 +120,7 @@ describe("searchLocalData", () => {
           projects,
           journalEntries,
           knowledgeItems,
+          manualEntries: [],
         },
         "   "
       )
@@ -94,6 +135,7 @@ describe("searchLocalData", () => {
         projects,
         journalEntries,
         knowledgeItems,
+        manualEntries: [],
       },
       "  PROJECT  "
     );
@@ -110,6 +152,7 @@ describe("searchLocalData", () => {
         projects,
         journalEntries,
         knowledgeItems,
+        manualEntries: [],
       },
       "local"
     );
@@ -128,6 +171,7 @@ describe("searchLocalData", () => {
           projects,
           journalEntries,
           knowledgeItems,
+          manualEntries: [],
         },
         "missing phrase"
       )
@@ -142,11 +186,73 @@ describe("searchLocalData", () => {
         projects,
         journalEntries,
         knowledgeItems,
+        manualEntries: [],
       },
       "check"
     );
 
     expect(results.some((result) => result.kind === "knowledge" && result.kindLabelKey === "search.typeKnowledge")).toBe(true);
     expect(results.some((result) => result.kind === "project" && result.kindLabelKey === "search.typeProject")).toBe(true);
+  });
+
+  it("searches manual entries by title, body, tags, and status case-insensitively", () => {
+    const titleResults = searchLocalData(
+      {
+        inboxItems,
+        tasks,
+        projects,
+        journalEntries,
+        knowledgeItems,
+        manualEntries,
+      },
+      "  calm  "
+    );
+
+    expect(titleResults.some((result) => result.kind === "manual")).toBe(true);
+    expect(titleResults.find((result) => result.kind === "manual")?.kindLabelKey).toBe(
+      "search.typeManual"
+    );
+
+    const tagResults = searchLocalData(
+      {
+        inboxItems,
+        tasks,
+        projects,
+        journalEntries,
+        knowledgeItems,
+        manualEntries,
+      },
+      "focus"
+    );
+
+    expect(tagResults.some((result) => result.href === "/manual?focusId=manual-1")).toBe(true);
+
+    const draftResults = searchLocalData(
+      {
+        inboxItems,
+        tasks,
+        projects,
+        journalEntries,
+        knowledgeItems,
+        manualEntries,
+      },
+      "boundary"
+    );
+
+    expect(draftResults.some((result) => result.href === "/manual?focusId=manual-2")).toBe(true);
+
+    const archivedResults = searchLocalData(
+      {
+        inboxItems,
+        tasks,
+        projects,
+        journalEntries,
+        knowledgeItems,
+        manualEntries,
+      },
+      "legacy"
+    );
+
+    expect(archivedResults.some((result) => result.href === "/manual?focusId=manual-3")).toBe(true);
   });
 });
