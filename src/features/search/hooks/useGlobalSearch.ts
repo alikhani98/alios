@@ -1,10 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { useStorageAdapter } from "@/core/storage";
+import { useI18n } from "@/shared/i18n";
 import type { SearchLocalDataInput } from "../searchLocalData";
+import { mergeLifeAreas } from "@/features/lifeAreas";
 
 export function useGlobalSearch() {
-  const { inbox, tasks, projects, goals, journal, knowledge, manual } = useStorageAdapter();
+  const { inbox, tasks, projects, goals, lifeAreas, journal, knowledge, manual } = useStorageAdapter();
+  const { t } = useI18n();
   const [data, setData] = useState<SearchLocalDataInput | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
@@ -19,6 +22,7 @@ export function useGlobalSearch() {
         taskItems,
         projectItems,
         goalItems,
+        lifeAreaItems,
         journalEntries,
         knowledgeItems,
         manualEntries,
@@ -28,6 +32,7 @@ export function useGlobalSearch() {
           tasks.list(),
           projects.list(),
           goals.list(),
+          lifeAreas.list(),
           journal.list(),
           knowledge.list(),
           manual.list(),
@@ -38,6 +43,7 @@ export function useGlobalSearch() {
         tasks: taskItems,
         projects: projectItems,
         goals: goalItems,
+        lifeAreas: mergeLifeAreas(lifeAreaItems, t),
         journalEntries,
         knowledgeItems,
         manualEntries,
@@ -47,7 +53,7 @@ export function useGlobalSearch() {
     } finally {
       setIsLoading(false);
     }
-  }, [goals, inbox, journal, knowledge, manual, projects, tasks]);
+  }, [goals, inbox, journal, knowledge, lifeAreas, manual, projects, t, tasks]);
 
   useEffect(() => {
     void loadSearchData();

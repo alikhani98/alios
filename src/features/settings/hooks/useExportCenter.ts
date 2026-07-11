@@ -9,6 +9,7 @@ import {
   createJournalMarkdownExport,
   createKnowledgeMarkdownExport,
   createGoalsMarkdownExport,
+  createLifeAreasMarkdownExport,
   createManualMarkdownExport,
   createReadableExportFilename,
   downloadTextExport,
@@ -19,7 +20,7 @@ function getErrorMessage(error: unknown, fallback: string): string {
 }
 
 export function useExportCenter() {
-  const { finance, decisions, goals, journal, knowledge, manual } =
+  const { finance, decisions, goals, lifeAreas, journal, knowledge, manual } =
     useStorageAdapter();
   const { t } = useI18n();
   const [activeExport, setActiveExport] =
@@ -89,6 +90,19 @@ export function useExportCenter() {
     });
   }, [goals, startExport, t]);
 
+  const exportLifeAreasMarkdown = useCallback(() => {
+    return startExport("lifeAreas", async () => {
+      const entries = await lifeAreas.list();
+
+      downloadTextExport(
+        createReadableExportFilename("life-areas", "md"),
+        createLifeAreasMarkdownExport(entries),
+        "text/markdown;charset=utf-8"
+      );
+      setSuccess(t("settings.lifeAreasExported"));
+    });
+  }, [lifeAreas, startExport, t]);
+
   const exportJournalMarkdown = useCallback(() => {
     return startExport("journal", async () => {
       const entries = await journal.list();
@@ -136,6 +150,7 @@ export function useExportCenter() {
     exportFinanceCsv,
     exportDecisionLogMarkdown,
     exportGoalsMarkdown,
+    exportLifeAreasMarkdown,
     exportJournalMarkdown,
     exportKnowledgeMarkdown,
     exportManualMarkdown,

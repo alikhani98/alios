@@ -4,6 +4,7 @@ export const DEXIE_SCHEMA_VERSION_3 = 3;
 export const DEXIE_SCHEMA_VERSION_4 = 4;
 export const DEXIE_SCHEMA_VERSION_5 = 5;
 export const DEXIE_SCHEMA_VERSION_6 = 6;
+export const DEXIE_SCHEMA_VERSION_7 = 7;
 
 export const DEXIE_TABLE_NAMES = {
   dailyCheckins: "dailyCheckins",
@@ -12,6 +13,7 @@ export const DEXIE_TABLE_NAMES = {
   journalEntries: "journalEntries",
   knowledgeItems: "knowledgeItems",
   goals: "goals",
+  lifeAreas: "lifeAreas",
   decisionLogEntries: "decisionLogEntries",
   manualEntries: "manualEntries",
   settings: "settings",
@@ -77,4 +79,10 @@ export const DEXIE_SCHEMA_V6 = {
   ...DEXIE_SCHEMA_V5,
   [DEXIE_TABLE_NAMES.goals]:
     "id, area, timeframe, status, importance, progressPercent, targetDate, reviewIntervalDays, updatedAt",
+} satisfies Partial<Record<DexieTableName, string>>;
+
+export const DEXIE_SCHEMA_V7 = {
+  ...DEXIE_SCHEMA_V6,
+  [DEXIE_TABLE_NAMES.lifeAreas]:
+    "id, areaKey, status, attentionLevel, satisfactionScore, reviewIntervalDays, updatedAt",
 } satisfies Record<DexieTableName, string>;

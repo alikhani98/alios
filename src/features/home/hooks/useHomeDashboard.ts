@@ -2,7 +2,9 @@ import { format } from "date-fns";
 import { useCallback, useEffect, useState } from "react";
 
 import { useStorageAdapter } from "@/core/storage";
+import { useI18n } from "@/shared/i18n";
 import { getGoalsSummary } from "@/features/goals";
+import { getLifeAreasSummary, mergeLifeAreas } from "@/features/lifeAreas";
 import { getManualEntrySummary } from "@/features/manual";
 import type { HomeDashboardData } from "../types";
 
@@ -11,8 +13,9 @@ function byUpdatedAtDescending<T extends { updatedAt: string }>(a: T, b: T) {
 }
 
 export function useHomeDashboard() {
-  const { tasks, dailyCheckins, projects, journal, knowledge, goals, manual, inbox } =
+  const { tasks, dailyCheckins, projects, journal, knowledge, goals, lifeAreas, manual, inbox } =
     useStorageAdapter();
+  const { t } = useI18n();
   const [data, setData] = useState<HomeDashboardData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
@@ -30,6 +33,7 @@ export function useHomeDashboard() {
         journalEntries,
         knowledgeItems,
         goalEntries,
+        lifeAreaEntries,
         manualEntries,
         inboxItems,
       ] =
@@ -40,6 +44,7 @@ export function useHomeDashboard() {
           journal.list(),
           knowledge.list(),
           goals.list(),
+          lifeAreas.list(),
           manual.list(),
           inbox.list(),
         ]);
@@ -51,6 +56,8 @@ export function useHomeDashboard() {
       const latestJournal = [...journalEntries].sort(byUpdatedAtDescending)[0];
       const latestKnowledge = [...knowledgeItems].sort(byUpdatedAtDescending)[0];
       const goalSummary = getGoalsSummary(goalEntries);
+      const lifeAreaViews = mergeLifeAreas(lifeAreaEntries, t);
+      const lifeAreaSummary = getLifeAreasSummary(lifeAreaViews, new Date());
       const manualSummary = getManualEntrySummary(manualEntries, new Date());
 
       setData({
@@ -86,6 +93,14 @@ export function useHomeDashboard() {
           averageActiveProgress: goalSummary.averageActiveProgress,
           latest: goalSummary.latestUpdatedGoal,
         },
+        lifeAreas: {
+          totalCount: lifeAreaSummary.totalCount,
+          activeCount: lifeAreaSummary.activeCount,
+          highAttentionActiveCount: lifeAreaSummary.highAttentionActiveCount,
+          reviewDueCount: lifeAreaSummary.reviewDueCount,
+          averageSatisfactionScore: lifeAreaSummary.averageSatisfactionScore,
+          latest: lifeAreaSummary.latestReviewedArea,
+        },
         manual: {
           totalCount: manualSummary.totalCount,
           activeCount: manualSummary.activeCount,
@@ -102,6 +117,7 @@ export function useHomeDashboard() {
           journalEntries.length === 0 &&
           knowledgeItems.length === 0 &&
           goalEntries.length === 0 &&
+          lifeAreaEntries.length === 0 &&
           manualEntries.length === 0 &&
           inboxItems.length === 0,
       });
@@ -110,7 +126,7 @@ export function useHomeDashboard() {
     } finally {
       setIsLoading(false);
     }
-  }, [dailyCheckins, goals, inbox, journal, knowledge, manual, projects, tasks]);
+  }, [dailyCheckins, goals, inbox, journal, knowledge, lifeAreas, manual, projects, tasks, t]);
 
   useEffect(() => {
     void loadDashboard();

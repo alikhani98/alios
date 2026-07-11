@@ -12,6 +12,7 @@ import {
   journalEntryInput,
   inboxItemInput,
   knowledgeItemInput,
+  lifeAreaInput,
   manualEntryInput,
   projectInput,
   settingInput,
@@ -46,6 +47,7 @@ describe("BackupService with DexieBackupStorage", () => {
       financeObligationInput
     );
     const goal = await storage.goals.create(goalInput);
+    const lifeArea = await storage.lifeAreas.upsert(lifeAreaInput);
     const decisionLogEntry = await storage.decisions.create(decisionLogInput);
     const manualEntry = await storage.manual.create(manualEntryInput);
     const journalEntry = await storage.journal.create(journalEntryInput);
@@ -64,6 +66,7 @@ describe("BackupService with DexieBackupStorage", () => {
         "dailyCheckins",
         "tasks",
         "goals",
+        "lifeAreas",
         "decisionLogEntries",
         "manualEntries",
         "financeTransactions",
@@ -78,6 +81,7 @@ describe("BackupService with DexieBackupStorage", () => {
     expect(backup.data.projects).toEqual([project]);
     expect(backup.data.tasks).toEqual([task]);
     expect(backup.data.goals).toEqual([goal]);
+    expect(backup.data.lifeAreas).toEqual([lifeArea]);
     expect(backup.data.financeTransactions).toEqual([financeTransaction]);
     expect(backup.data.financeObligations).toEqual([financeObligation]);
     expect(backup.data.journalEntries).toEqual([journalEntry]);
@@ -100,6 +104,7 @@ describe("BackupService with DexieBackupStorage", () => {
       dailyCheckins: 0,
       tasks: 0,
       goals: 0,
+      lifeAreas: 0,
       decisionLogEntries: 0,
       manualEntries: 0,
       financeTransactions: 0,

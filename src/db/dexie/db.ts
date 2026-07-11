@@ -7,6 +7,7 @@ import type {
   FinanceObligation,
   FinanceTransaction,
   JournalEntry,
+  LifeArea,
   InboxItem,
   KnowledgeItem,
   ManualEntry,
@@ -22,11 +23,13 @@ import {
   DEXIE_SCHEMA_V4,
   DEXIE_SCHEMA_V5,
   DEXIE_SCHEMA_V6,
+  DEXIE_SCHEMA_V7,
   DEXIE_SCHEMA_VERSION,
   DEXIE_SCHEMA_VERSION_3,
   DEXIE_SCHEMA_VERSION_4,
   DEXIE_SCHEMA_VERSION_5,
   DEXIE_SCHEMA_VERSION_6,
+  DEXIE_SCHEMA_VERSION_7,
 } from "./schema";
 
 export class AliosDatabase extends Dexie {
@@ -37,6 +40,7 @@ export class AliosDatabase extends Dexie {
   knowledgeItems!: Table<KnowledgeItem, string>;
   decisionLogEntries!: Table<DecisionLogEntry, string>;
   goals!: Table<Goal, string>;
+  lifeAreas!: Table<LifeArea, string>;
   manualEntries!: Table<ManualEntry, string>;
   settings!: Table<Setting, string>;
   inboxItems!: Table<InboxItem, string>;
@@ -51,6 +55,7 @@ export class AliosDatabase extends Dexie {
     this.version(DEXIE_SCHEMA_VERSION_4).stores(DEXIE_SCHEMA_V4);
     this.version(DEXIE_SCHEMA_VERSION_5).stores(DEXIE_SCHEMA_V5);
     this.version(DEXIE_SCHEMA_VERSION_6).stores(DEXIE_SCHEMA_V6);
+    this.version(DEXIE_SCHEMA_VERSION_7).stores(DEXIE_SCHEMA_V7);
   }
 }
 

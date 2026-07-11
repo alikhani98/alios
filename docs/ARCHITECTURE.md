@@ -37,6 +37,14 @@ AliOS 1.0 is a local-first static web app.
 - Goals templates are static UI starter constants that prefill the existing form only; they are not persisted records and do not require a Dexie schema change, backup change, or new storage table
 - Backup and restore include goals data additively without breaking older backups that do not contain the goals arrays
 
+## Life Areas Module Boundary
+
+- Life Areas data lives in a dedicated Dexie table for local user-managed areas of life
+- UI code reads and writes Life Areas data through the feature hook, repository interface, and storage adapter boundary
+- The app may surface a canonical static set of life areas in the UI, but only user changes are persisted
+- Life Areas review timing is deterministic and local, and the feature stays user-managed rather than advisory
+- Backup and restore include life area data additively without breaking older backups that do not contain the life area arrays
+
 ## Personal Manual Module Boundary
 
 - Personal Manual data lives in a dedicated Dexie table for local user-authored reference entries

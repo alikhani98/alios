@@ -10,6 +10,7 @@ import {
   journalEntryInput,
   inboxItemInput,
   knowledgeItemInput,
+  lifeAreaInput,
   manualEntryInput,
   projectInput,
   settingInput,
@@ -225,6 +226,33 @@ describe("Dexie repositories", () => {
     await storage.manual.delete(created.id);
     expect(await storage.manual.list()).toEqual([]);
     expect(await storage.manual.getById(created.id)).toBeUndefined();
+  });
+
+  it("supports the complete Life Areas CRUD lifecycle", async () => {
+    const created = await storage.lifeAreas.upsert(lifeAreaInput);
+
+    expect(created.id).toBe(lifeAreaInput.areaKey);
+    expect(await storage.lifeAreas.list()).toEqual([created]);
+    expect(await storage.lifeAreas.getByAreaKey(created.areaKey)).toEqual(created);
+    expect(created.createdAt).toBeTruthy();
+    expect(created.updatedAt).toBeTruthy();
+
+    const updated = await storage.lifeAreas.update(created.areaKey, {
+      attentionLevel: "medium",
+      satisfactionScore: 5,
+    });
+    expect(updated.attentionLevel).toBe("medium");
+    expect(updated.satisfactionScore).toBe(5);
+    expect((await storage.lifeAreas.getByAreaKey(created.areaKey))?.attentionLevel).toBe(
+      "medium"
+    );
+
+    const reviewed = await storage.lifeAreas.markReviewed(created.areaKey);
+    expect(reviewed.lastReviewedAt).toBeTruthy();
+
+    await storage.lifeAreas.delete(created.areaKey);
+    expect(await storage.lifeAreas.list()).toEqual([]);
+    expect(await storage.lifeAreas.getByAreaKey(created.areaKey)).toBeUndefined();
   });
 
   it("supports the complete Inbox CRUD and status lifecycle", async () => {

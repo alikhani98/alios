@@ -3,6 +3,7 @@ export * from "./journalRepository";
 export * from "./inboxRepository";
 export * from "./knowledgeRepository";
 export * from "./manualRepository";
+export * from "./lifeAreasRepository";
 export * from "./decisionLogRepository";
 export * from "./goalsRepository";
 export * from "./financeRepository";

@@ -28,6 +28,11 @@ import {
   getUpcomingObligations,
 } from "../finance/financeCalculations";
 import { getReviewDueGoals } from "../goals";
+import {
+  getHighAttentionLifeAreas,
+  getReviewDueLifeAreas,
+  type LifeAreaView,
+} from "../lifeAreas";
 import { isManualEntryReviewDue } from "../manual/manualEntries";
 
 export type WeeklyReviewWindow = {
@@ -84,6 +89,14 @@ export type WeeklyReviewGoalSummary = {
   dueEntries: Goal[];
 };
 
+export type WeeklyReviewLifeAreaSummary = {
+  totalCount: number;
+  activeCount: number;
+  highAttentionActiveCount: number;
+  dueCount: number;
+  dueEntries: LifeAreaView[];
+};
+
 export type WeeklyReviewManualSummary = {
   totalCount: number;
   dueCount: number;
@@ -116,6 +129,7 @@ export type WeeklyReviewSectionId =
   | "knowledge"
   | "decisions"
   | "goals"
+  | "lifeAreas"
   | "manual"
   | "finance"
   | "wellness";
@@ -137,6 +151,8 @@ export type WeeklyReviewObservationKind =
   | "projectProgress"
   | "decisionReview"
   | "goalReview"
+  | "lifeAreaReview"
+  | "lifeAreaAttention"
   | "wellnessCheckins"
   | "noData";
 
@@ -153,6 +169,7 @@ export type WeeklyReviewFocusKind =
   | "writeJournalEntry"
   | "recordFinanceData"
   | "reviewDecisions"
+  | "reviewLifeAreas"
   | "reviewGoals"
   | "refineProjectNextAction"
   | "addFirstTask";
@@ -171,6 +188,7 @@ export type WeeklyReviewSummary = {
   knowledgeSummary: WeeklyReviewKnowledgeSummary;
   decisionSummary: WeeklyReviewDecisionSummary;
   goalSummary: WeeklyReviewGoalSummary;
+  lifeAreaSummary: WeeklyReviewLifeAreaSummary;
   manualSummary: WeeklyReviewManualSummary;
   financeSummary: WeeklyReviewFinanceSummary;
   wellnessSummary: WeeklyReviewWellnessSummary;
@@ -188,6 +206,7 @@ export type WeeklyReviewData = {
   knowledgeItems: ReadonlyArray<KnowledgeItem>;
   decisionLogEntries: ReadonlyArray<DecisionLogEntry>;
   goals: ReadonlyArray<Goal>;
+  lifeAreas?: ReadonlyArray<LifeAreaView>;
   manualEntries: ReadonlyArray<ManualEntry>;
   financeTransactions: ReadonlyArray<FinanceTransaction>;
   financeObligations: ReadonlyArray<FinanceObligation>;
@@ -327,6 +346,7 @@ function buildEmptyStates(summary: {
   knowledgeSummary: WeeklyReviewKnowledgeSummary;
   decisionSummary: WeeklyReviewDecisionSummary;
   goalSummary: WeeklyReviewGoalSummary;
+  lifeAreaSummary: WeeklyReviewLifeAreaSummary;
   manualSummary: WeeklyReviewManualSummary;
   financeSummary: WeeklyReviewFinanceSummary;
   wellnessSummary: WeeklyReviewWellnessSummary;
@@ -359,6 +379,10 @@ function buildEmptyStates(summary: {
 
   if (summary.goalSummary.totalCount === 0) {
     emptyStates.push({ sectionId: "goals" });
+  }
+
+  if (summary.lifeAreaSummary.totalCount === 0) {
+    emptyStates.push({ sectionId: "lifeAreas" });
   }
 
   if (summary.manualSummary.dueCount === 0) {
@@ -441,6 +465,22 @@ function buildObservations(summary: WeeklyReviewSummary): WeeklyReviewObservatio
     });
   }
 
+  if (summary.lifeAreaSummary.dueCount > 0) {
+    observations.push({
+      kind: "lifeAreaReview",
+      tone: "needs-review",
+      count: summary.lifeAreaSummary.dueCount,
+    });
+  }
+
+  if (summary.lifeAreaSummary.highAttentionActiveCount > 0) {
+    observations.push({
+      kind: "lifeAreaAttention",
+      tone: "awareness",
+      count: summary.lifeAreaSummary.highAttentionActiveCount,
+    });
+  }
+
   if (summary.wellnessSummary.checkinCountInWindow > 0) {
     observations.push({
       kind: "wellnessCheckins",
@@ -482,6 +522,10 @@ function buildSuggestedFocus(summary: WeeklyReviewSummary): WeeklyReviewFocusSug
 
   if (summary.goalSummary.dueCount > 0) {
     return [{ kind: "reviewGoals", tone: "next-focus" }];
+  }
+
+  if (summary.lifeAreaSummary.dueCount > 0) {
+    return [{ kind: "reviewLifeAreas", tone: "next-focus" }];
   }
 
   if (summary.financeSummary.transactionCount === 0) {
@@ -600,6 +644,16 @@ export function buildWeeklyReviewSummary(
     dueEntries: dueGoals,
   };
 
+  const lifeAreas = data.lifeAreas ?? [];
+  const dueLifeAreas = getReviewDueLifeAreas(lifeAreas, referenceDate);
+  const lifeAreaSummary: WeeklyReviewLifeAreaSummary = {
+    totalCount: lifeAreas.length,
+    activeCount: lifeAreas.filter((area) => area.status === "active").length,
+    highAttentionActiveCount: getHighAttentionLifeAreas(lifeAreas).length,
+    dueCount: dueLifeAreas.length,
+    dueEntries: dueLifeAreas,
+  };
+
   const manualDueEntries = getWeeklyReviewManualDueEntries(
     data.manualEntries,
     referenceDate
@@ -666,6 +720,7 @@ export function buildWeeklyReviewSummary(
     knowledgeSummary,
     decisionSummary,
     goalSummary,
+    lifeAreaSummary,
     manualSummary,
     financeSummary,
     wellnessSummary,
@@ -683,6 +738,7 @@ export function buildWeeklyReviewSummary(
     summary.knowledgeSummary.totalCount > 0 ||
     summary.decisionSummary.totalCount > 0 ||
     summary.goalSummary.totalCount > 0 ||
+    summary.lifeAreaSummary.totalCount > 0 ||
     summary.manualSummary.totalCount > 0 ||
     summary.financeSummary.transactionCount > 0 ||
     summary.financeSummary.activeObligationsCount > 0 ||

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { useStorageAdapter } from "@/core/storage";
+import type { LifeAreaKey } from "@/shared/types";
 
 import {
   buildWeeklyReviewSummary,
@@ -22,6 +23,7 @@ export function useWeeklyReview() {
     knowledge,
     decisions,
     goals,
+    lifeAreas,
     manual,
     finance,
     dailyCheckins,
@@ -44,21 +46,23 @@ export function useWeeklyReview() {
         loadedKnowledgeItems,
         loadedDecisionLogEntries,
         loadedGoals,
+        loadedLifeAreas,
         loadedManualEntries,
         loadedTransactions,
         loadedObligations,
         loadedCheckins,
       ] = await Promise.all([
         tasks.list(),
-          projects.list(),
-          inbox.list(),
-          journal.list(),
-          knowledge.list(),
-          decisions.list(),
-          goals.list(),
-          manual.list(),
-          finance.listTransactions(),
-          finance.listObligations(),
+        projects.list(),
+        inbox.list(),
+        journal.list(),
+        knowledge.list(),
+        decisions.list(),
+        goals.list(),
+        lifeAreas.list(),
+        manual.list(),
+        finance.listTransactions(),
+        finance.listObligations(),
         dailyCheckins.list(),
       ]);
 
@@ -66,16 +70,17 @@ export function useWeeklyReview() {
         buildWeeklyReviewSummary(
           {
             tasks: loadedTasks,
-          projects: loadedProjects,
-          inboxItems: loadedInboxItems,
-          journalEntries: loadedJournalEntries,
-          knowledgeItems: loadedKnowledgeItems,
-          decisionLogEntries: loadedDecisionLogEntries,
-          goals: loadedGoals,
-          manualEntries: loadedManualEntries,
-          financeTransactions: loadedTransactions,
-          financeObligations: loadedObligations,
-          dailyCheckins: loadedCheckins,
+            projects: loadedProjects,
+            inboxItems: loadedInboxItems,
+            journalEntries: loadedJournalEntries,
+            knowledgeItems: loadedKnowledgeItems,
+            decisionLogEntries: loadedDecisionLogEntries,
+            goals: loadedGoals,
+            lifeAreas: loadedLifeAreas,
+            manualEntries: loadedManualEntries,
+            financeTransactions: loadedTransactions,
+            financeObligations: loadedObligations,
+            dailyCheckins: loadedCheckins,
           },
           referenceDate
         )
@@ -85,7 +90,19 @@ export function useWeeklyReview() {
     } finally {
       setIsLoading(false);
     }
-  }, [dailyCheckins, decisions, finance, goals, inbox, journal, manual, knowledge, projects, tasks]);
+  }, [
+    dailyCheckins,
+    decisions,
+    finance,
+    goals,
+    inbox,
+    journal,
+    knowledge,
+    lifeAreas,
+    manual,
+    projects,
+    tasks,
+  ]);
 
   useEffect(() => {
     void loadWeeklyReview();
@@ -115,5 +132,25 @@ export function useWeeklyReview() {
     [goals, loadWeeklyReview]
   );
 
-  return { summary, isLoading, error, loadWeeklyReview, markManualEntryReviewed, markGoalReviewed };
+  const markLifeAreaReviewed = useCallback(
+    async (areaKey: LifeAreaKey) => {
+      try {
+        await lifeAreas.markReviewed(areaKey);
+        await loadWeeklyReview();
+      } catch (updateError) {
+        setError(getErrorMessage(updateError));
+      }
+    },
+    [lifeAreas, loadWeeklyReview]
+  );
+
+  return {
+    summary,
+    isLoading,
+    error,
+    loadWeeklyReview,
+    markManualEntryReviewed,
+    markGoalReviewed,
+    markLifeAreaReviewed,
+  };
 }

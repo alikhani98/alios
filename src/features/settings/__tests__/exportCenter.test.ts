@@ -6,6 +6,7 @@ import {
   createGoalsMarkdownExport,
   createJournalMarkdownExport,
   createKnowledgeMarkdownExport,
+  createLifeAreasMarkdownExport,
   createManualMarkdownExport,
   createReadableExportFilename,
 } from "../exportCenter";
@@ -16,6 +17,7 @@ import {
   goalRecord,
   journalEntryRecord,
   knowledgeItemRecord,
+  lifeAreaRecord,
   manualEntryRecord,
 } from "@/test/factories";
 
@@ -82,6 +84,21 @@ describe("export center helpers", () => {
     expect(markdown).toContain("> Keep a regular bedtime and morning routine.");
   });
 
+  it("creates a readable life areas markdown export", () => {
+    const markdown = createLifeAreasMarkdownExport([lifeAreaRecord]);
+
+    expect(markdown).toContain("# AliOS Life Areas Export");
+    expect(markdown).toContain("Entries: 1");
+    expect(markdown).toContain("## Health balance");
+    expect(markdown).toContain("- Area: health");
+    expect(markdown).toContain("- Status: active");
+    expect(markdown).toContain("- Attention level: high");
+    expect(markdown).toContain("- Satisfaction score: 4");
+    expect(markdown).toContain("- Review interval (days): 7");
+    expect(markdown).toContain("- Last reviewed at: 2026-07-04T08:30:00.000Z");
+    expect(markdown).toContain("> Revisit sleep, movement, and hydration.");
+  });
+
   it("creates a readable personal manual markdown export", () => {
     const markdown = createManualMarkdownExport([manualEntryRecord]);
 
@@ -116,6 +133,9 @@ describe("export center helpers", () => {
     );
     expect(createGoalsMarkdownExport([])).toContain(
       "No goals were recorded yet."
+    );
+    expect(createLifeAreasMarkdownExport([])).toContain(
+      "No life areas were recorded yet."
     );
     expect(createManualMarkdownExport([])).toContain(
       "No manual entries were recorded yet."

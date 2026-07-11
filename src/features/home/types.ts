@@ -7,6 +7,7 @@ import type {
   Project,
   Task,
 } from "@/shared/types";
+import type { LifeAreaView } from "@/features/lifeAreas";
 
 export type HomeDashboardData = {
   tasks: Task[];
@@ -36,6 +37,14 @@ export type HomeDashboardData = {
     highImportanceActiveCount: number;
     averageActiveProgress: number | null;
     latest?: Goal;
+  };
+  lifeAreas: {
+    totalCount: number;
+    activeCount: number;
+    highAttentionActiveCount: number;
+    reviewDueCount: number;
+    averageSatisfactionScore: number | null;
+    latest?: LifeAreaView;
   };
   manual: {
     totalCount: number;

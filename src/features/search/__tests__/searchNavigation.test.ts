@@ -10,6 +10,7 @@ describe("searchNavigation", () => {
       ["task", "item-2", "/today?focusId=item-2"],
       ["project", "item-3", "/projects?focusId=item-3"],
       ["goal", "item-3g", "/goals?focusId=item-3g"],
+      ["lifeArea", "item-3l", "/life-areas?focusId=item-3l"],
       ["journal", "item-4", "/journal?focusId=item-4"],
       ["knowledge", "item-5", "/knowledge?focusId=item-5"],
       ["manual", "item-6", "/manual?focusId=item-6"],
@@ -25,6 +26,7 @@ describe("searchNavigation", () => {
     expect(getSearchResultPath("task")).toBe("/today");
     expect(getSearchResultPath("project")).toBe("/projects");
     expect(getSearchResultPath("goal")).toBe("/goals");
+    expect(getSearchResultPath("lifeArea")).toBe("/life-areas");
     expect(getSearchResultPath("journal")).toBe("/journal");
     expect(getSearchResultPath("knowledge")).toBe("/knowledge");
     expect(getSearchResultPath("manual")).toBe("/manual");

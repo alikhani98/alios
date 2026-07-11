@@ -6,12 +6,14 @@ import type {
   JournalEntry,
   KnowledgeItem,
   ManualEntry,
+  LifeArea,
 } from "@/shared/types";
 
 export type ExportCenterAction =
   | "finance"
   | "decisionLog"
   | "goals"
+  | "lifeAreas"
   | "journal"
   | "knowledge"
   | "manual";
@@ -208,6 +210,44 @@ export function createGoalsMarkdownExport(entries: Goal[]): string {
       `- Updated at: ${goal.updatedAt}`,
       "",
       formatBlock(goal.description, "Not recorded"),
+      ""
+    );
+  }
+
+  return lines.join("\n").trimEnd();
+}
+
+export function createLifeAreasMarkdownExport(entries: LifeArea[]): string {
+  const lines = [
+    "# AliOS Life Areas Export",
+    "",
+    `Exported at: ${new Date().toISOString()}`,
+    `Entries: ${entries.length}`,
+    "",
+  ];
+
+  if (entries.length === 0) {
+    lines.push("No life areas were recorded yet.");
+    return lines.join("\n");
+  }
+
+  for (const area of entries) {
+    lines.push(
+      `## ${area.title}`,
+      "",
+      `- Area: ${area.areaKey}`,
+      `- Status: ${area.status}`,
+      `- Attention level: ${area.attentionLevel}`,
+      `- Satisfaction score: ${area.satisfactionScore ?? "Not recorded"}`,
+      `- Review interval (days): ${area.reviewIntervalDays ?? "Not recorded"}`,
+      `- Last reviewed at: ${area.lastReviewedAt ?? "Not recorded"}`,
+      `- Tags: ${area.tags.length > 0 ? area.tags.join(", ") : "Not recorded"}`,
+      `- Created at: ${area.createdAt}`,
+      `- Updated at: ${area.updatedAt}`,
+      "",
+      formatBlock(area.focusNote, "No focus note recorded."),
+      "",
+      formatBlock(area.description, "No description recorded."),
       ""
     );
   }

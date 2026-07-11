@@ -2,6 +2,12 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 72 - Life Areas Foundation
+
+- Added a local-first Life Areas module with repository CRUD, Dexie storage, a calm `/life-areas` page, Home summary awareness, Weekly Review due awareness, Global Search support, backup/restore support, and a readable export path
+- Added focused regression coverage for Life Areas schemas, repository CRUD, search, backup preview, backup validation, weekly-review calculations, and export/readability helpers
+- Kept the stage local-only, bilingual, repository-backed, and unchanged in package/config, backup format, backup version, and Dexie schema shape beyond the additive table
+
 ## Stage 71 - Goals Templates & Quick Start
 
 - Added static local Goals templates that prefill the existing form with safe starter values for common goal shapes

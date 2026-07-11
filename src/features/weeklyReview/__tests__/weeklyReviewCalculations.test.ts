@@ -9,6 +9,7 @@ import type {
   InboxItem,
   JournalEntry,
   KnowledgeItem,
+  LifeArea,
   ManualEntry,
   Project,
   Task,
@@ -56,6 +57,24 @@ function createGoal(id: string, overrides: Partial<Goal> = {}): Goal {
     status: "active",
     importance: "medium",
     progressPercent: 50,
+    reviewIntervalDays: 7,
+    tags: [],
+    createdAt: "2026-07-01T08:00:00.000Z",
+    updatedAt: "2026-07-01T08:00:00.000Z",
+    ...overrides,
+  };
+}
+
+function createLifeArea(id: string, overrides: Partial<LifeArea> = {}): LifeArea {
+  return {
+    id,
+    areaKey: "health",
+    title: `Life area ${id}`,
+    description: `Life area description ${id}`,
+    status: "active",
+    attentionLevel: "medium",
+    satisfactionScore: 3,
+    focusNote: `Life area focus ${id}`,
     reviewIntervalDays: 7,
     tags: [],
     createdAt: "2026-07-01T08:00:00.000Z",
@@ -260,6 +279,13 @@ describe("weekly review calculations", () => {
       dueCount: 0,
       dueEntries: [],
     });
+    expect(summary.lifeAreaSummary).toEqual({
+      totalCount: 0,
+      activeCount: 0,
+      highAttentionActiveCount: 0,
+      dueCount: 0,
+      dueEntries: [],
+    });
     expect(summary.manualSummary).toEqual({
       totalCount: 0,
       dueCount: 0,
@@ -295,6 +321,7 @@ describe("weekly review calculations", () => {
       "knowledge",
       "decisions",
       "goals",
+      "lifeAreas",
       "manual",
       "finance",
       "wellness",
@@ -680,6 +707,52 @@ describe("weekly review calculations", () => {
     });
     expect(summary.emptyStates.map((item) => item.sectionId)).not.toContain(
       "goals"
+    );
+  });
+
+  it("includes only active life areas that are due for review", () => {
+    const referenceDate = new Date(2026, 6, 12);
+    const dueLifeArea = createLifeArea("due-life-area", {
+      updatedAt: "2026-07-04T08:30:00.000Z",
+      reviewIntervalDays: 7,
+    });
+    const pausedLifeArea = createLifeArea("paused-life-area", {
+      status: "paused",
+      updatedAt: "2026-07-04T08:30:00.000Z",
+      reviewIntervalDays: 7,
+    });
+    const freshLifeArea = createLifeArea("fresh-life-area", {
+      updatedAt: "2026-07-10T08:30:00.000Z",
+      reviewIntervalDays: 7,
+    });
+
+    const summary = buildWeeklyReviewSummary(
+      {
+        tasks: [],
+        projects: [],
+        goals: [],
+        lifeAreas: [freshLifeArea, pausedLifeArea, dueLifeArea],
+        inboxItems: [],
+        journalEntries: [],
+        knowledgeItems: [],
+        decisionLogEntries: [],
+        manualEntries: [],
+        financeTransactions: [],
+        financeObligations: [],
+        dailyCheckins: [],
+      },
+      referenceDate
+    );
+
+    expect(summary.lifeAreaSummary).toEqual({
+      totalCount: 3,
+      activeCount: 2,
+      highAttentionActiveCount: 0,
+      dueCount: 1,
+      dueEntries: [dueLifeArea],
+    });
+    expect(summary.emptyStates.map((item) => item.sectionId)).not.toContain(
+      "lifeAreas"
     );
   });
 
