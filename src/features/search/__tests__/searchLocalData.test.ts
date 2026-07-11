@@ -255,4 +255,20 @@ describe("searchLocalData", () => {
 
     expect(archivedResults.some((result) => result.href === "/manual?focusId=manual-3")).toBe(true);
   });
+
+  it("searches manual entries by importance", () => {
+    const results = searchLocalData(
+      {
+        inboxItems,
+        tasks,
+        projects,
+        journalEntries,
+        knowledgeItems,
+        manualEntries,
+      },
+      "high"
+    );
+
+    expect(results.some((result) => result.href === "/manual?focusId=manual-1")).toBe(true);
+  });
 });

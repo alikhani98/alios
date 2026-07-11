@@ -51,6 +51,27 @@ describe("manual entry helpers", () => {
     expect(result).toEqual([draftEntry]);
   });
 
+  it("filters entries by importance in the text query", () => {
+    const importanceMatch = {
+      ...manualEntryRecord,
+      id: "manual-important",
+      title: "Calm rule",
+      body: "This note should match by importance.",
+      importance: "medium" as const,
+    };
+
+    const result = filterManualEntries(
+      [manualEntryRecord, importanceMatch],
+      {
+        category: "all",
+        status: "all",
+        query: "medium",
+      }
+    );
+
+    expect(result).toEqual([importanceMatch]);
+  });
+
   it("detects review-due entries using lastReviewedAt or updatedAt", () => {
     expect(isManualEntryReviewDue(manualEntryRecord, new Date("2026-07-12T12:00:00.000Z"))).toBe(
       true

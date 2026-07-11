@@ -38,6 +38,7 @@ Stage 63 integrates Personal Manual review-due awareness into Weekly Review with
 Stage 64 integrates Personal Manual into Global Search and adds focus navigation back into the manual page using the existing local `focusId` query-parameter pattern.
 Stage 65 adds static Personal Manual templates that seed the existing form with starter title, body, category, status, importance, and tags values without changing the storage model or backup format.
 Stage 66 polishes Personal Manual for mobile and dense data scenarios with safer wrapping, tighter spacing, and a calmer compact layout without changing behavior or storage.
+Stage 67 hardens the Personal Manual track with a focused release audit, importance-aware search coverage, and a concise smoke-test checklist without changing behavior or storage.
 
 ## Version 1.1
 

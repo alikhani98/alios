@@ -49,7 +49,14 @@ export function filterManualEntries(
       filter.status === "all" || entry.status === filter.status;
     const matchesQuery =
       query.length === 0 ||
-      [entry.title, entry.body, entry.category, entry.status, ...entry.tags]
+      [
+        entry.title,
+        entry.body,
+        entry.category,
+        entry.status,
+        entry.importance,
+        ...entry.tags,
+      ]
         .join(" ")
         .toLowerCase()
         .includes(query);
