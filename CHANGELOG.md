@@ -2,6 +2,12 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 68 - v1.50 Release Hardening
+
+- Updated the in-app release metadata to match the v1.50 hardening pass and added a tiny regression guard for the visible app version badge
+- Added a concise v1.50 release smoke-test checklist in the mobile usage docs for the full app, including GitHub Pages path, routing, backup, restore, export, recovery, finance, weekly review, and mobile overflow checks
+- Kept the stage local-only, bilingual, repository-backed, and unchanged in package/config, backup format, backup version, and Dexie schema
+
 ## Stage 67 - Personal Manual Track Release Hardening
 
 - Added a small release-hardening pass to Personal Manual search so manual-page queries also match importance alongside title, body, tags, category, and status

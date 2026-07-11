@@ -4,8 +4,8 @@
 
 - Project name: AliOS
 - Architecture version: AliOS 1.0
-- Current status: AliOS includes validated mobile-first Inbox capture, processing, global search, focused search-result navigation, filters, bulk triage, local appearance switching, local profile preferences, calendar month view foundation, home time-window routine nudges, upcoming task grouping, routine templates foundation, Wellness / Badminton Routine foundation, visual motion polish, premium Home dashboard visual upgrade, premium app shell polish, Home dashboard customization, premium reusable components, lightweight Personal Insights, Stage 37 premium Home showcase polish, light core-page visual alignment, hardened backup/restore safety, Stage 38 UI regression QA and release hardening with desktop sticky sidebar accessibility improvements, Stage 39 topbar dashboard controls plus accent color personalization, Stage 40 finance foundation, Stage 41 finance review and budget guard, Stage 42 lightweight finance charts foundation, Stage 43 lightweight motion and interaction polish, Stage 44 finance mobile UX and section navigation, Stage 45 performance audit and bundle optimization, Stage 46 Home collapsible dashboard sections, Stage 47 Settings Help Center Foundation, Stage 48 Weekly Review Foundation, Stage 49 Decision Log Foundation, Stage 50 Backup / Restore Safety & Migration Foundation, Stage 51 App Error Boundary & Local Error Log Foundation, Stage 53 Mobile UX Hardening for dense pages, Stage 54 Empty States & First-Run Guidance Foundation, Stage 55 Backup Reminder & Last Backup Status Foundation, Stage 56 Export Center Foundation, Stage 57 Recovery Mode / Safe Mode Foundation, Stage 58 Finance Monthly Plan Foundation, Stage 59 Personal Manual Foundation, Stage 60 Personal Manual QA & Release Hardening, Stage 61 Personal Manual Export Center Integration, Stage 62 Bundle Size Audit & Initial Load Hardening, Stage 63 Personal Manual Weekly Review Integration, Stage 64 Personal Manual Search & Focus Navigation, Stage 65 Personal Manual Templates Foundation, Stage 66 Personal Manual Mobile & Dense Page Polish, and Stage 67 Personal Manual Track Release Hardening, and remains ready for static GitHub Pages deployment.
-- Current Stage: Stage 67 Completed
+- Current status: AliOS includes validated mobile-first Inbox capture, processing, global search, focused search-result navigation, filters, bulk triage, local appearance switching, local profile preferences, calendar month view foundation, home time-window routine nudges, upcoming task grouping, routine templates foundation, Wellness / Badminton Routine foundation, visual motion polish, premium Home dashboard visual upgrade, premium app shell polish, Home dashboard customization, premium reusable components, lightweight Personal Insights, Stage 37 premium Home showcase polish, light core-page visual alignment, hardened backup/restore safety, Stage 38 UI regression QA and release hardening with desktop sticky sidebar accessibility improvements, Stage 39 topbar dashboard controls plus accent color personalization, Stage 40 finance foundation, Stage 41 finance review and budget guard, Stage 42 lightweight finance charts foundation, Stage 43 lightweight motion and interaction polish, Stage 44 finance mobile UX and section navigation, Stage 45 performance audit and bundle optimization, Stage 46 Home collapsible dashboard sections, Stage 47 Settings Help Center Foundation, Stage 48 Weekly Review Foundation, Stage 49 Decision Log Foundation, Stage 50 Backup / Restore Safety & Migration Foundation, Stage 51 App Error Boundary & Local Error Log Foundation, Stage 53 Mobile UX Hardening for dense pages, Stage 54 Empty States & First-Run Guidance Foundation, Stage 55 Backup Reminder & Last Backup Status Foundation, Stage 56 Export Center Foundation, Stage 57 Recovery Mode / Safe Mode Foundation, Stage 58 Finance Monthly Plan Foundation, Stage 59 Personal Manual Foundation, Stage 60 Personal Manual QA & Release Hardening, Stage 61 Personal Manual Export Center Integration, Stage 62 Bundle Size Audit & Initial Load Hardening, Stage 63 Personal Manual Weekly Review Integration, Stage 64 Personal Manual Search & Focus Navigation, Stage 65 Personal Manual Templates Foundation, Stage 66 Personal Manual Mobile & Dense Page Polish, Stage 67 Personal Manual Track Release Hardening, and Stage 68 v1.50 Release Hardening, and remains ready for static GitHub Pages deployment.
+- Current Stage: Stage 68 Completed
 
 ## Architecture References
 
@@ -106,6 +106,7 @@ Stages 1–65 are complete.
 - Stage 65 â€” Personal Manual Templates Foundation
 - Stage 66 â€” Personal Manual Mobile & Dense Page Polish
 - Stage 67 â€” Personal Manual Track Release Hardening
+- Stage 68 â€” v1.50 Release Hardening
 
 Stage 54 completion is evidenced by the calmer bilingual empty-state guidance across Home, Finance, Decisions, Weekly Review, Inbox, Projects, Journal, Knowledge, and Settings. The stage adds no schema migration, no backup-format change, no backup-version bump, no route redesign, no onboarding modal or tour, no backend, no sync, no cloud, no AI, no telemetry, and no new dependency. It keeps the existing local-first repository/storage-adapter boundaries intact while giving low-data users a clearer first step.
 
@@ -134,6 +135,8 @@ Stage 65 completion is evidenced by the static Personal Manual template starter 
 Stage 66 completion is evidenced by the mobile and dense-page polish pass on Personal Manual, which tightens card, badge, form, and template spacing so long Persian and English titles, bodies, and tags wrap safely on narrow screens. The stage keeps create/edit/delete/search/focus/template/review behavior intact, remains local-first and dependency-free, and keeps TypeScript, Vitest, and the production build passing without changing the backup format, backup version, Dexie schema, or package/config files.
 
 Stage 67 completion is evidenced by the Personal Manual track release-hardening pass, which adds importance-aware manual-page search coverage and a concise smoke-test checklist for the full track. The stage keeps create/edit/delete/search/focus/template/review/weekly-review/export/backup behavior intact, remains local-first and dependency-free, and keeps TypeScript, Vitest, and the production build passing without changing the backup format, backup version, Dexie schema, or package/config files.
+
+Stage 68 completion is evidenced by the v1.50 release-hardening pass, which updates the in-app release metadata, adds a small regression guard for the app version badge, and adds a concise release smoke-test checklist for the full app. The stage keeps the app local-first and dependency-free, preserves the backup format, backup version, Dexie schema, and package/config files, and keeps TypeScript, Vitest, and the production build passing.
 
 Stage 53 completion is evidenced by the mobile-focused readability and overflow hardening pass across the dense Finance, Weekly Review, Decision Log, Settings, and Home surfaces. The stage keeps the existing product behavior intact while improving small-screen stacking, wrapping, button usability, and section readability on 360px, 390px, and 430px class devices. It does not change routes, storage, schemas, backup format, dependencies, or navigation architecture, and it remains aligned with static GitHub Pages deployment.
 Stage 48 completion is evidenced by the derived-only Weekly Review foundation, which summarizes the last seven days of existing local tasks, projects, inbox items, journal entries, knowledge items, finance records, wellness/check-in data, and routine signals where available. The stage adds deterministic observations and suggested focus rules, keeps the review window local and read-only, and stores no new weekly-review data. It uses the existing feature/repository/storage-adapter boundaries, adds no schema migration, no backup-format change, no new dependency, no backend, no sync, no cloud, and no AI, and it remains aligned with static GitHub Pages deployment.
@@ -232,7 +235,7 @@ The next stage is intentionally undefined pending explicit approval. Project con
 
 ## Git Latest Recommended Commit
 
-`test(manual): harden personal manual track`
+`test(release): harden v1.50 release`
 
 ## Build Status
 
@@ -240,7 +243,7 @@ The next stage is intentionally undefined pending explicit approval. Project con
 - Automated tests: passing (`cmd /c node_modules\\.bin\\vitest.cmd run`)
 - Production build: passing (`cmd /c node_modules\\.bin\\vite.cmd build`)
 - Production build warning: resolved; the initial `index` chunk is now 474.65 kB and below the warning threshold
-- Automated test count: 615 passing across 37 suites
+- Automated test count: 616 passing across 38 suites
 - Last verified: 2026-07-11
 
 ## Rules Before Modifying the Project
