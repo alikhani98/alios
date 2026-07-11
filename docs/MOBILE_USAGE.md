@@ -23,7 +23,19 @@ Stage 55 adds a calm backup reminder and last-backup-status foundation so Settin
 Stage 56 adds a readable export center in Settings for finance CSV, decision log Markdown, journal Markdown, and knowledge Markdown while keeping backup/restore separate.
 Stage 57 adds a recovery mode foundation so mobile users can surface calm access to Settings, Backup/Restore, Export Center, and Local Error Log without deleting data or changing the backup format.
 Stage 66 polishes Personal Manual for mobile and dense-page use so long notes, tags, and template cards wrap more safely on narrow screens without changing storage or behavior.
+Stage 67 hardens the Personal Manual track so search, review, export, backup, and mobile smoke tests stay clear and repeatable without changing storage or behavior.
 The Personal Insights section stays local to the device and only reflects stored tasks, projects, inbox items, journal entries, knowledge items, and wellness checklist state.
+
+## Personal Manual smoke test
+
+Use this short checklist after a release-hardening change to the Personal Manual track:
+
+1. Open Personal Manual with zero entries and confirm the empty state stays calm.
+2. Create a manual entry from a template, save it, and confirm it behaves like a normal entry.
+3. Search for a manual entry by title, body, tags, category, status, and importance.
+4. Open a manual search result from Global Search and confirm it lands on the target entry.
+5. Mark a due manual entry reviewed and confirm the last-reviewed time updates.
+6. Export and restore a backup to confirm manual entries survive the round trip.
 
 ## Open or install AliOS
 

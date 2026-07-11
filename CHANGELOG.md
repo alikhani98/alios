@@ -2,6 +2,12 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 67 - Personal Manual Track Release Hardening
+
+- Added a small release-hardening pass to Personal Manual search so manual-page queries also match importance alongside title, body, tags, category, and status
+- Added focused regression coverage for importance-based manual filtering and a concise Personal Manual smoke-test checklist in the mobile usage docs
+- Kept the stage local-only, bilingual, repository-backed, and unchanged in package/config, backup format, backup version, and Dexie schema
+
 ## Stage 66 - Personal Manual Mobile & Dense Page Polish
 
 - Tightened the Personal Manual page, entry cards, and form spacing so dense content stays readable on narrow screens
