@@ -84,6 +84,7 @@ const backupTableLabelKeys = [
   "settings.checkinsCount",
   "settings.tasksCount",
   "settings.goalsCount",
+  "settings.lifeAreasCount",
   "settings.decisionLogsCount",
   "settings.manualEntriesCount",
   "settings.financeTransactionsCount",
@@ -105,6 +106,7 @@ function getTotalRecords(summary: {
   dailyCheckins: number;
   tasks: number;
   goals: number;
+  lifeAreas: number;
   decisionLogEntries: number;
   manualEntries: number;
   financeTransactions: number;
@@ -119,6 +121,7 @@ function getTotalRecords(summary: {
     summary.dailyCheckins +
     summary.tasks +
     summary.goals +
+    summary.lifeAreas +
     summary.decisionLogEntries +
     summary.manualEntries +
     summary.financeTransactions +
@@ -528,6 +531,10 @@ export function SettingsPage() {
                 <CountItem
                   label={t("settings.goalsCount")}
                   value={dataManagement.summary.goals}
+                />
+                <CountItem
+                  label={t("settings.lifeAreasCount")}
+                  value={dataManagement.summary.lifeAreas}
                 />
                 <CountItem
                   label={t("settings.decisionLogsCount")}

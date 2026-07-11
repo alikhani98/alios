@@ -43,6 +43,7 @@ Stage 68 hardens the v1.50 release with a tiny app-version metadata fix, a relea
 Stage 69 adds a local-first Goals foundation with repository CRUD, Home visibility, Weekly Review due awareness, Global Search support, and additive backup support without changing the storage model or backup format.
 Stage 70 hardens the Goals track with focused QA coverage, mobile-safe layout checks, and backup/search/review smoke-test guidance without changing the storage model or backup format.
 Stage 71 adds static Goals templates and a quick-start picker that prefill the existing form only, without changing storage, backup format, or the save flow.
+Stage 72 adds a local-first Life Areas foundation with repository CRUD, Home visibility, Weekly Review due awareness, Global Search support, and additive backup support without changing the storage model or backup format.
 
 ## Version 1.1
 

@@ -3,6 +3,7 @@ export * from "./journal";
 export * from "./inbox";
 export * from "./knowledge";
 export * from "./manual";
+export * from "./life-area";
 export * from "./finance";
 export * from "./decision-log";
 export * from "./goal";

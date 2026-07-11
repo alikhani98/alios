@@ -5,6 +5,7 @@ import type {
   InboxItem,
   JournalEntry,
   KnowledgeItem,
+  LifeArea,
   ManualEntry,
   Project,
   Task,
@@ -77,6 +78,24 @@ const goals: Goal[] = [
     tags: ["study", "code"],
     createdAt: "2026-07-03T09:00:00.000Z",
     updatedAt: "2026-07-04T10:00:00.000Z",
+  },
+];
+
+const lifeAreas: LifeArea[] = [
+  {
+    id: "life-area-1",
+    areaKey: "health",
+    title: "Health balance",
+    description: "Keep a calm view of health routines and attention.",
+    status: "active",
+    attentionLevel: "high",
+    satisfactionScore: 4,
+    focusNote: "Revisit sleep, movement, and hydration.",
+    reviewIntervalDays: 7,
+    lastReviewedAt: "2026-07-05T08:00:00.000Z",
+    tags: ["wellness", "routine"],
+    createdAt: "2026-07-04T09:00:00.000Z",
+    updatedAt: "2026-07-05T10:00:00.000Z",
   },
 ];
 
@@ -364,5 +383,25 @@ describe("searchLocalData", () => {
     );
 
     expect(tagResults.some((result) => result.href === "/goals?focusId=goal-2")).toBe(true);
+  });
+
+  it("searches life areas by title, focus note, status, attention, and tags", () => {
+    const results = searchLocalData(
+      {
+        inboxItems,
+        tasks,
+        projects,
+        goals: [],
+        lifeAreas,
+        journalEntries,
+        knowledgeItems,
+        manualEntries: [],
+      },
+      "hydration"
+    );
+
+    expect(results.some((result) => result.kind === "lifeArea")).toBe(true);
+    expect(results.some((result) => result.kindLabelKey === "search.typeLifeArea")).toBe(true);
+    expect(results.some((result) => result.href === "/life-areas?focusId=life-area-1")).toBe(true);
   });
 });

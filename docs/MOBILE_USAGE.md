@@ -26,6 +26,7 @@ Stage 66 polishes Personal Manual for mobile and dense-page use so long notes, t
 Stage 67 hardens the Personal Manual track so search, review, export, backup, and mobile smoke tests stay clear and repeatable without changing storage or behavior.
 Stage 70 hardens the Goals track so search, review, export, backup, and mobile smoke tests stay clear and repeatable without changing storage or behavior.
 Stage 71 adds static Goals templates and a compact quick-start picker that only prefill the existing form, so narrow screens can start a goal without changing the saved data model.
+Stage 72 adds a Life Areas foundation with local-first review, search, and export support that stays on the current device until you manually export or restore a backup.
 The Personal Insights section stays local to the device and only reflects stored tasks, projects, inbox items, journal entries, knowledge items, and wellness checklist state.
 
 ## Personal Manual smoke test
@@ -50,6 +51,18 @@ Use this short checklist after a release-hardening change to the Goals track:
 5. Confirm Goals appear in Home, Weekly Review, Global Search, and the export center.
 6. Export and restore a backup to confirm Goals survive the round trip.
 7. Check a narrow mobile width and confirm the template cards and form do not overflow horizontally.
+
+## Life Areas smoke test
+
+Use this short checklist after a release-hardening change to the Life Areas track:
+
+1. Open Life Areas with zero persisted records and confirm the canonical starter areas stay calm and visible.
+2. Edit a Life Area, save it, and confirm the record remains local on refresh.
+3. Search for a Life Area by title, description, focus note, status, attention level, or tags.
+4. Mark a due Life Area reviewed and confirm the last-reviewed time updates.
+5. Confirm Life Areas appear in Home, Weekly Review, Global Search, and the readable export center.
+6. Export and restore a backup to confirm Life Areas survive the round trip.
+7. Check a narrow mobile width and confirm the Life Areas cards and form do not overflow horizontally.
 
 ## v1.50 release smoke test
 
@@ -99,6 +112,8 @@ AliOS stores data in IndexedDB for the current browser, device, and site origin.
 - The Decision Log entries, review dates, and reflection fields stay on the current browser or device and do not sync.
 - The Personal Manual entries, review timing, and user-authored notes stay on the current browser or device and do not sync.
 - The Personal Manual page, template cards, and entry cards stay on the current browser or device and are polished for narrow mobile widths without changing behavior.
+- The Life Areas entries, review timing, and user-authored notes stay on the current browser or device and do not sync.
+- The Life Areas page, cards, and form stay on the current browser or device and are polished for narrow mobile widths without changing behavior.
 - Finance due-date fields store ISO/Gregorian values only; the Jalali preview is display-only.
 - There is no automatic sync, cloud backup, account, or backend in AliOS 1.0.
 - Publishing AliOS to GitHub Pages does not change this device-local storage model.

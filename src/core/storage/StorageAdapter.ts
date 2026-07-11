@@ -4,6 +4,7 @@ import type {
   GoalsRepository,
   FinanceRepository,
   JournalRepository,
+  LifeAreasRepository,
   ManualRepository,
   InboxRepository,
   KnowledgeRepository,
@@ -21,6 +22,7 @@ export interface StorageAdapter {
   decisions: DecisionLogRepository;
   goals: GoalsRepository;
   finance: FinanceRepository;
+  lifeAreas: LifeAreasRepository;
   manual: ManualRepository;
   projects: ProjectsRepository;
   journal: JournalRepository;

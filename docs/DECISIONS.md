@@ -290,3 +290,17 @@ Reason:
 - Templates should help the user start faster without creating another stored content model
 - Keeping templates static preserves the local-first architecture and avoids backup or migration overhead
 - Form-seeding only keeps the feature lightweight and leaves the final note fully user-authored
+
+## ADR-024: Keep Life Areas canonical in the UI and additive in storage
+
+Decision:
+
+- Life Areas may surface a canonical static starter set in the UI, but only user changes are persisted
+- Life Areas are stored in a dedicated Dexie table and accessed through the repository and storage-adapter boundary
+- Backup and restore include life area records additively without breaking older backups that do not contain the life area arrays
+
+Reason:
+
+- The app needs a calm default set of life areas without forcing a seed migration or a special bootstrap path
+- Keeping canonical areas in the UI preserves the local-first model while still letting users personalize what they persist
+- Additive backup compatibility keeps older files usable and avoids unnecessary breaking changes

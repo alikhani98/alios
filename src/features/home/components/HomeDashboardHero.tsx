@@ -2,6 +2,7 @@ import {
   BookOpenText,
   Brain,
   CalendarCheck2,
+  Compass,
   FolderKanban,
   Inbox,
   Target,
@@ -108,6 +109,20 @@ export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
         </StatusChip>
       ),
     },
+    {
+      icon: <Compass className="h-5 w-5" />,
+      label: t("home.lifeAreas"),
+      value: String(data.lifeAreas.activeCount),
+      description:
+        data.lifeAreas.averageSatisfactionScore === null
+          ? t("home.lifeAreasNoSatisfaction")
+          : `${t("home.lifeAreasAverageSatisfaction")}: ${data.lifeAreas.averageSatisfactionScore.toFixed(1)}/5`,
+      status: (
+        <StatusChip tone={data.lifeAreas.reviewDueCount > 0 ? "warning" : "neutral"}>
+          {t("home.lifeAreasReviewDue")}: {data.lifeAreas.reviewDueCount}
+        </StatusChip>
+      ),
+    },
   ];
 
   return (
@@ -156,6 +171,10 @@ export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
               <Badge variant="outline" className="gap-1.5 px-3 py-1.5">
                 <Target className="h-3.5 w-3.5" />
                 {t("home.goals")}: {data.goals.activeCount}
+              </Badge>
+              <Badge variant="outline" className="gap-1.5 px-3 py-1.5">
+                <Compass className="h-3.5 w-3.5" />
+                {t("home.lifeAreas")}: {data.lifeAreas.activeCount}
               </Badge>
             </div>
 

@@ -7,6 +7,7 @@ import {
   CalendarDays,
   ClipboardList,
   Clock3,
+  Compass,
   GitBranch,
   FolderKanban,
   Inbox,
@@ -40,6 +41,10 @@ import {
   GOAL_STATUS_LABEL_KEYS,
   GOAL_TIMEFRAME_LABEL_KEYS,
 } from "@/features/goals";
+import {
+  LIFE_AREA_ATTENTION_LABEL_KEYS,
+  LIFE_AREA_STATUS_LABEL_KEYS,
+} from "@/features/lifeAreas";
 import {
   MANUAL_CATEGORY_LABEL_KEYS,
   MANUAL_IMPORTANCE_LABEL_KEYS,
@@ -96,6 +101,10 @@ function getObservationMessageKey(observation: WeeklyReviewObservation) {
       return "weeklyReview.observationProjectProgress";
     case "decisionReview":
       return "weeklyReview.observationDecisionReview";
+    case "lifeAreaReview":
+      return "weeklyReview.observationLifeAreaReview";
+    case "lifeAreaAttention":
+      return "weeklyReview.observationLifeAreaAttention";
     case "wellnessCheckins":
       return "weeklyReview.observationWellnessCheckins";
     case "noData":
@@ -118,6 +127,8 @@ function getFocusMessageKey(suggestion: WeeklyReviewFocusSuggestion) {
       return "weeklyReview.focusReviewDecisions";
     case "reviewGoals":
       return "weeklyReview.focusReviewGoals";
+    case "reviewLifeAreas":
+      return "weeklyReview.focusReviewLifeAreas";
     case "refineProjectNextAction":
       return "weeklyReview.focusRefineProjectNextAction";
     case "addFirstTask":
@@ -167,6 +178,7 @@ export function WeeklyReviewPage() {
     loadWeeklyReview,
     markManualEntryReviewed,
     markGoalReviewed,
+    markLifeAreaReviewed,
   } = useWeeklyReview();
 
   const currencyLocale = language === "fa" ? "fa-IR" : "en-US";
@@ -706,6 +718,96 @@ export function WeeklyReviewPage() {
                         </Button>
                         <Button asChild size="sm" variant="ghost">
                           <Link to="/goals">{t("weeklyReview.openGoals")}</Link>
+                        </Button>
+                      </div>
+                    </SoftPanel>
+                  ))}
+                </div>
+              )}
+            </CollapsibleSection>
+
+            <CollapsibleSection
+              id="weekly-review-life-areas"
+              title={t("weeklyReview.lifeAreasSection")}
+              description={t("weeklyReview.lifeAreasSectionDescription")}
+              icon={<Compass className="h-5 w-5" />}
+              status={
+                <StatusChip
+                  tone={summary.lifeAreaSummary.dueCount > 0 ? "warning" : "neutral"}
+                >
+                  {summary.lifeAreaSummary.dueCount}
+                </StatusChip>
+              }
+              contentClassName="space-y-3"
+            >
+              <SoftPanel className="space-y-2">
+                <p className="text-sm leading-7 text-muted-foreground">
+                  {t("weeklyReview.lifeAreasSectionNote")}
+                </p>
+                <Button asChild variant="outline" className="w-full justify-start sm:w-auto">
+                  <Link to="/life-areas">{t("weeklyReview.openLifeAreas")}</Link>
+                </Button>
+              </SoftPanel>
+
+              {summary.lifeAreaSummary.dueCount === 0 ? (
+                <EmptyState
+                  icon={<Compass className="h-6 w-6" />}
+                  title={
+                    hasEmptyState(summary.emptyStates, "lifeAreas")
+                      ? t("weeklyReview.lifeAreasEmptyTitle")
+                      : t("weeklyReview.lifeAreasNoReviewDueTitle")
+                  }
+                  description={
+                    hasEmptyState(summary.emptyStates, "lifeAreas")
+                      ? t("weeklyReview.lifeAreasEmptyDescription")
+                      : t("weeklyReview.lifeAreasNoReviewDueDescription")
+                  }
+                  note={
+                    hasEmptyState(summary.emptyStates, "lifeAreas")
+                      ? t("weeklyReview.lifeAreasEmptyNote")
+                      : t("weeklyReview.lifeAreasNoReviewDueNote")
+                  }
+                  actions={
+                    <Button asChild variant="outline">
+                      <Link to="/life-areas">{t("weeklyReview.openLifeAreas")}</Link>
+                    </Button>
+                  }
+                />
+              ) : (
+                <div className="grid gap-3 lg:grid-cols-2">
+                  {summary.lifeAreaSummary.dueEntries.map((area) => (
+                    <SoftPanel key={area.id} className="space-y-3">
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div className="space-y-1">
+                          <p className="font-semibold leading-7">{area.title}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {area.focusNote || area.description}
+                          </p>
+                        </div>
+                        <StatusChip tone="warning">{t("weeklyReview.lifeAreasDue")}</StatusChip>
+                      </div>
+
+                      <div className="flex flex-wrap gap-2">
+                        <Badge variant="secondary">{t(GOAL_AREA_LABEL_KEYS[area.areaKey])}</Badge>
+                        <Badge variant="outline">
+                          {t(LIFE_AREA_STATUS_LABEL_KEYS[area.status])}
+                        </Badge>
+                        <Badge variant="outline">
+                          {t(LIFE_AREA_ATTENTION_LABEL_KEYS[area.attentionLevel])}
+                        </Badge>
+                      </div>
+
+                      <div className="flex flex-wrap gap-2">
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                          onClick={() => void markLifeAreaReviewed(area.areaKey)}
+                          >
+                          {t("weeklyReview.lifeAreasMarkReviewed")}
+                        </Button>
+                        <Button asChild size="sm" variant="ghost">
+                          <Link to="/life-areas">{t("weeklyReview.openLifeAreas")}</Link>
                         </Button>
                       </div>
                     </SoftPanel>

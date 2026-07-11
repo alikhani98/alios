@@ -6,6 +6,10 @@ import {
   GOAL_TIMEFRAME_LABEL_KEYS,
 } from "@/features/goals";
 import {
+  LIFE_AREA_ATTENTION_LABEL_KEYS,
+  LIFE_AREA_STATUS_LABEL_KEYS,
+} from "@/features/lifeAreas";
+import {
   INBOX_STATUS_LABEL_KEYS,
   INBOX_TYPE_LABEL_KEYS,
 } from "@/features/inbox/constants";
@@ -33,6 +37,7 @@ import type {
   Project,
   Task,
 } from "@/shared/types";
+import type { LifeAreaView } from "@/features/lifeAreas";
 
 import { buildSearchResultHref } from "./searchNavigation";
 
@@ -41,6 +46,7 @@ export type SearchResultKind =
   | "task"
   | "project"
   | "goal"
+  | "lifeArea"
   | "journal"
   | "knowledge"
   | "manual";
@@ -67,6 +73,7 @@ export type SearchLocalDataInput = {
   tasks: Task[];
   projects: Project[];
   goals: Goal[];
+  lifeAreas?: LifeAreaView[];
   journalEntries: JournalEntry[];
   knowledgeItems: KnowledgeItem[];
   manualEntries: ManualEntry[];
@@ -77,6 +84,7 @@ const kindLabelKeys: Record<SearchResultKind, TranslationKey> = {
   task: "search.typeTask",
   project: "search.typeProject",
   goal: "search.typeGoal",
+  lifeArea: "search.typeLifeArea",
   journal: "search.typeJournal",
   knowledge: "search.typeKnowledge",
   manual: "search.typeManual",
@@ -289,6 +297,41 @@ export function searchLocalData(
       ],
       sortKey: item.updatedAt,
       date: item.targetDate ?? item.updatedAt,
+      query: normalizedQuery,
+    });
+    if (result) results.push(result);
+  }
+
+  for (const item of data.lifeAreas ?? []) {
+    const result = buildResult({
+      kind: "lifeArea",
+      title: item.title,
+      snippetSource: [item.title, item.description, item.focusNote, item.tags.join(" ")].join(
+        " "
+      ),
+      fields: [
+        item.description,
+        item.focusNote,
+        item.areaKey,
+        item.status,
+        item.attentionLevel,
+        item.tags.join(" "),
+        item.satisfactionScore ? String(item.satisfactionScore) : "",
+      ],
+      href: buildSearchResultHref("lifeArea", item.id),
+      facets: [
+        { labelKey: "lifeAreas.areaLabel", valueKey: GOAL_AREA_LABEL_KEYS[item.areaKey] },
+        {
+          labelKey: "lifeAreas.attentionLabel",
+          valueKey: LIFE_AREA_ATTENTION_LABEL_KEYS[item.attentionLevel],
+        },
+        {
+          labelKey: "common.status",
+          valueKey: LIFE_AREA_STATUS_LABEL_KEYS[item.status],
+        },
+      ],
+      sortKey: item.updatedAt ?? item.areaKey,
+      date: item.lastReviewedAt ?? item.updatedAt,
       query: normalizedQuery,
     });
     if (result) results.push(result);

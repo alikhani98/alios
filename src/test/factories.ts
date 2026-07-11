@@ -7,6 +7,7 @@ import type {
   CreateJournalEntryInput,
   CreateInboxItemInput,
   CreateKnowledgeItemInput,
+  CreateLifeAreaInput,
   CreateManualEntryInput,
   CreateProjectInput,
   CreateSettingInput,
@@ -22,6 +23,7 @@ import type {
   InboxItem,
   KnowledgeItem,
   ManualEntry,
+  LifeArea,
   Project,
   Setting,
   Task,
@@ -142,6 +144,18 @@ export const goalInput: CreateGoalInput = {
   tags: ["health", "routine"],
 };
 
+export const lifeAreaInput: CreateLifeAreaInput = {
+  areaKey: "health",
+  title: "Health balance",
+  description: "Keep a calm view of health routines and attention.",
+  status: "active",
+  attentionLevel: "high",
+  satisfactionScore: 4,
+  focusNote: "Revisit sleep, movement, and hydration.",
+  reviewIntervalDays: 7,
+  tags: ["wellness", "routine"],
+};
+
 export const manualEntryInput: Omit<
   CreateManualEntryInput,
   "lastReviewedAt"
@@ -196,6 +210,13 @@ export const decisionLogRecord: DecisionLogEntry = {
 export const goalRecord: Goal = {
   ...goalInput,
   ...metadata,
+};
+export const lifeAreaRecord: LifeArea = {
+  id: lifeAreaInput.areaKey,
+  createdAt: timestamp,
+  updatedAt: timestamp,
+  lastReviewedAt: "2026-07-04T08:30:00.000Z",
+  ...lifeAreaInput,
 };
 export const manualEntryRecord: ManualEntry = {
   ...manualEntryInput,

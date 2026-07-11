@@ -24,6 +24,11 @@ const GoalsPage = lazy(() =>
     default: module.GoalsPage,
   }))
 );
+const LifeAreasPage = lazy(() =>
+  import("@/features/lifeAreas/pages/LifeAreasPage").then((module) => ({
+    default: module.LifeAreasPage,
+  }))
+);
 const JournalPage = lazy(() =>
   import("@/features/journal/pages/JournalPage").then((module) => ({
     default: module.JournalPage,
@@ -112,6 +117,14 @@ const router = createHashRouter([
         element: (
           <Suspense fallback={<RouteLoadingFallback />}>
             <GoalsPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "life-areas",
+        element: (
+          <Suspense fallback={<RouteLoadingFallback />}>
+            <LifeAreasPage />
           </Suspense>
         ),
       },
