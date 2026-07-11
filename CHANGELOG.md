@@ -2,6 +2,12 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 65 - Personal Manual Templates Foundation
+
+- Added a compact template picker to Personal Manual with static local starter structures for principles, decision rules, boundaries, lessons, work preferences, routines, values, focus rules, finance rules, health rules, and other notes
+- Added form-prefill behavior so choosing a template opens the existing manual entry form with localized title, body scaffold, category, importance, status, and tags values that the user can edit before saving
+- Kept the stage local-only, bilingual, repository-backed, and unchanged in package/config, backup format, backup version, and Dexie schema
+
 ## Stage 64 - Personal Manual Search & Focus Navigation
 
 - Added Personal Manual entries to Global Search with title, body, category, status, importance, and tag matching

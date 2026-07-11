@@ -18,12 +18,23 @@ import {
 } from "@/shared/ui";
 import { cn } from "@/shared/utils";
 
-import { MANUAL_CATEGORY_OPTIONS, MANUAL_STATUS_OPTIONS } from "../constants";
+import {
+  MANUAL_CATEGORY_LABEL_KEYS,
+  MANUAL_CATEGORY_OPTIONS,
+  MANUAL_IMPORTANCE_LABEL_KEYS,
+  MANUAL_STATUS_LABEL_KEYS,
+  MANUAL_STATUS_OPTIONS,
+} from "../constants";
 import { filterManualEntries, getManualEntrySummary } from "../manualEntries";
 import { ManualEntryCard } from "../components/ManualEntryCard";
 import { ManualEntryForm } from "../components/ManualEntryForm";
 import { useManualEntries } from "../hooks/useManualEntries";
+import {
+  createManualEntryDraftFromTemplate,
+  PERSONAL_MANUAL_TEMPLATES,
+} from "../manualTemplates";
 import type { ManualEntryFormValues } from "../types";
+import type { ManualEntryFormSeed } from "../types";
 
 function splitTags(value: string): string[] {
   return value
@@ -42,6 +53,15 @@ function parseReviewIntervalDays(value: string): number | undefined {
   return Number.isInteger(parsed) && parsed > 0 ? parsed : undefined;
 }
 
+function previewTemplateBody(value: string): string {
+  const firstLine = value.split("\n")[0].trim();
+  if (firstLine.length <= 88) {
+    return firstLine;
+  }
+
+  return `${firstLine.slice(0, 88)}…`;
+}
+
 export function PersonalManualPage() {
   const { t } = useI18n();
   const { formatDateTime } = useDateFormatter();
@@ -50,6 +70,7 @@ export function PersonalManualPage() {
     useManualEntries();
   const [formOpen, setFormOpen] = useState(false);
   const [editingEntry, setEditingEntry] = useState<ManualEntry | undefined>();
+  const [draftEntry, setDraftEntry] = useState<ManualEntryFormSeed | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -62,9 +83,20 @@ export function PersonalManualPage() {
   const entryRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const [focusedEntryId, setFocusedEntryId] = useState<string | null>(null);
   const [focusMessage, setFocusMessage] = useState<string | null>(null);
+  const [formRevision, setFormRevision] = useState(0);
   const focusId = searchParams.get("focusId");
 
   const summary = useMemo(() => getManualEntrySummary(entries), [entries]);
+  const templateCards = useMemo(
+    () =>
+      PERSONAL_MANUAL_TEMPLATES.map((template) => ({
+        ...template,
+        title: t(template.titleKey),
+        description: t(template.descriptionKey),
+        bodyPreview: previewTemplateBody(t(template.bodyScaffoldKey)),
+      })),
+    [t]
+  );
   const filteredEntries = useMemo(
     () =>
       filterManualEntries(
@@ -121,19 +153,45 @@ export function PersonalManualPage() {
 
   const openCreateForm = () => {
     setEditingEntry(undefined);
+    setDraftEntry(undefined);
     setFormOpen(true);
+    setFormRevision((current) => current + 1);
     clearMessages();
   };
 
   const openEditForm = (entry: ManualEntry) => {
     setEditingEntry(entry);
+    setDraftEntry({
+      title: entry.title,
+      body: entry.body,
+      category: entry.category,
+      importance: entry.importance,
+      status: entry.status,
+      tags: [...entry.tags],
+      reviewIntervalDays: entry.reviewIntervalDays,
+    });
     setFormOpen(true);
+    setFormRevision((current) => current + 1);
+    clearMessages();
+  };
+
+  const openTemplateForm = (templateId: string) => {
+    const template = PERSONAL_MANUAL_TEMPLATES.find((item) => item.id === templateId);
+    if (!template) {
+      return;
+    }
+
+    setEditingEntry(undefined);
+    setDraftEntry(createManualEntryDraftFromTemplate(template, t));
+    setFormOpen(true);
+    setFormRevision((current) => current + 1);
     clearMessages();
   };
 
   const closeForm = () => {
     setFormOpen(false);
     setEditingEntry(undefined);
+    setDraftEntry(undefined);
   };
 
   const handleSearch = () => {
@@ -295,7 +353,60 @@ export function PersonalManualPage() {
       <PremiumCard>
         <div className="space-y-4 p-5 sm:p-6">
           <SectionHeader
-            title={formOpen ? (editingEntry ? t("manual.editEntry") : t("manual.createEntry")) : t("manual.newEntry")}
+            title={t("manual.templatesTitle")}
+            description={t("manual.templatesDescription")}
+            status={<Badge variant="secondary">{t("manual.localOnlyNote")}</Badge>}
+          />
+          <p className="max-w-3xl text-sm leading-7 text-muted-foreground">
+            {t("manual.templatesNote")}
+          </p>
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {templateCards.map((template) => (
+              <button
+                key={template.id}
+                type="button"
+                onClick={() => openTemplateForm(template.id)}
+                className="rounded-[1.5rem] border border-border/70 bg-background/80 p-4 text-start shadow-sm transition hover:-translate-y-0.5 hover:border-primary/35 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-base font-semibold">{template.title}</p>
+                    <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                      {template.description}
+                    </p>
+                  </div>
+                  <Sparkles className="mt-1 h-4 w-4 shrink-0 text-primary" />
+                </div>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <Badge variant="secondary">
+                    {t(MANUAL_CATEGORY_LABEL_KEYS[template.defaultCategory])}
+                  </Badge>
+                  <Badge variant="outline">
+                    {t(MANUAL_IMPORTANCE_LABEL_KEYS[template.defaultImportance])}
+                  </Badge>
+                  <Badge variant="outline">
+                    {t(MANUAL_STATUS_LABEL_KEYS[template.defaultStatus])}
+                  </Badge>
+                </div>
+                <p className="mt-4 text-sm leading-6 text-muted-foreground">
+                  {template.bodyPreview}
+                </p>
+              </button>
+            ))}
+          </div>
+        </div>
+      </PremiumCard>
+
+      <PremiumCard>
+        <div className="space-y-4 p-5 sm:p-6">
+          <SectionHeader
+            title={
+              formOpen
+                ? editingEntry
+                  ? t("manual.editEntry")
+                  : t("manual.createEntry")
+                : t("manual.newEntry")
+            }
             description={t("manual.formDescription")}
             status={<Badge variant="secondary">{t("manual.userWrittenOnly")}</Badge>}
           />
@@ -308,8 +419,8 @@ export function PersonalManualPage() {
           {formOpen ? (
             <div ref={formRef}>
               <ManualEntryForm
-                key={editingEntry?.id ?? "manual-entry-form"}
-                entry={editingEntry}
+                key={`${editingEntry?.id ?? draftEntry?.title ?? "manual-entry-form"}-${formRevision}`}
+                entry={editingEntry ?? draftEntry}
                 isSubmitting={isSubmitting}
                 onSubmit={handleSubmit}
                 onCancel={closeForm}

@@ -9,10 +9,10 @@ import {
   MANUAL_IMPORTANCE_OPTIONS,
   MANUAL_STATUS_OPTIONS,
 } from "../constants";
-import type { ManualEntryFormValues } from "../types";
+import type { ManualEntryFormSeed, ManualEntryFormValues } from "../types";
 
 type ManualEntryFormProps = {
-  entry?: ManualEntry;
+  entry?: ManualEntryFormSeed;
   isSubmitting: boolean;
   onSubmit: (values: ManualEntryFormValues) => Promise<void>;
   onCancel?: () => void;
