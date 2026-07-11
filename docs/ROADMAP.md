@@ -37,6 +37,7 @@ Stage 62 reduces initial load cost by moving the Dexie storage adapter behind an
 Stage 63 integrates Personal Manual review-due awareness into Weekly Review with a calm empty state, a mark-reviewed action, and a link back to the manual page, while keeping the review logic derived-only.
 Stage 64 integrates Personal Manual into Global Search and adds focus navigation back into the manual page using the existing local `focusId` query-parameter pattern.
 Stage 65 adds static Personal Manual templates that seed the existing form with starter title, body, category, status, importance, and tags values without changing the storage model or backup format.
+Stage 66 polishes Personal Manual for mobile and dense data scenarios with safer wrapping, tighter spacing, and a calmer compact layout without changing behavior or storage.
 
 ## Version 1.1
 

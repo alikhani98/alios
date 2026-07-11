@@ -351,7 +351,7 @@ export function PersonalManualPage() {
       ) : null}
 
       <PremiumCard>
-        <div className="space-y-4 p-5 sm:p-6">
+        <div className="space-y-3 p-5 sm:space-y-4 sm:p-6">
           <SectionHeader
             title={t("manual.templatesTitle")}
             description={t("manual.templatesDescription")}
@@ -360,35 +360,46 @@ export function PersonalManualPage() {
           <p className="max-w-3xl text-sm leading-7 text-muted-foreground">
             {t("manual.templatesNote")}
           </p>
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-2 sm:gap-3 md:grid-cols-2 xl:grid-cols-3">
             {templateCards.map((template) => (
               <button
                 key={template.id}
                 type="button"
                 onClick={() => openTemplateForm(template.id)}
-                className="rounded-[1.5rem] border border-border/70 bg-background/80 p-4 text-start shadow-sm transition hover:-translate-y-0.5 hover:border-primary/35 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                className="min-w-0 rounded-[1.5rem] border border-border/70 bg-background/80 p-3 text-start shadow-sm transition hover:-translate-y-0.5 hover:border-primary/35 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:p-4"
               >
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-base font-semibold">{template.title}</p>
-                    <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                <div className="flex min-w-0 items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1 space-y-1">
+                    <p className="break-words text-[0.95rem] font-semibold leading-6 sm:text-base">
+                      {template.title}
+                    </p>
+                    <p className="break-words text-sm leading-6 text-muted-foreground">
                       {template.description}
                     </p>
                   </div>
                   <Sparkles className="mt-1 h-4 w-4 shrink-0 text-primary" />
                 </div>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <Badge variant="secondary">
+                <div className="mt-3 flex flex-wrap gap-2 sm:mt-4">
+                  <Badge
+                    variant="secondary"
+                    className="max-w-full break-words whitespace-normal text-start leading-5"
+                  >
                     {t(MANUAL_CATEGORY_LABEL_KEYS[template.defaultCategory])}
                   </Badge>
-                  <Badge variant="outline">
+                  <Badge
+                    variant="outline"
+                    className="max-w-full break-words whitespace-normal text-start leading-5"
+                  >
                     {t(MANUAL_IMPORTANCE_LABEL_KEYS[template.defaultImportance])}
                   </Badge>
-                  <Badge variant="outline">
+                  <Badge
+                    variant="outline"
+                    className="max-w-full break-words whitespace-normal text-start leading-5"
+                  >
                     {t(MANUAL_STATUS_LABEL_KEYS[template.defaultStatus])}
                   </Badge>
                 </div>
-                <p className="mt-4 text-sm leading-6 text-muted-foreground">
+                <p className="mt-3 hidden break-words text-sm leading-6 text-muted-foreground sm:block">
                   {template.bodyPreview}
                 </p>
               </button>
@@ -398,7 +409,7 @@ export function PersonalManualPage() {
       </PremiumCard>
 
       <PremiumCard>
-        <div className="space-y-4 p-5 sm:p-6">
+        <div className="space-y-3 p-5 sm:space-y-4 sm:p-6">
           <SectionHeader
             title={
               formOpen
@@ -438,7 +449,7 @@ export function PersonalManualPage() {
             status={<Badge variant="secondary">{filteredEntries.length}</Badge>}
           />
 
-          <div className="grid gap-3 md:grid-cols-[1fr_12rem_12rem_auto]">
+          <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_12rem_12rem_auto]">
             <div className="relative">
               <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -518,7 +529,7 @@ export function PersonalManualPage() {
           }
         />
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {filteredEntries.map((entry) => (
             <div
               key={entry.id}
@@ -526,7 +537,7 @@ export function PersonalManualPage() {
                 entryRefs.current[entry.id] = node;
               }}
               className={cn(
-                "scroll-mt-6 rounded-[1.75rem] transition-shadow",
+                "min-w-0 scroll-mt-6 rounded-[1.75rem] transition-shadow",
                 focusedEntryId === entry.id ? "ring-2 ring-primary/20" : null
               )}
             >
