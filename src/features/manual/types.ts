@@ -9,3 +9,8 @@ export type ManualEntryFormValues = {
   tagsText: string;
   reviewIntervalDays: string;
 };
+
+export type ManualEntryFormSeed = Pick<
+  ManualEntry,
+  "title" | "body" | "category" | "importance" | "status" | "tags" | "reviewIntervalDays"
+>;

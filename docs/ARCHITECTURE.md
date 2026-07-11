@@ -34,6 +34,7 @@ AliOS 1.0 is a local-first static web app.
 - Personal Manual data lives in a dedicated Dexie table for local user-authored reference entries
 - UI code reads and writes manual data through the feature hook, repository interface, and storage adapter boundary
 - Personal Manual review timing is deterministic and local, and the feature stays user-authored rather than advisory
+- Personal Manual templates are static UI starter constants that seed the existing form only; they are not persisted records and do not require a Dexie schema change, backup change, or new storage table
 - Backup and restore include manual data additively without breaking older backups that do not contain the manual arrays
 - Global search may surface Personal Manual entries and route them through the same stable `focusId` query parameter pattern used by the other content pages, so a search result can jump to the exact local entry without a new routing model
 

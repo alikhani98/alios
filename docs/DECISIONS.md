@@ -276,3 +276,17 @@ Reason:
 - The manual is meant to help the user keep their own written references in one place without changing the architecture
 - Additive backup compatibility preserves older backups and keeps the local-first recovery model simple
 - Keeping the feature user-authored and non-advisory avoids turning it into a decision engine or AI-driven helper
+
+## ADR-023: Keep Personal Manual templates static and non-persistent
+
+Decision:
+
+- Personal Manual templates may only seed the existing manual form with static starter values
+- Templates live as code constants in the feature layer and are not saved as records, tables, or user-generated objects
+- Personal Manual templates must not change the Dexie schema, backup format, backup version, or storage adapter contracts
+
+Reason:
+
+- Templates should help the user start faster without creating another stored content model
+- Keeping templates static preserves the local-first architecture and avoids backup or migration overhead
+- Form-seeding only keeps the feature lightweight and leaves the final note fully user-authored
