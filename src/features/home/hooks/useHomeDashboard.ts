@@ -2,6 +2,7 @@ import { format } from "date-fns";
 import { useCallback, useEffect, useState } from "react";
 
 import { useStorageAdapter } from "@/core/storage";
+import { getGoalsSummary } from "@/features/goals";
 import { getManualEntrySummary } from "@/features/manual";
 import type { HomeDashboardData } from "../types";
 
@@ -10,7 +11,7 @@ function byUpdatedAtDescending<T extends { updatedAt: string }>(a: T, b: T) {
 }
 
 export function useHomeDashboard() {
-  const { tasks, dailyCheckins, projects, journal, knowledge, manual, inbox } =
+  const { tasks, dailyCheckins, projects, journal, knowledge, goals, manual, inbox } =
     useStorageAdapter();
   const [data, setData] = useState<HomeDashboardData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -28,6 +29,7 @@ export function useHomeDashboard() {
         allProjects,
         journalEntries,
         knowledgeItems,
+        goalEntries,
         manualEntries,
         inboxItems,
       ] =
@@ -37,6 +39,7 @@ export function useHomeDashboard() {
           projects.list(),
           journal.list(),
           knowledge.list(),
+          goals.list(),
           manual.list(),
           inbox.list(),
         ]);
@@ -47,6 +50,7 @@ export function useHomeDashboard() {
         .slice(0, 3);
       const latestJournal = [...journalEntries].sort(byUpdatedAtDescending)[0];
       const latestKnowledge = [...knowledgeItems].sort(byUpdatedAtDescending)[0];
+      const goalSummary = getGoalsSummary(goalEntries);
       const manualSummary = getManualEntrySummary(manualEntries, new Date());
 
       setData({
@@ -74,6 +78,14 @@ export function useHomeDashboard() {
           totalCount: knowledgeItems.length,
           latest: latestKnowledge,
         },
+        goals: {
+          totalCount: goalSummary.totalCount,
+          activeCount: goalSummary.activeCount,
+          reviewDueCount: goalSummary.reviewDueCount,
+          highImportanceActiveCount: goalSummary.highImportanceActiveCount,
+          averageActiveProgress: goalSummary.averageActiveProgress,
+          latest: goalSummary.latestUpdatedGoal,
+        },
         manual: {
           totalCount: manualSummary.totalCount,
           activeCount: manualSummary.activeCount,
@@ -89,6 +101,7 @@ export function useHomeDashboard() {
           allProjects.length === 0 &&
           journalEntries.length === 0 &&
           knowledgeItems.length === 0 &&
+          goalEntries.length === 0 &&
           manualEntries.length === 0 &&
           inboxItems.length === 0,
       });
@@ -97,7 +110,7 @@ export function useHomeDashboard() {
     } finally {
       setIsLoading(false);
     }
-  }, [dailyCheckins, inbox, journal, knowledge, manual, projects, tasks]);
+  }, [dailyCheckins, goals, inbox, journal, knowledge, manual, projects, tasks]);
 
   useEffect(() => {
     void loadDashboard();

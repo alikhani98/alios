@@ -4,6 +4,7 @@ const searchResultPaths: Record<SearchResultKind, string> = {
   inbox: "/inbox",
   task: "/today",
   project: "/projects",
+  goal: "/goals",
   journal: "/journal",
   knowledge: "/knowledge",
   manual: "/manual",

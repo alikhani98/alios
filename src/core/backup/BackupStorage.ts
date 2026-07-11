@@ -3,6 +3,7 @@ import type { AliosBackupData } from "./types";
 export type LocalDataSummary = {
   dailyCheckins: number;
   tasks: number;
+  goals: number;
   decisionLogEntries: number;
   manualEntries: number;
   financeTransactions: number;

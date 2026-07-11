@@ -1,6 +1,7 @@
 import type {
   CreateDailyCheckinInput,
   CreateDecisionLogEntryInput,
+  CreateGoalInput,
   CreateFinanceObligationInput,
   CreateFinanceTransactionInput,
   CreateJournalEntryInput,
@@ -14,6 +15,7 @@ import type {
 import type {
   DailyCheckin,
   DecisionLogEntry,
+  Goal,
   FinanceObligation,
   FinanceTransaction,
   JournalEntry,
@@ -127,6 +129,19 @@ export const decisionLogInput: CreateDecisionLogEntryInput = {
   tags: ["release", "product"],
 };
 
+export const goalInput: CreateGoalInput = {
+  title: "Improve sleep",
+  description: "Keep a regular bedtime and morning routine.",
+  area: "health",
+  timeframe: "quarter",
+  status: "active",
+  importance: "high",
+  progressPercent: 35,
+  targetDate: "2026-09-30",
+  reviewIntervalDays: 7,
+  tags: ["health", "routine"],
+};
+
 export const manualEntryInput: Omit<
   CreateManualEntryInput,
   "lastReviewedAt"
@@ -176,6 +191,10 @@ export const financeObligationRecord: FinanceObligation = {
 };
 export const decisionLogRecord: DecisionLogEntry = {
   ...decisionLogInput,
+  ...metadata,
+};
+export const goalRecord: Goal = {
+  ...goalInput,
   ...metadata,
 };
 export const manualEntryRecord: ManualEntry = {

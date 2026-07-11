@@ -6,12 +6,14 @@ import {
   CircleCheckBig,
   CalendarDays,
   ClipboardList,
+  Clock3,
   GitBranch,
   FolderKanban,
   Inbox,
   NotebookPen,
   RefreshCcw,
   Sparkles,
+  Target,
   Wallet,
 } from "lucide-react";
 import { useMemo } from "react";
@@ -19,7 +21,7 @@ import { Link } from "react-router-dom";
 
 import { useDateFormatter } from "@/shared/date";
 import { useI18n, type TranslationKey } from "@/shared/i18n";
-import type { ManualEntry } from "@/shared/types";
+import type { Goal, ManualEntry } from "@/shared/types";
 import {
   Badge,
   Button,
@@ -32,6 +34,12 @@ import {
   StatusChip,
 } from "@/shared/ui";
 import { formatFinanceAmount } from "@/features/finance/financeCalculations";
+import {
+  GOAL_AREA_LABEL_KEYS,
+  GOAL_IMPORTANCE_LABEL_KEYS,
+  GOAL_STATUS_LABEL_KEYS,
+  GOAL_TIMEFRAME_LABEL_KEYS,
+} from "@/features/goals";
 import {
   MANUAL_CATEGORY_LABEL_KEYS,
   MANUAL_IMPORTANCE_LABEL_KEYS,
@@ -47,6 +55,7 @@ const quickLinks: ReadonlyArray<{ to: string; labelKey: TranslationKey }> = [
   { to: "/today", labelKey: "nav.today" },
   { to: "/inbox", labelKey: "nav.inbox" },
   { to: "/projects", labelKey: "nav.projects" },
+  { to: "/goals", labelKey: "nav.goals" },
   { to: "/journal", labelKey: "nav.journal" },
   { to: "/manual", labelKey: "nav.manual" },
   { to: "/decisions", labelKey: "nav.decisions" },
@@ -107,6 +116,8 @@ function getFocusMessageKey(suggestion: WeeklyReviewFocusSuggestion) {
       return "weeklyReview.focusRecordFinanceData";
     case "reviewDecisions":
       return "weeklyReview.focusReviewDecisions";
+    case "reviewGoals":
+      return "weeklyReview.focusReviewGoals";
     case "refineProjectNextAction":
       return "weeklyReview.focusRefineProjectNextAction";
     case "addFirstTask":
@@ -134,6 +145,18 @@ function getManualReviewContext(
   return `${t("weeklyReview.manualLastUpdated")}: ${formatDateTime(entry.updatedAt)}`;
 }
 
+function getGoalReviewContext(
+  goal: Goal,
+  formatDateTime: (value: string) => string,
+  t: (key: TranslationKey) => string
+) {
+  if (goal.lastReviewedAt) {
+    return `${t("weeklyReview.goalsLastReviewed")}: ${formatDateTime(goal.lastReviewedAt)}`;
+  }
+
+  return `${t("weeklyReview.goalsLastUpdated")}: ${formatDateTime(goal.updatedAt)}`;
+}
+
 export function WeeklyReviewPage() {
   const { language, t } = useI18n();
   const { formatDate, formatDateTime } = useDateFormatter();
@@ -143,6 +166,7 @@ export function WeeklyReviewPage() {
     error,
     loadWeeklyReview,
     markManualEntryReviewed,
+    markGoalReviewed,
   } = useWeeklyReview();
 
   const currencyLocale = language === "fa" ? "fa-IR" : "en-US";
@@ -218,6 +242,19 @@ export function WeeklyReviewPage() {
               {summary.manualSummary.dueCount > 0
                 ? t("weeklyReview.manualDue")
                 : t("weeklyReview.manualClear")}
+            </StatusChip>
+          ),
+        },
+        {
+          icon: <Target className="h-5 w-5" />,
+          label: t("weeklyReview.goalsReviewDue"),
+          value: summary.goalSummary.dueCount,
+          description: t("weeklyReview.goalsSectionDescription"),
+          status: (
+            <StatusChip tone={summary.goalSummary.dueCount > 0 ? "warning" : "neutral"}>
+              {summary.goalSummary.dueCount > 0
+                ? t("weeklyReview.goalsDue")
+                : t("weeklyReview.goalsClear")}
             </StatusChip>
           ),
         },
@@ -577,6 +614,104 @@ export function WeeklyReviewPage() {
                   description={t("weeklyReview.decisionsEmptyDescription")}
                 />
               ) : null}
+            </CollapsibleSection>
+
+            <CollapsibleSection
+              id="weekly-review-goals"
+              title={t("weeklyReview.goalsSection")}
+              description={t("weeklyReview.goalsSectionDescription")}
+              icon={<Target className="h-5 w-5" />}
+              status={<StatusChip tone={summary.goalSummary.dueCount > 0 ? "warning" : "neutral"}>{summary.goalSummary.dueCount}</StatusChip>}
+              contentClassName="space-y-3"
+            >
+              <SoftPanel className="space-y-2">
+                <p className="text-sm leading-7 text-muted-foreground">
+                  {t("weeklyReview.goalsSectionNote")}
+                </p>
+                <Button asChild variant="outline" className="w-full justify-start sm:w-auto">
+                  <Link to="/goals">{t("weeklyReview.openGoals")}</Link>
+                </Button>
+              </SoftPanel>
+
+              {summary.goalSummary.dueCount === 0 ? (
+                <EmptyState
+                  icon={<Target className="h-6 w-6" />}
+                  title={
+                    hasEmptyState(summary.emptyStates, "goals")
+                      ? t("weeklyReview.goalsEmptyTitle")
+                      : t("weeklyReview.goalsNoReviewDueTitle")
+                  }
+                  description={
+                    hasEmptyState(summary.emptyStates, "goals")
+                      ? t("weeklyReview.goalsEmptyDescription")
+                      : t("weeklyReview.goalsNoReviewDueDescription")
+                  }
+                  note={
+                    hasEmptyState(summary.emptyStates, "goals")
+                      ? t("weeklyReview.goalsEmptyNote")
+                      : t("weeklyReview.goalsNoReviewDueNote")
+                  }
+                  actions={
+                    <Button asChild variant="outline">
+                      <Link to="/goals">{t("weeklyReview.openGoals")}</Link>
+                    </Button>
+                  }
+                />
+              ) : (
+                <div className="grid gap-3 lg:grid-cols-2">
+                  {summary.goalSummary.dueEntries.map((goal) => (
+                    <SoftPanel key={goal.id} className="space-y-3">
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div className="space-y-1">
+                          <p className="font-semibold leading-7">{goal.title}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {getGoalReviewContext(goal, formatDateTime, t)}
+                          </p>
+                        </div>
+                        <StatusChip tone="warning">{t("goals.reviewDue")}</StatusChip>
+                      </div>
+
+                      <div className="flex flex-wrap gap-2">
+                        <Badge variant="secondary">
+                          {t(GOAL_AREA_LABEL_KEYS[goal.area])}
+                        </Badge>
+                        <Badge variant="outline">
+                          {t(GOAL_TIMEFRAME_LABEL_KEYS[goal.timeframe])}
+                        </Badge>
+                        <Badge variant="outline">
+                          {t(GOAL_STATUS_LABEL_KEYS[goal.status])}
+                        </Badge>
+                        <Badge variant="outline">
+                          {t(GOAL_IMPORTANCE_LABEL_KEYS[goal.importance])}
+                        </Badge>
+                      </div>
+
+                      <div className="space-y-2">
+                        <p className="text-sm leading-7 text-muted-foreground">
+                          {goal.description}
+                        </p>
+                        <p className="text-xs leading-6 text-muted-foreground">
+                          {t("goals.progressLabel")}: {goal.progressPercent}%
+                        </p>
+                      </div>
+
+                      <div className="flex flex-wrap gap-2">
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => void markGoalReviewed(goal.id)}
+                        >
+                          {t("weeklyReview.goalsMarkReviewed")}
+                        </Button>
+                        <Button asChild size="sm" variant="ghost">
+                          <Link to="/goals">{t("weeklyReview.openGoals")}</Link>
+                        </Button>
+                      </div>
+                    </SoftPanel>
+                  ))}
+                </div>
+              )}
             </CollapsibleSection>
 
             <CollapsibleSection

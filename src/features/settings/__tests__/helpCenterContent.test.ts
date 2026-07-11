@@ -12,7 +12,7 @@ describe("settings help center content", () => {
     const moduleSection = settingsHelpCenterSections.find(
       (section) => section.id === "modules"
     );
-    expect(moduleSection?.modules).toHaveLength(12);
+    expect(moduleSection?.modules).toHaveLength(13);
 
     const moduleTitles = moduleSection?.modules?.map((module) => ({
       fa: getLocalizedText("fa", module.title),
@@ -23,6 +23,7 @@ describe("settings help center content", () => {
       expect.arrayContaining([
         expect.objectContaining({ fa: "خانه", en: "Home" }),
         expect.objectContaining({ fa: "امروز", en: "Today" }),
+        expect.objectContaining({ fa: "هدف‌ها", en: "Goals" }),
         expect.objectContaining({ fa: "مالی", en: "Finance" }),
         expect.objectContaining({ fa: "تنظیمات", en: "Settings" }),
       ])

@@ -6,6 +6,7 @@ export type NavIconName =
   | "git-branch"
   | "inbox"
   | "folder-kanban"
+  | "target"
   | "book-open"
   | "notebook-text"
   | "wallet"
@@ -53,6 +54,11 @@ export const mainNavigation: NavItem[] = [
     titleKey: "nav.projects",
     href: "/projects",
     icon: "folder-kanban",
+  },
+  {
+    titleKey: "nav.goals",
+    href: "/goals",
+    icon: "target",
   },
   {
     titleKey: "nav.journal",

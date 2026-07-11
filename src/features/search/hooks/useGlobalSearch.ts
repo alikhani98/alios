@@ -4,7 +4,7 @@ import { useStorageAdapter } from "@/core/storage";
 import type { SearchLocalDataInput } from "../searchLocalData";
 
 export function useGlobalSearch() {
-  const { inbox, tasks, projects, journal, knowledge, manual } = useStorageAdapter();
+  const { inbox, tasks, projects, goals, journal, knowledge, manual } = useStorageAdapter();
   const [data, setData] = useState<SearchLocalDataInput | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
@@ -18,6 +18,7 @@ export function useGlobalSearch() {
         inboxItems,
         taskItems,
         projectItems,
+        goalItems,
         journalEntries,
         knowledgeItems,
         manualEntries,
@@ -26,6 +27,7 @@ export function useGlobalSearch() {
           inbox.list(),
           tasks.list(),
           projects.list(),
+          goals.list(),
           journal.list(),
           knowledge.list(),
           manual.list(),
@@ -35,6 +37,7 @@ export function useGlobalSearch() {
         inboxItems,
         tasks: taskItems,
         projects: projectItems,
+        goals: goalItems,
         journalEntries,
         knowledgeItems,
         manualEntries,
@@ -44,7 +47,7 @@ export function useGlobalSearch() {
     } finally {
       setIsLoading(false);
     }
-  }, [inbox, journal, knowledge, manual, projects, tasks]);
+  }, [goals, inbox, journal, knowledge, manual, projects, tasks]);
 
   useEffect(() => {
     void loadSearchData();

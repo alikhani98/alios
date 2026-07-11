@@ -3,6 +3,7 @@ import type { AliosBackup, AliosBackupData } from "@/core/backup";
 export const BACKUP_TABLE_KEYS = [
   "dailyCheckins",
   "tasks",
+  "goals",
   "decisionLogEntries",
   "manualEntries",
   "financeTransactions",

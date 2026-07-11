@@ -4,6 +4,7 @@ import {
   CalendarCheck2,
   FolderKanban,
   Inbox,
+  Target,
   Sparkles,
 } from "lucide-react";
 
@@ -91,6 +92,22 @@ export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
       description: t("home.knowledgeOverview"),
       status: <StatusChip tone="neutral">{t("home.knowledgeItems")}</StatusChip>,
     },
+    {
+      icon: <Target className="h-5 w-5" />,
+      label: t("home.goals"),
+      value: String(data.goals.activeCount),
+      description:
+        data.goals.averageActiveProgress === null
+          ? t("home.goalsNoProgress")
+          : `${t("home.averageProgress")}: ${Math.round(
+              data.goals.averageActiveProgress
+            )}%`,
+      status: (
+        <StatusChip tone={data.goals.reviewDueCount > 0 ? "warning" : "neutral"}>
+          {t("home.goalsReviewDue")}: {data.goals.reviewDueCount}
+        </StatusChip>
+      ),
+    },
   ];
 
   return (
@@ -135,6 +152,10 @@ export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
               <Badge variant="outline" className="gap-1.5 px-3 py-1.5">
                 <BookOpenText className="h-3.5 w-3.5" />
                 {t("home.journalEntries")}: {data.journal.totalCount}
+              </Badge>
+              <Badge variant="outline" className="gap-1.5 px-3 py-1.5">
+                <Target className="h-3.5 w-3.5" />
+                {t("home.goals")}: {data.goals.activeCount}
               </Badge>
             </div>
 

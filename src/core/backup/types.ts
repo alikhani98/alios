@@ -3,6 +3,7 @@ import { z } from "zod";
 import {
   dailyCheckinSchema,
   decisionLogEntrySchema,
+  goalSchema,
   financeObligationSchema,
   financeTransactionSchema,
   journalEntrySchema,
@@ -21,6 +22,7 @@ export const ALIOS_BACKUP_VERSION = 1 as const;
 export const aliosBackupDataSchema = z.object({
   dailyCheckins: z.array(dailyCheckinSchema),
   tasks: z.array(taskSchema),
+  goals: z.array(goalSchema).default([]),
   decisionLogEntries: z.array(decisionLogEntrySchema).default([]),
   manualEntries: z.array(manualEntrySchema).default([]),
   financeTransactions: z.array(financeTransactionSchema).default([]),

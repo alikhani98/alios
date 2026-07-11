@@ -77,6 +77,14 @@ function createHomeData(overrides: Partial<HomeDashboardData> = {}): HomeDashboa
       totalCount: 0,
       latest: undefined,
     },
+    goals: {
+      totalCount: 0,
+      activeCount: 0,
+      reviewDueCount: 0,
+      highImportanceActiveCount: 0,
+      averageActiveProgress: null,
+      latest: undefined,
+    },
     manual: {
       totalCount: 0,
       activeCount: 0,

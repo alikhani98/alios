@@ -4,6 +4,7 @@ import type { AliosDatabase, DexieStorageAdapter } from "@/db/dexie";
 import {
   dailyCheckinInput,
   decisionLogInput,
+  goalInput,
   financeObligationInput,
   financeTransactionInput,
   inboxItemInput,
@@ -35,6 +36,7 @@ describe("backup preview", () => {
   it("summarizes record counts for the restore preview", async () => {
     await storage.projects.create(projectInput);
     await storage.tasks.create(taskInput);
+    await storage.goals.create(goalInput);
     await storage.decisions.create(decisionLogInput);
     await storage.manual.create(manualEntryInput);
     await storage.finance.createTransaction(financeTransactionInput);
@@ -49,10 +51,11 @@ describe("backup preview", () => {
 
     expect(preview.backupVersion).toBe(1);
     expect(new Date(preview.exportedAt).toISOString()).toBe(preview.exportedAt);
-    expect(preview.totalRecords).toBe(11);
+    expect(preview.totalRecords).toBe(12);
     expect(preview.tableCounts).toEqual([
       { key: "dailyCheckins", count: 1 },
       { key: "tasks", count: 1 },
+      { key: "goals", count: 1 },
       { key: "decisionLogEntries", count: 1 },
       { key: "manualEntries", count: 1 },
       { key: "financeTransactions", count: 1 },
