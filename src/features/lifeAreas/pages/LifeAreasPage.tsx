@@ -11,11 +11,12 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
 import type { CreateLifeAreaInput } from "@/core/repositories";
+import { GOAL_AREA_LABEL_KEYS } from "@/features/goals/constants";
+import { useGoals } from "@/features/goals/hooks/useGoals";
 import { useI18n } from "@/shared/i18n";
+import type { LifeAreaKey } from "@/shared/types";
 import { Badge, Button, EmptyState, Input, MetricCard, PremiumCard, SectionHeader, StatusChip } from "@/shared/ui";
 import { cn } from "@/shared/utils";
-
-import { GOAL_AREA_LABEL_KEYS } from "@/features/goals";
 
 import { LifeAreaCard } from "../components/LifeAreaCard";
 import { LifeAreaForm } from "../components/LifeAreaForm";
@@ -28,9 +29,9 @@ import {
   filterLifeAreas,
   getLifeAreasSummary,
 } from "../lifeAreas";
+import { getLifeAreaGoalSummary } from "../lifeAreaGoals";
 import { useLifeAreas } from "../hooks/useLifeAreas";
 import type { LifeAreaFormValues } from "../types";
-import type { LifeAreaKey } from "@/shared/types";
 
 function splitTags(value: string): string[] {
   return value
@@ -73,6 +74,12 @@ export function LifeAreasPage() {
     deleteArea,
     markReviewed,
   } = useLifeAreas();
+  const {
+    entries: goals,
+    isLoading: isGoalsLoading,
+    error: goalsError,
+    loadGoals,
+  } = useGoals();
   const [editingAreaKey, setEditingAreaKey] = useState<LifeAreaKey | null>(null);
   const [deletingAreaKey, setDeletingAreaKey] = useState<LifeAreaKey | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -331,6 +338,29 @@ export function LifeAreasPage() {
         </div>
       ) : null}
 
+      {goalsError ? (
+        <div
+          role="alert"
+          className="flex flex-col gap-3 rounded-xl border border-border/70 bg-muted/30 p-4 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div className="flex items-start gap-2 text-sm text-muted-foreground">
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+            <span className="min-w-0 break-words">
+              {t("lifeAreas.goalSummaryError")}
+            </span>
+          </div>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => void loadGoals()}
+          >
+            <RotateCcw className="me-2 h-4 w-4" />
+            {t("common.tryAgain")}
+          </Button>
+        </div>
+      ) : null}
+
       {focusMessage ? (
         <div
           role="status"
@@ -487,6 +517,9 @@ export function LifeAreasPage() {
             >
               <LifeAreaCard
                 area={area}
+                goalSummary={getLifeAreaGoalSummary(goals, area.areaKey)}
+                isGoalSummaryLoading={isGoalsLoading}
+                isGoalSummaryUnavailable={Boolean(goalsError)}
                 isDeleting={deletingAreaKey === area.id}
                 isFocused={focusedAreaKey === area.id}
                 onEdit={() => openEditor(area.areaKey)}

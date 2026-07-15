@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 76 - Goals ↔ Life Areas Derived Integration
+
+- Added derived linked-goal summaries to every Life Area using the existing shared canonical area key
+- Added two-way navigation from Life Areas to area-filtered Goals and from each Goal back to its focused Life Area
+- Added validated URL area filters plus focused coverage for area summaries, empty states, status handling, immutability, valid parameters, invalid parameters, and stable paths
+- Kept the integration local-only and non-cascading, with no dependency, repository contract, Dexie schema, backup format, backup version, backend, sync, cloud, AI, or user-data migration
+
 ## Stage 75 - Life Areas QA & Mobile Hardening
 
 - Added focused regression coverage for canonical-area merging, localized definitions, filters, review timing, satisfaction summaries, attention states, sorting, and malformed dates

@@ -43,6 +43,7 @@ import {
   isGoalReviewDue,
   type GoalFilter,
 } from "../goals";
+import { parseGoalAreaSearchParam } from "../goalAreaNavigation";
 import {
   createGoalDraftFromTemplate,
   GOAL_TEMPLATES,
@@ -77,7 +78,7 @@ function parseOptionalDate(value: string): string | undefined {
 
 export function GoalsPage() {
   const { t } = useI18n();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const {
     entries,
     isLoading,
@@ -97,7 +98,9 @@ export function GoalsPage() {
   const [actionError, setActionError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<GoalFilter["status"]>("all");
-  const [areaFilter, setAreaFilter] = useState<GoalFilter["area"]>("all");
+  const [areaFilter, setAreaFilter] = useState<GoalFilter["area"]>(() =>
+    parseGoalAreaSearchParam(searchParams.get("area"))
+  );
   const [timeframeFilter, setTimeframeFilter] =
     useState<GoalFilter["timeframe"]>("all");
   const [importanceFilter, setImportanceFilter] =
@@ -112,6 +115,7 @@ export function GoalsPage() {
   const goalRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const formRef = useRef<HTMLDivElement | null>(null);
   const focusId = searchParams.get("focusId");
+  const areaParam = searchParams.get("area");
 
   const summary = useMemo(() => getGoalsSummary(entries), [entries]);
   const templateCards = useMemo(
@@ -208,6 +212,22 @@ export function GoalsPage() {
     setAreaFilter("all");
     setTimeframeFilter("all");
     setImportanceFilter("all");
+    const nextSearchParams = new URLSearchParams(searchParams);
+    nextSearchParams.delete("area");
+    setSearchParams(nextSearchParams, { replace: true });
+  };
+
+  const handleAreaFilterChange = (value: GoalFilter["area"]) => {
+    setAreaFilter(value);
+    const nextSearchParams = new URLSearchParams(searchParams);
+
+    if (value === "all") {
+      nextSearchParams.delete("area");
+    } else {
+      nextSearchParams.set("area", value);
+    }
+
+    setSearchParams(nextSearchParams, { replace: true });
   };
 
   const handleSubmit = async (values: GoalFormValues) => {
@@ -310,6 +330,10 @@ export function GoalsPage() {
       );
     }
   };
+
+  useEffect(() => {
+    setAreaFilter(parseGoalAreaSearchParam(areaParam));
+  }, [areaParam]);
 
   useEffect(() => {
     if (!formOpen) {
@@ -569,7 +593,9 @@ export function GoalsPage() {
             <select
               value={areaFilter}
               onChange={(event) =>
-                setAreaFilter(event.target.value as GoalFilter["area"])
+                handleAreaFilterChange(
+                  event.target.value as GoalFilter["area"]
+                )
               }
               aria-label={t("goals.areaFilter")}
               className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
