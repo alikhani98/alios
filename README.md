@@ -27,6 +27,7 @@ Stage 66 polishes Personal Manual for mobile widths and dense content with tight
 Stage 67 hardens the Personal Manual track with importance-aware search coverage and a concise smoke-test checklist without changing behavior, storage, or backup compatibility.
 Stage 68 hardens the v1.50 release with a small app-version metadata fix, a release smoke-test checklist, and defensive QA coverage without changing behavior, storage, or backup compatibility.
 Stage 73 hardens the asynchronous storage bootstrap with a calm bilingual retry/reload fallback and bounded local error capture, without changing routes, storage schemas, backup compatibility, or dependencies.
+Stage 74 adds a least-privilege GitHub pull-request validation gate for TypeScript, automated tests, and the production build without changing application behavior or runtime dependencies.
 
 AliOS is designed for one person and stores its data in the browser through IndexedDB. It requires no backend, account, authentication, subscription, paid API, or hosted AI service.
 
@@ -146,6 +147,8 @@ https://alikhani98.github.io/alios/
 ```
 
 The production build uses `/alios/` as its Vite base path. Local development remains available at the development server root. The deployment workflow runs TypeScript validation, automated tests, and the production build before publishing `dist/`.
+
+Pull requests targeting `main` run the same TypeScript, test, and production-build gates through the **Validate Pull Request** workflow. Reviewers should wait for that workflow to pass before merging. New commits pushed to the same pull request cancel superseded validation runs automatically.
 
 To enable deployment:
 
