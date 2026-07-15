@@ -304,3 +304,18 @@ Reason:
 - The app needs a calm default set of life areas without forcing a seed migration or a special bootstrap path
 - Keeping canonical areas in the UI preserves the local-first model while still letting users personalize what they persist
 - Additive backup compatibility keeps older files usable and avoids unnecessary breaking changes
+
+## ADR-025: Derive the Goals and Life Areas relationship from the shared area key
+
+Decision:
+
+- Goals and Life Areas are related only when `Goal.area` equals `LifeArea.areaKey`
+- Linked-goal counts, status counts, and active-progress summaries are calculated in memory from existing local records
+- Navigation may carry the shared key through validated URL parameters, but no relationship ID, join table, schema migration, or backup field is added
+- Resetting, pausing, archiving, or editing a Life Area must not automatically modify or delete any Goal, and Goal actions must not automatically modify a Life Area
+
+Reason:
+
+- Both modules already use the same canonical seven-value area key, so another persisted relationship would duplicate data without adding useful identity
+- Derived summaries keep the integration deterministic, reversible, and compatible with existing backups and static hosting
+- Avoiding cascade behavior keeps each module user-managed and prevents a presentation-level connection from becoming hidden automation

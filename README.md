@@ -29,6 +29,7 @@ Stage 68 hardens the v1.50 release with a small app-version metadata fix, a rele
 Stage 73 hardens the asynchronous storage bootstrap with a calm bilingual retry/reload fallback and bounded local error capture, without changing routes, storage schemas, backup compatibility, or dependencies.
 Stage 74 adds a least-privilege GitHub pull-request validation gate for TypeScript, automated tests, and the production build without changing application behavior or runtime dependencies.
 Stage 75 hardens Life Areas with focused deterministic helper tests and safer mobile wrapping at 360px, 390px, and 430px class widths without changing behavior, storage, backup compatibility, or dependencies.
+Stage 76 connects Goals and Life Areas with derived goal summaries and two-way area navigation using their existing shared key, without adding a stored relationship, migration, cascade, or backup change.
 
 AliOS is designed for one person and stores its data in the browser through IndexedDB. It requires no backend, account, authentication, subscription, paid API, or hosted AI service.
 
@@ -41,6 +42,7 @@ AliOS is designed for one person and stores its data in the browser through Inde
 - Personal Manual starter templates for calm note scaffolding before saving a final entry
 - Goals templates for calm goal scaffolding before saving a final goal
 - Life Areas foundation for local user-authored areas with calm review awareness, search, and export support
+- Derived Goals ↔ Life Areas summaries and two-way area navigation with no additional persisted relationship
 - Personal Manual track release hardening for search, review, export, backup, and mobile smoke-test coverage
 - Personal Manual mobile and dense-page polish for long titles, body previews, badges, and tag chips
 - Upcoming tasks foundation on Home with overdue, today, tomorrow, this week, and later groupings

@@ -1,7 +1,9 @@
-import { CheckCircle2, Clock3, RotateCcw, Target, Trash2 } from "lucide-react";
+import { CheckCircle2, Clock3, Compass, RotateCcw, Trash2 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 import { useDateFormatter } from "@/shared/date";
 import { useI18n } from "@/shared/i18n";
+import type { Goal } from "@/shared/types";
 import {
   Badge,
   Button,
@@ -20,7 +22,7 @@ import {
   GOAL_STATUS_LABEL_KEYS,
   GOAL_TIMEFRAME_LABEL_KEYS,
 } from "../constants";
-import type { Goal } from "@/shared/types";
+import { createLifeAreaFocusPath } from "../goalAreaNavigation";
 
 type GoalCardProps = {
   goal: Goal;
@@ -112,6 +114,12 @@ export function GoalCard({
         ) : null}
 
         <div className="flex flex-wrap gap-2 pt-1">
+          <Button size="sm" asChild>
+            <Link to={createLifeAreaFocusPath(goal.area)}>
+              <Compass className="me-2 h-4 w-4" />
+              {t("goals.openLifeArea")}
+            </Link>
+          </Button>
           <Button type="button" size="sm" variant="outline" onClick={onEdit}>
             {t("common.edit")}
           </Button>

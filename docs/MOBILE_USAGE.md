@@ -77,6 +77,19 @@ Repeat this focused pass at 360px, 390px, and 430px viewport widths in both Pers
 6. Use Reset on an edited canonical area, read the confirmation, and confirm the restored values render without overflow.
 7. Open a Life Area from Global Search with `focusId` and confirm the focused card remains visible and mobile-safe.
 
+## Stage 76 Goals ↔ Life Areas integration smoke test
+
+Repeat this pass at 360px, 390px, and 430px viewport widths in both Persian and English:
+
+1. Create active, paused, completed, and archived Goals across at least two areas.
+2. Open Life Areas and confirm each card shows only the goal totals, active count, completed count, and average active progress for its own shared area key.
+3. Select **View area goals** and confirm Goals opens with the matching area filter reflected in the URL and filter control.
+4. Change the Goals area filter, refresh, and use browser back/forward; confirm the validated `area` parameter and visible goals stay aligned.
+5. Open an unsupported `area` URL value and confirm Goals safely falls back to all areas.
+6. Select **View life area** on a Goal and confirm the matching Life Area card receives the existing temporary focus treatment.
+7. Reset, pause, archive, or edit a Life Area and confirm no Goal is deleted or changed.
+8. Confirm the linked-goal summary, navigation buttons, badges, and error fallback never create horizontal page overflow.
+
 ## v1.50 release smoke test
 
 Use this short checklist before the v1.50 release is marked ready:

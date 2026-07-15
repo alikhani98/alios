@@ -1,6 +1,9 @@
-import { CheckCircle2, Pencil, RotateCcw, Trash2 } from "lucide-react";
+import { CheckCircle2, Pencil, RotateCcw, Target, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
+import { GOAL_AREA_LABEL_KEYS } from "@/features/goals/constants";
+import { createGoalsForAreaPath } from "@/features/goals/goalAreaNavigation";
 import { useDateFormatter } from "@/shared/date";
 import { useI18n } from "@/shared/i18n";
 import {
@@ -14,7 +17,6 @@ import {
   CardTitle,
   StatusChip,
 } from "@/shared/ui";
-import { GOAL_AREA_LABEL_KEYS } from "@/features/goals";
 
 import {
   LIFE_AREA_ATTENTION_LABEL_KEYS,
@@ -25,6 +27,7 @@ import {
   isLifeAreaReviewDue,
   type LifeAreaView,
 } from "../lifeAreas";
+import type { LifeAreaGoalSummary } from "../lifeAreaGoals";
 
 type LifeAreaCardProps = {
   area: LifeAreaView;
@@ -33,6 +36,9 @@ type LifeAreaCardProps = {
   onDelete: () => Promise<void>;
   onMarkReviewed: () => Promise<void>;
   isFocused?: boolean;
+  goalSummary: LifeAreaGoalSummary;
+  isGoalSummaryLoading: boolean;
+  isGoalSummaryUnavailable: boolean;
 };
 
 export function LifeAreaCard({
@@ -42,6 +48,9 @@ export function LifeAreaCard({
   onDelete,
   onMarkReviewed,
   isFocused,
+  goalSummary,
+  isGoalSummaryLoading,
+  isGoalSummaryUnavailable,
 }: LifeAreaCardProps) {
   const { t } = useI18n();
   const { formatDateTime } = useDateFormatter();
@@ -125,6 +134,38 @@ export function LifeAreaCard({
           </p>
         </div>
 
+        <div className="min-w-0 rounded-2xl border border-primary/15 bg-primary/5 px-3 py-3 sm:px-4">
+          <div className="flex min-w-0 flex-wrap items-center justify-between gap-2">
+            <p className="flex min-w-0 items-center gap-2 text-sm font-medium text-foreground">
+              <Target className="h-4 w-4 shrink-0 text-primary" />
+              <span className="break-words">{t("lifeAreas.linkedGoals")}</span>
+            </p>
+            <StatusChip tone="neutral">
+              {isGoalSummaryLoading
+                ? t("common.loading")
+                : isGoalSummaryUnavailable
+                  ? t("lifeAreas.linkedGoalsUnavailable")
+                  : goalSummary.totalCount}
+            </StatusChip>
+          </div>
+          {!isGoalSummaryLoading && !isGoalSummaryUnavailable ? (
+            <div className="mt-3 grid min-w-0 gap-2 text-sm text-muted-foreground sm:grid-cols-3">
+              <p className="min-w-0 break-words">
+                {t("lifeAreas.linkedActiveGoals")}: {goalSummary.activeCount}
+              </p>
+              <p className="min-w-0 break-words">
+                {t("lifeAreas.linkedCompletedGoals")}: {goalSummary.completedCount}
+              </p>
+              <p className="min-w-0 break-words">
+                {t("lifeAreas.linkedAverageProgress")}: {" "}
+                {goalSummary.averageActiveProgress === null
+                  ? t("common.notRecorded")
+                  : `${Math.round(goalSummary.averageActiveProgress)}%`}
+              </p>
+            </div>
+          ) : null}
+        </div>
+
         {area.focusNote.trim().length > 0 ? (
           <div className="rounded-2xl border bg-background/70 px-3 py-3 sm:px-4">
             <p className="text-xs text-muted-foreground">{t("lifeAreas.focusNoteLabel")}</p>
@@ -180,6 +221,16 @@ export function LifeAreaCard({
           </>
         ) : (
           <>
+            <Button
+              asChild
+              size="sm"
+              className="w-full sm:w-auto"
+            >
+              <Link to={createGoalsForAreaPath(area.areaKey)}>
+                <Target className="me-2 h-4 w-4" />
+                {t("lifeAreas.openLinkedGoals")}
+              </Link>
+            </Button>
             <Button type="button" size="sm" variant="outline" className="w-full sm:w-auto" onClick={onEdit}>
               <Pencil className="me-2 h-4 w-4" />
               {t("common.edit")}
