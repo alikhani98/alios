@@ -257,9 +257,9 @@ export function LifeAreasPage() {
   }, [areas, filteredAreas, focusId, isLoading, t]);
 
   return (
-    <section className="alios-page space-y-6">
+    <section className="alios-page min-w-0 space-y-6">
       <PremiumCard className="border-primary/15 bg-gradient-to-br from-primary/10 via-background to-background shadow-sm">
-        <div className="p-5 sm:p-6">
+        <div className="p-4 sm:p-6">
           <SectionHeader
             eyebrow={t("lifeAreas.title")}
             icon={<Compass className="h-5 w-5" />}
@@ -274,7 +274,7 @@ export function LifeAreasPage() {
         </div>
       </PremiumCard>
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid min-w-0 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard
           icon={<Compass className="h-5 w-5" />}
           label={t("lifeAreas.totalAreas")}
@@ -307,7 +307,7 @@ export function LifeAreasPage() {
       {successMessage ? (
         <div
           role="status"
-          className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm"
+          className="break-words rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm"
         >
           {successMessage}
         </div>
@@ -320,7 +320,7 @@ export function LifeAreasPage() {
         >
           <div className="flex items-start gap-2 text-sm text-destructive">
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-            <span>{actionError ?? error}</span>
+            <span className="min-w-0 break-words">{actionError ?? error}</span>
           </div>
           {error ? (
             <Button type="button" size="sm" variant="outline" onClick={() => void loadLifeAreas()}>
@@ -341,7 +341,7 @@ export function LifeAreasPage() {
       ) : null}
 
       <PremiumCard>
-        <div className="space-y-3 p-5 sm:space-y-4 sm:p-6">
+        <div className="min-w-0 space-y-3 p-4 sm:space-y-4 sm:p-6">
           <SectionHeader
             title={
               editingArea
@@ -370,7 +370,7 @@ export function LifeAreasPage() {
       </PremiumCard>
 
       <PremiumCard>
-        <div className="space-y-4 p-5 sm:p-6">
+        <div className="min-w-0 space-y-4 p-4 sm:p-6">
           <SectionHeader
             title={t("lifeAreas.filters")}
             description={t("lifeAreas.filtersDescription")}
@@ -416,12 +416,17 @@ export function LifeAreasPage() {
                 </option>
               ))}
             </select>
-            <div className="flex flex-wrap gap-2">
-              <Button type="button" onClick={handleSearch}>
+            <div className="flex min-w-0 flex-col gap-2 sm:flex-row md:flex-col xl:flex-row">
+              <Button type="button" className="w-full md:w-auto" onClick={handleSearch}>
                 {t("lifeAreas.search")}
               </Button>
               {hasActiveFilters ? (
-                <Button type="button" variant="ghost" onClick={clearFilters}>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="w-full md:w-auto"
+                  onClick={clearFilters}
+                >
                   <X className="me-2 h-4 w-4" />
                   {t("lifeAreas.clearFilters")}
                 </Button>
@@ -447,11 +452,21 @@ export function LifeAreasPage() {
           note={hasActiveFilters ? undefined : t("lifeAreas.emptyNote")}
           actions={
             hasActiveFilters ? (
-              <Button type="button" variant="outline" onClick={clearFilters}>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full sm:w-auto"
+                onClick={clearFilters}
+              >
                 {t("lifeAreas.clearFilters")}
               </Button>
             ) : (
-              <Button type="button" variant="outline" onClick={() => setAppliedQuery("")}>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full sm:w-auto"
+                onClick={() => setAppliedQuery("")}
+              >
                 {t("lifeAreas.emptyAction")}
               </Button>
             )
@@ -466,7 +481,7 @@ export function LifeAreasPage() {
                 areaRefs.current[area.id] = node;
               }}
               className={cn(
-                "scroll-mt-6 rounded-[1.75rem] transition-shadow",
+                "min-w-0 scroll-mt-6 rounded-[1.75rem] transition-shadow",
                 focusedAreaKey === area.id ? "ring-2 ring-primary/20" : null
               )}
             >
@@ -484,7 +499,7 @@ export function LifeAreasPage() {
       )}
 
       <PremiumCard>
-        <div className="space-y-3 p-5 sm:p-6">
+        <div className="min-w-0 space-y-3 p-4 sm:p-6">
           <SectionHeader
             title={t("lifeAreas.canonicalTitle")}
             description={t("lifeAreas.canonicalDescription")}
@@ -495,7 +510,11 @@ export function LifeAreasPage() {
           </p>
           <div className="flex flex-wrap gap-2">
             {LIFE_AREA_DEFINITIONS.map((definition) => (
-              <Badge key={definition.areaKey} variant="secondary">
+              <Badge
+                key={definition.areaKey}
+                variant="secondary"
+                className="max-w-full break-words whitespace-normal text-start"
+              >
                 {t(GOAL_AREA_LABEL_KEYS[definition.areaKey])}
               </Badge>
             ))}

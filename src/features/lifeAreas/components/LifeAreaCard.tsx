@@ -55,15 +55,15 @@ export function LifeAreaCard({
         isFocused ? "ring-2 ring-primary/20" : "",
       ].join(" ")}
     >
-      <CardHeader className="space-y-3">
-        <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
-          <div className="min-w-0 space-y-1">
+      <CardHeader className="space-y-3 p-4 sm:p-6">
+        <div className="flex min-w-0 flex-col items-start gap-3 sm:flex-row sm:justify-between">
+          <div className="min-w-0 flex-1 space-y-1">
             <CardTitle className="break-words leading-7">{area.title}</CardTitle>
             <CardDescription className="break-words whitespace-pre-wrap">
               {area.description}
             </CardDescription>
           </div>
-          <div className="flex flex-wrap justify-end gap-2">
+          <div className="flex w-full min-w-0 flex-wrap justify-start gap-2 sm:w-auto sm:justify-end">
             <StatusChip
               tone={
                 area.status === "archived"
@@ -79,50 +79,61 @@ export function LifeAreaCard({
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          <Badge variant="secondary">{t(GOAL_AREA_LABEL_KEYS[area.areaKey])}</Badge>
-          <Badge variant="outline">
+        <div className="flex min-w-0 flex-wrap gap-2">
+          <Badge
+            variant="secondary"
+            className="max-w-full break-words whitespace-normal text-start"
+          >
+            {t(GOAL_AREA_LABEL_KEYS[area.areaKey])}
+          </Badge>
+          <Badge
+            variant="outline"
+            className="max-w-full break-words whitespace-normal text-start"
+          >
             {t("lifeAreas.attentionLabel")}: {t(LIFE_AREA_ATTENTION_LABEL_KEYS[area.attentionLevel])}
           </Badge>
           {typeof area.satisfactionScore === "number" ? (
-            <Badge variant="outline">
+            <Badge
+              variant="outline"
+              className="max-w-full break-words whitespace-normal text-start"
+            >
               {t("lifeAreas.satisfactionLabel")}: {area.satisfactionScore}/5
             </Badge>
           ) : null}
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 px-4 pb-4 sm:px-6 sm:pb-6">
         <div className="grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
-          <p>
+          <p className="min-w-0 break-words">
             {t("lifeAreas.reviewIntervalDaysLabel")}:{" "}
             {area.reviewIntervalDays ?? t("common.notRecorded")}
           </p>
-          <p>
+          <p className="min-w-0 break-words">
             {t("lifeAreas.lastReviewedLabel")}:{" "}
             {area.lastReviewedAt
               ? formatDateTime(area.lastReviewedAt)
               : t("common.notRecorded")}
           </p>
-          <p>
+          <p className="min-w-0 break-words">
             {t("lifeAreas.updatedAtLabel")}:{" "}
             {area.updatedAt ? formatDateTime(area.updatedAt) : t("common.notRecorded")}
           </p>
-          <p>
+          <p className="min-w-0 break-words">
             {t("lifeAreas.createdAtLabel")}:{" "}
             {area.createdAt ? formatDateTime(area.createdAt) : t("common.notRecorded")}
           </p>
         </div>
 
         {area.focusNote.trim().length > 0 ? (
-          <div className="rounded-2xl border bg-background/70 px-4 py-3">
+          <div className="rounded-2xl border bg-background/70 px-3 py-3 sm:px-4">
             <p className="text-xs text-muted-foreground">{t("lifeAreas.focusNoteLabel")}</p>
             <p className="mt-1 break-words whitespace-pre-wrap text-sm leading-7">
               {area.focusNote}
             </p>
           </div>
         ) : (
-          <div className="rounded-2xl border bg-muted/30 px-4 py-3">
+          <div className="rounded-2xl border bg-muted/30 px-3 py-3 sm:px-4">
             <p className="text-sm leading-7 text-muted-foreground">
               {t("lifeAreas.noFocusNote")}
             </p>
@@ -144,7 +155,7 @@ export function LifeAreaCard({
         ) : null}
       </CardContent>
 
-      <CardFooter className="flex flex-col gap-2 border-t pt-4 sm:flex-row sm:flex-wrap sm:items-center">
+      <CardFooter className="flex flex-col gap-2 border-t px-4 pb-4 pt-4 sm:flex-row sm:flex-wrap sm:items-center sm:px-6 sm:pb-6">
         {confirmingDelete ? (
           <>
             <Button
