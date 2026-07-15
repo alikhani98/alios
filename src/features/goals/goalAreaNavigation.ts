@@ -11,6 +11,27 @@ export function parseGoalAreaSearchParam(
   return value !== null && isGoalArea(value) ? value : "all";
 }
 
+export function parseLifeAreaFocusSearchParam(
+  value: string | null
+): LifeAreaKey | null {
+  return value !== null && isGoalArea(value) ? value : null;
+}
+
+export function updateGoalAreaSearchParams(
+  current: URLSearchParams,
+  area: GoalArea | "all"
+): URLSearchParams {
+  const next = new URLSearchParams(current);
+
+  if (area === "all") {
+    next.delete("area");
+  } else {
+    next.set("area", area);
+  }
+
+  return next;
+}
+
 export function createGoalsForAreaPath(areaKey: LifeAreaKey): string {
   const searchParams = new URLSearchParams({ area: areaKey });
   return `/goals?${searchParams.toString()}`;

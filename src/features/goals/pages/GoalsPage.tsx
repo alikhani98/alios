@@ -43,7 +43,10 @@ import {
   isGoalReviewDue,
   type GoalFilter,
 } from "../goals";
-import { parseGoalAreaSearchParam } from "../goalAreaNavigation";
+import {
+  parseGoalAreaSearchParam,
+  updateGoalAreaSearchParams,
+} from "../goalAreaNavigation";
 import {
   createGoalDraftFromTemplate,
   GOAL_TEMPLATES,
@@ -212,22 +215,16 @@ export function GoalsPage() {
     setAreaFilter("all");
     setTimeframeFilter("all");
     setImportanceFilter("all");
-    const nextSearchParams = new URLSearchParams(searchParams);
-    nextSearchParams.delete("area");
-    setSearchParams(nextSearchParams, { replace: true });
+    setSearchParams(updateGoalAreaSearchParams(searchParams, "all"), {
+      replace: true,
+    });
   };
 
   const handleAreaFilterChange = (value: GoalFilter["area"]) => {
     setAreaFilter(value);
-    const nextSearchParams = new URLSearchParams(searchParams);
-
-    if (value === "all") {
-      nextSearchParams.delete("area");
-    } else {
-      nextSearchParams.set("area", value);
-    }
-
-    setSearchParams(nextSearchParams, { replace: true });
+    setSearchParams(updateGoalAreaSearchParams(searchParams, value), {
+      replace: true,
+    });
   };
 
   const handleSubmit = async (values: GoalFormValues) => {
@@ -558,15 +555,15 @@ export function GoalsPage() {
       </PremiumCard>
 
       <PremiumCard>
-        <div className="space-y-4 p-5 sm:p-6">
+        <div className="min-w-0 space-y-4 p-5 sm:p-6">
           <SectionHeader
             title={t("goals.filters")}
             description={t("goals.filtersDescription")}
             status={<StatusChip tone="neutral">{filteredEntries.length}</StatusChip>}
           />
 
-          <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_11rem_11rem_11rem_11rem_auto]">
-            <div className="relative">
+          <div className="grid min-w-0 gap-3 md:grid-cols-[minmax(0,1fr)_11rem_11rem_11rem_11rem_auto]">
+            <div className="relative min-w-0">
               <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 value={query}
@@ -634,12 +631,21 @@ export function GoalsPage() {
                 </option>
               ))}
             </select>
-            <div className="flex flex-wrap gap-2">
-              <Button type="button" onClick={handleSearch}>
+            <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+              <Button
+                type="button"
+                className="w-full sm:w-auto"
+                onClick={handleSearch}
+              >
                 {t("goals.search")}
               </Button>
               {hasActiveFilters ? (
-                <Button type="button" variant="ghost" onClick={clearFilters}>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="w-full sm:w-auto"
+                  onClick={clearFilters}
+                >
                   <X className="me-2 h-4 w-4" />
                   {t("goals.clearFilters")}
                 </Button>
@@ -650,7 +656,10 @@ export function GoalsPage() {
       </PremiumCard>
 
       {isLoading ? (
-        <div className="grid gap-4 xl:grid-cols-2" aria-label={t("goals.loading")}>
+        <div
+          className="grid min-w-0 gap-4 xl:grid-cols-2"
+          aria-label={t("goals.loading")}
+        >
           {[0, 1, 2].map((item) => (
             <div key={item} className="h-72 animate-pulse rounded-[1.75rem] border bg-muted/60" />
           ))}
@@ -665,11 +674,20 @@ export function GoalsPage() {
           note={hasActiveFilters ? undefined : t("goals.emptyNote")}
           actions={
             hasActiveFilters ? (
-              <Button type="button" variant="outline" onClick={clearFilters}>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full sm:w-auto"
+                onClick={clearFilters}
+              >
                 {t("goals.clearFilters")}
               </Button>
             ) : (
-              <Button type="button" onClick={openCreateForm}>
+              <Button
+                type="button"
+                className="w-full sm:w-auto"
+                onClick={openCreateForm}
+              >
                 <Plus className="me-2 h-4 w-4" />
                 {t("goals.emptyAction")}
               </Button>
@@ -677,7 +695,7 @@ export function GoalsPage() {
           }
         />
       ) : (
-        <div className="grid gap-4 xl:grid-cols-2">
+        <div className="grid min-w-0 gap-4 xl:grid-cols-2">
           {filteredEntries.map((goal) => (
             <div
               key={goal.id}
@@ -685,7 +703,7 @@ export function GoalsPage() {
                 goalRefs.current[goal.id] = node;
               }}
               className={cn(
-                "scroll-mt-6 rounded-[1.75rem] transition-shadow",
+                "min-w-0 scroll-mt-6 rounded-[1.75rem] transition-shadow",
                 focusedGoalId === goal.id ? "ring-2 ring-primary/20" : null
               )}
             >
@@ -712,7 +730,7 @@ export function GoalsPage() {
               description={t("goals.reviewDueSectionDescription")}
               status={<StatusChip tone="warning">{reviewDueGoals.length}</StatusChip>}
             />
-            <div className="grid gap-4 xl:grid-cols-2">
+            <div className="grid min-w-0 gap-4 xl:grid-cols-2">
               {reviewDueGoals.slice(0, 4).map((goal) => (
                 <GoalCard
                   key={`review-${goal.id}`}

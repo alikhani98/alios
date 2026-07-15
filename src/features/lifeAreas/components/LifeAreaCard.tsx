@@ -157,10 +157,11 @@ export function LifeAreaCard({
                 {t("lifeAreas.linkedCompletedGoals")}: {goalSummary.completedCount}
               </p>
               <p className="min-w-0 break-words">
-                {t("lifeAreas.linkedAverageProgress")}: {" "}
-                {goalSummary.averageActiveProgress === null
-                  ? t("common.notRecorded")
-                  : `${Math.round(goalSummary.averageActiveProgress)}%`}
+                {`${t("lifeAreas.linkedAverageProgress")}: ${
+                  goalSummary.averageActiveProgress === null
+                    ? t("common.notRecorded")
+                    : `${Math.round(goalSummary.averageActiveProgress)}%`
+                }`}
               </p>
             </div>
           ) : null}

@@ -48,6 +48,7 @@ Stage 73 hardens the async app startup path with a bilingual retry/reload fallba
 Stage 74 adds a least-privilege pull-request validation workflow that runs frozen installation, TypeScript validation, the full test suite, and the production build before approved changes reach `main`.
 Stage 75 hardens the Life Areas track with focused helper coverage and narrow-screen overflow protection for cards, filters, forms, tags, and actions without changing behavior, storage, or backup compatibility.
 Stage 76 connects Goals and Life Areas through their existing shared canonical area key, adding derived summaries and two-way filtered navigation without persisting a new relationship or changing backup compatibility.
+Stage 77 release-hardens the combined Goals and Life Areas track with bilingual card rendering coverage, safer URL parameter preservation and validation, failure-isolated linked summaries, and narrow-screen wrapping without changing behavior, storage, routes, dependencies, or backup compatibility.
 
 ## Version 1.1
 
