@@ -44,6 +44,7 @@ Stage 69 adds a local-first Goals foundation with repository CRUD, Home visibili
 Stage 70 hardens the Goals track with focused QA coverage, mobile-safe layout checks, and backup/search/review smoke-test guidance without changing the storage model or backup format.
 Stage 71 adds static Goals templates and a quick-start picker that prefill the existing form only, without changing storage, backup format, or the save flow.
 Stage 72 adds a local-first Life Areas foundation with repository CRUD, Home visibility, Weekly Review due awareness, Global Search support, and additive backup support without changing the storage model or backup format.
+Stage 73 hardens the async app startup path with a bilingual retry/reload fallback and local-only error capture, while keeping the lazy Dexie boundary, routes, storage model, backup format, and dependencies unchanged.
 
 ## Version 1.1
 
