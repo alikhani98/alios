@@ -28,6 +28,7 @@ Stage 67 hardens the Personal Manual track with importance-aware search coverage
 Stage 68 hardens the v1.50 release with a small app-version metadata fix, a release smoke-test checklist, and defensive QA coverage without changing behavior, storage, or backup compatibility.
 Stage 73 hardens the asynchronous storage bootstrap with a calm bilingual retry/reload fallback and bounded local error capture, without changing routes, storage schemas, backup compatibility, or dependencies.
 Stage 74 adds a least-privilege GitHub pull-request validation gate for TypeScript, automated tests, and the production build without changing application behavior or runtime dependencies.
+Stage 75 hardens Life Areas with focused deterministic helper tests and safer mobile wrapping at 360px, 390px, and 430px class widths without changing behavior, storage, backup compatibility, or dependencies.
 
 AliOS is designed for one person and stores its data in the browser through IndexedDB. It requires no backend, account, authentication, subscription, paid API, or hosted AI service.
 

@@ -65,6 +65,18 @@ Use this short checklist after a release-hardening change to the Life Areas trac
 6. Export and restore a backup to confirm Life Areas survive the round trip.
 7. Check a narrow mobile width and confirm the Life Areas cards and form do not overflow horizontally.
 
+## Stage 75 Life Areas mobile smoke test
+
+Repeat this focused pass at 360px, 390px, and 430px viewport widths in both Persian and English:
+
+1. Open Life Areas and confirm the summary, filter controls, canonical-area notice, cards, and page actions stay inside the viewport with no horizontal scroll.
+2. Use unusually long titles, descriptions, focus notes, and tags in both languages; confirm text and badges wrap without hiding actions or widening the page.
+3. Open the editor and confirm every input, textarea, select, save button, and cancel button remains readable and tappable without overlap.
+4. Combine query, status, and attention filters; confirm filter buttons stack safely and the filtered result list remains usable.
+5. Mark an area reviewed and confirm the review metadata updates without shifting controls outside the card.
+6. Use Reset on an edited canonical area, read the confirmation, and confirm the restored values render without overflow.
+7. Open a Life Area from Global Search with `focusId` and confirm the focused card remains visible and mobile-safe.
+
 ## v1.50 release smoke test
 
 Use this short checklist before the v1.50 release is marked ready:

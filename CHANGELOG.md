@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 75 - Life Areas QA & Mobile Hardening
+
+- Added focused regression coverage for canonical-area merging, localized definitions, filters, review timing, satisfaction summaries, attention states, sorting, and malformed dates
+- Hardened Life Areas cards, filters, forms, badges, tags, and actions against narrow-screen overflow at 360px, 390px, and 430px class widths
+- Expanded the Life Areas smoke-test checklist for long Persian and English content, review actions, filters, and mobile layout safety
+- Kept the stage behavior-preserving and dependency-free, with no route, repository, Dexie schema, backup format, backup version, backend, sync, cloud, AI, or user-data change
+
 ## Stage 74 - Pull Request CI Foundation
 
 - Added a least-privilege GitHub Actions workflow that validates every pull request targeting `main`

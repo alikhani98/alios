@@ -57,14 +57,14 @@ export function LifeAreaForm({
 
   return (
     <form
-      className="space-y-4"
+      className="min-w-0 space-y-4"
       onSubmit={(event) => {
         event.preventDefault();
         void onSubmit(values);
       }}
     >
       <div className="grid gap-4 lg:grid-cols-2">
-        <div className="space-y-2">
+        <div className="min-w-0 space-y-2">
           <label className="text-sm font-medium" htmlFor={`life-area-title-${area.areaKey}`}>
             {t("lifeAreas.titleLabel")}
           </label>
@@ -73,9 +73,10 @@ export function LifeAreaForm({
             value={values.title}
             onChange={(event) => updateValue("title", event.target.value)}
             placeholder={t("lifeAreas.titlePlaceholder")}
+            className="min-w-0"
           />
         </div>
-        <div className="space-y-2">
+        <div className="min-w-0 space-y-2">
           <label className="text-sm font-medium" htmlFor={`life-area-status-${area.areaKey}`}>
             {t("lifeAreas.statusLabel")}
           </label>
@@ -85,7 +86,7 @@ export function LifeAreaForm({
             onChange={(event) =>
               updateValue("status", event.target.value as LifeAreaStatus)
             }
-            className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
+            className="flex h-11 min-w-0 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
           >
             {LIFE_AREA_STATUS_OPTIONS.filter((option) => option.value !== "all").map(
               (option) => (
@@ -98,7 +99,7 @@ export function LifeAreaForm({
         </div>
       </div>
 
-      <div className="space-y-2">
+      <div className="min-w-0 space-y-2">
         <label className="text-sm font-medium" htmlFor={`life-area-description-${area.areaKey}`}>
           {t("lifeAreas.descriptionLabel")}
         </label>
@@ -108,11 +109,12 @@ export function LifeAreaForm({
           onChange={(event) => updateValue("description", event.target.value)}
           placeholder={t("lifeAreas.descriptionPlaceholder")}
           rows={4}
+          className="min-w-0"
         />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
-        <div className="space-y-2">
+        <div className="min-w-0 space-y-2">
           <label className="text-sm font-medium" htmlFor={`life-area-attention-${area.areaKey}`}>
             {t("lifeAreas.attentionLabel")}
           </label>
@@ -125,7 +127,7 @@ export function LifeAreaForm({
                 event.target.value as LifeAreaAttentionLevel
               )
             }
-            className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
+            className="flex h-11 min-w-0 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
           >
             {LIFE_AREA_ATTENTION_OPTIONS.filter((option) => option.value !== "all").map(
               (option) => (
@@ -136,7 +138,7 @@ export function LifeAreaForm({
             )}
           </select>
         </div>
-        <div className="space-y-2">
+        <div className="min-w-0 space-y-2">
           <label
             className="text-sm font-medium"
             htmlFor={`life-area-satisfaction-${area.areaKey}`}
@@ -147,7 +149,7 @@ export function LifeAreaForm({
             id={`life-area-satisfaction-${area.areaKey}`}
             value={values.satisfactionScore}
             onChange={(event) => updateValue("satisfactionScore", event.target.value)}
-            className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
+            className="flex h-11 min-w-0 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
           >
             <option value="">{t("common.notRecorded")}</option>
             {["1", "2", "3", "4", "5"].map((value) => (
@@ -157,7 +159,7 @@ export function LifeAreaForm({
             ))}
           </select>
         </div>
-        <div className="space-y-2">
+        <div className="min-w-0 space-y-2">
           <label
             className="text-sm font-medium"
             htmlFor={`life-area-review-${area.areaKey}`}
@@ -174,11 +176,12 @@ export function LifeAreaForm({
               updateValue("reviewIntervalDays", event.target.value)
             }
             placeholder={t("lifeAreas.reviewIntervalDaysPlaceholder")}
+            className="min-w-0"
           />
         </div>
       </div>
 
-      <div className="space-y-2">
+      <div className="min-w-0 space-y-2">
         <label className="text-sm font-medium" htmlFor={`life-area-focus-${area.areaKey}`}>
           {t("lifeAreas.focusNoteLabel")}
         </label>
@@ -188,10 +191,11 @@ export function LifeAreaForm({
           onChange={(event) => updateValue("focusNote", event.target.value)}
           placeholder={t("lifeAreas.focusNotePlaceholder")}
           rows={4}
+          className="min-w-0"
         />
       </div>
 
-      <div className="space-y-2">
+      <div className="min-w-0 space-y-2">
         <label className="text-sm font-medium" htmlFor={`life-area-tags-${area.areaKey}`}>
           {t("lifeAreas.tagsLabel")}
         </label>
@@ -200,14 +204,20 @@ export function LifeAreaForm({
           value={values.tagsText}
           onChange={(event) => updateValue("tagsText", event.target.value)}
           placeholder={t("lifeAreas.tagsPlaceholder")}
+          className="min-w-0"
         />
       </div>
 
-      <div className="flex flex-wrap gap-3 pt-1">
-        <Button type="submit" disabled={isSubmitting}>
+      <div className="flex flex-col gap-3 pt-1 sm:flex-row sm:flex-wrap">
+        <Button type="submit" className="w-full sm:w-auto" disabled={isSubmitting}>
           {isSubmitting ? t("common.saving") : t("lifeAreas.saveArea")}
         </Button>
-        <Button type="button" variant="outline" onClick={onCancel}>
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full sm:w-auto"
+          onClick={onCancel}
+        >
           {t("common.cancel")}
         </Button>
       </div>

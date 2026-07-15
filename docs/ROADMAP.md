@@ -46,6 +46,7 @@ Stage 71 adds static Goals templates and a quick-start picker that prefill the e
 Stage 72 adds a local-first Life Areas foundation with repository CRUD, Home visibility, Weekly Review due awareness, Global Search support, and additive backup support without changing the storage model or backup format.
 Stage 73 hardens the async app startup path with a bilingual retry/reload fallback and local-only error capture, while keeping the lazy Dexie boundary, routes, storage model, backup format, and dependencies unchanged.
 Stage 74 adds a least-privilege pull-request validation workflow that runs frozen installation, TypeScript validation, the full test suite, and the production build before approved changes reach `main`.
+Stage 75 hardens the Life Areas track with focused helper coverage and narrow-screen overflow protection for cards, filters, forms, tags, and actions without changing behavior, storage, or backup compatibility.
 
 ## Version 1.1
 
