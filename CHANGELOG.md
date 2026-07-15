@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 74 - Pull Request CI Foundation
+
+- Added a least-privilege GitHub Actions workflow that validates every pull request targeting `main`
+- Added frozen dependency installation, TypeScript validation, the full automated test suite, and the production build as pre-merge checks
+- Added per-pull-request concurrency so superseded validation runs are cancelled when a newer commit is pushed
+- Kept the stage release-only and dependency-free, with no application, route, repository, Dexie schema, backup format, backend, sync, cloud, AI, or user-data change
+
 ## Stage 73 - App Startup Resilience & Release Hygiene
 
 - Added an explicit async storage-bootstrap error state so a failed Dexie module load no longer leaves AliOS on an endless loading screen
