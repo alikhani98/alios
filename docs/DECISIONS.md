@@ -319,3 +319,19 @@ Reason:
 - Both modules already use the same canonical seven-value area key, so another persisted relationship would duplicate data without adding useful identity
 - Derived summaries keep the integration deterministic, reversible, and compatible with existing backups and static hosting
 - Avoiding cascade behavior keeps each module user-managed and prevents a presentation-level connection from becoming hidden automation
+
+## ADR-026: Store an optional one-way Project to Goal identity link
+
+Decision:
+
+- A Project may store one optional `goalId`, while a Goal stores no reverse Project IDs or counts
+- Project screens resolve the referenced Goal from existing local Goal records and use the established `focusId` navigation pattern
+- The field remains unindexed because Project repository operations do not query by Goal, so no Dexie table, index, schema-version change, or migration is added
+- Deleting or changing a Goal must not cascade to linked Projects; an unresolved link remains visible as unavailable and can be removed or reassigned from the Project form
+- Backup version 1 remains unchanged, and older Project records without `goalId` remain valid
+
+Reason:
+
+- A one-way identity reference extends the user-visible chain from Life Area to Goal to Project without duplicating relationship state on both records
+- Avoiding reverse persistence, indexes, and cascades keeps both modules independently user-managed and preserves existing repository and storage-adapter boundaries
+- An optional additive field keeps existing local data and backups compatible while still allowing stable navigation to the exact Goal

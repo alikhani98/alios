@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 78 - Projects → Goals Link Foundation
+
+- Added an optional `Project.goalId` relationship so a project can be linked, relinked, or unlinked from one existing Goal
+- Added bilingual project-form goal selection and project-card navigation to the linked Goal, with calm loading and unavailable states
+- Preserved project usability when a linked Goal is missing or deleted, with no cascade behavior or reverse Goal mutation
+- Kept backup version 1 compatible with older projects that omit `goalId`, with no dependency, route, Dexie table, index, schema-version, backend, sync, cloud, or AI change
+
 ## Stage 77 - Goals & Life Areas Release Hardening
 
 - Added focused bilingual rendering coverage for the two-way Goals and Life Areas cards, filtered/focused links, linked-goal loading, and failure-isolated unavailable states

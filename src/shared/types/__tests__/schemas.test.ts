@@ -24,6 +24,18 @@ import {
 } from "@/test/factories";
 
 describe("core domain schemas", () => {
+  it("keeps legacy projects without a goal link valid", () => {
+    const { goalId: _goalId, ...legacyProject } = projectRecord;
+
+    expect(projectSchema.safeParse(legacyProject).success).toBe(true);
+  });
+
+  it("rejects an empty project goal link", () => {
+    expect(
+      projectSchema.safeParse({ ...projectRecord, goalId: "" }).success
+    ).toBe(false);
+  });
+
   it.each([
     ["project", projectSchema, projectRecord],
     ["task", taskSchema, taskRecord],

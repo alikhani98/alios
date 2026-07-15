@@ -15,6 +15,7 @@ export const projectSchema = z.object({
   description: z.string().optional(),
   status: projectStatusSchema,
   priority: projectPrioritySchema,
+  goalId: z.string().min(1).optional(),
   nextAction: z.string().optional(),
   reviewDate: dateOnlySchema.optional(),
   createdAt: isoDateTimeSchema,

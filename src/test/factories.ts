@@ -36,6 +36,7 @@ export const projectInput: CreateProjectInput = {
   description: "Prepare the local-first release",
   status: "active",
   priority: "high",
+  goalId: "fixture-id",
   nextAction: "Run validation",
   reviewDate: "2026-07-06",
 };

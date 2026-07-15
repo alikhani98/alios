@@ -9,11 +9,13 @@ export const projectFormSchema = projectSchema
     description: true,
     status: true,
     priority: true,
+    goalId: true,
     nextAction: true,
     reviewDate: true,
   })
   .extend({
     description: z.string().optional(),
+    goalId: z.union([z.string().min(1), z.literal("")]).optional(),
     nextAction: z.string().optional(),
     reviewDate: z.union([dateOnlySchema, z.literal("")]).optional(),
   })
