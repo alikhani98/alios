@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 73 - App Startup Resilience & Release Hygiene
+
+- Added an explicit async storage-bootstrap error state so a failed Dexie module load no longer leaves AliOS on an endless loading screen
+- Added calm bilingual retry and full-page reload actions, plus bounded local error-log capture without exposing technical details in the UI
+- Added focused bootstrap-loader and fallback-rendering coverage, and removed four tracked terminal-output artifacts from the repository root
+- Kept the stage local-only and dependency-free, with no route, repository, Dexie schema, backup format, backup version, backend, sync, cloud, AI, or user-data change
+
 ## Stage 72 - Life Areas Foundation
 
 - Added a local-first Life Areas module with repository CRUD, Dexie storage, a calm `/life-areas` page, Home summary awareness, Weekly Review due awareness, Global Search support, backup/restore support, and a readable export path

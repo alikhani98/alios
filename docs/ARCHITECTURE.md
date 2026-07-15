@@ -86,6 +86,13 @@ AliOS 1.0 is a local-first static web app.
 
 AliOS does not require a Node.js server in production. Node.js is allowed for development, dependency installation, and building static assets.
 
+## App Startup Boundary
+
+- The Dexie storage adapter stays behind an asynchronous bootstrap import so the storage layer is not eagerly bundled into the initial application path
+- Bootstrap loading, ready, and failure states are handled before the router renders
+- A failed storage-module load exposes calm bilingual retry and reload actions instead of leaving the app on an endless loading state
+- Bootstrap failures may append a bounded summary to the existing local error log, but they do not send telemetry, display stack traces, delete data, or bypass the storage-adapter boundary
+
 ## Layering
 
 ```text

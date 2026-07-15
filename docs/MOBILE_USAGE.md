@@ -27,6 +27,7 @@ Stage 67 hardens the Personal Manual track so search, review, export, backup, an
 Stage 70 hardens the Goals track so search, review, export, backup, and mobile smoke tests stay clear and repeatable without changing storage or behavior.
 Stage 71 adds static Goals templates and a compact quick-start picker that only prefill the existing form, so narrow screens can start a goal without changing the saved data model.
 Stage 72 adds a Life Areas foundation with local-first review, search, and export support that stays on the current device until you manually export or restore a backup.
+Stage 73 prevents a failed local-storage module load from leaving the mobile app on an endless loading screen by offering calm retry and reload actions before the router starts.
 The Personal Insights section stays local to the device and only reflects stored tasks, projects, inbox items, journal entries, knowledge items, and wellness checklist state.
 
 ## Personal Manual smoke test
@@ -73,6 +74,16 @@ Use this short checklist before the v1.50 release is marked ready:
 3. Create, edit, delete, search, export, and restore a small sample of local data.
 4. Confirm invalid restore files are rejected and restore preview still appears first.
 5. Check a narrow mobile width and confirm the main screens do not overflow horizontally.
+
+## App startup resilience smoke test
+
+Use this checklist after changing the app bootstrap or storage-loading path:
+
+1. Load AliOS normally and confirm the loading fallback transitions into the requested hash route.
+2. Simulate a failed storage-module request in browser developer tools and confirm the bilingual startup fallback replaces the loading state.
+3. Select **Try again** and confirm another load attempt starts without deleting local data.
+4. Select **Reload page** and confirm the browser performs a full reload.
+5. Restore normal network conditions, reload AliOS, and confirm the existing local data is still available.
 
 ## Open or install AliOS
 
