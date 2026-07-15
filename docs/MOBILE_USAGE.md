@@ -28,6 +28,7 @@ Stage 70 hardens the Goals track so search, review, export, backup, and mobile s
 Stage 71 adds static Goals templates and a compact quick-start picker that only prefill the existing form, so narrow screens can start a goal without changing the saved data model.
 Stage 72 adds a Life Areas foundation with local-first review, search, and export support that stays on the current device until you manually export or restore a backup.
 Stage 73 prevents a failed local-storage module load from leaving the mobile app on an endless loading screen by offering calm retry and reload actions before the router starts.
+Stage 77 release-hardens the Goals and Life Areas connection so long content, URL navigation, linked-summary states, and card actions stay safe on narrow screens in both interface languages.
 The Personal Insights section stays local to the device and only reflects stored tasks, projects, inbox items, journal entries, knowledge items, and wellness checklist state.
 
 ## Personal Manual smoke test
@@ -89,6 +90,19 @@ Repeat this pass at 360px, 390px, and 430px viewport widths in both Persian and 
 6. Select **View life area** on a Goal and confirm the matching Life Area card receives the existing temporary focus treatment.
 7. Reset, pause, archive, or edit a Life Area and confirm no Goal is deleted or changed.
 8. Confirm the linked-goal summary, navigation buttons, badges, and error fallback never create horizontal page overflow.
+
+## Stage 77 Goals and Life Areas release smoke test
+
+Repeat this release pass at 360px, 390px, and 430px viewport widths in both Persian and English:
+
+1. Open Goals with long titles, descriptions, metadata, and tags; confirm all badges, dates, and actions wrap inside each card.
+2. Change the area filter while another URL parameter is present; confirm the unrelated parameter remains intact and the selected area survives refresh.
+3. Clear the area filter and confirm only `area` is removed from the URL.
+4. Open every canonical Life Area from a Goal and confirm the matching card receives focus without opening edit mode.
+5. Open an unsupported `focusId` and confirm Life Areas clears the temporary focus safely without an error or data change.
+6. Confirm linked-goal loading and unavailable states never show partial counts and never disable Life Area edit, review, or reset actions.
+7. Use browser back and forward across both routes and confirm the visible filter/focus state follows the URL.
+8. Confirm Home, Weekly Review, Global Search, readable exports, and backup/restore still include Goals and Life Areas as before.
 
 ## v1.50 release smoke test
 

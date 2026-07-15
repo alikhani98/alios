@@ -12,6 +12,7 @@ import { useSearchParams } from "react-router-dom";
 
 import type { CreateLifeAreaInput } from "@/core/repositories";
 import { GOAL_AREA_LABEL_KEYS } from "@/features/goals/constants";
+import { parseLifeAreaFocusSearchParam } from "@/features/goals/goalAreaNavigation";
 import { useGoals } from "@/features/goals/hooks/useGoals";
 import { useI18n } from "@/shared/i18n";
 import type { LifeAreaKey } from "@/shared/types";
@@ -95,6 +96,7 @@ export function LifeAreasPage() {
   const formRef = useRef<HTMLDivElement | null>(null);
   const areaRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const focusId = searchParams.get("focusId");
+  const focusAreaKey = parseLifeAreaFocusSearchParam(focusId);
 
   const summary = useMemo(() => getLifeAreasSummary(areas), [areas]);
   const filteredAreas = useMemo(
@@ -232,15 +234,17 @@ export function LifeAreasPage() {
   }, [editingArea]);
 
   useEffect(() => {
-    if (!focusId) {
+    if (!focusAreaKey) {
       setFocusedAreaKey(null);
       setFocusMessage(null);
       return;
     }
 
-    const focusedArea = filteredAreas.find((area) => area.areaKey === focusId);
+    const focusedArea = filteredAreas.find(
+      (area) => area.areaKey === focusAreaKey
+    );
     if (!focusedArea) {
-      if (!isLoading && areas.some((area) => area.areaKey === focusId)) {
+      if (!isLoading && areas.some((area) => area.areaKey === focusAreaKey)) {
         setFocusedAreaKey(null);
         setFocusMessage(t("search.focusItemNotVisible"));
       }
@@ -261,7 +265,7 @@ export function LifeAreasPage() {
     }, 2200);
 
     return () => window.clearTimeout(timeout);
-  }, [areas, filteredAreas, focusId, isLoading, t]);
+  }, [areas, filteredAreas, focusAreaKey, isLoading, t]);
 
   return (
     <section className="alios-page min-w-0 space-y-6">

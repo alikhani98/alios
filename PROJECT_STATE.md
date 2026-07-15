@@ -4,8 +4,8 @@
 
 - Project name: AliOS
 - Architecture version: AliOS 1.0
-- Current status: AliOS includes validated mobile-first Inbox capture, processing, global search, focused search-result navigation, filters, bulk triage, local appearance switching, local profile preferences, calendar month view foundation, home time-window routine nudges, upcoming task grouping, routine templates foundation, Wellness / Badminton Routine foundation, visual motion polish, premium Home dashboard visual upgrade, premium app shell polish, Home dashboard customization, premium reusable components, lightweight Personal Insights, Stage 37 premium Home showcase polish, light core-page visual alignment, hardened backup/restore safety, Stage 38 UI regression QA and release hardening with desktop sticky sidebar accessibility improvements, Stage 39 topbar dashboard controls plus accent color personalization, Stage 40 finance foundation, Stage 41 finance review and budget guard, Stage 42 lightweight finance charts foundation, Stage 43 lightweight motion and interaction polish, Stage 44 finance mobile UX and section navigation, Stage 45 performance audit and bundle optimization, Stage 46 Home collapsible dashboard sections, Stage 47 Settings Help Center Foundation, Stage 48 Weekly Review Foundation, Stage 49 Decision Log Foundation, Stage 50 Backup / Restore Safety & Migration Foundation, Stage 51 App Error Boundary & Local Error Log Foundation, Stage 53 Mobile UX Hardening for dense pages, Stage 54 Empty States & First-Run Guidance Foundation, Stage 55 Backup Reminder & Last Backup Status Foundation, Stage 56 Export Center Foundation, Stage 57 Recovery Mode / Safe Mode Foundation, Stage 58 Finance Monthly Plan Foundation, Stage 59 Personal Manual Foundation, Stage 60 Personal Manual QA & Release Hardening, Stage 61 Personal Manual Export Center Integration, Stage 62 Bundle Size Audit & Initial Load Hardening, Stage 63 Personal Manual Weekly Review Integration, Stage 64 Personal Manual Search & Focus Navigation, Stage 65 Personal Manual Templates Foundation, Stage 66 Personal Manual Mobile & Dense Page Polish, Stage 67 Personal Manual Track Release Hardening, Stage 68 v1.50 Release Hardening, Stage 69 Goals Track Foundation, Stage 70 Goals Track QA & Mobile Hardening, Stage 71 Goals Templates & Quick Start, Stage 72 Life Areas Foundation, Stage 73 App Startup Resilience & Release Hygiene, Stage 74 Pull Request CI Foundation, Stage 75 Life Areas QA & Mobile Hardening, and Stage 76 Goals ↔ Life Areas Derived Integration, and remains ready for static GitHub Pages deployment.
-- Current Stage: Stage 76 Completed
+- Current status: AliOS includes validated mobile-first Inbox capture, processing, global search, focused search-result navigation, filters, bulk triage, local appearance switching, local profile preferences, calendar month view foundation, home time-window routine nudges, upcoming task grouping, routine templates foundation, Wellness / Badminton Routine foundation, visual motion polish, premium Home dashboard visual upgrade, premium app shell polish, Home dashboard customization, premium reusable components, lightweight Personal Insights, Stage 37 premium Home showcase polish, light core-page visual alignment, hardened backup/restore safety, Stage 38 UI regression QA and release hardening with desktop sticky sidebar accessibility improvements, Stage 39 topbar dashboard controls plus accent color personalization, Stage 40 finance foundation, Stage 41 finance review and budget guard, Stage 42 lightweight finance charts foundation, Stage 43 lightweight motion and interaction polish, Stage 44 finance mobile UX and section navigation, Stage 45 performance audit and bundle optimization, Stage 46 Home collapsible dashboard sections, Stage 47 Settings Help Center Foundation, Stage 48 Weekly Review Foundation, Stage 49 Decision Log Foundation, Stage 50 Backup / Restore Safety & Migration Foundation, Stage 51 App Error Boundary & Local Error Log Foundation, Stage 53 Mobile UX Hardening for dense pages, Stage 54 Empty States & First-Run Guidance Foundation, Stage 55 Backup Reminder & Last Backup Status Foundation, Stage 56 Export Center Foundation, Stage 57 Recovery Mode / Safe Mode Foundation, Stage 58 Finance Monthly Plan Foundation, Stage 59 Personal Manual Foundation, Stage 60 Personal Manual QA & Release Hardening, Stage 61 Personal Manual Export Center Integration, Stage 62 Bundle Size Audit & Initial Load Hardening, Stage 63 Personal Manual Weekly Review Integration, Stage 64 Personal Manual Search & Focus Navigation, Stage 65 Personal Manual Templates Foundation, Stage 66 Personal Manual Mobile & Dense Page Polish, Stage 67 Personal Manual Track Release Hardening, Stage 68 v1.50 Release Hardening, Stage 69 Goals Track Foundation, Stage 70 Goals Track QA & Mobile Hardening, Stage 71 Goals Templates & Quick Start, Stage 72 Life Areas Foundation, Stage 73 App Startup Resilience & Release Hygiene, Stage 74 Pull Request CI Foundation, Stage 75 Life Areas QA & Mobile Hardening, Stage 76 Goals ↔ Life Areas Derived Integration, and Stage 77 Goals & Life Areas Release Hardening, and remains ready for static GitHub Pages deployment.
+- Current Stage: Stage 77 Completed
 
 ## Architecture References
 
@@ -38,7 +38,7 @@
 
 ## Completed Stages
 
-Stages 1–76 are complete.
+Stages 1–77 are complete.
 
 - Stage 1 â€” Foundation
 - Stage 2 â€” App Shell
@@ -115,6 +115,7 @@ Stages 1–76 are complete.
 - Stage 74 â€” Pull Request CI Foundation
 - Stage 75 â€” Life Areas QA & Mobile Hardening
 - Stage 76 â€” Goals ↔ Life Areas Derived Integration
+- Stage 77 â€” Goals & Life Areas Release Hardening
 
 Stage 54 completion is evidenced by the calmer bilingual empty-state guidance across Home, Finance, Decisions, Weekly Review, Inbox, Projects, Journal, Knowledge, and Settings. The stage adds no schema migration, no backup-format change, no backup-version bump, no route redesign, no onboarding modal or tour, no backend, no sync, no cloud, no AI, no telemetry, and no new dependency. It keeps the existing local-first repository/storage-adapter boundaries intact while giving low-data users a clearer first step.
 
@@ -161,6 +162,8 @@ Stage 74 completion is evidenced by the least-privilege pull-request validation 
 Stage 75 completion is evidenced by focused direct coverage for Life Areas canonical definitions, persisted-value merging, filtering, review-due timing, satisfaction summaries, attention states, sorting, and malformed dates, plus a narrow-screen hardening pass across Life Area cards, filters, forms, badges, tags, and actions. The mobile smoke checklist now explicitly covers 360px, 390px, and 430px widths, both interface languages, long content, Reset, Mark reviewed, and focused Global Search navigation. The stage preserves all behavior and repository/storage boundaries and adds no dependency, route change, Dexie schema change, backup-format change, backup-version change, backend, sync, cloud, AI, telemetry, or user-data mutation.
 
 Stage 76 completion is evidenced by the derived Goals ↔ Life Areas integration, which matches the existing `Goal.area` and `LifeArea.areaKey` values in memory to show per-area goal totals, active and completed counts, and average active progress. Life Areas now open Goals with a validated URL-backed area filter, while Goal cards navigate back to the matching Life Area through the existing `focusId` pattern. The integration is non-cascading and failure-isolated, adds focused helper and navigation coverage, and changes no dependency, repository contract, Dexie schema, backup format, backup version, backend, sync, cloud, AI, telemetry, or stored relationship.
+
+Stage 77 completion is evidenced by focused bilingual server-rendered coverage for both sides of the Goals and Life Areas connection, including stable filtered/focused links, linked-goal summaries, loading, unavailable-state isolation, Persian labels, and mobile-safe action classes. Area URL updates now preserve unrelated parameters without mutating their source, every canonical area round-trips through both navigation paths, and unsupported Life Area focus values clear safely. Goal cards and filters now wrap long content and stack actions at narrow widths. The stage changes no product behavior, dependency, route, repository contract, Dexie schema, backup format, backup version, backend, sync, cloud, AI, telemetry, or user data.
 
 Stage 53 completion is evidenced by the mobile-focused readability and overflow hardening pass across the dense Finance, Weekly Review, Decision Log, Settings, and Home surfaces. The stage keeps the existing product behavior intact while improving small-screen stacking, wrapping, button usability, and section readability on 360px, 390px, and 430px class devices. It does not change routes, storage, schemas, backup format, dependencies, or navigation architecture, and it remains aligned with static GitHub Pages deployment.
 Stage 48 completion is evidenced by the derived-only Weekly Review foundation, which summarizes the last seven days of existing local tasks, projects, inbox items, journal entries, knowledge items, finance records, wellness/check-in data, and routine signals where available. The stage adds deterministic observations and suggested focus rules, keeps the review window local and read-only, and stores no new weekly-review data. It uses the existing feature/repository/storage-adapter boundaries, adds no schema migration, no backup-format change, no new dependency, no backend, no sync, no cloud, and no AI, and it remains aligned with static GitHub Pages deployment.
@@ -259,7 +262,7 @@ The next stage is intentionally undefined pending explicit approval. Project con
 
 ## Git Latest Recommended Commit
 
-`feat(life-areas): connect derived goal summaries`
+`test(goals): harden goals and life areas integration`
 
 ## Build Status
 
@@ -267,7 +270,7 @@ The next stage is intentionally undefined pending explicit approval. Project con
 - Automated tests: passing (`pnpm test:run`)
 - Production build: passing (`pnpm build`)
 - Production build warning: Vite reported a chunk-size warning for the 507.21 kB main bundle
-- Automated test count: 733 passing across 43 suites
+- Automated test count: 740 passing across 44 suites
 - Pull request validation: configured (`.github/workflows/ci.yml`)
 - Last verified: 2026-07-15
 

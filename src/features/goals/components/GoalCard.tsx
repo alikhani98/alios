@@ -49,12 +49,12 @@ export function GoalCard({
   const { formatDateTime, formatDate } = useDateFormatter();
 
   return (
-    <Card className="overflow-hidden border-border/70 bg-background/90 shadow-sm">
+    <Card className="min-w-0 overflow-hidden border-border/70 bg-background/90 shadow-sm">
       <CardHeader className="space-y-3">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="min-w-0 space-y-1">
+        <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
+          <div className="min-w-0 flex-1 space-y-1">
             <CardTitle className="break-words">{goal.title}</CardTitle>
-            <CardDescription className="break-words">
+            <CardDescription className="break-words whitespace-pre-wrap">
               {goal.description}
             </CardDescription>
           </div>
@@ -63,42 +63,56 @@ export function GoalCard({
           </StatusChip>
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          <Badge variant="secondary">{t(GOAL_AREA_LABEL_KEYS[goal.area])}</Badge>
-          <Badge variant="outline">
+        <div className="flex min-w-0 flex-wrap gap-2">
+          <Badge
+            variant="secondary"
+            className="max-w-full break-words whitespace-normal text-start"
+          >
+            {t(GOAL_AREA_LABEL_KEYS[goal.area])}
+          </Badge>
+          <Badge
+            variant="outline"
+            className="max-w-full break-words whitespace-normal text-start"
+          >
             {t(GOAL_TIMEFRAME_LABEL_KEYS[goal.timeframe])}
           </Badge>
-          <Badge variant="outline">
+          <Badge
+            variant="outline"
+            className="max-w-full break-words whitespace-normal text-start"
+          >
             {t(GOAL_IMPORTANCE_LABEL_KEYS[goal.importance])}
           </Badge>
-          <Badge variant="outline">
+          <Badge
+            variant="outline"
+            className="max-w-full break-words whitespace-normal text-start"
+          >
             {t("goals.progressLabel")}: {goal.progressPercent}%
           </Badge>
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4">
+      <CardContent className="min-w-0 space-y-4">
         <MiniProgressBar
           value={goal.progressPercent}
           label={t("goals.progressLabel")}
         />
 
         <div className="grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
-          <p>
+          <p className="min-w-0 break-words">
             {t("goals.targetDateLabel")}:{" "}
             {goal.targetDate ? formatDate(goal.targetDate) : t("common.notRecorded")}
           </p>
-          <p>
+          <p className="min-w-0 break-words">
             {t("goals.reviewIntervalDaysLabel")}:{" "}
             {goal.reviewIntervalDays ?? t("common.notRecorded")}
           </p>
-          <p>
+          <p className="min-w-0 break-words">
             {t("goals.lastReviewedLabel")}:{" "}
             {goal.lastReviewedAt
               ? formatDateTime(goal.lastReviewedAt)
               : t("common.notRecorded")}
           </p>
-          <p>
+          <p className="min-w-0 break-words">
             {t("goals.updatedAtLabel")}: {formatDateTime(goal.updatedAt)}
           </p>
         </div>
@@ -106,27 +120,38 @@ export function GoalCard({
         {goal.tags.length > 0 ? (
           <div className="flex flex-wrap gap-2">
             {goal.tags.map((tag) => (
-              <Badge key={tag} variant="secondary">
+              <Badge
+                key={tag}
+                variant="secondary"
+                className="max-w-full break-words whitespace-normal text-start"
+              >
                 {tag}
               </Badge>
             ))}
           </div>
         ) : null}
 
-        <div className="flex flex-wrap gap-2 pt-1">
-          <Button size="sm" asChild>
+        <div className="flex flex-col gap-2 pt-1 sm:flex-row sm:flex-wrap">
+          <Button size="sm" className="w-full sm:w-auto" asChild>
             <Link to={createLifeAreaFocusPath(goal.area)}>
               <Compass className="me-2 h-4 w-4" />
               {t("goals.openLifeArea")}
             </Link>
           </Button>
-          <Button type="button" size="sm" variant="outline" onClick={onEdit}>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            className="w-full sm:w-auto"
+            onClick={onEdit}
+          >
             {t("common.edit")}
           </Button>
           <Button
             type="button"
             size="sm"
             variant="outline"
+            className="w-full sm:w-auto"
             disabled={isDeleting}
             onClick={onDelete}
           >
@@ -134,18 +159,35 @@ export function GoalCard({
             {t("common.delete")}
           </Button>
           {goal.status === "active" && isReviewDue ? (
-            <Button type="button" size="sm" variant="outline" onClick={onMarkReviewed}>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              className="w-full sm:w-auto"
+              onClick={onMarkReviewed}
+            >
               <Clock3 className="me-2 h-4 w-4" />
               {t("goals.markReviewed")}
             </Button>
           ) : null}
           {goal.status !== "completed" ? (
-            <Button type="button" size="sm" onClick={onMarkCompleted}>
+            <Button
+              type="button"
+              size="sm"
+              className="w-full sm:w-auto"
+              onClick={onMarkCompleted}
+            >
               <CheckCircle2 className="me-2 h-4 w-4" />
               {t("goals.markCompleted")}
             </Button>
           ) : (
-            <Button type="button" size="sm" variant="outline" onClick={onReactivate}>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              className="w-full sm:w-auto"
+              onClick={onReactivate}
+            >
               <RotateCcw className="me-2 h-4 w-4" />
               {t("goals.reactivate")}
             </Button>

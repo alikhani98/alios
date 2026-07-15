@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 77 - Goals & Life Areas Release Hardening
+
+- Added focused bilingual rendering coverage for the two-way Goals and Life Areas cards, filtered/focused links, linked-goal loading, and failure-isolated unavailable states
+- Hardened Goals area URL updates so unrelated parameters are preserved, unsupported Life Area focus values are ignored safely, and all canonical area paths remain stable
+- Tightened Goal cards, filters, badges, tags, metadata, empty states, and actions for long content and narrow mobile widths
+- Kept the stage behavior-preserving and local-only, with no dependency, route, repository, Dexie schema, backup format, backup version, backend, sync, cloud, AI, or user-data change
+
 ## Stage 76 - Goals ↔ Life Areas Derived Integration
 
 - Added derived linked-goal summaries to every Life Area using the existing shared canonical area key
