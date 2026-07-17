@@ -1,4 +1,4 @@
-import { CalendarDays, CheckCircle2, Pencil, Target, Trash2 } from "lucide-react";
+import { CalendarDays, CheckCircle2, ListChecks, Pencil, Target, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -20,10 +20,12 @@ import {
   PROJECT_STATUS_LABEL_KEYS,
 } from "../constants";
 import { createLinkedGoalPath } from "../projectGoalLinks";
+import { createProjectTodayTasksPath, type ProjectTaskProgress } from "../projectTaskProgress";
 
 type ProjectCardProps = {
   project: Project;
   linkedGoal?: Goal;
+  taskProgress?: ProjectTaskProgress;
   isLinkedGoalLoading: boolean;
   isDeleting: boolean;
   onEdit: () => void;
@@ -33,6 +35,7 @@ type ProjectCardProps = {
 export function ProjectCard({
   project,
   linkedGoal,
+  taskProgress = { total: 0, completed: 0 },
   isLinkedGoalLoading,
   isDeleting,
   onEdit,
@@ -72,6 +75,24 @@ export function ProjectCard({
       </CardHeader>
 
       <CardContent className="min-w-0 flex-1 space-y-3">
+        <div className="min-w-0 rounded-2xl border bg-muted/30 p-3">
+          <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0 space-y-1">
+              <p className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                <ListChecks className="h-4 w-4 shrink-0 text-primary" />
+                {t("projects.taskProgress")}
+              </p>
+              <p className="text-sm font-medium">
+                {t("projects.taskProgressValue", taskProgress)}
+              </p>
+            </div>
+            <Button asChild size="sm" variant="outline" className="w-full shrink-0 sm:w-auto">
+              <Link to={createProjectTodayTasksPath(project.id)}>
+                {t("projects.openTodayTasks")}
+              </Link>
+            </Button>
+          </div>
+        </div>
         {project.goalId ? (
           <div className="min-w-0 rounded-2xl border border-primary/15 bg-primary/5 p-3">
             <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

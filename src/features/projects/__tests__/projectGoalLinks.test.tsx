@@ -13,6 +13,11 @@ import {
   createLinkedGoalPath,
   findLinkedGoal,
 } from "../projectGoalLinks";
+import {
+  createProjectTodayTasksPath,
+  getProjectTaskProgress,
+} from "../projectTaskProgress";
+import { taskRecord } from "@/test/factories";
 import { projectFormSchema } from "../types";
 
 function renderProjectUi(element: ReactElement): string {
@@ -35,6 +40,19 @@ describe("Project goal links", () => {
     expect(createLinkedGoalPath("goal / one")).toBe(
       "/goals?focusId=goal+%2F+one"
     );
+  });
+
+  it("summarizes linked tasks and creates a stable Today filter path", () => {
+    expect(createProjectTodayTasksPath("project / one")).toBe(
+      "/today?projectId=project+%2F+one"
+    );
+    expect(
+      getProjectTaskProgress("fixture-id", [
+        taskRecord,
+        { ...taskRecord, id: "done-task", status: "done" },
+        { ...taskRecord, id: "other-task", projectId: "other-project" },
+      ])
+    ).toEqual({ total: 2, completed: 1 });
   });
 
   it("finds linked goals without changing unlinked legacy projects", () => {

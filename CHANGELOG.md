@@ -2,6 +2,11 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 88 - Project Task Progress View
+
+- Added derived linked-task totals and completed counts to Project cards using existing `Task.projectId` data
+- Added stable Project → Today filtered navigation without changing task, project, backup, or storage contracts
+
 ## Stage 87 - Backup / Restore Round-Trip Integrity Guard
 
 - Strengthened the full Dexie backup test into a true export → clear → restore → re-export round trip across every supported table

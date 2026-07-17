@@ -61,6 +61,10 @@ export function TodayPage() {
   const [focusMessage, setFocusMessage] = useState<string | null>(null);
   const taskRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const focusId = searchParams.get("focusId");
+  const projectId = searchParams.get("projectId");
+  const visibleTasks = projectId
+    ? tasks.filter((task) => task.projectId === projectId)
+    : tasks;
 
   const showError = (caught: unknown, fallback: string) => {
     setActionError(caught instanceof Error ? caught.message : fallback);
@@ -187,9 +191,9 @@ export function TodayPage() {
       return;
     }
 
-    const focusedTask = tasks.find((task) => task.id === focusId);
+    const focusedTask = visibleTasks.find((task) => task.id === focusId);
     if (!focusedTask) {
-      if (!isLoading && tasks.length > 0) {
+      if (!isLoading && visibleTasks.length > 0) {
         setFocusedTaskId(null);
         setFocusMessage(t("search.focusItemNotVisible"));
       }
@@ -206,7 +210,7 @@ export function TodayPage() {
     }, 2200);
 
     return () => window.clearTimeout(timeout);
-  }, [focusId, isLoading, tasks, t]);
+  }, [focusId, isLoading, t, visibleTasks]);
 
   return (
     <section className="alios-page space-y-6">
@@ -342,7 +346,7 @@ export function TodayPage() {
             <div key={item} className="h-28 animate-pulse rounded-2xl border bg-muted/60" />
           ))}
         </div>
-      ) : tasks.length === 0 ? (
+      ) : visibleTasks.length === 0 ? (
         <EmptyState
           icon={<CheckSquare2 className="h-6 w-6" />}
           title={t("today.noTasks")}
@@ -356,7 +360,7 @@ export function TodayPage() {
         />
       ) : (
         <div className="space-y-3">
-          {tasks.map((task) => (
+          {visibleTasks.map((task) => (
             <div
               key={task.id}
               ref={(node) => {
