@@ -64,6 +64,8 @@ Stage 85 hardens the existing initial-load path with measured Vite vendor chunki
 
 Stage 86 adds a dependency-free build-performance regression guard and PR-CI gate for the Stage 85 entry budget, form-preload boundary, and Vite warning check. It adds no runtime behavior, data collection, dependency, storage, route, backup, or product feature.
 
+Stage 87 adds a full automated backup / clear / restore / re-export integrity guard across every supported local table and the optional Goal → Project → Task links, without changing the version-1 backup format, storage model, dependencies, routes, or product behavior.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1

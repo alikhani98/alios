@@ -2,6 +2,12 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 87 - Backup / Restore Round-Trip Integrity Guard
+
+- Strengthened the full Dexie backup test into a true export → clear → restore → re-export round trip across every supported table
+- Added explicit identity-link assertions for Goal → Project → Task so optional planning links cannot silently disappear from backups
+- Kept the stage test-only and local-first, with no runtime behavior, route, storage schema, backup version, dependency, backend, sync, cloud, AI, telemetry, or user-data change
+
 ## Stage 86 - Performance Regression Guard
 
 - Added a dependency-free `pnpm performance:check` command that produces a Vite manifest and enforces the initial-entry budget, the no-forms-preload boundary, and absence of the Vite chunk-size warning
