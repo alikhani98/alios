@@ -401,3 +401,18 @@ Reason:
 - One native primitive removes visual drift and makes future accessibility or mobile improvements apply consistently without changing form-domain behavior
 - Preserving the browser-native control avoids a new dependency, custom popup behavior, focus-management complexity, and RTL risk
 - Keeping focused overrides explicit supports real layout needs without creating another component variant system prematurely
+
+## ADR-031: Keep shell overlay accessibility local and dependency-free
+
+Decision:
+
+- The Topbar owns the focus lifecycle for its non-modal appearance, dashboard, and profile panels
+- Opening a Topbar panel moves focus to its first interactive control; Escape closes the panel and returns focus to the trigger
+- The mobile sidebar is treated as the app-shell modal dialog and owns close-button focus, Escape dismissal, Tab containment, and focus restoration to its opener
+- No generic modal framework or dependency is introduced until another approved product surface demonstrates a shared need
+
+Reason:
+
+- The prior shell panels were visually available but did not provide a complete, predictable keyboard path for opening, dismissing, and returning to the originating control
+- The mobile sidebar blocks route interaction while open, so its keyboard behavior must match its modal presentation
+- The two overlay types have deliberately different semantics; a small local implementation preserves the existing shell architecture without prematurely adding a global abstraction

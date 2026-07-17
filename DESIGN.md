@@ -309,6 +309,8 @@ Material UI work is incomplete until these checks pass:
 - icon-only controls have accessible names;
 - headings form a sensible hierarchy;
 - collapsible controls expose `aria-expanded` and `aria-controls`;
+- shell popovers expose their expanded state and controlled panel, move focus into the opened panel, and return focus to the trigger after Escape;
+- modal shell surfaces announce their label, keep Tab focus inside while open, and restore focus to their opener after dismissal;
 - errors and status changes have readable text;
 - touch targets remain at least 40 px and normally 44 px;
 - content does not require color, hover, or motion alone to be understood;

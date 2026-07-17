@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 
 import { getNavigationItemByPath } from "@/shared/constants/navigation";
@@ -29,6 +29,9 @@ export function AppShell() {
   const location = useLocation();
   const currentNavigationItem = getNavigationItemByPath(location.pathname);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const closeMobileSidebar = useCallback(() => {
+    setMobileSidebarOpen(false);
+  }, []);
   const { value: appearancePreference } = usePersistentString({
     key: APPEARANCE_STORAGE_KEY,
     defaultValue: DEFAULT_APPEARANCE_PREFERENCE,
@@ -107,7 +110,7 @@ export function AppShell() {
 
         <MobileSidebar
           open={mobileSidebarOpen}
-          onClose={() => setMobileSidebarOpen(false)}
+          onClose={closeMobileSidebar}
         />
 
         <div className="flex min-w-0 flex-1 flex-col min-h-0 overflow-x-hidden">

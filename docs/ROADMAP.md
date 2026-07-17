@@ -56,7 +56,9 @@ Stage 81 establishes a repository-native AliOS design system contract for consis
 
 Stage 82 adopts the design contract for form controls by adding one shared Select primitive and migrating all existing feature-level native selects while preserving their values, handlers, labels, options, and form registration.
 
-Stage 83 UI Accessibility & Design Contract Release Hardening is a candidate only and remains unapproved. If approved, it should run representative bilingual keyboard and narrow-screen smoke passes, address only evidenced defects, and release-harden the Stage 81–82 design-system track without a broad visual redesign.
+Stage 83 release-hardens the Stage 81–82 design-system track with keyboard-focus behavior for Topbar panels and the mobile sidebar, focused regression coverage, and a bilingual/narrow-screen smoke checklist. It adds no new product capability, dependency, storage change, or visual redesign.
+
+No Stage 84 implementation scope is approved. The next decision should follow real-world use of the current local-first product.
 
 ## Version 1.1
 
