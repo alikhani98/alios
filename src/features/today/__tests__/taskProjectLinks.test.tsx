@@ -9,8 +9,10 @@ import { projectRecord, taskRecord } from "@/test/factories";
 import { TodayTaskCard } from "../components/TodayTaskCard";
 import { TodayTaskForm } from "../components/TodayTaskForm";
 import {
+  createAllTodayTasksPath,
   createLinkedProjectPath,
   findLinkedProject,
+  findProjectFilter,
 } from "../taskProjectLinks";
 import { todayTaskFormSchema } from "../types";
 
@@ -40,6 +42,13 @@ describe("Task project links", () => {
     expect(createLinkedProjectPath("project / one")).toBe(
       "/projects?focusId=project+%2F+one"
     );
+  });
+
+  it("resolves and clears a safe Today project filter", () => {
+    expect(createAllTodayTasksPath()).toBe("/today");
+    expect(findProjectFilter(projectRecord.id, [projectRecord])).toEqual(projectRecord);
+    expect(findProjectFilter("deleted-project", [projectRecord])).toBeUndefined();
+    expect(findProjectFilter(null, [projectRecord])).toBeUndefined();
   });
 
   it("finds linked projects without changing unlinked legacy tasks", () => {

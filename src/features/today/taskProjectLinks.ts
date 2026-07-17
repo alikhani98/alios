@@ -5,6 +5,19 @@ export function createLinkedProjectPath(projectId: string): string {
   return `/projects?${searchParams.toString()}`;
 }
 
+export function createAllTodayTasksPath(): string {
+  return "/today";
+}
+
+export function findProjectFilter(
+  projectId: string | null,
+  projects: ReadonlyArray<Project>
+): Project | undefined {
+  return projectId
+    ? projects.find((project) => project.id === projectId)
+    : undefined;
+}
+
 export function findLinkedProject(
   task: Pick<Task, "projectId">,
   projects: ReadonlyArray<Project>

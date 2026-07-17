@@ -2,6 +2,7 @@ import { AlertCircle, CalendarDays, CheckSquare2, Plus, RotateCcw } from "lucide
 import { format } from "date-fns";
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import type { UpdateTaskInput } from "@/core/repositories";
 import { useProjects } from "@/features/projects/hooks/useProjects";
@@ -23,7 +24,11 @@ import { DailyCheckinForm } from "../components/DailyCheckinForm";
 import { TodayTaskCard } from "../components/TodayTaskCard";
 import { TodayTaskForm } from "../components/TodayTaskForm";
 import { useTodayData } from "../hooks/useTodayData";
-import { findLinkedProject } from "../taskProjectLinks";
+import {
+  createAllTodayTasksPath,
+  findLinkedProject,
+  findProjectFilter,
+} from "../taskProjectLinks";
 import type { DailyCheckinFormValues, TodayTaskFormValues } from "../types";
 
 export function TodayPage() {
@@ -62,6 +67,7 @@ export function TodayPage() {
   const taskRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const focusId = searchParams.get("focusId");
   const projectId = searchParams.get("projectId");
+  const filteredProject = findProjectFilter(projectId, projects);
   const visibleTasks = projectId
     ? tasks.filter((task) => task.projectId === projectId)
     : tasks;
@@ -229,6 +235,24 @@ export function TodayPage() {
           />
         </CardContent>
       </PremiumCard>
+
+      {projectId ? (
+        <div
+          role="status"
+          className="flex flex-col gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-4 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <p className="min-w-0 break-words text-sm text-foreground">
+            {filteredProject
+              ? t("today.projectFilterActive", { title: filteredProject.title })
+              : t("today.projectFilterUnavailable")}
+          </p>
+          <Button asChild size="sm" variant="outline" className="w-full shrink-0 sm:w-auto">
+            <Link to={createAllTodayTasksPath()}>
+              {t("today.clearProjectFilter")}
+            </Link>
+          </Button>
+        </div>
+      ) : null}
 
       {successMessage ? (
         <div
