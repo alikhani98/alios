@@ -2,6 +2,11 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 89 - Today Project Filter Context
+
+- Added clear bilingual context and a reset action when Today is filtered from a Project
+- Kept an unavailable linked Project safe and non-blocking without changing task data or routes
+
 ## Stage 88 - Project Task Progress View
 
 - Added derived linked-task totals and completed counts to Project cards using existing `Task.projectId` data

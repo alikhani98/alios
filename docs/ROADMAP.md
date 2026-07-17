@@ -68,6 +68,8 @@ Stage 87 adds a full automated backup / clear / restore / re-export integrity gu
 
 Stage 88 surfaces derived linked-task progress on Projects and adds a stable Today project filter using the existing optional task-project relationship, with no schema, backup, dependency, or backend change.
 
+Stage 89 makes the Today project filter visible and reversible, including a safe unavailable-project state, without changing storage, backup, dependencies, or routes.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1
