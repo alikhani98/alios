@@ -16,7 +16,7 @@ import { parseLifeAreaFocusSearchParam } from "@/features/goals/goalAreaNavigati
 import { useGoals } from "@/features/goals/hooks/useGoals";
 import { useI18n } from "@/shared/i18n";
 import type { LifeAreaKey } from "@/shared/types";
-import { Badge, Button, EmptyState, Input, MetricCard, PremiumCard, SectionHeader, StatusChip } from "@/shared/ui";
+import { Badge, Button, EmptyState, Input, MetricCard, PremiumCard, SectionHeader, StatusChip, Select } from "@/shared/ui";
 import { cn } from "@/shared/utils";
 
 import { LifeAreaCard } from "../components/LifeAreaCard";
@@ -422,34 +422,32 @@ export function LifeAreasPage() {
                 aria-label={t("lifeAreas.searchLabel")}
               />
             </div>
-            <select
+            <Select
               value={statusFilter}
               onChange={(event) =>
                 setStatusFilter(event.target.value as typeof statusFilter)
               }
               aria-label={t("lifeAreas.statusFilter")}
-              className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
             >
               {LIFE_AREA_STATUS_OPTIONS.map((option) => (
                 <option key={String(option.value)} value={option.value}>
                   {t(option.labelKey)}
                 </option>
               ))}
-            </select>
-            <select
+            </Select>
+            <Select
               value={attentionFilter}
               onChange={(event) =>
                 setAttentionFilter(event.target.value as typeof attentionFilter)
               }
               aria-label={t("lifeAreas.attentionFilter")}
-              className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
             >
               {LIFE_AREA_ATTENTION_OPTIONS.map((option) => (
                 <option key={String(option.value)} value={option.value}>
                   {t(option.labelKey)}
                 </option>
               ))}
-            </select>
+            </Select>
             <div className="flex min-w-0 flex-col gap-2 sm:flex-row md:flex-col xl:flex-row">
               <Button type="button" className="w-full md:w-auto" onClick={handleSearch}>
                 {t("lifeAreas.search")}

@@ -1,5 +1,5 @@
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { readFileSync, readdirSync } from "node:fs";
+import { join, resolve } from "node:path";
 
 import { describe, expect, it } from "vitest";
 
@@ -7,6 +7,18 @@ import { accentColorPreferences } from "@/shared/preferences";
 
 function readRepositoryFile(path: string) {
   return readFileSync(resolve(process.cwd(), path), "utf8");
+}
+
+function listProductionTsxFiles(directory: string): string[] {
+  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const path = join(directory, entry.name);
+
+    if (entry.isDirectory()) {
+      return entry.name === "__tests__" ? [] : listProductionTsxFiles(path);
+    }
+
+    return entry.isFile() && path.endsWith(".tsx") ? [path] : [];
+  });
 }
 
 describe("AliOS design system contract", () => {
@@ -40,5 +52,16 @@ describe("AliOS design system contract", () => {
     accentColorPreferences.forEach((preference) => {
       expect(contract).toContain(preference);
     });
+  });
+
+  it("keeps native select rendering inside the shared primitive", () => {
+    const sharedSelectPath = resolve(process.cwd(), "src/shared/ui/select.tsx");
+    const offenders = listProductionTsxFiles(resolve(process.cwd(), "src"))
+      .filter((path) => path !== sharedSelectPath)
+      .filter((path) => /<select(?:\s|>)/.test(readFileSync(path, "utf8")))
+      .map((path) => path.replace(`${resolve(process.cwd())}/`, ""));
+
+    expect(offenders).toEqual([]);
+    expect(readFileSync(sharedSelectPath, "utf8")).toMatch(/<select(?:\s|>)/);
   });
 });

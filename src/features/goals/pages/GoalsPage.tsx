@@ -23,6 +23,7 @@ import {
   PremiumCard,
   SectionHeader,
   StatusChip,
+  Select,
 } from "@/shared/ui";
 import { cn } from "@/shared/utils";
 
@@ -573,21 +574,20 @@ export function GoalsPage() {
                 aria-label={t("goals.searchLabel")}
               />
             </div>
-            <select
+            <Select
               value={statusFilter}
               onChange={(event) =>
                 setStatusFilter(event.target.value as GoalFilter["status"])
               }
               aria-label={t("goals.statusFilter")}
-              className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
             >
               {GOAL_STATUS_OPTIONS.map((option) => (
                 <option key={String(option.value)} value={option.value}>
                   {t(option.labelKey)}
                 </option>
               ))}
-            </select>
-            <select
+            </Select>
+            <Select
               value={areaFilter}
               onChange={(event) =>
                 handleAreaFilterChange(
@@ -595,42 +595,39 @@ export function GoalsPage() {
                 )
               }
               aria-label={t("goals.areaFilter")}
-              className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
             >
               {GOAL_AREA_OPTIONS.map((option) => (
                 <option key={String(option.value)} value={option.value}>
                   {t(option.labelKey)}
                 </option>
               ))}
-            </select>
-            <select
+            </Select>
+            <Select
               value={timeframeFilter}
               onChange={(event) =>
                 setTimeframeFilter(event.target.value as GoalFilter["timeframe"])
               }
               aria-label={t("goals.timeframeFilter")}
-              className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
             >
               {GOAL_TIMEFRAME_OPTIONS.map((option) => (
                 <option key={String(option.value)} value={option.value}>
                   {t(option.labelKey)}
                 </option>
               ))}
-            </select>
-            <select
+            </Select>
+            <Select
               value={importanceFilter}
               onChange={(event) =>
                 setImportanceFilter(event.target.value as GoalFilter["importance"])
               }
               aria-label={t("goals.importanceFilter")}
-              className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
             >
               {GOAL_IMPORTANCE_OPTIONS.map((option) => (
                 <option key={String(option.value)} value={option.value}>
                   {t(option.labelKey)}
                 </option>
               ))}
-            </select>
+            </Select>
             <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
               <Button
                 type="button"

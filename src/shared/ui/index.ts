@@ -7,5 +7,6 @@ export * from "./input";
 export * from "./premium";
 export * from "./page-placeholder";
 export * from "./route-loading-fallback";
+export * from "./select";
 export * from "./separator";
 export * from "./textarea";

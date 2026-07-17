@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 
 import type { DecisionLogEntry } from "@/shared/types";
 import { useI18n, type TranslationKey } from "@/shared/i18n";
-import { Button, Input, Textarea, CollapsibleSection } from "@/shared/ui";
+import { Button, Input, Textarea, CollapsibleSection, Select } from "@/shared/ui";
 
 import { decisionLogStatusValues } from "@/shared/types";
 import { decisionLogFormSchema, type DecisionLogFormValues } from "../types";
@@ -98,9 +98,8 @@ export function DecisionLogForm({
             <label htmlFor="decision-status" className="text-sm font-medium">
               {t("common.status")}
             </label>
-            <select
+            <Select
               id="decision-status"
-              className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
               {...register("status")}
             >
               {decisionLogStatusValues.map((value) => (
@@ -108,7 +107,7 @@ export function DecisionLogForm({
                   {t(statusLabelKeys[value])}
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
 
           <div className="grid gap-2">
@@ -141,9 +140,8 @@ export function DecisionLogForm({
             <label htmlFor="decision-confidence" className="text-sm font-medium">
               {t("decisions.confidence")}
             </label>
-            <select
+            <Select
               id="decision-confidence"
-              className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
               {...register("confidence")}
             >
               {ratingOptions.map((value) => (
@@ -151,16 +149,15 @@ export function DecisionLogForm({
                   {value ? `${value}/5` : t("common.notRecorded")}
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
 
           <div className="grid gap-2">
             <label htmlFor="decision-importance" className="text-sm font-medium">
               {t("decisions.importance")}
             </label>
-            <select
+            <Select
               id="decision-importance"
-              className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
               {...register("importance")}
             >
               {ratingOptions.map((value) => (
@@ -168,7 +165,7 @@ export function DecisionLogForm({
                   {value ? `${value}/5` : t("common.notRecorded")}
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
         </div>
       </CollapsibleSection>

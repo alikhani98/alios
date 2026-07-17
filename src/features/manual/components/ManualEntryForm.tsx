@@ -1,7 +1,7 @@
 import type { FormEvent } from "react";
 
 import { useI18n } from "@/shared/i18n";
-import { Button, Input, Textarea } from "@/shared/ui";
+import { Button, Input, Textarea, Select } from "@/shared/ui";
 import type { ManualEntry } from "@/shared/types";
 
 import {
@@ -72,10 +72,9 @@ export function ManualEntryForm({
 
         <label className="space-y-1.5">
           <span className="text-sm font-medium">{t("common.type")}</span>
-          <select
+          <Select
             name="category"
             defaultValue={entry?.category ?? "other"}
-            className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
           >
             {MANUAL_CATEGORY_OPTIONS.filter((option) => option.value !== "all").map(
               (option) => (
@@ -84,7 +83,7 @@ export function ManualEntryForm({
                 </option>
               )
             )}
-          </select>
+          </Select>
         </label>
       </div>
 
@@ -102,10 +101,9 @@ export function ManualEntryForm({
       <div className="grid gap-3 lg:grid-cols-3">
         <label className="space-y-1.5">
           <span className="text-sm font-medium">{t("common.status")}</span>
-          <select
+          <Select
             name="status"
             defaultValue={entry?.status ?? "active"}
-            className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
           >
             {MANUAL_STATUS_OPTIONS.filter((option) => option.value !== "all").map(
               (option) => (
@@ -114,22 +112,21 @@ export function ManualEntryForm({
                 </option>
               )
             )}
-          </select>
+          </Select>
         </label>
 
         <label className="space-y-1.5">
           <span className="text-sm font-medium">{t("common.priority")}</span>
-          <select
+          <Select
             name="importance"
             defaultValue={entry?.importance ?? "medium"}
-            className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
           >
             {MANUAL_IMPORTANCE_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
                 {t(option.labelKey)}
               </option>
             ))}
-          </select>
+          </Select>
         </label>
 
         <label className="space-y-1.5">

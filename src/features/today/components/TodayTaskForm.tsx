@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { PROJECT_STATUS_LABEL_KEYS } from "@/features/projects/constants";
 import type { Project, Task } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
-import { Button, Input, Textarea } from "@/shared/ui";
+import { Button, Input, Textarea, Select } from "@/shared/ui";
 import { TASK_PRIORITY_OPTIONS, TASK_STATUS_OPTIONS } from "../constants";
 import { todayTaskFormSchema, type TodayTaskFormValues } from "../types";
 
@@ -83,9 +83,8 @@ export function TodayTaskForm({
         <label htmlFor="today-task-project" className="text-sm font-medium">
           {t("today.linkedProject")}
         </label>
-        <select
+        <Select
           id="today-task-project"
-          className="flex h-11 w-full min-w-0 rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
           {...register("projectId")}
         >
           <option value="">{t("today.noLinkedProject")}</option>
@@ -100,7 +99,7 @@ export function TodayTaskForm({
               {project.title} · {t(PROJECT_STATUS_LABEL_KEYS[project.status])}
             </option>
           ))}
-        </select>
+        </Select>
         <p className="break-words text-sm leading-6 text-muted-foreground">
           {isProjectsLoading
             ? t("today.linkedProjectLoading")
@@ -115,9 +114,8 @@ export function TodayTaskForm({
           <label htmlFor="today-task-status" className="text-sm font-medium">
             {t("common.status")}
           </label>
-          <select
+          <Select
             id="today-task-status"
-            className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
             {...register("status")}
           >
             {TASK_STATUS_OPTIONS.map((option) => (
@@ -125,16 +123,15 @@ export function TodayTaskForm({
                 {t(option.labelKey)}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
 
         <div className="grid gap-2">
           <label htmlFor="today-task-priority" className="text-sm font-medium">
             {t("common.priority")}
           </label>
-          <select
+          <Select
             id="today-task-priority"
-            className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
             {...register("priority")}
           >
             {TASK_PRIORITY_OPTIONS.map((option) => (
@@ -142,7 +139,7 @@ export function TodayTaskForm({
                 {t(option.labelKey)}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
       </div>
 

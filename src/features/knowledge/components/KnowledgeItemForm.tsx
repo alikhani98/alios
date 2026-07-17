@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 
 import type { KnowledgeItem } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
-import { Button, Input, Textarea } from "@/shared/ui";
+import { Button, Input, Textarea, Select } from "@/shared/ui";
 import { KNOWLEDGE_TYPE_OPTIONS } from "../constants";
 import {
   knowledgeItemFormSchema,
@@ -65,9 +65,8 @@ export function KnowledgeItemForm({
           <label htmlFor="knowledge-type" className="text-sm font-medium">
             {t("common.type")}
           </label>
-          <select
+          <Select
             id="knowledge-type"
-            className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
             {...register("type")}
           >
             {KNOWLEDGE_TYPE_OPTIONS.map((option) => (
@@ -75,7 +74,7 @@ export function KnowledgeItemForm({
                 {t(option.labelKey)}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
       </div>
 

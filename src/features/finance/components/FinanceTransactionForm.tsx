@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 
 import type { FinanceTransaction } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
-import { Button, Input, Textarea } from "@/shared/ui";
+import { Button, Input, Textarea, Select } from "@/shared/ui";
 import {
   DEFAULT_FINANCE_TRANSACTION_CATEGORY,
   FINANCE_CATEGORY_OPTIONS,
@@ -82,9 +82,8 @@ export function FinanceTransactionForm({
           <label htmlFor="finance-transaction-type" className="text-sm font-medium">
             {t("common.type")}
           </label>
-          <select
+          <Select
             id="finance-transaction-type"
-            className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:text-sm"
             {...register("type")}
           >
             {FINANCE_TRANSACTION_TYPE_OPTIONS.map((option) => (
@@ -92,7 +91,7 @@ export function FinanceTransactionForm({
                 {t(option.labelKey)}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
       </div>
 
@@ -119,9 +118,8 @@ export function FinanceTransactionForm({
           <label htmlFor="finance-transaction-category" className="text-sm font-medium">
             {t("finance.category")}
           </label>
-          <select
+          <Select
             id="finance-transaction-category"
-            className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:text-sm"
             {...register("category")}
           >
             {FINANCE_CATEGORY_OPTIONS.map((option) => (
@@ -129,7 +127,7 @@ export function FinanceTransactionForm({
                 {t(option.labelKey)}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
 
         <div className="grid gap-2">

@@ -247,6 +247,17 @@ Use this checklist after a material UI change. Stage 81 only documents the exist
 6. Exercise the relevant loading, empty, no-result, unavailable, validation, success, error, and destructive-confirmation states.
 7. Confirm there is no horizontal page overflow and that actions, badges, tags, URLs, and mixed Persian/English text wrap safely.
 
+## Stage 82 shared Select smoke test
+
+Use this checklist after applying Stage 82 or changing the shared select primitive:
+
+1. At 360px, 390px, and 430px widths, open create/edit forms and filters in Today, Projects, Goals, Life Areas, Inbox, Journal, Knowledge, Finance, Decisions, and Personal Manual.
+2. Confirm every select keeps its expected options, current value, change behavior, visible label or accessible name, and validation behavior.
+3. Verify Persian RTL and English LTR layouts, including long translated options, without horizontal overflow or clipped focus rings.
+4. Navigate selects by keyboard and confirm a visible focus ring, native option selection, and a clear disabled state.
+5. On a Today task card, confirm the compact status select still becomes content-width on larger screens while remaining full-width on mobile.
+6. Create and edit representative records to confirm React Hook Form registration and saved values remain unchanged.
+
 ## Deferred mobile capabilities
 
 - Offline service-worker caching

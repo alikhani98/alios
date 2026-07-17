@@ -16,7 +16,7 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 ## Automated release gates
 
 - [x] `pnpm exec tsc --noEmit`
-- [x] `pnpm test:run` — 774 tests across 47 suites
+- [x] `pnpm test:run` — 777 tests across 48 suites
 - [x] `pnpm build`
 - [x] Repository create, list, read, update, and delete coverage
 - [x] Backup metadata and all currently supported additive arrays
@@ -73,6 +73,16 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] External DesignMD-style documents remain advisory and cannot overwrite the AliOS contract or introduce dependencies without explicit approval
 - [x] The stage changes no runtime UI, package, route, repository, Dexie schema, backup format, or user data
 - [x] TypeScript, 774 automated tests across 47 suites, and the production build pass
+
+### Stage 82 design contract adoption and form control consistency
+
+- [x] The shared `Select` primitive owns mobile sizing, semantic styling, focus, motion, disabled state, and ref forwarding
+- [x] All 43 feature-level select controls across 18 files use the primitive while preserving their existing props and native behavior
+- [x] The compact Today task-status layout remains an explicit focused override rather than a duplicated base style
+- [x] Focused tests cover the primitive contract and the repository guard rejects native select rendering outside the shared primitive
+- [x] No dependency, route, repository, Dexie schema, backup format, backup version, or user-data change is introduced
+- [x] TypeScript, 777 automated tests across 48 suites, and the production build pass
+- [ ] Complete the Stage 82 manual select smoke pass at 360px, 390px, and 430px in Persian and English
 
 ## Production-preview QA
 
