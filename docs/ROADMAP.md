@@ -51,6 +51,7 @@ Stage 76 connects Goals and Life Areas through their existing shared canonical a
 Stage 77 release-hardens the combined Goals and Life Areas track with bilingual card rendering coverage, safer URL parameter preservation and validation, failure-isolated linked summaries, and narrow-screen wrapping without changing behavior, storage, routes, dependencies, or backup compatibility.
 Stage 78 adds an optional one-way Project → Goal identity link with bilingual selection, stable Goal navigation, safe unlinking, and non-cascading unavailable states without changing Dexie indexes, the database schema version, or backup version 1.
 Stage 79 activates the existing optional Task → Project identity link in Today with bilingual selection, stable Project navigation, safe unlinking, and non-cascading unavailable states without adding a field, index, migration, or backup change.
+Stage 80 completes Persian Life Areas localization, preserves custom user text while re-localizing untouched canonical defaults, and refreshes the static bilingual Help Center for current modules and optional planning links without changing storage, backup compatibility, dependencies, or routes.
 
 ## Version 1.1
 

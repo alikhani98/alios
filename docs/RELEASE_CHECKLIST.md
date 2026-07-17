@@ -1,6 +1,6 @@
 # AliOS v1.0 Release Checklist
 
-Automated gates last verified on 2026-07-17. The original v1.0 production-preview QA baseline remains recorded below; Stage 77 through Stage 79 mobile checks still require their documented manual browser smoke passes.
+Automated gates last verified on 2026-07-17. The original v1.0 production-preview QA baseline remains recorded below; Stage 77 through Stage 80 mobile checks still require their documented manual browser smoke passes.
 
 ## Pull request validation
 
@@ -16,7 +16,7 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 ## Automated release gates
 
 - [x] `pnpm exec tsc --noEmit`
-- [x] `pnpm test:run` — 770 tests across 46 suites
+- [x] `pnpm test:run` — 772 tests across 46 suites
 - [x] `pnpm build`
 - [x] Repository create, list, read, update, and delete coverage
 - [x] Backup metadata and all currently supported additive arrays
@@ -55,6 +55,15 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] Missing or deleted Projects do not block Task edit, status, MIT, or delete actions and do not trigger cascade changes
 - [x] No dependency, route redesign, field, Dexie table, index, or database schema-version change is introduced
 - [ ] Complete the Stage 79 manual smoke pass at 360px, 390px, and 430px in Persian and English
+
+### Stage 80 Life Areas Persian localization and Help Center refresh
+
+- [x] Every visible `lifeAreas.*` message has an explicit Persian value and the catalog regression test rejects English fallback
+- [x] Previously persisted exact canonical English defaults follow the current interface language without mutating custom user-authored text
+- [x] The static bilingual Help Center covers Life Areas, Weekly Review, Decisions, Personal Manual, Finance monthly review, planning links, backup reminders, readable exports, Recovery Mode, and the local error log
+- [x] Help content remains read-only and adds no CMS, chatbot, persistence, repository, route, dependency, or schema behavior
+- [x] TypeScript, 772 automated tests across 46 suites, and the production build pass
+- [ ] Complete the Stage 80 manual smoke pass at 360px, 390px, and 430px in Persian and English
 
 ## Production-preview QA
 
@@ -108,10 +117,11 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 ### Data and release integrity
 
 - [x] User-generated content is not translated
+- [x] Canonical Life Area defaults follow the selected language while customized Life Area content remains unchanged
 - [x] Stored dates remain ISO/Gregorian strings
 - [x] Backup format remains version 1 and unchanged
 - [x] Route-level chunks load for every feature page
-- [x] Existing main-chunk warning reviewed; Stage 79 measures 509.80 kB (up 1.32 kB from the Stage 78 baseline) and adds no production dependency
+- [x] Existing main-chunk warning reviewed; Stage 80 measures 514.73 kB (up 4.93 kB from the Stage 79 baseline) because the shared Persian catalog now contains the complete Life Areas copy and adds no production dependency
 - [x] No browser console errors during final QA
 
 ## Release procedure

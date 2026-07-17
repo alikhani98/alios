@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 80 - Life Areas Persian Localization & Help Center Refresh
+
+- Completed the Persian catalog for every visible Life Areas message and added a regression guard that rejects silent English fallback in the Persian interface
+- Re-localized untouched canonical Life Area titles and descriptions that may already have been persisted in English, while preserving user-authored custom text
+- Updated the bilingual Settings Help Center for Life Areas, Weekly Review, Decisions, Personal Manual, readable exports, Recovery Mode, and the Life Area → Goal → Project → Task planning chain
+- Kept the stage presentation- and documentation-only, with no dependency, route, repository contract, Dexie schema, backup format, backup version, backend, sync, cloud, or AI change
+
 ## Stage 79 - Tasks → Projects Link Activation
 
 - Activated the existing optional `Task.projectId` relationship in the Today task form so tasks can be linked, relinked, or unlinked from Projects

@@ -351,3 +351,19 @@ Reason:
 - Activating the dormant relationship completes the user-visible Life Area → Goal → Project → Task chain without duplicating relationship state
 - Avoiding reverse persistence and cascades keeps Today and Projects independently user-managed and preserves existing repository and storage-adapter boundaries
 - Reusing the existing field, index, and focus navigation adds useful context without storage migration or backup pressure
+
+## ADR-028: Localize canonical Life Area defaults without mutating user-authored text
+
+Decision:
+
+- Every visible `lifeAreas.*` message receives an explicit Persian catalog entry instead of silently inheriting its English source string
+- Canonical Life Area titles and descriptions remain language-aware presentation defaults
+- A persisted title or description that exactly matches a known canonical English or Persian default is rendered through the current locale so records saved by earlier versions do not remain accidentally English
+- Any value that differs from the known canonical defaults is treated as user-authored content and is preserved exactly
+- The Help Center remains static bilingual code content and is refreshed alongside the existing module set without adding persistence, CMS behavior, or runtime dependencies
+
+Reason:
+
+- Earlier Persian catalogs inherited the Life Areas source strings, and saving or marking a canonical area reviewed could persist those accidental English defaults
+- Exact known-default matching repairs the visible language without a database migration and without guessing about genuinely customized user text
+- Keeping help content static preserves the local-first architecture while making later modules and optional relationships discoverable

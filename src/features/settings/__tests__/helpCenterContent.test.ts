@@ -7,12 +7,12 @@ import {
 
 describe("settings help center content", () => {
   it("covers the beginner flow, main modules, and safety guidance in both languages", () => {
-    expect(settingsHelpCenterSections).toHaveLength(6);
+    expect(settingsHelpCenterSections).toHaveLength(7);
 
     const moduleSection = settingsHelpCenterSections.find(
       (section) => section.id === "modules"
     );
-    expect(moduleSection?.modules).toHaveLength(13);
+    expect(moduleSection?.modules).toHaveLength(19);
 
     const moduleTitles = moduleSection?.modules?.map((module) => ({
       fa: getLocalizedText("fa", module.title),
@@ -24,7 +24,16 @@ describe("settings help center content", () => {
         expect.objectContaining({ fa: "خانه", en: "Home" }),
         expect.objectContaining({ fa: "امروز", en: "Today" }),
         expect.objectContaining({ fa: "هدف‌ها", en: "Goals" }),
+        expect.objectContaining({ fa: "حوزه‌های زندگی", en: "Life Areas" }),
+        expect.objectContaining({ fa: "مرور هفتگی", en: "Weekly Review" }),
+        expect.objectContaining({ fa: "ثبت تصمیم‌ها", en: "Decisions" }),
+        expect.objectContaining({ fa: "دفترچه شخصی", en: "Personal Manual" }),
         expect.objectContaining({ fa: "مالی", en: "Finance" }),
+        expect.objectContaining({ fa: "مرکز خروجی", en: "Export Center" }),
+        expect.objectContaining({
+          fa: "حالت بازیابی و گزارش خطا",
+          en: "Recovery Mode and local error log",
+        }),
         expect.objectContaining({ fa: "تنظیمات", en: "Settings" }),
       ])
     );
@@ -43,9 +52,30 @@ describe("settings help center content", () => {
       )
     ).toBe(true);
 
+    const planningLinksSection = settingsHelpCenterSections.find(
+      (section) => section.id === "planning-links"
+    );
+    expect(planningLinksSection?.bullets).toHaveLength(5);
+    expect(
+      planningLinksSection?.bullets?.some((bullet) =>
+        getLocalizedText("en", bullet).includes("does not delete")
+      )
+    ).toBe(true);
+
+    const backupSection = settingsHelpCenterSections.find(
+      (section) => section.id === "backup"
+    );
+    expect(
+      backupSection?.bullets?.some(
+        (bullet) =>
+          getLocalizedText("en", bullet).includes("Life Areas") &&
+          getLocalizedText("fa", bullet).includes("دفترچه شخصی")
+      )
+    ).toBe(true);
+
     const checklistSection = settingsHelpCenterSections.find(
       (section) => section.id === "first-week"
     );
-    expect(checklistSection?.orderedBullets).toHaveLength(7);
+    expect(checklistSection?.orderedBullets).toHaveLength(9);
   });
 });

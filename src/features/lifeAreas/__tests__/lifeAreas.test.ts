@@ -75,6 +75,38 @@ describe("life area helpers", () => {
     });
   });
 
+  it("re-localizes previously persisted canonical English text without changing custom text", () => {
+    const persistedCanonical = {
+      ...lifeAreaRecord,
+      areaKey: "health" as const,
+      title: translate("en", "lifeAreas.healthTitle"),
+      description: translate("en", "lifeAreas.healthDescription"),
+    };
+    const persistedCustom = {
+      ...lifeAreaRecord,
+      id: "work",
+      areaKey: "work" as const,
+      title: "My work balance",
+      description: "A description written by the user.",
+    };
+
+    const merged = mergeLifeAreas(
+      [persistedCanonical, persistedCustom],
+      (key) => translate("fa", key)
+    );
+
+    expect(merged.find((area) => area.areaKey === "health")).toMatchObject({
+      title: translate("fa", "lifeAreas.healthTitle"),
+      description: translate("fa", "lifeAreas.healthDescription"),
+      isPersisted: true,
+    });
+    expect(merged.find((area) => area.areaKey === "work")).toMatchObject({
+      title: "My work balance",
+      description: "A description written by the user.",
+      isPersisted: true,
+    });
+  });
+
   it("filters by status, attention, and normalized text across area details", () => {
     const health = buildArea({
       areaKey: "health",
