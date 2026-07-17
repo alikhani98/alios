@@ -46,6 +46,14 @@ AliOS 1.0 is a local-first static web app.
 - Deleting or changing a Goal never cascades to a Project; a missing linked Goal is shown as unavailable so the Project can still be edited, unlinked, relinked, or deleted
 - Backup version 1 accepts both linked Projects and older Project records that omit `goalId`
 
+## Today Tasks Module Boundary
+
+- Tasks remain local records accessed through the Today feature hook, repository interface, and storage-adapter boundary
+- A Task may optionally store one `projectId`; Projects do not store reverse Task IDs or derived counts in Stage 79
+- `Task.projectId` and its Dexie index predate Stage 79, so activating the relationship in Today requires no new field, table, index, database schema version, or migration
+- Deleting or changing a Project never cascades to a Task; a missing linked Project is shown as unavailable so the Task can still be edited, unlinked, relinked, completed, deferred, cancelled, selected as MIT, or deleted
+- Backup version 1 accepts both linked Tasks and older Task records that omit `projectId`
+
 ## Life Areas Module Boundary
 
 - Life Areas data lives in a dedicated Dexie table for local user-managed areas of life

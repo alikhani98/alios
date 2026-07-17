@@ -2,7 +2,7 @@
 
 AliOS is a bilingual, local-first personal life-management system. It brings quick capture, Today planning, projects, journaling, personal knowledge, a read-only dashboard, monthly calendar and upcoming-task views, routine templates, Personal Manual, Personal Manual starter templates, Goals, Goals templates and quick start, Life Areas, manual backup/restore, local data controls, a compact topbar dashboard customizer with a local accent palette, a Finance foundation with a local review layer, budget guard, lightweight local charts, mobile quick navigation, collapsible sections, Jalali due-date previews, a Weekly Review foundation, a Decision Log foundation, a readable Settings export center, an app error boundary with a local error log foundation, backup/restore safety and migration validation, a beginner-friendly Help Center inside Settings, a Recovery Mode / Safe Mode foundation, Stage 53 mobile UX hardening for dense pages, Stage 54 empty-state and first-run guidance polish, Stage 55 backup reminder and last backup status foundation, Stage 56 export center foundation, Stage 57 recovery mode foundation, Stage 59 Personal Manual foundation, Stage 64 Personal Manual search and focus navigation, Stage 65 Personal Manual templates foundation, Stage 66 Personal Manual mobile and dense page polish, Stage 67 Personal Manual track release hardening, Stage 68 v1.50 release hardening, Stage 70 Goals track QA and mobile hardening, Stage 71 Goals templates and quick start, Stage 72 Life Areas foundation, and Stage 73 app startup resilience into one static web application.
 
-Stages 74–78 add pull-request validation, Life Areas QA, derived Goals ↔ Life Areas navigation, release hardening for the combined track, and an optional Project → Goal link without changing AliOS's local-only architecture.
+Stages 74–79 add pull-request validation, Life Areas QA, derived Goals ↔ Life Areas navigation, release hardening for the combined track, an optional Project → Goal link, and activation of the existing Task → Project link without changing AliOS's local-only architecture.
 
 Stage 38 was a UI regression QA and release-hardening pass. It did not add a new feature; it kept the existing local-first scope intact and hardened desktop sidebar accessibility on long scrolling pages.
 Stage 39 moves dashboard customization into the topbar and adds a local-only accent color palette for restrained visual personalization.
@@ -34,6 +34,7 @@ Stage 75 hardens Life Areas with focused deterministic helper tests and safer mo
 Stage 76 connects Goals and Life Areas with derived goal summaries and two-way area navigation using their existing shared key, without adding a stored relationship, migration, cascade, or backup change.
 Stage 77 release-hardens the Goals and Life Areas connection with bilingual card rendering tests, safer URL parameter handling, and narrow-screen wrapping without changing product behavior or storage.
 Stage 78 lets each Project optionally reference one Goal, relink or remove that reference, and open the linked Goal while preserving the Project if the Goal later becomes unavailable.
+Stage 79 activates the existing optional Task → Project relationship in Today so a task can be linked, relinked, unlinked, and navigated to its Project without cascade behavior.
 
 AliOS is designed for one person and stores its data in the browser through IndexedDB. It requires no backend, account, authentication, subscription, paid API, or hosted AI service.
 
@@ -49,6 +50,7 @@ AliOS is designed for one person and stores its data in the browser through Inde
 - Derived Goals ↔ Life Areas summaries and two-way area navigation with no additional persisted relationship
 - Release-hardened Goals and Life Areas cards, URLs, loading states, and mobile actions
 - Optional Project → Goal links with bilingual selection, safe unlinking, and non-cascading unavailable states
+- Optional Task → Project links in Today with bilingual selection, focused navigation, safe unlinking, and no schema change
 - Personal Manual track release hardening for search, review, export, backup, and mobile smoke-test coverage
 - Personal Manual mobile and dense-page polish for long titles, body previews, badges, and tag chips
 - Upcoming tasks foundation on Home with overdue, today, tomorrow, this week, and later groupings

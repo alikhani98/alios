@@ -48,6 +48,7 @@ export const taskInput: CreateTaskInput = {
   priority: "high",
   dueDate: "2026-07-05",
   isMit: true,
+  projectId: "fixture-id",
 };
 
 export const journalEntryInput: CreateJournalEntryInput = {

@@ -335,3 +335,19 @@ Reason:
 - A one-way identity reference extends the user-visible chain from Life Area to Goal to Project without duplicating relationship state on both records
 - Avoiding reverse persistence, indexes, and cascades keeps both modules independently user-managed and preserves existing repository and storage-adapter boundaries
 - An optional additive field keeps existing local data and backups compatible while still allowing stable navigation to the exact Goal
+
+## ADR-027: Activate the existing one-way Task to Project identity link
+
+Decision:
+
+- Today may create and edit the existing optional `Task.projectId`, while a Project stores no reverse Task IDs or counts in Stage 79
+- Today task cards resolve the referenced Project from existing local Project records and use the established `focusId` navigation pattern
+- The Task field and Dexie index already exist, so Stage 79 adds no field, table, index, database schema-version change, or migration
+- Deleting or changing a Project must not cascade to linked Tasks; an unresolved link remains visible as unavailable and can be removed or reassigned from the Task form
+- Backup version 1 remains unchanged, and older Task records without `projectId` remain valid
+
+Reason:
+
+- Activating the dormant relationship completes the user-visible Life Area → Goal → Project → Task chain without duplicating relationship state
+- Avoiding reverse persistence and cascades keeps Today and Projects independently user-managed and preserves existing repository and storage-adapter boundaries
+- Reusing the existing field, index, and focus navigation adds useful context without storage migration or backup pressure

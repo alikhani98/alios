@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 79 - Tasks → Projects Link Activation
+
+- Activated the existing optional `Task.projectId` relationship in the Today task form so tasks can be linked, relinked, or unlinked from Projects
+- Added bilingual linked-Project context and focused Project navigation to Today task cards, with calm loading and unavailable states
+- Preserved task usability when a linked Project is missing or deleted, with no cascade behavior or reverse Project mutation
+- Kept the existing Task field, Dexie index, database schema version, and backup version 1 unchanged, with no dependency, backend, sync, cloud, or AI change
+
 ## Stage 78 - Projects → Goals Link Foundation
 
 - Added an optional `Project.goalId` relationship so a project can be linked, relinked, or unlinked from one existing Goal

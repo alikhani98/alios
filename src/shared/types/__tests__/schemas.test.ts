@@ -36,6 +36,18 @@ describe("core domain schemas", () => {
     ).toBe(false);
   });
 
+  it("keeps legacy tasks without a project link valid", () => {
+    const { projectId: _projectId, ...legacyTask } = taskRecord;
+
+    expect(taskSchema.safeParse(legacyTask).success).toBe(true);
+  });
+
+  it("rejects an empty task project link", () => {
+    expect(taskSchema.safeParse({ ...taskRecord, projectId: "" }).success).toBe(
+      false
+    );
+  });
+
   it.each([
     ["project", projectSchema, projectRecord],
     ["task", taskSchema, taskRecord],

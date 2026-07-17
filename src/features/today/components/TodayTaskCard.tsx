@@ -1,16 +1,21 @@
-import { Pencil, Star, Trash2 } from "lucide-react";
+import { FolderKanban, Pencil, Star, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
-import type { Task, TaskStatus } from "@/shared/types";
+import { PROJECT_STATUS_LABEL_KEYS } from "@/features/projects/constants";
+import type { Project, Task, TaskStatus } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
 import { Badge, Button, Card, CardContent } from "@/shared/ui";
 import {
   TASK_PRIORITY_LABEL_KEYS,
   TASK_STATUS_OPTIONS,
 } from "../constants";
+import { createLinkedProjectPath } from "../taskProjectLinks";
 
 type TodayTaskCardProps = {
   task: Task;
+  linkedProject?: Project;
+  isLinkedProjectLoading: boolean;
   isBusy: boolean;
   onEdit: () => void;
   onStatusChange: (status: TaskStatus) => Promise<void>;
@@ -20,6 +25,8 @@ type TodayTaskCardProps = {
 
 export function TodayTaskCard({
   task,
+  linkedProject,
+  isLinkedProjectLoading,
   isBusy,
   onEdit,
   onStatusChange,
@@ -31,15 +38,21 @@ export function TodayTaskCard({
   const completed = task.status === "done" || task.status === "cancelled";
 
   return (
-    <Card className={completed ? "bg-muted/40" : undefined}>
-      <CardContent className="grid gap-4 p-5 lg:grid-cols-[1fr_auto] lg:items-center">
+    <Card
+      className={
+        completed
+          ? "min-w-0 overflow-hidden bg-muted/40"
+          : "min-w-0 overflow-hidden"
+      }
+    >
+      <CardContent className="grid min-w-0 gap-4 p-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
         <div className="min-w-0 space-y-2">
           <div className="flex flex-wrap items-center gap-2">
             <h3
               className={
                 completed
-                  ? "font-semibold text-muted-foreground line-through"
-                  : "font-semibold"
+                  ? "min-w-0 break-words font-semibold text-muted-foreground line-through"
+                  : "min-w-0 break-words font-semibold"
               }
             >
               {task.title}
@@ -50,18 +63,63 @@ export function TodayTaskCard({
                 {t("today.mit")}
               </Badge>
             ) : null}
-            <Badge variant="outline">
-              {t("today.priority", { value: t(TASK_PRIORITY_LABEL_KEYS[task.priority]) })}
+            <Badge
+              variant="outline"
+              className="max-w-full break-words whitespace-normal text-start"
+            >
+              {t("today.priority", {
+                value: t(TASK_PRIORITY_LABEL_KEYS[task.priority]),
+              })}
             </Badge>
           </div>
           {task.description ? (
-            <p className="text-sm leading-7 text-muted-foreground">
+            <p className="break-words whitespace-pre-wrap text-sm leading-7 text-muted-foreground">
               {task.description}
             </p>
           ) : null}
+          {task.projectId ? (
+            <div className="min-w-0 rounded-xl border border-primary/15 bg-primary/5 p-3">
+              <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="min-w-0 space-y-1">
+                  <p className="flex min-w-0 items-center gap-2 text-xs font-medium text-muted-foreground">
+                    <FolderKanban className="h-4 w-4 shrink-0 text-primary" />
+                    <span className="break-words">{t("today.linkedProject")}</span>
+                  </p>
+                  {linkedProject ? (
+                    <div className="flex min-w-0 flex-wrap items-center gap-2">
+                      <p className="min-w-0 break-words text-sm font-medium">
+                        {linkedProject.title}
+                      </p>
+                      <Badge variant="secondary">
+                        {t(PROJECT_STATUS_LABEL_KEYS[linkedProject.status])}
+                      </Badge>
+                    </div>
+                  ) : (
+                    <p className="break-words text-sm text-muted-foreground">
+                      {isLinkedProjectLoading
+                        ? t("today.linkedProjectLoading")
+                        : t("today.linkedProjectUnavailable")}
+                    </p>
+                  )}
+                </div>
+                {linkedProject ? (
+                  <Button
+                    asChild
+                    size="sm"
+                    variant="outline"
+                    className="w-full shrink-0 sm:w-auto"
+                  >
+                    <Link to={createLinkedProjectPath(linkedProject.id)}>
+                      {t("today.openLinkedProject")}
+                    </Link>
+                  </Button>
+                ) : null}
+              </div>
+            </div>
+          ) : null}
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center lg:justify-end">
           <select
             aria-label={t("today.statusFor", { title: task.title })}
             value={task.status}
@@ -69,7 +127,7 @@ export function TodayTaskCard({
             onChange={(event) =>
               void onStatusChange(event.target.value as TaskStatus)
             }
-            className="flex min-h-11 max-w-full rounded-lg border border-input bg-background px-3 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:text-sm"
+            className="flex min-h-11 w-full max-w-full rounded-lg border border-input bg-background px-3 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:w-auto sm:text-sm"
           >
             {TASK_STATUS_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
@@ -83,6 +141,7 @@ export function TodayTaskCard({
               type="button"
               size="sm"
               variant="ghost"
+              className="w-full sm:w-auto"
               disabled={isBusy}
               onClick={() => void onSelectMit()}
             >
@@ -97,6 +156,7 @@ export function TodayTaskCard({
                 type="button"
                 size="sm"
                 variant="destructive"
+                className="w-full sm:w-auto"
                 disabled={isBusy}
                 onClick={() => void onDelete()}
               >
@@ -106,6 +166,7 @@ export function TodayTaskCard({
                 type="button"
                 size="sm"
                 variant="ghost"
+                className="w-full sm:w-auto"
                 onClick={() => setConfirmingDelete(false)}
               >
                 {t("common.cancel")}
@@ -113,7 +174,13 @@ export function TodayTaskCard({
             </>
           ) : (
             <>
-              <Button type="button" size="sm" variant="outline" onClick={onEdit}>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                className="w-full sm:w-auto"
+                onClick={onEdit}
+              >
                 <Pencil className="me-2 h-4 w-4" />
                 {t("common.edit")}
               </Button>
@@ -121,7 +188,7 @@ export function TodayTaskCard({
                 type="button"
                 size="sm"
                 variant="ghost"
-                className="text-destructive hover:text-destructive"
+                className="w-full text-destructive hover:text-destructive sm:w-auto"
                 onClick={() => setConfirmingDelete(true)}
               >
                 <Trash2 className="me-2 h-4 w-4" />
