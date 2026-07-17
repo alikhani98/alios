@@ -367,3 +367,20 @@ Reason:
 - Earlier Persian catalogs inherited the Life Areas source strings, and saving or marking a canonical area reviewed could persist those accidental English defaults
 - Exact known-default matching repairs the visible language without a database migration and without guessing about genuinely customized user text
 - Keeping help content static preserves the local-first architecture while making later modules and optional relationships discoverable
+
+## ADR-029: Keep one repository-native design contract
+
+Decision:
+
+- The root `DESIGN.md` is the canonical design contract for AliOS product UI and AI-assisted interface implementation
+- The contract documents the existing semantic tokens, shared components, shell, accent preferences, mobile targets, RTL/LTR behavior, motion, accessibility expectations, interaction states, and content style rather than introducing a replacement theme
+- `AGENTS.md` requires agents to read the contract before material UI work and to reuse existing semantic tokens and shared components
+- External DesignMD-style files may be evaluated as advisory references, but they must not overwrite the repository contract or become authoritative without explicit approval and an intentional mapping to the existing implementation
+- Adopting a new visual language, design dependency, component library, font, semantic color model, or navigation model requires a separately approved stage
+
+Reason:
+
+- AliOS already has a coherent implemented visual foundation, but its rules were distributed across CSS, Tailwind configuration, shared components, layout code, and prior stage documentation
+- A single repository-native contract gives developers and AI coding agents consistent constraints without creating a runtime design layer or duplicating implementation
+- Treating external libraries as references prevents an attractive downloaded theme from silently breaking Persian RTL, mobile behavior, dark mode, accessibility, or the dependency-free local-first model
+- Explicit governance allows useful external ideas to be adopted deliberately while preserving one source of truth

@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 81 - AliOS Design System Contract
+
+- Added the repository-native root `DESIGN.md` as the single design contract for developers and AI coding agents, plus a development-time regression guard for required sections, agent wiring, and supported accent preferences
+- Documented the implemented AliOS visual character, semantic colors, typography, spacing, shared components, responsive targets, RTL/LTR behavior, motion, accessibility, content style, interaction states, and review checklist
+- Updated the agent contract and architecture guidance so UI work reuses existing tokens and components and external DesignMD-style files remain advisory until explicitly approved
+- Kept the stage documentation- and development-validation-only, with no runtime UI, dependency, route, repository, Dexie schema, backup format, backup version, backend, sync, cloud, AI, telemetry, or user-data change
+
 ## Stage 80 - Life Areas Persian Localization & Help Center Refresh
 
 - Completed the Persian catalog for every visible Life Areas message and added a regression guard that rejects silent English fallback in the Persian interface

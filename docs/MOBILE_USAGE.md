@@ -235,6 +235,18 @@ Export a fresh backup before restoring or clearing data. AliOS does not merge tw
 - Confirm that the browser is not configured to clear site data automatically.
 - Test backup export and import on each device before relying on AliOS for important records.
 
+## Design system UI smoke test
+
+Use this checklist after a material UI change. Stage 81 only documents the existing system and does not itself change runtime UI.
+
+1. Test the changed surface at 360px, 390px, and 430px widths, then at a desktop width of at least 1280px.
+2. Repeat the primary workflow in Persian RTL and English LTR with long labels and representative user-authored content.
+3. Check light and dark appearance and every supported accent preset; the primary color must not be assumed to stay blue.
+4. Navigate all controls with a keyboard and confirm visible focus, logical order, accessible labels, and usable 40–44px minimum targets.
+5. Enable reduced motion and confirm that the workflow stays understandable and fully usable.
+6. Exercise the relevant loading, empty, no-result, unavailable, validation, success, error, and destructive-confirmation states.
+7. Confirm there is no horizontal page overflow and that actions, badges, tags, URLs, and mixed Persian/English text wrap safely.
+
 ## Deferred mobile capabilities
 
 - Offline service-worker caching

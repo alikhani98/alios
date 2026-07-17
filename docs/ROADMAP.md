@@ -52,6 +52,9 @@ Stage 77 release-hardens the combined Goals and Life Areas track with bilingual 
 Stage 78 adds an optional one-way Project → Goal identity link with bilingual selection, stable Goal navigation, safe unlinking, and non-cascading unavailable states without changing Dexie indexes, the database schema version, or backup version 1.
 Stage 79 activates the existing optional Task → Project identity link in Today with bilingual selection, stable Project navigation, safe unlinking, and non-cascading unavailable states without adding a field, index, migration, or backup change.
 Stage 80 completes Persian Life Areas localization, preserves custom user text while re-localizing untouched canonical defaults, and refreshes the static bilingual Help Center for current modules and optional planning links without changing storage, backup compatibility, dependencies, or routes.
+Stage 81 establishes a repository-native AliOS design system contract for consistent developer and AI-assisted UI work, documenting the existing tokens, components, responsive behavior, bilingual directions, motion, accessibility, and external-design-system governance without changing runtime behavior.
+
+Stage 82 Design Contract Adoption & UI Consistency Audit is a candidate only and remains unapproved. If approved, it should audit representative shared and feature surfaces against `DESIGN.md` and fix only evidenced consistency or accessibility defects without a broad visual redesign.
 
 ## Version 1.1
 

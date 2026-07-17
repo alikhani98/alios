@@ -2,7 +2,7 @@
 
 AliOS is a bilingual, local-first personal life-management system. It brings quick capture, Today planning, projects, journaling, personal knowledge, a read-only dashboard, monthly calendar and upcoming-task views, routine templates, Personal Manual, Personal Manual starter templates, Goals, Goals templates and quick start, Life Areas, manual backup/restore, local data controls, a compact topbar dashboard customizer with a local accent palette, a Finance foundation with a local review layer, budget guard, lightweight local charts, mobile quick navigation, collapsible sections, Jalali due-date previews, a Weekly Review foundation, a Decision Log foundation, a readable Settings export center, an app error boundary with a local error log foundation, backup/restore safety and migration validation, a beginner-friendly Help Center inside Settings, a Recovery Mode / Safe Mode foundation, Stage 53 mobile UX hardening for dense pages, Stage 54 empty-state and first-run guidance polish, Stage 55 backup reminder and last backup status foundation, Stage 56 export center foundation, Stage 57 recovery mode foundation, Stage 59 Personal Manual foundation, Stage 64 Personal Manual search and focus navigation, Stage 65 Personal Manual templates foundation, Stage 66 Personal Manual mobile and dense page polish, Stage 67 Personal Manual track release hardening, Stage 68 v1.50 release hardening, Stage 70 Goals track QA and mobile hardening, Stage 71 Goals templates and quick start, Stage 72 Life Areas foundation, and Stage 73 app startup resilience into one static web application.
 
-Stages 74–80 add pull-request validation, Life Areas QA, derived Goals ↔ Life Areas navigation, release hardening for the combined track, optional Project → Goal and Task → Project links, complete Persian Life Areas localization, and an updated in-app Help Center without changing AliOS's local-only architecture.
+Stages 74–81 add pull-request validation, Life Areas QA, derived Goals ↔ Life Areas navigation, release hardening for the combined track, optional Project → Goal and Task → Project links, complete Persian Life Areas localization, an updated in-app Help Center, and a repository-native design system contract without changing AliOS's local-only architecture.
 
 Stage 38 was a UI regression QA and release-hardening pass. It did not add a new feature; it kept the existing local-first scope intact and hardened desktop sidebar accessibility on long scrolling pages.
 Stage 39 moves dashboard customization into the topbar and adds a local-only accent color palette for restrained visual personalization.
@@ -36,6 +36,7 @@ Stage 77 release-hardens the Goals and Life Areas connection with bilingual card
 Stage 78 lets each Project optionally reference one Goal, relink or remove that reference, and open the linked Goal while preserving the Project if the Goal later becomes unavailable.
 Stage 79 activates the existing optional Task → Project relationship in Today so a task can be linked, relinked, unlinked, and navigated to its Project without cascade behavior.
 Stage 80 completes Persian Life Areas localization, safely re-localizes untouched canonical text persisted by earlier versions, and refreshes the bilingual Settings Help Center for the modules and links added after Stage 47.
+Stage 81 adds `DESIGN.md` as the canonical design contract for consistent human- and AI-assisted UI work, grounded in the existing AliOS tokens, shared components, bilingual directions, responsive targets, motion, and accessibility rules.
 
 AliOS is designed for one person and stores its data in the browser through IndexedDB. It requires no backend, account, authentication, subscription, paid API, or hosted AI service.
 
@@ -101,6 +102,7 @@ Application features access persistence through Repository and Storage Adapter b
 
 Architecture references:
 
+- [Design system contract](DESIGN.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [Architecture decisions](docs/DECISIONS.md)
 - [Project state](PROJECT_STATE.md)

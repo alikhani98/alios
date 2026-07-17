@@ -16,7 +16,7 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 ## Automated release gates
 
 - [x] `pnpm exec tsc --noEmit`
-- [x] `pnpm test:run` — 772 tests across 46 suites
+- [x] `pnpm test:run` — 774 tests across 47 suites
 - [x] `pnpm build`
 - [x] Repository create, list, read, update, and delete coverage
 - [x] Backup metadata and all currently supported additive arrays
@@ -64,6 +64,15 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] Help content remains read-only and adds no CMS, chatbot, persistence, repository, route, dependency, or schema behavior
 - [x] TypeScript, 772 automated tests across 46 suites, and the production build pass
 - [ ] Complete the Stage 80 manual smoke pass at 360px, 390px, and 430px in Persian and English
+
+### Stage 81 AliOS design system contract
+
+- [x] Root `DESIGN.md` documents the implemented design foundations, shared patterns, interaction states, accessibility rules, and review checklist
+- [x] The contract explicitly covers Persian RTL, English LTR, light/dark appearance, all accent presets, reduced motion, and 360px, 390px, and 430px mobile targets
+- [x] `AGENTS.md` requires the design contract before material UI work and preserves existing semantic-token and shared-component reuse
+- [x] External DesignMD-style documents remain advisory and cannot overwrite the AliOS contract or introduce dependencies without explicit approval
+- [x] The stage changes no runtime UI, package, route, repository, Dexie schema, backup format, or user data
+- [x] TypeScript, 774 automated tests across 47 suites, and the production build pass
 
 ## Production-preview QA
 
