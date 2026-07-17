@@ -8,7 +8,8 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "test": "vitest",
-    "test:run": "vitest run"
+    "test:run": "vitest run",
+    "performance:check": "node scripts/verify-build-performance.mjs"
   },
   "dependencies": {
     "@fontsource/vazirmatn": "^5.1.1",

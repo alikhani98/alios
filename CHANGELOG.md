@@ -2,6 +2,12 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 86 - Performance Regression Guard
+
+- Added a dependency-free `pnpm performance:check` command that produces a Vite manifest and enforces the initial-entry budget, the no-forms-preload boundary, and absence of the Vite chunk-size warning
+- Added the same check to pull-request CI after the normal production build so performance regressions are caught before merge
+- Kept the stage build- and release-only, with no runtime feature, route, storage, backup, dependency, backend, sync, cloud, AI, telemetry, or user-data change
+
 ## Stage 85 - Bundle Performance & Initial Load Hardening
 
 - Added explicit, cacheable Vite vendor chunks for React, icons, date utilities, and form/validation code; the production build no longer emits the chunk-size warning

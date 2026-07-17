@@ -41,6 +41,7 @@ Stage 82 adopts that contract for form controls by routing all 43 feature-level 
 Stage 83 hardens the Topbar panels and mobile sidebar for predictable keyboard focus, Escape dismissal, and narrow-screen release checks while preserving the current design and local-only architecture.
 Stage 84 adds a manual, local-only real-world usage QA guide so future work is prioritized from observed daily workflows rather than speculative product scope.
 Stage 85 splits stable third-party build output into cacheable chunks and keeps form validation code out of the initial module-preload path; see [`docs/PERFORMANCE.md`](docs/PERFORMANCE.md).
+Stage 86 turns that measured boundary into a repeatable local and pull-request CI guard through `pnpm performance:check`.
 
 AliOS is designed for one person and stores its data in the browser through IndexedDB. It requires no backend, account, authentication, subscription, paid API, or hosted AI service.
 

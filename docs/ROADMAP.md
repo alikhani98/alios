@@ -62,6 +62,8 @@ Stage 84 establishes a documentation-only real-world usage protocol with a seven
 
 Stage 85 hardens the existing initial-load path with measured Vite vendor chunking and direct startup imports, keeping form/validation code out of entry module-preloads without changing product behavior, dependencies, storage, routing, backup compatibility, or the local-first architecture.
 
+Stage 86 adds a dependency-free build-performance regression guard and PR-CI gate for the Stage 85 entry budget, form-preload boundary, and Vite warning check. It adds no runtime behavior, data collection, dependency, storage, route, backup, or product feature.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1
