@@ -54,7 +54,7 @@ Do not add a dependency, hosted service, or platform integration without explici
 
 ## Development Rules
 
-1. Read `AGENTS.md`, `PROJECT_STATE.md`, `docs/ARCHITECTURE.md`, `docs/DECISIONS.md`, and `docs/ROADMAP.md` before modifying the project.
+1. Read `AGENTS.md`, `DESIGN.md`, `PROJECT_STATE.md`, `docs/ARCHITECTURE.md`, `docs/DECISIONS.md`, and `docs/ROADMAP.md` before modifying the project.
 2. Inspect the repository and confirm the current stage from implementation evidence.
 3. Implement only the explicitly approved stage and scope.
 4. Do not begin the next stage early, even through partial implementations.
@@ -68,6 +68,14 @@ Do not add a dependency, hosted service, or platform integration without explici
 ## AI Capability Rule
 
 AliOS 1.0 has no AI integration. Any future AI capability must be introduced exclusively through the `AIProvider` abstraction. Feature code must not call an AI SDK, model API, or provider directly. Adding or activating an AI provider requires a separately approved future stage.
+
+## Design System Rule
+
+- `DESIGN.md` is the canonical product design contract for AI agents and developers.
+- Read `DESIGN.md` before any UI, layout, styling, interaction, or content-design change.
+- Reuse semantic tokens from `src/styles` and shared components from `src/shared/ui` before adding feature-local visual variants.
+- Material UI changes must preserve Persian RTL, English LTR, light and dark appearance, all supported accent colors, reduced motion, visible keyboard focus, and mobile usability at 360px, 390px, and 430px widths.
+- An external or generated design system may be evaluated as a reference, but it must not overwrite `DESIGN.md`, replace the current visual language, add dependencies, or become authoritative without explicit user approval.
 
 ## Stage Workflow
 
