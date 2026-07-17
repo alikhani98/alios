@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { cn } from "@/shared/utils";
+import { cn } from "@/shared/utils/cn";
 
 export type SeparatorProps = React.HTMLAttributes<HTMLDivElement> & {
   orientation?: "horizontal" | "vertical";

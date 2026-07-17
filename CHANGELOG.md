@@ -2,6 +2,12 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 85 - Bundle Performance & Initial Load Hardening
+
+- Added explicit, cacheable Vite vendor chunks for React, icons, date utilities, and form/validation code; the production build no longer emits the chunk-size warning
+- Replaced startup-path barrel imports with direct utility and preference imports so form validation code is not module-preloaded by the application entry
+- Recorded the measured build contract and a mobile/deployed-load smoke check without changing routes, product behavior, data, storage, backup compatibility, dependencies, backend, sync, cloud, AI, or telemetry
+
 ## Stage 84 - Real-World Usage QA & Product Prioritization Foundation
 
 - Added a local, manual seven-day usage protocol that covers Inbox capture, Today planning, planning links, review, search, finance, exports, and backup safety

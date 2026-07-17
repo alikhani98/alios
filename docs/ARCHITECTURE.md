@@ -143,6 +143,7 @@ AliOS does not require a Node.js server in production. Node.js is allowed for de
 - Bootstrap loading, ready, and failure states are handled before the router renders
 - A failed storage-module load exposes calm bilingual retry and reload actions instead of leaving the app on an endless loading state
 - Bootstrap failures may append a bounded summary to the existing local error log, but they do not send telemetry, display stack traces, delete data, or bypass the storage-adapter boundary
+- Shared shell code uses direct imports for small utilities and preferences when a barrel would pull schemas or feature-only modules into the entry path; build chunking and measured release checks are defined in [`PERFORMANCE.md`](./PERFORMANCE.md)
 
 ## Layering
 

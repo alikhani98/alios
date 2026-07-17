@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { cn } from "@/shared/utils";
+import { cn } from "@/shared/utils/cn";
 
 function clampPercent(value: number): number {
   if (!Number.isFinite(value)) {

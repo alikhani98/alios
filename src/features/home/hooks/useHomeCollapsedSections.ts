@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { LOCAL_PREFERENCE_CHANGE_EVENT } from "@/shared/constants";
+import { LOCAL_PREFERENCE_CHANGE_EVENT } from "@/shared/constants/preferences";
 
 import {
   homeCollapsibleSectionIds,
@@ -94,4 +94,3 @@ export function useHomeCollapsedSections() {
       collapsedSectionIds.length <= homeCollapsibleSectionIds.length,
   } as const;
 }
-

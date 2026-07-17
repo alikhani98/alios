@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { LOCAL_PREFERENCE_CHANGE_EVENT } from "@/shared/constants";
+import { LOCAL_PREFERENCE_CHANGE_EVENT } from "@/shared/constants/preferences";
 
 import {
   HOME_DASHBOARD_LAYOUT_STORAGE_KEY,

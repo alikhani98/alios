@@ -101,6 +101,13 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] No telemetry, analytics, persistence, dependency, route, repository, schema, backup, or user-data behavior is added
 - [ ] Complete the Stage 84 real-world usage pass and share the observed issue log before approving Stage 85
 
+### Stage 85 bundle performance and initial-load hardening
+
+- [x] Production build emits no Vite chunk-size warning
+- [x] The entry module-preload list excludes the 82.28 kB forms/validation vendor chunk
+- [x] Build-performance contract records measured output and avoids real-user timing claims
+- [ ] Complete the deployed mobile/throttled initial-load smoke test in `MOBILE_USAGE.md`
+
 ## Production-preview QA
 
 ### Home

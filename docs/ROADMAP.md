@@ -60,7 +60,9 @@ Stage 83 release-hardens the Stage 81–82 design-system track with keyboard-foc
 
 Stage 84 establishes a documentation-only real-world usage protocol with a seven-day workflow pass, bilingual/mobile/keyboard checks, an issue log, severity definitions, and evidence-first prioritization. It adds no runtime product behavior or data collection.
 
-No Stage 85 implementation scope is approved. The next decision should follow evidence gathered through the Stage 84 usage pass.
+Stage 85 hardens the existing initial-load path with measured Vite vendor chunking and direct startup imports, keeping form/validation code out of entry module-preloads without changing product behavior, dependencies, storage, routing, backup compatibility, or the local-first architecture.
+
+The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1
 

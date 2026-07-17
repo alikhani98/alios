@@ -2,21 +2,24 @@ import { useCallback, useEffect, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 
 import { getNavigationItemByPath } from "@/shared/constants/navigation";
-import { usePersistentBoolean, usePersistentString } from "@/shared/hooks";
+import { usePersistentBoolean } from "@/shared/hooks/usePersistentBoolean";
+import { usePersistentString } from "@/shared/hooks/usePersistentString";
 import { useI18n } from "@/shared/i18n";
 import {
   APPEARANCE_STORAGE_KEY,
   RECOVERY_MODE_ENABLED_STORAGE_KEY,
-} from "@/shared/constants";
+} from "@/shared/constants/preferences";
 import { ErrorBoundary } from "@/shared/error";
 import { RecoveryModeBanner, applyRecoveryModeUrlFlag } from "@/shared/recovery";
 import {
   applyAccentColorThemeVariables,
+  useAccentColorPreference,
+} from "@/shared/preferences/accentColor";
+import {
   DEFAULT_APPEARANCE_PREFERENCE,
   parseAppearancePreference,
   resolveAppearance,
-  useAccentColorPreference,
-} from "@/shared/preferences";
+} from "@/shared/preferences/appearance";
 
 import { MobileSidebar } from "./MobileSidebar";
 import { Sidebar } from "./Sidebar";

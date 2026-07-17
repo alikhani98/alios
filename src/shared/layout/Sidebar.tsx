@@ -4,7 +4,7 @@ import { mainNavigation } from "@/shared/constants/navigation";
 import { useI18n } from "@/shared/i18n";
 import { Button } from "@/shared/ui";
 import { aliosSurfaceMotion } from "@/shared/ui/motion";
-import { cn } from "@/shared/utils";
+import { cn } from "@/shared/utils/cn";
 
 import { NavigationLink } from "./NavigationLink";
 
