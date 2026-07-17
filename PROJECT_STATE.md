@@ -4,8 +4,8 @@
 
 - Project name: AliOS
 - Architecture version: AliOS 1.0
-- Current status: AliOS includes validated mobile-first Inbox capture, processing, global search, focused search-result navigation, filters, bulk triage, local appearance switching, local profile preferences, calendar month view foundation, home time-window routine nudges, upcoming task grouping, routine templates, Wellness / Badminton Routine foundation, visual motion polish, premium Home dashboard visual upgrade, premium app shell polish, Home dashboard customization, premium reusable components, lightweight Personal Insights, Stage 37 premium Home showcase polish, light core-page visual alignment, hardened backup/restore safety, Stage 38 UI regression QA and release hardening with desktop sticky sidebar accessibility improvements, Stage 39 topbar dashboard controls plus accent color personalization, Stage 40 finance foundation, Stage 41 finance review and budget guard, Stage 42 lightweight finance charts foundation, Stage 43 lightweight motion and interaction polish, Stage 44 finance mobile UX and section navigation, Stage 45 performance audit and bundle optimization, Stage 46 Home collapsible dashboard sections, Stage 47 Settings Help Center Foundation, Stage 48 Weekly Review Foundation, Stage 49 Decision Log Foundation, Stage 50 Backup / Restore Safety & Migration Foundation, Stage 51 App Error Boundary & Local Error Log Foundation, Stage 53 Mobile UX Hardening for dense pages, Stage 54 Empty States & First-Run Guidance Foundation, Stage 55 Backup Reminder & Last Backup Status Foundation, Stage 56 Export Center Foundation, Stage 57 Recovery Mode / Safe Mode Foundation, Stage 58 Finance Monthly Plan Foundation, Stage 59 Personal Manual Foundation, Stage 60 Personal Manual QA & Release Hardening, Stage 61 Personal Manual Export Center Integration, Stage 62 Bundle Size Audit & Initial Load Hardening, Stage 63 Personal Manual Weekly Review Integration, Stage 64 Personal Manual Search & Focus Navigation, Stage 65 Personal Manual Templates Foundation, Stage 66 Personal Manual Mobile & Dense Page Polish, Stage 67 Personal Manual Track Release Hardening, Stage 68 v1.50 Release Hardening, Stage 69 Goals Track Foundation, Stage 70 Goals Track QA & Mobile Hardening, Stage 71 Goals Templates & Quick Start, Stage 72 Life Areas Foundation, Stage 73 App Startup Resilience & Release Hygiene, Stage 74 Pull Request CI Foundation, Stage 75 Life Areas QA & Mobile Hardening, Stage 76 Goals ↔ Life Areas Derived Integration, Stage 77 Goals & Life Areas Release Hardening, Stage 78 Projects → Goals Link Foundation, Stage 79 Tasks → Projects Link Activation, Stage 80 Life Areas Persian Localization & Help Center Refresh, Stage 81 AliOS Design System Contract, and Stage 82 Design Contract Adoption & Form Control Consistency, and remains ready for static GitHub Pages deployment.
-- Current Stage: Stage 82 Completed
+- Current status: AliOS includes validated mobile-first Inbox capture, processing, global search, focused search-result navigation, filters, bulk triage, local appearance switching, local profile preferences, calendar month view foundation, home time-window routine nudges, upcoming task grouping, routine templates, Wellness / Badminton Routine foundation, visual motion polish, premium Home dashboard visual upgrade, premium app shell polish, Home dashboard customization, premium reusable components, lightweight Personal Insights, Stage 37 premium Home showcase polish, light core-page visual alignment, hardened backup/restore safety, Stage 38 UI regression QA and release hardening with desktop sticky sidebar accessibility improvements, Stage 39 topbar dashboard controls plus accent color personalization, Stage 40 finance foundation, Stage 41 finance review and budget guard, Stage 42 lightweight finance charts foundation, Stage 43 lightweight motion and interaction polish, Stage 44 finance mobile UX and section navigation, Stage 45 performance audit and bundle optimization, Stage 46 Home collapsible dashboard sections, Stage 47 Settings Help Center Foundation, Stage 48 Weekly Review Foundation, Stage 49 Decision Log Foundation, Stage 50 Backup / Restore Safety & Migration Foundation, Stage 51 App Error Boundary & Local Error Log Foundation, Stage 53 Mobile UX Hardening for dense pages, Stage 54 Empty States & First-Run Guidance Foundation, Stage 55 Backup Reminder & Last Backup Status Foundation, Stage 56 Export Center Foundation, Stage 57 Recovery Mode / Safe Mode Foundation, Stage 58 Finance Monthly Plan Foundation, Stage 59 Personal Manual Foundation, Stage 60 Personal Manual QA & Release Hardening, Stage 61 Personal Manual Export Center Integration, Stage 62 Bundle Size Audit & Initial Load Hardening, Stage 63 Personal Manual Weekly Review Integration, Stage 64 Personal Manual Search & Focus Navigation, Stage 65 Personal Manual Templates Foundation, Stage 66 Personal Manual Mobile & Dense Page Polish, Stage 67 Personal Manual Track Release Hardening, Stage 68 v1.50 Release Hardening, Stage 69 Goals Track Foundation, Stage 70 Goals Track QA & Mobile Hardening, Stage 71 Goals Templates & Quick Start, Stage 72 Life Areas Foundation, Stage 73 App Startup Resilience & Release Hygiene, Stage 74 Pull Request CI Foundation, Stage 75 Life Areas QA & Mobile Hardening, Stage 76 Goals ↔ Life Areas Derived Integration, Stage 77 Goals & Life Areas Release Hardening, Stage 78 Projects → Goals Link Foundation, Stage 79 Tasks → Projects Link Activation, Stage 80 Life Areas Persian Localization & Help Center Refresh, Stage 81 AliOS Design System Contract, Stage 82 Design Contract Adoption & Form Control Consistency, and Stage 83 UI Accessibility & Design Contract Release Hardening, and remains ready for static GitHub Pages deployment.
+- Current Stage: Stage 83 Completed
 
 ## Architecture References
 
@@ -39,7 +39,7 @@
 
 ## Completed Stages
 
-Stages 1–82 are complete.
+Stages 1–83 are complete.
 
 - Stage 1 â€” Foundation
 - Stage 2 â€” App Shell
@@ -122,6 +122,7 @@ Stages 1–82 are complete.
 - Stage 80 — Life Areas Persian Localization & Help Center Refresh
 - Stage 81 — AliOS Design System Contract
 - Stage 82 — Design Contract Adoption & Form Control Consistency
+- Stage 83 — UI Accessibility & Design Contract Release Hardening
 
 Stage 54 completion is evidenced by the calmer bilingual empty-state guidance across Home, Finance, Decisions, Weekly Review, Inbox, Projects, Journal, Knowledge, and Settings. The stage adds no schema migration, no backup-format change, no backup-version bump, no route redesign, no onboarding modal or tour, no backend, no sync, no cloud, no AI, no telemetry, and no new dependency. It keeps the existing local-first repository/storage-adapter boundaries intact while giving low-data users a clearer first step.
 
@@ -181,6 +182,8 @@ Stage 81 completion is evidenced by the repository-native root `DESIGN.md`, whic
 
 Stage 82 completion is evidenced by the shared native `Select` primitive and migration of all 43 feature-level select controls across 18 files. The primitive now owns the existing semantic colors, 44px mobile height, responsive typography, visible focus ring and offset, reduced-motion-safe interaction transition, disabled state, and ref forwarding, while each feature preserves its labels, options, values, handlers, React Hook Form registration, and browser-native behavior. The Today task-status control keeps one focused responsive-width override. Component tests verify the base contract and override merging, while a repository guard rejects native select rendering outside the shared primitive. The stage adds no dependency, route, repository contract, Dexie schema, backup-format, backup-version, backend, sync, cloud, AI, telemetry, or user-data change.
 
+Stage 83 completion is evidenced by the shared shell keyboard hardening: Topbar appearance, dashboard, and local-profile panels now expose their trigger state and controlled panel, move focus to their first interactive control, and restore focus to the trigger after Escape. The mobile sidebar is now a labeled modal dialog with close-button focus, Escape dismissal, Tab containment, and focus restoration to its opener. Focused source-level regression coverage protects these contracts, and the mobile usage guide now records the bilingual 360px, 390px, 430px, and desktop smoke pass. The stage adds no dependency, route, repository contract, Dexie schema, backup-format, backup-version, backend, sync, cloud, AI, telemetry, or user-data change.
+
 Stage 53 completion is evidenced by the mobile-focused readability and overflow hardening pass across the dense Finance, Weekly Review, Decision Log, Settings, and Home surfaces. The stage keeps the existing product behavior intact while improving small-screen stacking, wrapping, button usability, and section readability on 360px, 390px, and 430px class devices. It does not change routes, storage, schemas, backup format, dependencies, or navigation architecture, and it remains aligned with static GitHub Pages deployment.
 Stage 48 completion is evidenced by the derived-only Weekly Review foundation, which summarizes the last seven days of existing local tasks, projects, inbox items, journal entries, knowledge items, finance records, wellness/check-in data, and routine signals where available. The stage adds deterministic observations and suggested focus rules, keeps the review window local and read-only, and stores no new weekly-review data. It uses the existing feature/repository/storage-adapter boundaries, adds no schema migration, no backup-format change, no new dependency, no backend, no sync, no cloud, and no AI, and it remains aligned with static GitHub Pages deployment.
 
@@ -216,7 +219,7 @@ Stage 37 completion is evidenced by a denser premium Home showcase with stronger
 
 Stage 36 completion is evidenced by reusable premium Home-facing card surfaces, a compact Personal Insights section on Home, CSS/Tailwind-only micro-visuals, and insight calculations derived only from existing local task, project, inbox, journal, knowledge, and wellness checklist state. The stage did not add a chart library, dependency, schema migration, Dexie table or field, backup-format change, backend, sync, cloud, AI, or medical interpretation. TypeScript validation, automated tests, and the production build pass.
 
-Next stage: Stage 83 UI Accessibility & Design Contract Release Hardening is proposed and remains unapproved.
+Next stage: no Stage 84 implementation scope is approved; real-world usage of the current local-first product should guide the next decision.
 
 Stage 9 completion is evidenced by the Today page, daily check-in create/update form, date-scoped task CRUD, all approved task statuses, completed timestamps, and single-MIT selection synchronized with todayâ€™s check-in. Browser validation confirmed task and check-in persistence across refresh, task editing, status updates, MIT selection, deletion, and the task empty state. The feature consumes TasksRepository and DailyCheckinsRepository through the injected `StorageAdapter` and does not import Dexie. Health advice, Home dashboard data, recurring tasks, notifications, analytics, backup, AI, and cross-feature workflows remain unavailable. TypeScript validation and the production build pass.
 
@@ -274,19 +277,19 @@ Stage 35 completion is evidenced by the premium app shell polish across the side
 
 ## Next Stage
 
-Stage 83 UI Accessibility & Design Contract Release Hardening is the proposed next stage and requires explicit approval. It would run representative bilingual keyboard and narrow-screen smoke passes, fix only evidenced accessibility or consistency defects, and release-harden the Stage 81–82 design-system track without a broad redesign. Project conversion, bulk conversion, tags, attachments, reminders, AI classification, semantic search, offline service-worker caching, automatic sync, cloud backup, and further visual redesign remain deferred. Advanced wellness coaching, medical guidance, treatment logic, charts, and deeper interaction systems remain deferred beyond the approved local-first model.
+No Stage 84 implementation scope is currently approved. The next decision should follow real-world use of the current local-first product; project conversion, bulk conversion, tags, attachments, reminders, AI classification, semantic search, offline service-worker caching, automatic sync, cloud backup, and further visual redesign remain deferred. Advanced wellness coaching, medical guidance, treatment logic, charts, and deeper interaction systems remain deferred beyond the approved local-first model.
 
 ## Git Latest Recommended Commit
 
-`refactor(ui): centralize select controls`
+`fix(a11y): harden shell keyboard focus`
 
 ## Build Status
 
 - TypeScript: passing (`pnpm exec tsc --noEmit`)
 - Automated tests: passing (`pnpm test:run`)
 - Production build: passing (`pnpm build`)
-- Production build warning: Vite reported a chunk-size warning for the 515.06 kB main bundle
-- Automated test count: 777 passing across 48 suites
+- Production build warning: Vite reported a chunk-size warning for the 517.00 kB main bundle
+- Automated test count: 780 passing across 49 suites
 - Pull request validation: configured (`.github/workflows/ci.yml`)
 - Last verified: 2026-07-17
 

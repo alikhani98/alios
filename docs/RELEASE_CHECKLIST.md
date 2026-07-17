@@ -84,6 +84,15 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] TypeScript, 777 automated tests across 48 suites, and the production build pass
 - [ ] Complete the Stage 82 manual select smoke pass at 360px, 390px, and 430px in Persian and English
 
+### Stage 83 UI accessibility and design-contract release hardening
+
+- [x] Topbar appearance, dashboard, and profile triggers expose their expanded state and controlled panel
+- [x] Opening a Topbar panel moves focus into it; Escape closes it and restores focus to its trigger
+- [x] The mobile sidebar is a labeled modal dialog with close-control focus, Escape dismissal, Tab containment, and opener-focus restoration
+- [x] Focused shell accessibility regression coverage passes without adding a dependency, route, repository, storage, schema, or user-data change
+- [x] TypeScript, automated tests, and the production build pass
+- [ ] Complete the Stage 83 manual shell smoke pass at 360px, 390px, and 430px in Persian and English
+
 ## Production-preview QA
 
 ### Home

@@ -258,6 +258,16 @@ Use this checklist after applying Stage 82 or changing the shared select primiti
 5. On a Today task card, confirm the compact status select still becomes content-width on larger screens while remaining full-width on mobile.
 6. Create and edit representative records to confirm React Hook Form registration and saved values remain unchanged.
 
+## Stage 83 shell keyboard and narrow-screen smoke test
+
+Repeat this pass in Persian RTL and English LTR at 360px, 390px, and 430px, then once at a desktop width of at least 1280px:
+
+1. Open the Topbar appearance, profile, and (on Home) dashboard controls with the keyboard; confirm focus enters the opened panel and its trigger exposes the expanded state.
+2. Press Escape in each Topbar panel and confirm it closes without changing a preference and focus returns to the exact trigger.
+3. Open the mobile menu, confirm focus begins on the close control, use Tab and Shift+Tab to confirm focus remains inside the menu, then press Escape and confirm focus returns to the menu opener.
+4. With long Persian and English labels, confirm the Topbar panels and mobile menu stay within the viewport, remain scrollable when needed, and do not create horizontal page overflow.
+5. Repeat the path in light and dark appearance with each accent preset; confirm focus remains visible and color is not the only state signal.
+
 ## Deferred mobile capabilities
 
 - Offline service-worker caching

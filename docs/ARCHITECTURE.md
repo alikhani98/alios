@@ -119,6 +119,13 @@ AliOS 1.0 is a local-first static web app.
 - Recovery UI may surface calm access to Settings, backup/restore, readable exports, and the local error log without adding routing complexity or a global modal system
 - The recovery surface stays separate from backend, sync, cloud, AI, telemetry, notifications, service workers, and new dependencies
 
+## Shell Accessibility Boundary
+
+- The shared Topbar owns focus behavior for its appearance, dashboard, and local-profile panels; feature pages do not create competing global overlays
+- Topbar triggers expose their expanded state and controlled panel, move focus into the opened panel, and restore focus to the trigger when Escape dismisses the panel
+- The mobile sidebar is a labeled modal dialog that owns initial focus, Escape dismissal, Tab containment, and focus restoration to the opener
+- These shell behaviors remain UI-only and use browser-native focus management; they do not introduce a modal framework, a dependency, persistence, routing, or storage behavior
+
 ## Runtime Rule
 
 AliOS does not require a Node.js server in production. Node.js is allowed for development, dependency installation, and building static assets.

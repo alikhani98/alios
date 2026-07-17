@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 83 - UI Accessibility & Design Contract Release Hardening
+
+- Added predictable keyboard focus to the Topbar appearance, dashboard, and local-profile panels, including trigger-to-panel focus movement, explicit expanded/control relationships, and Escape-based focus restoration
+- Hardened the mobile sidebar as a labeled modal dialog with initial close-control focus, Escape dismissal, Tab containment, and trigger-focus restoration after closing
+- Added shell accessibility regression coverage and a focused bilingual/narrow-screen smoke checklist while preserving the existing visual language and browser-native controls
+- Kept the stage dependency-free and local-only, with no route, repository, Dexie schema, backup format, backup version, backend, sync, cloud, AI, telemetry, or user-data change
+
 ## Stage 82 - Design Contract Adoption & Form Control Consistency
 
 - Added the shared `Select` primitive with the AliOS mobile sizing, semantic colors, focus ring, motion, disabled state, ref forwarding, and focused layout overrides

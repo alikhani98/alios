@@ -78,6 +78,8 @@ export function Topbar({
   const { direction, t } = useI18n();
   const navigate = useNavigate();
   const panelRef = useRef<HTMLDivElement>(null);
+  const activePanelContentRef = useRef<HTMLDivElement>(null);
+  const activePanelTriggerRef = useRef<HTMLButtonElement | null>(null);
   const { value: appearancePreference, setValue: setAppearancePreference } =
     usePersistentString({
       key: APPEARANCE_STORAGE_KEY,
@@ -111,19 +113,36 @@ export function Topbar({
   }, [activePanel, showDashboardControls]);
 
   useEffect(() => {
+    if (!activePanel) {
+      return;
+    }
+
+    const frame = window.requestAnimationFrame(() => {
+      activePanelContentRef.current
+        ?.querySelector<HTMLElement>(
+          "button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href]"
+        )
+        ?.focus();
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [activePanel]);
+
+  useEffect(() => {
     const handlePointerDown = (event: MouseEvent | TouchEvent) => {
       if (
         panelRef.current &&
         event.target instanceof Node &&
         !panelRef.current.contains(event.target)
       ) {
-        setActivePanel(null);
+        closeActivePanel();
       }
     };
 
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        setActivePanel(null);
+        event.preventDefault();
+        closeActivePanel(true);
       }
     };
 
@@ -146,9 +165,28 @@ export function Topbar({
     };
   }, []);
 
+  const closeActivePanel = (restoreFocus = false) => {
+    setActivePanel(null);
+
+    if (restoreFocus) {
+      window.requestAnimationFrame(() => activePanelTriggerRef.current?.focus());
+    }
+  };
+
+  const togglePanel = (panel: Exclude<ActivePanel, null>, trigger: HTMLButtonElement) => {
+    setActivePanel((currentValue) => {
+      if (currentValue === panel) {
+        return null;
+      }
+
+      activePanelTriggerRef.current = trigger;
+      return panel;
+    });
+  };
+
   const handleSelectAppearance = (value: string) => {
     setAppearancePreference(value);
-    setActivePanel(null);
+    closeActivePanel(true);
   };
 
   const showSavedFeedback = () => {
@@ -195,17 +233,15 @@ export function Topbar({
     showSavedFeedback();
   };
 
-  const handleOpenProfilePanel = () => {
+  const handleOpenProfilePanel = (trigger: HTMLButtonElement) => {
     setDraftDisplayName(displayName);
-    setActivePanel((currentValue) =>
-      currentValue === "profile" ? null : "profile"
-    );
+    togglePanel("profile", trigger);
   };
 
   const handleSaveDisplayName = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setDisplayName(normalizeDisplayName(draftDisplayName));
-    setActivePanel(null);
+    closeActivePanel(true);
   };
 
   return (
@@ -262,12 +298,9 @@ export function Topbar({
               aria-label={t("home.dashboardLayoutTooltip")}
               aria-expanded={activePanel === "dashboard"}
               aria-controls="topbar-dashboard-controls"
+              aria-haspopup="dialog"
               title={t("home.dashboardLayoutTooltip")}
-              onClick={() =>
-                setActivePanel((currentValue) =>
-                  currentValue === "dashboard" ? null : "dashboard"
-                )
-              }
+              onClick={(event) => togglePanel("dashboard", event.currentTarget)}
             >
               <LayoutDashboard className="h-5 w-5" />
             </Button>
@@ -287,12 +320,11 @@ export function Topbar({
           size="icon"
           className="rounded-full"
           aria-label={t("settings.appearance")}
+          aria-expanded={activePanel === "theme"}
+          aria-controls="topbar-theme-controls"
+          aria-haspopup="dialog"
           title={t("settings.appearance")}
-          onClick={() =>
-            setActivePanel((currentValue) =>
-              currentValue === "theme" ? null : "theme"
-            )
-          }
+          onClick={(event) => togglePanel("theme", event.currentTarget)}
         >
           <SunMoon className="h-5 w-5" />
         </Button>
@@ -303,8 +335,11 @@ export function Topbar({
           size="icon"
           className="rounded-full"
           aria-label={t("settings.localProfile")}
+          aria-expanded={activePanel === "profile"}
+          aria-controls="topbar-profile-controls"
+          aria-haspopup="dialog"
           title={t("settings.localProfile")}
-          onClick={handleOpenProfilePanel}
+          onClick={(event) => handleOpenProfilePanel(event.currentTarget)}
         >
           {hasDisplayName ? (
             <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-[0.65rem] font-semibold text-primary-foreground">
@@ -317,12 +352,15 @@ export function Topbar({
 
         {activePanel === "theme" ? (
           <div
+            ref={activePanelContentRef}
+            id="topbar-theme-controls"
             className={cn(
               "absolute top-full z-50 mt-2 max-h-[calc(100vh-6rem)] w-64 overflow-y-auto rounded-2xl border bg-card p-2 shadow-aliosFloating",
               aliosPopoverMotion,
               direction === "rtl" ? "left-0" : "right-0"
             )}
-            role="menu"
+            role="dialog"
+            aria-modal="false"
             aria-label={t("settings.appearance")}
           >
             <div className="px-2 py-1.5">
@@ -356,6 +394,7 @@ export function Topbar({
 
         {activePanel === "dashboard" ? (
           <div
+            ref={activePanelContentRef}
             id="topbar-dashboard-controls"
             className={cn(
               "absolute top-full z-50 mt-2 max-h-[calc(100vh-7rem)] w-[min(30rem,calc(100vw-1rem))] max-w-[calc(100vw-1rem)] overflow-y-auto rounded-2xl border bg-card p-3 shadow-aliosFloating",
@@ -363,6 +402,7 @@ export function Topbar({
               direction === "rtl" ? "left-0" : "right-0"
             )}
             role="dialog"
+            aria-modal="false"
             aria-label={t("home.dashboardControlsTitle")}
           >
             <Suspense
@@ -412,12 +452,15 @@ export function Topbar({
 
         {activePanel === "profile" ? (
           <div
+            ref={activePanelContentRef}
+            id="topbar-profile-controls"
             className={cn(
               "absolute top-full z-50 mt-2 max-h-[calc(100vh-6rem)] w-[22rem] max-w-[calc(100vw-1.5rem)] overflow-y-auto rounded-2xl border bg-card p-4 shadow-aliosFloating",
               aliosPopoverMotion,
               direction === "rtl" ? "left-0" : "right-0"
             )}
             role="dialog"
+            aria-modal="false"
             aria-label={t("settings.localProfile")}
           >
             <div className="flex items-center gap-3">
@@ -463,7 +506,7 @@ export function Topbar({
                   className="flex-1"
                   onClick={() => {
                     setDraftDisplayName(displayName);
-                    setActivePanel(null);
+                    closeActivePanel(true);
                   }}
                 >
                   {t("common.cancel")}
