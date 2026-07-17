@@ -44,3 +44,6 @@ jobs:
 
       - name: Build production assets
         run: pnpm build
+
+      - name: Verify initial-load performance contract
+        run: pnpm performance:check

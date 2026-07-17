@@ -438,3 +438,11 @@ Reason:
 AliOS uses Vite manual vendor chunks for React, icons, date utilities, and form/validation dependencies. The shared shell must prefer direct imports for small utilities and preferences when a barrel would also expose schema or form code. This keeps the forms vendor chunk lazy for form-bearing routes while allowing stable browser caching of common third-party code.
 
 This is a build-performance boundary only: it does not change routes, storage, data, backup compatibility, dependencies, or user-facing behavior. The measured build contract is documented in `docs/PERFORMANCE.md`.
+
+## ADR-034: Enforce the initial-load boundary in CI
+
+**Status:** Accepted (Stage 86)
+
+The build-performance contract is executable through `pnpm performance:check` and runs in every pull request after the ordinary production build. It checks the manifest-derived entry size, entry preload boundary, and Vite chunk-size warning without adding an external performance service.
+
+The raw-byte budget is intentionally conservative and deterministic. Real-device checks remain a separate release activity because CI cannot measure a user's network or device.

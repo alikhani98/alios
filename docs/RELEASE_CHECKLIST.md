@@ -108,6 +108,12 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] Build-performance contract records measured output and avoids real-user timing claims
 - [ ] Complete the deployed mobile/throttled initial-load smoke test in `MOBILE_USAGE.md`
 
+### Stage 86 performance regression guard
+
+- [x] `pnpm performance:check` builds a manifest and enforces the entry-byte budget, no forms preload, and no Vite chunk-size warning
+- [x] Pull-request CI runs the same guard after the normal production build
+- [ ] Complete the deployed mobile/throttled initial-load smoke test in `MOBILE_USAGE.md`
+
 ## Production-preview QA
 
 ### Home
