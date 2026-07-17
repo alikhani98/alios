@@ -30,6 +30,7 @@ Stage 72 adds a Life Areas foundation with local-first review, search, and expor
 Stage 73 prevents a failed local-storage module load from leaving the mobile app on an endless loading screen by offering calm retry and reload actions before the router starts.
 Stage 77 release-hardens the Goals and Life Areas connection so long content, URL navigation, linked-summary states, and card actions stay safe on narrow screens in both interface languages.
 Stage 78 adds optional Project → Goal linking with mobile-safe selection, navigation, unlinking, and unavailable states while keeping Projects independently usable.
+Stage 79 activates optional Task → Project linking in Today with mobile-safe selection, navigation, unlinking, and unavailable states while keeping Tasks independently usable.
 The Personal Insights section stays local to the device and only reflects stored tasks, projects, inbox items, journal entries, knowledge items, and wellness checklist state.
 
 ## Personal Manual smoke test
@@ -117,6 +118,19 @@ Repeat this pass at 360px, 390px, and 430px viewport widths in both Persian and 
 6. Simulate a Goal-loading failure and confirm Project create, edit, delete, and existing data remain usable.
 7. Use unusually long Project and Goal titles and confirm the selector, badges, relationship panel, and actions stay inside the viewport without horizontal scroll.
 8. Export and restore a backup containing a linked Project, then restore an older valid backup whose Projects omit `goalId`; confirm both flows remain usable.
+
+## Stage 79 Tasks → Projects link smoke test
+
+Repeat this pass at 360px, 390px, and 430px viewport widths in both Persian and English:
+
+1. Create a Today Task with no linked Project and confirm it saves normally without a relationship panel.
+2. Create and edit Tasks while selecting different active, paused, completed, or archived Projects; confirm the selected title and status remain readable.
+3. Open **View project** and confirm Projects receives the linked record through the existing `focusId` URL parameter.
+4. Edit a linked Task, choose **No linked project**, save, and confirm the relationship panel disappears without changing the Project.
+5. Delete a linked Project and confirm its Task survives, remains editable, status-changeable, MIT-selectable, and deletable, and shows a calm unavailable state until unlinked or reassigned.
+6. Simulate a Project-loading failure and confirm Daily Check-in and Task create, edit, status, MIT, and delete actions remain usable.
+7. Use unusually long Task and Project titles and confirm the selector, badges, relationship panel, status control, and actions stay inside the viewport without horizontal scroll.
+8. Export and restore a backup containing a linked Task, then restore an older valid backup whose Tasks omit `projectId`; confirm both flows remain usable.
 
 ## v1.50 release smoke test
 

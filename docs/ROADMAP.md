@@ -50,6 +50,7 @@ Stage 75 hardens the Life Areas track with focused helper coverage and narrow-sc
 Stage 76 connects Goals and Life Areas through their existing shared canonical area key, adding derived summaries and two-way filtered navigation without persisting a new relationship or changing backup compatibility.
 Stage 77 release-hardens the combined Goals and Life Areas track with bilingual card rendering coverage, safer URL parameter preservation and validation, failure-isolated linked summaries, and narrow-screen wrapping without changing behavior, storage, routes, dependencies, or backup compatibility.
 Stage 78 adds an optional one-way Project → Goal identity link with bilingual selection, stable Goal navigation, safe unlinking, and non-cascading unavailable states without changing Dexie indexes, the database schema version, or backup version 1.
+Stage 79 activates the existing optional Task → Project identity link in Today with bilingual selection, stable Project navigation, safe unlinking, and non-cascading unavailable states without adding a field, index, migration, or backup change.
 
 ## Version 1.1
 

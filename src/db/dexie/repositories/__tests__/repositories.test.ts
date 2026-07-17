@@ -64,17 +64,25 @@ describe("Dexie repositories", () => {
     const created = await storage.tasks.create(taskInput);
 
     expect(created.id).toMatch(/^[0-9a-f-]{36}$/i);
+    expect(created.projectId).toBe("fixture-id");
     expect(await storage.tasks.list()).toEqual([created]);
     expect(await storage.tasks.getById(created.id)).toEqual(created);
 
     const updated = await storage.tasks.update(created.id, {
       status: "done",
       completedAt: "2026-07-05T09:00:00.000Z",
+      projectId: "replacement-project",
     });
     expect(updated.status).toBe("done");
+    expect(updated.projectId).toBe("replacement-project");
     expect((await storage.tasks.getById(created.id))?.completedAt).toBe(
       "2026-07-05T09:00:00.000Z"
     );
+
+    const unlinked = await storage.tasks.update(created.id, {
+      projectId: undefined,
+    });
+    expect(unlinked.projectId).toBeUndefined();
 
     await storage.tasks.delete(created.id);
     expect(await storage.tasks.list()).toEqual([]);

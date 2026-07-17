@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
 import type { UpdateTaskInput } from "@/core/repositories";
+import { useProjects } from "@/features/projects/hooks/useProjects";
 import type { Task, TaskStatus } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
 import { useDateFormatter } from "@/shared/date";
@@ -22,6 +23,7 @@ import { DailyCheckinForm } from "../components/DailyCheckinForm";
 import { TodayTaskCard } from "../components/TodayTaskCard";
 import { TodayTaskForm } from "../components/TodayTaskForm";
 import { useTodayData } from "../hooks/useTodayData";
+import { findLinkedProject } from "../taskProjectLinks";
 import type { DailyCheckinFormValues, TodayTaskFormValues } from "../types";
 
 export function TodayPage() {
@@ -42,6 +44,12 @@ export function TodayPage() {
     deleteTask,
     saveCheckin,
   } = useTodayData(today);
+  const {
+    projects,
+    isLoading: isProjectsLoading,
+    error: projectsError,
+    loadProjects,
+  } = useProjects();
   const [taskFormOpen, setTaskFormOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | undefined>();
   const [isTaskSubmitting, setIsTaskSubmitting] = useState(false);
@@ -103,6 +111,7 @@ export function TodayPage() {
     const input = {
       ...values,
       description: values.description || undefined,
+      projectId: values.projectId || undefined,
     };
 
     try {
@@ -292,6 +301,9 @@ export function TodayPage() {
             <TodayTaskForm
               key={editingTask?.id ?? "new-task"}
               task={editingTask}
+              projects={projects}
+              isProjectsLoading={isProjectsLoading}
+              areProjectsUnavailable={Boolean(projectsError)}
               defaultDueDate={today}
               isSubmitting={isTaskSubmitting}
               onSubmit={handleTaskSubmit}
@@ -299,6 +311,29 @@ export function TodayPage() {
             />
           </CardContent>
         </PremiumCard>
+      ) : null}
+
+      {projectsError ? (
+        <div
+          role="alert"
+          className="flex flex-col gap-3 rounded-xl border border-border/70 bg-muted/30 p-4 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div className="flex items-start gap-2 text-sm text-muted-foreground">
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+            <span className="min-w-0 break-words">
+              {t("today.projectLinksUnavailable")}
+            </span>
+          </div>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => void loadProjects()}
+          >
+            <RotateCcw className="me-2 h-4 w-4" />
+            {t("common.tryAgain")}
+          </Button>
+        </div>
       ) : null}
 
       {isLoading ? (
@@ -336,6 +371,8 @@ export function TodayPage() {
             >
               <TodayTaskCard
                 task={task}
+                linkedProject={findLinkedProject(task, projects)}
+                isLinkedProjectLoading={isProjectsLoading}
                 isBusy={busyTaskId === task.id}
                 onEdit={() => openEditTask(task)}
                 onStatusChange={(status) => handleStatusChange(task, status)}

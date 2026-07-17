@@ -108,6 +108,25 @@ describe("backup validation and migration", () => {
     expect(legacyBackup.data.projects[0]?.goalId).toBeUndefined();
   });
 
+  it("round-trips task project links and accepts legacy unlinked tasks", () => {
+    const linkedBackup = validateAndMigrateBackupPayload({
+      app: ALIOS_BACKUP_APP,
+      backupVersion: ALIOS_BACKUP_VERSION,
+      exportedAt: "2026-07-05T08:30:00.000Z",
+      data: { tasks: [taskRecord] },
+    });
+    const { projectId: _projectId, ...legacyTask } = taskRecord;
+    const legacyBackup = validateAndMigrateBackupPayload({
+      app: ALIOS_BACKUP_APP,
+      backupVersion: ALIOS_BACKUP_VERSION,
+      exportedAt: "2026-07-05T08:30:00.000Z",
+      data: { tasks: [legacyTask] },
+    });
+
+    expect(linkedBackup.data.tasks[0]?.projectId).toBe(taskRecord.projectId);
+    expect(legacyBackup.data.tasks[0]?.projectId).toBeUndefined();
+  });
+
   it("rejects invalid JSON before any restore write can happen", () => {
     expect(() => validateAndMigrateBackup("{")).toThrow(ValidationError);
     try {

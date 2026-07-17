@@ -1,7 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
-import type { Task } from "@/shared/types";
+import { PROJECT_STATUS_LABEL_KEYS } from "@/features/projects/constants";
+import type { Project, Task } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
 import { Button, Input, Textarea } from "@/shared/ui";
 import { TASK_PRIORITY_OPTIONS, TASK_STATUS_OPTIONS } from "../constants";
@@ -9,6 +10,9 @@ import { todayTaskFormSchema, type TodayTaskFormValues } from "../types";
 
 type TodayTaskFormProps = {
   task?: Task;
+  projects: ReadonlyArray<Project>;
+  isProjectsLoading: boolean;
+  areProjectsUnavailable: boolean;
   defaultDueDate: string;
   isSubmitting: boolean;
   onSubmit: (values: TodayTaskFormValues) => Promise<void>;
@@ -17,6 +21,9 @@ type TodayTaskFormProps = {
 
 export function TodayTaskForm({
   task,
+  projects,
+  isProjectsLoading,
+  areProjectsUnavailable,
   defaultDueDate,
   isSubmitting,
   onSubmit,
@@ -36,6 +43,7 @@ export function TodayTaskForm({
       priority: task?.priority ?? "medium",
       isMit: task?.isMit ?? false,
       dueDate: task?.dueDate ?? defaultDueDate,
+      projectId: task?.projectId ?? "",
     },
   });
 
@@ -69,6 +77,37 @@ export function TodayTaskForm({
           placeholder={t("today.optionalDetails")}
           {...register("description")}
         />
+      </div>
+
+      <div className="grid min-w-0 gap-2">
+        <label htmlFor="today-task-project" className="text-sm font-medium">
+          {t("today.linkedProject")}
+        </label>
+        <select
+          id="today-task-project"
+          className="flex h-11 w-full min-w-0 rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
+          {...register("projectId")}
+        >
+          <option value="">{t("today.noLinkedProject")}</option>
+          {task?.projectId &&
+          !projects.some((project) => project.id === task.projectId) ? (
+            <option value={task.projectId}>
+              {t("today.currentProjectUnavailable")}
+            </option>
+          ) : null}
+          {projects.map((project) => (
+            <option key={project.id} value={project.id}>
+              {project.title} · {t(PROJECT_STATUS_LABEL_KEYS[project.status])}
+            </option>
+          ))}
+        </select>
+        <p className="break-words text-sm leading-6 text-muted-foreground">
+          {isProjectsLoading
+            ? t("today.linkedProjectLoading")
+            : areProjectsUnavailable
+              ? t("today.linkedProjectUnavailableNote")
+              : t("today.linkedProjectOptionalNote")}
+        </p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
@@ -138,11 +177,24 @@ export function TodayTaskForm({
         {t("today.makeMit")}
       </label>
 
-      <div className="flex flex-wrap gap-3">
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? t("common.saving") : task ? t("common.saveChanges") : t("today.createTaskButton")}
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+        <Button
+          type="submit"
+          className="w-full sm:w-auto"
+          disabled={isSubmitting}
+        >
+          {isSubmitting
+            ? t("common.saving")
+            : task
+              ? t("common.saveChanges")
+              : t("today.createTaskButton")}
         </Button>
-        <Button type="button" variant="outline" onClick={onCancel}>
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full sm:w-auto"
+          onClick={onCancel}
+        >
           {t("common.cancel")}
         </Button>
       </div>
