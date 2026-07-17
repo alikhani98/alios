@@ -446,3 +446,11 @@ This is a build-performance boundary only: it does not change routes, storage, d
 The build-performance contract is executable through `pnpm performance:check` and runs in every pull request after the ordinary production build. It checks the manifest-derived entry size, entry preload boundary, and Vite chunk-size warning without adding an external performance service.
 
 The raw-byte budget is intentionally conservative and deterministic. Real-device checks remain a separate release activity because CI cannot measure a user's network or device.
+
+## ADR-035: Treat backup as a round-trip contract
+
+**Status:** Accepted (Stage 87)
+
+Backup coverage must verify the complete local lifecycle rather than only a successful restore call: export records, clear local tables, restore the parsed backup, and re-export the records for exact data comparison. Optional identity links are part of this contract.
+
+This protects local-first data portability while preserving the version-1 backup format and without introducing a cloud, sync, or migration dependency.

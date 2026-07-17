@@ -37,16 +37,22 @@ describe("BackupService with DexieBackupStorage", () => {
     localStorage.clear();
   });
 
-  it("exports, clears, and restores every supported data table", async () => {
-    const project = await storage.projects.create(projectInput);
-    const task = await storage.tasks.create(taskInput);
+  it("round-trips every supported table and the Goal → Project → Task links", async () => {
+    const goal = await storage.goals.create(goalInput);
+    const project = await storage.projects.create({
+      ...projectInput,
+      goalId: goal.id,
+    });
+    const task = await storage.tasks.create({
+      ...taskInput,
+      projectId: project.id,
+    });
     const financeTransaction = await storage.finance.createTransaction(
       financeTransactionInput
     );
     const financeObligation = await storage.finance.createObligation(
       financeObligationInput
     );
-    const goal = await storage.goals.create(goalInput);
     const lifeArea = await storage.lifeAreas.upsert(lifeAreaInput);
     const decisionLogEntry = await storage.decisions.create(decisionLogInput);
     const manualEntry = await storage.manual.create(manualEntryInput);
@@ -81,6 +87,8 @@ describe("BackupService with DexieBackupStorage", () => {
     expect(backup.data.projects).toEqual([project]);
     expect(backup.data.tasks).toEqual([task]);
     expect(backup.data.goals).toEqual([goal]);
+    expect(backup.data.projects[0]?.goalId).toBe(goal.id);
+    expect(backup.data.tasks[0]?.projectId).toBe(project.id);
     expect(backup.data.lifeAreas).toEqual([lifeArea]);
     expect(backup.data.financeTransactions).toEqual([financeTransaction]);
     expect(backup.data.financeObligations).toEqual([financeObligation]);
@@ -139,6 +147,11 @@ describe("BackupService with DexieBackupStorage", () => {
     );
     expect(await storage.settings.getByKey(setting.key)).toEqual(setting);
     expect(await storage.inbox.getById(inboxItem.id)).toEqual(inboxItem);
+
+    const restoredBackup = await service.createBackup();
+    expect(restoredBackup.data).toEqual(backup.data);
+    expect(restoredBackup.data.projects[0]?.goalId).toBe(goal.id);
+    expect(restoredBackup.data.tasks[0]?.projectId).toBe(project.id);
   });
 
   it("restores an older valid backup without inboxItems as an empty inbox", async () => {

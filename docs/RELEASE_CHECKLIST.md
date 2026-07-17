@@ -114,6 +114,12 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] Pull-request CI runs the same guard after the normal production build
 - [ ] Complete the deployed mobile/throttled initial-load smoke test in `MOBILE_USAGE.md`
 
+### Stage 87 backup / restore round-trip integrity
+
+- [x] Automated backup coverage exports, clears, restores, and re-exports every supported data table
+- [x] Goal → Project → Task optional links retain their exact referenced IDs after the round trip
+- [x] The data-only assertion remains independent of export timestamp and does not change backup version 1
+
 ## Production-preview QA
 
 ### Home
