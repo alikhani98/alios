@@ -58,7 +58,9 @@ Stage 82 adopts the design contract for form controls by adding one shared Selec
 
 Stage 83 release-hardens the Stage 81–82 design-system track with keyboard-focus behavior for Topbar panels and the mobile sidebar, focused regression coverage, and a bilingual/narrow-screen smoke checklist. It adds no new product capability, dependency, storage change, or visual redesign.
 
-No Stage 84 implementation scope is approved. The next decision should follow real-world use of the current local-first product.
+Stage 84 establishes a documentation-only real-world usage protocol with a seven-day workflow pass, bilingual/mobile/keyboard checks, an issue log, severity definitions, and evidence-first prioritization. It adds no runtime product behavior or data collection.
+
+No Stage 85 implementation scope is approved. The next decision should follow evidence gathered through the Stage 84 usage pass.
 
 ## Version 1.1
 

@@ -93,6 +93,14 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] TypeScript, automated tests, and the production build pass
 - [ ] Complete the Stage 83 manual shell smoke pass at 360px, 390px, and 430px in Persian and English
 
+### Stage 84 real-world usage QA and product prioritization
+
+- [x] A local-only seven-day usage protocol covers capture, planning, review, search, finance, export, and backup safety
+- [x] The QA guide includes Persian/English, 360px/390px/430px, keyboard, appearance, and long-content checks
+- [x] The issue log requires reproducible workflow evidence, severity, and expected behavior before a future stage is proposed
+- [x] No telemetry, analytics, persistence, dependency, route, repository, schema, backup, or user-data behavior is added
+- [ ] Complete the Stage 84 real-world usage pass and share the observed issue log before approving Stage 85
+
 ## Production-preview QA
 
 ### Home
