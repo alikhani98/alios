@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 84 - Real-World Usage QA & Product Prioritization Foundation
+
+- Added a local, manual seven-day usage protocol that covers Inbox capture, Today planning, planning links, review, search, finance, exports, and backup safety
+- Added bilingual, narrow-screen, keyboard, appearance, and long-content checks plus an evidence-first issue log and severity model
+- Defined a prioritization rule so future work is driven by observed workflow impact rather than speculative features or broad redesigns
+- Kept the stage documentation-only and local-first, with no telemetry, analytics, dependency, route, repository, Dexie schema, backup format, backend, sync, cloud, AI, or user-data change
+
 ## Stage 83 - UI Accessibility & Design Contract Release Hardening
 
 - Added predictable keyboard focus to the Topbar appearance, dashboard, and local-profile panels, including trigger-to-panel focus movement, explicit expanded/control relationships, and Escape-based focus restoration

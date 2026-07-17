@@ -268,6 +268,10 @@ Repeat this pass in Persian RTL and English LTR at 360px, 390px, and 430px, then
 4. With long Persian and English labels, confirm the Topbar panels and mobile menu stay within the viewport, remain scrollable when needed, and do not create horizontal page overflow.
 5. Repeat the path in light and dark appearance with each accent preset; confirm focus remains visible and color is not the only state signal.
 
+## Stage 84 real-world usage handoff
+
+Use [`REAL_WORLD_USAGE_QA.md`](./REAL_WORLD_USAGE_QA.md) during normal daily use. It includes the seven-day workflow pass, required Persian/English and narrow-screen checks, an issue-log template, severity definitions, and the evidence required before proposing another implementation stage.
+
 ## Deferred mobile capabilities
 
 - Offline service-worker caching

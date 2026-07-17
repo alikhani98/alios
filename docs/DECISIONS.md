@@ -416,3 +416,17 @@ Reason:
 - The prior shell panels were visually available but did not provide a complete, predictable keyboard path for opening, dismissing, and returning to the originating control
 - The mobile sidebar blocks route interaction while open, so its keyboard behavior must match its modal presentation
 - The two overlay types have deliberately different semantics; a small local implementation preserves the existing shell architecture without prematurely adding a global abstraction
+
+## ADR-032: Prioritize future work from manual local evidence
+
+Decision:
+
+- Real-world QA is recorded in the repository guide rather than through in-app telemetry, analytics, or a new persisted feedback model
+- The guide asks for workflow, route, actual and expected result, frequency, severity, and optional private-safe evidence
+- A future implementation stage requires an explicitly approved, evidence-backed scope after the usage pass
+
+Reason:
+
+- AliOS is a single-user, local-first system, so collecting behavioral data would conflict with the current product model and add privacy and architecture cost
+- A structured manual log gives enough context to reproduce and rank actual problems without inventing analytics infrastructure
+- Separating observation from implementation prevents a single preference from expanding into an unreviewed redesign or unrelated feature

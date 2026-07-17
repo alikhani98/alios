@@ -126,6 +126,13 @@ AliOS 1.0 is a local-first static web app.
 - The mobile sidebar is a labeled modal dialog that owns initial focus, Escape dismissal, Tab containment, and focus restoration to the opener
 - These shell behaviors remain UI-only and use browser-native focus management; they do not introduce a modal framework, a dependency, persistence, routing, or storage behavior
 
+## Real-World Usage Evidence Boundary
+
+- Product prioritization may use only user-provided manual observations recorded through `docs/REAL_WORLD_USAGE_QA.md`
+- The QA protocol is documentation only: it does not collect telemetry, inspect personal records, add analytics, or transmit browser data
+- A reported issue must include its observed workflow, route, result, expected result, frequency, and severity before it becomes a candidate implementation stage
+- Future stages remain separately approved and must not infer a broad product feature from one unverified preference
+
 ## Runtime Rule
 
 AliOS does not require a Node.js server in production. Node.js is allowed for development, dependency installation, and building static assets.
