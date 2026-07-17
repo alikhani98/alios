@@ -63,6 +63,15 @@ AliOS 1.0 is a local-first static web app.
 - Goal counts and progress shown for a Life Area are derived at runtime by matching `Goal.area` with `LifeArea.areaKey`; they are never persisted and never cascade updates or deletes between modules
 - Backup and restore include life area data additively without breaking older backups that do not contain the life area arrays
 
+## Localization & Help Center Boundary
+
+- English remains the complete source catalog, while the Persian catalog may use English only as an explicit fallback for keys that have not yet been localized
+- Every `lifeAreas.*` key must have a distinct Persian message so the Persian Life Areas surface cannot silently render source-language copy
+- Canonical Life Area titles and descriptions are presentation defaults: persisted values that still exactly match a known English or Persian canonical default are rendered in the current interface language
+- User-authored Life Area titles and descriptions are never translated or overwritten
+- The Settings Help Center remains static bilingual application content, not persisted user data, a CMS, a chatbot, or a new architectural layer
+- Help Center guidance may describe existing modules and relationships but must not create records, automate links, or bypass repository and storage-adapter boundaries
+
 ## Personal Manual Module Boundary
 
 - Personal Manual data lives in a dedicated Dexie table for local user-authored reference entries

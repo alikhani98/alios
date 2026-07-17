@@ -549,6 +549,17 @@ describe("i18n utilities", () => {
     expect(messagesFa[key]).toBeTruthy();
   });
 
+  it("does not fall back to English for any Life Areas message", () => {
+    const lifeAreaKeys = (
+      Object.keys(messagesEn) as Array<keyof typeof messagesEn>
+    ).filter((key) => key.startsWith("lifeAreas."));
+
+    expect(lifeAreaKeys.length).toBeGreaterThan(0);
+    expect(
+      lifeAreaKeys.filter((key) => messagesFa[key] === messagesEn[key])
+    ).toEqual([]);
+  });
+
   it("translates interpolation values without changing catalog data", () => {
     expect(translate("en", "home.updated", { date: "Jul 5, 2026" })).toBe(
       "Updated Jul 5, 2026"

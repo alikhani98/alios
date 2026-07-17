@@ -4,8 +4,8 @@
 
 - Project name: AliOS
 - Architecture version: AliOS 1.0
-- Current status: AliOS includes validated mobile-first Inbox capture, processing, global search, focused search-result navigation, filters, bulk triage, local appearance switching, local profile preferences, calendar month view foundation, home time-window routine nudges, upcoming task grouping, routine templates, Wellness / Badminton Routine foundation, visual motion polish, premium Home dashboard visual upgrade, premium app shell polish, Home dashboard customization, premium reusable components, lightweight Personal Insights, Stage 37 premium Home showcase polish, light core-page visual alignment, hardened backup/restore safety, Stage 38 UI regression QA and release hardening with desktop sticky sidebar accessibility improvements, Stage 39 topbar dashboard controls plus accent color personalization, Stage 40 finance foundation, Stage 41 finance review and budget guard, Stage 42 lightweight finance charts foundation, Stage 43 lightweight motion and interaction polish, Stage 44 finance mobile UX and section navigation, Stage 45 performance audit and bundle optimization, Stage 46 Home collapsible dashboard sections, Stage 47 Settings Help Center Foundation, Stage 48 Weekly Review Foundation, Stage 49 Decision Log Foundation, Stage 50 Backup / Restore Safety & Migration Foundation, Stage 51 App Error Boundary & Local Error Log Foundation, Stage 53 Mobile UX Hardening for dense pages, Stage 54 Empty States & First-Run Guidance Foundation, Stage 55 Backup Reminder & Last Backup Status Foundation, Stage 56 Export Center Foundation, Stage 57 Recovery Mode / Safe Mode Foundation, Stage 58 Finance Monthly Plan Foundation, Stage 59 Personal Manual Foundation, Stage 60 Personal Manual QA & Release Hardening, Stage 61 Personal Manual Export Center Integration, Stage 62 Bundle Size Audit & Initial Load Hardening, Stage 63 Personal Manual Weekly Review Integration, Stage 64 Personal Manual Search & Focus Navigation, Stage 65 Personal Manual Templates Foundation, Stage 66 Personal Manual Mobile & Dense Page Polish, Stage 67 Personal Manual Track Release Hardening, Stage 68 v1.50 Release Hardening, Stage 69 Goals Track Foundation, Stage 70 Goals Track QA & Mobile Hardening, Stage 71 Goals Templates & Quick Start, Stage 72 Life Areas Foundation, Stage 73 App Startup Resilience & Release Hygiene, Stage 74 Pull Request CI Foundation, Stage 75 Life Areas QA & Mobile Hardening, Stage 76 Goals ↔ Life Areas Derived Integration, Stage 77 Goals & Life Areas Release Hardening, Stage 78 Projects → Goals Link Foundation, and Stage 79 Tasks → Projects Link Activation, and remains ready for static GitHub Pages deployment.
-- Current Stage: Stage 79 Completed
+- Current status: AliOS includes validated mobile-first Inbox capture, processing, global search, focused search-result navigation, filters, bulk triage, local appearance switching, local profile preferences, calendar month view foundation, home time-window routine nudges, upcoming task grouping, routine templates, Wellness / Badminton Routine foundation, visual motion polish, premium Home dashboard visual upgrade, premium app shell polish, Home dashboard customization, premium reusable components, lightweight Personal Insights, Stage 37 premium Home showcase polish, light core-page visual alignment, hardened backup/restore safety, Stage 38 UI regression QA and release hardening with desktop sticky sidebar accessibility improvements, Stage 39 topbar dashboard controls plus accent color personalization, Stage 40 finance foundation, Stage 41 finance review and budget guard, Stage 42 lightweight finance charts foundation, Stage 43 lightweight motion and interaction polish, Stage 44 finance mobile UX and section navigation, Stage 45 performance audit and bundle optimization, Stage 46 Home collapsible dashboard sections, Stage 47 Settings Help Center Foundation, Stage 48 Weekly Review Foundation, Stage 49 Decision Log Foundation, Stage 50 Backup / Restore Safety & Migration Foundation, Stage 51 App Error Boundary & Local Error Log Foundation, Stage 53 Mobile UX Hardening for dense pages, Stage 54 Empty States & First-Run Guidance Foundation, Stage 55 Backup Reminder & Last Backup Status Foundation, Stage 56 Export Center Foundation, Stage 57 Recovery Mode / Safe Mode Foundation, Stage 58 Finance Monthly Plan Foundation, Stage 59 Personal Manual Foundation, Stage 60 Personal Manual QA & Release Hardening, Stage 61 Personal Manual Export Center Integration, Stage 62 Bundle Size Audit & Initial Load Hardening, Stage 63 Personal Manual Weekly Review Integration, Stage 64 Personal Manual Search & Focus Navigation, Stage 65 Personal Manual Templates Foundation, Stage 66 Personal Manual Mobile & Dense Page Polish, Stage 67 Personal Manual Track Release Hardening, Stage 68 v1.50 Release Hardening, Stage 69 Goals Track Foundation, Stage 70 Goals Track QA & Mobile Hardening, Stage 71 Goals Templates & Quick Start, Stage 72 Life Areas Foundation, Stage 73 App Startup Resilience & Release Hygiene, Stage 74 Pull Request CI Foundation, Stage 75 Life Areas QA & Mobile Hardening, Stage 76 Goals ↔ Life Areas Derived Integration, Stage 77 Goals & Life Areas Release Hardening, Stage 78 Projects → Goals Link Foundation, Stage 79 Tasks → Projects Link Activation, and Stage 80 Life Areas Persian Localization & Help Center Refresh, and remains ready for static GitHub Pages deployment.
+- Current Stage: Stage 80 Completed
 
 ## Architecture References
 
@@ -38,7 +38,7 @@
 
 ## Completed Stages
 
-Stages 1–79 are complete.
+Stages 1–80 are complete.
 
 - Stage 1 â€” Foundation
 - Stage 2 â€” App Shell
@@ -118,6 +118,7 @@ Stages 1–79 are complete.
 - Stage 77 â€” Goals & Life Areas Release Hardening
 - Stage 78 — Projects → Goals Link Foundation
 - Stage 79 — Tasks → Projects Link Activation
+- Stage 80 — Life Areas Persian Localization & Help Center Refresh
 
 Stage 54 completion is evidenced by the calmer bilingual empty-state guidance across Home, Finance, Decisions, Weekly Review, Inbox, Projects, Journal, Knowledge, and Settings. The stage adds no schema migration, no backup-format change, no backup-version bump, no route redesign, no onboarding modal or tour, no backend, no sync, no cloud, no AI, no telemetry, and no new dependency. It keeps the existing local-first repository/storage-adapter boundaries intact while giving low-data users a clearer first step.
 
@@ -170,6 +171,8 @@ Stage 77 completion is evidenced by focused bilingual server-rendered coverage f
 Stage 78 completion is evidenced by the optional `Project.goalId` field, bilingual Goal selection in the Project form, linked-Goal status and navigation on Project cards, and failure-isolated handling when Goals are loading, unavailable, or deleted. Projects can be linked, relinked, and unlinked without mutating Goals, and deleting a Goal neither deletes nor changes its Projects. The relationship remains an unindexed optional Project field, so no Dexie table, index, or schema-version change is required; backup version 1 remains valid, and older Project records without `goalId` still validate and restore safely. The stage adds no dependency, route redesign, backend, sync, cloud, AI, telemetry, or cascade behavior.
 
 Stage 79 completion is evidenced by activating the existing optional `Task.projectId` field in the Today task form, bilingual linked-Project context and focused Project navigation on task cards, and failure-isolated handling when Projects are loading, unavailable, or deleted. Tasks can be linked, relinked, and unlinked without mutating Projects, and deleting a Project neither deletes nor changes its Tasks. The field and its Dexie index already existed, so no table, index, database schema-version, backup-format, or backup-version change is required; older Task records without `projectId` still validate and restore safely. The stage adds no dependency, route redesign, reverse Project summary, Today Project filter, backend, sync, cloud, AI, telemetry, or cascade behavior.
+
+Stage 80 completion is evidenced by explicit Persian messages for every visible Life Areas key, a catalog regression guard against accidental English fallback, and language-aware rendering for canonical defaults that earlier versions may have persisted in English. Exact canonical defaults follow the selected interface language, while custom user-authored titles and descriptions remain unchanged. The static bilingual Settings Help Center now covers Life Areas, Weekly Review, Decisions, Personal Manual, readable exports, Recovery Mode, backup coverage, and the Life Area → Goal → Project → Task planning chain. The stage adds no dependency, route, repository contract, Dexie schema, backup-format, backup-version, backend, sync, cloud, AI, telemetry, CMS, or chatbot behavior.
 
 Stage 53 completion is evidenced by the mobile-focused readability and overflow hardening pass across the dense Finance, Weekly Review, Decision Log, Settings, and Home surfaces. The stage keeps the existing product behavior intact while improving small-screen stacking, wrapping, button usability, and section readability on 360px, 390px, and 430px class devices. It does not change routes, storage, schemas, backup format, dependencies, or navigation architecture, and it remains aligned with static GitHub Pages deployment.
 Stage 48 completion is evidenced by the derived-only Weekly Review foundation, which summarizes the last seven days of existing local tasks, projects, inbox items, journal entries, knowledge items, finance records, wellness/check-in data, and routine signals where available. The stage adds deterministic observations and suggested focus rules, keeps the review window local and read-only, and stores no new weekly-review data. It uses the existing feature/repository/storage-adapter boundaries, adds no schema migration, no backup-format change, no new dependency, no backend, no sync, no cloud, and no AI, and it remains aligned with static GitHub Pages deployment.
@@ -264,19 +267,19 @@ Stage 35 completion is evidenced by the premium app shell polish across the side
 
 ## Next Stage
 
-The next stage is intentionally undefined pending explicit approval. Project conversion, bulk conversion, tags, attachments, reminders, AI classification, semantic search, offline service-worker caching, automatic sync, cloud backup, and further visual redesign remain deferred. Advanced wellness coaching, medical guidance, treatment logic, charts, and deeper interaction systems remain deferred beyond the approved local-first model.
+The next stage is intentionally undefined pending explicit approval. A repository-native AliOS `DESIGN.md` foundation remains a candidate for a separately approved stage; no community design system has been imported. Project conversion, bulk conversion, tags, attachments, reminders, AI classification, semantic search, offline service-worker caching, automatic sync, cloud backup, and further visual redesign remain deferred. Advanced wellness coaching, medical guidance, treatment logic, charts, and deeper interaction systems remain deferred beyond the approved local-first model.
 
 ## Git Latest Recommended Commit
 
-`feat(tasks): activate optional project links`
+`fix(i18n): localize Life Areas and refresh help`
 
 ## Build Status
 
 - TypeScript: passing (`pnpm exec tsc --noEmit`)
 - Automated tests: passing (`pnpm test:run`)
 - Production build: passing (`pnpm build`)
-- Production build warning: Vite reported a chunk-size warning for the 509.80 kB main bundle
-- Automated test count: 770 passing across 46 suites
+- Production build warning: Vite reported a chunk-size warning for the 514.73 kB main bundle
+- Automated test count: 772 passing across 46 suites
 - Pull request validation: configured (`.github/workflows/ci.yml`)
 - Last verified: 2026-07-17
 

@@ -1,6 +1,6 @@
 import { addDays, endOfDay, isValid, parseISO } from "date-fns";
 
-import type { TranslationKey } from "@/shared/i18n";
+import { translate, type TranslationKey } from "@/shared/i18n";
 import type {
   LifeArea,
   LifeAreaAttentionLevel,
@@ -50,6 +50,18 @@ function compact(value: string): string {
   return value.replace(/\s+/g, " ").trim();
 }
 
+function isCanonicalLocalizedValue(
+  value: string,
+  key: TranslationKey
+): boolean {
+  const normalized = value.trim();
+
+  return (
+    normalized === translate("en", key) ||
+    normalized === translate("fa", key)
+  );
+}
+
 export function getLifeAreaDefinitions(
   t: (key: TranslationKey) => string
 ) {
@@ -95,11 +107,19 @@ export function mergeLifeAreas(
     return {
       ...base,
       ...persisted,
-      title: persisted.title.trim().length > 0 ? persisted.title : base.title,
+      title:
+        persisted.title.trim().length === 0 ||
+        isCanonicalLocalizedValue(persisted.title, definition.titleKey)
+          ? base.title
+          : persisted.title,
       description:
-        persisted.description.trim().length > 0
-          ? persisted.description
-          : base.description,
+        persisted.description.trim().length === 0 ||
+        isCanonicalLocalizedValue(
+          persisted.description,
+          definition.descriptionKey
+        )
+          ? base.description
+          : persisted.description,
       focusNote: persisted.focusNote?.trim() ?? "",
       tags: [...persisted.tags],
       isPersisted: true,

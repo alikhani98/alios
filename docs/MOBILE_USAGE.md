@@ -31,6 +31,7 @@ Stage 73 prevents a failed local-storage module load from leaving the mobile app
 Stage 77 release-hardens the Goals and Life Areas connection so long content, URL navigation, linked-summary states, and card actions stay safe on narrow screens in both interface languages.
 Stage 78 adds optional Project → Goal linking with mobile-safe selection, navigation, unlinking, and unavailable states while keeping Projects independently usable.
 Stage 79 activates optional Task → Project linking in Today with mobile-safe selection, navigation, unlinking, and unavailable states while keeping Tasks independently usable.
+Stage 80 completes Persian Life Areas localization and refreshes the bilingual Settings Help Center for the current module set and optional planning links without changing local data behavior.
 The Personal Insights section stays local to the device and only reflects stored tasks, projects, inbox items, journal entries, knowledge items, and wellness checklist state.
 
 ## Personal Manual smoke test
@@ -131,6 +132,18 @@ Repeat this pass at 360px, 390px, and 430px viewport widths in both Persian and 
 6. Simulate a Project-loading failure and confirm Daily Check-in and Task create, edit, status, MIT, and delete actions remain usable.
 7. Use unusually long Task and Project titles and confirm the selector, badges, relationship panel, status control, and actions stay inside the viewport without horizontal scroll.
 8. Export and restore a backup containing a linked Task, then restore an older valid backup whose Tasks omit `projectId`; confirm both flows remain usable.
+
+## Stage 80 Life Areas localization and Help Center smoke test
+
+Repeat this pass at 360px, 390px, and 430px viewport widths:
+
+1. Switch to Persian, open **حوزه‌های زندگی**, and confirm the header, summaries, filters, canonical-area cards, editor, actions, empty states, linked-goal states, and guidance contain no unintended English interface text.
+2. Confirm user-authored titles, descriptions, focus notes, and tags remain exactly as entered and are not translated when the interface language changes.
+3. In an older profile where a canonical area was saved or marked reviewed while its default title and description were English, switch to Persian and confirm the untouched default text now renders in Persian.
+4. Switch back to English and confirm canonical defaults return to English while customized content stays unchanged.
+5. Open **Settings → AliOS Help Center** in Persian and English; confirm Life Areas, Weekly Review, Decisions, Personal Manual, planning links, backup, readable exports, and Recovery Mode guidance is present and readable.
+6. Expand every Help Center section and confirm long Persian and English paragraphs, ordered lists, and module cards wrap without horizontal overflow.
+7. Confirm the Help Center remains read-only and that opening or expanding guidance does not create, edit, link, restore, export, or delete any local record.
 
 ## v1.50 release smoke test
 
