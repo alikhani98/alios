@@ -29,6 +29,7 @@ Stage 71 adds static Goals templates and a compact quick-start picker that only 
 Stage 72 adds a Life Areas foundation with local-first review, search, and export support that stays on the current device until you manually export or restore a backup.
 Stage 73 prevents a failed local-storage module load from leaving the mobile app on an endless loading screen by offering calm retry and reload actions before the router starts.
 Stage 77 release-hardens the Goals and Life Areas connection so long content, URL navigation, linked-summary states, and card actions stay safe on narrow screens in both interface languages.
+Stage 78 adds optional Project → Goal linking with mobile-safe selection, navigation, unlinking, and unavailable states while keeping Projects independently usable.
 The Personal Insights section stays local to the device and only reflects stored tasks, projects, inbox items, journal entries, knowledge items, and wellness checklist state.
 
 ## Personal Manual smoke test
@@ -103,6 +104,19 @@ Repeat this release pass at 360px, 390px, and 430px viewport widths in both Pers
 6. Confirm linked-goal loading and unavailable states never show partial counts and never disable Life Area edit, review, or reset actions.
 7. Use browser back and forward across both routes and confirm the visible filter/focus state follows the URL.
 8. Confirm Home, Weekly Review, Global Search, readable exports, and backup/restore still include Goals and Life Areas as before.
+
+## Stage 78 Projects → Goals link smoke test
+
+Repeat this pass at 360px, 390px, and 430px viewport widths in both Persian and English:
+
+1. Create a Project with no linked Goal and confirm it saves normally without a relationship card.
+2. Create and edit Projects while selecting different active, paused, completed, or archived Goals; confirm the selected title and status remain readable.
+3. Open **View goal** and confirm Goals receives the linked record through the existing `focusId` URL parameter.
+4. Edit a linked Project, choose **No linked goal**, save, and confirm the relationship card disappears without changing the Goal.
+5. Delete a linked Goal and confirm its Project survives, remains editable and deletable, and shows a calm unavailable state until it is unlinked or reassigned.
+6. Simulate a Goal-loading failure and confirm Project create, edit, delete, and existing data remain usable.
+7. Use unusually long Project and Goal titles and confirm the selector, badges, relationship panel, and actions stay inside the viewport without horizontal scroll.
+8. Export and restore a backup containing a linked Project, then restore an older valid backup whose Projects omit `goalId`; confirm both flows remain usable.
 
 ## v1.50 release smoke test
 

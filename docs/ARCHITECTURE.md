@@ -38,6 +38,14 @@ AliOS 1.0 is a local-first static web app.
 - Goals may navigate to and from Life Areas through the shared canonical area key, but the integration stores no additional relationship field
 - Backup and restore include goals data additively without breaking older backups that do not contain the goals arrays
 
+## Projects Module Boundary
+
+- Projects remain local records accessed through the existing feature hook, repository interface, and storage-adapter boundary
+- A Project may optionally store one `goalId`; Goals do not store a reverse Project list, and linked summaries are resolved in memory
+- `Project.goalId` is not queried through a Dexie index, so the optional field requires no new table, index, database schema version, or data migration
+- Deleting or changing a Goal never cascades to a Project; a missing linked Goal is shown as unavailable so the Project can still be edited, unlinked, relinked, or deleted
+- Backup version 1 accepts both linked Projects and older Project records that omit `goalId`
+
 ## Life Areas Module Boundary
 
 - Life Areas data lives in a dedicated Dexie table for local user-managed areas of life

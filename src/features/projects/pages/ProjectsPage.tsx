@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
 import type { CreateProjectInput } from "@/core/repositories";
+import { useGoals } from "@/features/goals/hooks/useGoals";
 import type { Project } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
 import {
@@ -19,6 +20,7 @@ import { cn } from "@/shared/utils";
 import { ProjectCard } from "../components/ProjectCard";
 import { ProjectForm } from "../components/ProjectForm";
 import { useProjects } from "../hooks/useProjects";
+import { findLinkedGoal } from "../projectGoalLinks";
 import type { ProjectFormValues } from "../types";
 
 export function ProjectsPage() {
@@ -33,6 +35,12 @@ export function ProjectsPage() {
     updateProject,
     deleteProject,
   } = useProjects();
+  const {
+    entries: goals,
+    isLoading: isGoalsLoading,
+    error: goalsError,
+    loadGoals,
+  } = useGoals();
   const [formOpen, setFormOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -74,6 +82,7 @@ export function ProjectsPage() {
       description: values.description || undefined,
       status: values.status,
       priority: values.priority,
+      goalId: values.goalId || undefined,
       nextAction: values.nextAction || undefined,
       reviewDate: values.reviewDate || undefined,
     };
@@ -171,6 +180,9 @@ export function ProjectsPage() {
             <ProjectForm
               key={editingProject?.id ?? "new-project"}
               project={editingProject}
+              goals={goals}
+              isGoalsLoading={isGoalsLoading}
+              areGoalsUnavailable={Boolean(goalsError)}
               isSubmitting={isSubmitting}
               onSubmit={handleSubmit}
               onCancel={closeForm}
@@ -203,6 +215,28 @@ export function ProjectsPage() {
               {t("common.tryAgain")}
             </Button>
           ) : null}
+        </div>
+      ) : null}
+      {goalsError ? (
+        <div
+          role="alert"
+          className="flex flex-col gap-3 rounded-xl border border-border/70 bg-muted/30 p-4 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div className="flex items-start gap-2 text-sm text-muted-foreground">
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+            <span className="min-w-0 break-words">
+              {t("projects.goalLinksUnavailable")}
+            </span>
+          </div>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => void loadGoals()}
+          >
+            <RotateCcw className="me-2 h-4 w-4" />
+            {t("common.tryAgain")}
+          </Button>
         </div>
       ) : null}
       {focusMessage ? (
@@ -253,6 +287,8 @@ export function ProjectsPage() {
             >
               <ProjectCard
                 project={project}
+                linkedGoal={findLinkedGoal(project, goals)}
+                isLinkedGoalLoading={isGoalsLoading}
                 isDeleting={deletingId === project.id}
                 onEdit={() => openEditForm(project)}
                 onDelete={() => handleDelete(project)}

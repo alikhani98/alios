@@ -36,16 +36,24 @@ describe("Dexie repositories", () => {
     expect(created.id).toMatch(/^[0-9a-f-]{36}$/i);
     expect(created.createdAt).toBeTruthy();
     expect(created.updatedAt).toBeTruthy();
+    expect(created.goalId).toBe("fixture-id");
     expect(await storage.projects.list()).toEqual([created]);
     expect(await storage.projects.getById(created.id)).toEqual(created);
 
     const updated = await storage.projects.update(created.id, {
       title: "Ship tested AliOS",
+      goalId: "replacement-goal",
     });
     expect(updated.title).toBe("Ship tested AliOS");
+    expect(updated.goalId).toBe("replacement-goal");
     expect((await storage.projects.getById(created.id))?.title).toBe(
       "Ship tested AliOS"
     );
+
+    const unlinked = await storage.projects.update(created.id, {
+      goalId: undefined,
+    });
+    expect(unlinked.goalId).toBeUndefined();
 
     await storage.projects.delete(created.id);
     expect(await storage.projects.list()).toEqual([]);

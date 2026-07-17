@@ -1,6 +1,6 @@
 # AliOS v1.0 Release Checklist
 
-Automated gates last verified on 2026-07-15. The original v1.0 production-preview QA baseline remains recorded below; Stage 77 mobile checks still require the documented manual browser smoke pass.
+Automated gates last verified on 2026-07-15. The original v1.0 production-preview QA baseline remains recorded below; Stage 77 and Stage 78 mobile checks still require their documented manual browser smoke passes.
 
 ## Pull request validation
 
@@ -16,7 +16,7 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 ## Automated release gates
 
 - [x] `pnpm exec tsc --noEmit`
-- [x] `pnpm test:run` — 740 tests across 44 suites
+- [x] `pnpm test:run` — 755 tests across 45 suites
 - [x] `pnpm build`
 - [x] Repository create, list, read, update, and delete coverage
 - [x] Backup metadata and all currently supported additive arrays
@@ -35,6 +35,16 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] Linked-goal summaries hide partial details while loading or unavailable
 - [x] Goals, Life Areas, Search, Weekly Review, exports, backup/restore, and Home regression suites pass
 - [ ] Complete the Stage 77 manual smoke pass at 360px, 390px, and 430px in Persian and English
+
+### Stage 78 Projects → Goals link foundation
+
+- [x] `Project.goalId` is optional, rejects empty persisted IDs, and preserves legacy Projects without the field
+- [x] Project repository coverage includes create with a Goal, relink, and unlink behavior
+- [x] Backup validation covers linked-Project round trips and legacy Project compatibility while backup version remains 1
+- [x] Project forms and cards cover available, loading, unavailable, unlinked, Persian, and English Goal-link states
+- [x] Missing or deleted Goals do not block Project edit or delete actions and do not trigger cascade changes
+- [x] No dependency, route redesign, Dexie table, index, or database schema-version change is introduced
+- [ ] Complete the Stage 78 manual smoke pass at 360px, 390px, and 430px in Persian and English
 
 ## Production-preview QA
 
@@ -91,7 +101,7 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] Stored dates remain ISO/Gregorian strings
 - [x] Backup format remains version 1 and unchanged
 - [x] Route-level chunks load for every feature page
-- [x] Existing 507.21 kB main-chunk warning reviewed; Stage 77 adds no production dependency and does not increase the measured main bundle
+- [x] Existing main-chunk warning reviewed; Stage 78 measures 508.48 kB (up 1.27 kB from the Stage 77 baseline) and adds no production dependency
 - [x] No browser console errors during final QA
 
 ## Release procedure
