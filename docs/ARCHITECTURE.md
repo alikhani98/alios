@@ -19,6 +19,7 @@ AliOS 1.0 is a local-first static web app.
 - The root `DESIGN.md` is the canonical design contract for product UI and AI-assisted interface work
 - Runtime design sources remain the semantic CSS variables in `src/styles`, shared components in `src/shared/ui`, shell patterns in `src/shared/layout`, and accent preference logic in `src/shared/preferences`
 - Feature UI consumes those sources without creating a second styling framework, duplicated theme, or feature-local component library
+- Feature-level select controls use the shared `Select` primitive; only that primitive renders and styles the native element so focus, motion, disabled state, mobile typography, and semantic colors remain consistent
 - Material UI changes preserve Persian RTL, English LTR, light and dark appearance, all supported accent palettes, reduced motion, visible focus, and 360px, 390px, and 430px mobile usability
 - External design-system documents may inform an approved change but do not replace the repository-native contract or authorize dependencies, hosted services, or a redesign
 - The design contract is documentation and governance only; it does not add a runtime service, persistence layer, remote source, or application dependency

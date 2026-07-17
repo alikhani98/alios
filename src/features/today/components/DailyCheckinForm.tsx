@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 
 import type { DailyCheckin } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
-import { Button, Textarea } from "@/shared/ui";
+import { Button, Textarea, Select } from "@/shared/ui";
 import {
   LEVEL_OPTIONS,
   SMOKING_OPTIONS,
@@ -54,9 +54,8 @@ export function DailyCheckinForm({
             <label htmlFor={`checkin-${name}`} className="text-sm font-medium">
               {label}
             </label>
-            <select
+            <Select
               id={`checkin-${name}`}
-              className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
               {...register(name as "sleepQuality" | "energyLevel" | "moodLevel")}
             >
               {LEVEL_OPTIONS.map((option) => (
@@ -64,7 +63,7 @@ export function DailyCheckinForm({
                   {t(option.labelKey)}
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
         ))}
 
@@ -72,9 +71,8 @@ export function DailyCheckinForm({
           <label htmlFor="checkin-stress" className="text-sm font-medium">
             {t("today.stress")}
           </label>
-          <select
+          <Select
             id="checkin-stress"
-            className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
             {...register("stressLevel")}
           >
             {STRESS_OPTIONS.map((option) => (
@@ -82,7 +80,7 @@ export function DailyCheckinForm({
                 {t(option.labelKey)}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
       </div>
 
@@ -91,9 +89,8 @@ export function DailyCheckinForm({
           <label htmlFor="checkin-smoking" className="text-sm font-medium">
             {t("today.smokingStatus")}
           </label>
-          <select
+          <Select
             id="checkin-smoking"
-            className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
             {...register("smokingStatus")}
           >
             {SMOKING_OPTIONS.map((option) => (
@@ -101,7 +98,7 @@ export function DailyCheckinForm({
                 {t(option.labelKey)}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
 
         <label className="flex min-h-11 items-center gap-3 rounded-xl border px-4 py-2 text-sm font-medium">

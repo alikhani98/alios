@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 
 import { INBOX_ITEM_TYPE_VALUES, type InboxItem } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
-import { Button, Textarea } from "@/shared/ui";
+import { Button, Textarea, Select } from "@/shared/ui";
 import { INBOX_TYPE_LABEL_KEYS } from "../constants";
 import { inboxFormSchema, type InboxFormValues } from "../types";
 
@@ -58,13 +58,12 @@ export function InboxItemForm({ item, isSubmitting, onSubmit, onCancel }: Props)
         <label htmlFor={item ? `inbox-type-${item.id}` : "inbox-type"} className="text-sm font-medium">
           {t("common.type")}
         </label>
-        <select
+        <Select
           id={item ? `inbox-type-${item.id}` : "inbox-type"}
-          className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:text-sm"
           {...register("type")}
         >
           {INBOX_ITEM_TYPE_VALUES.map((type) => <option key={type} value={type}>{t(INBOX_TYPE_LABEL_KEYS[type])}</option>)}
-        </select>
+        </Select>
       </div>
       <div className="flex flex-wrap gap-3">
         <Button type="submit" disabled={isSubmitting}>

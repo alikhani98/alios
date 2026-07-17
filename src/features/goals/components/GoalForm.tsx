@@ -1,7 +1,7 @@
 import { useMemo, type FormEvent } from "react";
 
 import { useI18n } from "@/shared/i18n";
-import { Button, Input, Textarea } from "@/shared/ui";
+import { Button, Input, Textarea, Select } from "@/shared/ui";
 
 import {
   GOAL_AREA_OPTIONS,
@@ -65,10 +65,9 @@ export function GoalForm({
 
         <label className="space-y-2">
           <span className="text-sm font-medium">{t("goals.statusLabel")}</span>
-          <select
+          <Select
             name="status"
             defaultValue={goal?.status ?? "active"}
-            className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
           >
             {GOAL_STATUS_OPTIONS.filter((option) => option.value !== "all").map(
               (option) => (
@@ -77,7 +76,7 @@ export function GoalForm({
                 </option>
               )
             )}
-          </select>
+          </Select>
         </label>
       </div>
 
@@ -95,10 +94,9 @@ export function GoalForm({
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <label className="space-y-2">
           <span className="text-sm font-medium">{t("goals.areaLabel")}</span>
-          <select
+          <Select
             name="area"
             defaultValue={goal?.area ?? "personal"}
-            className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
           >
             {GOAL_AREA_OPTIONS.filter((option) => option.value !== "all").map(
               (option) => (
@@ -107,15 +105,14 @@ export function GoalForm({
                 </option>
               )
             )}
-          </select>
+          </Select>
         </label>
 
         <label className="space-y-2">
           <span className="text-sm font-medium">{t("goals.timeframeLabel")}</span>
-          <select
+          <Select
             name="timeframe"
             defaultValue={goal?.timeframe ?? "open"}
-            className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
           >
             {GOAL_TIMEFRAME_OPTIONS.filter((option) => option.value !== "all").map(
               (option) => (
@@ -124,15 +121,14 @@ export function GoalForm({
                 </option>
               )
             )}
-          </select>
+          </Select>
         </label>
 
         <label className="space-y-2">
           <span className="text-sm font-medium">{t("goals.importanceLabel")}</span>
-          <select
+          <Select
             name="importance"
             defaultValue={goal?.importance ?? "medium"}
-            className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
           >
             {GOAL_IMPORTANCE_OPTIONS.filter((option) => option.value !== "all").map(
               (option) => (
@@ -141,7 +137,7 @@ export function GoalForm({
                 </option>
               )
             )}
-          </select>
+          </Select>
         </label>
 
         <label className="space-y-2">

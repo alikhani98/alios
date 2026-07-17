@@ -15,6 +15,7 @@ import {
   PremiumCard,
   SectionHeader,
   StatusChip,
+  Select,
 } from "@/shared/ui";
 import { cn } from "@/shared/utils";
 
@@ -460,34 +461,32 @@ export function PersonalManualPage() {
                 aria-label={t("manual.searchLabel")}
               />
             </div>
-            <select
+            <Select
               value={categoryFilter}
               onChange={(event) =>
                 setCategoryFilter(event.target.value as ManualEntry["category"] | "all")
               }
               aria-label={t("manual.categoryFilter")}
-              className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
             >
               {MANUAL_CATEGORY_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
                   {t(option.labelKey)}
                 </option>
               ))}
-            </select>
-            <select
+            </Select>
+            <Select
               value={statusFilter}
               onChange={(event) =>
                 setStatusFilter(event.target.value as ManualEntry["status"] | "all")
               }
               aria-label={t("manual.statusFilter")}
-              className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
             >
               {MANUAL_STATUS_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
                   {t(option.labelKey)}
                 </option>
               ))}
-            </select>
+            </Select>
             <div className="flex flex-wrap gap-2">
               <Button type="button" onClick={handleSearch}>
                 {t("manual.search")}

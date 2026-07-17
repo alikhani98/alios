@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { PROJECT_STATUS_LABEL_KEYS } from "@/features/projects/constants";
 import type { Project, Task, TaskStatus } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
-import { Badge, Button, Card, CardContent } from "@/shared/ui";
+import { Badge, Button, Card, CardContent, Select } from "@/shared/ui";
 import {
   TASK_PRIORITY_LABEL_KEYS,
   TASK_STATUS_OPTIONS,
@@ -120,21 +120,21 @@ export function TodayTaskCard({
         </div>
 
         <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center lg:justify-end">
-          <select
+          <Select
             aria-label={t("today.statusFor", { title: task.title })}
             value={task.status}
             disabled={isBusy}
             onChange={(event) =>
               void onStatusChange(event.target.value as TaskStatus)
             }
-            className="flex min-h-11 w-full max-w-full rounded-lg border border-input bg-background px-3 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:w-auto sm:text-sm"
+            className="max-w-full rounded-lg sm:w-auto"
           >
             {TASK_STATUS_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
                 {t(option.labelKey)}
               </option>
             ))}
-          </select>
+          </Select>
 
           {!task.isMit ? (
             <Button

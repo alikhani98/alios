@@ -15,6 +15,7 @@ import {
   EmptyState,
   PremiumCard,
   SectionHeader,
+  Select,
 } from "@/shared/ui";
 import { cn } from "@/shared/utils";
 import { KnowledgeItemCard } from "../components/KnowledgeItemCard";
@@ -228,13 +229,12 @@ export function KnowledgePage() {
                 className={direction === "rtl" ? "pr-9" : "pl-9"}
               />
             </div>
-            <select
+            <Select
               aria-label={t("knowledge.filterLabel")}
               value={typeFilter}
               onChange={(event) =>
                 setTypeFilter(event.target.value as KnowledgeItemType | "all")
               }
-              className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
             >
               <option value="all">{t("knowledge.allTypes")}</option>
               {KNOWLEDGE_TYPE_OPTIONS.map((option) => (
@@ -242,7 +242,7 @@ export function KnowledgePage() {
                   {t(option.labelKey)}
                 </option>
               ))}
-            </select>
+            </Select>
             <div className="flex flex-wrap gap-2">
               <Button type="submit">{t("knowledge.search")}</Button>
               {hasActiveSearch ? (

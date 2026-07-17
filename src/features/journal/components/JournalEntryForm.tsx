@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 
 import type { JournalEntry } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
-import { Button, Input, Textarea } from "@/shared/ui";
+import { Button, Input, Textarea, Select } from "@/shared/ui";
 import { JOURNAL_TYPE_OPTIONS, LEVEL_OPTIONS } from "../constants";
 import {
   journalEntryFormSchema,
@@ -66,9 +66,8 @@ export function JournalEntryForm({
           <label htmlFor="journal-type" className="text-sm font-medium">
             {t("journal.entryType")}
           </label>
-          <select
+          <Select
             id="journal-type"
-            className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
             {...register("type")}
           >
             {JOURNAL_TYPE_OPTIONS.map((option) => (
@@ -76,7 +75,7 @@ export function JournalEntryForm({
                 {t(option.labelKey)}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
       </div>
 
@@ -117,9 +116,8 @@ export function JournalEntryForm({
           <label htmlFor="journal-mood" className="text-sm font-medium">
             {t("journal.mood")}
           </label>
-          <select
+          <Select
             id="journal-mood"
-            className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
             {...register("moodLevel")}
           >
             <option value="">{t("common.notRecorded")}</option>
@@ -128,16 +126,15 @@ export function JournalEntryForm({
                 {t(option.labelKey)}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
 
         <div className="grid gap-2">
           <label htmlFor="journal-energy" className="text-sm font-medium">
             {t("journal.energy")}
           </label>
-          <select
+          <Select
             id="journal-energy"
-            className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
             {...register("energyLevel")}
           >
             <option value="">{t("common.notRecorded")}</option>
@@ -146,7 +143,7 @@ export function JournalEntryForm({
                 {t(option.labelKey)}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
       </div>
 

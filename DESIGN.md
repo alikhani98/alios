@@ -221,7 +221,7 @@ Approved minimum heights are 40 px for small, 44 px for default and icon, and 48
 
 ### 7.2 Inputs and forms
 
-Use shared `Input` and `Textarea`, native `select` styling consistent with them, React Hook Form, and Zod where the feature already follows that form boundary.
+Use shared `Input`, `Select`, and `Textarea`, React Hook Form, and Zod where the feature already follows that form boundary. Feature code must use the shared `Select` primitive instead of restyling a native `select`; the primitive remains the single place that renders the native control.
 
 - Every control needs a visible label or an equivalent accessible name.
 - Help and validation text belong close to the field.

@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 82 - Design Contract Adoption & Form Control Consistency
+
+- Added the shared `Select` primitive with the AliOS mobile sizing, semantic colors, focus ring, motion, disabled state, ref forwarding, and focused layout overrides
+- Migrated all 43 feature-level native select controls across 18 files to the shared primitive while preserving labels, options, values, handlers, React Hook Form registration, and the compact Today status override
+- Added focused component coverage plus a repository guard that keeps native select rendering inside the shared primitive
+- Kept the stage behavior-preserving and dependency-free, with no route, repository, Dexie schema, backup format, backup version, backend, sync, cloud, AI, telemetry, or user-data change
+
 ## Stage 81 - AliOS Design System Contract
 
 - Added the repository-native root `DESIGN.md` as the single design contract for developers and AI coding agents, plus a development-time regression guard for required sections, agent wiring, and supported accent preferences

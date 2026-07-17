@@ -54,7 +54,9 @@ Stage 79 activates the existing optional Task → Project identity link in Today
 Stage 80 completes Persian Life Areas localization, preserves custom user text while re-localizing untouched canonical defaults, and refreshes the static bilingual Help Center for current modules and optional planning links without changing storage, backup compatibility, dependencies, or routes.
 Stage 81 establishes a repository-native AliOS design system contract for consistent developer and AI-assisted UI work, documenting the existing tokens, components, responsive behavior, bilingual directions, motion, accessibility, and external-design-system governance without changing runtime behavior.
 
-Stage 82 Design Contract Adoption & UI Consistency Audit is a candidate only and remains unapproved. If approved, it should audit representative shared and feature surfaces against `DESIGN.md` and fix only evidenced consistency or accessibility defects without a broad visual redesign.
+Stage 82 adopts the design contract for form controls by adding one shared Select primitive and migrating all existing feature-level native selects while preserving their values, handlers, labels, options, and form registration.
+
+Stage 83 UI Accessibility & Design Contract Release Hardening is a candidate only and remains unapproved. If approved, it should run representative bilingual keyboard and narrow-screen smoke passes, address only evidenced defects, and release-harden the Stage 81–82 design-system track without a broad visual redesign.
 
 ## Version 1.1
 

@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 
 import type { FinanceObligation } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
-import { Button, Input, Textarea } from "@/shared/ui";
+import { Button, Input, Textarea, Select } from "@/shared/ui";
 import {
   DEFAULT_FINANCE_OBLIGATION_STATUS,
   DEFAULT_FINANCE_OBLIGATION_TYPE,
@@ -95,9 +95,8 @@ export function FinanceObligationForm({
           <label htmlFor="finance-obligation-type" className="text-sm font-medium">
             {t("common.type")}
           </label>
-          <select
+          <Select
             id="finance-obligation-type"
-            className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:text-sm"
             {...register("type")}
           >
             {FINANCE_OBLIGATION_TYPE_OPTIONS.map((option) => (
@@ -105,7 +104,7 @@ export function FinanceObligationForm({
                 {t(option.labelKey)}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
       </div>
 
@@ -249,9 +248,8 @@ export function FinanceObligationForm({
         <label htmlFor="finance-obligation-status" className="text-sm font-medium">
           {t("common.status")}
         </label>
-        <select
+        <Select
           id="finance-obligation-status"
-          className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:text-sm"
           {...register("status")}
         >
           {FINANCE_OBLIGATION_STATUS_OPTIONS.map((option) => (
@@ -259,7 +257,7 @@ export function FinanceObligationForm({
               {t(option.labelKey)}
             </option>
           ))}
-        </select>
+        </Select>
       </div>
 
       <div className="grid gap-2">

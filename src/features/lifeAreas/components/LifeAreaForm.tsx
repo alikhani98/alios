@@ -5,6 +5,7 @@ import {
   Button,
   Input,
   Textarea,
+  Select,
 } from "@/shared/ui";
 import type { LifeAreaAttentionLevel, LifeAreaStatus } from "@/shared/types";
 
@@ -80,13 +81,12 @@ export function LifeAreaForm({
           <label className="text-sm font-medium" htmlFor={`life-area-status-${area.areaKey}`}>
             {t("lifeAreas.statusLabel")}
           </label>
-            <select
+          <Select
             id={`life-area-status-${area.areaKey}`}
             value={values.status}
             onChange={(event) =>
               updateValue("status", event.target.value as LifeAreaStatus)
             }
-            className="flex h-11 min-w-0 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
           >
             {LIFE_AREA_STATUS_OPTIONS.filter((option) => option.value !== "all").map(
               (option) => (
@@ -95,7 +95,7 @@ export function LifeAreaForm({
                 </option>
               )
             )}
-          </select>
+          </Select>
         </div>
       </div>
 
@@ -118,7 +118,7 @@ export function LifeAreaForm({
           <label className="text-sm font-medium" htmlFor={`life-area-attention-${area.areaKey}`}>
             {t("lifeAreas.attentionLabel")}
           </label>
-          <select
+          <Select
             id={`life-area-attention-${area.areaKey}`}
             value={values.attentionLevel}
             onChange={(event) =>
@@ -127,7 +127,6 @@ export function LifeAreaForm({
                 event.target.value as LifeAreaAttentionLevel
               )
             }
-            className="flex h-11 min-w-0 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
           >
             {LIFE_AREA_ATTENTION_OPTIONS.filter((option) => option.value !== "all").map(
               (option) => (
@@ -136,7 +135,7 @@ export function LifeAreaForm({
                 </option>
               )
             )}
-          </select>
+          </Select>
         </div>
         <div className="min-w-0 space-y-2">
           <label
@@ -145,11 +144,10 @@ export function LifeAreaForm({
           >
             {t("lifeAreas.satisfactionLabel")}
           </label>
-          <select
+          <Select
             id={`life-area-satisfaction-${area.areaKey}`}
             value={values.satisfactionScore}
             onChange={(event) => updateValue("satisfactionScore", event.target.value)}
-            className="flex h-11 min-w-0 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
           >
             <option value="">{t("common.notRecorded")}</option>
             {["1", "2", "3", "4", "5"].map((value) => (
@@ -157,7 +155,7 @@ export function LifeAreaForm({
                 {value}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
         <div className="min-w-0 space-y-2">
           <label

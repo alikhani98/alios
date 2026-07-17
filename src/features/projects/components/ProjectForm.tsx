@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { GOAL_STATUS_LABEL_KEYS } from "@/features/goals/constants";
 import type { Goal, Project } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
-import { Button, Input, Textarea } from "@/shared/ui";
+import { Button, Input, Textarea, Select } from "@/shared/ui";
 import {
   PROJECT_PRIORITY_OPTIONS,
   PROJECT_STATUS_OPTIONS,
@@ -73,9 +73,8 @@ export function ProjectForm({
         <label htmlFor="project-goal" className="text-sm font-medium">
           {t("projects.linkedGoal")}
         </label>
-        <select
+        <Select
           id="project-goal"
-          className="flex h-11 w-full min-w-0 rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
           {...register("goalId")}
         >
           <option value="">{t("projects.noLinkedGoal")}</option>
@@ -89,7 +88,7 @@ export function ProjectForm({
               {goal.title} · {t(GOAL_STATUS_LABEL_KEYS[goal.status])}
             </option>
           ))}
-        </select>
+        </Select>
         <p className="break-words text-sm leading-6 text-muted-foreground">
           {isGoalsLoading
             ? t("projects.linkedGoalLoading")
@@ -115,9 +114,8 @@ export function ProjectForm({
           <label htmlFor="project-status" className="text-sm font-medium">
             {t("common.status")}
           </label>
-          <select
+          <Select
             id="project-status"
-            className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
             {...register("status")}
           >
             {PROJECT_STATUS_OPTIONS.map((option) => (
@@ -125,16 +123,15 @@ export function ProjectForm({
                 {t(option.labelKey)}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
 
         <div className="grid gap-2">
           <label htmlFor="project-priority" className="text-sm font-medium">
             {t("common.priority")}
           </label>
-          <select
+          <Select
             id="project-priority"
-            className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
             {...register("priority")}
           >
             {PROJECT_PRIORITY_OPTIONS.map((option) => (
@@ -142,7 +139,7 @@ export function ProjectForm({
                 {t(option.labelKey)}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
       </div>
 

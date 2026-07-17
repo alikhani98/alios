@@ -14,6 +14,7 @@ import {
   Input,
   PremiumCard,
   SectionHeader,
+  Select,
 } from "@/shared/ui";
 import { cn } from "@/shared/utils";
 import { InboxItemCard } from "../components/InboxItemCard";
@@ -225,28 +226,26 @@ export function InboxPage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="grid gap-2 text-sm font-medium">
               {t("inbox.filterByStatus")}
-              <select
+              <Select
                 value={statusFilter}
                 onChange={(event) => setStatusFilter(event.target.value as InboxStatusFilter)}
-                className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:text-sm"
               >
                 <option value="all">{t("inbox.allStatuses")}</option>
                 <option value="unprocessed">{t(INBOX_STATUS_LABEL_KEYS.unprocessed)}</option>
                 <option value="processed">{t(INBOX_STATUS_LABEL_KEYS.processed)}</option>
-              </select>
+              </Select>
             </label>
             <label className="grid gap-2 text-sm font-medium">
               {t("inbox.filterByType")}
-              <select
+              <Select
                 value={typeFilter}
                 onChange={(event) => setTypeFilter(event.target.value as InboxTypeFilter)}
-                className="flex h-11 w-full rounded-xl border border-input bg-background px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:text-sm"
               >
                 <option value="all">{t("inbox.allTypes")}</option>
                 {INBOX_ITEM_TYPE_VALUES.map((type) => (
                   <option key={type} value={type}>{t(INBOX_TYPE_LABEL_KEYS[type])}</option>
                 ))}
-              </select>
+              </Select>
             </label>
           </div>
           {filtersActive ? (

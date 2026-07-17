@@ -384,3 +384,20 @@ Reason:
 - A single repository-native contract gives developers and AI coding agents consistent constraints without creating a runtime design layer or duplicating implementation
 - Treating external libraries as references prevents an attractive downloaded theme from silently breaking Persian RTL, mobile behavior, dark mode, accessibility, or the dependency-free local-first model
 - Explicit governance allows useful external ideas to be adopted deliberately while preserving one source of truth
+
+## ADR-030: Centralize native select rendering in one shared primitive
+
+Decision:
+
+- Feature code uses the shared `Select` component instead of rendering and styling native select elements directly
+- The primitive owns the common mobile height, semantic colors, typography, focus ring, reduced-motion-safe transition, disabled state, and ref forwarding
+- Feature code may pass a narrow layout override when the context requires it, such as the compact task-status control, but must not duplicate the base visual contract
+- Existing labels, options, values, change handlers, React Hook Form registration, and browser-native selection behavior remain unchanged
+- A development-time repository guard prevents feature-level native select rendering from returning silently
+
+Reason:
+
+- Forty-three select controls across 18 feature files repeated nearly identical class strings with small focus and transition differences
+- One native primitive removes visual drift and makes future accessibility or mobile improvements apply consistently without changing form-domain behavior
+- Preserving the browser-native control avoids a new dependency, custom popup behavior, focus-management complexity, and RTL risk
+- Keeping focused overrides explicit supports real layout needs without creating another component variant system prematurely
