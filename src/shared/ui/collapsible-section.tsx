@@ -1,7 +1,7 @@
 import { ChevronDown } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 
-import { cn } from "@/shared/utils";
+import { cn } from "@/shared/utils/cn";
 
 import { aliosFocusRing, aliosSurfaceMotion } from "./motion";
 

@@ -22,22 +22,26 @@ import { Link, useNavigate } from "react-router-dom";
 import {
   APPEARANCE_STORAGE_KEY,
   DISPLAY_NAME_STORAGE_KEY,
-} from "@/shared/constants";
+} from "@/shared/constants/preferences";
 import { appConfig } from "@/shared/constants/app";
-import { usePersistentString } from "@/shared/hooks";
+import { usePersistentString } from "@/shared/hooks/usePersistentString";
 import { useI18n } from "@/shared/i18n";
 import {
-  DEFAULT_APPEARANCE_PREFERENCE,
-  getDisplayNameInitials,
   getAccentColorThemeVariables,
-  normalizeDisplayName,
-  parseAppearancePreference,
   useAccentColorPreference,
-} from "@/shared/preferences";
+} from "@/shared/preferences/accentColor";
+import {
+  DEFAULT_APPEARANCE_PREFERENCE,
+  parseAppearancePreference,
+} from "@/shared/preferences/appearance";
+import {
+  getDisplayNameInitials,
+  normalizeDisplayName,
+} from "@/shared/preferences/profile";
 import { Badge, Button, SectionHeader } from "@/shared/ui";
 import { Input } from "@/shared/ui";
 import { aliosPopoverMotion, aliosSurfaceMotion } from "@/shared/ui/motion";
-import { cn } from "@/shared/utils";
+import { cn } from "@/shared/utils/cn";
 
 import { useHomeDashboardLayout } from "@/features/home/hooks/useHomeDashboardLayout";
 

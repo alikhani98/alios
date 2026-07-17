@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { mainNavigation } from "@/shared/constants/navigation";
 import { useI18n } from "@/shared/i18n";
 import { Button } from "@/shared/ui";
-import { cn } from "@/shared/utils";
+import { cn } from "@/shared/utils/cn";
 
 import { NavigationLink } from "./NavigationLink";
 

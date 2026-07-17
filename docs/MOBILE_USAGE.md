@@ -272,6 +272,12 @@ Repeat this pass in Persian RTL and English LTR at 360px, 390px, and 430px, then
 
 Use [`REAL_WORLD_USAGE_QA.md`](./REAL_WORLD_USAGE_QA.md) during normal daily use. It includes the seven-day workflow pass, required Persian/English and narrow-screen checks, an issue-log template, severity definitions, and the evidence required before proposing another implementation stage.
 
+## Stage 85 initial-load smoke test
+
+1. On a 360px or 390px device (or throttled browser), open the deployed GitHub Pages URL in a new tab and wait for the initial loading state to resolve.
+2. Navigate to Today, Projects, and one route with a form; confirm each route loads and form controls remain usable.
+3. Repeat once after a hard refresh. A delayed network must show the existing calm bootstrap/loading UI, never a blank or stuck screen.
+
 ## Deferred mobile capabilities
 
 - Offline service-worker caching

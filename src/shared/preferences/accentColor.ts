@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { LOCAL_PREFERENCE_CHANGE_EVENT } from "@/shared/constants";
-
-import { ACCENT_COLOR_STORAGE_KEY } from "@/shared/constants";
+import {
+  ACCENT_COLOR_STORAGE_KEY,
+  LOCAL_PREFERENCE_CHANGE_EVENT,
+} from "@/shared/constants/preferences";
 
 export type AccentColorPreference =
   | "default"

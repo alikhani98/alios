@@ -1,9 +1,9 @@
 import {
   LOCAL_PREFERENCE_CHANGE_EVENT,
   RECOVERY_MODE_ENABLED_STORAGE_KEY,
-} from "@/shared/constants";
+} from "@/shared/constants/preferences";
 
-export { RECOVERY_MODE_ENABLED_STORAGE_KEY } from "@/shared/constants";
+export { RECOVERY_MODE_ENABLED_STORAGE_KEY } from "@/shared/constants/preferences";
 
 type StorageLike = Pick<Storage, "getItem" | "removeItem" | "setItem">;
 

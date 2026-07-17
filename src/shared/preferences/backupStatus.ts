@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { BACKUP_STATUS_STORAGE_KEY } from "@/shared/constants";
+import { BACKUP_STATUS_STORAGE_KEY } from "@/shared/constants/preferences";
 
 export const LEGACY_LAST_BACKUP_EXPORTED_AT_KEY =
   "alios.lastBackupExportedAt";

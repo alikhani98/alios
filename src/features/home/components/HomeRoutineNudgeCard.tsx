@@ -12,7 +12,7 @@ import { Link } from "react-router-dom";
 import {
   MORNING_WARMUP_ENABLED_STORAGE_KEY,
   MORNING_WARMUP_DISMISSED_DATE_STORAGE_KEY,
-} from "@/shared/constants";
+} from "@/shared/constants/preferences";
 import { usePersistentBoolean, usePersistentString } from "@/shared/hooks";
 import { useI18n } from "@/shared/i18n";
 import { Badge, Button, CollapsibleSection, SoftPanel } from "@/shared/ui";

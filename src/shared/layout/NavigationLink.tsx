@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 
 import type { NavItem } from "@/shared/constants/navigation";
 import { useI18n } from "@/shared/i18n";
-import { cn } from "@/shared/utils";
+import { cn } from "@/shared/utils/cn";
 import {
   aliosFocusRing,
   aliosInteractiveLift,

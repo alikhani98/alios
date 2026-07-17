@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { LOCAL_PREFERENCE_CHANGE_EVENT } from "@/shared/constants";
+import { LOCAL_PREFERENCE_CHANGE_EVENT } from "@/shared/constants/preferences";
 
 type UsePersistentBooleanOptions = {
   key: string;

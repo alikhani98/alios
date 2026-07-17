@@ -430,3 +430,11 @@ Reason:
 - AliOS is a single-user, local-first system, so collecting behavioral data would conflict with the current product model and add privacy and architecture cost
 - A structured manual log gives enough context to reproduce and rank actual problems without inventing analytics infrastructure
 - Separating observation from implementation prevents a single preference from expanding into an unreviewed redesign or unrelated feature
+
+## ADR-033: Keep form validation out of the initial application preload path
+
+**Status:** Accepted (Stage 85)
+
+AliOS uses Vite manual vendor chunks for React, icons, date utilities, and form/validation dependencies. The shared shell must prefer direct imports for small utilities and preferences when a barrel would also expose schema or form code. This keeps the forms vendor chunk lazy for form-bearing routes while allowing stable browser caching of common third-party code.
+
+This is a build-performance boundary only: it does not change routes, storage, data, backup compatibility, dependencies, or user-facing behavior. The measured build contract is documented in `docs/PERFORMANCE.md`.
