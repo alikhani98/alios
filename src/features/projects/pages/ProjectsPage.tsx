@@ -4,6 +4,8 @@ import { useSearchParams } from "react-router-dom";
 
 import type { CreateProjectInput } from "@/core/repositories";
 import { useGoals } from "@/features/goals/hooks/useGoals";
+import { useStorageAdapter } from "@/core/storage";
+import type { Task } from "@/shared/types";
 import type { Project } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
 import {
@@ -21,10 +23,12 @@ import { ProjectCard } from "../components/ProjectCard";
 import { ProjectForm } from "../components/ProjectForm";
 import { useProjects } from "../hooks/useProjects";
 import { findLinkedGoal } from "../projectGoalLinks";
+import { getProjectTaskProgress } from "../projectTaskProgress";
 import type { ProjectFormValues } from "../types";
 
 export function ProjectsPage() {
   const { t } = useI18n();
+  const { tasks: tasksRepository } = useStorageAdapter();
   const [searchParams] = useSearchParams();
   const {
     projects,
@@ -49,8 +53,13 @@ export function ProjectsPage() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [focusedProjectId, setFocusedProjectId] = useState<string | null>(null);
   const [focusMessage, setFocusMessage] = useState<string | null>(null);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const projectRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const focusId = searchParams.get("focusId");
+
+  useEffect(() => {
+    void tasksRepository.list().then(setTasks).catch(() => setTasks([]));
+  }, [tasksRepository]);
 
   const openCreateForm = () => {
     setEditingProject(undefined);
@@ -288,6 +297,7 @@ export function ProjectsPage() {
               <ProjectCard
                 project={project}
                 linkedGoal={findLinkedGoal(project, goals)}
+                taskProgress={getProjectTaskProgress(project.id, tasks)}
                 isLinkedGoalLoading={isGoalsLoading}
                 isDeleting={deletingId === project.id}
                 onEdit={() => openEditForm(project)}

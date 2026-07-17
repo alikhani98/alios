@@ -66,6 +66,8 @@ Stage 86 adds a dependency-free build-performance regression guard and PR-CI gat
 
 Stage 87 adds a full automated backup / clear / restore / re-export integrity guard across every supported local table and the optional Goal → Project → Task links, without changing the version-1 backup format, storage model, dependencies, routes, or product behavior.
 
+Stage 88 surfaces derived linked-task progress on Projects and adds a stable Today project filter using the existing optional task-project relationship, with no schema, backup, dependency, or backend change.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1
