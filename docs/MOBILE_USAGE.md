@@ -133,6 +133,17 @@ Repeat this pass at 360px, 390px, and 430px viewport widths in both Persian and 
 7. Use unusually long Task and Project titles and confirm the selector, badges, relationship panel, status control, and actions stay inside the viewport without horizontal scroll.
 8. Export and restore a backup containing a linked Task, then restore an older valid backup whose Tasks omit `projectId`; confirm both flows remain usable.
 
+## Stage 90 Project planning chain QA smoke test
+
+Repeat this pass at 360px, 390px, and 430px viewport widths in both Persian and English:
+
+1. From a linked Goal, open its Project; use a long Goal and Project title and confirm titles, badges, link panels, and actions wrap without horizontal scrolling.
+2. Create two Today Tasks linked to that Project, complete one, then open the Project and confirm the linked-task summary is accurate and the **View today's tasks** action is readable.
+3. Open that action and confirm Today shows only Tasks with the selected `projectId`, names the linked Project when available, and **Show all today's tasks** returns to unfiltered Today.
+4. Refresh the filtered Today URL, switch Persian/English, and confirm the filter context and clear action remain stable.
+5. Delete or simulate a missing Project while retaining its linked Tasks; confirm Today presents the calm unavailable-filter context, still shows matching Tasks, and never blocks task actions.
+6. Confirm no Goal, Project, or Task is created, edited, unlinked, or deleted merely by opening planning links or clearing the filter.
+
 ## Stage 80 Life Areas localization and Help Center smoke test
 
 Repeat this pass at 360px, 390px, and 430px viewport widths:
