@@ -82,6 +82,8 @@ Stage 94 adds a read-only Goal planning summary from the existing Goal → Proje
 
 Stage 95 brings the existing planning chain into Weekly Review and Home as derived, local-only views. It adds no automatic prioritization, data mutation, background behavior, or stored roll-up.
 
+Stage 96 adds an explicit, local Project review lifecycle with optional recurring timing and a last-reviewed record. Today, Home, and Weekly Review derive due status in the foreground; no scheduler, notification, background work, backend, sync, cloud, AI, telemetry, dependency, index, migration, or backup-version change is added.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1

@@ -159,6 +159,14 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] TypeScript, automated tests, production build, and the performance guard pass
 - [ ] Complete the Stage 95 manual smoke pass at 360px, 390px, and 430px in Persian and English
 
+### Stage 96 Project review lifecycle
+
+- [x] Optional recurring Project review fields retain legacy Project and version-1 backup compatibility
+- [x] A due one-time or recurring review can be explicitly recorded from Projects and Today without affecting Tasks, Goals, or future one-time dates
+- [x] Home and Weekly Review derive the same project review attention without a persisted roll-up or scheduler
+- [x] TypeScript, automated tests, production build, and the performance guard pass
+- [ ] Complete the Stage 96 manual smoke pass at 360px, 390px, and 430px in Persian and English
+
 ### Stage 86 performance regression guard
 
 - [x] `pnpm performance:check` builds a manifest and enforces the entry-byte budget, no forms preload, and no Vite chunk-size warning

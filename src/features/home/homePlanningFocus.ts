@@ -1,4 +1,5 @@
 import type { Goal, Project, Task } from "@/shared/types";
+import { isProjectReviewDue } from "@/features/projects/projectReviews";
 
 export type HomePlanningFocus = {
   goal: Goal;
@@ -40,7 +41,7 @@ function projectNeedsAttention(project: Project, referenceDate: Date): boolean {
     return true;
   }
 
-  return Boolean(project.reviewDate && project.reviewDate <= referenceDate.toISOString().slice(0, 10));
+  return isProjectReviewDue(project, referenceDate);
 }
 
 export function getHomePlanningFocus(

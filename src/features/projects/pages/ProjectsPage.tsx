@@ -24,7 +24,13 @@ import { ProjectForm } from "../components/ProjectForm";
 import { useProjects } from "../hooks/useProjects";
 import { findGoalProjectFilter, findLinkedGoal } from "../projectGoalLinks";
 import { getProjectTaskProgress } from "../projectTaskProgress";
+import { clearDueProjectReviewDate, isProjectReviewDue } from "../projectReviews";
 import type { ProjectFormValues } from "../types";
+
+function parseOptionalPositiveInteger(value: string | undefined): number | undefined {
+  const parsed = Number(value ?? "");
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : undefined;
+}
 
 export function ProjectsPage() {
   const { t } = useI18n();
@@ -99,6 +105,7 @@ export function ProjectsPage() {
       goalId: values.goalId || undefined,
       nextAction: values.nextAction || undefined,
       reviewDate: values.reviewDate || undefined,
+      reviewIntervalDays: parseOptionalPositiveInteger(values.reviewIntervalDays),
     };
 
     try {
@@ -118,6 +125,23 @@ export function ProjectsPage() {
       );
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleMarkReviewed = async (project: Project) => {
+    setActionError(null);
+    setSuccessMessage(null);
+
+    try {
+      await updateProject(project.id, {
+        lastReviewedAt: new Date().toISOString(),
+        reviewDate: clearDueProjectReviewDate(project),
+      });
+      setSuccessMessage(t("common.changesSaved"));
+    } catch (updateError) {
+      setActionError(
+        updateError instanceof Error ? updateError.message : t("projects.saveError")
+      );
     }
   };
 
@@ -331,9 +355,11 @@ export function ProjectsPage() {
                 linkedGoal={findLinkedGoal(project, goals)}
                 taskProgress={getProjectTaskProgress(project.id, tasks)}
                 isLinkedGoalLoading={isGoalsLoading}
+                isReviewDue={isProjectReviewDue(project)}
                 isDeleting={deletingId === project.id}
                 onEdit={() => openEditForm(project)}
                 onDelete={() => handleDelete(project)}
+                onMarkReviewed={() => handleMarkReviewed(project)}
               />
             </div>
           ))}

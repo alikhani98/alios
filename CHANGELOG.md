@@ -2,6 +2,12 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 96 - Project Review Lifecycle
+
+- Added optional recurring project-review timing and local last-reviewed records while keeping legacy Projects valid
+- Added a deliberate local review action on Projects and a compact Today list for projects that are due for review
+- Extended derived Home and Weekly Review attention signals to recognize both legacy one-time dates and the new recurring review timing
+
 ## Stage 95 - Integrated Planning Review
 
 - Added a read-only Goal → Project → Task planning-chain section to Weekly Review, including linked progress, open work, attention items, and safe unavailable-Goal context

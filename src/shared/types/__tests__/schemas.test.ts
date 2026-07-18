@@ -38,6 +38,18 @@ describe("core domain schemas", () => {
     ).toBe(false);
   });
 
+  it("keeps legacy projects valid while validating optional review lifecycle fields", () => {
+    const { reviewIntervalDays: _interval, lastReviewedAt: _reviewedAt, ...legacyProject } = projectRecord;
+
+    expect(projectSchema.safeParse(legacyProject).success).toBe(true);
+    expect(
+      projectSchema.safeParse({ ...projectRecord, reviewIntervalDays: 0 }).success
+    ).toBe(false);
+    expect(
+      projectSchema.safeParse({ ...projectRecord, lastReviewedAt: "not-a-date" }).success
+    ).toBe(false);
+  });
+
   it("keeps legacy tasks without a project link valid", () => {
     const { projectId: _projectId, ...legacyTask } = taskRecord;
 

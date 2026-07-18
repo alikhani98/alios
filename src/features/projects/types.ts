@@ -12,12 +12,14 @@ export const projectFormSchema = projectSchema
     goalId: true,
     nextAction: true,
     reviewDate: true,
+    reviewIntervalDays: true,
   })
   .extend({
     description: z.string().optional(),
     goalId: z.union([z.string().min(1), z.literal("")]).optional(),
     nextAction: z.string().optional(),
     reviewDate: z.union([dateOnlySchema, z.literal("")]).optional(),
+    reviewIntervalDays: z.string().optional(),
   })
   .refine(({ status }) => status !== "archived", {
     message: "Archiving is not available in this stage.",

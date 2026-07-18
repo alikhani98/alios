@@ -18,6 +18,8 @@ export const projectSchema = z.object({
   goalId: z.string().min(1).optional(),
   nextAction: z.string().optional(),
   reviewDate: dateOnlySchema.optional(),
+  reviewIntervalDays: z.number().int().positive().optional(),
+  lastReviewedAt: isoDateTimeSchema.optional(),
   createdAt: isoDateTimeSchema,
   updatedAt: isoDateTimeSchema,
   archivedAt: isoDateTimeSchema.optional(),
