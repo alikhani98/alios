@@ -2,6 +2,12 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 97 - Unified Review Queue
+
+- Added an actionable Weekly Review queue for review-due Projects, Goals, Life Areas, Personal Manual entries, and Decisions
+- Kept each review action explicit and local while linking the item back to its own module and focused record where supported
+- Expanded Weekly Review decision awareness to retain overdue review items beyond the seven-day display window
+
 ## Stage 96 - Project Review Lifecycle
 
 - Added optional recurring project-review timing and local last-reviewed records while keeping legacy Projects valid

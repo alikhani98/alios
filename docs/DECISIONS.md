@@ -494,3 +494,11 @@ Missing Goal references remain visible as unavailable links. No cascade, automat
 Projects may carry an optional recurring review interval and last-reviewed timestamp. A legacy one-time `reviewDate` remains valid. Due state is calculated in the foreground from those fields; Today, Home, and Weekly Review do not write a cached due flag or invoke automatic scheduling.
 
 Recording a review is an explicit local update. It clears a one-time date only when that date is already due, while a future date is retained. Optional fields preserve older Project records and version-1 backups without an index, migration, or backup-version bump.
+
+## ADR-041: Keep the unified review queue derived and action-scoped
+
+**Status:** Accepted (Stage 97)
+
+Weekly Review may combine independently due Projects, Goals, Life Areas, Personal Manual entries, and Decisions into one foreground queue. The queue is an in-memory view, not a new workflow, priority score, snapshot, scheduler, or stored review history.
+
+An action updates only its selected record through the existing repository and reloads the summary. Decision due status follows the existing deterministic due-date helper, including overdue records outside the weekly display window. No schema, index, migration, backup change, background process, backend, sync, cloud, AI, telemetry, or dependency is introduced.

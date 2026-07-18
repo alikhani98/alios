@@ -167,6 +167,14 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] TypeScript, automated tests, production build, and the performance guard pass
 - [ ] Complete the Stage 96 manual smoke pass at 360px, 390px, and 430px in Persian and English
 
+### Stage 97 unified review queue
+
+- [x] Weekly Review combines due Project, Goal, Life Area, Personal Manual, and Decision records without persisting a queue
+- [x] Each action updates only the selected local record and refreshes the queue; no linked record is cascaded
+- [x] Overdue Decisions remain reviewable outside the seven-day display window
+- [x] TypeScript, automated tests, production build, and the performance guard pass
+- [ ] Complete the Stage 97 manual smoke pass at 360px, 390px, and 430px in Persian and English
+
 ### Stage 86 performance regression guard
 
 - [x] `pnpm performance:check` builds a manifest and enforces the entry-byte budget, no forms preload, and no Vite chunk-size warning
