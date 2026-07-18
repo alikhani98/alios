@@ -267,6 +267,7 @@ describe("weekly review calculations", () => {
       activeCount: 0,
       projectsWithNextActionCount: 0,
       needsAttentionCount: 0,
+      reviewDueEntries: [],
     });
     expect(summary.inboxSummary).toEqual({
       totalCount: 0,
@@ -289,6 +290,7 @@ describe("weekly review calculations", () => {
       createdInWindowCount: 0,
       needsReviewCount: 0,
       reviewedInWindowCount: 0,
+      dueEntries: [],
     });
     expect(summary.goalSummary).toEqual({
       totalCount: 0,
@@ -630,8 +632,44 @@ describe("weekly review calculations", () => {
       needsReviewCount: 1,
       reviewedInWindowCount: 0,
     });
+    expect(first.decisionSummary.dueEntries.map((entry) => entry.id)).toEqual([
+      "decision",
+    ]);
+    expect(first.projectSummary.reviewDueEntries.map((entry) => entry.id)).toEqual([
+      "project",
+    ]);
     expect(first.suggestedFocus).toEqual([
       { kind: "processInbox", tone: "next-focus" },
+    ]);
+  });
+
+  it("keeps overdue decisions reviewable even after the seven-day display window", () => {
+    const summary = buildWeeklyReviewSummary(
+      {
+        tasks: [],
+        projects: [],
+        inboxItems: [],
+        journalEntries: [],
+        knowledgeItems: [],
+        decisionLogEntries: [
+          createDecision("older-due", { reviewDate: "2026-06-20" }),
+          createDecision("reviewed", {
+            reviewDate: "2026-06-20",
+            status: "reviewed",
+          }),
+        ],
+        goals: [],
+        manualEntries: [],
+        financeTransactions: [],
+        financeObligations: [],
+        dailyCheckins: [],
+      },
+      new Date(2026, 6, 10)
+    );
+
+    expect(summary.decisionSummary.needsReviewCount).toBe(1);
+    expect(summary.decisionSummary.dueEntries.map((entry) => entry.id)).toEqual([
+      "older-due",
     ]);
   });
 

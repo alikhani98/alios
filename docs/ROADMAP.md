@@ -84,6 +84,8 @@ Stage 95 brings the existing planning chain into Weekly Review and Home as deriv
 
 Stage 96 adds an explicit, local Project review lifecycle with optional recurring timing and a last-reviewed record. Today, Home, and Weekly Review derive due status in the foreground; no scheduler, notification, background work, backend, sync, cloud, AI, telemetry, dependency, index, migration, or backup-version change is added.
 
+Stage 97 adds a derived unified review queue inside Weekly Review for existing due Projects, Goals, Life Areas, Personal Manual entries, and Decisions. Each review remains an explicit local action; the queue adds no persisted workflow, scheduler, notification, backend, sync, cloud, AI, telemetry, dependency, schema, migration, or backup change.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1

@@ -35,6 +35,7 @@ import {
 } from "../lifeAreas";
 import { isManualEntryReviewDue } from "../manual/manualEntries";
 import { isProjectReviewDue } from "../projects/projectReviews";
+import { isDecisionNeedsReview } from "../decisions/decisionLog";
 
 export type WeeklyReviewWindow = {
   days: number;
@@ -64,6 +65,7 @@ export type WeeklyReviewProjectSummary = {
   activeCount: number;
   projectsWithNextActionCount: number;
   needsAttentionCount: number;
+  reviewDueEntries: Project[];
 };
 
 export type WeeklyReviewPlanningAttentionEntry = {
@@ -106,6 +108,7 @@ export type WeeklyReviewDecisionSummary = {
   createdInWindowCount: number;
   needsReviewCount: number;
   reviewedInWindowCount: number;
+  dueEntries: DecisionLogEntry[];
 };
 
 export type WeeklyReviewGoalSummary = {
@@ -629,6 +632,9 @@ export function buildWeeklyReviewSummary(
     needsAttentionCount: data.projects.filter((project) =>
       needsProjectAttention(project, referenceDate)
     ).length,
+    reviewDueEntries: data.projects
+      .filter((project) => isProjectReviewDue(project, referenceDate))
+      .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt)),
   };
 
   const goalsById = new Map(data.goals.map((goal) => [goal.id, goal]));
@@ -699,15 +705,13 @@ export function buildWeeklyReviewSummary(
   const decisionEntriesInWindow = data.decisionLogEntries.filter((entry) =>
     isWithinRange(entry.createdAt, boundaries.start, boundaries.end)
   );
+  const dueDecisions = data.decisionLogEntries
+    .filter((entry) => isDecisionNeedsReview(entry, referenceDate))
+    .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt));
   const decisionSummary: WeeklyReviewDecisionSummary = {
     totalCount: data.decisionLogEntries.length,
     createdInWindowCount: decisionEntriesInWindow.length,
-    needsReviewCount: data.decisionLogEntries.filter((entry) =>
-      entry.status !== "reviewed" &&
-      entry.status !== "archived" &&
-      entry.reviewDate !== undefined &&
-      isWithinRange(entry.reviewDate, boundaries.start, boundaries.end)
-    ).length,
+    needsReviewCount: dueDecisions.length,
     reviewedInWindowCount: data.decisionLogEntries.filter((entry) => {
       if (entry.status !== "reviewed") {
         return false;
@@ -719,6 +723,7 @@ export function buildWeeklyReviewSummary(
 
       return hasReflection && isWithinRange(entry.updatedAt, boundaries.start, boundaries.end);
     }).length,
+    dueEntries: dueDecisions,
   };
 
   const dueGoals = getReviewDueGoals(data.goals, referenceDate);

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { useStorageAdapter } from "@/core/storage";
 import type { LifeAreaKey } from "@/shared/types";
+import { clearDueProjectReviewDate } from "@/features/projects/projectReviews";
 
 import {
   buildWeeklyReviewSummary,
@@ -144,6 +145,37 @@ export function useWeeklyReview() {
     [lifeAreas, loadWeeklyReview]
   );
 
+  const markProjectReviewed = useCallback(
+    async (id: string) => {
+      try {
+        const project = await projects.getById(id);
+        if (!project) {
+          throw new Error("Project is no longer available.");
+        }
+        await projects.update(id, {
+          lastReviewedAt: new Date().toISOString(),
+          reviewDate: clearDueProjectReviewDate(project),
+        });
+        await loadWeeklyReview();
+      } catch (updateError) {
+        setError(getErrorMessage(updateError));
+      }
+    },
+    [loadWeeklyReview, projects]
+  );
+
+  const markDecisionReviewed = useCallback(
+    async (id: string) => {
+      try {
+        await decisions.update(id, { status: "reviewed" });
+        await loadWeeklyReview();
+      } catch (updateError) {
+        setError(getErrorMessage(updateError));
+      }
+    },
+    [decisions, loadWeeklyReview]
+  );
+
   return {
     summary,
     isLoading,
@@ -152,5 +184,7 @@ export function useWeeklyReview() {
     markManualEntryReviewed,
     markGoalReviewed,
     markLifeAreaReviewed,
+    markProjectReviewed,
+    markDecisionReviewed,
   };
 }

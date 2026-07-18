@@ -23,7 +23,7 @@ import { Link } from "react-router-dom";
 
 import { useDateFormatter } from "@/shared/date";
 import { useI18n, type TranslationKey } from "@/shared/i18n";
-import type { Goal, ManualEntry } from "@/shared/types";
+import type { Goal, LifeAreaKey, ManualEntry } from "@/shared/types";
 import {
   Badge,
   Button,
@@ -57,7 +57,15 @@ import { useWeeklyReview } from "../hooks/useWeeklyReview";
 import type {
   WeeklyReviewFocusSuggestion,
   WeeklyReviewObservation,
+  WeeklyReviewSummary,
 } from "../weeklyReviewCalculations";
+
+type ReviewQueueItem = {
+  id: string;
+  kind: "goal" | "lifeArea" | "project" | "manual" | "decision";
+  title: string;
+  to: string;
+};
 
 const quickLinks: ReadonlyArray<{ to: string; labelKey: TranslationKey }> = [
   { to: "/today", labelKey: "nav.today" },
@@ -172,6 +180,77 @@ function getGoalReviewContext(
   return `${t("weeklyReview.goalsLastUpdated")}: ${formatDateTime(goal.updatedAt)}`;
 }
 
+function createFocusPath(path: string, id: string): string {
+  return `${path}?${new URLSearchParams({ focusId: id }).toString()}`;
+}
+
+function getReviewQueue(summary: WeeklyReviewSummary): ReviewQueueItem[] {
+  return [
+    ...summary.projectSummary.reviewDueEntries.map((entry) => ({
+      id: entry.id,
+      kind: "project" as const,
+      title: entry.title,
+      to: createFocusPath("/projects", entry.id),
+    })),
+    ...summary.goalSummary.dueEntries.map((entry) => ({
+      id: entry.id,
+      kind: "goal" as const,
+      title: entry.title,
+      to: createFocusPath("/goals", entry.id),
+    })),
+    ...summary.lifeAreaSummary.dueEntries.map((entry) => ({
+      id: entry.areaKey,
+      kind: "lifeArea" as const,
+      title: entry.title,
+      to: createFocusPath("/life-areas", entry.areaKey),
+    })),
+    ...summary.manualSummary.dueEntries.map((entry) => ({
+      id: entry.id,
+      kind: "manual" as const,
+      title: entry.title,
+      to: createFocusPath("/manual", entry.id),
+    })),
+    ...summary.decisionSummary.dueEntries.map((entry) => ({
+      id: entry.id,
+      kind: "decision" as const,
+      title: entry.title,
+      to: "/decisions",
+    })),
+  ];
+}
+
+function getReviewQueueLabelKey(item: ReviewQueueItem): TranslationKey {
+  switch (item.kind) {
+    case "goal":
+      return "nav.goals";
+    case "lifeArea":
+      return "nav.lifeAreas";
+    case "project":
+      return "nav.projects";
+    case "manual":
+      return "nav.manual";
+    case "decision":
+    default:
+      return "nav.decisions";
+  }
+}
+
+function getReviewQueueReasonKey(item: ReviewQueueItem): TranslationKey {
+  switch (item.kind) {
+    case "goal":
+      return "goals.reviewDue";
+    case "lifeArea":
+      return "lifeAreas.reviewDue";
+    case "manual":
+      return "manual.reviewDue";
+    case "decision":
+      return "decisions.reviewDue";
+    case "project":
+    default:
+      return "weeklyReview.needsReview";
+  }
+}
+
 export function WeeklyReviewPage() {
   const { language, t } = useI18n();
   const { formatDate, formatDateTime } = useDateFormatter();
@@ -183,7 +262,30 @@ export function WeeklyReviewPage() {
     markManualEntryReviewed,
     markGoalReviewed,
     markLifeAreaReviewed,
+    markProjectReviewed,
+    markDecisionReviewed,
   } = useWeeklyReview();
+
+  const reviewQueue = useMemo(
+    () => (summary ? getReviewQueue(summary) : []),
+    [summary]
+  );
+
+  const handleReviewQueueItem = (item: ReviewQueueItem) => {
+    switch (item.kind) {
+      case "goal":
+        return markGoalReviewed(item.id);
+      case "lifeArea":
+        return markLifeAreaReviewed(item.id as LifeAreaKey);
+      case "project":
+        return markProjectReviewed(item.id);
+      case "manual":
+        return markManualEntryReviewed(item.id);
+      case "decision":
+      default:
+        return markDecisionReviewed(item.id);
+    }
+  };
 
   const currencyLocale = language === "fa" ? "fa-IR" : "en-US";
   const formatAmount = useMemo(
@@ -407,6 +509,45 @@ export function WeeklyReviewPage() {
               />
             ))}
           </div>
+
+          {reviewQueue.length > 0 ? (
+            <CollapsibleSection
+              id="weekly-review-queue"
+              title={t("weeklyReview.needsReview")}
+              description={t("weeklyReview.localOnlyNote")}
+              icon={<Clock3 className="h-5 w-5" />}
+              status={<StatusChip tone="warning">{reviewQueue.length}</StatusChip>}
+              contentClassName="space-y-3"
+            >
+              <div className="grid gap-3 lg:grid-cols-2">
+                {reviewQueue.map((item) => (
+                  <SoftPanel key={`${item.kind}-${item.id}`} className="space-y-3">
+                    <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
+                      <p className="min-w-0 break-words font-semibold leading-7">{item.title}</p>
+                      <div className="flex flex-wrap gap-2">
+                        <Badge variant="secondary">{t(getReviewQueueLabelKey(item))}</Badge>
+                        <StatusChip tone="warning">{t(getReviewQueueReasonKey(item))}</StatusChip>
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        className="w-full sm:w-auto"
+                        onClick={() => void handleReviewQueueItem(item)}
+                      >
+                        {t("goals.markReviewed")}
+                      </Button>
+                      <Button asChild size="sm" variant="ghost" className="w-full sm:w-auto">
+                        <Link to={item.to}>{t(getReviewQueueLabelKey(item))}</Link>
+                      </Button>
+                    </div>
+                  </SoftPanel>
+                ))}
+              </div>
+            </CollapsibleSection>
+          ) : null}
 
           <div className="grid gap-4 xl:grid-cols-2">
             <CollapsibleSection
