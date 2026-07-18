@@ -80,6 +80,8 @@ Stage 93 derives Routine task progress from the existing optional `Task.routineI
 
 Stage 94 adds a read-only Goal planning summary from the existing Goal → Project → Task links and reversible Goal-focused navigation to Projects and Today. It preserves manual Goal progress and adds no stored roll-up or new service.
 
+Stage 95 brings the existing planning chain into Weekly Review and Home as derived, local-only views. It adds no automatic prioritization, data mutation, background behavior, or stored roll-up.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1

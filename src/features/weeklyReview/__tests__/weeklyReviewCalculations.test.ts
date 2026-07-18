@@ -253,6 +253,15 @@ describe("weekly review calculations", () => {
       openInWindowCount: 0,
       completionPercent: 0,
     });
+    expect(summary.planningSummary).toEqual({
+      linkedProjectCount: 0,
+      linkedTaskCount: 0,
+      completedLinkedTaskCount: 0,
+      openLinkedTaskCount: 0,
+      completionPercent: 0,
+      unavailableGoalProjectCount: 0,
+      attentionEntries: [],
+    });
     expect(summary.projectSummary).toEqual({
       totalCount: 0,
       activeCount: 0,
@@ -335,6 +344,48 @@ describe("weekly review calculations", () => {
       "wellness",
     ]);
     expect(summary.hasAnyData).toBe(false);
+  });
+
+  it("derives a safe Goal → Project → Task planning chain without mutating manual Goal progress", () => {
+    const goal = createGoal("goal", { progressPercent: 42 });
+    const summary = buildWeeklyReviewSummary(
+      {
+        tasks: [
+          createTask("done", { projectId: "project", status: "done" }),
+          createTask("open", { projectId: "project", status: "todo" }),
+          createTask("unrelated", { projectId: "other", status: "done" }),
+        ],
+        projects: [
+          createProject("project", { goalId: goal.id, nextAction: undefined }),
+          createProject("orphaned", { goalId: "deleted-goal", nextAction: "Keep moving" }),
+        ],
+        goals: [goal],
+        inboxItems: [],
+        journalEntries: [],
+        knowledgeItems: [],
+        decisionLogEntries: [],
+        manualEntries: [],
+        financeTransactions: [],
+        financeObligations: [],
+        dailyCheckins: [],
+      },
+      new Date(2026, 6, 10)
+    );
+
+    expect(summary.planningSummary).toMatchObject({
+      linkedProjectCount: 2,
+      linkedTaskCount: 2,
+      completedLinkedTaskCount: 1,
+      openLinkedTaskCount: 1,
+      completionPercent: 50,
+      unavailableGoalProjectCount: 1,
+    });
+    expect(summary.planningSummary.attentionEntries[0]).toMatchObject({
+      project: { id: "project" },
+      goal: { id: goal.id, progressPercent: 42 },
+      openTaskCount: 1,
+    });
+    expect(goal.progressPercent).toBe(42);
   });
 
   it("includes items on the last-7-days boundary and ignores older records", () => {

@@ -65,6 +65,22 @@ export type WeeklyReviewProjectSummary = {
   needsAttentionCount: number;
 };
 
+export type WeeklyReviewPlanningAttentionEntry = {
+  project: Project;
+  goal?: Goal;
+  openTaskCount: number;
+};
+
+export type WeeklyReviewPlanningSummary = {
+  linkedProjectCount: number;
+  linkedTaskCount: number;
+  completedLinkedTaskCount: number;
+  openLinkedTaskCount: number;
+  completionPercent: number;
+  unavailableGoalProjectCount: number;
+  attentionEntries: WeeklyReviewPlanningAttentionEntry[];
+};
+
 export type WeeklyReviewInboxSummary = {
   totalCount: number;
   pendingCount: number;
@@ -193,6 +209,7 @@ export type WeeklyReviewSummary = {
   taskSummary: WeeklyReviewTaskSummary;
   routineSummary: WeeklyReviewRoutineSummary;
   projectSummary: WeeklyReviewProjectSummary;
+  planningSummary: WeeklyReviewPlanningSummary;
   inboxSummary: WeeklyReviewInboxSummary;
   journalSummary: WeeklyReviewJournalSummary;
   knowledgeSummary: WeeklyReviewKnowledgeSummary;
@@ -352,6 +369,7 @@ function buildEmptyStates(summary: {
   taskSummary: WeeklyReviewTaskSummary;
   routineSummary: WeeklyReviewRoutineSummary;
   projectSummary: WeeklyReviewProjectSummary;
+  planningSummary: WeeklyReviewPlanningSummary;
   inboxSummary: WeeklyReviewInboxSummary;
   journalSummary: WeeklyReviewJournalSummary;
   knowledgeSummary: WeeklyReviewKnowledgeSummary;
@@ -614,6 +632,38 @@ export function buildWeeklyReviewSummary(
     ).length,
   };
 
+  const goalsById = new Map(data.goals.map((goal) => [goal.id, goal]));
+  const linkedProjects = data.projects.filter((project) => Boolean(project.goalId));
+  const linkedProjectIds = new Set(linkedProjects.map((project) => project.id));
+  const linkedTasks = data.tasks.filter(
+    (task) => task.projectId && linkedProjectIds.has(task.projectId)
+  );
+  const completedLinkedTaskCount = linkedTasks.filter(isTaskCompleted).length;
+  const attentionEntries = linkedProjects
+    .filter((project) => needsProjectAttention(project, referenceDate))
+    .map((project) => ({
+      project,
+      goal: project.goalId ? goalsById.get(project.goalId) : undefined,
+      openTaskCount: linkedTasks.filter(
+        (task) => task.projectId === project.id && isOpenTask(task)
+      ).length,
+    }))
+    .sort((left, right) => right.project.updatedAt.localeCompare(left.project.updatedAt));
+  const planningSummary: WeeklyReviewPlanningSummary = {
+    linkedProjectCount: linkedProjects.length,
+    linkedTaskCount: linkedTasks.length,
+    completedLinkedTaskCount,
+    openLinkedTaskCount: linkedTasks.filter(isOpenTask).length,
+    completionPercent:
+      linkedTasks.length === 0
+        ? 0
+        : Math.round((completedLinkedTaskCount / linkedTasks.length) * 100),
+    unavailableGoalProjectCount: linkedProjects.filter(
+      (project) => project.goalId && !goalsById.has(project.goalId)
+    ).length,
+    attentionEntries: attentionEntries.slice(0, 4),
+  };
+
   const inboxSummary: WeeklyReviewInboxSummary = {
     totalCount: data.inboxItems.length,
     pendingCount: data.inboxItems.filter((item) => item.status === "unprocessed").length,
@@ -751,6 +801,7 @@ export function buildWeeklyReviewSummary(
     taskSummary,
     routineSummary,
     projectSummary,
+    planningSummary,
     inboxSummary,
     journalSummary,
     knowledgeSummary,

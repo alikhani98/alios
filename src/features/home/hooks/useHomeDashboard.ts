@@ -6,6 +6,7 @@ import { useI18n } from "@/shared/i18n";
 import { getGoalsSummary } from "@/features/goals";
 import { getLifeAreasSummary, mergeLifeAreas } from "@/features/lifeAreas";
 import { getManualEntrySummary } from "@/features/manual";
+import { getHomePlanningFocus } from "../homePlanningFocus";
 import type { HomeDashboardData } from "../types";
 
 function byUpdatedAtDescending<T extends { updatedAt: string }>(a: T, b: T) {
@@ -110,6 +111,7 @@ export function useHomeDashboard() {
         inbox: {
           unprocessedCount: inboxItems.filter((item) => item.status === "unprocessed").length,
         },
+        planningFocus: getHomePlanningFocus(goalEntries, allProjects, allTasks),
         isEmpty:
           allTasks.length === 0 &&
           !checkin &&

@@ -779,7 +779,7 @@ export const messagesEn = {
   "projects.taskProgress": "Linked task progress",
   "projects.taskProgressValue": "{completed} of {total} completed",
   "projects.openTodayTasks": "View today’s tasks",
-  "projects.noGoalFilterResults": "No projects are linked to this goal",
+  "projects.noGoalResults": "No linked projects",
   "journal.title": "Journal",
   "journal.description": "Capture what happened, how it felt, and what you learned.",
   "journal.new": "New journal entry",

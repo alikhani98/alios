@@ -150,6 +150,15 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] TypeScript, automated tests, production build, and the performance guard pass
 - [ ] Complete the Stage 94 manual smoke pass at 360px, 390px, and 430px in Persian and English
 
+### Stage 95 integrated planning review
+
+- [x] Weekly Review derives linked Goal → Project → Task totals and handles unavailable Goal links without hiding Projects or Tasks
+- [x] Home selects at most one derived Goal, Project, and open Task focus path without mutating stored planning data
+- [x] Existing Goal, Project, and Today navigation stays URL-backed and mobile-safe
+- [x] No schema, backup, persisted roll-up, dependency, backend, sync, cloud, AI, telemetry, or user-data mutation is introduced
+- [x] TypeScript, automated tests, production build, and the performance guard pass
+- [ ] Complete the Stage 95 manual smoke pass at 360px, 390px, and 430px in Persian and English
+
 ### Stage 86 performance regression guard
 
 - [x] `pnpm performance:check` builds a manifest and enforces the entry-byte budget, no forms preload, and no Vite chunk-size warning
