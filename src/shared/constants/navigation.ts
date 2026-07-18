@@ -3,6 +3,7 @@ export type NavIconName =
   | "search"
   | "calendar-check"
   | "calendar-range"
+  | "repeat"
   | "git-branch"
   | "inbox"
   | "folder-kanban"
@@ -35,6 +36,11 @@ export const mainNavigation: NavItem[] = [
     titleKey: "nav.today",
     href: "/today",
     icon: "calendar-check",
+  },
+  {
+    titleKey: "nav.routines",
+    href: "/routines",
+    icon: "repeat",
   },
   {
     titleKey: "nav.weeklyReview",

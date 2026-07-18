@@ -94,6 +94,7 @@ const backupTableLabelKeys = [
   "settings.knowledgeCount",
   "settings.settingsCount",
   "settings.inboxCount",
+  "settings.routinesCount",
 ] as const;
 
 const appearanceOptions = [
@@ -116,6 +117,7 @@ function getTotalRecords(summary: {
   knowledgeItems: number;
   settings: number;
   inboxItems: number;
+  routines: number;
 }): number {
   return (
     summary.dailyCheckins +
@@ -130,7 +132,8 @@ function getTotalRecords(summary: {
     summary.journalEntries +
     summary.knowledgeItems +
     summary.settings +
-    summary.inboxItems
+    summary.inboxItems +
+    summary.routines
   );
 }
 
@@ -571,6 +574,10 @@ export function SettingsPage() {
                 <CountItem
                   label={t("settings.settingsCount")}
                   value={dataManagement.summary.settings}
+                />
+                <CountItem
+                  label={t("settings.routinesCount")}
+                  value={dataManagement.summary.routines}
                 />
               </div>
               <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">

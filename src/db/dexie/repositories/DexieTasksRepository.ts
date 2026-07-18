@@ -1,5 +1,7 @@
 import type {
   CreateTaskInput,
+  CreateRoutineTaskInput,
+  CreateRoutineTaskResult,
   TasksRepository,
   UpdateTaskInput,
 } from "@/core/repositories";
@@ -35,6 +37,21 @@ export class DexieTasksRepository
       await this.database.tasks.add(task);
       return task;
     });
+  }
+
+  async createFromRoutine(input: CreateRoutineTaskInput): Promise<CreateRoutineTaskResult> {
+    return this.execute("creating a task from a routine", () =>
+      this.database.transaction("rw", this.database.tasks, async () => {
+        const existing = await this.database.tasks
+          .where("[routineId+dueDate]")
+          .equals([input.routineId, input.dueDate])
+          .first();
+        if (existing) return { task: taskSchema.parse(existing), created: false };
+        const task = taskSchema.parse({ ...input, ...this.createMetadata() });
+        await this.database.tasks.add(task);
+        return { task, created: true };
+      })
+    );
   }
 
   async update(id: string, input: UpdateTaskInput): Promise<Task> {

@@ -6,7 +6,7 @@ import type { SearchLocalDataInput } from "../searchLocalData";
 import { mergeLifeAreas } from "@/features/lifeAreas";
 
 export function useGlobalSearch() {
-  const { inbox, tasks, projects, goals, lifeAreas, journal, knowledge, manual } = useStorageAdapter();
+  const { inbox, tasks, projects, goals, lifeAreas, journal, knowledge, manual, routines } = useStorageAdapter();
   const { t } = useI18n();
   const [data, setData] = useState<SearchLocalDataInput | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -26,6 +26,7 @@ export function useGlobalSearch() {
         journalEntries,
         knowledgeItems,
         manualEntries,
+        routineEntries,
       ] =
         await Promise.all([
           inbox.list(),
@@ -36,6 +37,7 @@ export function useGlobalSearch() {
           journal.list(),
           knowledge.list(),
           manual.list(),
+          routines.list(),
         ]);
 
       setData({
@@ -47,13 +49,14 @@ export function useGlobalSearch() {
         journalEntries,
         knowledgeItems,
         manualEntries,
+        routines: routineEntries,
       });
     } catch {
       setHasError(true);
     } finally {
       setIsLoading(false);
     }
-  }, [goals, inbox, journal, knowledge, lifeAreas, manual, projects, t, tasks]);
+  }, [goals, inbox, journal, knowledge, lifeAreas, manual, projects, routines, t, tasks]);
 
   useEffect(() => {
     void loadSearchData();

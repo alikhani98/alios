@@ -129,6 +129,8 @@ AliOS 1.0 is a local-first static web app.
 ## Real-World Usage Evidence Boundary
 
 - Product prioritization may use only user-provided manual observations recorded through `docs/REAL_WORLD_USAGE_QA.md`
+- Recurring routines remain repository-backed local records; Today derives suggestions in the foreground and creates a traceable Task only after explicit user confirmation
+- A Routine deletion never cascades to prior Tasks, and same-day duplication is guarded transactionally by the Tasks repository
 - The QA protocol is documentation only: it does not collect telemetry, inspect personal records, add analytics, or transmit browser data
 - A reported issue must include its observed workflow, route, result, expected result, frequency, and severity before it becomes a candidate implementation stage
 - Future stages remain separately approved and must not infer a broad product feature from one unverified preference

@@ -14,6 +14,7 @@ import {
   projectSchema,
   settingSchema,
   taskSchema,
+  routineSchema,
 } from "@/shared/types";
 import { isoDateTimeSchema } from "@/shared/utils";
 
@@ -34,6 +35,7 @@ export const aliosBackupDataSchema = z.object({
   knowledgeItems: z.array(knowledgeItemSchema),
   settings: z.array(settingSchema),
   inboxItems: z.array(inboxItemSchema).default([]),
+  routines: z.array(routineSchema).default([]),
 });
 
 export const aliosBackupSchema = z.object({

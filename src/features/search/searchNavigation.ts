@@ -9,6 +9,7 @@ const searchResultPaths: Record<SearchResultKind, string> = {
   journal: "/journal",
   knowledge: "/knowledge",
   manual: "/manual",
+  routine: "/routines",
 };
 
 export function getSearchResultPath(kind: SearchResultKind): string {

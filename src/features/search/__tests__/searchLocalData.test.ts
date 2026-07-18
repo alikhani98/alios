@@ -12,6 +12,7 @@ import type {
 } from "@/shared/types";
 
 import { searchLocalData } from "../searchLocalData";
+import { routineRecord } from "@/test/factories";
 
 const inboxItems: InboxItem[] = [
   {
@@ -163,6 +164,10 @@ const manualEntries: ManualEntry[] = [
 ];
 
 describe("searchLocalData", () => {
+  it("finds a recurring routine and links to its focused page", () => {
+    const [result] = searchLocalData({ inboxItems: [], tasks: [], projects: [], goals: [], journalEntries: [], knowledgeItems: [], manualEntries: [], routines: [routineRecord] }, "morning");
+    expect(result).toMatchObject({ kind: "routine", href: "/routines?focusId=fixture-id" });
+  });
   it("returns no results for an empty query", () => {
     expect(
       searchLocalData(

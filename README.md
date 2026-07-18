@@ -4,6 +4,8 @@ AliOS is a bilingual, local-first personal life-management system. It brings qui
 
 Stages 74–85 add pull-request validation, Life Areas QA, derived Goals ↔ Life Areas navigation, release hardening for the combined track, optional Project → Goal and Task → Project links, complete Persian Life Areas localization, an updated in-app Help Center, a repository-native design system contract, shared select-control adoption, keyboard-safe shell dialogs, an evidence-first real-world usage protocol, and a measured initial-load hardening pass without changing AliOS's local-only architecture.
 
+Stage 92 adds repository-backed recurring routines with explicit weekday schedules and opt-in Today suggestions. AliOS never creates Routine tasks in the background; each suggestion requires a user action, and duplicate same-day tasks are prevented transactionally.
+
 Stage 38 was a UI regression QA and release-hardening pass. It did not add a new feature; it kept the existing local-first scope intact and hardened desktop sidebar accessibility on long scrolling pages.
 Stage 39 moves dashboard customization into the topbar and adds a local-only accent color palette for restrained visual personalization.
 Stage 40 adds a local-first Finance module for income, expenses, installments, debts, and a simple monthly liquidity summary.

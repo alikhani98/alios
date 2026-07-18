@@ -36,6 +36,7 @@ import type {
   ManualEntry,
   Project,
   Task,
+  Routine,
 } from "@/shared/types";
 import type { LifeAreaView } from "@/features/lifeAreas";
 
@@ -49,7 +50,8 @@ export type SearchResultKind =
   | "lifeArea"
   | "journal"
   | "knowledge"
-  | "manual";
+  | "manual"
+  | "routine";
 
 export type SearchResultFacet = {
   labelKey: TranslationKey;
@@ -77,6 +79,7 @@ export type SearchLocalDataInput = {
   journalEntries: JournalEntry[];
   knowledgeItems: KnowledgeItem[];
   manualEntries: ManualEntry[];
+  routines?: Routine[];
 };
 
 const kindLabelKeys: Record<SearchResultKind, TranslationKey> = {
@@ -88,6 +91,7 @@ const kindLabelKeys: Record<SearchResultKind, TranslationKey> = {
   journal: "search.typeJournal",
   knowledge: "search.typeKnowledge",
   manual: "search.typeManual",
+  routine: "search.typeRoutine",
 };
 
 function normalize(value: string): string {
@@ -235,6 +239,21 @@ export function searchLocalData(
       ],
       sortKey: item.updatedAt,
       date: item.dueDate ?? item.createdAt,
+      query: normalizedQuery,
+    });
+    if (result) results.push(result);
+  }
+
+  for (const item of data.routines ?? []) {
+    const result = buildResult({
+      kind: "routine",
+      title: item.title,
+      snippetSource: item.description ?? item.title,
+      fields: [item.description ?? "", item.priority, item.isActive ? "active" : "paused"],
+      href: buildSearchResultHref("routine", item.id),
+      facets: [{ labelKey: "common.priority", valueKey: TASK_PRIORITY_LABEL_KEYS[item.priority] }],
+      sortKey: item.updatedAt,
+      date: item.updatedAt,
       query: normalizedQuery,
     });
     if (result) results.push(result);

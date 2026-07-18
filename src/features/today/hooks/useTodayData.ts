@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import type {
   CreateTaskInput,
+  CreateRoutineTaskInput,
   UpdateTaskInput,
 } from "@/core/repositories";
 import { useStorageAdapter } from "@/core/storage";
@@ -83,6 +84,13 @@ export function useTodayData(today: string) {
     },
     [checkin, clearOtherMit, dailyCheckins, tasksRepository, today]
   );
+
+  const createRoutineTask = useCallback(async (input: CreateRoutineTaskInput) => {
+    setError(null);
+    const result = await tasksRepository.createFromRoutine(input);
+    if (result.created) setTasks((current) => [...current, result.task]);
+    return result;
+  }, [tasksRepository]);
 
   const updateTask = useCallback(
     async (id: string, input: UpdateTaskInput) => {
@@ -168,6 +176,7 @@ export function useTodayData(today: string) {
     error,
     loadToday,
     createTask,
+    createRoutineTask,
     updateTask,
     updateTaskStatus,
     selectMit,

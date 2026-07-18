@@ -14,6 +14,9 @@ const TodayPage = lazy(() =>
     default: module.TodayPage,
   }))
 );
+const RoutinesPage = lazy(() =>
+  import("@/features/routines/pages/RoutinesPage").then((module) => ({ default: module.RoutinesPage }))
+);
 const ProjectsPage = lazy(() =>
   import("@/features/projects/pages/ProjectsPage").then((module) => ({
     default: module.ProjectsPage,
@@ -95,6 +98,10 @@ const router = createHashRouter([
             <TodayPage />
           </Suspense>
         ),
+      },
+      {
+        path: "routines",
+        element: <Suspense fallback={<RouteLoadingFallback />}><RoutinesPage /></Suspense>,
       },
       {
         path: "inbox",

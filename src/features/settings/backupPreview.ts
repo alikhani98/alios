@@ -14,6 +14,7 @@ export const BACKUP_TABLE_KEYS = [
   "knowledgeItems",
   "settings",
   "inboxItems",
+  "routines",
 ] as const satisfies readonly (keyof AliosBackupData)[];
 
 export type BackupTableKey = (typeof BACKUP_TABLE_KEYS)[number];

@@ -15,6 +15,7 @@ import {
   projectRecord,
   settingRecord,
   taskRecord,
+  routineRecord,
 } from "@/test/factories";
 
 import {
@@ -219,6 +220,7 @@ describe("backup validation and migration", () => {
       knowledgeItems: [knowledgeItemRecord],
       settings: [settingRecord],
       inboxItems: [inboxItemRecord],
+      routines: [routineRecord],
     };
     const snapshot = JSON.parse(JSON.stringify(input));
 
@@ -229,5 +231,6 @@ describe("backup validation and migration", () => {
     expect(normalized.tasks).not.toBe(input.tasks);
     expect(normalized.goals).not.toBe(input.goals);
     expect(normalized.inboxItems).not.toBe(input.inboxItems);
+    expect(normalized.routines).not.toBe(input.routines);
   });
 });

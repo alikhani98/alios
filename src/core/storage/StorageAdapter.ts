@@ -11,6 +11,7 @@ import type {
   ProjectsRepository,
   SettingsRepository,
   TasksRepository,
+  RoutinesRepository,
 } from "@/core/repositories";
 import type { BackupStorage } from "@/core/backup";
 
@@ -19,6 +20,7 @@ export interface StorageAdapter {
   inbox: InboxRepository;
   dailyCheckins: DailyCheckinsRepository;
   tasks: TasksRepository;
+  routines: RoutinesRepository;
   decisions: DecisionLogRepository;
   goals: GoalsRepository;
   finance: FinanceRepository;
