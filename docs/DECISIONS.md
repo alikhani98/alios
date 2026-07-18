@@ -526,3 +526,11 @@ This keeps a weekly plan user-authored, non-destructive, and compatible with rec
 The top-level Weekly Planning Dashboard composes an existing user-authored weekly plan with task counts and the existing review queue in the foreground. Its progress indicator is a presentation of current local task data, not a stored weekly score, recommendation, or workflow state.
 
 The full review metrics remain available as secondary disclosure. The dashboard writes nothing by itself and introduces no schema, migration, backup change, route, scheduler, backend, sync, cloud, AI, telemetry, or dependency.
+
+## ADR-045: Keep Today’s weekly-plan handoff read-only
+
+**Status:** Accepted (Stage 101)
+
+Today may read the current Monday-starting Weekly Plan and combine its optional Goal, Project, and Task references with existing local Task records to show a contextual, derived completion signal. Weekly Review remains the only weekly-plan editing surface.
+
+This handoff never creates a Task, changes Task state, writes a plan, stores a completion roll-up, schedules work, or makes a priority decision. It adds no schema, migration, backup change, route, backend, sync, cloud, AI, telemetry, or dependency.

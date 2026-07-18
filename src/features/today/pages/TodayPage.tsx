@@ -22,9 +22,11 @@ import {
 } from "@/shared/ui";
 import { cn } from "@/shared/utils";
 import { DailyCheckinForm } from "../components/DailyCheckinForm";
+import { TodayWeeklyPlanCard } from "../components/TodayWeeklyPlanCard";
 import { TodayTaskCard } from "../components/TodayTaskCard";
 import { TodayTaskForm } from "../components/TodayTaskForm";
 import { useTodayData } from "../hooks/useTodayData";
+import { useTodayWeeklyPlan } from "../hooks/useTodayWeeklyPlan";
 import {
   findLinkedProject,
   findProjectFilter,
@@ -56,6 +58,7 @@ export function TodayPage() {
     deleteTask,
     saveCheckin,
   } = useTodayData(today);
+  const { focus: weeklyPlanFocus, isLoading: isWeeklyPlanLoading } = useTodayWeeklyPlan();
   const {
     projects,
     isLoading: isProjectsLoading,
@@ -355,6 +358,8 @@ export function TodayPage() {
           </Button>
         </div>
       ) : null}
+
+      <TodayWeeklyPlanCard focus={weeklyPlanFocus} isLoading={isWeeklyPlanLoading} />
 
       <PremiumCard>
         <CardHeader>
