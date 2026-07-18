@@ -534,3 +534,11 @@ The full review metrics remain available as secondary disclosure. The dashboard 
 Today may read the current Monday-starting Weekly Plan and combine its optional Goal, Project, and Task references with existing local Task records to show a contextual, derived completion signal. Weekly Review remains the only weekly-plan editing surface.
 
 This handoff never creates a Task, changes Task state, writes a plan, stores a completion roll-up, schedules work, or makes a priority decision. It adds no schema, migration, backup change, route, backend, sync, cloud, AI, telemetry, or dependency.
+
+## ADR-046: Scope planning execution to explicit weekly-plan links
+
+**Status:** Accepted (Stage 102)
+
+The Weekly Planning Dashboard and Today handoff may show an empty, active, or completed execution state, but their task totals must be derived only from Tasks reached through the current plan's available Goal, Project, or direct Task reference. General weekly activity and the review queue remain distinct signals.
+
+This avoids representing unrelated activity as progress on a user-authored focus. The state is computed in memory and never changes a Task, Weekly Plan, review record, schedule, priority, schema, migration, backup, route, backend, sync, cloud, AI, telemetry, or dependency.

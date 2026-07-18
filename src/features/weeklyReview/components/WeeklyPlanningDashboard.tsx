@@ -11,27 +11,30 @@ import {
   StatusChip,
 } from "@/shared/ui";
 
-import type { WeeklyReviewSummary } from "../weeklyReviewCalculations";
+import type { WeeklyPlanExecution } from "../weeklyPlanExecution";
 import type { WeeklyPlanLink } from "../weeklyPlanLinks";
 import { WeeklyPlanLinks } from "./WeeklyPlanLinks";
 
 type WeeklyPlanningDashboardProps = {
   plan?: WeeklyPlan;
   links: ReadonlyArray<WeeklyPlanLink>;
-  summary: WeeklyReviewSummary;
+  execution: WeeklyPlanExecution;
   reviewQueueCount: number;
 };
 
 export function WeeklyPlanningDashboard({
   plan,
   links,
-  summary,
+  execution,
   reviewQueueCount,
 }: WeeklyPlanningDashboardProps) {
   const { t } = useI18n();
-  const completed = summary.taskSummary.completedInWindowCount;
-  const open = summary.taskSummary.openCount;
-  const progress = completed + open > 0 ? (completed / (completed + open)) * 100 : 0;
+  const progress = execution.total > 0 ? (execution.completed / execution.total) * 100 : 0;
+  const executionStatus = execution.state === "completed"
+    ? { label: t("common.completed"), tone: "success" as const }
+    : execution.state === "active"
+      ? { label: t("common.active"), tone: "primary" as const }
+      : { label: t("weeklyReview.tasksEmptyTitle"), tone: "neutral" as const };
 
   return (
     <PremiumCard className="border-primary/20 bg-gradient-to-br from-primary/10 via-background to-background shadow-sm">
@@ -72,16 +75,16 @@ export function WeeklyPlanningDashboard({
           </Button>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
           <SoftPanel className="space-y-3 border-primary/10 bg-background/85">
             <div className="flex items-center justify-between gap-3">
               <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
                 <CircleCheckBig className="h-4 w-4" aria-hidden="true" />
               </span>
-              <StatusChip tone="primary">{completed}</StatusChip>
+              <StatusChip tone={executionStatus.tone}>{executionStatus.label}</StatusChip>
             </div>
             <div>
-              <p className="text-sm font-semibold">{t("weeklyReview.completedTasks")}</p>
+              <p className="text-sm font-semibold">{t("projects.taskProgress")}</p>
               <MiniProgressBar value={progress} label={t("home.completion")} className="mt-3" />
             </div>
           </SoftPanel>
@@ -90,7 +93,16 @@ export function WeeklyPlanningDashboard({
               <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-muted text-muted-foreground">
                 <ClipboardList className="h-4 w-4" aria-hidden="true" />
               </span>
-              <StatusChip tone="neutral">{open}</StatusChip>
+              <StatusChip tone="primary">{execution.completed} / {execution.total}</StatusChip>
+            </div>
+            <p className="text-sm font-semibold">{t("weeklyReview.completedTasks")}</p>
+          </SoftPanel>
+          <SoftPanel className="space-y-3">
+            <div className="flex items-center justify-between gap-3">
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-muted text-muted-foreground">
+                <ClipboardList className="h-4 w-4" aria-hidden="true" />
+              </span>
+              <StatusChip tone="neutral">{execution.open}</StatusChip>
             </div>
             <p className="text-sm font-semibold">{t("weeklyReview.openTasks")}</p>
           </SoftPanel>
