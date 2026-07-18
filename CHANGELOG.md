@@ -2,6 +2,12 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 94 - Goal Progress & Planning Navigation
+
+- Added a derived, read-only Goal progress summary from existing linked Projects and their Tasks; manual Goal progress remains unchanged
+- Added reversible Goal → Projects and Goal → Today navigation, including calm unavailable and no-linked-record states
+- Extended the existing Today query composition so Goal, Project, and Routine filters can safely coexist
+
 ## Stage 93 - Routine Progress & Review Integration
 
 - Added derived Routine task totals, completed/open counts, and completion percentage on Routine cards using the existing `Task.routineId` relationship

@@ -5,6 +5,13 @@ export function createLinkedGoalPath(goalId: string): string {
   return `/goals?${searchParams.toString()}`;
 }
 
+export function findGoalProjectFilter(
+  goalId: string | null,
+  goals: ReadonlyArray<Goal>
+): Goal | undefined {
+  return goalId ? goals.find((goal) => goal.id === goalId) : undefined;
+}
+
 export function findLinkedGoal(
   project: Pick<Project, "goalId">,
   goals: ReadonlyArray<Goal>

@@ -778,6 +778,7 @@ export const messagesFa: Record<TranslationKey, string> = {
   "projects.taskProgress": "پیشرفت کارهای مرتبط",
   "projects.taskProgressValue": "{completed} از {total} انجام شده",
   "projects.openTodayTasks": "مشاهده کارهای امروز",
+  "projects.noGoalFilterResults": "پروژه‌ای به این هدف متصل نیست",
   "journal.title": "روزنوشت",
   "journal.description": "آنچه رخ داد، احساستان و آموخته‌هایتان را ثبت کنید.",
   "journal.new": "یادداشت جدید",

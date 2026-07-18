@@ -58,8 +58,8 @@ describe("routine task progress", () => {
       "/today?routineId=routine+%2F+one"
     );
     expect(
-      createTodayTasksPath({ projectId: "project one", routineId: routine.id })
-    ).toBe("/today?projectId=project+one&routineId=routine+%2F+one");
+      createTodayTasksPath({ goalId: "goal one", projectId: "project one", routineId: routine.id })
+    ).toBe("/today?goalId=goal+one&projectId=project+one&routineId=routine+%2F+one");
     expect(findRoutineFilter(routine.id, [routine])).toEqual(routine);
     expect(findRoutineFilter("deleted-routine", [routine])).toBeUndefined();
     expect(findRoutineFilter(null, [routine])).toBeUndefined();
