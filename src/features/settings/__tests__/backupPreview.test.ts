@@ -15,6 +15,7 @@ import {
   projectInput,
   settingInput,
   taskInput,
+  routineInput,
 } from "@/test/factories";
 import { createTestStorage, destroyTestDatabase } from "@/test/database";
 import { BackupService } from "@/core/backup";
@@ -48,12 +49,13 @@ describe("backup preview", () => {
     await storage.dailyCheckins.create(dailyCheckinInput);
     await storage.settings.create(settingInput);
     await storage.inbox.create(inboxItemInput);
+    await storage.routines.create(routineInput);
 
     const preview = createBackupPreview(await service.createBackup());
 
     expect(preview.backupVersion).toBe(1);
     expect(new Date(preview.exportedAt).toISOString()).toBe(preview.exportedAt);
-    expect(preview.totalRecords).toBe(13);
+    expect(preview.totalRecords).toBe(14);
     expect(preview.tableCounts).toEqual([
       { key: "dailyCheckins", count: 1 },
       { key: "tasks", count: 1 },
@@ -68,6 +70,7 @@ describe("backup preview", () => {
       { key: "knowledgeItems", count: 1 },
       { key: "settings", count: 1 },
       { key: "inboxItems", count: 1 },
+      { key: "routines", count: 1 },
     ]);
   });
 });

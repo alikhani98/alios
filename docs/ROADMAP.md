@@ -74,6 +74,8 @@ Stage 90 release-hardens the Goal → Project → Today planning chain with focu
 
 Stage 91 consolidates release readiness into one manual end-to-end pass for capture, planning, completion, review, retrieval, backup preview, recovery, mobile, and keyboard behavior. It is documentation-only and adds no runtime behavior, data collection, storage, backup, route, dependency, backend, sync, cloud, AI, telemetry, or user-data change.
 
+Stage 92 adds a local-first recurring-routines foundation with explicit weekday schedules, repository CRUD, Today suggestions, atomic same-day duplicate prevention, search, and additive backup support. Routines never create tasks without a user action and add no notification, background scheduler, backend, sync, cloud, AI, telemetry, or dependency.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1

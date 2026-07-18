@@ -1,4 +1,4 @@
-import { AlertCircle, CalendarDays, CheckSquare2, Plus, RotateCcw } from "lucide-react";
+import { AlertCircle, CalendarDays, CheckSquare2, Plus, Repeat2, RotateCcw } from "lucide-react";
 import { format } from "date-fns";
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 
 import type { UpdateTaskInput } from "@/core/repositories";
 import { useProjects } from "@/features/projects/hooks/useProjects";
+import { useRoutines } from "@/features/routines/hooks/useRoutines";
 import type { Task, TaskStatus } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
 import { useDateFormatter } from "@/shared/date";
@@ -30,6 +31,7 @@ import {
   findProjectFilter,
 } from "../taskProjectLinks";
 import type { DailyCheckinFormValues, TodayTaskFormValues } from "../types";
+import { createRoutineTaskInput, getRoutineSuggestions } from "../routineSuggestions";
 
 export function TodayPage() {
   const { t } = useI18n();
@@ -43,6 +45,7 @@ export function TodayPage() {
     error,
     loadToday,
     createTask,
+    createRoutineTask,
     updateTask,
     updateTaskStatus,
     selectMit,
@@ -55,11 +58,18 @@ export function TodayPage() {
     error: projectsError,
     loadProjects,
   } = useProjects();
+  const {
+    entries: routines,
+    isLoading: isRoutinesLoading,
+    error: routinesError,
+    loadRoutines,
+  } = useRoutines();
   const [taskFormOpen, setTaskFormOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | undefined>();
   const [isTaskSubmitting, setIsTaskSubmitting] = useState(false);
   const [isCheckinSubmitting, setIsCheckinSubmitting] = useState(false);
   const [busyTaskId, setBusyTaskId] = useState<string | null>(null);
+  const [busyRoutineId, setBusyRoutineId] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [focusedTaskId, setFocusedTaskId] = useState<string | null>(null);
@@ -71,6 +81,12 @@ export function TodayPage() {
   const visibleTasks = projectId
     ? tasks.filter((task) => task.projectId === projectId)
     : tasks;
+  const routineSuggestions = getRoutineSuggestions(
+    routines,
+    tasks,
+    today,
+    new Date().getDay()
+  );
 
   const showError = (caught: unknown, fallback: string) => {
     setActionError(caught instanceof Error ? caught.message : fallback);
@@ -190,6 +206,19 @@ export function TodayPage() {
       t("today.taskDeleteError")
     );
 
+  const handleAddRoutine = async (routine: (typeof routines)[number]) => {
+    setBusyRoutineId(routine.id);
+    setActionError(null);
+    try {
+      await createRoutineTask(createRoutineTaskInput(routine, today));
+      setSuccessMessage(t("routines.addedToToday"));
+    } catch (caught) {
+      showError(caught, t("today.taskSaveError"));
+    } finally {
+      setBusyRoutineId(null);
+    }
+  };
+
   useEffect(() => {
     if (!focusId) {
       setFocusedTaskId(null);
@@ -253,6 +282,37 @@ export function TodayPage() {
           </Button>
         </div>
       ) : null}
+
+      <PremiumCard>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Repeat2 className="h-5 w-5 text-primary" />
+            {t("routines.todayTitle")}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-sm leading-7 text-muted-foreground">
+            {t("routines.todayDescription")}
+          </p>
+          {routinesError ? (
+            <div className="flex flex-col gap-3 rounded-xl border p-3 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-sm text-muted-foreground">{t("routines.todayUnavailable")}</p>
+              <Button size="sm" variant="outline" onClick={() => void loadRoutines()}>{t("common.tryAgain")}</Button>
+            </div>
+          ) : isRoutinesLoading ? (
+            <div className="h-16 animate-pulse rounded-xl bg-muted/60" />
+          ) : routineSuggestions.length > 0 ? (
+            <div className="grid gap-3 md:grid-cols-2">
+              {routineSuggestions.map((routine) => (
+                <div key={routine.id} className="flex min-w-0 flex-col gap-3 rounded-xl border bg-muted/20 p-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="min-w-0"><p className="break-words font-medium">{routine.title}</p>{routine.description ? <p className="break-words text-sm text-muted-foreground">{routine.description}</p> : null}</div>
+                  <Button size="sm" className="w-full shrink-0 sm:w-auto" disabled={busyRoutineId === routine.id} onClick={() => void handleAddRoutine(routine)}><Plus className="me-2 h-4 w-4" />{t("routines.addToToday")}</Button>
+                </div>
+              ))}
+            </div>
+          ) : null}
+        </CardContent>
+      </PremiumCard>
 
       {successMessage ? (
         <div

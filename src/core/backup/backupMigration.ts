@@ -14,6 +14,7 @@ import {
   projectSchema,
   settingSchema,
   taskSchema,
+  routineSchema,
 } from "@/shared/types";
 
 import {
@@ -38,6 +39,7 @@ export const backupDataInputSchema = z.object({
   knowledgeItems: z.array(knowledgeItemSchema).optional(),
   settings: z.array(settingSchema).optional(),
   inboxItems: z.array(inboxItemSchema).optional(),
+  routines: z.array(routineSchema).optional(),
 });
 
 export type BackupDataInput = z.infer<typeof backupDataInputSchema>;
@@ -61,6 +63,7 @@ export function normalizeBackupData(data: BackupDataInput): AliosBackupData {
     knowledgeItems: cloneRecords(data.knowledgeItems),
     settings: cloneRecords(data.settings),
     inboxItems: cloneRecords(data.inboxItems),
+    routines: cloneRecords(data.routines),
   };
 }
 

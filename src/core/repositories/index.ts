@@ -10,3 +10,4 @@ export * from "./financeRepository";
 export * from "./projectsRepository";
 export * from "./settingsRepository";
 export * from "./tasksRepository";
+export * from "./routinesRepository";

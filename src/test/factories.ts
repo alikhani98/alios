@@ -12,6 +12,7 @@ import type {
   CreateProjectInput,
   CreateSettingInput,
   CreateTaskInput,
+  CreateRoutineInput,
 } from "@/core/repositories";
 import type {
   DailyCheckin,
@@ -27,6 +28,7 @@ import type {
   Project,
   Setting,
   Task,
+  Routine,
 } from "@/shared/types";
 
 const timestamp = "2026-07-05T08:30:00.000Z";
@@ -49,6 +51,14 @@ export const taskInput: CreateTaskInput = {
   dueDate: "2026-07-05",
   isMit: true,
   projectId: "fixture-id",
+};
+
+export const routineInput: CreateRoutineInput = {
+  title: "Morning review",
+  description: "Review the day before planning",
+  weekdays: [1, 2, 3, 4, 5],
+  priority: "medium",
+  isActive: true,
 };
 
 export const journalEntryInput: CreateJournalEntryInput = {
@@ -179,6 +189,7 @@ const metadata = {
 
 export const projectRecord: Project = { ...projectInput, ...metadata };
 export const taskRecord: Task = { ...taskInput, ...metadata };
+export const routineRecord: Routine = { ...routineInput, ...metadata };
 export const journalEntryRecord: JournalEntry = {
   ...journalEntryInput,
   ...metadata,

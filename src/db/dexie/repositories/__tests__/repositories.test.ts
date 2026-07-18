@@ -15,6 +15,7 @@ import {
   projectInput,
   settingInput,
   taskInput,
+  routineInput,
 } from "@/test/factories";
 import { createTestStorage, destroyTestDatabase } from "@/test/database";
 
@@ -305,5 +306,33 @@ describe("Dexie repositories", () => {
     await expect(
       storage.projects.create({ ...projectInput, title: " " })
     ).rejects.toBeInstanceOf(ValidationError);
+  });
+
+  it("supports Routine CRUD and atomically prevents duplicate daily tasks", async () => {
+    const routine = await storage.routines.create(routineInput);
+    expect(await storage.routines.list()).toEqual([routine]);
+
+    const updated = await storage.routines.update(routine.id, {
+      isActive: false,
+      weekdays: [5, 1, 1],
+    });
+    expect(updated.isActive).toBe(false);
+    expect(updated.weekdays).toEqual([1, 5]);
+
+    const input = {
+      ...taskInput,
+      isMit: false,
+      routineId: routine.id,
+      dueDate: "2026-07-05",
+    };
+    const first = await storage.tasks.createFromRoutine(input);
+    const second = await storage.tasks.createFromRoutine(input);
+    expect(first.created).toBe(true);
+    expect(second).toEqual({ task: first.task, created: false });
+    expect(await storage.tasks.list()).toHaveLength(1);
+
+    await storage.routines.delete(routine.id);
+    expect(await storage.routines.list()).toEqual([]);
+    expect(await storage.tasks.list()).toEqual([first.task]);
   });
 });

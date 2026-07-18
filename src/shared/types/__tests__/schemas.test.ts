@@ -10,6 +10,7 @@ import {
   manualEntrySchema,
   projectSchema,
   taskSchema,
+  routineSchema,
 } from "@/shared/types";
 import {
   dailyCheckinRecord,
@@ -21,6 +22,7 @@ import {
   manualEntryRecord,
   projectRecord,
   taskRecord,
+  routineRecord,
 } from "@/test/factories";
 
 describe("core domain schemas", () => {
@@ -51,6 +53,7 @@ describe("core domain schemas", () => {
   it.each([
     ["project", projectSchema, projectRecord],
     ["task", taskSchema, taskRecord],
+    ["routine", routineSchema, routineRecord],
     ["journal entry", journalEntrySchema, journalEntryRecord],
     ["knowledge item", knowledgeItemSchema, knowledgeItemRecord],
     ["life area", lifeAreaSchema, lifeAreaRecord],
@@ -65,6 +68,7 @@ describe("core domain schemas", () => {
   it.each([
     ["project", projectSchema, { ...projectRecord, title: " " }],
     ["task", taskSchema, { ...taskRecord, status: "unknown" }],
+    ["routine", routineSchema, { ...routineRecord, weekdays: [] }],
     ["journal entry", journalEntrySchema, { ...journalEntryRecord, content: "" }],
     ["knowledge item", knowledgeItemSchema, { ...knowledgeItemRecord, type: "unknown" }],
     ["life area", lifeAreaSchema, { ...lifeAreaRecord, status: "unknown" }],

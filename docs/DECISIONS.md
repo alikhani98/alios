@@ -454,3 +454,11 @@ The raw-byte budget is intentionally conservative and deterministic. Real-device
 Backup coverage must verify the complete local lifecycle rather than only a successful restore call: export records, clear local tables, restore the parsed backup, and re-export the records for exact data comparison. Optional identity links are part of this contract.
 
 This protects local-first data portability while preserving the version-1 backup format and without introducing a cloud, sync, or migration dependency.
+
+## ADR-036: Keep recurring routines explicit and foreground-only
+
+**Status:** Accepted (Stage 92)
+
+Recurring routines are stored as independent local records with weekday schedules. Today derives due suggestions in the foreground, and a Task is created only after an explicit user action. `Task.routineId` records origin, while the compound Dexie index `[routineId+dueDate]` and a transactional repository method prevent duplicate tasks for one routine and local date.
+
+Deleting a Routine does not cascade into existing Tasks. The stage adds no background scheduler, notification, service worker, backend, sync, cloud, AI, telemetry, or dependency. Backup version remains 1; the additive `routines` array defaults to empty for older valid backups.

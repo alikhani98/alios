@@ -15,6 +15,7 @@ export const taskSchema = z.object({
   dueDate: dateOnlySchema.optional(),
   isMit: z.boolean(),
   projectId: z.string().min(1).optional(),
+  routineId: z.string().min(1).optional(),
   createdAt: isoDateTimeSchema,
   updatedAt: isoDateTimeSchema,
   completedAt: isoDateTimeSchema.optional(),

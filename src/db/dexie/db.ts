@@ -14,6 +14,7 @@ import type {
   Project,
   Setting,
   Task,
+  Routine,
 } from "@/shared/types";
 import {
   DEXIE_DATABASE_NAME,
@@ -24,12 +25,14 @@ import {
   DEXIE_SCHEMA_V5,
   DEXIE_SCHEMA_V6,
   DEXIE_SCHEMA_V7,
+  DEXIE_SCHEMA_V8,
   DEXIE_SCHEMA_VERSION,
   DEXIE_SCHEMA_VERSION_3,
   DEXIE_SCHEMA_VERSION_4,
   DEXIE_SCHEMA_VERSION_5,
   DEXIE_SCHEMA_VERSION_6,
   DEXIE_SCHEMA_VERSION_7,
+  DEXIE_SCHEMA_VERSION_8,
 } from "./schema";
 
 export class AliosDatabase extends Dexie {
@@ -46,6 +49,7 @@ export class AliosDatabase extends Dexie {
   inboxItems!: Table<InboxItem, string>;
   financeTransactions!: Table<FinanceTransaction, string>;
   financeObligations!: Table<FinanceObligation, string>;
+  routines!: Table<Routine, string>;
 
   constructor() {
     super(DEXIE_DATABASE_NAME);
@@ -56,6 +60,7 @@ export class AliosDatabase extends Dexie {
     this.version(DEXIE_SCHEMA_VERSION_5).stores(DEXIE_SCHEMA_V5);
     this.version(DEXIE_SCHEMA_VERSION_6).stores(DEXIE_SCHEMA_V6);
     this.version(DEXIE_SCHEMA_VERSION_7).stores(DEXIE_SCHEMA_V7);
+    this.version(DEXIE_SCHEMA_VERSION_8).stores(DEXIE_SCHEMA_V8);
   }
 }
 

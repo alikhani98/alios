@@ -2,6 +2,12 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 92 - Recurring Routines & Daily Planning Foundation
+
+- Added repository-backed recurring routines with weekday schedules, active/paused state, priority, bilingual CRUD, local search, and mobile-safe navigation
+- Added explicit Today suggestions that never create tasks automatically and atomically prevent duplicate Routine tasks for the same local date
+- Added Dexie schema version 8, optional `Task.routineId`, and additive version-1 backup/restore compatibility for routines and legacy backups
+
 ## Stage 91 - Release Consolidation & Real-Use Readiness
 
 - Added one reproducible release-readiness pass for capture, planning links, completion, review, search, backup preview, recovery, mobile, and keyboard flows

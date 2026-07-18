@@ -124,6 +124,15 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] No runtime, storage, backup, route, dependency, backend, sync, cloud, AI, telemetry, or user-data behavior is introduced
 - [ ] Complete the Stage 91 release-readiness pass on the deployed site
 
+### Stage 92 recurring routines and daily planning
+
+- [x] Routine CRUD stays behind the Repository and Storage Adapter boundaries
+- [x] Dexie v8 adds `routines` and the `[routineId+dueDate]` duplicate guard without changing existing record identities
+- [x] Today creates a Routine task only after an explicit user action and never through a background process
+- [x] Deleting a Routine preserves all existing Tasks; valid older backups restore with an empty routines array
+- [x] Routines are bilingual, searchable, mobile-safe, included in local counts, and covered by version-1 backup/restore
+- [ ] Complete the Stage 92 manual smoke pass at 360px, 390px, and 430px in Persian and English
+
 ### Stage 86 performance regression guard
 
 - [x] `pnpm performance:check` builds a manifest and enforces the entry-byte budget, no forms preload, and no Vite chunk-size warning

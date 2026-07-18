@@ -144,6 +144,16 @@ Repeat this pass at 360px, 390px, and 430px viewport widths in both Persian and 
 5. Delete or simulate a missing Project while retaining its linked Tasks; confirm Today presents the calm unavailable-filter context, still shows matching Tasks, and never blocks task actions.
 6. Confirm no Goal, Project, or Task is created, edited, unlinked, or deleted merely by opening planning links or clearing the filter.
 
+## Stage 92 recurring routines smoke test
+
+Repeat at 360px, 390px, and 430px in Persian and English:
+
+1. Create, edit, pause, reactivate, search, and delete a Routine with a long mixed-language title and multiple weekdays.
+2. On a scheduled day, open Today and confirm the Routine appears only as a suggestion; reload and confirm no Task was created automatically.
+3. Choose **Add to Today** twice quickly and confirm exactly one traceable Task exists for that Routine and date.
+4. Complete the Task, delete its Routine, and confirm the historical Task remains unchanged and usable.
+5. Export and restore a backup containing routines, then restore an older valid backup without `routines`; confirm both flows remain usable.
+
 ## Stage 80 Life Areas localization and Help Center smoke test
 
 Repeat this pass at 360px, 390px, and 430px viewport widths:
