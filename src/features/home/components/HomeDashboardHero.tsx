@@ -38,6 +38,12 @@ const levelLabelKeys = {
   good: "common.good",
 } as const;
 
+const weeklyPlanLinkLabelKeys = {
+  goal: "projects.linkedGoal",
+  project: "today.linkedProject",
+  task: "nav.today",
+} as const;
+
 export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
   const { t } = useI18n();
   const { formatDate } = useDateFormatter();
@@ -252,13 +258,28 @@ export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
             ) : null}
 
             {weeklyPlan ? (
-              <SoftPanel className="space-y-2 border-primary/10 bg-background/85">
+              <SoftPanel className="space-y-3 border-primary/10 bg-background/85">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className="text-sm font-medium">{t("weeklyReview.nextFocusLabel")}</p>
                   <Button asChild size="sm" variant="ghost"><Link to="/weekly-review">{t("nav.weeklyReview")}</Link></Button>
                 </div>
                 <p className="break-words text-sm font-semibold">{weeklyPlan.focusTitle}</p>
                 {weeklyPlan.intention ? <p className="break-words text-sm leading-7 text-muted-foreground">{weeklyPlan.intention}</p> : null}
+                {data.weeklyPlanLinks?.length ? (
+                  <div className="flex flex-wrap gap-2">
+                    {data.weeklyPlanLinks.map((link) =>
+                      link.to ? (
+                        <Button key={`${link.kind}-${link.id}`} asChild size="sm" variant="outline">
+                          <Link to={link.to}>{t(weeklyPlanLinkLabelKeys[link.kind])}</Link>
+                        </Button>
+                      ) : (
+                        <StatusChip key={`${link.kind}-${link.id}`} tone="warning">
+                          {t("lifeAreas.linkedGoalsUnavailable")}
+                        </StatusChip>
+                      )
+                    )}
+                  </div>
+                ) : null}
               </SoftPanel>
             ) : null}
           </div>

@@ -55,7 +55,9 @@ import {
 
 import { useWeeklyReview } from "../hooks/useWeeklyReview";
 import { WeeklyPlanForm } from "../components/WeeklyPlanForm";
+import { WeeklyPlanLinks } from "../components/WeeklyPlanLinks";
 import { getWeeklyPlanWeekStart } from "../weeklyPlan";
+import { getWeeklyPlanLinks } from "../weeklyPlanLinks";
 import type {
   WeeklyReviewFocusSuggestion,
   WeeklyReviewObservation,
@@ -275,6 +277,10 @@ export function WeeklyReviewPage() {
   const reviewQueue = useMemo(
     () => (summary ? getReviewQueue(summary) : []),
     [summary]
+  );
+  const weeklyPlanLinks = useMemo(
+    () => getWeeklyPlanLinks(weeklyPlan, planningOptions.goals, planningOptions.projects, planningOptions.tasks),
+    [planningOptions.goals, planningOptions.projects, planningOptions.tasks, weeklyPlan]
   );
 
   const handleReviewQueueItem = (item: ReviewQueueItem) => {
@@ -528,7 +534,7 @@ export function WeeklyReviewPage() {
             description={windowLabel}
             icon={<CalendarDays className="h-5 w-5" />}
             status={<StatusChip tone={weeklyPlan ? "primary" : "neutral"}>{weeklyPlan ? t("common.changesSaved") : t("common.notRecorded")}</StatusChip>}
-            contentClassName="space-y-3"
+            contentClassName="space-y-5"
           >
             <WeeklyPlanForm
               key={weeklyPlan?.updatedAt ?? "new-weekly-plan"}
@@ -540,6 +546,7 @@ export function WeeklyReviewPage() {
               isSaving={isSavingWeeklyPlan}
               onSave={handleSaveWeeklyPlan}
             />
+            <WeeklyPlanLinks links={weeklyPlanLinks} />
           </CollapsibleSection>
 
           {reviewQueue.length > 0 ? (

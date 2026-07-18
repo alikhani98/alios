@@ -2,6 +2,12 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 99 - Weekly Planning Visual Navigation
+
+- Made the Weekly Review planning form more readable with explicit labels and mobile-safe grouped controls
+- Added linked Goal, Project, and Task destination cards to the weekly plan, plus a compact linked-path handoff on Home
+- Kept unavailable linked records visible and non-destructive instead of generating broken navigation
+
 ## Stage 98 - Weekly Planning Foundation
 
 - Added one local weekly plan per Monday-starting week with a focus, optional intention, and optional Goal, Project, and Task links
