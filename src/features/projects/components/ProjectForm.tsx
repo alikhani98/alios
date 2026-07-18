@@ -45,6 +45,7 @@ export function ProjectForm({
       goalId: project?.goalId ?? "",
       nextAction: project?.nextAction ?? "",
       reviewDate: project?.reviewDate ?? "",
+      reviewIntervalDays: project?.reviewIntervalDays ? String(project.reviewIntervalDays) : "",
     },
   });
 
@@ -161,6 +162,20 @@ export function ProjectForm({
           </label>
           <Input id="project-review-date" type="date" {...register("reviewDate")} />
         </div>
+      </div>
+
+      <div className="grid gap-2">
+        <label htmlFor="project-review-interval" className="text-sm font-medium">
+          {t("goals.reviewIntervalDaysLabel")}
+        </label>
+        <Input
+          id="project-review-interval"
+          type="number"
+          min="1"
+          inputMode="numeric"
+          placeholder={t("goals.reviewIntervalDaysPlaceholder")}
+          {...register("reviewIntervalDays")}
+        />
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">

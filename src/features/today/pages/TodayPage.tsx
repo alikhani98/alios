@@ -1,4 +1,4 @@
-import { AlertCircle, CalendarDays, CheckSquare2, Plus, Repeat2, RotateCcw } from "lucide-react";
+import { AlertCircle, CalendarDays, CheckSquare2, Clock3, Plus, Repeat2, RotateCcw } from "lucide-react";
 import { format } from "date-fns";
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 import type { UpdateTaskInput } from "@/core/repositories";
 import { useProjects } from "@/features/projects/hooks/useProjects";
 import { useRoutines } from "@/features/routines/hooks/useRoutines";
-import type { Task, TaskStatus } from "@/shared/types";
+import type { Project, Task, TaskStatus } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
 import { useDateFormatter } from "@/shared/date";
 import {
@@ -35,6 +35,7 @@ import {
 } from "@/features/routines/routineTaskLinks";
 import type { DailyCheckinFormValues, TodayTaskFormValues } from "../types";
 import { createRoutineTaskInput, getRoutineSuggestions } from "../routineSuggestions";
+import { clearDueProjectReviewDate, isProjectReviewDue } from "@/features/projects/projectReviews";
 
 export function TodayPage() {
   const { t } = useI18n();
@@ -60,6 +61,7 @@ export function TodayPage() {
     isLoading: isProjectsLoading,
     error: projectsError,
     loadProjects,
+    updateProject,
   } = useProjects();
   const {
     entries: routines,
@@ -73,6 +75,7 @@ export function TodayPage() {
   const [isCheckinSubmitting, setIsCheckinSubmitting] = useState(false);
   const [busyTaskId, setBusyTaskId] = useState<string | null>(null);
   const [busyRoutineId, setBusyRoutineId] = useState<string | null>(null);
+  const [busyProjectReviewId, setBusyProjectReviewId] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [focusedTaskId, setFocusedTaskId] = useState<string | null>(null);
@@ -101,6 +104,7 @@ export function TodayPage() {
     today,
     new Date().getDay()
   );
+  const reviewDueProjects = projects.filter((project) => isProjectReviewDue(project));
 
   const showError = (caught: unknown, fallback: string) => {
     setActionError(caught instanceof Error ? caught.message : fallback);
@@ -230,6 +234,23 @@ export function TodayPage() {
       showError(caught, t("today.taskSaveError"));
     } finally {
       setBusyRoutineId(null);
+    }
+  };
+
+  const handleMarkProjectReviewed = async (project: Project) => {
+    setBusyProjectReviewId(project.id);
+    setActionError(null);
+    setSuccessMessage(null);
+    try {
+      await updateProject(project.id, {
+        lastReviewedAt: new Date().toISOString(),
+        reviewDate: clearDueProjectReviewDate(project),
+      });
+      setSuccessMessage(t("common.changesSaved"));
+    } catch (caught) {
+      showError(caught, t("projects.saveError"));
+    } finally {
+      setBusyProjectReviewId(null);
     }
   };
 
@@ -365,6 +386,37 @@ export function TodayPage() {
           ) : null}
         </CardContent>
       </PremiumCard>
+
+      {reviewDueProjects.length > 0 ? (
+        <PremiumCard>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Clock3 className="h-5 w-5 text-primary" />
+              {t("projects.title")}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {reviewDueProjects.map((project) => (
+              <div
+                key={project.id}
+                className="flex min-w-0 flex-col gap-3 rounded-xl border bg-muted/20 p-3 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <p className="min-w-0 break-words font-medium">{project.title}</p>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="w-full shrink-0 sm:w-auto"
+                  disabled={busyProjectReviewId === project.id}
+                  onClick={() => void handleMarkProjectReviewed(project)}
+                >
+                  <Clock3 className="me-2 h-4 w-4" />
+                  {t("goals.markReviewed")}
+                </Button>
+              </div>
+            ))}
+          </CardContent>
+        </PremiumCard>
+      ) : null}
 
       {successMessage ? (
         <div

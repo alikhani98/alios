@@ -486,3 +486,11 @@ This adds no persisted roll-up, schema/index/migration, backup change, backgroun
 Weekly Review may join the existing optional Goal → Project → Task links in memory to show planning progress and projects that lack an actionable next step. Home may select one active Goal, then its active linked Project and one open Task, as a compact focus path. The selection is an observation, not an instruction, score, scheduling rule, or stored priority.
 
 Missing Goal references remain visible as unavailable links. No cascade, automatic progress update, schema/index/migration, backup change, background process, backend, sync, cloud, AI, telemetry, or dependency is introduced.
+
+## ADR-040: Keep Project review timing explicit and local
+
+**Status:** Accepted (Stage 96)
+
+Projects may carry an optional recurring review interval and last-reviewed timestamp. A legacy one-time `reviewDate` remains valid. Due state is calculated in the foreground from those fields; Today, Home, and Weekly Review do not write a cached due flag or invoke automatic scheduling.
+
+Recording a review is an explicit local update. It clears a one-time date only when that date is already due, while a future date is retained. Optional fields preserve older Project records and version-1 backups without an index, migration, or backup-version bump.

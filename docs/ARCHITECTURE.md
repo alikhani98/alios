@@ -55,6 +55,9 @@ AliOS 1.0 is a local-first static web app.
 - `Project.goalId` is not queried through a Dexie index, so the optional field requires no new table, index, database schema version, or data migration
 - Deleting or changing a Goal never cascades to a Project; a missing linked Goal is shown as unavailable so the Project can still be edited, unlinked, relinked, or deleted
 - Backup version 1 accepts both linked Projects and older Project records that omit `goalId`
+- Projects may optionally store `reviewIntervalDays` and `lastReviewedAt`; review-due state is derived from these fields or the legacy one-time `reviewDate`, never persisted as a separate roll-up
+- A review is recorded only from an explicit foreground action. It may clear an already-due one-time `reviewDate`, but never clears a future date or schedules background work
+- The optional fields need no Dexie index or database-version bump, and version-1 backup records remain backward compatible because the fields are optional
 
 ## Today Tasks Module Boundary
 

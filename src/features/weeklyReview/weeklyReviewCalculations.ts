@@ -34,6 +34,7 @@ import {
   type LifeAreaView,
 } from "../lifeAreas";
 import { isManualEntryReviewDue } from "../manual/manualEntries";
+import { isProjectReviewDue } from "../projects/projectReviews";
 
 export type WeeklyReviewWindow = {
   days: number;
@@ -356,13 +357,11 @@ function needsProjectAttention(project: Project, referenceDate: Date): boolean {
   }
 
   const hasNextAction = hasProjectNextAction(project);
-  const reviewDate = project.reviewDate ? parseDate(project.reviewDate) : null;
-
   if (!hasNextAction) {
     return true;
   }
 
-  return reviewDate !== null && reviewDate.getTime() <= endOfDay(referenceDate).getTime();
+  return isProjectReviewDue(project, referenceDate);
 }
 
 function buildEmptyStates(summary: {

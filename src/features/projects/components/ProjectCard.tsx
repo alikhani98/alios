@@ -1,4 +1,4 @@
-import { CalendarDays, CheckCircle2, ListChecks, Pencil, Target, Trash2 } from "lucide-react";
+import { CalendarDays, CheckCircle2, Clock3, ListChecks, Pencil, Target, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -27,9 +27,11 @@ type ProjectCardProps = {
   linkedGoal?: Goal;
   taskProgress?: ProjectTaskProgress;
   isLinkedGoalLoading: boolean;
+  isReviewDue?: boolean;
   isDeleting: boolean;
   onEdit: () => void;
   onDelete: () => Promise<void>;
+  onMarkReviewed?: () => Promise<void>;
 };
 
 export function ProjectCard({
@@ -37,12 +39,14 @@ export function ProjectCard({
   linkedGoal,
   taskProgress = { total: 0, completed: 0 },
   isLinkedGoalLoading,
+  isReviewDue,
   isDeleting,
   onEdit,
   onDelete,
+  onMarkReviewed,
 }: ProjectCardProps) {
   const { t } = useI18n();
-  const { formatDate } = useDateFormatter();
+  const { formatDate, formatDateTime } = useDateFormatter();
   const [confirmingDelete, setConfirmingDelete] = useState(false);
 
   return (
@@ -151,11 +155,31 @@ export function ProjectCard({
             </span>
           </div>
         ) : null}
+        <div className="grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
+          <p className="min-w-0 break-words">
+            {t("goals.reviewIntervalDaysLabel")}: {project.reviewIntervalDays ?? t("common.notRecorded")}
+          </p>
+          <p className="min-w-0 break-words">
+            {t("goals.lastReviewedLabel")}: {project.lastReviewedAt ? formatDateTime(project.lastReviewedAt) : t("common.notRecorded")}
+          </p>
+        </div>
       </CardContent>
 
       <CardFooter className="flex flex-col gap-2 border-t pt-4 sm:flex-row sm:flex-wrap">
         {confirmingDelete ? (
           <>
+            {project.status === "active" && isReviewDue && onMarkReviewed ? (
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                className="w-full sm:w-auto"
+                onClick={() => void onMarkReviewed()}
+              >
+                <Clock3 className="me-2 h-4 w-4" />
+                {t("goals.markReviewed")}
+              </Button>
+            ) : null}
             <Button
               type="button"
               size="sm"
