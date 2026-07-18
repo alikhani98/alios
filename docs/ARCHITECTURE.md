@@ -71,6 +71,7 @@ AliOS 1.0 is a local-first static web app.
 - Weekly Plans are local records keyed by the Monday-starting ISO-style `weekStart` date and are saved through their own repository
 - A plan may reference Goal, Project, and Task IDs, but stores no reverse link and never cascades when any referenced record is changed or deleted
 - Weekly Review is the editing surface; Home may display the current plan read-only
+- Weekly Review may compose the current plan with derived task and review-queue signals into a planning dashboard; this remains a foreground UI view and never stores a roll-up or priority score
 - Backup version 1 includes weekly plans additively and normalizes absent arrays for older valid backups
 
 ## Today Tasks Module Boundary
