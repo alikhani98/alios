@@ -11,6 +11,7 @@ import { ProjectCard } from "../components/ProjectCard";
 import { ProjectForm } from "../components/ProjectForm";
 import {
   createLinkedGoalPath,
+  findGoalProjectFilter,
   findLinkedGoal,
 } from "../projectGoalLinks";
 import {
@@ -62,6 +63,12 @@ describe("Project goal links", () => {
     expect(
       findLinkedGoal({ ...projectRecord, goalId: "missing" }, [goalRecord])
     ).toBeUndefined();
+  });
+
+  it("resolves a Goal filter without making an unavailable Goal destructive", () => {
+    expect(findGoalProjectFilter(goalRecord.id, [goalRecord])).toEqual(goalRecord);
+    expect(findGoalProjectFilter("deleted-goal", [goalRecord])).toBeUndefined();
+    expect(findGoalProjectFilter(null, [goalRecord])).toBeUndefined();
   });
 
   it("allows an empty optional Goal value in the Project form", () => {

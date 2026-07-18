@@ -470,3 +470,11 @@ Deleting a Routine does not cascade into existing Tasks. The stage adds no backg
 Routine progress is calculated from existing Tasks with a matching `routineId`. Routine cards may show total, completed, open, and percentage values; Weekly Review may summarize the local seven-day subset by Task due date. A Routine suggestion that the user never adds to Today has no Task record and is deliberately not treated as a missed action, failure, streak break, or behavior score.
 
 Routine filters use the existing URL-query pattern and remain safe when a referenced Routine has been deleted. This adds no persisted progress model, table, index, migration, backup format/version change, scheduler, notification, backend, sync, cloud, AI, telemetry, or dependency.
+
+## ADR-038: Keep Goal progress derived and non-destructive
+
+**Status:** Accepted (Stage 94)
+
+The optional Goal → Project and Project → Task links may produce a read-only Goal planning summary, but they must never overwrite the Goal's manually managed `progressPercent`. Linked Task completion is the primary signal when Tasks exist; linked Project completion is only a fallback. URL filters may carry Goal, Project, and Routine context together, while missing references remain a visible, reversible state rather than an error or a cascade.
+
+This adds no persisted roll-up, schema/index/migration, backup change, background process, backend, sync, cloud, AI, telemetry, or dependency.

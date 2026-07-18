@@ -1,12 +1,17 @@
 import type { Routine } from "@/shared/types";
 
 export type TodayTaskFilters = {
+  goalId?: string | null;
   projectId?: string | null;
   routineId?: string | null;
 };
 
 export function createTodayTasksPath(filters: TodayTaskFilters = {}): string {
   const searchParams = new URLSearchParams();
+
+  if (filters.goalId) {
+    searchParams.set("goalId", filters.goalId);
+  }
 
   if (filters.projectId) {
     searchParams.set("projectId", filters.projectId);

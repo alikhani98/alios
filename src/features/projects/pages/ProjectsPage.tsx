@@ -1,6 +1,6 @@
 import { AlertCircle, FolderKanban, Plus, RotateCcw } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
 import type { CreateProjectInput } from "@/core/repositories";
 import { useGoals } from "@/features/goals/hooks/useGoals";
@@ -22,7 +22,7 @@ import { cn } from "@/shared/utils";
 import { ProjectCard } from "../components/ProjectCard";
 import { ProjectForm } from "../components/ProjectForm";
 import { useProjects } from "../hooks/useProjects";
-import { findLinkedGoal } from "../projectGoalLinks";
+import { findGoalProjectFilter, findLinkedGoal } from "../projectGoalLinks";
 import { getProjectTaskProgress } from "../projectTaskProgress";
 import type { ProjectFormValues } from "../types";
 
@@ -56,6 +56,11 @@ export function ProjectsPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const projectRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const focusId = searchParams.get("focusId");
+  const goalId = searchParams.get("goalId");
+  const filteredGoal = findGoalProjectFilter(goalId, goals);
+  const visibleProjects = goalId
+    ? projects.filter((project) => project.goalId === goalId)
+    : projects;
 
   useEffect(() => {
     void tasksRepository.list().then(setTasks).catch(() => setTasks([]));
@@ -257,6 +262,22 @@ export function ProjectsPage() {
         </div>
       ) : null}
 
+      {goalId ? (
+        <div
+          role="status"
+          className="flex flex-col gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-4 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <p className="min-w-0 break-words text-sm text-foreground">
+            {filteredGoal
+              ? `${t("projects.linkedGoal")}: ${filteredGoal.title}`
+              : t("projects.linkedGoalUnavailable")}
+          </p>
+          <Button asChild size="sm" variant="outline" className="w-full shrink-0 sm:w-auto">
+            <Link to="/projects">{t("goals.clearFilters")}</Link>
+          </Button>
+        </div>
+      ) : null}
+
       {isLoading ? (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" aria-label={t("projects.loading")}>
           {[0, 1, 2].map((item) => (
@@ -279,9 +300,20 @@ export function ProjectsPage() {
             </Button>
           }
         />
+      ) : visibleProjects.length === 0 ? (
+        <EmptyState
+          icon={<FolderKanban className="h-6 w-6" />}
+          title={t("projects.noGoalFilterResults")}
+          description={t("projects.emptyDescription")}
+          actions={
+            <Button asChild type="button">
+              <Link to="/projects">{t("goals.clearFilters")}</Link>
+            </Button>
+          }
+        />
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {projects.map((project) => (
+          {visibleProjects.map((project) => (
             <div
               key={project.id}
               ref={(node) => {

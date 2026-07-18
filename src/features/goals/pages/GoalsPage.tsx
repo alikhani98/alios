@@ -13,8 +13,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
 import type { CreateGoalInput } from "@/core/repositories";
+import { useStorageAdapter } from "@/core/storage";
+import { useProjects } from "@/features/projects/hooks/useProjects";
 import { useI18n } from "@/shared/i18n";
-import type { Goal } from "@/shared/types";
+import type { Goal, Task } from "@/shared/types";
 import {
   Button,
   EmptyState,
@@ -55,6 +57,7 @@ import {
 } from "../goalTemplates";
 import { GoalCard } from "../components/GoalCard";
 import { GoalForm } from "../components/GoalForm";
+import { getGoalProjectProgress } from "../goalProjectProgress";
 import { useGoals } from "../hooks/useGoals";
 import type { GoalFormSeed, GoalFormValues } from "../types";
 
@@ -82,6 +85,7 @@ function parseOptionalDate(value: string): string | undefined {
 
 export function GoalsPage() {
   const { t } = useI18n();
+  const { tasks: tasksRepository } = useStorageAdapter();
   const [searchParams, setSearchParams] = useSearchParams();
   const {
     entries,
@@ -95,6 +99,9 @@ export function GoalsPage() {
     markGoalCompleted,
     reactivateGoal,
   } = useGoals();
+  const { projects, isLoading: isProjectsLoading } = useProjects();
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [isTasksLoading, setIsTasksLoading] = useState(true);
   const [formOpen, setFormOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<Goal | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -122,6 +129,16 @@ export function GoalsPage() {
   const areaParam = searchParams.get("area");
 
   const summary = useMemo(() => getGoalsSummary(entries), [entries]);
+  const isProjectProgressLoading = isProjectsLoading || isTasksLoading;
+
+  useEffect(() => {
+    setIsTasksLoading(true);
+    void tasksRepository
+      .list()
+      .then(setTasks)
+      .catch(() => setTasks([]))
+      .finally(() => setIsTasksLoading(false));
+  }, [tasksRepository]);
   const templateCards = useMemo(
     () =>
       GOAL_TEMPLATES.map((template) => ({
@@ -707,6 +724,8 @@ export function GoalsPage() {
               <GoalCard
                 goal={goal}
                 isReviewDue={isGoalReviewDue(goal)}
+                projectProgress={getGoalProjectProgress(goal.id, projects, tasks)}
+                isProjectProgressLoading={isProjectProgressLoading}
                 isDeleting={deletingId === goal.id}
                 onEdit={() => openEditForm(goal)}
                 onDelete={() => void handleDelete(goal)}
@@ -733,6 +752,8 @@ export function GoalsPage() {
                   key={`review-${goal.id}`}
                   goal={goal}
                   isReviewDue
+                  projectProgress={getGoalProjectProgress(goal.id, projects, tasks)}
+                  isProjectProgressLoading={isProjectProgressLoading}
                   isDeleting={deletingId === goal.id}
                   onEdit={() => openEditForm(goal)}
                   onDelete={() => void handleDelete(goal)}

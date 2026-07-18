@@ -78,6 +78,8 @@ Stage 92 adds a local-first recurring-routines foundation with explicit weekday 
 
 Stage 93 derives Routine task progress from the existing optional `Task.routineId` relationship, adds safe Routine → Today filtering, and includes an awareness-only seven-day Routine summary in Weekly Review. It stores no completion history beyond existing Tasks and never treats a Routine suggestion the user did not add as a missed event.
 
+Stage 94 adds a read-only Goal planning summary from the existing Goal → Project → Task links and reversible Goal-focused navigation to Projects and Today. It preserves manual Goal progress and adds no stored roll-up or new service.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1

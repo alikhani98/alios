@@ -133,6 +133,8 @@ AliOS 1.0 is a local-first static web app.
 - A Routine deletion never cascades to prior Tasks, and same-day duplication is guarded transactionally by the Tasks repository
 - Routine task progress and Weekly Review counts are derived only from existing `Task.routineId` records; unadded suggestions create no record and are never interpreted as missed behavior
 - Routine → Today filtering is URL-backed, reversible, and safely retains linked Task history when a Routine is unavailable or deleted
+- Goal planning progress is derived from existing `Project.goalId` and `Task.projectId` records. It remains read-only: the Goal's manually managed `progressPercent` is never overwritten. Linked Task completion is used when Tasks exist; otherwise completed linked Projects provide the fallback summary.
+- Goal → Projects and Goal → Today use the same URL-query filtering pattern. Goal, Project, and Routine filters compose without adding a persisted roll-up or bypassing the storage-adapter boundary.
 - The QA protocol is documentation only: it does not collect telemetry, inspect personal records, add analytics, or transmit browser data
 - A reported issue must include its observed workflow, route, result, expected result, frequency, and severity before it becomes a candidate implementation stage
 - Future stages remain separately approved and must not infer a broad product feature from one unverified preference

@@ -1,4 +1,4 @@
-import { CheckCircle2, Clock3, Compass, RotateCcw, Trash2 } from "lucide-react";
+import { CheckCircle2, Clock3, Compass, FolderKanban, ListChecks, RotateCcw, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { useDateFormatter } from "@/shared/date";
@@ -23,10 +23,14 @@ import {
   GOAL_TIMEFRAME_LABEL_KEYS,
 } from "../constants";
 import { createLifeAreaFocusPath } from "../goalAreaNavigation";
+import { createGoalProjectsPath, type GoalProjectProgress } from "../goalProjectProgress";
+import { createTodayTasksPath } from "@/features/routines/routineTaskLinks";
 
 type GoalCardProps = {
   goal: Goal;
   isReviewDue: boolean;
+  projectProgress?: GoalProjectProgress;
+  isProjectProgressLoading?: boolean;
   isDeleting: boolean;
   onEdit: () => void;
   onDelete: () => void;
@@ -38,6 +42,8 @@ type GoalCardProps = {
 export function GoalCard({
   goal,
   isReviewDue,
+  projectProgress,
+  isProjectProgressLoading,
   isDeleting,
   onEdit,
   onDelete,
@@ -96,6 +102,45 @@ export function GoalCard({
           value={goal.progressPercent}
           label={t("goals.progressLabel")}
         />
+
+        <div className="min-w-0 rounded-2xl border border-primary/15 bg-primary/5 p-3">
+          <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0 space-y-1">
+              <p className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                <FolderKanban className="h-4 w-4 shrink-0 text-primary" />
+                {t("projects.taskProgress")}
+              </p>
+              <p className="break-words text-sm font-medium">
+                {isProjectProgressLoading
+                  ? t("common.loading")
+                  : projectProgress && projectProgress.projectCount > 0
+                    ? `${projectProgress.completedProjectCount}/${projectProgress.projectCount} · ${projectProgress.completionPercent ?? 0}%`
+                    : t("common.notRecorded")}
+              </p>
+              {!isProjectProgressLoading && projectProgress ? (
+                <p className="break-words text-xs leading-5 text-muted-foreground">
+                  {projectProgress.taskCount > 0
+                    ? `${projectProgress.completedTaskCount}/${projectProgress.taskCount} · ${t("projects.taskProgress")}`
+                    : t("projects.title")}
+                </p>
+              ) : null}
+            </div>
+            <div className="flex w-full flex-col gap-2 sm:w-auto">
+              <Button asChild size="sm" variant="outline" className="w-full shrink-0 sm:w-auto">
+                <Link to={createGoalProjectsPath(goal.id)}>
+                  <FolderKanban className="me-2 h-4 w-4" />
+                  {t("projects.title")}
+                </Link>
+              </Button>
+              <Button asChild size="sm" variant="outline" className="w-full shrink-0 sm:w-auto">
+                <Link to={createTodayTasksPath({ goalId: goal.id })}>
+                  <ListChecks className="me-2 h-4 w-4" />
+                  {t("projects.openTodayTasks")}
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </div>
 
         <div className="grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
           <p className="min-w-0 break-words">
