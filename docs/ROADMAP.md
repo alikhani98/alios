@@ -72,6 +72,8 @@ Stage 89 makes the Today project filter visible and reversible, including a safe
 
 Stage 90 release-hardens the Goal → Project → Today planning chain with focused regression coverage and bilingual narrow-screen smoke guidance for long content, filter refresh/reset, and unavailable Projects. It changes no product behavior, storage, backup format, routes, dependencies, backend, sync, cloud, AI, telemetry, or user data.
 
+Stage 91 consolidates release readiness into one manual end-to-end pass for capture, planning, completion, review, retrieval, backup preview, recovery, mobile, and keyboard behavior. It is documentation-only and adds no runtime behavior, data collection, storage, backup, route, dependency, backend, sync, cloud, AI, telemetry, or user-data change.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1

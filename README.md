@@ -113,6 +113,7 @@ Architecture references:
 - [Project state](PROJECT_STATE.md)
 - [Roadmap](docs/ROADMAP.md)
 - [Release checklist](docs/RELEASE_CHECKLIST.md)
+- [Release readiness pass](docs/RELEASE_READINESS.md)
 - [Mobile usage](docs/MOBILE_USAGE.md)
 
 ## Requirements

@@ -116,6 +116,14 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] No storage, backup, route, dependency, backend, sync, cloud, AI, telemetry, or user-data behavior is introduced
 - [ ] Complete the Stage 90 manual planning-chain smoke pass at 360px, 390px, and 430px in Persian and English
 
+### Stage 91 release consolidation and real-use readiness
+
+- [x] `RELEASE_READINESS.md` joins capture, Goal → Project → Task planning, completion, review, search, backup preview, recovery, mobile, and keyboard checks into one reproducible pass
+- [x] The release decision requires green automated gates, no blocker in essential workflows, an externally stored backup, and explicit treatment of high-severity observations
+- [x] The consolidated issue record preserves environment, expected result, severity, safe evidence, and fix/defer decision
+- [x] No runtime, storage, backup, route, dependency, backend, sync, cloud, AI, telemetry, or user-data behavior is introduced
+- [ ] Complete the Stage 91 release-readiness pass on the deployed site
+
 ### Stage 86 performance regression guard
 
 - [x] `pnpm performance:check` builds a manifest and enforces the entry-byte budget, no forms preload, and no Vite chunk-size warning
