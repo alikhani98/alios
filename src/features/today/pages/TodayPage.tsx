@@ -26,10 +26,13 @@ import { TodayTaskCard } from "../components/TodayTaskCard";
 import { TodayTaskForm } from "../components/TodayTaskForm";
 import { useTodayData } from "../hooks/useTodayData";
 import {
-  createAllTodayTasksPath,
   findLinkedProject,
   findProjectFilter,
 } from "../taskProjectLinks";
+import {
+  createTodayTasksPath,
+  findRoutineFilter,
+} from "@/features/routines/routineTaskLinks";
 import type { DailyCheckinFormValues, TodayTaskFormValues } from "../types";
 import { createRoutineTaskInput, getRoutineSuggestions } from "../routineSuggestions";
 
@@ -77,10 +80,14 @@ export function TodayPage() {
   const taskRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const focusId = searchParams.get("focusId");
   const projectId = searchParams.get("projectId");
+  const routineId = searchParams.get("routineId");
   const filteredProject = findProjectFilter(projectId, projects);
-  const visibleTasks = projectId
-    ? tasks.filter((task) => task.projectId === projectId)
-    : tasks;
+  const filteredRoutine = findRoutineFilter(routineId, routines);
+  const visibleTasks = tasks.filter(
+    (task) =>
+      (!projectId || task.projectId === projectId) &&
+      (!routineId || task.routineId === routineId)
+  );
   const routineSuggestions = getRoutineSuggestions(
     routines,
     tasks,
@@ -276,8 +283,26 @@ export function TodayPage() {
               : t("today.projectFilterUnavailable")}
           </p>
           <Button asChild size="sm" variant="outline" className="w-full shrink-0 sm:w-auto">
-            <Link to={createAllTodayTasksPath()}>
+            <Link to={createTodayTasksPath({ routineId })}>
               {t("today.clearProjectFilter")}
+            </Link>
+          </Button>
+        </div>
+      ) : null}
+
+      {routineId ? (
+        <div
+          role="status"
+          className="flex flex-col gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-4 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <p className="min-w-0 break-words text-sm text-foreground">
+            {filteredRoutine
+              ? t("today.routineFilterActive", { title: filteredRoutine.title })
+              : t("today.routineFilterUnavailable")}
+          </p>
+          <Button asChild size="sm" variant="outline" className="w-full shrink-0 sm:w-auto">
+            <Link to={createTodayTasksPath({ projectId })}>
+              {t("today.clearRoutineFilter")}
             </Link>
           </Button>
         </div>

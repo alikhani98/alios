@@ -76,6 +76,8 @@ Stage 91 consolidates release readiness into one manual end-to-end pass for capt
 
 Stage 92 adds a local-first recurring-routines foundation with explicit weekday schedules, repository CRUD, Today suggestions, atomic same-day duplicate prevention, search, and additive backup support. Routines never create tasks without a user action and add no notification, background scheduler, backend, sync, cloud, AI, telemetry, or dependency.
 
+Stage 93 derives Routine task progress from the existing optional `Task.routineId` relationship, adds safe Routine → Today filtering, and includes an awareness-only seven-day Routine summary in Weekly Review. It stores no completion history beyond existing Tasks and never treats a Routine suggestion the user did not add as a missed event.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1

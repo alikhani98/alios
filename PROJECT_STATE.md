@@ -5,7 +5,7 @@
 - Project name: AliOS
 - Architecture version: AliOS 1.0
 - Current status: AliOS includes validated mobile-first Inbox capture, processing, global search, focused search-result navigation, filters, bulk triage, local appearance switching, local profile preferences, calendar month view foundation, home time-window routine nudges, upcoming task grouping, routine templates, Wellness / Badminton Routine foundation, visual motion polish, premium Home dashboard visual upgrade, premium app shell polish, Home dashboard customization, premium reusable components, lightweight Personal Insights, Stage 37 premium Home showcase polish, light core-page visual alignment, hardened backup/restore safety, Stage 38 UI regression QA and release hardening with desktop sticky sidebar accessibility improvements, Stage 39 topbar dashboard controls plus accent color personalization, Stage 40 finance foundation, Stage 41 finance review and budget guard, Stage 42 lightweight finance charts foundation, Stage 43 lightweight motion and interaction polish, Stage 44 finance mobile UX and section navigation, Stage 45 performance audit and bundle optimization, Stage 46 Home collapsible dashboard sections, Stage 47 Settings Help Center Foundation, Stage 48 Weekly Review Foundation, Stage 49 Decision Log Foundation, Stage 50 Backup / Restore Safety & Migration Foundation, Stage 51 App Error Boundary & Local Error Log Foundation, Stage 53 Mobile UX Hardening for dense pages, Stage 54 Empty States & First-Run Guidance Foundation, Stage 55 Backup Reminder & Last Backup Status Foundation, Stage 56 Export Center Foundation, Stage 57 Recovery Mode / Safe Mode Foundation, Stage 58 Finance Monthly Plan Foundation, Stage 59 Personal Manual Foundation, Stage 60 Personal Manual QA & Release Hardening, Stage 61 Personal Manual Export Center Integration, Stage 62 Bundle Size Audit & Initial Load Hardening, Stage 63 Personal Manual Weekly Review Integration, Stage 64 Personal Manual Search & Focus Navigation, Stage 65 Personal Manual Templates Foundation, Stage 66 Personal Manual Mobile & Dense Page Polish, Stage 67 Personal Manual Track Release Hardening, Stage 68 v1.50 Release Hardening, Stage 69 Goals Track Foundation, Stage 70 Goals Track QA & Mobile Hardening, Stage 71 Goals Templates & Quick Start, Stage 72 Life Areas Foundation, Stage 73 App Startup Resilience & Release Hygiene, Stage 74 Pull Request CI Foundation, Stage 75 Life Areas QA & Mobile Hardening, Stage 76 Goals ↔ Life Areas Derived Integration, Stage 77 Goals & Life Areas Release Hardening, Stage 78 Projects → Goals Link Foundation, Stage 79 Tasks → Projects Link Activation, Stage 80 Life Areas Persian Localization & Help Center Refresh, Stage 81 AliOS Design System Contract, Stage 82 Design Contract Adoption & Form Control Consistency, Stage 83 UI Accessibility & Design Contract Release Hardening, Stage 84 Real-World Usage QA & Product Prioritization Foundation, and Stage 85 Bundle Performance & Initial Load Hardening, and remains ready for static GitHub Pages deployment.
-- Current Stage: Stage 92 Completed (Stage 84 manual usage pass remains pending)
+- Current Stage: Stage 93 Completed (Stage 84 manual usage pass remains pending)
 
 ## Architecture References
 
@@ -132,6 +132,7 @@ Stages 1–91 are complete.
 - Stage 90 — Project Planning Chain QA & Mobile Hardening
 - Stage 91 — Release Consolidation & Real-Use Readiness
 - Stage 92 — Recurring Routines & Daily Planning Foundation
+- Stage 93 — Routine Progress & Review Integration
 
 Stage 54 completion is evidenced by the calmer bilingual empty-state guidance across Home, Finance, Decisions, Weekly Review, Inbox, Projects, Journal, Knowledge, and Settings. The stage adds no schema migration, no backup-format change, no backup-version bump, no route redesign, no onboarding modal or tour, no backend, no sync, no cloud, no AI, no telemetry, and no new dependency. It keeps the existing local-first repository/storage-adapter boundaries intact while giving low-data users a clearer first step.
 
@@ -210,6 +211,8 @@ Stage 90 completion is evidenced by focused regression coverage for the Goal →
 Stage 91 completion is evidenced by `docs/RELEASE_READINESS.md`, which consolidates capture, planning, completion, review, retrieval, backup-preview, recovery, mobile, and keyboard checks into one reproducible manual release pass with explicit decision criteria and an environment-aware issue record. It is documentation-only and adds no runtime behavior, storage, backup, route, dependency, backend, sync, cloud, AI, telemetry, or user-data change.
 
 Stage 92 completion is evidenced by the repository-backed Routine domain, Dexie schema version 8, bilingual Routine CRUD and navigation, local search integration, explicit Today suggestions, optional `Task.routineId`, and transactional `[routineId+dueDate]` duplicate prevention. Routine deletion never cascades to historical Tasks; version-1 backups add an optional routines array that normalizes to empty for older valid files. The stage adds no background scheduler, notification, service worker, backend, sync, cloud, AI, telemetry, or dependency.
+
+Stage 93 completion is evidenced by derived Routine task progress on Routine cards, stable Routine → Today URL filtering, and a read-only Weekly Review Routine summary. Every number is derived from existing `Task.routineId` records: only Tasks explicitly added from a Routine are counted, so a suggestion that was never added is not marked as missed. The Stage keeps Routine deletion non-cascading, does not add a table, field, index, migration, backup change, scheduler, notification, backend, sync, cloud, AI, telemetry, or dependency.
 
 Stage 53 completion is evidenced by the mobile-focused readability and overflow hardening pass across the dense Finance, Weekly Review, Decision Log, Settings, and Home surfaces. The stage keeps the existing product behavior intact while improving small-screen stacking, wrapping, button usability, and section readability on 360px, 390px, and 430px class devices. It does not change routes, storage, schemas, backup format, dependencies, or navigation architecture, and it remains aligned with static GitHub Pages deployment.
 Stage 48 completion is evidenced by the derived-only Weekly Review foundation, which summarizes the last seven days of existing local tasks, projects, inbox items, journal entries, knowledge items, finance records, wellness/check-in data, and routine signals where available. The stage adds deterministic observations and suggested focus rules, keeps the review window local and read-only, and stores no new weekly-review data. It uses the existing feature/repository/storage-adapter boundaries, adds no schema migration, no backup-format change, no new dependency, no backend, no sync, no cloud, and no AI, and it remains aligned with static GitHub Pages deployment.
@@ -308,15 +311,15 @@ No further implementation scope is currently approved. The next decision should 
 
 ## Git Latest Recommended Commit
 
-`feat(routines): add explicit recurring planning`
+`feat(routines): integrate progress and weekly review`
 
 ## Build Status
 
 - TypeScript: passing (`pnpm exec tsc --noEmit`)
 - Automated tests: passing (`pnpm test:run`)
 - Production build: passing (`pnpm build`)
-- Production build: no Vite chunk-size warning; guarded primary entry is 277,303 bytes, with forms/validation code excluded from entry module-preloads
-- Automated test count: 789 passing tests across 50 test files
+- Production build: no Vite chunk-size warning; guarded primary entry is 279,794 bytes, with forms/validation code excluded from entry module-preloads
+- Automated test count: 793 passing tests across 51 test files
 - Pull request validation: configured (`.github/workflows/ci.yml`)
 - Last verified: 2026-07-18
 

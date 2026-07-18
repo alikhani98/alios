@@ -462,3 +462,11 @@ This protects local-first data portability while preserving the version-1 backup
 Recurring routines are stored as independent local records with weekday schedules. Today derives due suggestions in the foreground, and a Task is created only after an explicit user action. `Task.routineId` records origin, while the compound Dexie index `[routineId+dueDate]` and a transactional repository method prevent duplicate tasks for one routine and local date.
 
 Deleting a Routine does not cascade into existing Tasks. The stage adds no background scheduler, notification, service worker, backend, sync, cloud, AI, telemetry, or dependency. Backup version remains 1; the additive `routines` array defaults to empty for older valid backups.
+
+## ADR-037: Derive Routine progress from explicit Task creation
+
+**Status:** Accepted (Stage 93)
+
+Routine progress is calculated from existing Tasks with a matching `routineId`. Routine cards may show total, completed, open, and percentage values; Weekly Review may summarize the local seven-day subset by Task due date. A Routine suggestion that the user never adds to Today has no Task record and is deliberately not treated as a missed action, failure, streak break, or behavior score.
+
+Routine filters use the existing URL-query pattern and remain safe when a referenced Routine has been deleted. This adds no persisted progress model, table, index, migration, backup format/version change, scheduler, notification, backend, sync, cloud, AI, telemetry, or dependency.
