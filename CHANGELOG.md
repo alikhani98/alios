@@ -2,6 +2,12 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 91 - Release Consolidation & Real-Use Readiness
+
+- Added one reproducible release-readiness pass for capture, planning links, completion, review, search, backup preview, recovery, mobile, and keyboard flows
+- Unified the release decision criteria and safe issue-record format with the existing seven-day manual usage protocol
+- Kept the stage documentation-only and local-first: no runtime, storage, backup, dependency, route, backend, or product-scope change
+
 ## Stage 90 - Project Planning Chain QA & Mobile Hardening
 
 - Added regression coverage for the Goal → Project → Today handoff, linked-task summary, stable filtered route, and long-content mobile layout contract

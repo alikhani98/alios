@@ -61,6 +61,6 @@ At the end of the week, group issues by repeated workflow rather than by screen.
 
 Do not turn a one-off preference into a broad redesign. Features such as sync, accounts, hosted AI, notifications, cloud backup, semantic search, tags, attachments, or a new analytics system remain outside this protocol and require a separately approved stage.
 
-## Handoff to the next stage
+## Handoff to release consolidation or the next stage
 
-Send the completed issue rows, the device/browser used, language and viewport where relevant, and the exact route. The project architect will then propose a small Stage 85 scope with acceptance criteria, risk assessment, and no unrelated changes.
+Complete `RELEASE_READINESS.md` after this seven-day pass when preparing a release. Send the completed issue rows, the device/browser used, language and viewport where relevant, and the exact route. The project architect will then propose only a narrowly evidenced scope with acceptance criteria, risk assessment, and no unrelated changes.
