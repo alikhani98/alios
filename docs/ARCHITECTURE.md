@@ -66,6 +66,13 @@ AliOS 1.0 is a local-first static web app.
 - Each action delegates to the owning repository and refreshes the derived summary; no action cascades to linked records
 - Decision due status uses the shared deterministic rule, so older overdue Decisions remain visible until explicitly marked reviewed
 
+## Weekly Planning Boundary
+
+- Weekly Plans are local records keyed by the Monday-starting ISO-style `weekStart` date and are saved through their own repository
+- A plan may reference Goal, Project, and Task IDs, but stores no reverse link and never cascades when any referenced record is changed or deleted
+- Weekly Review is the editing surface; Home may display the current plan read-only
+- Backup version 1 includes weekly plans additively and normalizes absent arrays for older valid backups
+
 ## Today Tasks Module Boundary
 
 - Tasks remain local records accessed through the Today feature hook, repository interface, and storage-adapter boundary

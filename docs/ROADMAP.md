@@ -86,6 +86,8 @@ Stage 96 adds an explicit, local Project review lifecycle with optional recurrin
 
 Stage 97 adds a derived unified review queue inside Weekly Review for existing due Projects, Goals, Life Areas, Personal Manual entries, and Decisions. Each review remains an explicit local action; the queue adds no persisted workflow, scheduler, notification, backend, sync, cloud, AI, telemetry, dependency, schema, migration, or backup change.
 
+Stage 98 adds a local weekly planning record with one focus, optional intention, and optional Goal, Project, and Task links. Weekly Review edits it and Home displays it; Dexie v9 and additive Backup v1 support are used without a scheduler, notification, backend, sync, cloud, AI, telemetry, or dependency.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1

@@ -29,6 +29,7 @@ import type {
   Setting,
   Task,
   Routine,
+  WeeklyPlan,
 } from "@/shared/types";
 
 const timestamp = "2026-07-05T08:30:00.000Z";
@@ -59,6 +60,15 @@ export const routineInput: CreateRoutineInput = {
   weekdays: [1, 2, 3, 4, 5],
   priority: "medium",
   isActive: true,
+};
+
+export const weeklyPlanInput = {
+  weekStart: "2026-07-06",
+  focusTitle: "Ship weekly plan",
+  intention: "Keep the next action clear.",
+  goalId: "fixture-id",
+  projectId: "fixture-id",
+  taskId: "fixture-id",
 };
 
 export const journalEntryInput: CreateJournalEntryInput = {
@@ -190,6 +200,7 @@ const metadata = {
 export const projectRecord: Project = { ...projectInput, ...metadata };
 export const taskRecord: Task = { ...taskInput, ...metadata };
 export const routineRecord: Routine = { ...routineInput, ...metadata };
+export const weeklyPlanRecord: WeeklyPlan = { ...weeklyPlanInput, ...metadata };
 export const journalEntryRecord: JournalEntry = {
   ...journalEntryInput,
   ...metadata,

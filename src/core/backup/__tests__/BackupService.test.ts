@@ -18,6 +18,7 @@ import {
   settingInput,
   taskInput,
   routineInput,
+  weeklyPlanInput,
 } from "@/test/factories";
 import { createTestStorage, destroyTestDatabase } from "@/test/database";
 import { BackupService, createBackupFilename } from "../BackupService";
@@ -63,6 +64,7 @@ describe("BackupService with DexieBackupStorage", () => {
     const setting = await storage.settings.create(settingInput);
     const inboxItem = await storage.inbox.create(inboxItemInput);
     const routine = await storage.routines.create(routineInput);
+    const weeklyPlan = await storage.weeklyPlans.save({ ...weeklyPlanInput, goalId: goal.id, projectId: project.id, taskId: task.id });
 
     const backup = await service.createBackup();
 
@@ -85,11 +87,13 @@ describe("BackupService with DexieBackupStorage", () => {
         "settings",
         "inboxItems",
         "routines",
+        "weeklyPlans",
       ].sort()
     );
     expect(backup.data.projects).toEqual([project]);
     expect(backup.data.tasks).toEqual([task]);
     expect(backup.data.routines).toEqual([routine]);
+    expect(backup.data.weeklyPlans).toEqual([weeklyPlan]);
     expect(backup.data.goals).toEqual([goal]);
     expect(backup.data.projects[0]?.goalId).toBe(goal.id);
     expect(backup.data.tasks[0]?.projectId).toBe(project.id);
@@ -127,6 +131,7 @@ describe("BackupService with DexieBackupStorage", () => {
       settings: 0,
       inboxItems: 0,
       routines: 0,
+      weeklyPlans: 0,
     });
     expect(localStorage.getItem(LANGUAGE_STORAGE_KEY)).toBe("en");
 
@@ -136,6 +141,7 @@ describe("BackupService with DexieBackupStorage", () => {
     expect(await storage.tasks.getById(task.id)).toEqual(task);
     expect(await storage.goals.getById(goal.id)).toEqual(goal);
     expect(await storage.routines.list()).toEqual([routine]);
+    expect(await storage.weeklyPlans.getByWeekStart(weeklyPlan.weekStart)).toEqual(weeklyPlan);
     expect(await storage.finance.getTransactionById(financeTransaction.id)).toEqual(
       financeTransaction
     );

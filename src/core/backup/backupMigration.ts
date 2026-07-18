@@ -15,6 +15,7 @@ import {
   settingSchema,
   taskSchema,
   routineSchema,
+  weeklyPlanSchema,
 } from "@/shared/types";
 
 import {
@@ -40,6 +41,7 @@ export const backupDataInputSchema = z.object({
   settings: z.array(settingSchema).optional(),
   inboxItems: z.array(inboxItemSchema).optional(),
   routines: z.array(routineSchema).optional(),
+  weeklyPlans: z.array(weeklyPlanSchema).optional(),
 });
 
 export type BackupDataInput = z.infer<typeof backupDataInputSchema>;
@@ -64,6 +66,7 @@ export function normalizeBackupData(data: BackupDataInput): AliosBackupData {
     settings: cloneRecords(data.settings),
     inboxItems: cloneRecords(data.inboxItems),
     routines: cloneRecords(data.routines),
+    weeklyPlans: cloneRecords(data.weeklyPlans),
   };
 }
 
