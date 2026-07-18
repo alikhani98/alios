@@ -2,6 +2,12 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 93 - Routine Progress & Review Integration
+
+- Added derived Routine task totals, completed/open counts, and completion percentage on Routine cards using the existing `Task.routineId` relationship
+- Added stable Routine → Today filtering with visible, reversible context that safely handles deleted Routines and composes with the existing Project filter
+- Added a read-only seven-day Routine section to Weekly Review that reports only Tasks explicitly created from Routines, never treating an unadded suggestion as missed
+
 ## Stage 92 - Recurring Routines & Daily Planning Foundation
 
 - Added repository-backed recurring routines with weekday schedules, active/paused state, priority, bilingual CRUD, local search, and mobile-safe navigation

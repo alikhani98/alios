@@ -16,7 +16,7 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 ## Automated release gates
 
 - [x] `pnpm exec tsc --noEmit`
-- [x] `pnpm test:run` — 777 tests across 48 suites
+- [x] `pnpm test:run` — 793 tests across 51 suites
 - [x] `pnpm build`
 - [x] Repository create, list, read, update, and delete coverage
 - [x] Backup metadata and all currently supported additive arrays
@@ -132,6 +132,15 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] Deleting a Routine preserves all existing Tasks; valid older backups restore with an empty routines array
 - [x] Routines are bilingual, searchable, mobile-safe, included in local counts, and covered by version-1 backup/restore
 - [ ] Complete the Stage 92 manual smoke pass at 360px, 390px, and 430px in Persian and English
+
+### Stage 93 Routine progress and Weekly Review integration
+
+- [x] Routine progress is derived only from existing `Task.routineId` records, including safe zero, completed, open, and percentage states
+- [x] Routine → Today filtering is URL-backed, reversible, composable with the Project filter, and safe when the Routine is unavailable
+- [x] Weekly Review reports only explicitly added Routine tasks in its seven-day due-date window; unadded suggestions are never treated as missed
+- [x] No table, field, index, migration, backup change, scheduler, notification, dependency, backend, sync, cloud, AI, telemetry, or user-data mutation is introduced
+- [x] TypeScript, 793 automated tests across 51 suites, production build, and the performance guard pass
+- [ ] Complete the Stage 93 manual smoke pass at 360px, 390px, and 430px in Persian and English
 
 ### Stage 86 performance regression guard
 

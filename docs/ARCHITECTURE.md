@@ -131,6 +131,8 @@ AliOS 1.0 is a local-first static web app.
 - Product prioritization may use only user-provided manual observations recorded through `docs/REAL_WORLD_USAGE_QA.md`
 - Recurring routines remain repository-backed local records; Today derives suggestions in the foreground and creates a traceable Task only after explicit user confirmation
 - A Routine deletion never cascades to prior Tasks, and same-day duplication is guarded transactionally by the Tasks repository
+- Routine task progress and Weekly Review counts are derived only from existing `Task.routineId` records; unadded suggestions create no record and are never interpreted as missed behavior
+- Routine → Today filtering is URL-backed, reversible, and safely retains linked Task history when a Routine is unavailable or deleted
 - The QA protocol is documentation only: it does not collect telemetry, inspect personal records, add analytics, or transmit browser data
 - A reported issue must include its observed workflow, route, result, expected result, frequency, and severity before it becomes a candidate implementation stage
 - Future stages remain separately approved and must not infer a broad product feature from one unverified preference

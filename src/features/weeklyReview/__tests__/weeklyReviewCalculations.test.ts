@@ -246,6 +246,13 @@ describe("weekly review calculations", () => {
       dueSoonCount: 0,
       completedInWindowCount: 0,
     });
+    expect(summary.routineSummary).toEqual({
+      linkedTaskCount: 0,
+      plannedInWindowCount: 0,
+      completedInWindowCount: 0,
+      openInWindowCount: 0,
+      completionPercent: 0,
+    });
     expect(summary.projectSummary).toEqual({
       totalCount: 0,
       activeCount: 0,
@@ -315,6 +322,7 @@ describe("weekly review calculations", () => {
     ]);
     expect(summary.emptyStates.map((item) => item.sectionId)).toEqual([
       "tasks",
+      "routines",
       "projects",
       "inbox",
       "journal",
@@ -790,5 +798,56 @@ describe("weekly review calculations", () => {
     expect(summary.taskSummary.dueSoonCount).toBe(1);
     expect(summary.financeSummary.transactionCount).toBe(0);
     expect(summary.financeSummary.netCashflowInWindow).toBe(0);
+  });
+
+  it("summarizes only explicitly added routine tasks in the review window", () => {
+    const summary = buildWeeklyReviewSummary(
+      {
+        tasks: [
+          createTask("routine-done", {
+            routineId: "morning-review",
+            dueDate: "2026-07-08",
+            status: "done",
+            completedAt: "2026-07-08T10:00:00.000Z",
+          }),
+          createTask("routine-open", {
+            routineId: "morning-review",
+            dueDate: "2026-07-10",
+            status: "doing",
+          }),
+          createTask("routine-outside-window", {
+            routineId: "morning-review",
+            dueDate: "2026-07-03",
+            status: "done",
+          }),
+          createTask("ordinary-task", {
+            dueDate: "2026-07-09",
+            status: "done",
+          }),
+        ],
+        projects: [],
+        goals: [],
+        inboxItems: [],
+        journalEntries: [],
+        knowledgeItems: [],
+        decisionLogEntries: [],
+        manualEntries: [],
+        financeTransactions: [],
+        financeObligations: [],
+        dailyCheckins: [],
+      },
+      new Date(2026, 6, 10)
+    );
+
+    expect(summary.routineSummary).toEqual({
+      linkedTaskCount: 3,
+      plannedInWindowCount: 2,
+      completedInWindowCount: 1,
+      openInWindowCount: 1,
+      completionPercent: 50,
+    });
+    expect(summary.emptyStates.map((item) => item.sectionId)).not.toContain(
+      "routines"
+    );
   });
 });

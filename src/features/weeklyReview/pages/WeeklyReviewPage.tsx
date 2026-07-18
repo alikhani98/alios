@@ -13,6 +13,7 @@ import {
   Inbox,
   NotebookPen,
   RefreshCcw,
+  Repeat2,
   Sparkles,
   Target,
   Wallet,
@@ -58,6 +59,7 @@ import type {
 
 const quickLinks: ReadonlyArray<{ to: string; labelKey: TranslationKey }> = [
   { to: "/today", labelKey: "nav.today" },
+  { to: "/routines", labelKey: "nav.routines" },
   { to: "/inbox", labelKey: "nav.inbox" },
   { to: "/projects", labelKey: "nav.projects" },
   { to: "/goals", labelKey: "nav.goals" },
@@ -473,6 +475,54 @@ export function WeeklyReviewPage() {
                   icon={<FolderKanban className="h-6 w-6" />}
                   title={t("weeklyReview.projectsEmptyTitle")}
                   description={t("weeklyReview.projectsEmptyDescription")}
+                />
+              ) : null}
+            </CollapsibleSection>
+
+            <CollapsibleSection
+              id="weekly-review-routines"
+              title={t("weeklyReview.routinesSection")}
+              description={t("weeklyReview.routinesSectionDescription")}
+              icon={<Repeat2 className="h-5 w-5" />}
+              status={<StatusChip tone="neutral">{summary.routineSummary.plannedInWindowCount}</StatusChip>}
+              contentClassName="space-y-3"
+            >
+              <div className="grid gap-3 sm:grid-cols-2">
+                <SoftPanel>
+                  <p className="text-xs text-muted-foreground">{t("weeklyReview.routinePlannedTasks")}</p>
+                  <p className="mt-1 text-lg font-semibold tabular-nums">{summary.routineSummary.plannedInWindowCount}</p>
+                </SoftPanel>
+                <SoftPanel>
+                  <p className="text-xs text-muted-foreground">{t("weeklyReview.routineCompletedTasks")}</p>
+                  <p className="mt-1 text-lg font-semibold tabular-nums">{summary.routineSummary.completedInWindowCount}</p>
+                </SoftPanel>
+                <SoftPanel>
+                  <p className="text-xs text-muted-foreground">{t("weeklyReview.routineOpenTasks")}</p>
+                  <p className="mt-1 text-lg font-semibold tabular-nums">{summary.routineSummary.openInWindowCount}</p>
+                </SoftPanel>
+                <SoftPanel>
+                  <p className="text-xs text-muted-foreground">{t("weeklyReview.routineCompletionRate")}</p>
+                  <p className="mt-1 text-lg font-semibold tabular-nums">{summary.routineSummary.completionPercent}%</p>
+                </SoftPanel>
+              </div>
+              <SoftPanel className="space-y-3">
+                <p className="text-sm leading-7 text-muted-foreground">
+                  {t("weeklyReview.routinesSectionNote")}
+                </p>
+                <Button asChild variant="outline" className="w-full justify-start sm:w-auto">
+                  <Link to="/routines">{t("weeklyReview.openRoutines")}</Link>
+                </Button>
+              </SoftPanel>
+              {hasEmptyState(summary.emptyStates, "routines") ? (
+                <EmptyState
+                  icon={<Repeat2 className="h-6 w-6" />}
+                  title={t("weeklyReview.routinesEmptyTitle")}
+                  description={t("weeklyReview.routinesEmptyDescription")}
+                  actions={
+                    <Button asChild variant="outline">
+                      <Link to="/routines">{t("weeklyReview.openRoutines")}</Link>
+                    </Button>
+                  }
                 />
               ) : null}
             </CollapsibleSection>

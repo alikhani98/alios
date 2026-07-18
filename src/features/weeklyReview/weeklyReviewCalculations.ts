@@ -50,6 +50,14 @@ export type WeeklyReviewTaskSummary = {
   completedInWindowCount: number;
 };
 
+export type WeeklyReviewRoutineSummary = {
+  linkedTaskCount: number;
+  plannedInWindowCount: number;
+  completedInWindowCount: number;
+  openInWindowCount: number;
+  completionPercent: number;
+};
+
 export type WeeklyReviewProjectSummary = {
   totalCount: number;
   activeCount: number;
@@ -123,6 +131,7 @@ export type WeeklyReviewWellnessSummary = {
 
 export type WeeklyReviewSectionId =
   | "tasks"
+  | "routines"
   | "projects"
   | "inbox"
   | "journal"
@@ -182,6 +191,7 @@ export type WeeklyReviewFocusSuggestion = {
 export type WeeklyReviewSummary = {
   reviewWindow: WeeklyReviewWindow;
   taskSummary: WeeklyReviewTaskSummary;
+  routineSummary: WeeklyReviewRoutineSummary;
   projectSummary: WeeklyReviewProjectSummary;
   inboxSummary: WeeklyReviewInboxSummary;
   journalSummary: WeeklyReviewJournalSummary;
@@ -340,6 +350,7 @@ function needsProjectAttention(project: Project, referenceDate: Date): boolean {
 
 function buildEmptyStates(summary: {
   taskSummary: WeeklyReviewTaskSummary;
+  routineSummary: WeeklyReviewRoutineSummary;
   projectSummary: WeeklyReviewProjectSummary;
   inboxSummary: WeeklyReviewInboxSummary;
   journalSummary: WeeklyReviewJournalSummary;
@@ -355,6 +366,10 @@ function buildEmptyStates(summary: {
 
   if (summary.taskSummary.totalCount === 0) {
     emptyStates.push({ sectionId: "tasks" });
+  }
+
+  if (summary.routineSummary.plannedInWindowCount === 0) {
+    emptyStates.push({ sectionId: "routines" });
   }
 
   if (summary.projectSummary.totalCount === 0) {
@@ -568,6 +583,26 @@ export function buildWeeklyReviewSummary(
     }).length,
   };
 
+  const routineTasks = data.tasks.filter((task) => Boolean(task.routineId));
+  const routineTasksInWindow = routineTasks.filter(
+    (task) =>
+      task.dueDate !== undefined &&
+      isWithinRange(task.dueDate, boundaries.start, boundaries.end)
+  );
+  const completedRoutineTasksInWindow = routineTasksInWindow.filter(isTaskCompleted);
+  const routineSummary: WeeklyReviewRoutineSummary = {
+    linkedTaskCount: routineTasks.length,
+    plannedInWindowCount: routineTasksInWindow.length,
+    completedInWindowCount: completedRoutineTasksInWindow.length,
+    openInWindowCount: routineTasksInWindow.filter(isOpenTask).length,
+    completionPercent:
+      routineTasksInWindow.length === 0
+        ? 0
+        : Math.round(
+            (completedRoutineTasksInWindow.length / routineTasksInWindow.length) * 100
+          ),
+  };
+
   const projectSummary: WeeklyReviewProjectSummary = {
     totalCount: data.projects.length,
     activeCount: data.projects.filter((project) => project.status === "active").length,
@@ -714,6 +749,7 @@ export function buildWeeklyReviewSummary(
   const summary: WeeklyReviewSummary = {
     reviewWindow,
     taskSummary,
+    routineSummary,
     projectSummary,
     inboxSummary,
     journalSummary,
@@ -732,6 +768,7 @@ export function buildWeeklyReviewSummary(
 
   summary.hasAnyData =
     summary.taskSummary.totalCount > 0 ||
+    summary.routineSummary.linkedTaskCount > 0 ||
     summary.projectSummary.totalCount > 0 ||
     summary.inboxSummary.totalCount > 0 ||
     summary.journalSummary.totalCount > 0 ||

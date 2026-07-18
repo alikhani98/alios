@@ -6,6 +6,8 @@ Stages 74–85 add pull-request validation, Life Areas QA, derived Goals ↔ Lif
 
 Stage 92 adds repository-backed recurring routines with explicit weekday schedules and opt-in Today suggestions. AliOS never creates Routine tasks in the background; each suggestion requires a user action, and duplicate same-day tasks are prevented transactionally.
 
+Stage 93 adds derived Routine progress, safe Routine-to-Today filtering, and a Weekly Review summary based only on Tasks the user explicitly created from a Routine.
+
 Stage 38 was a UI regression QA and release-hardening pass. It did not add a new feature; it kept the existing local-first scope intact and hardened desktop sidebar accessibility on long scrolling pages.
 Stage 39 moves dashboard customization into the topbar and adds a local-only accent color palette for restrained visual personalization.
 Stage 40 adds a local-first Finance module for income, expenses, installments, debts, and a simple monthly liquidity summary.

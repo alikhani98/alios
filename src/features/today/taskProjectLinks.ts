@@ -1,4 +1,7 @@
 import type { Project, Task } from "@/shared/types";
+import { createTodayTasksPath } from "@/features/routines/routineTaskLinks";
+
+export { createTodayTasksPath };
 
 export function createLinkedProjectPath(projectId: string): string {
   const searchParams = new URLSearchParams({ focusId: projectId });
@@ -6,7 +9,7 @@ export function createLinkedProjectPath(projectId: string): string {
 }
 
 export function createAllTodayTasksPath(): string {
-  return "/today";
+  return createTodayTasksPath();
 }
 
 export function findProjectFilter(
