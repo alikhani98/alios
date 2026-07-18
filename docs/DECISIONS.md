@@ -510,3 +510,11 @@ An action updates only its selected record through the existing repository and r
 Weekly planning is a small user-authored record keyed by the Monday-starting `weekStart` date. Saving the current week updates that same record rather than creating a history of competing weekly plans. Optional Goal, Project, and Task references are identifiers only and do not create reverse collections or cascade behavior.
 
 The plan is edited in Weekly Review and observed on Home. It creates no automatic tasks, scheduling, reminders, priority score, background process, notification, backend, sync, cloud, AI, telemetry, or dependency. The dedicated Dexie table is added in version 9 and backup version 1 remains additive.
+
+## ADR-043: Keep weekly-plan links derived and reversible
+
+**Status:** Accepted (Stage 99)
+
+Weekly-plan Goal, Project, and Task references are rendered as derived navigation paths, not copied snapshots or reverse relations. Each available reference uses the existing focused route of its destination; missing references remain visible as unavailable and are not silently removed.
+
+This keeps a weekly plan user-authored, non-destructive, and compatible with record deletion. It adds no schema, migration, storage mutation, backup change, scheduler, backend, sync, cloud, AI, telemetry, or dependency.

@@ -3,12 +3,40 @@ import { useCallback, useEffect, useState } from "react";
 
 import { useStorageAdapter } from "@/core/storage";
 import { useI18n } from "@/shared/i18n";
+import type { Goal, Project, Task, WeeklyPlan } from "@/shared/types";
 import { getGoalsSummary } from "@/features/goals";
 import { getLifeAreasSummary, mergeLifeAreas } from "@/features/lifeAreas";
 import { getManualEntrySummary } from "@/features/manual";
 import { getHomePlanningFocus } from "../homePlanningFocus";
 import { getWeeklyPlanWeekStart } from "@/features/weeklyReview/weeklyPlan";
 import type { HomeDashboardData } from "../types";
+
+function getHomeWeeklyPlanLinks(
+  weeklyPlan: WeeklyPlan | undefined,
+  goals: ReadonlyArray<Goal>,
+  projects: ReadonlyArray<Project>,
+  tasks: ReadonlyArray<Task>
+): NonNullable<HomeDashboardData["weeklyPlanLinks"]> {
+  if (!weeklyPlan) {
+    return [];
+  }
+
+  const links: NonNullable<HomeDashboardData["weeklyPlanLinks"]> = [];
+  if (weeklyPlan.goalId) {
+    const goal = goals.find((entry) => entry.id === weeklyPlan.goalId);
+    links.push({ kind: "goal", id: weeklyPlan.goalId, title: goal?.title, to: goal ? `/goals?${new URLSearchParams({ focusId: goal.id }).toString()}` : undefined });
+  }
+  if (weeklyPlan.projectId) {
+    const project = projects.find((entry) => entry.id === weeklyPlan.projectId);
+    links.push({ kind: "project", id: weeklyPlan.projectId, title: project?.title, to: project ? `/projects?${new URLSearchParams({ focusId: project.id }).toString()}` : undefined });
+  }
+  if (weeklyPlan.taskId) {
+    const task = tasks.find((entry) => entry.id === weeklyPlan.taskId);
+    links.push({ kind: "task", id: weeklyPlan.taskId, title: task?.title, to: task ? `/today?${new URLSearchParams({ focusId: task.id }).toString()}` : undefined });
+  }
+
+  return links;
+}
 
 function byUpdatedAtDescending<T extends { updatedAt: string }>(a: T, b: T) {
   return b.updatedAt.localeCompare(a.updatedAt);
@@ -116,6 +144,7 @@ export function useHomeDashboard() {
         },
         planningFocus: getHomePlanningFocus(goalEntries, allProjects, allTasks),
         weeklyPlan,
+        weeklyPlanLinks: getHomeWeeklyPlanLinks(weeklyPlan, goalEntries, allProjects, allTasks),
         isEmpty:
           allTasks.length === 0 &&
           !checkin &&

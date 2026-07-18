@@ -88,6 +88,8 @@ Stage 97 adds a derived unified review queue inside Weekly Review for existing d
 
 Stage 98 adds a local weekly planning record with one focus, optional intention, and optional Goal, Project, and Task links. Weekly Review edits it and Home displays it; Dexie v9 and additive Backup v1 support are used without a scheduler, notification, backend, sync, cloud, AI, telemetry, or dependency.
 
+Stage 99 improves the Weekly Plan’s visual hierarchy and surfaces the chosen Goal, Project, and Task as safe, reversible navigation paths in Weekly Review and Home. Missing linked records remain visible as unavailable; no link is cleared automatically and no storage, schema, backup, or behavior change is added.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1
