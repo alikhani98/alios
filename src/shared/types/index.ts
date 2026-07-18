@@ -11,3 +11,4 @@ export * from "./project";
 export * from "./setting";
 export * from "./task";
 export * from "./routine";
+export * from "./weekly-plan";

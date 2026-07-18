@@ -16,6 +16,7 @@ import {
   settingRecord,
   taskRecord,
   routineRecord,
+  weeklyPlanRecord,
 } from "@/test/factories";
 
 import {
@@ -221,6 +222,7 @@ describe("backup validation and migration", () => {
       settings: [settingRecord],
       inboxItems: [inboxItemRecord],
       routines: [routineRecord],
+      weeklyPlans: [weeklyPlanRecord],
     };
     const snapshot = JSON.parse(JSON.stringify(input));
 
@@ -232,5 +234,6 @@ describe("backup validation and migration", () => {
     expect(normalized.goals).not.toBe(input.goals);
     expect(normalized.inboxItems).not.toBe(input.inboxItems);
     expect(normalized.routines).not.toBe(input.routines);
+    expect(normalized.weeklyPlans).not.toBe(input.weeklyPlans);
   });
 });

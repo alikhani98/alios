@@ -6,6 +6,7 @@ export const DEXIE_SCHEMA_VERSION_5 = 5;
 export const DEXIE_SCHEMA_VERSION_6 = 6;
 export const DEXIE_SCHEMA_VERSION_7 = 7;
 export const DEXIE_SCHEMA_VERSION_8 = 8;
+export const DEXIE_SCHEMA_VERSION_9 = 9;
 
 export const DEXIE_TABLE_NAMES = {
   dailyCheckins: "dailyCheckins",
@@ -22,6 +23,7 @@ export const DEXIE_TABLE_NAMES = {
   financeTransactions: "financeTransactions",
   financeObligations: "financeObligations",
   routines: "routines",
+  weeklyPlans: "weeklyPlans",
 } as const;
 
 export type DexieTableName =
@@ -94,4 +96,9 @@ export const DEXIE_SCHEMA_V8 = {
   [DEXIE_TABLE_NAMES.tasks]:
     "id, status, dueDate, projectId, routineId, [routineId+dueDate], isMit, createdAt, updatedAt",
   [DEXIE_TABLE_NAMES.routines]: "id, isActive, updatedAt",
+} satisfies Partial<Record<DexieTableName, string>>;
+
+export const DEXIE_SCHEMA_V9 = {
+  ...DEXIE_SCHEMA_V8,
+  [DEXIE_TABLE_NAMES.weeklyPlans]: "id, &weekStart, updatedAt",
 } satisfies Record<DexieTableName, string>;

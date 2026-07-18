@@ -18,7 +18,7 @@ import {
   Target,
   Wallet,
 } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { useDateFormatter } from "@/shared/date";
@@ -54,6 +54,8 @@ import {
 } from "@/features/manual/constants";
 
 import { useWeeklyReview } from "../hooks/useWeeklyReview";
+import { WeeklyPlanForm } from "../components/WeeklyPlanForm";
+import { getWeeklyPlanWeekStart } from "../weeklyPlan";
 import type {
   WeeklyReviewFocusSuggestion,
   WeeklyReviewObservation,
@@ -264,7 +266,11 @@ export function WeeklyReviewPage() {
     markLifeAreaReviewed,
     markProjectReviewed,
     markDecisionReviewed,
+    weeklyPlan,
+    planningOptions,
+    saveWeeklyPlan,
   } = useWeeklyReview();
+  const [isSavingWeeklyPlan, setIsSavingWeeklyPlan] = useState(false);
 
   const reviewQueue = useMemo(
     () => (summary ? getReviewQueue(summary) : []),
@@ -285,6 +291,12 @@ export function WeeklyReviewPage() {
       default:
         return markDecisionReviewed(item.id);
     }
+  };
+
+  const handleSaveWeeklyPlan = async (values: { focusTitle: string; intention?: string; goalId?: string; projectId?: string; taskId?: string }) => {
+    if (!values.focusTitle) return;
+    setIsSavingWeeklyPlan(true);
+    try { await saveWeeklyPlan(values); } finally { setIsSavingWeeklyPlan(false); }
   };
 
   const currencyLocale = language === "fa" ? "fa-IR" : "en-US";
@@ -509,6 +521,26 @@ export function WeeklyReviewPage() {
               />
             ))}
           </div>
+
+          <CollapsibleSection
+            id="weekly-plan"
+            title={t("weeklyReview.nextFocusLabel")}
+            description={windowLabel}
+            icon={<CalendarDays className="h-5 w-5" />}
+            status={<StatusChip tone={weeklyPlan ? "primary" : "neutral"}>{weeklyPlan ? t("common.changesSaved") : t("common.notRecorded")}</StatusChip>}
+            contentClassName="space-y-3"
+          >
+            <WeeklyPlanForm
+              key={weeklyPlan?.updatedAt ?? "new-weekly-plan"}
+              weekStart={getWeeklyPlanWeekStart()}
+              plan={weeklyPlan}
+              goals={planningOptions.goals}
+              projects={planningOptions.projects}
+              tasks={planningOptions.tasks}
+              isSaving={isSavingWeeklyPlan}
+              onSave={handleSaveWeeklyPlan}
+            />
+          </CollapsibleSection>
 
           {reviewQueue.length > 0 ? (
             <CollapsibleSection

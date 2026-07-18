@@ -15,6 +15,7 @@ export type LocalDataSummary = {
   settings: number;
   inboxItems: number;
   routines: number;
+  weeklyPlans: number;
 };
 
 export interface BackupStorage {

@@ -175,6 +175,14 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] TypeScript, automated tests, production build, and the performance guard pass
 - [ ] Complete the Stage 97 manual smoke pass at 360px, 390px, and 430px in Persian and English
 
+### Stage 98 weekly planning foundation
+
+- [x] One plan per Monday-starting week can save a focus, intention, and optional Goal, Project, and Task IDs locally
+- [x] Weekly Review edits the current plan and Home displays it without creating automatic Tasks or schedules
+- [x] Dexie v9 and Backup v1 round-trip weekly plans while older backups normalize missing plans to empty
+- [x] TypeScript, automated tests, production build, and the performance guard pass
+- [ ] Complete the Stage 98 manual smoke pass at 360px, 390px, and 430px in Persian and English
+
 ### Stage 86 performance regression guard
 
 - [x] `pnpm performance:check` builds a manifest and enforces the entry-byte budget, no forms preload, and no Vite chunk-size warning

@@ -6,6 +6,7 @@ import type {
   ManualEntry,
   Project,
   Task,
+  WeeklyPlan,
 } from "@/shared/types";
 import type { LifeAreaView } from "@/features/lifeAreas";
 import type { HomePlanningFocus } from "./homePlanningFocus";
@@ -57,5 +58,6 @@ export type HomeDashboardData = {
     unprocessedCount: number;
   };
   planningFocus?: HomePlanningFocus;
+  weeklyPlan?: WeeklyPlan;
   isEmpty: boolean;
 };

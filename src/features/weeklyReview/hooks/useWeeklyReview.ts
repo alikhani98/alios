@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { useStorageAdapter } from "@/core/storage";
-import type { LifeAreaKey } from "@/shared/types";
+import type { Goal, LifeAreaKey, Project, Task, WeeklyPlan } from "@/shared/types";
+import type { SaveWeeklyPlanInput } from "@/core/repositories";
+import { getWeeklyPlanWeekStart } from "../weeklyPlan";
 import { clearDueProjectReviewDate } from "@/features/projects/projectReviews";
 
 import {
@@ -28,10 +30,13 @@ export function useWeeklyReview() {
     manual,
     finance,
     dailyCheckins,
+    weeklyPlans,
   } = useStorageAdapter();
   const [summary, setSummary] = useState<WeeklyReviewSummary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [weeklyPlan, setWeeklyPlan] = useState<WeeklyPlan | undefined>();
+  const [planningOptions, setPlanningOptions] = useState<{ goals: Goal[]; projects: Project[]; tasks: Task[] }>({ goals: [], projects: [], tasks: [] });
 
   const loadWeeklyReview = useCallback(async () => {
     setIsLoading(true);
@@ -52,6 +57,7 @@ export function useWeeklyReview() {
         loadedTransactions,
         loadedObligations,
         loadedCheckins,
+        loadedWeeklyPlan,
       ] = await Promise.all([
         tasks.list(),
         projects.list(),
@@ -65,6 +71,7 @@ export function useWeeklyReview() {
         finance.listTransactions(),
         finance.listObligations(),
         dailyCheckins.list(),
+        weeklyPlans.getByWeekStart(getWeeklyPlanWeekStart(referenceDate)),
       ]);
 
       setSummary(
@@ -86,6 +93,8 @@ export function useWeeklyReview() {
           referenceDate
         )
       );
+      setWeeklyPlan(loadedWeeklyPlan);
+      setPlanningOptions({ goals: loadedGoals, projects: loadedProjects, tasks: loadedTasks });
     } catch (loadError) {
       setError(getErrorMessage(loadError));
     } finally {
@@ -103,6 +112,7 @@ export function useWeeklyReview() {
     manual,
     projects,
     tasks,
+    weeklyPlans,
   ]);
 
   useEffect(() => {
@@ -120,6 +130,13 @@ export function useWeeklyReview() {
     },
     [loadWeeklyReview, manual]
   );
+
+  const saveWeeklyPlan = useCallback(async (input: Omit<SaveWeeklyPlanInput, "weekStart">) => {
+    try {
+      const saved = await weeklyPlans.save({ ...input, weekStart: getWeeklyPlanWeekStart() });
+      setWeeklyPlan(saved);
+    } catch (updateError) { setError(getErrorMessage(updateError)); throw updateError; }
+  }, [weeklyPlans]);
 
   const markGoalReviewed = useCallback(
     async (id: string) => {
@@ -186,5 +203,8 @@ export function useWeeklyReview() {
     markLifeAreaReviewed,
     markProjectReviewed,
     markDecisionReviewed,
+    weeklyPlan,
+    planningOptions,
+    saveWeeklyPlan,
   };
 }

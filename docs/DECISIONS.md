@@ -502,3 +502,11 @@ Recording a review is an explicit local update. It clears a one-time date only w
 Weekly Review may combine independently due Projects, Goals, Life Areas, Personal Manual entries, and Decisions into one foreground queue. The queue is an in-memory view, not a new workflow, priority score, snapshot, scheduler, or stored review history.
 
 An action updates only its selected record through the existing repository and reloads the summary. Decision due status follows the existing deterministic due-date helper, including overdue records outside the weekly display window. No schema, index, migration, backup change, background process, backend, sync, cloud, AI, telemetry, or dependency is introduced.
+
+## ADR-042: Keep weekly plans explicit and one-per-week
+
+**Status:** Accepted (Stage 98)
+
+Weekly planning is a small user-authored record keyed by the Monday-starting `weekStart` date. Saving the current week updates that same record rather than creating a history of competing weekly plans. Optional Goal, Project, and Task references are identifiers only and do not create reverse collections or cascade behavior.
+
+The plan is edited in Weekly Review and observed on Home. It creates no automatic tasks, scheduling, reminders, priority score, background process, notification, backend, sync, cloud, AI, telemetry, or dependency. The dedicated Dexie table is added in version 9 and backup version 1 remains additive.

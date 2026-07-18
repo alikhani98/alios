@@ -7,6 +7,7 @@ import { getGoalsSummary } from "@/features/goals";
 import { getLifeAreasSummary, mergeLifeAreas } from "@/features/lifeAreas";
 import { getManualEntrySummary } from "@/features/manual";
 import { getHomePlanningFocus } from "../homePlanningFocus";
+import { getWeeklyPlanWeekStart } from "@/features/weeklyReview/weeklyPlan";
 import type { HomeDashboardData } from "../types";
 
 function byUpdatedAtDescending<T extends { updatedAt: string }>(a: T, b: T) {
@@ -14,7 +15,7 @@ function byUpdatedAtDescending<T extends { updatedAt: string }>(a: T, b: T) {
 }
 
 export function useHomeDashboard() {
-  const { tasks, dailyCheckins, projects, journal, knowledge, goals, lifeAreas, manual, inbox } =
+  const { tasks, dailyCheckins, projects, journal, knowledge, goals, lifeAreas, manual, inbox, weeklyPlans } =
     useStorageAdapter();
   const { t } = useI18n();
   const [data, setData] = useState<HomeDashboardData | null>(null);
@@ -37,6 +38,7 @@ export function useHomeDashboard() {
         lifeAreaEntries,
         manualEntries,
         inboxItems,
+        weeklyPlan,
       ] =
         await Promise.all([
           tasks.list(),
@@ -48,6 +50,7 @@ export function useHomeDashboard() {
           lifeAreas.list(),
           manual.list(),
           inbox.list(),
+          weeklyPlans.getByWeekStart(getWeeklyPlanWeekStart()),
         ]);
 
       const todayTasks = allTasks.filter((task) => task.dueDate === today);
@@ -112,6 +115,7 @@ export function useHomeDashboard() {
           unprocessedCount: inboxItems.filter((item) => item.status === "unprocessed").length,
         },
         planningFocus: getHomePlanningFocus(goalEntries, allProjects, allTasks),
+        weeklyPlan,
         isEmpty:
           allTasks.length === 0 &&
           !checkin &&
@@ -128,7 +132,7 @@ export function useHomeDashboard() {
     } finally {
       setIsLoading(false);
     }
-  }, [dailyCheckins, goals, inbox, journal, knowledge, lifeAreas, manual, projects, tasks, t]);
+  }, [dailyCheckins, goals, inbox, journal, knowledge, lifeAreas, manual, projects, tasks, t, weeklyPlans]);
 
   useEffect(() => {
     void loadDashboard();

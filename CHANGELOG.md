@@ -2,6 +2,12 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 98 - Weekly Planning Foundation
+
+- Added one local weekly plan per Monday-starting week with a focus, optional intention, and optional Goal, Project, and Task links
+- Added an editable planning surface to Weekly Review and a compact current-week focus display on Home
+- Added Dexie v9, repository persistence, and additive version-1 backup/restore compatibility for weekly plans
+
 ## Stage 97 - Unified Review Queue
 
 - Added an actionable Weekly Review queue for review-due Projects, Goals, Life Areas, Personal Manual entries, and Decisions

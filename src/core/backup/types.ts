@@ -15,6 +15,7 @@ import {
   settingSchema,
   taskSchema,
   routineSchema,
+  weeklyPlanSchema,
 } from "@/shared/types";
 import { isoDateTimeSchema } from "@/shared/utils";
 
@@ -36,6 +37,7 @@ export const aliosBackupDataSchema = z.object({
   settings: z.array(settingSchema),
   inboxItems: z.array(inboxItemSchema).default([]),
   routines: z.array(routineSchema).default([]),
+  weeklyPlans: z.array(weeklyPlanSchema).default([]),
 });
 
 export const aliosBackupSchema = z.object({

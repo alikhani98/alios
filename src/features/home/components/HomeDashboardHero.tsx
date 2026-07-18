@@ -53,6 +53,7 @@ export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
     : t("home.noCheckin");
   const mitLabel = data.today.mitTask?.title ?? t("home.noMit");
   const planningFocus = data.planningFocus;
+  const weeklyPlan = data.weeklyPlan;
 
   const heroMetrics = [
     {
@@ -247,6 +248,17 @@ export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
                     </Button>
                   ) : null}
                 </div>
+              </SoftPanel>
+            ) : null}
+
+            {weeklyPlan ? (
+              <SoftPanel className="space-y-2 border-primary/10 bg-background/85">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-sm font-medium">{t("weeklyReview.nextFocusLabel")}</p>
+                  <Button asChild size="sm" variant="ghost"><Link to="/weekly-review">{t("nav.weeklyReview")}</Link></Button>
+                </div>
+                <p className="break-words text-sm font-semibold">{weeklyPlan.focusTitle}</p>
+                {weeklyPlan.intention ? <p className="break-words text-sm leading-7 text-muted-foreground">{weeklyPlan.intention}</p> : null}
               </SoftPanel>
             ) : null}
           </div>
