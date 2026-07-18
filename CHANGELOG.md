@@ -2,6 +2,12 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 101 - Integrated Planning Flow
+
+- Added a calm Today handoff for the current weekly focus, its optional intention, and safe Goal / Project destinations
+- Shows derived completion only from already-linked local Tasks; it never creates, schedules, prioritizes, or updates a Task
+- Keeps Weekly Review as the single explicit editing surface for the weekly plan and preserves local-only behavior
+
 ## Stage 100 - Weekly Planning Dashboard
 
 - Promoted the current week’s focus, linked destinations, and three calm task/review signals to the top of Weekly Review

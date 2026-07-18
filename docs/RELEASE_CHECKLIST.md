@@ -199,6 +199,14 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] TypeScript, automated tests, production build, and the performance guard pass
 - [ ] Complete the Stage 100 manual smoke pass at 360px, 390px, and 430px in Persian and English
 
+### Stage 101 integrated planning flow
+
+- [x] Today displays the current-week focus and optional intention from the existing local weekly plan
+- [x] Linked Goal and Project destinations stay safe and derived Task completion never creates or changes a Task
+- [x] Weekly Review remains the only plan-editing surface; Today writes no plan, roll-up, schedule, or priority
+- [x] TypeScript, automated tests, production build, and the performance guard pass
+- [ ] Complete the Stage 101 manual smoke pass at 360px, 390px, and 430px in Persian and English
+
 ### Stage 86 performance regression guard
 
 - [x] `pnpm performance:check` builds a manifest and enforces the entry-byte budget, no forms preload, and no Vite chunk-size warning

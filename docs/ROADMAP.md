@@ -92,6 +92,8 @@ Stage 99 improves the Weekly Plan’s visual hierarchy and surfaces the chosen G
 
 Stage 100 establishes the Weekly Planning Dashboard as the first reading path inside Weekly Review. It combines the existing plan, derived local task signals, and review-queue count while retaining detailed metrics as secondary disclosure. It adds no new data, scoring, automation, schema, backup change, route, dependency, backend, sync, cloud, AI, or telemetry.
 
+Stage 101 carries the current weekly focus into Today as a read-only execution handoff. It shows the plan’s focus, optional intention, safe linked destinations, and derived completion from already-linked Tasks; it never edits the plan or automatically creates, schedules, prioritizes, or changes a Task.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1
