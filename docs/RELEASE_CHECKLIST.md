@@ -108,6 +108,14 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] Build-performance contract records measured output and avoids real-user timing claims
 - [ ] Complete the deployed mobile/throttled initial-load smoke test in `MOBILE_USAGE.md`
 
+### Stage 90 Project planning chain QA and mobile hardening
+
+- [x] Goal → Project and Project → Today links use stable encoded query parameters
+- [x] Project task-progress rendering covers populated counts, long content, and the Today-filter action
+- [x] Available, missing, and reset Today Project-filter helpers remain safe and non-mutating
+- [x] No storage, backup, route, dependency, backend, sync, cloud, AI, telemetry, or user-data behavior is introduced
+- [ ] Complete the Stage 90 manual planning-chain smoke pass at 360px, 390px, and 430px in Persian and English
+
 ### Stage 86 performance regression guard
 
 - [x] `pnpm performance:check` builds a manifest and enforces the entry-byte budget, no forms preload, and no Vite chunk-size warning

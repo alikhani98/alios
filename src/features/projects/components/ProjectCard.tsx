@@ -82,7 +82,7 @@ export function ProjectCard({
                 <ListChecks className="h-4 w-4 shrink-0 text-primary" />
                 {t("projects.taskProgress")}
               </p>
-              <p className="text-sm font-medium">
+              <p className="break-words text-sm font-medium">
                 {t("projects.taskProgressValue", taskProgress)}
               </p>
             </div>

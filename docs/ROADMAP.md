@@ -70,6 +70,8 @@ Stage 88 surfaces derived linked-task progress on Projects and adds a stable Tod
 
 Stage 89 makes the Today project filter visible and reversible, including a safe unavailable-project state, without changing storage, backup, dependencies, or routes.
 
+Stage 90 release-hardens the Goal → Project → Today planning chain with focused regression coverage and bilingual narrow-screen smoke guidance for long content, filter refresh/reset, and unavailable Projects. It changes no product behavior, storage, backup format, routes, dependencies, backend, sync, cloud, AI, telemetry, or user data.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1

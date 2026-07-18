@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import { DateDisplayProvider } from "@/shared/date";
 import { I18nProvider, LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
-import { goalRecord, projectRecord } from "@/test/factories";
+import { goalRecord, projectRecord, taskRecord } from "@/test/factories";
 
 import { ProjectCard } from "../components/ProjectCard";
 import { ProjectForm } from "../components/ProjectForm";
@@ -17,7 +17,6 @@ import {
   createProjectTodayTasksPath,
   getProjectTaskProgress,
 } from "../projectTaskProgress";
-import { taskRecord } from "@/test/factories";
 import { projectFormSchema } from "../types";
 
 function renderProjectUi(element: ReactElement): string {
@@ -95,6 +94,27 @@ describe("Project goal links", () => {
     expect(html).toContain(goalRecord.title);
     expect(html).toContain('href="/goals?focusId=fixture-id"');
     expect(html).toContain("View goal");
+  });
+
+  it("keeps the Project → Today planning handoff readable for long content", () => {
+    const longTitle = "A project title that stays readable on a narrow mobile screen ".repeat(3);
+    const html = renderProjectUi(
+      <ProjectCard
+        project={{ ...projectRecord, title: longTitle }}
+        linkedGoal={goalRecord}
+        taskProgress={{ total: 12, completed: 7 }}
+        isLinkedGoalLoading={false}
+        isDeleting={false}
+        onEdit={() => undefined}
+        onDelete={async () => undefined}
+      />
+    );
+
+    expect(html).toContain(longTitle);
+    expect(html).toContain("7 of 12 completed");
+    expect(html).toContain('href="/today?projectId=fixture-id"');
+    expect(html).toContain("View today’s tasks");
+    expect(html).toContain("break-words");
   });
 
   it("keeps an orphaned Project usable without a cascade", () => {

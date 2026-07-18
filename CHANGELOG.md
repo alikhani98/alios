@@ -2,6 +2,12 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 90 - Project Planning Chain QA & Mobile Hardening
+
+- Added regression coverage for the Goal → Project → Today handoff, linked-task summary, stable filtered route, and long-content mobile layout contract
+- Added a concise bilingual, narrow-screen smoke pass covering filter refresh, reset, and a safely unavailable Project
+- Kept the stage local-first and compatibility-only: no storage, backup, route, dependency, backend, or product-scope change
+
 ## Stage 89 - Today Project Filter Context
 
 - Added clear bilingual context and a reset action when Today is filtered from a Project
