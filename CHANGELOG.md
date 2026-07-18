@@ -2,6 +2,12 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 100 - Weekly Planning Dashboard
+
+- Promoted the current week’s focus, linked destinations, and three calm task/review signals to the top of Weekly Review
+- Moved the full derived metric grid into a secondary collapsible overview so planning is the first reading path
+- Preserved the existing plan editor, review queue, local-only behavior, and every underlying data record
+
 ## Stage 99 - Weekly Planning Visual Navigation
 
 - Made the Weekly Review planning form more readable with explicit labels and mobile-safe grouped controls

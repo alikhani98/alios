@@ -56,6 +56,7 @@ import {
 import { useWeeklyReview } from "../hooks/useWeeklyReview";
 import { WeeklyPlanForm } from "../components/WeeklyPlanForm";
 import { WeeklyPlanLinks } from "../components/WeeklyPlanLinks";
+import { WeeklyPlanningDashboard } from "../components/WeeklyPlanningDashboard";
 import { getWeeklyPlanWeekStart } from "../weeklyPlan";
 import { getWeeklyPlanLinks } from "../weeklyPlanLinks";
 import type {
@@ -515,21 +516,15 @@ export function WeeklyReviewPage() {
             />
           )}
 
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            {overviewMetrics.map((metric) => (
-              <MetricCard
-                key={metric.label}
-                icon={metric.icon}
-                label={metric.label}
-                value={metric.value}
-                description={metric.description}
-                status={metric.status}
-              />
-            ))}
-          </div>
+          <WeeklyPlanningDashboard
+            plan={weeklyPlan}
+            links={weeklyPlanLinks}
+            summary={summary}
+            reviewQueueCount={reviewQueue.length}
+          />
 
           <CollapsibleSection
-            id="weekly-plan"
+            id="weekly-plan-editor"
             title={t("weeklyReview.nextFocusLabel")}
             description={windowLabel}
             icon={<CalendarDays className="h-5 w-5" />}
@@ -547,6 +542,27 @@ export function WeeklyReviewPage() {
               onSave={handleSaveWeeklyPlan}
             />
             <WeeklyPlanLinks links={weeklyPlanLinks} />
+          </CollapsibleSection>
+
+          <CollapsibleSection
+            id="weekly-review-overview"
+            title={t("weeklyReview.reviewScope")}
+            description={t("weeklyReview.scopeDescription")}
+            icon={<Compass className="h-5 w-5" />}
+            status={<StatusChip tone="neutral">{overviewMetrics.length}</StatusChip>}
+            defaultOpen={false}
+            contentClassName="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
+          >
+            {overviewMetrics.map((metric) => (
+              <MetricCard
+                key={metric.label}
+                icon={metric.icon}
+                label={metric.label}
+                value={metric.value}
+                description={metric.description}
+                status={metric.status}
+              />
+            ))}
           </CollapsibleSection>
 
           {reviewQueue.length > 0 ? (

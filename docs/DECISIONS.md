@@ -518,3 +518,11 @@ The plan is edited in Weekly Review and observed on Home. It creates no automati
 Weekly-plan Goal, Project, and Task references are rendered as derived navigation paths, not copied snapshots or reverse relations. Each available reference uses the existing focused route of its destination; missing references remain visible as unavailable and are not silently removed.
 
 This keeps a weekly plan user-authored, non-destructive, and compatible with record deletion. It adds no schema, migration, storage mutation, backup change, scheduler, backend, sync, cloud, AI, telemetry, or dependency.
+
+## ADR-044: Keep the weekly planning dashboard compositional
+
+**Status:** Accepted (Stage 100)
+
+The top-level Weekly Planning Dashboard composes an existing user-authored weekly plan with task counts and the existing review queue in the foreground. Its progress indicator is a presentation of current local task data, not a stored weekly score, recommendation, or workflow state.
+
+The full review metrics remain available as secondary disclosure. The dashboard writes nothing by itself and introduces no schema, migration, backup change, route, scheduler, backend, sync, cloud, AI, telemetry, or dependency.

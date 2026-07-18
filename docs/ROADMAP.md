@@ -90,6 +90,8 @@ Stage 98 adds a local weekly planning record with one focus, optional intention,
 
 Stage 99 improves the Weekly Plan’s visual hierarchy and surfaces the chosen Goal, Project, and Task as safe, reversible navigation paths in Weekly Review and Home. Missing linked records remain visible as unavailable; no link is cleared automatically and no storage, schema, backup, or behavior change is added.
 
+Stage 100 establishes the Weekly Planning Dashboard as the first reading path inside Weekly Review. It combines the existing plan, derived local task signals, and review-queue count while retaining detailed metrics as secondary disclosure. It adds no new data, scoring, automation, schema, backup change, route, dependency, backend, sync, cloud, AI, or telemetry.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1
