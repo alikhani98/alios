@@ -478,3 +478,11 @@ Routine filters use the existing URL-query pattern and remain safe when a refere
 The optional Goal → Project and Project → Task links may produce a read-only Goal planning summary, but they must never overwrite the Goal's manually managed `progressPercent`. Linked Task completion is the primary signal when Tasks exist; linked Project completion is only a fallback. URL filters may carry Goal, Project, and Routine context together, while missing references remain a visible, reversible state rather than an error or a cascade.
 
 This adds no persisted roll-up, schema/index/migration, backup change, background process, backend, sync, cloud, AI, telemetry, or dependency.
+
+## ADR-039: Keep integrated planning review read-only and reversible
+
+**Status:** Accepted (Stage 95)
+
+Weekly Review may join the existing optional Goal → Project → Task links in memory to show planning progress and projects that lack an actionable next step. Home may select one active Goal, then its active linked Project and one open Task, as a compact focus path. The selection is an observation, not an instruction, score, scheduling rule, or stored priority.
+
+Missing Goal references remain visible as unavailable links. No cascade, automatic progress update, schema/index/migration, backup change, background process, backend, sync, cloud, AI, telemetry, or dependency is introduced.

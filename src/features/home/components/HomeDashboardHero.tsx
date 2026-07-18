@@ -8,6 +8,7 @@ import {
   Target,
   Sparkles,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 import { useDateFormatter } from "@/shared/date";
 import { useI18n } from "@/shared/i18n";
@@ -19,7 +20,10 @@ import {
   SoftPanel,
   StatusChip,
   CardContent,
+  Button,
 } from "@/shared/ui";
+import { createLinkedGoalPath } from "@/features/projects/projectGoalLinks";
+import { createProjectTodayTasksPath } from "@/features/projects/projectTaskProgress";
 import type { HomeDashboardData } from "../types";
 import type { ReactNode } from "react";
 
@@ -48,6 +52,7 @@ export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
       })
     : t("home.noCheckin");
   const mitLabel = data.today.mitTask?.title ?? t("home.noMit");
+  const planningFocus = data.planningFocus;
 
   const heroMetrics = [
     {
@@ -207,6 +212,43 @@ export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
                 </StatusChip>
               </div>
             </SoftPanel>
+
+            {planningFocus ? (
+              <SoftPanel className="space-y-3 border-primary/10 bg-background/85">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 text-sm font-medium">
+                    <Target className="h-4 w-4 text-primary" />
+                    {t("home.goals")}
+                  </div>
+                  <StatusChip tone="neutral">{t("nav.projects")}</StatusChip>
+                </div>
+                <div className="space-y-1">
+                  <p className="break-words text-sm font-semibold">{planningFocus.goal.title}</p>
+                  {planningFocus.project ? (
+                    <p className="break-words text-sm text-muted-foreground">
+                      {planningFocus.project.title}
+                    </p>
+                  ) : null}
+                  {planningFocus.task ? (
+                    <p className="break-words text-xs leading-6 text-muted-foreground">
+                      {planningFocus.task.title}
+                    </p>
+                  ) : null}
+                </div>
+                <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                  <Button asChild size="sm" variant="outline" className="w-full sm:w-auto">
+                    <Link to={createLinkedGoalPath(planningFocus.goal.id)}>{t("nav.goals")}</Link>
+                  </Button>
+                  {planningFocus.project ? (
+                    <Button asChild size="sm" variant="outline" className="w-full sm:w-auto">
+                      <Link to={createProjectTodayTasksPath(planningFocus.project.id)}>
+                        {t("projects.openTodayTasks")}
+                      </Link>
+                    </Button>
+                  ) : null}
+                </div>
+              </SoftPanel>
+            ) : null}
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">

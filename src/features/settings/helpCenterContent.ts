@@ -223,7 +223,7 @@ export const settingsHelpCenterSections: readonly HelpCenterSection[] = [
       createText("پروژه می‌تواند به یک هدف متصل شود؛ هدف فهرست معکوس پروژه‌ها را ذخیره نمی‌کند.", "A Project can link to one Goal; the Goal does not store a reverse Project list."),
       createText("کار امروز می‌تواند به یک پروژه متصل شود؛ پروژه فهرست معکوس کارها را ذخیره نمی‌کند.", "A Today Task can link to one Project; the Project does not store a reverse Task list."),
       createText("حذف هدف یا پروژه باعث حذف خودکار رکورد متصل نمی‌شود؛ وضعیت «در دسترس نیست» نشان داده می‌شود تا بتوانید پیوند را حذف یا تغییر دهید.", "Deleting a Goal or Project does not delete the linked record; an unavailable state lets you remove or change the link."),
-      createText("این ارتباط‌ها محلی هستند و در پشتیبان معتبر AliOS حفظ می‌شوند.", "These links stay local and are preserved in a valid AliOS backup."),
+      createText("پیشرفت و مرور این زنجیره از داده‌های موجود محاسبه می‌شود و درصد دستی هدف را تغییر نمی‌دهد.", "Progress and review for this chain are derived from existing records and never change a Goal's manual percentage."),
     ],
   },
   {

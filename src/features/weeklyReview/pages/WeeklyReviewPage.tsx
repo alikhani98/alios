@@ -36,6 +36,8 @@ import {
   StatusChip,
 } from "@/shared/ui";
 import { formatFinanceAmount } from "@/features/finance/financeCalculations";
+import { createLinkedGoalPath } from "@/features/projects/projectGoalLinks";
+import { createProjectTodayTasksPath } from "@/features/projects/projectTaskProgress";
 import {
   GOAL_AREA_LABEL_KEYS,
   GOAL_IMPORTANCE_LABEL_KEYS,
@@ -476,6 +478,81 @@ export function WeeklyReviewPage() {
                   title={t("weeklyReview.projectsEmptyTitle")}
                   description={t("weeklyReview.projectsEmptyDescription")}
                 />
+              ) : null}
+            </CollapsibleSection>
+
+            <CollapsibleSection
+              id="weekly-review-planning-chain"
+              title={`${t("nav.goals")} · ${t("nav.projects")} · ${t("nav.today")}`}
+              description={t("weeklyReview.projectsSectionDescription")}
+              icon={<Target className="h-5 w-5" />}
+              status={<StatusChip tone="neutral">{summary.planningSummary.linkedProjectCount}</StatusChip>}
+              contentClassName="space-y-3"
+            >
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                <SoftPanel>
+                  <p className="text-xs text-muted-foreground">{t("nav.projects")}</p>
+                  <p className="mt-1 text-lg font-semibold tabular-nums">{summary.planningSummary.linkedProjectCount}</p>
+                </SoftPanel>
+                <SoftPanel>
+                  <p className="text-xs text-muted-foreground">{t("weeklyReview.completedTasks")}</p>
+                  <p className="mt-1 text-lg font-semibold tabular-nums">
+                    {summary.planningSummary.completedLinkedTaskCount} / {summary.planningSummary.linkedTaskCount}
+                  </p>
+                </SoftPanel>
+                <SoftPanel>
+                  <p className="text-xs text-muted-foreground">{t("weeklyReview.openTasks")}</p>
+                  <p className="mt-1 text-lg font-semibold tabular-nums">{summary.planningSummary.openLinkedTaskCount}</p>
+                </SoftPanel>
+                <SoftPanel>
+                  <p className="text-xs text-muted-foreground">{t("goals.progressLabel")}</p>
+                  <p className="mt-1 text-lg font-semibold tabular-nums">{summary.planningSummary.completionPercent}%</p>
+                </SoftPanel>
+              </div>
+
+              {summary.planningSummary.attentionEntries.length > 0 ? (
+                <div className="grid gap-3 lg:grid-cols-2">
+                  {summary.planningSummary.attentionEntries.map((entry) => (
+                    <SoftPanel key={entry.project.id} className="space-y-3">
+                      <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
+                        <div className="min-w-0 space-y-1">
+                          <p className="break-words font-semibold leading-7">{entry.project.title}</p>
+                          <p className="break-words text-sm text-muted-foreground">
+                            {entry.goal?.title ?? t("projects.linkedGoalUnavailable")}
+                          </p>
+                        </div>
+                        <StatusChip tone="warning">{entry.openTaskCount}</StatusChip>
+                      </div>
+                      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                        {entry.goal ? (
+                          <Button asChild size="sm" variant="outline" className="w-full sm:w-auto">
+                            <Link to={createLinkedGoalPath(entry.goal.id)}>{t("nav.goals")}</Link>
+                          </Button>
+                        ) : null}
+                        <Button asChild size="sm" variant="outline" className="w-full sm:w-auto">
+                          <Link to={createProjectTodayTasksPath(entry.project.id)}>{t("projects.openTodayTasks")}</Link>
+                        </Button>
+                      </div>
+                    </SoftPanel>
+                  ))}
+                </div>
+              ) : (
+                <EmptyState
+                  icon={<Target className="h-6 w-6" />}
+                  title={t("weeklyReview.projectsEmptyTitle")}
+                  description={t("weeklyReview.projectsSectionDescription")}
+                  actions={
+                    <Button asChild variant="outline">
+                      <Link to="/projects">{t("nav.projects")}</Link>
+                    </Button>
+                  }
+                />
+              )}
+
+              {summary.planningSummary.unavailableGoalProjectCount > 0 ? (
+                <SoftPanel className="text-sm leading-7 text-muted-foreground">
+                  {t("projects.linkedGoalUnavailable")}: {summary.planningSummary.unavailableGoalProjectCount}
+                </SoftPanel>
               ) : null}
             </CollapsibleSection>
 

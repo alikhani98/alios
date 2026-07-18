@@ -8,6 +8,7 @@ import type {
   Task,
 } from "@/shared/types";
 import type { LifeAreaView } from "@/features/lifeAreas";
+import type { HomePlanningFocus } from "./homePlanningFocus";
 
 export type HomeDashboardData = {
   tasks: Task[];
@@ -55,5 +56,6 @@ export type HomeDashboardData = {
   inbox: {
     unprocessedCount: number;
   };
+  planningFocus?: HomePlanningFocus;
   isEmpty: boolean;
 };

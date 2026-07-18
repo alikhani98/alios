@@ -303,7 +303,7 @@ export function ProjectsPage() {
       ) : visibleProjects.length === 0 ? (
         <EmptyState
           icon={<FolderKanban className="h-6 w-6" />}
-          title={t("projects.noGoalFilterResults")}
+          title={t("projects.noGoalResults")}
           description={t("projects.emptyDescription")}
           actions={
             <Button asChild type="button">

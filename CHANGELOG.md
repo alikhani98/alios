@@ -2,6 +2,12 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 95 - Integrated Planning Review
+
+- Added a read-only Goal → Project → Task planning-chain section to Weekly Review, including linked progress, open work, attention items, and safe unavailable-Goal context
+- Added a compact Home focus path that selects one active Goal and its actionable linked Project/Task without mutating any record
+- Hardened the integrated planning flow with derived-only tests, Help Center guidance, mobile-safe wrapping, and navigation into existing Goals, Projects, and Today routes
+
 ## Stage 94 - Goal Progress & Planning Navigation
 
 - Added a derived, read-only Goal progress summary from existing linked Projects and their Tasks; manual Goal progress remains unchanged
