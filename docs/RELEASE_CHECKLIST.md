@@ -335,6 +335,12 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] TypeScript, focused automated tests, and the production build pass
 - [ ] After a deployed update, test one existing tab and one newly opened tab on desktop and mobile; confirm a stale lazy chunk either recovers once or shows the local error fallback without looping
 
+### Stage 119 Home priority lanes
+
+- [x] Overdue, today, and tomorrow tasks have immediate visual priority while this-week and later work stay visible as planning context
+- [x] Every Task remains unchanged and the existing Today route remains the only editing destination
+- [ ] Manually inspect populated Home with long task titles at 360px, 390px, 430px, and desktop width
+
 ### Stage 86 performance regression guard
 
 - [x] `pnpm performance:check` builds a manifest and enforces the entry-byte budget, no forms preload, and no Vite chunk-size warning

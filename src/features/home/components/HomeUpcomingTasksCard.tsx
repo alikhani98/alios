@@ -66,6 +66,17 @@ const previewLimitBySection: Record<TaskTimelineSection, number> = {
   later: 1,
 };
 
+const immediateSectionKeys: readonly TaskTimelineSection[] = [
+  "overdue",
+  "today",
+  "tomorrow",
+];
+
+const planningSectionKeys: readonly TaskTimelineSection[] = [
+  "thisWeek",
+  "later",
+];
+
 function SectionPreview({
   section,
   tasks,
@@ -79,7 +90,7 @@ function SectionPreview({
   const extraCount = tasks.length - previewTasks.length;
 
   return (
-    <SoftPanel className="space-y-3 bg-background/90">
+    <SoftPanel className="space-y-3 border-primary/10 bg-background/90 p-4">
       <div className="flex items-center justify-between gap-3">
         <p className="flex items-center gap-2 text-sm font-semibold">
           <Icon className="h-4 w-4 text-primary" />
@@ -113,6 +124,35 @@ function SectionPreview({
   );
 }
 
+function PlanningLane({
+  section,
+  tasks,
+}: {
+  section: TaskTimelineSection;
+  tasks: Task[];
+}) {
+  const { t } = useI18n();
+  const { icon: Icon, labelKey } = sectionMeta[section];
+  const firstTask = tasks[0];
+
+  return (
+    <div className="min-w-0 rounded-2xl border border-primary/10 bg-background/85 p-3">
+      <div className="flex items-center justify-between gap-2">
+        <p className="flex min-w-0 items-center gap-2 text-sm font-semibold">
+          <Icon className="h-4 w-4 shrink-0 text-primary" />
+          <span>{t(labelKey)}</span>
+        </p>
+        <StatusChip tone="neutral">{tasks.length}</StatusChip>
+      </div>
+      {firstTask ? (
+        <p className="mt-2 truncate text-xs leading-5 text-muted-foreground">
+          {firstTask.title}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
 export function HomeUpcomingTasksCard({
   tasks,
   sectionId,
@@ -126,6 +166,12 @@ export function HomeUpcomingTasksCard({
     0
   );
   const hasUpcomingTasks = totalUpcoming > 0;
+  const immediateSections = immediateSectionKeys.filter(
+    (section) => timeline[section].length > 0
+  );
+  const planningSections = planningSectionKeys.filter(
+    (section) => timeline[section].length > 0
+  );
 
   return (
     <CollapsibleSection
@@ -143,17 +189,38 @@ export function HomeUpcomingTasksCard({
     >
       {hasUpcomingTasks ? (
         <>
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-            {TASK_TIMELINE_SECTION_KEYS.map((section) =>
-              timeline[section].length > 0 ? (
+          {immediateSections.length > 0 ? (
+            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              {immediateSections.map((section) => (
                 <SectionPreview
                   key={section}
                   section={section}
                   tasks={timeline[section]}
                 />
-              ) : null
-            )}
-          </div>
+              ))}
+            </div>
+          ) : null}
+          {planningSections.length > 0 ? (
+            <SoftPanel className="border-primary/10 bg-primary/5 p-3 sm:p-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm font-semibold">{t("home.planForLater")}</p>
+                  <p className="text-xs leading-6 text-muted-foreground">
+                    {t("home.futureTasks")}
+                  </p>
+                </div>
+                <div className="grid min-w-0 gap-2 sm:grid-cols-2">
+                  {planningSections.map((section) => (
+                    <PlanningLane
+                      key={section}
+                      section={section}
+                      tasks={timeline[section]}
+                    />
+                  ))}
+                </div>
+              </div>
+            </SoftPanel>
+          ) : null}
           <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
             <Button asChild variant="outline" size="sm" className="w-full sm:w-auto">
               <Link to="/today">

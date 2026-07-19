@@ -128,6 +128,8 @@ Stage 117 makes the workspace actionable: a compact week replaces the tall month
 
 Stage 118 protects the static deployment boundary: a stale route chunk gets one cache-busting reload, while the Home backup reminder stays compact enough to preserve the daily-work hierarchy.
 
+Stage 119 gives the action workspace a clear time horizon: urgent work leads, while this-week and later work stay available as compact planning context.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1
