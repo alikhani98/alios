@@ -106,6 +106,8 @@ Stage 106 aligns the entry surfaces of Today, Inbox, and Projects through the ex
 
 Stage 107 completes this visual alignment for Journal, Knowledge, and Settings while preserving Settings as a calm, legible local-data safety surface.
 
+Stage 108 completes the core-page visual pass for Search and Routines while preserving their local-only and explicit-action boundaries.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1

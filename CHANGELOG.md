@@ -2,6 +2,11 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 108 - Search and Routines Visual Alignment
+
+- Aligned Search and Routines with the established core-page entry treatment
+- Preserved search, routine scheduling, task creation, editing, and deletion behavior exactly as before
+
 ## Stage 107 - Knowledge and Settings Visual Alignment
 
 - Aligned the Journal, Knowledge, and Settings entry surfaces with the primary visual hierarchy used across the application

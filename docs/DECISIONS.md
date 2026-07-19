@@ -582,3 +582,11 @@ This prevents visual drift without forming a feature abstraction or moving busin
 Journal, Knowledge, and Settings may align their entry surfaces with the application’s established icon and accent hierarchy. Settings remains a data-safety surface: visual changes must not obscure backup, restore, recovery, export, or destructive-data controls.
 
 The alignment changes no records, preferences, form behavior, navigation, schema, migration, backup format, dependency, backend, sync, cloud, AI, telemetry, or automation.
+
+## ADR-052: Keep search and routines behavior outside visual alignment
+
+**Status:** Accepted (Stage 108)
+
+Search and Routines may receive the same entry-surface treatment as other core pages. Search remains local and read-only; Routines continue to create Tasks only through explicit user actions.
+
+This changes no search scope, schedule, Task record, schema, migration, backup, dependency, backend, sync, cloud, AI, telemetry, or automation.
