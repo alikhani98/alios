@@ -566,3 +566,11 @@ The retrospective stores no assessment, score, completion history, or new plan r
 Home may elevate navigation to Today, Inbox, and Weekly Review and selectively emphasize existing derived metrics for daily orientation. This hierarchy is a visual reading path, not a priority engine, quick-create mechanism, or stored dashboard preference.
 
 The direct actions remain ordinary route navigation. They create no record, change no Task or Weekly Plan, and add no schema, migration, backup change, automation, backend, sync, cloud, AI, telemetry, or dependency.
+
+## ADR-050: Align core-page entry presentation without sharing feature behavior
+
+**Status:** Accepted (Stage 106)
+
+Today, Inbox, and Projects have the same page-entry need: an icon, title, purpose, and optional foreground action. They apply that composition through the existing shared card and header primitives, while every feature retains responsibility for its own forms, filters, records, actions, and data states.
+
+This prevents visual drift without forming a feature abstraction or moving business behavior into shared UI. It adds no schema, migration, backup change, route, dependency, backend, sync, cloud, AI, telemetry, or automation.

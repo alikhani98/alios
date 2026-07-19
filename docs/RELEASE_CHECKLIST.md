@@ -238,6 +238,13 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] TypeScript, automated tests, production build, and the performance guard pass
 - [ ] Complete the Stage 105 manual smoke pass at 360px, 390px, and 430px in Persian and English
 
+### Stage 106 core pages visual alignment
+
+- [x] Today, Inbox, and Projects use one mobile-safe page-entry hierarchy without changing their existing actions
+- [x] The aligned surface does not own or alter forms, filters, records, navigation, or local data
+- [x] TypeScript, automated tests, production build, and the performance guard pass
+- [ ] Complete the Stage 106 manual smoke pass at 360px, 390px, and 430px in Persian and English
+
 ### Stage 86 performance regression guard
 
 - [x] `pnpm performance:check` builds a manifest and enforces the entry-byte budget, no forms preload, and no Vite chunk-size warning

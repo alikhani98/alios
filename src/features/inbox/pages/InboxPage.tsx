@@ -13,8 +13,8 @@ import {
   EmptyState,
   Input,
   PremiumCard,
-  SectionHeader,
   Select,
+  SectionHeader,
 } from "@/shared/ui";
 import { cn } from "@/shared/utils";
 import { InboxItemCard } from "../components/InboxItemCard";
@@ -194,9 +194,10 @@ export function InboxPage() {
 
   return (
     <section className="alios-page space-y-6">
-      <PremiumCard>
+      <PremiumCard className="border-primary/15 bg-primary/5">
         <CardContent className="p-5 sm:p-6">
           <SectionHeader
+            icon={<Inbox className="h-5 w-5" />}
             title={t("inbox.title")}
             description={t("inbox.description")}
           />

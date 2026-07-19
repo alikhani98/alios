@@ -194,13 +194,14 @@ export function ProjectsPage() {
 
   return (
     <section className="alios-page space-y-6">
-      <PremiumCard>
+      <PremiumCard className="border-primary/15 bg-primary/5">
         <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
           <SectionHeader
+            icon={<FolderKanban className="h-5 w-5" />}
             title={t("projects.title")}
             description={t("projects.description")}
           />
-          <Button type="button" onClick={openCreateForm}>
+          <Button type="button" onClick={openCreateForm} className="w-full sm:w-auto">
             <Plus className="me-2 h-4 w-4" />
             {t("projects.new")}
           </Button>

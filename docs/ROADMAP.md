@@ -102,6 +102,8 @@ Stage 104 completes the weekly loop with a bounded read-only retrospective: Week
 
 Stage 105 refines Home into a clearer working entry point: Today, Inbox capture, and Weekly Review are immediately reachable, while primary and secondary local signals have a calmer visual hierarchy. It changes presentation only and keeps all data ownership and workflow behavior unchanged.
 
+Stage 106 aligns the entry surfaces of Today, Inbox, and Projects through the existing shared visual primitives. The pages retain their independent workflows while presenting a more coherent mobile and desktop experience.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1

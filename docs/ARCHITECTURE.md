@@ -30,6 +30,11 @@ AliOS 1.0 is a local-first static web app.
 - The Home hero’s direct actions navigate to existing routes; it does not create records, infer priorities, or mutate the current plan
 - Compact secondary metrics may summarize existing local data, but they must not replace the feature-level source of truth or add persisted dashboard state
 
+## Core Page Presentation Boundary
+
+- Repeated page-entry presentation belongs to shared UI only when multiple feature pages have the same structural need
+- A shared page hero may render existing titles, descriptions, icons, and foreground actions, but does not own form, filter, record, navigation, or storage behavior
+
 ## Finance Module Boundary
 
 - Finance data lives in finance-specific Dexie tables for transactions and obligations only

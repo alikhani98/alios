@@ -2,6 +2,12 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 106 - Core Pages Visual Alignment
+
+- Applied one consistent, responsive entry pattern to high-traffic feature pages
+- Applied the consistent visual entry point to Today, Inbox, and Projects, including their existing primary actions and context
+- Kept page forms, filters, records, navigation, and all local data behavior unchanged
+
 ## Stage 105 - Home Visual Hierarchy
 
 - Promoted the three primary local workflows—Today, Inbox capture, and Weekly Review—to clear actions in the Home hero
