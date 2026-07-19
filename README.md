@@ -101,7 +101,7 @@ AliOS is designed for one person and stores its data in the browser through Inde
 - Local data summary and confirmed clear-all operation
 - Automated data-layer, validation, backup, i18n, and date tests
 - Route-level code splitting for feature pages
-- Mobile-responsive layouts and manifest-level Add to Home Screen readiness
+- Mobile-responsive layouts, Add to Home Screen readiness, and conservative static-shell offline reopening after an online visit
 
 ## Architecture and technology
 
@@ -206,7 +206,7 @@ AliOS targets current mobile and desktop releases of Chromium-based browsers, Fi
 
 ## Mobile use and home-screen installation
 
-Open the deployed AliOS URL in a mobile browser. Where the browser and platform support it, use **Add to Home Screen** or **Install app** to launch AliOS in a standalone window. Stage 18 provides the manifest, icons, theme metadata, and mobile layout foundation; offline service-worker caching is intentionally deferred.
+Open the deployed AliOS URL in a mobile browser. Where the browser and platform support it, use **Add to Home Screen** or **Install app** to launch AliOS in a standalone window. The app uses a native Service Worker to cache its static shell and loaded same-origin assets after a normal online visit. User records remain only in IndexedDB; the first offline launch is not supported and updates are not forced mid-session.
 
 Data belongs to the exact browser, device, and deployed origin where it was created. Mobile and laptop data do not synchronize automatically. To move data between devices:
 

@@ -2,6 +2,11 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 111 - PWA Offline Foundation
+
+- Added a dependency-free native Service Worker for conservative static-shell and same-origin asset caching after an online visit
+- Kept user records exclusively in IndexedDB and avoided forced activation, background sync, notifications, and remote caching
+
 ## Stage 110 - Installed-Mode and Visual QA Protocol
 
 - Extended release readiness checks for GitHub Pages deep links, installed mode, safe-area behavior, responsive entry surfaces, and desktop shell density

@@ -598,3 +598,11 @@ This changes no search scope, schedule, Task record, schema, migration, backup, 
 The desktop Sidebar width and Topbar height use the canonical layout tokens from the AliOS Design System instead of duplicating their current values in component classes. This keeps the application shell internally consistent while preserving today’s visual dimensions.
 
 The change does not alter the mobile drawer, navigation, route behavior, preferences, records, schema, migration, backup, dependency, backend, sync, cloud, AI, telemetry, or automation.
+
+## ADR-054: Keep offline support shell-only and update-safe
+
+**Status:** Accepted (Stage 111)
+
+AliOS registers a native Service Worker only outside local development. It caches the static shell and same-origin static assets after an online visit, so the installed application can reopen offline once its assets are present. IndexedDB remains the sole location of user records and is never copied into Cache Storage.
+
+Navigation is network-first and falls back to the cached shell only when offline. The worker intentionally does not call `skipWaiting`, use background sync, push notifications, remote caching, or a dependency. A newly deployed worker activates through the browser’s normal lifecycle, avoiding a forced mid-session update that could mix an old page with new assets.

@@ -112,6 +112,8 @@ Stage 109 aligns the desktop application shell with the existing canonical sideb
 
 Stage 110 makes the final release-readiness pass explicit for the deployed and installed application: hash-route launch, supported home-screen installation, safe-area behavior, mobile viewports, and desktop shell readability. It changes no runtime behavior and does not add offline caching.
 
+Stage 111 adds a native, dependency-free PWA offline foundation. It caches only the static shell and same-origin assets after an online visit, keeps user records exclusively in IndexedDB, and avoids forced updates, background sync, notifications, and remote caching.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1

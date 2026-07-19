@@ -18,7 +18,7 @@ Run this once on the deployed GitHub Pages URL before the end-to-end planning pa
 1. Open the default `#/` route, then refresh one deep-linked route such as `#/today` or `#/weekly-review`; confirm AliOS opens normally without a server-side route error.
 2. On a supported mobile browser, use **Install app** or **Add to Home Screen**, launch AliOS from the new icon, and confirm the current local records remain visible in that same browser profile.
 3. Confirm the standalone window still exposes the mobile menu, Search, and Settings and does not clip the Topbar at the safe-area edge.
-4. Confirm the browser is online before judging app startup. AliOS intentionally has no offline service-worker cache, so an offline first load is not a release failure.
+4. After one normal online revisit, enable airplane mode and confirm the installed shell reopens without creating or changing data. An offline first launch is not a release failure because its assets have not yet been cached.
 
 ## End-to-end planning pass
 
