@@ -231,6 +231,13 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] TypeScript, automated tests, production build, and the performance guard pass
 - [ ] Complete the Stage 104 manual smoke pass at 360px, 390px, and 430px in Persian and English
 
+### Stage 105 Home visual hierarchy
+
+- [x] Home provides direct, keyboard-accessible links to Today, Inbox, and Weekly Review without writing any local record
+- [x] Primary cards prioritize daily Tasks, Inbox, active Projects, and Goals; broader local signals remain available as compact context
+- [x] TypeScript, automated tests, production build, and the performance guard pass
+- [ ] Complete the Stage 105 manual smoke pass at 360px, 390px, and 430px in Persian and English
+
 ### Stage 86 performance regression guard
 
 - [x] `pnpm performance:check` builds a manifest and enforces the entry-byte budget, no forms preload, and no Vite chunk-size warning
