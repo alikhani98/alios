@@ -590,3 +590,11 @@ The alignment changes no records, preferences, form behavior, navigation, schema
 Search and Routines may receive the same entry-surface treatment as other core pages. Search remains local and read-only; Routines continue to create Tasks only through explicit user actions.
 
 This changes no search scope, schedule, Task record, schema, migration, backup, dependency, backend, sync, cloud, AI, telemetry, or automation.
+
+## ADR-053: Keep shell density token-driven
+
+**Status:** Accepted (Stage 109)
+
+The desktop Sidebar width and Topbar height use the canonical layout tokens from the AliOS Design System instead of duplicating their current values in component classes. This keeps the application shell internally consistent while preserving today’s visual dimensions.
+
+The change does not alter the mobile drawer, navigation, route behavior, preferences, records, schema, migration, backup, dependency, backend, sync, cloud, AI, telemetry, or automation.

@@ -2,6 +2,11 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 109 - Shell Density Alignment
+
+- Connected the desktop sidebar width and topbar height to the canonical AliOS layout tokens
+- Preserved the existing responsive shell behavior, navigation, controls, preferences, and mobile drawer
+
 ## Stage 108 - Search and Routines Visual Alignment
 
 - Aligned Search and Routines with the established core-page entry treatment

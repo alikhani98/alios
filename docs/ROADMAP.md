@@ -108,6 +108,8 @@ Stage 107 completes this visual alignment for Journal, Knowledge, and Settings w
 
 Stage 108 completes the core-page visual pass for Search and Routines while preserving their local-only and explicit-action boundaries.
 
+Stage 109 aligns the desktop application shell with the existing canonical sidebar-width and topbar-height tokens. It is a presentation-only consistency step; the mobile drawer, navigation, routes, preferences, and data behavior remain unchanged.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1

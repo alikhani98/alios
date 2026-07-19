@@ -249,7 +249,7 @@ export function Topbar({
   };
 
   return (
-    <header className="sticky top-0 z-30 flex min-h-16 items-center gap-2 border-b border-border/70 bg-background/80 px-3 pt-[env(safe-area-inset-top)] shadow-sm backdrop-blur-xl supports-[backdrop-filter]:bg-background/70 sm:px-4 md:gap-3 md:px-6">
+    <header className="sticky top-0 z-30 flex min-h-[var(--alios-topbar-height)] items-center gap-2 border-b border-border/70 bg-background/80 px-3 pt-[env(safe-area-inset-top)] shadow-sm backdrop-blur-xl supports-[backdrop-filter]:bg-background/70 sm:px-4 md:gap-3 md:px-6">
       <Button
         type="button"
         variant="ghost"
