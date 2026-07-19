@@ -134,6 +134,8 @@ Stage 120 removes two observed layout defects: the desktop hero avoids an unused
 
 Stage 121 replaces the desktop hero's height-coupled columns with a deliberate focus-and-metrics upper row plus a full-width planning row, preserving the focused mobile reading order.
 
+Stage 122 ensures the Home calendar has its own full desktop row before it presents its calendar grid and selected-day detail side by side.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1
