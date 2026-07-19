@@ -1,6 +1,6 @@
 # AliOS Release Readiness Pass
 
-Status: Stage 91 release-consolidation guide
+Status: Stage 110 release-consolidation guide
 
 This is a manual, local-first release-readiness pass. It consolidates the highest-value workflows into one reproducible session; it does not replace the seven-day observation protocol in `REAL_WORLD_USAGE_QA.md`, collect data, or change the product.
 
@@ -10,6 +10,15 @@ This is a manual, local-first release-readiness pass. It consolidates the highes
 2. Export a new backup before starting and save it outside the browser.
 3. Record browser, device, language, viewport width, and app version/commit in the issue log.
 4. Use disposable sample data if a destructive check is needed. Never test clear or restore against the only copy of important data.
+
+## Application launch and installed-mode pass
+
+Run this once on the deployed GitHub Pages URL before the end-to-end planning pass.
+
+1. Open the default `#/` route, then refresh one deep-linked route such as `#/today` or `#/weekly-review`; confirm AliOS opens normally without a server-side route error.
+2. On a supported mobile browser, use **Install app** or **Add to Home Screen**, launch AliOS from the new icon, and confirm the current local records remain visible in that same browser profile.
+3. Confirm the standalone window still exposes the mobile menu, Search, and Settings and does not clip the Topbar at the safe-area edge.
+4. Confirm the browser is online before judging app startup. AliOS intentionally has no offline service-worker cache, so an offline first load is not a release failure.
 
 ## End-to-end planning pass
 
@@ -32,12 +41,14 @@ Run this sequence once in Persian RTL and once in English LTR. At least one run 
 
 ## Interface and accessibility pass
 
-At 360px, 390px, and 430px where possible, verify the following in Persian and English:
+At 360px, 390px, and 430px where possible, verify the following in Persian and English. Also inspect Home and one dense page at a desktop width of at least 1280px.
 
 1. Long Persian, long English, and mixed-language titles do not cause horizontal scrolling, clipped controls, or unreadable badges.
 2. The mobile menu and Topbar panels open, move focus predictably, close with Escape, and restore focus to their trigger.
 3. Light/dark appearance and a non-default accent preserve visible focus, selected, disabled, and destructive states.
 4. Planning-link unavailable states remain calm: deleting or simulating a missing Project must not block its linked Tasks from being viewed, edited, completed, or deleted.
+5. Home, Today, Inbox, Projects, Journal, Knowledge, Search, Routines, and Settings show one readable entry hierarchy without a duplicated or clipped title.
+6. On desktop, the Sidebar remains readable in both expanded and collapsed states, while the Topbar, page content, and long cards keep a calm, balanced reading width.
 
 ## Release decision
 
@@ -45,6 +56,7 @@ Mark the pass **ready** only when all conditions hold:
 
 - TypeScript, the full automated suite, production build, and the PR workflow are green.
 - No blocker exists in capture, planning links, Task completion, backup preview, or app startup.
+- The installed-mode pass has been run on at least one supported mobile browser, or its browser/platform limitation is recorded.
 - Every high-severity observation has either a narrowly approved fix or a documented reason to defer it.
 - The backup created before the pass remains available outside the browser.
 

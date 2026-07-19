@@ -2,6 +2,11 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 110 - Installed-Mode and Visual QA Protocol
+
+- Extended release readiness checks for GitHub Pages deep links, installed mode, safe-area behavior, responsive entry surfaces, and desktop shell density
+- Kept the protocol explicit that AliOS has no offline service-worker cache and no telemetry or runtime behavior change
+
 ## Stage 109 - Shell Density Alignment
 
 - Connected the desktop sidebar width and topbar height to the canonical AliOS layout tokens

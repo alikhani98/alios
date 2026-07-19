@@ -110,6 +110,8 @@ Stage 108 completes the core-page visual pass for Search and Routines while pres
 
 Stage 109 aligns the desktop application shell with the existing canonical sidebar-width and topbar-height tokens. It is a presentation-only consistency step; the mobile drawer, navigation, routes, preferences, and data behavior remain unchanged.
 
+Stage 110 makes the final release-readiness pass explicit for the deployed and installed application: hash-route launch, supported home-screen installation, safe-area behavior, mobile viewports, and desktop shell readability. It changes no runtime behavior and does not add offline caching.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1
