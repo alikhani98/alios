@@ -266,6 +266,13 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] TypeScript, automated tests, production build, and the performance guard pass
 - [ ] Complete the Stage 109 manual smoke pass at 360px, 390px, and 430px in Persian and English
 
+### Stage 110 installed-mode and visual QA protocol
+
+- [x] Release readiness covers GitHub Pages deep-link launch, supported installation, safe-area behavior, responsive entry surfaces, and desktop shell readability
+- [x] The protocol explicitly distinguishes supported installed mode from deferred offline service-worker caching
+- [x] No runtime, dependency, route, storage, schema, backup, or user-data behavior changed
+- [ ] Run the Stage 110 manual pass on one supported mobile browser and one desktop browser
+
 ### Stage 86 performance regression guard
 
 - [x] `pnpm performance:check` builds a manifest and enforces the entry-byte budget, no forms preload, and no Vite chunk-size warning
