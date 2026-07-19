@@ -1,10 +1,12 @@
 import {
+  ArrowUpLeft,
   BookOpenText,
   Brain,
   CalendarCheck2,
   Compass,
   FolderKanban,
   Inbox,
+  Plus,
   Target,
   Sparkles,
 } from "lucide-react";
@@ -99,13 +101,6 @@ export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
       status: <StatusChip tone="neutral">{t("home.activeProjects")}</StatusChip>,
     },
     {
-      icon: <Brain className="h-5 w-5" />,
-      label: t("home.knowledgeItems"),
-      value: String(data.knowledge.totalCount),
-      description: t("home.knowledgeOverview"),
-      status: <StatusChip tone="neutral">{t("home.knowledgeItems")}</StatusChip>,
-    },
-    {
       icon: <Target className="h-5 w-5" />,
       label: t("home.goals"),
       value: String(data.goals.activeCount),
@@ -121,20 +116,6 @@ export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
         </StatusChip>
       ),
     },
-    {
-      icon: <Compass className="h-5 w-5" />,
-      label: t("home.lifeAreas"),
-      value: String(data.lifeAreas.activeCount),
-      description:
-        data.lifeAreas.averageSatisfactionScore === null
-          ? t("home.lifeAreasNoSatisfaction")
-          : `${t("home.lifeAreasAverageSatisfaction")}: ${data.lifeAreas.averageSatisfactionScore.toFixed(1)}/5`,
-      status: (
-        <StatusChip tone={data.lifeAreas.reviewDueCount > 0 ? "warning" : "neutral"}>
-          {t("home.lifeAreasReviewDue")}: {data.lifeAreas.reviewDueCount}
-        </StatusChip>
-      ),
-    },
   ];
 
   return (
@@ -144,7 +125,7 @@ export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
         <div className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-primary/10 blur-3xl" />
         <div className="absolute -bottom-24 left-0 h-56 w-56 rounded-full bg-secondary/40 blur-3xl" />
 
-        <div className="relative grid gap-6 xl:grid-cols-[1.1fr_0.9fr] xl:items-end">
+        <div className="relative grid gap-6 xl:grid-cols-[1.08fr_0.92fr] xl:items-end">
           <div className="space-y-5">
             <div className="flex flex-wrap items-center gap-2">
               <div className="inline-flex items-center gap-2 rounded-full border bg-background/80 px-3 py-1 text-xs font-medium text-muted-foreground shadow-sm backdrop-blur">
@@ -163,7 +144,28 @@ export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
               </p>
             </div>
 
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2" aria-label={t("home.quickActions")}>
+              <Button asChild className="min-h-11 w-full sm:w-auto">
+                <Link to="/today">
+                  <CalendarCheck2 className="me-2 h-4 w-4" />
+                  {t("home.goToday")}
+                </Link>
+              </Button>
+              <Button asChild variant="outline" className="min-h-11 w-full sm:w-auto">
+                <Link to="/inbox">
+                  <Plus className="me-2 h-4 w-4" />
+                  {t("nav.inbox")}
+                </Link>
+              </Button>
+              <Button asChild variant="ghost" className="min-h-11 w-full sm:w-auto">
+                <Link to="/weekly-review">
+                  {t("nav.weeklyReview")}
+                  <ArrowUpLeft className="ms-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+
+            <div className="flex flex-wrap gap-2" aria-label={t("home.sectionSummaryStats")}>
               <Badge variant="secondary" className="gap-1.5 px-3 py-1.5">
                 <CalendarCheck2 className="h-3.5 w-3.5" />
                 {t("home.todayTasks")}: {todayCount}
@@ -177,16 +179,20 @@ export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
                 {t("home.activeProjects")}: {data.projects.activeCount}
               </Badge>
               <Badge variant="outline" className="gap-1.5 px-3 py-1.5">
-                <BookOpenText className="h-3.5 w-3.5" />
-                {t("home.journalEntries")}: {data.journal.totalCount}
-              </Badge>
-              <Badge variant="outline" className="gap-1.5 px-3 py-1.5">
                 <Target className="h-3.5 w-3.5" />
                 {t("home.goals")}: {data.goals.activeCount}
               </Badge>
               <Badge variant="outline" className="gap-1.5 px-3 py-1.5">
                 <Compass className="h-3.5 w-3.5" />
                 {t("home.lifeAreas")}: {data.lifeAreas.activeCount}
+              </Badge>
+              <Badge variant="outline" className="gap-1.5 px-3 py-1.5">
+                <BookOpenText className="h-3.5 w-3.5" />
+                {t("home.journalEntries")}: {data.journal.totalCount}
+              </Badge>
+              <Badge variant="outline" className="gap-1.5 px-3 py-1.5">
+                <Brain className="h-3.5 w-3.5" />
+                {t("home.knowledgeItems")}: {data.knowledge.totalCount}
               </Badge>
             </div>
 

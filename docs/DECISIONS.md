@@ -558,3 +558,11 @@ Any status, edit, or delete action remains explicit. The handoff never changes t
 Weekly Review may load only the immediately previous Monday-keyed Weekly Plan beside the current one. Its focus, optional intention, available linked destinations, and Task progress are derived from existing local records in memory; current planning, broad weekly activity, and the review queue retain their own meanings.
 
 The retrospective stores no assessment, score, completion history, or new plan record. It never writes a Task or Weekly Plan, changes status, schedules work, or introduces schema, migration, backup change, route, backend, sync, cloud, AI, telemetry, or dependency.
+
+## ADR-049: Keep Home workflow prioritization presentational
+
+**Status:** Accepted (Stage 105)
+
+Home may elevate navigation to Today, Inbox, and Weekly Review and selectively emphasize existing derived metrics for daily orientation. This hierarchy is a visual reading path, not a priority engine, quick-create mechanism, or stored dashboard preference.
+
+The direct actions remain ordinary route navigation. They create no record, change no Task or Weekly Plan, and add no schema, migration, backup change, automation, backend, sync, cloud, AI, telemetry, or dependency.

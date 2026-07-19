@@ -24,6 +24,12 @@ AliOS 1.0 is a local-first static web app.
 - External design-system documents may inform an approved change but do not replace the repository-native contract or authorize dependencies, hosted services, or a redesign
 - The design contract is documentation and governance only; it does not add a runtime service, persistence layer, remote source, or application dependency
 
+## Home Visual Hierarchy Boundary
+
+- Home may prioritize existing local actions and derived dashboard signals through layout and presentation only
+- The Home hero’s direct actions navigate to existing routes; it does not create records, infer priorities, or mutate the current plan
+- Compact secondary metrics may summarize existing local data, but they must not replace the feature-level source of truth or add persisted dashboard state
+
 ## Finance Module Boundary
 
 - Finance data lives in finance-specific Dexie tables for transactions and obligations only

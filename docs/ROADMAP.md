@@ -100,6 +100,8 @@ Stage 103 closes the last direct-plan execution gap by showing a selected Weekly
 
 Stage 104 completes the weekly loop with a bounded read-only retrospective: Weekly Review can show the immediately previous plan, its existing links, and its plan-scoped completion separately from the new week’s plan and the normal review signals.
 
+Stage 105 refines Home into a clearer working entry point: Today, Inbox capture, and Weekly Review are immediately reachable, while primary and secondary local signals have a calmer visual hierarchy. It changes presentation only and keeps all data ownership and workflow behavior unchanged.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1

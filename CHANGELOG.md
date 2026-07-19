@@ -2,6 +2,12 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 105 - Home Visual Hierarchy
+
+- Promoted the three primary local workflows—Today, Inbox capture, and Weekly Review—to clear actions in the Home hero
+- Reduced the large hero metric grid to the four operational signals needed for daily orientation, while retaining broader local context as compact badges
+- Kept every count and link derived from the existing dashboard data with no new storage, route, dependency, or behavior change
+
 ## Stage 104 - Weekly Plan Retrospective
 
 - Added a read-only previous-week planning card to Weekly Review, keeping its focus, intention, safe linked destinations, and plan-scoped Task progress visible
