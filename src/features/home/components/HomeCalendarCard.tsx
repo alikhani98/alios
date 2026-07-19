@@ -1,4 +1,4 @@
-import { format, startOfMonth } from "date-fns";
+import { addDays, format, startOfMonth, startOfWeek } from "date-fns";
 import {
   ArrowUpLeft,
   CalendarDays,
@@ -54,6 +54,7 @@ export function HomeCalendarCard({
   const { t, language, direction } = useI18n();
   const { formatDate, resolvedCalendar } = useDateFormatter();
   const [selectedDate, setSelectedDate] = useState(() => new Date());
+  const [calendarMode, setCalendarMode] = useState<"week" | "month">("week");
   const groupedTasks = useMemo(() => groupTasksByDate(tasks), [tasks]);
   const visibleMonth = startOfMonth(selectedDate);
   const today = new Date();
@@ -79,12 +80,22 @@ export function HomeCalendarCard({
     (count, cell) => count + cell.taskCount,
     0
   );
+  const weekStart = startOfWeek(selectedDate, {
+    weekStartsOn: getWeekStartsOn(language),
+  });
+  const weekDates = Array.from({ length: 7 }, (_, index) =>
+    addDays(weekStart, index)
+  );
+  const weekLabels = buildWeekdayLabels(weekStart, {
+    language,
+    calendar: resolvedCalendar,
+  });
 
   return (
     <CollapsibleSection
       id={`home-${sectionId}`}
       title={t("home.calendar")}
-      description={monthTitle}
+      description={calendarMode === "week" ? formatDate(weekStart) : monthTitle}
       icon={<CalendarDays className="h-5 w-5" />}
       status={<Badge variant="secondary">{monthTaskCount}</Badge>}
       open={open}
@@ -94,16 +105,23 @@ export function HomeCalendarCard({
       className="overflow-hidden border-primary/10 bg-gradient-to-br from-background via-background to-primary/5 shadow-sm"
       contentClassName="space-y-5"
     >
-      <div className="grid gap-2 sm:flex sm:flex-wrap sm:items-center">
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+        <div className="grid gap-2 sm:flex sm:flex-wrap sm:items-center">
         <Button
           type="button"
           size="sm"
           variant="outline"
           className="w-full sm:w-auto"
-          onClick={() => setSelectedDate((currentDate) => shiftMonth(currentDate, -1))}
+          onClick={() =>
+            setSelectedDate((currentDate) =>
+              calendarMode === "week"
+                ? addDays(currentDate, -7)
+                : shiftMonth(currentDate, -1)
+            )
+          }
         >
           <PreviousIcon className="me-2 h-4 w-4" />
-          {t("home.previousMonth")}
+          {calendarMode === "week" ? t("home.previousWeek") : t("home.previousMonth")}
         </Button>
         <Button
           type="button"
@@ -112,32 +130,86 @@ export function HomeCalendarCard({
           className="w-full sm:w-auto"
           onClick={() => setSelectedDate(() => new Date())}
         >
-          {t("home.currentMonth")}
+          {calendarMode === "week" ? t("home.currentWeek") : t("home.currentMonth")}
         </Button>
         <Button
           type="button"
           size="sm"
           variant="outline"
           className="w-full sm:w-auto"
-          onClick={() => setSelectedDate((currentDate) => shiftMonth(currentDate, 1))}
+          onClick={() =>
+            setSelectedDate((currentDate) =>
+              calendarMode === "week"
+                ? addDays(currentDate, 7)
+                : shiftMonth(currentDate, 1)
+            )
+          }
         >
-          {t("home.nextMonth")}
+          {calendarMode === "week" ? t("home.nextWeek") : t("home.nextMonth")}
           <NextIcon className="ms-2 h-4 w-4" />
+        </Button>
+        </div>
+        <Button
+          type="button"
+          size="sm"
+          variant="ghost"
+          className="w-full sm:w-auto"
+          onClick={() => setCalendarMode((currentMode) => currentMode === "week" ? "month" : "week")}
+        >
+          {calendarMode === "week" ? t("home.monthView") : t("home.weekView")}
         </Button>
       </div>
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)]">
         <div className="space-y-4">
-          <div className="grid grid-cols-7 gap-1 text-center text-[0.7rem] font-medium uppercase tracking-wide text-muted-foreground sm:text-xs">
-            {weekdayLabels.map((label) => (
-              <div key={label} className="px-1 py-2">
-                {label}
-              </div>
-            ))}
-          </div>
+          {calendarMode === "week" ? (
+            <div className="overflow-x-auto pb-1">
+              <div className="grid min-w-[29rem] grid-cols-7 gap-2">
+                {weekDates.map((date, index) => {
+                  const isoDate = format(date, "yyyy-MM-dd");
+                  const taskCount = groupedTasks[isoDate]?.length ?? 0;
+                  const isSelected = isoDate === selectedIsoDate;
+                  const isToday = isoDate === format(today, "yyyy-MM-dd");
 
-          <div className="grid grid-cols-7 gap-1">
-            {calendarCells.map((cell) => {
+                  return (
+                    <button
+                      key={isoDate}
+                      type="button"
+                      onClick={() => setSelectedDate(date)}
+                      aria-pressed={isSelected}
+                      aria-label={formatDate(date)}
+                      className={cn(
+                        "flex min-h-28 flex-col justify-between rounded-2xl border p-3 text-start transition-[transform,box-shadow,border-color,background-color,color] duration-200 hover:-translate-y-0.5 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                        isSelected ? "border-primary bg-primary/5 shadow-sm" : "bg-background hover:border-primary/50",
+                        isToday && "ring-1 ring-primary/25"
+                      )}
+                    >
+                      <span className="text-xs font-medium text-muted-foreground">
+                        {weekLabels[index]}
+                      </span>
+                      <span className="text-xl font-semibold tabular-nums">
+                        {formatDayNumber(date, { language, calendar: resolvedCalendar })}
+                      </span>
+                      <span className={cn("text-xs font-medium", taskCount > 0 ? "text-primary" : "text-muted-foreground")}>
+                        {taskCount > 0 ? `${taskCount} ${t("home.todayTasks")}` : t("home.noItemsForThisDay")}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-7 gap-1 text-center text-[0.7rem] font-medium uppercase tracking-wide text-muted-foreground sm:text-xs">
+                {weekdayLabels.map((label) => (
+                  <div key={label} className="px-1 py-2">
+                    {label}
+                  </div>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-7 gap-1">
+                {calendarCells.map((cell) => {
               const isSelected = cell.isoDate === selectedIsoDate;
               const secondaryLabel =
                 resolvedCalendar === "jalali"
@@ -197,8 +269,10 @@ export function HomeCalendarCard({
                   )}
                 </button>
               );
-            })}
-          </div>
+                })}
+              </div>
+            </>
+          )}
         </div>
 
         <SoftPanel className="space-y-4 border-primary/10 bg-background/85 lg:self-start">

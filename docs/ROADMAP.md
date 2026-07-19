@@ -124,6 +124,8 @@ Stage 115 gives Home its desktop composition: existing panels occupy a deliberat
 
 Stage 116 resets the first-view experience: Home opens as a bounded daily workspace and reveals supporting local panels only through one deliberate expansion.
 
+Stage 117 makes the workspace actionable: a compact week replaces the tall month-first calendar, and Personal Insights begins with only the three signals needed for daily orientation.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1

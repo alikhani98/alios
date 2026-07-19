@@ -1,5 +1,5 @@
-import { CalendarCheck2, Inbox, Sparkles, TrendingUp, Users } from "lucide-react";
-import { useMemo } from "react";
+import { CalendarCheck2, ChevronDown, ChevronUp, Inbox, Sparkles, TrendingUp, Users } from "lucide-react";
+import { useMemo, useState } from "react";
 
 import { usePersistentString } from "@/shared/hooks";
 import { useI18n } from "@/shared/i18n";
@@ -40,6 +40,7 @@ export function HomePersonalInsightsCard({
   onOpenChange,
 }: HomePersonalInsightsCardProps) {
   const { t } = useI18n();
+  const [showDetails, setShowDetails] = useState(false);
   const currentDate = getLocalDateKey(new Date());
   const wellnessStepCount = getWellnessRoutineStepIds().length;
   const { value: storedDate } = usePersistentString({
@@ -112,7 +113,7 @@ export function HomePersonalInsightsCard({
         />
       ) : (
         <>
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-3">
             <InsightStatCard
               icon={<CalendarCheck2 className="h-5 w-5" />}
               label={t("home.completedTasks")}
@@ -128,23 +129,11 @@ export function HomePersonalInsightsCard({
             />
 
             <InsightStatCard
-              icon={<TrendingUp className="h-5 w-5" />}
-              label={t("home.overdue")}
-              value={snapshot.overdueCount}
+              icon={<Inbox className="h-5 w-5" />}
+              label={t("home.inboxItems")}
+              value={snapshot.unprocessedInboxCount}
               description={t("home.keepUsingAliOSToSeeMoreInsights")}
-              status={
-                <StatusChip tone={snapshot.overdueCount > 0 ? "danger" : "neutral"}>
-                  {t("home.overdue")}
-                </StatusChip>
-              }
-            />
-
-            <InsightStatCard
-              icon={<Sparkles className="h-5 w-5" />}
-              label={t("home.upcoming")}
-              value={snapshot.upcomingCount}
-              description={t("home.keepUsingAliOSToSeeMoreInsights")}
-              status={<StatusChip tone="primary">{t("home.upcoming")}</StatusChip>}
+              status={<StatusChip tone="neutral">{t("home.inboxItems")}</StatusChip>}
             />
 
             <InsightStatCard
@@ -158,16 +147,48 @@ export function HomePersonalInsightsCard({
               }
               status={<StatusChip tone="neutral">{t("home.activeProjects")}</StatusChip>}
             />
+          </div>
 
-            <InsightStatCard
-              icon={<Inbox className="h-5 w-5" />}
-              label={t("home.inboxItems")}
-              value={snapshot.unprocessedInboxCount}
-              description={t("home.keepUsingAliOSToSeeMoreInsights")}
-              status={<StatusChip tone="neutral">{t("home.inboxItems")}</StatusChip>}
-            />
+          <button
+            type="button"
+            className="flex w-full items-center justify-between rounded-2xl border border-dashed bg-muted/20 px-4 py-3 text-sm font-medium transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            onClick={() => setShowDetails((currentValue) => !currentValue)}
+            aria-expanded={showDetails}
+          >
+            <span>{showDetails ? t("home.hideInsightDetails") : t("home.showInsightDetails")}</span>
+            {showDetails ? (
+              <ChevronUp className="h-4 w-4" aria-hidden="true" />
+            ) : (
+              <ChevronDown className="h-4 w-4" aria-hidden="true" />
+            )}
+          </button>
 
-            <SoftPanel className="flex h-full flex-col gap-4">
+          {showDetails ? (
+            <div className="grid gap-3 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+              <SoftPanel className="space-y-4">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <InsightStatCard
+                    icon={<TrendingUp className="h-5 w-5" />}
+                    label={t("home.overdue")}
+                    value={snapshot.overdueCount}
+                    description={t("home.keepUsingAliOSToSeeMoreInsights")}
+                    status={
+                      <StatusChip tone={snapshot.overdueCount > 0 ? "danger" : "neutral"}>
+                        {t("home.overdue")}
+                      </StatusChip>
+                    }
+                  />
+                  <InsightStatCard
+                    icon={<Sparkles className="h-5 w-5" />}
+                    label={t("home.upcoming")}
+                    value={snapshot.upcomingCount}
+                    description={t("home.keepUsingAliOSToSeeMoreInsights")}
+                    status={<StatusChip tone="primary">{t("home.upcoming")}</StatusChip>}
+                  />
+                </div>
+              </SoftPanel>
+
+              <SoftPanel className="flex h-full flex-col gap-4">
               <div className="flex items-start justify-between gap-3">
                 <div className="space-y-1">
                   <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
@@ -224,8 +245,9 @@ export function HomePersonalInsightsCard({
                   {t("home.knowledgeItems")}: {snapshot.knowledgeCount}
                 </StatusChip>
               </div>
-            </SoftPanel>
-          </div>
+              </SoftPanel>
+            </div>
+          ) : null}
         </>
       )}
     </CollapsibleSection>

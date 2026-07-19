@@ -319,6 +319,14 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] TypeScript, automated tests, and the production build pass
 - [ ] Manually inspect Home at 360px, 390px, 430px, and desktop width with both expanded and collapsed supporting panels
 
+### Stage 117 Home action workspace
+
+- [x] Home opens with a seven-day calendar and the existing full month remains available through an explicit local switch
+- [x] Personal Insights has three initial operational KPIs and supporting signals behind an explicit local expansion
+- [x] The repeated Home title surface is removed without changing navigation, records, or route behavior
+- [x] TypeScript, automated tests, and the production build pass
+- [ ] Manually inspect weekly/month calendar switching and insight-detail expansion at 360px, 390px, 430px, and desktop width
+
 ### Stage 86 performance regression guard
 
 - [x] `pnpm performance:check` builds a manifest and enforces the entry-byte budget, no forms preload, and no Vite chunk-size warning
