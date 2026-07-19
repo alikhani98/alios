@@ -98,6 +98,8 @@ Stage 102 makes execution signals honest and comparable across Weekly Review and
 
 Stage 103 closes the last direct-plan execution gap by showing a selected Weekly Plan Task in Today even when its date is not today. It remains a separate contextual card, never changes its date automatically, and does not expose MIT promotion for that cross-date handoff.
 
+Stage 104 completes the weekly loop with a bounded read-only retrospective: Weekly Review can show the immediately previous plan, its existing links, and its plan-scoped completion separately from the new week’s plan and the normal review signals.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1

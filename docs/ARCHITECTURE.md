@@ -75,6 +75,7 @@ AliOS 1.0 is a local-first static web app.
 - Today may read the current plan and show derived completion for already-linked Tasks, but it never edits a plan, creates a Task, changes Task state, or schedules work
 - Plan execution totals must use only Tasks reached through the current plan's available Goal, Project, or direct Task reference; broader weekly task activity remains a separate review signal
 - A direct weekly-plan Task that is outside Today’s date-bound list may appear in a separate contextual card. Its changes remain explicit user actions, and the card must not alter its due date or promote it to Today’s MIT
+- Weekly Review may load the immediately previous Monday-keyed plan for a read-only retrospective. Its focus, links, and execution remain separate from the current plan, review queue, and broad activity; no retrospective score or record is stored
 - Backup version 1 includes weekly plans additively and normalizes absent arrays for older valid backups
 
 ## Today Tasks Module Boundary

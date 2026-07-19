@@ -2,6 +2,12 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 104 - Weekly Plan Retrospective
+
+- Added a read-only previous-week planning card to Weekly Review, keeping its focus, intention, safe linked destinations, and plan-scoped Task progress visible
+- Kept the prior plan’s execution distinct from current-week planning, broad weekly activity, and the review queue
+- Derived every signal from existing local records without saving a score or changing any Task or plan
+
 ## Stage 103 - Planned Task Execution Handoff
 
 - Made a directly selected Weekly Plan Task visible in Today even when it is not due on the current date
