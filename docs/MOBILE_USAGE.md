@@ -41,6 +41,7 @@ Stage 117 replaces the tall month grid in the initial Home view with a horizonta
 Stage 118 keeps a stale post-deployment lazy chunk from stranding a mobile route by allowing one cache-busting reload; a repeated failure stays visible through the existing local error boundary. The Home backup reminder uses a compact shared surface and keeps its Settings action reachable at narrow widths.
 Stage 119 keeps immediate task buckets readable in one column and moves this-week/later context into a compact planning surface; all task editing remains in Today.
 Stage 120 makes the seven-day calendar fit 360px, 390px, and 430px widths without horizontal scrolling; its day buttons retain full accessible date labels.
+Stage 121 keeps the Home hero in a single deliberate mobile reading sequence: daily focus, current planning context, then quick metrics.
 The Personal Insights section stays local to the device and only reflects stored tasks, projects, inbox items, journal entries, knowledge items, and wellness checklist state.
 
 ## Personal Manual smoke test

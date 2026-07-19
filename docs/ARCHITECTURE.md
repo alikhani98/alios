@@ -209,6 +209,12 @@ AliOS does not require a Node.js server in production. Node.js is allowed for de
 - The retry marker is session-only, keyed to the canonical route, and prevents an automatic reload loop; a second failure is handled by the existing local error boundary
 - The recovery does not clear IndexedDB, local preferences, Cache Storage, or Service Worker state and does not send error data anywhere
 
+## Home Hero Composition Boundary
+
+- Home's daily focus, derived quick metrics, and existing planning context remain presentational feature-layer data
+- The desktop composition places focus and metrics in the upper row and planning context in a subsequent full-width row; mobile preserves their single-column order
+- No Home layout change writes records or changes routes, repositories, backup content, or storage behavior
+
 ## Layering
 
 ```text

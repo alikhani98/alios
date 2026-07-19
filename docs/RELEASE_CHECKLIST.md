@@ -348,6 +348,13 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] Calendar date labels remain available through accessible button names and wider descriptive text
 - [ ] Manually inspect Home at 360px, 390px, 430px, and desktop width with populated week data
 
+### Stage 121 Home hero composition
+
+- [x] Desktop daily focus and quick metrics share one compact upper row without a height-coupled blank metric column
+- [x] Goal and weekly-plan context use a full-width follow-up row when present
+- [x] Mobile preserves focus, context, and metrics in a readable single-column sequence
+- [ ] Manually inspect populated Home at 360px, 390px, 430px, and desktop width
+
 ### Stage 86 performance regression guard
 
 - [x] `pnpm performance:check` builds a manifest and enforces the entry-byte budget, no forms preload, and no Vite chunk-size warning
