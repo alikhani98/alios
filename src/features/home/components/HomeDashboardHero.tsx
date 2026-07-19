@@ -1,9 +1,6 @@
 import {
   ArrowUpLeft,
-  BookOpenText,
-  Brain,
   CalendarCheck2,
-  Compass,
   FolderKanban,
   Inbox,
   Plus,
@@ -120,12 +117,12 @@ export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
 
   return (
     <PremiumCard className="border-primary/15 bg-gradient-to-br from-primary/10 via-background to-background shadow-sm">
-      <CardContent className="relative p-5 sm:p-6 lg:p-8">
+      <CardContent className="relative p-5 sm:p-6 lg:p-7">
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
         <div className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-primary/10 blur-3xl" />
         <div className="absolute -bottom-24 left-0 h-56 w-56 rounded-full bg-secondary/40 blur-3xl" />
 
-        <div className="relative grid gap-6 xl:grid-cols-[1.08fr_0.92fr] xl:items-end">
+        <div className="relative grid gap-5 xl:grid-cols-[minmax(0,1.1fr)_minmax(20rem,0.9fr)] xl:items-start">
           <div className="space-y-5">
             <div className="flex flex-wrap items-center gap-2">
               <div className="inline-flex items-center gap-2 rounded-full border bg-background/80 px-3 py-1 text-xs font-medium text-muted-foreground shadow-sm backdrop-blur">
@@ -135,11 +132,11 @@ export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
               {actions ? <div className="flex flex-wrap gap-2">{actions}</div> : null}
             </div>
 
-            <div className="max-w-2xl space-y-3">
-              <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+            <div className="max-w-2xl space-y-2">
+              <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
                 {t("home.title")}
               </h2>
-              <p className="max-w-xl text-sm leading-7 text-muted-foreground sm:text-[0.95rem]">
+              <p className="max-w-xl text-sm leading-6 text-muted-foreground">
                 {t("home.description")}
               </p>
             </div>
@@ -163,37 +160,6 @@ export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
                   <ArrowUpLeft className="ms-2 h-4 w-4" />
                 </Link>
               </Button>
-            </div>
-
-            <div className="flex flex-wrap gap-2" aria-label={t("home.sectionSummaryStats")}>
-              <Badge variant="secondary" className="gap-1.5 px-3 py-1.5">
-                <CalendarCheck2 className="h-3.5 w-3.5" />
-                {t("home.todayTasks")}: {todayCount}
-              </Badge>
-              <Badge variant="outline" className="gap-1.5 px-3 py-1.5">
-                <Inbox className="h-3.5 w-3.5" />
-                {t("home.unprocessedInbox")}: {data.inbox.unprocessedCount}
-              </Badge>
-              <Badge variant="outline" className="gap-1.5 px-3 py-1.5">
-                <FolderKanban className="h-3.5 w-3.5" />
-                {t("home.activeProjects")}: {data.projects.activeCount}
-              </Badge>
-              <Badge variant="outline" className="gap-1.5 px-3 py-1.5">
-                <Target className="h-3.5 w-3.5" />
-                {t("home.goals")}: {data.goals.activeCount}
-              </Badge>
-              <Badge variant="outline" className="gap-1.5 px-3 py-1.5">
-                <Compass className="h-3.5 w-3.5" />
-                {t("home.lifeAreas")}: {data.lifeAreas.activeCount}
-              </Badge>
-              <Badge variant="outline" className="gap-1.5 px-3 py-1.5">
-                <BookOpenText className="h-3.5 w-3.5" />
-                {t("home.journalEntries")}: {data.journal.totalCount}
-              </Badge>
-              <Badge variant="outline" className="gap-1.5 px-3 py-1.5">
-                <Brain className="h-3.5 w-3.5" />
-                {t("home.knowledgeItems")}: {data.knowledge.totalCount}
-              </Badge>
             </div>
 
             <SoftPanel className="space-y-3 border-primary/10 bg-background/85">
@@ -226,8 +192,9 @@ export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
               </div>
             </SoftPanel>
 
-            {planningFocus ? (
-              <SoftPanel className="space-y-3 border-primary/10 bg-background/85">
+            <div className="grid gap-3 lg:grid-cols-2">
+              {planningFocus ? (
+                <SoftPanel className="space-y-3 border-primary/10 bg-background/85">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-2 text-sm font-medium">
                     <Target className="h-4 w-4 text-primary" />
@@ -260,11 +227,11 @@ export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
                     </Button>
                   ) : null}
                 </div>
-              </SoftPanel>
-            ) : null}
+                </SoftPanel>
+              ) : null}
 
-            {weeklyPlan ? (
-              <SoftPanel className="space-y-3 border-primary/10 bg-background/85">
+              {weeklyPlan ? (
+                <SoftPanel className="space-y-3 border-primary/10 bg-background/85">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className="text-sm font-medium">{t("weeklyReview.nextFocusLabel")}</p>
                   <Button asChild size="sm" variant="ghost"><Link to="/weekly-review">{t("nav.weeklyReview")}</Link></Button>
@@ -286,11 +253,12 @@ export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
                     )}
                   </div>
                 ) : null}
-              </SoftPanel>
-            ) : null}
+                </SoftPanel>
+              ) : null}
+            </div>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-3 grid-cols-2 xl:pt-1">
             {heroMetrics.map((metric) => (
               <MetricCard key={metric.label} {...metric} />
             ))}

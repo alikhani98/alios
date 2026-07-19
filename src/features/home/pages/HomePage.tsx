@@ -57,6 +57,15 @@ const quickLinks: ReadonlyArray<{ to: string; labelKey: TranslationKey }> = [
   { to: "/settings", labelKey: "home.goSettings" },
 ];
 
+const desktopSectionPairs = new Set([
+  "upcomingTasks:calendar",
+  "calendar:upcomingTasks",
+  "projectsOverview:journalOverview",
+  "journalOverview:projectsOverview",
+  "knowledgeOverview:manualOverview",
+  "manualOverview:knowledgeOverview",
+]);
+
 type SummaryCardProps = {
   icon: ReactNode;
   label: string;
@@ -379,8 +388,39 @@ export function HomePage() {
       } => Boolean(section.content)
     );
 
+  const remainingSections = renderedSections.slice(1);
+  const renderedSectionRows: ReactNode[] = [];
+
+  for (let index = 0; index < remainingSections.length; index += 1) {
+    const section = remainingSections[index];
+    const nextSection = remainingSections[index + 1];
+      const pairKey = nextSection
+        ? `${section.sectionId}:${nextSection.sectionId}`
+        : null;
+
+    if (pairKey && desktopSectionPairs.has(pairKey)) {
+      renderedSectionRows.push(
+        <div
+          key={pairKey}
+          className="grid min-w-0 gap-5 xl:grid-cols-2 xl:items-start"
+        >
+          <div className="min-w-0">{section.content}</div>
+          <div className="min-w-0">{nextSection.content}</div>
+        </div>
+      );
+      index += 1;
+      continue;
+    }
+
+    renderedSectionRows.push(
+      <div key={section.sectionId} className="min-w-0">
+        {section.content}
+      </div>
+    );
+  }
+
   return (
-    <section className="alios-page space-y-8">
+    <section className="alios-page space-y-5 lg:space-y-6">
       {hasError ? (
         <div
           role="alert"
@@ -448,11 +488,7 @@ export function HomePage() {
       ) : data ? (
         <>
           {renderedSections[0]?.content ?? null}
-          {renderedSections.slice(1).map(({ sectionId, content }) => (
-            <div key={sectionId} className="min-w-0">
-              {content}
-            </div>
-          ))}
+          {renderedSectionRows}
         </>
       ) : null}
     </section>

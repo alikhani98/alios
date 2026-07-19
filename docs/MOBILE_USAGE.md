@@ -33,6 +33,7 @@ Stage 78 adds optional Project → Goal linking with mobile-safe selection, navi
 Stage 79 activates optional Task → Project linking in Today with mobile-safe selection, navigation, unlinking, and unavailable states while keeping Tasks independently usable.
 Stage 80 completes Persian Life Areas localization and refreshes the bilingual Settings Help Center for the current module set and optional planning links without changing local data behavior.
 Stage 110 records the final installed-mode, launch, mobile viewport, and desktop-shell QA checks. It does not alter device-local data behavior.
+Stage 113 rebuilds the Home reading path for daily work: core actions and Today focus are clearer at the top, while mobile still keeps all sections in one readable column.
 The Personal Insights section stays local to the device and only reflects stored tasks, projects, inbox items, journal entries, knowledge items, and wellness checklist state.
 
 ## Personal Manual smoke test

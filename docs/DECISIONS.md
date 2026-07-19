@@ -614,3 +614,11 @@ Navigation is network-first and falls back to the cached shell only when offline
 Settings may ask the browser to update-check its existing Service Worker registration. The result communicates only whether a check could run; it does not claim that a new version exists, force worker activation, clear Cache Storage, or reload an active page.
 
 When a newer worker is ready, the browser activates it through its normal lifecycle after AliOS tabs are closed. This makes version discovery visible while retaining the shell-only cache boundary and preventing a mixed-version session.
+
+## ADR-056: Keep Home visual composition compatible with user layout choices
+
+**Status:** Accepted (Stage 113)
+
+Home may use a more compact daily-workspace hero and place compatible secondary sections side by side on wide screens. The pairing is presentation-only and applies only when two compatible sections remain adjacent in the user’s existing local dashboard order.
+
+This preserves the existing visibility, ordering, collapse preferences, mobile single-column reading path, routes, records, derived calculations, storage, schema, migration, backup, dependency, backend, sync, cloud, AI, telemetry, and automation boundaries.

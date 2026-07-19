@@ -288,6 +288,14 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] TypeScript, automated tests, production build, and the performance guard pass
 - [ ] On the deployed site, use Settings → App update while online, close AliOS tabs, and reopen the app to confirm its normal update lifecycle
 
+### Stage 113 Home real visual redesign
+
+- [x] Home separates its primary daily actions, Today focus, planning context, and operational metrics without changing their local data sources
+- [x] Compatible adjacent sections use balanced desktop rows while every section remains single-column on mobile
+- [x] Dashboard order, visibility, collapse preferences, routes, records, and data behavior remain unchanged
+- [x] TypeScript, automated tests, production build, and the performance guard pass
+- [ ] Manually inspect Home at 360px, 390px, 430px, and desktop width with default and customized dashboard orders
+
 ### Stage 86 performance regression guard
 
 - [x] `pnpm performance:check` builds a manifest and enforces the entry-byte budget, no forms preload, and no Vite chunk-size warning
