@@ -355,6 +355,13 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] Mobile preserves focus, context, and metrics in a readable single-column sequence
 - [ ] Manually inspect populated Home at 360px, 390px, 430px, and desktop width
 
+### Stage 122 Desktop calendar width repair
+
+- [x] Desktop calendar uses a full dashboard row rather than a narrow paired column
+- [x] Calendar/day-details split activates only with enough full-row width
+- [x] Mobile compact week view remains unchanged
+- [ ] Manually inspect populated calendar at desktop width and 360px, 390px, and 430px widths
+
 ### Stage 86 performance regression guard
 
 - [x] `pnpm performance:check` builds a manifest and enforces the entry-byte budget, no forms preload, and no Vite chunk-size warning

@@ -68,7 +68,7 @@ const desktopSectionSpans: Record<HomeDashboardSectionId, string> = {
   wellnessBadminton: "xl:col-span-6",
   routineTemplates: "xl:col-span-6",
   upcomingTasks: "xl:col-span-8",
-  calendar: "xl:col-span-4",
+  calendar: "xl:col-span-12",
   summaryStats: "xl:col-span-12",
   personalInsights: "xl:col-span-12",
   projectsOverview: "xl:col-span-6",

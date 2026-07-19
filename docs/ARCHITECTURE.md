@@ -215,6 +215,12 @@ AliOS does not require a Node.js server in production. Node.js is allowed for de
 - The desktop composition places focus and metrics in the upper row and planning context in a subsequent full-width row; mobile preserves their single-column order
 - No Home layout change writes records or changes routes, repositories, backup content, or storage behavior
 
+## Home Calendar Width Boundary
+
+- The Home calendar retains the same derived Task data and selected-day interaction at every viewport
+- A full desktop dashboard row is reserved before its calendar and day-details regions use a side-by-side layout
+- The responsive layout does not write data or change routing, repositories, backup content, or storage behavior
+
 ## Layering
 
 ```text

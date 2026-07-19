@@ -42,6 +42,7 @@ Stage 118 keeps a stale post-deployment lazy chunk from stranding a mobile route
 Stage 119 keeps immediate task buckets readable in one column and moves this-week/later context into a compact planning surface; all task editing remains in Today.
 Stage 120 makes the seven-day calendar fit 360px, 390px, and 430px widths without horizontal scrolling; its day buttons retain full accessible date labels.
 Stage 121 keeps the Home hero in a single deliberate mobile reading sequence: daily focus, current planning context, then quick metrics.
+Stage 122 leaves the compact mobile calendar unchanged while giving its desktop equivalent dedicated width before any side-by-side day detail is used.
 The Personal Insights section stays local to the device and only reflects stored tasks, projects, inbox items, journal entries, knowledge items, and wellness checklist state.
 
 ## Personal Manual smoke test

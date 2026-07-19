@@ -2,6 +2,11 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 122 - Desktop Calendar Width Repair
+
+- Moved the Home calendar into a full desktop dashboard row so the seven-day workspace never compresses inside a narrow side column
+- Delayed the calendar's internal two-column day-details layout until it has the full wide-screen space required for both regions
+
 ## Stage 121 - Home Hero Composition
 
 - Rebuilt the populated Home hero into a compact focus-and-metrics row, with planning context in its own full-width follow-up row

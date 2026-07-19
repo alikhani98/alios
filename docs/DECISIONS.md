@@ -686,3 +686,11 @@ Desktop Home summary metrics may stretch within their existing hero column to ma
 Home presents daily focus and quick metrics as peers in the upper desktop row. Existing goal and weekly-plan context follows in a full-width row instead of determining a neighbouring metric column's height. On narrow screens the reading order remains focus, planning context, then quick metrics.
 
 This is presentation-only. It changes no record, route, schema, migration, backup, dependency, backend, sync, cloud, AI, telemetry, or automation behavior.
+
+## ADR-065: Reserve full desktop width for Home's calendar workspace
+
+**Status:** Accepted (Stage 122)
+
+The Home calendar uses a full dashboard row on wide screens. Its calendar grid and selected-day details may only split into columns at the same wide breakpoint, avoiding a desktop layout that is technically wide but physically too narrow for seven interactive days.
+
+This is presentation-only. It changes no record, route, schema, migration, backup, dependency, backend, sync, cloud, AI, telemetry, or automation behavior.
