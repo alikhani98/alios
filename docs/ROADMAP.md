@@ -116,6 +116,8 @@ Stage 111 adds a native, dependency-free PWA offline foundation. It caches only 
 
 Stage 112 adds an explicit Settings update check for the existing Service Worker registration. It makes version discovery available without forcing a reload, clearing Cache Storage, or bypassing the browser’s safe activation lifecycle.
 
+Stage 113 is the actual Home visual redesign: it compacts the top reading path around daily work, separates key metrics from context, and uses wide-screen rows for compatible adjacent sections without changing the local dashboard’s visibility or ordering model.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1

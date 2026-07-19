@@ -2,6 +2,11 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 113 - Home Real Visual Redesign
+
+- Rebuilt the Home reading path around a compact daily-workspace hero, distinct operational metrics, and clearer Today, Inbox, and Weekly Review actions
+- Paired compatible secondary sections on wide screens while preserving mobile stacking and each user’s dashboard order
+
 ## Stage 112 - PWA Update Controls
 
 - Added a Settings action that asks the browser to check the existing Service Worker registration for a deployed update
