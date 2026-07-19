@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useStorageAdapter } from "@/core/storage";
 import type { Goal, LifeAreaKey, Project, Task, WeeklyPlan } from "@/shared/types";
 import type { SaveWeeklyPlanInput } from "@/core/repositories";
-import { getWeeklyPlanWeekStart } from "../weeklyPlan";
+import { getPreviousWeeklyPlanWeekStart, getWeeklyPlanWeekStart } from "../weeklyPlan";
 import { clearDueProjectReviewDate } from "@/features/projects/projectReviews";
 
 import {
@@ -36,6 +36,7 @@ export function useWeeklyReview() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [weeklyPlan, setWeeklyPlan] = useState<WeeklyPlan | undefined>();
+  const [previousWeeklyPlan, setPreviousWeeklyPlan] = useState<WeeklyPlan | undefined>();
   const [planningOptions, setPlanningOptions] = useState<{ goals: Goal[]; projects: Project[]; tasks: Task[] }>({ goals: [], projects: [], tasks: [] });
 
   const loadWeeklyReview = useCallback(async () => {
@@ -58,6 +59,7 @@ export function useWeeklyReview() {
         loadedObligations,
         loadedCheckins,
         loadedWeeklyPlan,
+        loadedPreviousWeeklyPlan,
       ] = await Promise.all([
         tasks.list(),
         projects.list(),
@@ -72,6 +74,7 @@ export function useWeeklyReview() {
         finance.listObligations(),
         dailyCheckins.list(),
         weeklyPlans.getByWeekStart(getWeeklyPlanWeekStart(referenceDate)),
+        weeklyPlans.getByWeekStart(getPreviousWeeklyPlanWeekStart(referenceDate)),
       ]);
 
       setSummary(
@@ -94,6 +97,7 @@ export function useWeeklyReview() {
         )
       );
       setWeeklyPlan(loadedWeeklyPlan);
+      setPreviousWeeklyPlan(loadedPreviousWeeklyPlan);
       setPlanningOptions({ goals: loadedGoals, projects: loadedProjects, tasks: loadedTasks });
     } catch (loadError) {
       setError(getErrorMessage(loadError));
@@ -204,6 +208,7 @@ export function useWeeklyReview() {
     markProjectReviewed,
     markDecisionReviewed,
     weeklyPlan,
+    previousWeeklyPlan,
     planningOptions,
     saveWeeklyPlan,
   };

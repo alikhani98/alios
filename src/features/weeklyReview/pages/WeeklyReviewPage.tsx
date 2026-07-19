@@ -57,6 +57,7 @@ import { useWeeklyReview } from "../hooks/useWeeklyReview";
 import { WeeklyPlanForm } from "../components/WeeklyPlanForm";
 import { WeeklyPlanLinks } from "../components/WeeklyPlanLinks";
 import { WeeklyPlanningDashboard } from "../components/WeeklyPlanningDashboard";
+import { WeeklyPlanRetrospective } from "../components/WeeklyPlanRetrospective";
 import { getWeeklyPlanWeekStart } from "../weeklyPlan";
 import { getWeeklyPlanExecution } from "../weeklyPlanExecution";
 import { getWeeklyPlanLinks } from "../weeklyPlanLinks";
@@ -271,6 +272,7 @@ export function WeeklyReviewPage() {
     markProjectReviewed,
     markDecisionReviewed,
     weeklyPlan,
+    previousWeeklyPlan,
     planningOptions,
     saveWeeklyPlan,
   } = useWeeklyReview();
@@ -287,6 +289,14 @@ export function WeeklyReviewPage() {
   const weeklyPlanExecution = useMemo(
     () => getWeeklyPlanExecution(weeklyPlan, planningOptions.goals, planningOptions.projects, planningOptions.tasks),
     [planningOptions.goals, planningOptions.projects, planningOptions.tasks, weeklyPlan]
+  );
+  const previousWeeklyPlanLinks = useMemo(
+    () => getWeeklyPlanLinks(previousWeeklyPlan, planningOptions.goals, planningOptions.projects, planningOptions.tasks),
+    [planningOptions.goals, planningOptions.projects, planningOptions.tasks, previousWeeklyPlan]
+  );
+  const previousWeeklyPlanExecution = useMemo(
+    () => getWeeklyPlanExecution(previousWeeklyPlan, planningOptions.goals, planningOptions.projects, planningOptions.tasks),
+    [planningOptions.goals, planningOptions.projects, planningOptions.tasks, previousWeeklyPlan]
   );
 
   const handleReviewQueueItem = (item: ReviewQueueItem) => {
@@ -526,6 +536,13 @@ export function WeeklyReviewPage() {
             links={weeklyPlanLinks}
             execution={weeklyPlanExecution}
             reviewQueueCount={reviewQueue.length}
+          />
+
+          <WeeklyPlanRetrospective
+            plan={previousWeeklyPlan}
+            links={previousWeeklyPlanLinks}
+            execution={previousWeeklyPlanExecution}
+            weekLabel={previousWeeklyPlan ? formatDate(previousWeeklyPlan.weekStart) : undefined}
           />
 
           <CollapsibleSection
