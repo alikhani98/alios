@@ -136,6 +136,8 @@ Stage 121 replaces the desktop hero's height-coupled columns with a deliberate f
 
 Stage 122 ensures the Home calendar has its own full desktop row before it presents its calendar grid and selected-day detail side by side.
 
+Stage 123 turns the remaining Home hero planning space into an actionable, responsive daily-planning strip instead of leaving an empty surface when planning data is sparse.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1

@@ -694,3 +694,11 @@ This is presentation-only. It changes no record, route, schema, migration, backu
 The Home calendar uses a full dashboard row on wide screens. Its calendar grid and selected-day details may only split into columns at the same wide breakpoint, avoiding a desktop layout that is technically wide but physically too narrow for seven interactive days.
 
 This is presentation-only. It changes no record, route, schema, migration, backup, dependency, backend, sync, cloud, AI, telemetry, or automation behavior.
+
+## ADR-066: Keep every Home hero planning slot actionable
+
+**Status:** Accepted (Stage 123)
+
+The Home daily-planning strip reserves three presentational actions: existing goal/project focus, existing weekly focus, and Inbox quick capture. If a goal or weekly plan is absent, the same slot presents a non-destructive route to the existing Goals or Weekly Review flow rather than leaving visual space unused.
+
+This changes no record, route meaning, schema, migration, backup, dependency, backend, sync, cloud, AI, telemetry, or automation behavior.

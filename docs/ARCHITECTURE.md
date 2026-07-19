@@ -221,6 +221,12 @@ AliOS does not require a Node.js server in production. Node.js is allowed for de
 - A full desktop dashboard row is reserved before its calendar and day-details regions use a side-by-side layout
 - The responsive layout does not write data or change routing, repositories, backup content, or storage behavior
 
+## Home Daily Planning Strip Boundary
+
+- The strip reuses existing derived planning focus and weekly-plan data, plus an existing Inbox navigation route
+- Empty planning data produces a link to the appropriate existing local-first feature; it does not create placeholder records
+- The strip does not change routing semantics, repositories, schemas, backups, or storage behavior
+
 ## Layering
 
 ```text

@@ -211,11 +211,19 @@ export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
           </div>
         </div>
 
-        {(planningFocus || weeklyPlan) ? (
-          <div className="border-t border-primary/10 p-5 sm:p-6">
-            <div className="grid gap-3 lg:grid-cols-2">
+        <div className="border-t border-primary/10 p-5 sm:p-6">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <p className="text-sm font-semibold">{t("home.dailyPlan")}</p>
+              <p className="text-xs leading-6 text-muted-foreground">
+                {t("home.dailyPlanDescription")}
+              </p>
+            </div>
+            <StatusChip tone="neutral">{t("home.localOnlyDashboardPreference")}</StatusChip>
+          </div>
+          <div className="grid gap-3 lg:grid-cols-3">
               {planningFocus ? (
-                <SoftPanel className="space-y-3 border-primary/10 bg-muted/20">
+                <SoftPanel className="flex min-h-48 flex-col space-y-3 border-primary/10 bg-muted/20">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-2 text-sm font-medium">
                     <Target className="h-4 w-4 text-primary" />
@@ -249,10 +257,25 @@ export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
                   ) : null}
                 </div>
                 </SoftPanel>
-              ) : null}
+              ) : (
+                <SoftPanel className="flex min-h-48 flex-col justify-between space-y-3 border-primary/10 bg-muted/20">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-sm font-medium">
+                      <Target className="h-4 w-4 text-primary" />
+                      {t("home.goals")}
+                    </div>
+                    <p className="text-sm leading-7 text-muted-foreground">
+                      {t("home.goalsNoProgress")}
+                    </p>
+                  </div>
+                  <Button asChild size="sm" variant="outline" className="w-full sm:w-auto">
+                    <Link to="/goals">{t("nav.goals")}</Link>
+                  </Button>
+                </SoftPanel>
+              )}
 
               {weeklyPlan ? (
-                <SoftPanel className="space-y-3 border-primary/10 bg-muted/20">
+                <SoftPanel className="flex min-h-48 flex-col space-y-3 border-primary/10 bg-muted/20">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className="text-sm font-medium">{t("weeklyReview.nextFocusLabel")}</p>
                   <Button asChild size="sm" variant="ghost"><Link to="/weekly-review">{t("nav.weeklyReview")}</Link></Button>
@@ -275,10 +298,42 @@ export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
                   </div>
                 ) : null}
                 </SoftPanel>
-              ) : null}
+              ) : (
+                <SoftPanel className="flex min-h-48 flex-col justify-between space-y-3 border-primary/10 bg-muted/20">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-sm font-medium">
+                      <CalendarCheck2 className="h-4 w-4 text-primary" />
+                      {t("weeklyReview.nextFocusLabel")}
+                    </div>
+                    <p className="text-sm leading-7 text-muted-foreground">
+                      {t("weeklyReview.noDataDescription")}
+                    </p>
+                  </div>
+                  <Button asChild size="sm" variant="outline" className="w-full sm:w-auto">
+                    <Link to="/weekly-review">{t("nav.weeklyReview")}</Link>
+                  </Button>
+                </SoftPanel>
+              )}
+
+              <SoftPanel className="flex min-h-48 flex-col justify-between space-y-3 border-primary/10 bg-primary/5">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-sm font-medium">
+                    <Inbox className="h-4 w-4 text-primary" />
+                    {t("inbox.quickCapture")}
+                  </div>
+                  <p className="text-sm leading-7 text-muted-foreground">
+                    {t("home.captureNextActionDescription")}
+                  </p>
+                </div>
+                <Button asChild size="sm" className="w-full sm:w-auto">
+                  <Link to="/inbox">
+                    <Plus className="me-2 h-4 w-4" />
+                    {t("inbox.captureItem")}
+                  </Link>
+                </Button>
+              </SoftPanel>
             </div>
           </div>
-        ) : null}
       </CardContent>
     </PremiumCard>
   );

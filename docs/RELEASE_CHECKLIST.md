@@ -362,6 +362,13 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] Mobile compact week view remains unchanged
 - [ ] Manually inspect populated calendar at desktop width and 360px, 390px, and 430px widths
 
+### Stage 123 Home daily planning strip
+
+- [x] Existing goal focus, weekly focus, and Inbox capture use the full planning area on wide Home layouts
+- [x] Absent goal or weekly-plan data produces an actionable fallback rather than empty space
+- [x] Mobile stacks the same three actions in a readable order
+- [ ] Manually inspect populated and sparse Home data on desktop and 360px, 390px, and 430px widths
+
 ### Stage 86 performance regression guard
 
 - [x] `pnpm performance:check` builds a manifest and enforces the entry-byte budget, no forms preload, and no Vite chunk-size warning
