@@ -2,6 +2,12 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 102 - Planning Execution Clarity
+
+- Made the Weekly Planning Dashboard report execution only from the current plan's existing linked Tasks instead of the wider weekly task pool
+- Added calm empty, active, and completed execution states to the planning handoff in both Weekly Review and Today
+- Preserved review-queue awareness and kept every status derived, local-only, and non-destructive
+
 ## Stage 101 - Integrated Planning Flow
 
 - Added a calm Today handoff for the current weekly focus, its optional intention, and safe Goal / Project destinations

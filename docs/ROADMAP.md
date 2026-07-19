@@ -94,6 +94,8 @@ Stage 100 establishes the Weekly Planning Dashboard as the first reading path in
 
 Stage 101 carries the current weekly focus into Today as a read-only execution handoff. It shows the plan’s focus, optional intention, safe linked destinations, and derived completion from already-linked Tasks; it never edits the plan or automatically creates, schedules, prioritizes, or changes a Task.
 
+Stage 102 makes execution signals honest and comparable across Weekly Review and Today: empty, active, and completed states use only Tasks actually linked through the current Weekly Plan. Broader weekly activity and review-due items remain separate, derived signals.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1

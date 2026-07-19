@@ -16,6 +16,11 @@ export function TodayWeeklyPlanCard({ focus, isLoading }: TodayWeeklyPlanCardPro
   const progress = focus.linkedTaskTotal > 0
     ? (focus.linkedTaskCompleted / focus.linkedTaskTotal) * 100
     : 0;
+  const executionStatus = focus.linkedTaskTotal === 0
+    ? { label: t("weeklyReview.tasksEmptyTitle"), tone: "neutral" as const }
+    : focus.linkedTaskCompleted === focus.linkedTaskTotal
+      ? { label: t("common.completed"), tone: "success" as const }
+      : { label: t("common.active"), tone: "primary" as const };
 
   if (isLoading) {
     return <div className="h-40 animate-pulse rounded-[1.75rem] border bg-muted/60" />;
@@ -78,9 +83,10 @@ export function TodayWeeklyPlanCard({ focus, isLoading }: TodayWeeklyPlanCardPro
         <div className="rounded-2xl border border-primary/10 bg-background/80 p-4">
           <div className="flex items-center justify-between gap-3">
             <p className="text-sm font-semibold">{t("projects.taskProgress")}</p>
-            <StatusChip tone="primary">
-              {focus.linkedTaskCompleted} / {focus.linkedTaskTotal}
-            </StatusChip>
+            <div className="flex flex-wrap justify-end gap-2">
+              <StatusChip tone={executionStatus.tone}>{executionStatus.label}</StatusChip>
+              <StatusChip tone="primary">{focus.linkedTaskCompleted} / {focus.linkedTaskTotal}</StatusChip>
+            </div>
           </div>
           <MiniProgressBar value={progress} label={t("home.completion")} className="mt-4" />
         </div>

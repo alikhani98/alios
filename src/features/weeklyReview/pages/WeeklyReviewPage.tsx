@@ -58,6 +58,7 @@ import { WeeklyPlanForm } from "../components/WeeklyPlanForm";
 import { WeeklyPlanLinks } from "../components/WeeklyPlanLinks";
 import { WeeklyPlanningDashboard } from "../components/WeeklyPlanningDashboard";
 import { getWeeklyPlanWeekStart } from "../weeklyPlan";
+import { getWeeklyPlanExecution } from "../weeklyPlanExecution";
 import { getWeeklyPlanLinks } from "../weeklyPlanLinks";
 import type {
   WeeklyReviewFocusSuggestion,
@@ -281,6 +282,10 @@ export function WeeklyReviewPage() {
   );
   const weeklyPlanLinks = useMemo(
     () => getWeeklyPlanLinks(weeklyPlan, planningOptions.goals, planningOptions.projects, planningOptions.tasks),
+    [planningOptions.goals, planningOptions.projects, planningOptions.tasks, weeklyPlan]
+  );
+  const weeklyPlanExecution = useMemo(
+    () => getWeeklyPlanExecution(weeklyPlan, planningOptions.goals, planningOptions.projects, planningOptions.tasks),
     [planningOptions.goals, planningOptions.projects, planningOptions.tasks, weeklyPlan]
   );
 
@@ -519,7 +524,7 @@ export function WeeklyReviewPage() {
           <WeeklyPlanningDashboard
             plan={weeklyPlan}
             links={weeklyPlanLinks}
-            summary={summary}
+            execution={weeklyPlanExecution}
             reviewQueueCount={reviewQueue.length}
           />
 
