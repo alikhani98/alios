@@ -32,6 +32,7 @@ AliOS 1.0 is a local-first static web app.
 - Compatible Home sections may share a desktop row only when adjacent in the user’s already-persisted dashboard order; narrow screens remain single-column
 - The Home command center may make one existing Today focus visually dominant and default lower-priority collapsible sections to closed only when no collapse preference has been stored; explicit local user choices always win
 - On wide screens, Home may assign presentational grid spans by section role while preserving the user’s local section order and visibility; narrow screens remain single-column
+- Home may group non-daily panels behind a local, session-only expandable surface to make the initial dashboard a bounded daily workspace; the grouping does not alter stored section preferences or data
 
 ## Core Page Presentation Boundary
 

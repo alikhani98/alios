@@ -2,6 +2,11 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 116 - Home Visual Reset
+
+- Reframed Home around a focused daily workspace and moved supporting panels behind one intentional expandable surface
+- Increased shared desktop reading scale through wider page bounds, larger shell dimensions, and calmer content spacing without changing data behavior
+
 ## Stage 115 - Home Visual System
 
 - Replaced the sequence of wide Home panels with a deliberate 12-column desktop grid while retaining the existing single-column mobile reading path

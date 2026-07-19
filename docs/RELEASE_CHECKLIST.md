@@ -311,6 +311,14 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] TypeScript, automated tests, and the production build pass
 - [ ] Manually inspect Home at 360px, 390px, 430px, and desktop width with customized section orders
 
+### Stage 116 Home visual reset
+
+- [x] Home opens as a bounded daily workspace and does not render all supporting panels in the initial view
+- [x] Supporting panels remain available through a labeled session-only expansion, with existing section preferences intact
+- [x] Shared shell and page scale use existing tokens and remain responsive without a new dependency
+- [x] TypeScript, automated tests, and the production build pass
+- [ ] Manually inspect Home at 360px, 390px, 430px, and desktop width with both expanded and collapsed supporting panels
+
 ### Stage 86 performance regression guard
 
 - [x] `pnpm performance:check` builds a manifest and enforces the entry-byte budget, no forms preload, and no Vite chunk-size warning

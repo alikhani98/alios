@@ -131,7 +131,7 @@
   }
 
   .alios-page {
-    @apply mx-auto w-full max-w-[88rem] px-3 py-4 sm:px-5 sm:py-6 lg:px-6 lg:py-8;
+    @apply mx-auto w-full max-w-[96rem] px-4 py-5 sm:px-6 sm:py-7 lg:px-8 lg:py-9 2xl:px-10;
   }
 
   .alios-page-header {

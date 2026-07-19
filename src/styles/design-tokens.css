@@ -1,9 +1,9 @@
 :root {
-  --alios-sidebar-width: 16rem;
-  --alios-topbar-height: 4rem;
+  --alios-sidebar-width: 17rem;
+  --alios-topbar-height: 4.5rem;
 
-  --alios-page-padding-x: 1.5rem;
-  --alios-page-padding-y: 1.5rem;
+  --alios-page-padding-x: 2rem;
+  --alios-page-padding-y: 2rem;
 
   --alios-card-padding: 1rem;
   --alios-section-gap: 1.5rem;

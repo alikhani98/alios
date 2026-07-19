@@ -638,3 +638,11 @@ The default applies only when no collapsed-section preference exists in local st
 Home may map its existing sections to stable desktop grid spans so daily work, calendar context, routines, and reference panels do not all compete as full-width cards. This mapping is visual only; it neither changes the stored dashboard order nor computes a new priority.
 
 Every section remains available through the user’s existing visibility and collapse preferences, and narrow screens keep a single-column flow. The stage adds no record, route, schema, migration, backup change, dependency, backend, sync, cloud, AI, telemetry, or automation.
+
+## ADR-059: Bound Home’s initial workspace without hiding information
+
+**Status:** Accepted (Stage 116)
+
+Home may show its daily command center, routine prompt, upcoming work, calendar, and personal insights as the initial workspace, with all other existing visible panels inside a single session-only expandable surface. The grouping reduces visual overload but does not change dashboard visibility, ordering, collapse preferences, or any stored record.
+
+Page and shell dimensions may be adjusted through existing design tokens and shared layout styles to improve reading scale. The stage adds no route, schema, migration, backup change, dependency, backend, sync, cloud, AI, telemetry, or automation.
