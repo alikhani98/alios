@@ -9,6 +9,7 @@ import {
   Moon,
   MonitorSmartphone,
   RotateCcw,
+  RefreshCw,
   ShieldCheck,
   SlidersHorizontal,
   Sunrise,
@@ -57,6 +58,7 @@ import { createBackupPreview } from "../backupPreview";
 import { useBackupRestore } from "../hooks/useBackupRestore";
 import { useLocalDataManagement } from "../hooks/useLocalDataManagement";
 import type { BackupStatusFreshness } from "@/shared/preferences";
+import { checkForServiceWorkerUpdate, type ServiceWorkerUpdateResult } from "@/shared/pwa";
 
 type CountItemProps = { label: string; value: number };
 
@@ -197,6 +199,9 @@ export function SettingsPage() {
   const [homeLayoutResetMessage, setHomeLayoutResetMessage] = useState<
     string | null
   >(null);
+  const [pwaUpdateStatus, setPwaUpdateStatus] = useState<
+    ServiceWorkerUpdateResult | "checking" | null
+  >(null);
   const dataManagement = useLocalDataManagement();
   const backup = useBackupRestore(dataManagement.loadSummary);
   const restorePreview = backup.pendingBackup
@@ -222,6 +227,11 @@ export function SettingsPage() {
       behavior: "smooth",
       block: "start",
     });
+  };
+
+  const handleCheckForUpdate = async () => {
+    setPwaUpdateStatus("checking");
+    setPwaUpdateStatus(await checkForServiceWorkerUpdate());
   };
 
   return (
@@ -781,6 +791,48 @@ export function SettingsPage() {
           <InfoItem label={t("settings.storage")} value={t("settings.indexedDb")} />
           <InfoItem label={t("settings.backend")} value={t("settings.none")} />
           <InfoItem label={t("settings.ai")} value={t("settings.aiDisabled")} />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <RefreshCw className="h-5 w-5 text-primary" />
+            {t("settings.pwaUpdateTitle")}
+          </CardTitle>
+          <CardDescription>{t("settings.pwaUpdateDescription")}</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm leading-7 text-muted-foreground">
+            {t("settings.pwaUpdateLifecycleNote")}
+          </p>
+          {pwaUpdateStatus ? (
+            <p role="status" className="rounded-xl border bg-muted/30 px-4 py-3 text-sm text-muted-foreground">
+              {t(
+                pwaUpdateStatus === "checking"
+                  ? "settings.pwaUpdateChecking"
+                  : pwaUpdateStatus === "checked"
+                    ? "settings.pwaUpdateChecked"
+                    : pwaUpdateStatus === "notRegistered"
+                      ? "settings.pwaUpdateNotRegistered"
+                      : pwaUpdateStatus === "unsupported"
+                        ? "settings.pwaUpdateUnsupported"
+                        : "settings.pwaUpdateFailed"
+              )}
+            </p>
+          ) : null}
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full sm:w-auto"
+            disabled={pwaUpdateStatus === "checking"}
+            onClick={() => void handleCheckForUpdate()}
+          >
+            <RefreshCw className="me-2 h-4 w-4" />
+            {pwaUpdateStatus === "checking"
+              ? t("settings.pwaUpdateChecking")
+              : t("settings.pwaUpdateAction")}
+          </Button>
         </CardContent>
       </Card>
 

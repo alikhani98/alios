@@ -208,6 +208,8 @@ The expected GitHub Pages URL is `https://alikhani98.github.io/alios/` after Pag
 
 Installation behavior varies by browser and platform. AliOS now registers a native Service Worker on deployed sites: after one normal online revisit, its static shell and loaded same-origin assets can reopen offline. User records remain in IndexedDB and are never cached as files. The first offline launch is not supported, and a new deployed version activates through the browser’s normal lifecycle rather than forcing a mid-session refresh.
 
+To check for a new deployed version, open **Settings → App update → Check for update** while online. The check does not reload an active page. If it reports completion, close AliOS tabs and open the app again so the browser can activate any ready update safely.
+
 ## Device-local data
 
 AliOS stores data in IndexedDB for the current browser, device, and site origin.

@@ -153,6 +153,7 @@ AliOS 1.0 is a local-first static web app.
 - The native Service Worker caches only the static application shell and same-origin static assets after a normal online visit; IndexedDB records remain outside Cache Storage
 - Navigation uses network-first behavior with the cached shell only as an offline fallback, while versioned assets use cache-first behavior after they have been loaded
 - The worker does not force activation, perform background sync, send notifications, cache remote requests, or change backup, restore, routing, or local-data behavior
+- Settings may request the browser to check the existing Service Worker registration for an update, but it never forces activation or reloads an active page
 
 ## Recovery Mode / Safe Mode Boundary
 
