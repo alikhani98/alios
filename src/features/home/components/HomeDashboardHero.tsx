@@ -117,26 +117,14 @@ export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
   return (
     <PremiumCard className="overflow-hidden border-primary/20 bg-card shadow-sm">
       <CardContent className="p-0">
-        <div className="flex flex-col gap-3 border-b border-primary/10 bg-muted/30 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <div className="min-w-0 space-y-1">
-            <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-muted-foreground">
-              <Sparkles className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
-              <span>{formatDate(new Date())}</span>
-            </div>
-            <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-              {t("home.title")}
-            </h2>
-          </div>
-          {actions ? <div className="flex flex-wrap gap-2">{actions}</div> : null}
-        </div>
-
         <div className="grid xl:grid-cols-[minmax(0,1.2fr)_minmax(19rem,0.8fr)]">
           <div className="border-b border-primary/10 p-5 sm:p-6 xl:border-b-0 xl:border-e">
             <div className="rounded-[1.75rem] bg-primary p-5 text-primary-foreground shadow-sm sm:p-6">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="space-y-1">
-                  <p className="text-xs font-semibold text-primary-foreground/75">
-                    {t("home.todayOverview")}
+                  <p className="flex items-center gap-2 text-xs font-semibold text-primary-foreground/75">
+                    <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
+                    {formatDate(new Date())}
                   </p>
                   <p className="text-base font-semibold">{t("home.mit")}</p>
                 </div>
@@ -183,6 +171,7 @@ export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
                   </Link>
                 </Button>
               </div>
+              {actions ? <div className="mt-3 flex flex-wrap gap-2">{actions}</div> : null}
             </div>
 
             <div className="mt-4 grid gap-3 lg:grid-cols-2">

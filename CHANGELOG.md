@@ -2,6 +2,11 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 117 - Home Action Workspace
+
+- Replaced the default month-first calendar with a compact seven-day workspace; the complete month remains available on demand
+- Reduced Personal Insights to three operational KPIs, with supporting signals explicitly expandable, and removed the repeated Home title surface
+
 ## Stage 116 - Home Visual Reset
 
 - Reframed Home around a focused daily workspace and moved supporting panels behind one intentional expandable surface

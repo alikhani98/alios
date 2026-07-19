@@ -646,3 +646,11 @@ Every section remains available through the user’s existing visibility and col
 Home may show its daily command center, routine prompt, upcoming work, calendar, and personal insights as the initial workspace, with all other existing visible panels inside a single session-only expandable surface. The grouping reduces visual overload but does not change dashboard visibility, ordering, collapse preferences, or any stored record.
 
 Page and shell dimensions may be adjusted through existing design tokens and shared layout styles to improve reading scale. The stage adds no route, schema, migration, backup change, dependency, backend, sync, cloud, AI, telemetry, or automation.
+
+## ADR-060: Prefer immediate weekly context over an expanded month grid
+
+**Status:** Accepted (Stage 117)
+
+Home opens its existing calendar as a compact seven-day view and reveals the existing full month only after an explicit local switch. This reduces first-view height without removing date selection, task summaries, or the full calendar capability.
+
+Personal Insights starts with the three operational signals most useful for daily work and reveals supporting signals only after an explicit local expansion. Neither switch is persisted or changes any record, route, schema, migration, backup, dependency, backend, sync, cloud, AI, telemetry, or automation.
