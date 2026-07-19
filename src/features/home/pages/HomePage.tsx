@@ -4,6 +4,8 @@ import {
   BookOpenText,
   Brain,
   CalendarCheck2,
+  ChevronDown,
+  ChevronUp,
   FolderKanban,
   Inbox,
   Target,
@@ -63,8 +65,8 @@ const desktopSectionSpans: Record<HomeDashboardSectionId, string> = {
   routineNudge: "xl:col-span-12",
   wellnessBadminton: "xl:col-span-6",
   routineTemplates: "xl:col-span-6",
-  upcomingTasks: "xl:col-span-7",
-  calendar: "xl:col-span-5",
+  upcomingTasks: "xl:col-span-8",
+  calendar: "xl:col-span-4",
   summaryStats: "xl:col-span-12",
   personalInsights: "xl:col-span-12",
   projectsOverview: "xl:col-span-6",
@@ -73,6 +75,14 @@ const desktopSectionSpans: Record<HomeDashboardSectionId, string> = {
   manualOverview: "xl:col-span-6",
   quickActions: "xl:col-span-12",
 };
+
+const primaryDashboardSectionIds = new Set<HomeDashboardSectionId>([
+  "emptyState",
+  "routineNudge",
+  "upcomingTasks",
+  "calendar",
+  "personalInsights",
+]);
 
 type SummaryCardProps = {
   icon: ReactNode;
@@ -105,6 +115,7 @@ export function HomePage() {
   const { isSectionCollapsed, setSectionOpen } = useHomeCollapsedSections();
   const [selectedRoutineTemplateId, setSelectedRoutineTemplateId] =
     useState<RoutineTemplateId | null>(null);
+  const [secondarySectionsOpen, setSecondarySectionsOpen] = useState(false);
 
   const visibleSectionIds = getVisibleDashboardSections(layout);
   const showBackupReminder =
@@ -402,6 +413,12 @@ export function HomePage() {
   const dashboardSections = renderedSections.filter(
     (section) => section.sectionId !== "hero"
   );
+  const primaryDashboardSections = dashboardSections.filter((section) =>
+    primaryDashboardSectionIds.has(section.sectionId)
+  );
+  const secondaryDashboardSections = dashboardSections.filter(
+    (section) => !primaryDashboardSectionIds.has(section.sectionId)
+  );
 
   return (
     <section className="alios-page space-y-5 lg:space-y-6">
@@ -472,16 +489,68 @@ export function HomePage() {
       ) : data ? (
         <>
           {heroSection?.content ?? null}
-          <div className="grid min-w-0 gap-5 xl:grid-cols-12 xl:items-start">
-            {dashboardSections.map((section) => (
-              <div
-                key={section.sectionId}
-                className={`min-w-0 ${desktopSectionSpans[section.sectionId]}`}
-              >
-                {section.content}
+          <section className="space-y-4 sm:space-y-5" aria-label={t("home.todayOverview")}>
+            <div className="flex flex-col gap-1 px-1 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="text-lg font-semibold tracking-tight sm:text-xl">
+                  {t("home.todayOverview")}
+                </p>
+                <p className="text-sm leading-6 text-muted-foreground">
+                  {t("home.primaryDashboardDescription")}
+                </p>
               </div>
-            ))}
-          </div>
+            </div>
+            <div className="grid min-w-0 gap-5 xl:grid-cols-12 xl:items-start">
+              {primaryDashboardSections.map((section) => (
+                <div
+                  key={section.sectionId}
+                  className={`min-w-0 ${desktopSectionSpans[section.sectionId]}`}
+                >
+                  {section.content}
+                </div>
+              ))}
+            </div>
+          </section>
+          {secondaryDashboardSections.length ? (
+            <Card className="overflow-hidden border-primary/15 bg-card shadow-sm">
+              <CardHeader className="gap-4 border-b border-primary/10 bg-muted/20 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+                <div className="min-w-0 space-y-1">
+                  <CardTitle className="text-lg">{t("home.moreDashboard")}</CardTitle>
+                  <CardDescription>{t("home.moreDashboardDescription")}</CardDescription>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="min-h-11 w-full sm:w-auto"
+                  onClick={() => setSecondarySectionsOpen((currentValue) => !currentValue)}
+                  aria-expanded={secondarySectionsOpen}
+                >
+                  {secondarySectionsOpen
+                    ? t("common.collapseSection")
+                    : t("common.expandSection")}
+                  {secondarySectionsOpen ? (
+                    <ChevronUp className="ms-2 h-4 w-4" aria-hidden="true" />
+                  ) : (
+                    <ChevronDown className="ms-2 h-4 w-4" aria-hidden="true" />
+                  )}
+                </Button>
+              </CardHeader>
+              {secondarySectionsOpen ? (
+                <CardContent className="p-4 sm:p-6">
+                  <div className="grid min-w-0 gap-5 xl:grid-cols-12 xl:items-start">
+                    {secondaryDashboardSections.map((section) => (
+                      <div
+                        key={section.sectionId}
+                        className={`min-w-0 ${desktopSectionSpans[section.sectionId]}`}
+                      >
+                        {section.content}
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              ) : null}
+            </Card>
+          ) : null}
         </>
       ) : null}
     </section>

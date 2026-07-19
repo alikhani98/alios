@@ -36,6 +36,7 @@ Stage 110 records the final installed-mode, launch, mobile viewport, and desktop
 Stage 113 rebuilds the Home reading path for daily work: core actions and Today focus are clearer at the top, while mobile still keeps all sections in one readable column.
 Stage 114 makes the Home entry point a compact command center: the existing daily focus and Today action appear first, and lower-priority sections begin collapsed only until the user chooses otherwise.
 Stage 115 keeps that hierarchy on desktop with a role-based grid while preserving the same single-column readable order on 360px, 390px, and 430px screens.
+Stage 116 keeps first-run Home compact on mobile by placing supporting panels behind one explicit expansion without removing any local information or changing the existing section controls.
 The Personal Insights section stays local to the device and only reflects stored tasks, projects, inbox items, journal entries, knowledge items, and wellness checklist state.
 
 ## Personal Manual smoke test
