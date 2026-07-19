@@ -21,7 +21,7 @@ export function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) {
         "sticky top-0 hidden h-dvh shrink-0 p-2 transition-all duration-300 ease-in-out motion-reduce:transition-none md:flex md:flex-col",
         aliosSurfaceMotion,
         direction === "rtl" ? "md:border-l" : "md:border-r",
-        collapsed ? "md:w-[5.25rem]" : "md:w-72"
+        collapsed ? "md:w-[5.25rem]" : "md:w-[var(--alios-sidebar-width)]"
       )}
     >
       <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-[2rem] border bg-card/85 shadow-[0_18px_50px_-24px_rgba(15,23,42,0.35)] backdrop-blur-xl">

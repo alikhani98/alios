@@ -143,6 +143,7 @@ AliOS 1.0 is a local-first static web app.
 ## App Error Boundary / Local Error Log Boundary
 
 - Route-content error handling may catch render-time failures inside the app shell so the sidebar and topbar can stay available
+- The desktop Sidebar and Topbar consume the canonical layout-width and layout-height tokens; feature pages do not own shell density
 - Error fallback UI stays calm, bilingual, and local-only, and it does not send telemetry or expose stack traces by default
 - Recent error summaries may be stored only in browser localStorage, capped to a small bounded list, and used only for local review or copy actions
 - The error boundary and error log stay separate from Dexie, backup export, backup restore, backend, sync, cloud, AI, and new dependencies
