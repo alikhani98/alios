@@ -654,3 +654,11 @@ Page and shell dimensions may be adjusted through existing design tokens and sha
 Home opens its existing calendar as a compact seven-day view and reveals the existing full month only after an explicit local switch. This reduces first-view height without removing date selection, task summaries, or the full calendar capability.
 
 Personal Insights starts with the three operational signals most useful for daily work and reveals supporting signals only after an explicit local expansion. Neither switch is persisted or changes any record, route, schema, migration, backup, dependency, backend, sync, cloud, AI, telemetry, or automation.
+
+## ADR-061: Recover stale static lazy chunks once without removing code splitting
+
+**Status:** Accepted (Stage 118)
+
+AliOS keeps route-level lazy loading. When a browser requests a removed hashed module after a static deployment, the shared lazy loader may reload the same canonical route once through a cache-busting URL. A session-only marker prevents a second automatic reload; if loading still fails, the existing local error boundary remains the safe recovery surface.
+
+This avoids globally disabling code splitting or clearing user data for a temporary deployment-cache mismatch. The recovery changes no record, route meaning, storage schema, backup, dependency, backend, sync, cloud, AI, telemetry, or automation behavior.

@@ -10,7 +10,6 @@ import {
   UserCircle,
 } from "lucide-react";
 import {
-  lazy,
   Suspense,
   FormEvent,
   useEffect,
@@ -26,6 +25,7 @@ import {
 import { appConfig } from "@/shared/constants/app";
 import { usePersistentString } from "@/shared/hooks/usePersistentString";
 import { useI18n } from "@/shared/i18n";
+import { lazyWithRetry } from "@/shared/runtime/lazyWithRetry";
 import {
   getAccentColorThemeVariables,
   useAccentColorPreference,
@@ -47,7 +47,7 @@ import { useHomeDashboardLayout } from "@/features/home/hooks/useHomeDashboardLa
 
 type ActivePanel = "dashboard" | "theme" | "profile" | null;
 
-const HomeDashboardCustomizer = lazy(() =>
+const HomeDashboardCustomizer = lazyWithRetry(() =>
   import("@/features/home/components/HomeDashboardCustomizer").then((module) => ({
     default: module.HomeDashboardCustomizer,
   }))

@@ -126,6 +126,8 @@ Stage 116 resets the first-view experience: Home opens as a bounded daily worksp
 
 Stage 117 makes the workspace actionable: a compact week replaces the tall month-first calendar, and Personal Insights begins with only the three signals needed for daily orientation.
 
+Stage 118 protects the static deployment boundary: a stale route chunk gets one cache-busting reload, while the Home backup reminder stays compact enough to preserve the daily-work hierarchy.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1

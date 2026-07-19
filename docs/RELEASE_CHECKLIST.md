@@ -327,6 +327,14 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] TypeScript, automated tests, and the production build pass
 - [ ] Manually inspect weekly/month calendar switching and insight-detail expansion at 360px, 390px, 430px, and desktop width
 
+### Stage 118 deployment recovery and compact Home reminder
+
+- [x] Stale dynamic-import failures reload the same canonical route at most once through a cache-busting URL
+- [x] A repeated failure leaves the existing local error boundary available and does not clear data or browser caches
+- [x] Home backup reminder uses shared UI primitives and preserves a compact action-first reading path on narrow and wide screens
+- [x] TypeScript, focused automated tests, and the production build pass
+- [ ] After a deployed update, test one existing tab and one newly opened tab on desktop and mobile; confirm a stale lazy chunk either recovers once or shows the local error fallback without looping
+
 ### Stage 86 performance regression guard
 
 - [x] `pnpm performance:check` builds a manifest and enforces the entry-byte budget, no forms preload, and no Vite chunk-size warning

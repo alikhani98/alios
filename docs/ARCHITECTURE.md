@@ -200,6 +200,13 @@ AliOS does not require a Node.js server in production. Node.js is allowed for de
 - Bootstrap failures may append a bounded summary to the existing local error log, but they do not send telemetry, display stack traces, delete data, or bypass the storage-adapter boundary
 - Shared shell code uses direct imports for small utilities and preferences when a barrel would pull schemas or feature-only modules into the entry path; build chunking and measured release checks are defined in [`PERFORMANCE.md`](./PERFORMANCE.md)
 
+## Static Deployment Lazy-Import Recovery Boundary
+
+- Route-level code splitting remains enabled for initial-load performance on static hosting
+- If a browser holds an obsolete HTML entry and requests a removed hashed lazy chunk, the shared loader may replace the URL once with a cache-busting query parameter
+- The retry marker is session-only, keyed to the canonical route, and prevents an automatic reload loop; a second failure is handled by the existing local error boundary
+- The recovery does not clear IndexedDB, local preferences, Cache Storage, or Service Worker state and does not send error data anywhere
+
 ## Layering
 
 ```text
