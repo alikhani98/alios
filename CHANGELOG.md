@@ -2,6 +2,12 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 103 - Planned Task Execution Handoff
+
+- Made a directly selected Weekly Plan Task visible in Today even when it is not due on the current date
+- Kept the planned Task clearly separated from Today’s date-bound task list, with direct user-controlled status, edit, and delete actions
+- Preserved Today’s MIT boundary: an out-of-date planned Task is never promoted to MIT from this handoff
+
 ## Stage 102 - Planning Execution Clarity
 
 - Made the Weekly Planning Dashboard report execution only from the current plan's existing linked Tasks instead of the wider weekly task pool

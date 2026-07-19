@@ -96,6 +96,8 @@ Stage 101 carries the current weekly focus into Today as a read-only execution h
 
 Stage 102 makes execution signals honest and comparable across Weekly Review and Today: empty, active, and completed states use only Tasks actually linked through the current Weekly Plan. Broader weekly activity and review-due items remain separate, derived signals.
 
+Stage 103 closes the last direct-plan execution gap by showing a selected Weekly Plan Task in Today even when its date is not today. It remains a separate contextual card, never changes its date automatically, and does not expose MIT promotion for that cross-date handoff.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1

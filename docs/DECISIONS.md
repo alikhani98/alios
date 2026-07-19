@@ -542,3 +542,11 @@ This handoff never creates a Task, changes Task state, writes a plan, stores a c
 The Weekly Planning Dashboard and Today handoff may show an empty, active, or completed execution state, but their task totals must be derived only from Tasks reached through the current plan's available Goal, Project, or direct Task reference. General weekly activity and the review queue remain distinct signals.
 
 This avoids representing unrelated activity as progress on a user-authored focus. The state is computed in memory and never changes a Task, Weekly Plan, review record, schedule, priority, schema, migration, backup, route, backend, sync, cloud, AI, telemetry, or dependency.
+
+## ADR-047: Keep planned-task handoff contextual, not rescheduled
+
+**Status:** Accepted (Stage 103)
+
+When a Weekly Plan explicitly selects a Task whose due date is not today, Today may display that existing Task in a separate planning-context card. It is not inserted into the date-bound Today list, and URL focus may scroll to this card rather than reporting that the Task is invisible.
+
+Any status, edit, or delete action remains explicit. The handoff never changes the Task's due date, creates a Task, writes the Weekly Plan, persists a roll-up, or exposes MIT selection for an out-of-date Task. It adds no schema, migration, backup change, route, backend, sync, cloud, AI, telemetry, or dependency.

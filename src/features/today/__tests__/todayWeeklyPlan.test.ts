@@ -2,7 +2,11 @@ import { describe, expect, it } from "vitest";
 
 import type { Goal, Project, Task, WeeklyPlan } from "@/shared/types";
 
-import { getTodayWeekStart, getTodayWeeklyPlanFocus } from "../todayWeeklyPlan";
+import {
+  getPlannedTaskOutsideToday,
+  getTodayWeekStart,
+  getTodayWeeklyPlanFocus,
+} from "../todayWeeklyPlan";
 
 const timestamp = "2026-07-18T08:00:00.000Z";
 const goal: Goal = { id: "goal", title: "Goal", description: "", area: "personal", timeframe: "month", status: "active", importance: "medium", progressPercent: 0, tags: [], createdAt: timestamp, updatedAt: timestamp };
@@ -29,5 +33,12 @@ describe("today weekly plan focus", () => {
 
   it("keeps an empty week calm and does not invent a plan", () => {
     expect(getTodayWeeklyPlanFocus(undefined, [], [], [])).toEqual({ linkedTaskTotal: 0, linkedTaskCompleted: 0 });
+  });
+
+  it("surfaces a directly planned task outside Today without changing its date", () => {
+    const focus = getTodayWeeklyPlanFocus(plan, [goal], [project], [{ ...task, dueDate: "2026-07-20" }]);
+
+    expect(getPlannedTaskOutsideToday(focus, "2026-07-19")).toMatchObject({ id: task.id, dueDate: "2026-07-20" });
+    expect(getPlannedTaskOutsideToday(focus, "2026-07-20")).toBeUndefined();
   });
 });
