@@ -6,6 +6,7 @@ import {
   readStoredHomeCollapsedSectionIds,
   writeStoredHomeCollapsedSectionIds,
 } from "../homeCollapsedSections";
+import { getDefaultHomeCollapsedSectionIds } from "../hooks/useHomeCollapsedSections";
 
 describe("home collapsed section helpers", () => {
   afterEach(() => {
@@ -23,9 +24,24 @@ describe("home collapsed section helpers", () => {
     ).toEqual(["calendar", "quickActions"]);
   });
 
-  it("defaults to open when the stored value is missing or invalid", () => {
+  it("returns no stored preference when the stored value is missing or invalid", () => {
     expect(normalizeHomeCollapsedSectionIds("not-an-array")).toEqual([]);
     expect(readStoredHomeCollapsedSectionIds()).toBeNull();
+  });
+
+  it("keeps the daily workflow open while secondary sections start collapsed", () => {
+    expect(getDefaultHomeCollapsedSectionIds()).toEqual([
+      "wellnessBadminton",
+      "routineTemplates",
+      "calendar",
+      "summaryStats",
+      "personalInsights",
+      "projectsOverview",
+      "journalOverview",
+      "knowledgeOverview",
+      "manualOverview",
+      "quickActions",
+    ]);
   });
 
   it("ignores localStorage failures safely", () => {

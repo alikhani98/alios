@@ -30,6 +30,7 @@ AliOS 1.0 is a local-first static web app.
 - The Home hero’s direct actions navigate to existing routes; it does not create records, infer priorities, or mutate the current plan
 - Compact secondary metrics may summarize existing local data, but they must not replace the feature-level source of truth or add persisted dashboard state
 - Compatible Home sections may share a desktop row only when adjacent in the user’s already-persisted dashboard order; narrow screens remain single-column
+- The Home command center may make one existing Today focus visually dominant and default lower-priority collapsible sections to closed only when no collapse preference has been stored; explicit local user choices always win
 
 ## Core Page Presentation Boundary
 

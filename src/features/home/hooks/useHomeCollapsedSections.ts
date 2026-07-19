@@ -9,8 +9,19 @@ import {
   type HomeCollapsibleSectionId,
 } from "../homeCollapsedSections";
 
-function getDefaultHomeCollapsedSectionIds(): HomeCollapsibleSectionId[] {
-  return [];
+export function getDefaultHomeCollapsedSectionIds(): HomeCollapsibleSectionId[] {
+  return [
+    "wellnessBadminton",
+    "routineTemplates",
+    "calendar",
+    "summaryStats",
+    "personalInsights",
+    "projectsOverview",
+    "journalOverview",
+    "knowledgeOverview",
+    "manualOverview",
+    "quickActions",
+  ];
 }
 
 function readCollapsedSections(): HomeCollapsibleSectionId[] {
@@ -79,8 +90,9 @@ export function useHomeCollapsedSections() {
   );
 
   const resetCollapsedSections = useCallback(() => {
-    setCollapsedSectionIds(getDefaultHomeCollapsedSectionIds());
-    writeStoredHomeCollapsedSectionIds([]);
+    const defaultSectionIds = getDefaultHomeCollapsedSectionIds();
+    setCollapsedSectionIds(defaultSectionIds);
+    writeStoredHomeCollapsedSectionIds(defaultSectionIds);
     window.dispatchEvent(new Event(LOCAL_PREFERENCE_CHANGE_EVENT));
   }, []);
 

@@ -13,7 +13,6 @@ import { useDateFormatter } from "@/shared/date";
 import { useI18n } from "@/shared/i18n";
 import {
   Badge,
-  MetricCard,
   MiniProgressBar,
   PremiumCard,
   SoftPanel,
@@ -116,83 +115,77 @@ export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
   ];
 
   return (
-    <PremiumCard className="border-primary/15 bg-gradient-to-br from-primary/10 via-background to-background shadow-sm">
-      <CardContent className="relative p-5 sm:p-6 lg:p-7">
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
-        <div className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-primary/10 blur-3xl" />
-        <div className="absolute -bottom-24 left-0 h-56 w-56 rounded-full bg-secondary/40 blur-3xl" />
-
-        <div className="relative grid gap-5 xl:grid-cols-[minmax(0,1.1fr)_minmax(20rem,0.9fr)] xl:items-start">
-          <div className="space-y-5">
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="inline-flex items-center gap-2 rounded-full border bg-background/80 px-3 py-1 text-xs font-medium text-muted-foreground shadow-sm backdrop-blur">
-                <Sparkles className="h-3.5 w-3.5 text-primary" />
-                {formatDate(new Date())}
-              </div>
-              {actions ? <div className="flex flex-wrap gap-2">{actions}</div> : null}
+    <PremiumCard className="overflow-hidden border-primary/20 bg-card shadow-sm">
+      <CardContent className="p-0">
+        <div className="flex flex-col gap-3 border-b border-primary/10 bg-muted/30 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+          <div className="min-w-0 space-y-1">
+            <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-muted-foreground">
+              <Sparkles className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+              <span>{formatDate(new Date())}</span>
             </div>
+            <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+              {t("home.title")}
+            </h2>
+          </div>
+          {actions ? <div className="flex flex-wrap gap-2">{actions}</div> : null}
+        </div>
 
-            <div className="max-w-2xl space-y-2">
-              <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-                {t("home.title")}
-              </h2>
-              <p className="max-w-xl text-sm leading-6 text-muted-foreground">
-                {t("home.description")}
-              </p>
-            </div>
-
-            <div className="flex flex-wrap gap-2" aria-label={t("home.quickActions")}>
-              <Button asChild className="min-h-11 w-full sm:w-auto">
-                <Link to="/today">
-                  <CalendarCheck2 className="me-2 h-4 w-4" />
-                  {t("home.goToday")}
-                </Link>
-              </Button>
-              <Button asChild variant="outline" className="min-h-11 w-full sm:w-auto">
-                <Link to="/inbox">
-                  <Plus className="me-2 h-4 w-4" />
-                  {t("nav.inbox")}
-                </Link>
-              </Button>
-              <Button asChild variant="ghost" className="min-h-11 w-full sm:w-auto">
-                <Link to="/weekly-review">
-                  {t("nav.weeklyReview")}
-                  <ArrowUpLeft className="ms-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
-
-            <SoftPanel className="space-y-3 border-primary/10 bg-background/85">
+        <div className="grid xl:grid-cols-[minmax(0,1.2fr)_minmax(19rem,0.8fr)]">
+          <div className="border-b border-primary/10 p-5 sm:p-6 xl:border-b-0 xl:border-e">
+            <div className="rounded-[1.75rem] bg-primary p-5 text-primary-foreground shadow-sm sm:p-6">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="space-y-1">
-                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                  <p className="text-xs font-semibold text-primary-foreground/75">
                     {t("home.todayOverview")}
                   </p>
-                  <p className="text-sm font-medium">{t("home.mit")}</p>
+                  <p className="text-base font-semibold">{t("home.mit")}</p>
                 </div>
-                <Badge variant={data.today.checkin ? "secondary" : "outline"}>
+                <Badge
+                  className="border-primary-foreground/20 bg-primary-foreground/15 text-primary-foreground hover:bg-primary-foreground/15"
+                  variant="outline"
+                >
                   {completedCount} / {todayCount}
                 </Badge>
               </div>
 
-              <p className="text-sm leading-7 text-muted-foreground">
+              <p className="mt-5 break-words text-xl font-semibold leading-8 sm:text-2xl">
                 {mitLabel}
               </p>
-              <MiniProgressBar
-                value={taskCompletionProgress}
-                label={t("home.completion")}
-              />
-              <div className="flex flex-wrap gap-2">
-                <StatusChip tone={data.today.checkin ? "primary" : "neutral"}>
-                  {checkinSummary}
-                </StatusChip>
-                <StatusChip tone="neutral">
+              <div className="mt-5 space-y-3">
+                <MiniProgressBar
+                  value={taskCompletionProgress}
+                  label={t("home.completion")}
+                />
+                <div className="flex flex-wrap gap-2">
+                  <span className="rounded-full border border-primary-foreground/20 bg-primary-foreground/10 px-3 py-1 text-xs font-medium">
+                    {checkinSummary}
+                  </span>
+                  <span className="rounded-full border border-primary-foreground/20 bg-primary-foreground/10 px-3 py-1 text-xs font-medium">
                   {t("home.completedTasks")}: {completedCount}
-                </StatusChip>
+                  </span>
+                </div>
               </div>
-            </SoftPanel>
+              <div className="mt-6 flex flex-col gap-2 sm:flex-row">
+                <Button asChild variant="secondary" className="min-h-11 w-full sm:w-auto">
+                  <Link to="/today">
+                    <CalendarCheck2 className="me-2 h-4 w-4" />
+                    {t("home.goToday")}
+                  </Link>
+                </Button>
+                <Button
+                  asChild
+                  variant="ghost"
+                  className="min-h-11 w-full text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground sm:w-auto"
+                >
+                  <Link to="/inbox">
+                    <Plus className="me-2 h-4 w-4" />
+                    {t("nav.inbox")}
+                  </Link>
+                </Button>
+              </div>
+            </div>
 
-            <div className="grid gap-3 lg:grid-cols-2">
+            <div className="mt-4 grid gap-3 lg:grid-cols-2">
               {planningFocus ? (
                 <SoftPanel className="space-y-3 border-primary/10 bg-background/85">
                 <div className="flex flex-wrap items-center justify-between gap-2">
@@ -258,10 +251,38 @@ export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
             </div>
           </div>
 
-          <div className="grid gap-3 grid-cols-2 xl:pt-1">
-            {heroMetrics.map((metric) => (
-              <MetricCard key={metric.label} {...metric} />
-            ))}
+          <div className="flex flex-col gap-3 p-5 sm:p-6">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-sm font-semibold">{t("home.quickActions")}</p>
+                <p className="text-xs leading-6 text-muted-foreground">
+                  {t("home.description")}
+                </p>
+              </div>
+              <Button asChild size="sm" variant="ghost" className="shrink-0">
+                <Link to="/weekly-review">
+                  {t("nav.weeklyReview")}
+                  <ArrowUpLeft className="ms-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              {heroMetrics.map((metric) => (
+                <SoftPanel
+                  key={metric.label}
+                  className="min-w-0 space-y-2 border-primary/10 bg-muted/30 p-4"
+                >
+                  <div className="flex items-center justify-between gap-2 text-muted-foreground">
+                    {metric.icon}
+                    <span className="text-xl font-semibold tabular-nums text-foreground">
+                      {metric.value}
+                    </span>
+                  </div>
+                  <p className="text-xs font-medium leading-5">{metric.label}</p>
+                  <div className="hidden xl:block">{metric.status}</div>
+                </SoftPanel>
+              ))}
+            </div>
           </div>
         </div>
       </CardContent>
