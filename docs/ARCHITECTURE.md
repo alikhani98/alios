@@ -35,6 +35,7 @@ AliOS 1.0 is a local-first static web app.
 - Core pages use the existing shared cards and section headers for their page-entry presentation
 - A page-entry surface may render existing titles, descriptions, icons, and foreground actions, but does not own form, filter, record, navigation, or storage behavior
 - Journal, Knowledge, and Settings retain their feature-owned content and data-safety behavior while consuming the same established visual primitives
+- Search and Routines retain their local search and explicit Task-creation boundaries while consuming the same established visual primitives
 
 ## Finance Module Boundary
 
