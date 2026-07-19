@@ -1,78 +1,79 @@
-import { lazy, Suspense } from "react";
+import { Suspense } from "react";
 import { createHashRouter, RouterProvider } from "react-router-dom";
 
 import { AppShell } from "@/shared/layout";
 import { RouteLoadingFallback } from "@/shared/ui";
+import { lazyWithRetry } from "@/shared/runtime/lazyWithRetry";
 
-const HomePage = lazy(() =>
+const HomePage = lazyWithRetry(() =>
   import("@/features/home/pages/HomePage").then((module) => ({
     default: module.HomePage,
   }))
 );
-const TodayPage = lazy(() =>
+const TodayPage = lazyWithRetry(() =>
   import("@/features/today/pages/TodayPage").then((module) => ({
     default: module.TodayPage,
   }))
 );
-const RoutinesPage = lazy(() =>
+const RoutinesPage = lazyWithRetry(() =>
   import("@/features/routines/pages/RoutinesPage").then((module) => ({ default: module.RoutinesPage }))
 );
-const ProjectsPage = lazy(() =>
+const ProjectsPage = lazyWithRetry(() =>
   import("@/features/projects/pages/ProjectsPage").then((module) => ({
     default: module.ProjectsPage,
   }))
 );
-const GoalsPage = lazy(() =>
+const GoalsPage = lazyWithRetry(() =>
   import("@/features/goals/pages/GoalsPage").then((module) => ({
     default: module.GoalsPage,
   }))
 );
-const LifeAreasPage = lazy(() =>
+const LifeAreasPage = lazyWithRetry(() =>
   import("@/features/lifeAreas/pages/LifeAreasPage").then((module) => ({
     default: module.LifeAreasPage,
   }))
 );
-const JournalPage = lazy(() =>
+const JournalPage = lazyWithRetry(() =>
   import("@/features/journal/pages/JournalPage").then((module) => ({
     default: module.JournalPage,
   }))
 );
-const KnowledgePage = lazy(() =>
+const KnowledgePage = lazyWithRetry(() =>
   import("@/features/knowledge/pages/KnowledgePage").then((module) => ({
     default: module.KnowledgePage,
   }))
 );
-const PersonalManualPage = lazy(() =>
+const PersonalManualPage = lazyWithRetry(() =>
   import("@/features/manual/pages/PersonalManualPage").then((module) => ({
     default: module.PersonalManualPage,
   }))
 );
-const FinancePage = lazy(() =>
+const FinancePage = lazyWithRetry(() =>
   import("@/features/finance/pages/FinancePage").then((module) => ({
     default: module.FinancePage,
   }))
 );
-const SettingsPage = lazy(() =>
+const SettingsPage = lazyWithRetry(() =>
   import("@/features/settings/pages/SettingsPage").then((module) => ({
     default: module.SettingsPage,
   }))
 );
-const InboxPage = lazy(() =>
+const InboxPage = lazyWithRetry(() =>
   import("@/features/inbox/pages/InboxPage").then((module) => ({
     default: module.InboxPage,
   }))
 );
-const SearchPage = lazy(() =>
+const SearchPage = lazyWithRetry(() =>
   import("@/features/search/pages/SearchPage").then((module) => ({
     default: module.SearchPage,
   }))
 );
-const WeeklyReviewPage = lazy(() =>
+const WeeklyReviewPage = lazyWithRetry(() =>
   import("@/features/weeklyReview/pages/WeeklyReviewPage").then((module) => ({
     default: module.WeeklyReviewPage,
   }))
 );
-const DecisionLogPage = lazy(() =>
+const DecisionLogPage = lazyWithRetry(() =>
   import("@/features/decisions/pages/DecisionLogPage").then((module) => ({
     default: module.DecisionLogPage,
   }))

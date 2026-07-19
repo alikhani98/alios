@@ -2,6 +2,11 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 118 - Deployment Recovery and Compact Home Reminder
+
+- Added a one-time cache-busting recovery path for stale lazy-route chunks after a static deployment, without disabling route-level code splitting or creating a reload loop
+- Reworked the Home backup reminder as a compact shared-design-system notice so daily action remains visually first
+
 ## Stage 117 - Home Action Workspace
 
 - Replaced the default month-first calendar with a compact seven-day workspace; the complete month remains available on demand

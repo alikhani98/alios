@@ -30,6 +30,8 @@ import {
   CollapsibleSection,
   EmptyState,
   MetricCard,
+  SoftPanel,
+  StatusChip,
 } from "@/shared/ui";
 
 import { RoutineTemplatesCard, type RoutineTemplateId } from "@/features/routines";
@@ -444,32 +446,31 @@ export function HomePage() {
       ) : null}
 
       {showBackupReminder ? (
-        <Card className="overflow-hidden border-primary/10 bg-gradient-to-br from-background via-background to-primary/5 shadow-sm">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2">
-              <ShieldCheck className="h-5 w-5 text-primary" />
-              {t("home.backupReminderTitle")}
-            </CardTitle>
-            <CardDescription>{t("home.backupReminderDescription")}</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex flex-wrap items-center gap-3">
-              <Badge variant="secondary">
+        <SoftPanel className="flex flex-col gap-3 border-primary/10 bg-gradient-to-l from-primary/5 via-background to-background p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
+          <div className="flex min-w-0 items-start gap-3">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-primary/10 bg-primary/10 text-primary">
+              <ShieldCheck className="h-5 w-5" aria-hidden="true" />
+            </span>
+            <div className="min-w-0 space-y-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <p className="font-semibold leading-6">{t("home.backupReminderTitle")}</p>
+                <StatusChip>
                 {t(
                   backupFreshness === "never"
                     ? "settings.backupStatusNever"
                     : "settings.backupStatusOverdue"
                 )}
-              </Badge>
-              <span className="text-sm text-muted-foreground">
+                </StatusChip>
+              </div>
+              <p className="text-sm leading-6 text-muted-foreground">
                 {t(backupReminderBodyKey)}
-              </span>
+              </p>
             </div>
-            <Button asChild variant="outline" className="w-full sm:w-auto">
-              <Link to="/settings">{t("home.backupReminderAction")}</Link>
-            </Button>
-          </CardContent>
-        </Card>
+          </div>
+          <Button asChild variant="outline" size="sm" className="w-full shrink-0 sm:w-auto">
+            <Link to="/settings">{t("home.backupReminderAction")}</Link>
+          </Button>
+        </SoftPanel>
       ) : null}
 
       {isLoading ? (
