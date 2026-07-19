@@ -606,3 +606,11 @@ The change does not alter the mobile drawer, navigation, route behavior, prefere
 AliOS registers a native Service Worker only outside local development. It caches the static shell and same-origin static assets after an online visit, so the installed application can reopen offline once its assets are present. IndexedDB remains the sole location of user records and is never copied into Cache Storage.
 
 Navigation is network-first and falls back to the cached shell only when offline. The worker intentionally does not call `skipWaiting`, use background sync, push notifications, remote caching, or a dependency. A newly deployed worker activates through the browser’s normal lifecycle, avoiding a forced mid-session update that could mix an old page with new assets.
+
+## ADR-055: Keep update checks explicit and non-disruptive
+
+**Status:** Accepted (Stage 112)
+
+Settings may ask the browser to update-check its existing Service Worker registration. The result communicates only whether a check could run; it does not claim that a new version exists, force worker activation, clear Cache Storage, or reload an active page.
+
+When a newer worker is ready, the browser activates it through its normal lifecycle after AliOS tabs are closed. This makes version discovery visible while retaining the shell-only cache boundary and preventing a mixed-version session.

@@ -114,6 +114,8 @@ Stage 110 makes the final release-readiness pass explicit for the deployed and i
 
 Stage 111 adds a native, dependency-free PWA offline foundation. It caches only the static shell and same-origin assets after an online visit, keeps user records exclusively in IndexedDB, and avoids forced updates, background sync, notifications, and remote caching.
 
+Stage 112 adds an explicit Settings update check for the existing Service Worker registration. It makes version discovery available without forcing a reload, clearing Cache Storage, or bypassing the browser’s safe activation lifecycle.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1

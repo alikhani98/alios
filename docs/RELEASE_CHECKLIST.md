@@ -281,6 +281,13 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] TypeScript, automated tests, production build, and the performance guard pass
 - [ ] On a deployed mobile browser, load AliOS online, reopen it once, enable airplane mode, and confirm the shell opens without creating or changing data
 
+### Stage 112 PWA update controls
+
+- [x] Settings can request an update check for an existing Service Worker registration and reports its browser state bilingually
+- [x] The check never forces activation, clears Cache Storage, reloads an active page, or claims that a newer version is installed
+- [x] TypeScript, automated tests, production build, and the performance guard pass
+- [ ] On the deployed site, use Settings → App update while online, close AliOS tabs, and reopen the app to confirm its normal update lifecycle
+
 ### Stage 86 performance regression guard
 
 - [x] `pnpm performance:check` builds a manifest and enforces the entry-byte budget, no forms preload, and no Vite chunk-size warning

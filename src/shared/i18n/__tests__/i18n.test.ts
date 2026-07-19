@@ -175,6 +175,8 @@ describe("i18n utilities", () => {
     "routines.whatToImproveTomorrow",
     "settings.appearance",
     "settings.localProfile",
+    "settings.pwaUpdateTitle",
+    "settings.pwaUpdateAction",
     "settings.accentColor",
     "settings.accentColorDescription",
     "settings.accentDefault",

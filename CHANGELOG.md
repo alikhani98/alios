@@ -2,6 +2,11 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 112 - PWA Update Controls
+
+- Added a Settings action that asks the browser to check the existing Service Worker registration for a deployed update
+- Kept update activation non-disruptive: no forced reload, cache clearing, or false claim that a new version is available
+
 ## Stage 111 - PWA Offline Foundation
 
 - Added a dependency-free native Service Worker for conservative static-shell and same-origin asset caching after an online visit
