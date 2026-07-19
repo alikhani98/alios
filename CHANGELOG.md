@@ -2,6 +2,11 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 123 - Home Daily Planning Strip
+
+- Replaced the empty planning area below the Home hero with a three-part daily planning strip for the current goal, weekly focus, and quick capture
+- Kept every planning slot useful even when local planning data is missing by showing a clear route to create or review that information
+
 ## Stage 122 - Desktop Calendar Width Repair
 
 - Moved the Home calendar into a full desktop dashboard row so the seven-day workspace never compresses inside a narrow side column
