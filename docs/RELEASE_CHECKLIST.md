@@ -304,6 +304,13 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [ ] The Stage 86 performance guard currently reports an existing entry-budget breach (282,387 bytes vs. 280,000 bytes); resolve it before a release claim
 - [ ] Manually inspect Home at 360px, 390px, 430px, and desktop width with both a fresh profile and an existing collapsed-section preference
 
+### Stage 115 Home visual system
+
+- [x] Wide Home layouts use deliberate section spans instead of a sequence of equally weighted panels
+- [x] Existing dashboard ordering, visibility, collapse preferences, routes, and local data behavior remain unchanged
+- [x] TypeScript, automated tests, and the production build pass
+- [ ] Manually inspect Home at 360px, 390px, 430px, and desktop width with customized section orders
+
 ### Stage 86 performance regression guard
 
 - [x] `pnpm performance:check` builds a manifest and enforces the entry-byte budget, no forms preload, and no Vite chunk-size warning
