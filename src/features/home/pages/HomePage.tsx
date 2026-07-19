@@ -57,14 +57,22 @@ const quickLinks: ReadonlyArray<{ to: string; labelKey: TranslationKey }> = [
   { to: "/settings", labelKey: "home.goSettings" },
 ];
 
-const desktopSectionPairs = new Set([
-  "upcomingTasks:calendar",
-  "calendar:upcomingTasks",
-  "projectsOverview:journalOverview",
-  "journalOverview:projectsOverview",
-  "knowledgeOverview:manualOverview",
-  "manualOverview:knowledgeOverview",
-]);
+const desktopSectionSpans: Record<HomeDashboardSectionId, string> = {
+  hero: "xl:col-span-12",
+  emptyState: "xl:col-span-12",
+  routineNudge: "xl:col-span-12",
+  wellnessBadminton: "xl:col-span-6",
+  routineTemplates: "xl:col-span-6",
+  upcomingTasks: "xl:col-span-7",
+  calendar: "xl:col-span-5",
+  summaryStats: "xl:col-span-12",
+  personalInsights: "xl:col-span-12",
+  projectsOverview: "xl:col-span-6",
+  journalOverview: "xl:col-span-6",
+  knowledgeOverview: "xl:col-span-6",
+  manualOverview: "xl:col-span-6",
+  quickActions: "xl:col-span-12",
+};
 
 type SummaryCardProps = {
   icon: ReactNode;
@@ -388,36 +396,12 @@ export function HomePage() {
       } => Boolean(section.content)
     );
 
-  const remainingSections = renderedSections.slice(1);
-  const renderedSectionRows: ReactNode[] = [];
-
-  for (let index = 0; index < remainingSections.length; index += 1) {
-    const section = remainingSections[index];
-    const nextSection = remainingSections[index + 1];
-      const pairKey = nextSection
-        ? `${section.sectionId}:${nextSection.sectionId}`
-        : null;
-
-    if (pairKey && desktopSectionPairs.has(pairKey)) {
-      renderedSectionRows.push(
-        <div
-          key={pairKey}
-          className="grid min-w-0 gap-5 xl:grid-cols-2 xl:items-start"
-        >
-          <div className="min-w-0">{section.content}</div>
-          <div className="min-w-0">{nextSection.content}</div>
-        </div>
-      );
-      index += 1;
-      continue;
-    }
-
-    renderedSectionRows.push(
-      <div key={section.sectionId} className="min-w-0">
-        {section.content}
-      </div>
-    );
-  }
+  const heroSection = renderedSections.find(
+    (section) => section.sectionId === "hero"
+  );
+  const dashboardSections = renderedSections.filter(
+    (section) => section.sectionId !== "hero"
+  );
 
   return (
     <section className="alios-page space-y-5 lg:space-y-6">
@@ -487,8 +471,17 @@ export function HomePage() {
         </div>
       ) : data ? (
         <>
-          {renderedSections[0]?.content ?? null}
-          {renderedSectionRows}
+          {heroSection?.content ?? null}
+          <div className="grid min-w-0 gap-5 xl:grid-cols-12 xl:items-start">
+            {dashboardSections.map((section) => (
+              <div
+                key={section.sectionId}
+                className={`min-w-0 ${desktopSectionSpans[section.sectionId]}`}
+              >
+                {section.content}
+              </div>
+            ))}
+          </div>
         </>
       ) : null}
     </section>

@@ -630,3 +630,11 @@ This preserves the existing visibility, ordering, collapse preferences, mobile s
 Home may place the existing MIT and Today navigation in one visually dominant command-center surface, then begin new users with lower-priority sections collapsed. This is presentation-only: it neither calculates a new priority nor creates or updates any record.
 
 The default applies only when no collapsed-section preference exists in local storage. Any stored preference, including a user choice to keep all sections open, remains authoritative. The stage adds no route, schema, migration, backup change, dependency, backend, sync, cloud, AI, telemetry, or automation.
+
+## ADR-058: Use section roles for Home’s wide-screen composition
+
+**Status:** Accepted (Stage 115)
+
+Home may map its existing sections to stable desktop grid spans so daily work, calendar context, routines, and reference panels do not all compete as full-width cards. This mapping is visual only; it neither changes the stored dashboard order nor computes a new priority.
+
+Every section remains available through the user’s existing visibility and collapse preferences, and narrow screens keep a single-column flow. The stage adds no record, route, schema, migration, backup change, dependency, backend, sync, cloud, AI, telemetry, or automation.

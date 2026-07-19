@@ -120,6 +120,8 @@ Stage 113 is the actual Home visual redesign: it compacts the top reading path a
 
 Stage 114 makes that hierarchy unmistakable: Home begins with a command-center panel for the existing daily focus and Today action, while secondary sections start collapsed only for users without an existing collapse preference.
 
+Stage 115 gives Home its desktop composition: existing panels occupy a deliberate visual grid instead of appearing as a long series of equally weighted full-width cards.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1

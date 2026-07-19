@@ -2,6 +2,11 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 115 - Home Visual System
+
+- Replaced the sequence of wide Home panels with a deliberate 12-column desktop grid while retaining the existing single-column mobile reading path
+- Gave daily work, calendar, routines, and local reference panels stable visual proportions without changing a user’s selected sections or their ordering
+
 ## Stage 114 - Home Command Center
 
 - Rebuilt the Home entry surface around one unmistakable daily-focus panel, an immediate Today action, and a compact operational snapshot
