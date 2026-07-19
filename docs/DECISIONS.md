@@ -670,3 +670,11 @@ This avoids globally disabling code splitting or clearing user data for a tempor
 Home may visually prioritize existing overdue, today, and tomorrow Task buckets while showing existing this-week and later buckets as compact planning context. This is a derived presentation rule only: all Tasks remain visible through Today and no Task status, due date, MIT, or preference is changed.
 
 The stage adds no record, route, schema, migration, backup change, dependency, backend, sync, cloud, AI, telemetry, or automation.
+
+## ADR-063: Fit Home’s seven-day calendar within narrow screens
+
+**Status:** Accepted (Stage 120)
+
+The compact week view uses a responsive seven-column grid rather than an oversized horizontally scrolling strip. Narrow screens may show abbreviated visual task counts, while the button’s accessible date label retains full context and wider screens retain descriptive task text.
+
+Desktop Home summary metrics may stretch within their existing hero column to match the adjacent daily-focus and planning context. This is presentation-only and changes no record, route, schema, migration, backup, dependency, backend, sync, cloud, AI, telemetry, or automation behavior.

@@ -163,8 +163,8 @@ export function HomeCalendarCard({
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)]">
         <div className="space-y-4">
           {calendarMode === "week" ? (
-            <div className="overflow-x-auto pb-1">
-              <div className="grid min-w-[29rem] grid-cols-7 gap-2">
+            <div className="pb-1">
+              <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
                 {weekDates.map((date, index) => {
                   const isoDate = format(date, "yyyy-MM-dd");
                   const taskCount = groupedTasks[isoDate]?.length ?? 0;
@@ -179,19 +179,22 @@ export function HomeCalendarCard({
                       aria-pressed={isSelected}
                       aria-label={formatDate(date)}
                       className={cn(
-                        "flex min-h-28 flex-col justify-between rounded-2xl border p-3 text-start transition-[transform,box-shadow,border-color,background-color,color] duration-200 hover:-translate-y-0.5 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                        "flex min-w-0 min-h-24 flex-col justify-between rounded-xl border p-1.5 text-center transition-[transform,box-shadow,border-color,background-color,color] duration-200 hover:-translate-y-0.5 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:min-h-28 sm:rounded-2xl sm:p-3 sm:text-start",
                         isSelected ? "border-primary bg-primary/5 shadow-sm" : "bg-background hover:border-primary/50",
                         isToday && "ring-1 ring-primary/25"
                       )}
                     >
-                      <span className="text-xs font-medium text-muted-foreground">
+                      <span className="truncate text-[0.625rem] font-medium text-muted-foreground sm:text-xs">
                         {weekLabels[index]}
                       </span>
-                      <span className="text-xl font-semibold tabular-nums">
+                      <span className="text-base font-semibold tabular-nums sm:text-xl">
                         {formatDayNumber(date, { language, calendar: resolvedCalendar })}
                       </span>
-                      <span className={cn("text-xs font-medium", taskCount > 0 ? "text-primary" : "text-muted-foreground")}>
-                        {taskCount > 0 ? `${taskCount} ${t("home.todayTasks")}` : t("home.noItemsForThisDay")}
+                      <span className={cn("truncate text-[0.625rem] font-medium sm:text-xs", taskCount > 0 ? "text-primary" : "text-muted-foreground")}>
+                        <span className="sm:hidden">{taskCount || "—"}</span>
+                        <span className="hidden sm:inline">
+                          {taskCount > 0 ? `${taskCount} ${t("home.todayTasks")}` : t("home.noItemsForThisDay")}
+                        </span>
                       </span>
                     </button>
                   );

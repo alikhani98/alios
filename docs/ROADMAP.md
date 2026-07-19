@@ -130,6 +130,8 @@ Stage 118 protects the static deployment boundary: a stale route chunk gets one 
 
 Stage 119 gives the action workspace a clear time horizon: urgent work leads, while this-week and later work stay available as compact planning context.
 
+Stage 120 removes two observed layout defects: the desktop hero avoids an unused lower panel and the mobile seven-day calendar fits without horizontal clipping.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1

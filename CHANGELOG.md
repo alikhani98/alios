@@ -2,6 +2,11 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 120 - Home Hero and Mobile Calendar Fit
+
+- Balanced the desktop Home hero’s quick metrics against the daily focus column so populated planning context no longer leaves an unused blank panel
+- Made the seven-day mobile calendar fit the available width without a hidden horizontal scroll while keeping the full date labels accessible
+
 ## Stage 119 - Home Priority Lanes
 
 - Restructured upcoming work around immediate lanes for overdue, today, and tomorrow instead of giving every future bucket equal visual weight
