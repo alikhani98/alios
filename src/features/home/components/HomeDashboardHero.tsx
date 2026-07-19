@@ -240,7 +240,7 @@ export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
             </div>
           </div>
 
-          <div className="flex flex-col gap-3 p-5 sm:p-6">
+          <div className="flex h-full flex-col gap-3 p-5 sm:p-6">
             <div className="flex items-center justify-between gap-3">
               <div>
                 <p className="text-sm font-semibold">{t("home.quickActions")}</p>
@@ -255,11 +255,11 @@ export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
                 </Link>
               </Button>
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid flex-1 auto-rows-fr grid-cols-2 gap-3">
               {heroMetrics.map((metric) => (
                 <SoftPanel
                   key={metric.label}
-                  className="min-w-0 space-y-2 border-primary/10 bg-muted/30 p-4"
+                  className="min-w-0 space-y-2 border-primary/10 bg-muted/30 p-4 xl:h-full"
                 >
                   <div className="flex items-center justify-between gap-2 text-muted-foreground">
                     {metric.icon}

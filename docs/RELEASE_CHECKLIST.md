@@ -341,6 +341,13 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] Every Task remains unchanged and the existing Today route remains the only editing destination
 - [ ] Manually inspect populated Home with long task titles at 360px, 390px, 430px, and desktop width
 
+### Stage 120 Home hero and mobile calendar fit
+
+- [x] Desktop Hero metric cards stretch to use the adjacent daily-focus column height without a blank lower panel
+- [x] Seven-day calendar fits narrow widths without horizontal scrolling or clipped interactive day cells
+- [x] Calendar date labels remain available through accessible button names and wider descriptive text
+- [ ] Manually inspect Home at 360px, 390px, 430px, and desktop width with populated week data
+
 ### Stage 86 performance regression guard
 
 - [x] `pnpm performance:check` builds a manifest and enforces the entry-byte budget, no forms preload, and no Vite chunk-size warning
