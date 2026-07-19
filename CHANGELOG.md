@@ -2,6 +2,12 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 107 - Knowledge and Settings Visual Alignment
+
+- Aligned the Journal, Knowledge, and Settings entry surfaces with the primary visual hierarchy used across the application
+- Added meaningful existing iconography and restrained accent treatment while preserving each page’s current primary action and content flow
+- Kept all records, preferences, forms, data safety controls, and local-first behavior unchanged
+
 ## Stage 106 - Core Pages Visual Alignment
 
 - Applied one consistent, responsive entry pattern to high-traffic feature pages

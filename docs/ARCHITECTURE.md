@@ -32,8 +32,9 @@ AliOS 1.0 is a local-first static web app.
 
 ## Core Page Presentation Boundary
 
-- Repeated page-entry presentation belongs to shared UI only when multiple feature pages have the same structural need
-- A shared page hero may render existing titles, descriptions, icons, and foreground actions, but does not own form, filter, record, navigation, or storage behavior
+- Core pages use the existing shared cards and section headers for their page-entry presentation
+- A page-entry surface may render existing titles, descriptions, icons, and foreground actions, but does not own form, filter, record, navigation, or storage behavior
+- Journal, Knowledge, and Settings retain their feature-owned content and data-safety behavior while consuming the same established visual primitives
 
 ## Finance Module Boundary
 
