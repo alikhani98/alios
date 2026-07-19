@@ -32,7 +32,7 @@ Stage 77 release-hardens the Goals and Life Areas connection so long content, UR
 Stage 78 adds optional Project → Goal linking with mobile-safe selection, navigation, unlinking, and unavailable states while keeping Projects independently usable.
 Stage 79 activates optional Task → Project linking in Today with mobile-safe selection, navigation, unlinking, and unavailable states while keeping Tasks independently usable.
 Stage 80 completes Persian Life Areas localization and refreshes the bilingual Settings Help Center for the current module set and optional planning links without changing local data behavior.
-Stage 110 records the final installed-mode, launch, mobile viewport, and desktop-shell QA checks. It does not add offline caching or change how device-local data behaves.
+Stage 110 records the final installed-mode, launch, mobile viewport, and desktop-shell QA checks. It does not alter device-local data behavior.
 The Personal Insights section stays local to the device and only reflects stored tasks, projects, inbox items, journal entries, knowledge items, and wellness checklist state.
 
 ## Personal Manual smoke test
@@ -206,7 +206,7 @@ The expected GitHub Pages URL is `https://alikhani98.github.io/alios/` after Pag
 3. On iPhone/iPad Safari, use **Share** and choose **Add to Home Screen** when available.
 4. Launch AliOS from the new home-screen icon.
 
-Installation behavior varies by browser and platform. The current foundation includes a manifest, theme metadata, and scalable icons. Offline service-worker caching is not included, so AliOS still needs the hosted application files to load.
+Installation behavior varies by browser and platform. AliOS now registers a native Service Worker on deployed sites: after one normal online revisit, its static shell and loaded same-origin assets can reopen offline. User records remain in IndexedDB and are never cached as files. The first offline launch is not supported, and a new deployed version activates through the browser’s normal lifecycle rather than forcing a mid-session refresh.
 
 ## Device-local data
 
@@ -312,7 +312,6 @@ Use [`REAL_WORLD_USAGE_QA.md`](./REAL_WORLD_USAGE_QA.md) during normal daily use
 
 ## Deferred mobile capabilities
 
-- Offline service-worker caching
 - Automatic synchronization
 - Cloud backup
 - Push notifications

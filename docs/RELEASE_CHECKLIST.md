@@ -273,6 +273,14 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] No runtime, dependency, route, storage, schema, backup, or user-data behavior changed
 - [ ] Run the Stage 110 manual pass on one supported mobile browser and one desktop browser
 
+### Stage 111 PWA offline foundation
+
+- [x] A native Service Worker registers only outside local development and caches the static shell after an online visit
+- [x] Navigation is network-first with a cached-shell offline fallback; user records stay outside Cache Storage
+- [x] The worker does not force activation, use background sync, notifications, remote caching, or a dependency
+- [x] TypeScript, automated tests, production build, and the performance guard pass
+- [ ] On a deployed mobile browser, load AliOS online, reopen it once, enable airplane mode, and confirm the shell opens without creating or changing data
+
 ### Stage 86 performance regression guard
 
 - [x] `pnpm performance:check` builds a manifest and enforces the entry-byte budget, no forms preload, and no Vite chunk-size warning

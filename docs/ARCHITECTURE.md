@@ -148,6 +148,12 @@ AliOS 1.0 is a local-first static web app.
 - Recent error summaries may be stored only in browser localStorage, capped to a small bounded list, and used only for local review or copy actions
 - The error boundary and error log stay separate from Dexie, backup export, backup restore, backend, sync, cloud, AI, and new dependencies
 
+## PWA Offline Boundary
+
+- The native Service Worker caches only the static application shell and same-origin static assets after a normal online visit; IndexedDB records remain outside Cache Storage
+- Navigation uses network-first behavior with the cached shell only as an offline fallback, while versioned assets use cache-first behavior after they have been loaded
+- The worker does not force activation, perform background sync, send notifications, cache remote requests, or change backup, restore, routing, or local-data behavior
+
 ## Recovery Mode / Safe Mode Boundary
 
 - Recovery mode is a local-only browser preference stored in `localStorage` and may be enabled from a safe URL flag or from Settings
