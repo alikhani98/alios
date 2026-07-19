@@ -53,3 +53,10 @@ export function getTodayWeeklyPlanFocus(
     linkedTaskCompleted: linkedTasks.filter((entry) => entry.status === "done").length,
   };
 }
+
+export function getPlannedTaskOutsideToday(
+  focus: TodayWeeklyPlanFocus,
+  today: string
+): Task | undefined {
+  return focus.task?.dueDate !== today ? focus.task : undefined;
+}

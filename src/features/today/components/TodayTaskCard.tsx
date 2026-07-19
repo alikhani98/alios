@@ -17,6 +17,8 @@ type TodayTaskCardProps = {
   linkedProject?: Project;
   isLinkedProjectLoading: boolean;
   isBusy: boolean;
+  contextLabel?: string;
+  allowMit?: boolean;
   onEdit: () => void;
   onStatusChange: (status: TaskStatus) => Promise<void>;
   onSelectMit: () => Promise<void>;
@@ -28,6 +30,8 @@ export function TodayTaskCard({
   linkedProject,
   isLinkedProjectLoading,
   isBusy,
+  contextLabel,
+  allowMit = true,
   onEdit,
   onStatusChange,
   onSelectMit,
@@ -63,6 +67,7 @@ export function TodayTaskCard({
                 {t("today.mit")}
               </Badge>
             ) : null}
+            {contextLabel ? <Badge variant="secondary">{contextLabel}</Badge> : null}
             <Badge
               variant="outline"
               className="max-w-full break-words whitespace-normal text-start"
@@ -136,7 +141,7 @@ export function TodayTaskCard({
             ))}
           </Select>
 
-          {!task.isMit ? (
+          {allowMit && !task.isMit ? (
             <Button
               type="button"
               size="sm"

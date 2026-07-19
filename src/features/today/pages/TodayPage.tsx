@@ -27,6 +27,7 @@ import { TodayTaskCard } from "../components/TodayTaskCard";
 import { TodayTaskForm } from "../components/TodayTaskForm";
 import { useTodayData } from "../hooks/useTodayData";
 import { useTodayWeeklyPlan } from "../hooks/useTodayWeeklyPlan";
+import { getPlannedTaskOutsideToday } from "../todayWeeklyPlan";
 import {
   findLinkedProject,
   findProjectFilter,
@@ -58,7 +59,11 @@ export function TodayPage() {
     deleteTask,
     saveCheckin,
   } = useTodayData(today);
-  const { focus: weeklyPlanFocus, isLoading: isWeeklyPlanLoading } = useTodayWeeklyPlan();
+  const {
+    focus: weeklyPlanFocus,
+    isLoading: isWeeklyPlanLoading,
+    loadTodayWeeklyPlan,
+  } = useTodayWeeklyPlan();
   const {
     projects,
     isLoading: isProjectsLoading,
@@ -84,6 +89,7 @@ export function TodayPage() {
   const [focusedTaskId, setFocusedTaskId] = useState<string | null>(null);
   const [focusMessage, setFocusMessage] = useState<string | null>(null);
   const taskRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const plannedTaskRef = useRef<HTMLDivElement | null>(null);
   const focusId = searchParams.get("focusId");
   const goalId = searchParams.get("goalId");
   const projectId = searchParams.get("projectId");
@@ -101,6 +107,7 @@ export function TodayPage() {
       (!projectId || task.projectId === projectId) &&
       (!routineId || task.routineId === routineId)
   );
+  const plannedTaskOutsideToday = getPlannedTaskOutsideToday(weeklyPlanFocus, today);
   const routineSuggestions = getRoutineSuggestions(
     routines,
     tasks,
@@ -176,6 +183,7 @@ export function TodayPage() {
         await createTask(input);
         setSuccessMessage(t("today.taskCreated"));
       }
+      await loadTodayWeeklyPlan();
       closeTaskForm();
     } catch (caught) {
       showError(caught, t("today.taskSaveError"));
@@ -195,6 +203,7 @@ export function TodayPage() {
     setSuccessMessage(null);
     try {
       await action();
+      await Promise.all([loadToday(), loadTodayWeeklyPlan()]);
       setSuccessMessage(success);
     } catch (caught) {
       showError(caught, fallback);
@@ -265,6 +274,17 @@ export function TodayPage() {
     }
 
     const focusedTask = visibleTasks.find((task) => task.id === focusId);
+    if (!focusedTask && plannedTaskOutsideToday?.id === focusId) {
+      setFocusMessage(null);
+      setFocusedTaskId(focusId);
+      plannedTaskRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+
+      const timeout = window.setTimeout(() => {
+        setFocusedTaskId((current) => (current === focusId ? null : current));
+      }, 2200);
+
+      return () => window.clearTimeout(timeout);
+    }
     if (!focusedTask) {
       if (!isLoading && visibleTasks.length > 0) {
         setFocusedTaskId(null);
@@ -283,7 +303,7 @@ export function TodayPage() {
     }, 2200);
 
     return () => window.clearTimeout(timeout);
-  }, [focusId, isLoading, t, visibleTasks]);
+  }, [focusId, isLoading, plannedTaskOutsideToday, t, visibleTasks]);
 
   return (
     <section className="alios-page space-y-6">
@@ -530,6 +550,47 @@ export function TodayPage() {
             <RotateCcw className="me-2 h-4 w-4" />
             {t("common.tryAgain")}
           </Button>
+        </div>
+      ) : null}
+
+      {plannedTaskOutsideToday ? (
+        <div
+          ref={plannedTaskRef}
+          className={cn(
+            "scroll-mt-24 rounded-2xl transition-[transform,box-shadow,border-color] duration-200 ease-out motion-reduce:transition-none motion-reduce:transform-none",
+            focusedTaskId === plannedTaskOutsideToday.id
+              ? "ring-2 ring-primary/50 ring-offset-2 ring-offset-background shadow-lg shadow-primary/10"
+              : null
+          )}
+        >
+          <PremiumCard className="border-primary/25 bg-primary/5">
+            <CardContent className="space-y-4 p-5 sm:p-6">
+              <SectionHeader
+                eyebrow={t("weeklyReview.title")}
+                title={t("weeklyReview.nextFocusLabel")}
+                description={weeklyPlanFocus.plan?.focusTitle}
+                actions={
+                  <span className="text-sm text-muted-foreground">
+                    {plannedTaskOutsideToday.dueDate
+                      ? formatDate(plannedTaskOutsideToday.dueDate)
+                      : t("common.notRecorded")}
+                  </span>
+                }
+              />
+              <TodayTaskCard
+                task={plannedTaskOutsideToday}
+                linkedProject={findLinkedProject(plannedTaskOutsideToday, projects)}
+                isLinkedProjectLoading={isProjectsLoading}
+                isBusy={busyTaskId === plannedTaskOutsideToday.id}
+                contextLabel={t("weeklyReview.title")}
+                allowMit={false}
+                onEdit={() => openEditTask(plannedTaskOutsideToday)}
+                onStatusChange={(status) => handleStatusChange(plannedTaskOutsideToday, status)}
+                onSelectMit={() => handleSelectMit(plannedTaskOutsideToday)}
+                onDelete={() => handleDeleteTask(plannedTaskOutsideToday)}
+              />
+            </CardContent>
+          </PremiumCard>
         </div>
       ) : null}
 
