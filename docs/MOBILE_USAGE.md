@@ -34,6 +34,7 @@ Stage 79 activates optional Task → Project linking in Today with mobile-safe s
 Stage 80 completes Persian Life Areas localization and refreshes the bilingual Settings Help Center for the current module set and optional planning links without changing local data behavior.
 Stage 110 records the final installed-mode, launch, mobile viewport, and desktop-shell QA checks. It does not alter device-local data behavior.
 Stage 113 rebuilds the Home reading path for daily work: core actions and Today focus are clearer at the top, while mobile still keeps all sections in one readable column.
+Stage 114 makes the Home entry point a compact command center: the existing daily focus and Today action appear first, and lower-priority sections begin collapsed only until the user chooses otherwise.
 The Personal Insights section stays local to the device and only reflects stored tasks, projects, inbox items, journal entries, knowledge items, and wellness checklist state.
 
 ## Personal Manual smoke test

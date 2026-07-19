@@ -2,6 +2,11 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 114 - Home Command Center
+
+- Rebuilt the Home entry surface around one unmistakable daily-focus panel, an immediate Today action, and a compact operational snapshot
+- Made lower-priority Home sections collapsed by default for new layout preferences while preserving any sections a user has already explicitly opened or closed
+
 ## Stage 113 - Home Real Visual Redesign
 
 - Rebuilt the Home reading path around a compact daily-workspace hero, distinct operational metrics, and clearer Today, Inbox, and Weekly Review actions

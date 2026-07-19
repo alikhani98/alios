@@ -118,6 +118,8 @@ Stage 112 adds an explicit Settings update check for the existing Service Worker
 
 Stage 113 is the actual Home visual redesign: it compacts the top reading path around daily work, separates key metrics from context, and uses wide-screen rows for compatible adjacent sections without changing the local dashboard’s visibility or ordering model.
 
+Stage 114 makes that hierarchy unmistakable: Home begins with a command-center panel for the existing daily focus and Today action, while secondary sections start collapsed only for users without an existing collapse preference.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1

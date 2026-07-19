@@ -622,3 +622,11 @@ When a newer worker is ready, the browser activates it through its normal lifecy
 Home may use a more compact daily-workspace hero and place compatible secondary sections side by side on wide screens. The pairing is presentation-only and applies only when two compatible sections remain adjacent in the user’s existing local dashboard order.
 
 This preserves the existing visibility, ordering, collapse preferences, mobile single-column reading path, routes, records, derived calculations, storage, schema, migration, backup, dependency, backend, sync, cloud, AI, telemetry, and automation boundaries.
+
+## ADR-057: Give Home one default daily reading path without overwriting choices
+
+**Status:** Accepted (Stage 114)
+
+Home may place the existing MIT and Today navigation in one visually dominant command-center surface, then begin new users with lower-priority sections collapsed. This is presentation-only: it neither calculates a new priority nor creates or updates any record.
+
+The default applies only when no collapsed-section preference exists in local storage. Any stored preference, including a user choice to keep all sections open, remains authoritative. The stage adds no route, schema, migration, backup change, dependency, backend, sync, cloud, AI, telemetry, or automation.

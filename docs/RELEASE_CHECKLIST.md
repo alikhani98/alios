@@ -296,6 +296,14 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] TypeScript, automated tests, production build, and the performance guard pass
 - [ ] Manually inspect Home at 360px, 390px, 430px, and desktop width with default and customized dashboard orders
 
+### Stage 114 Home command center
+
+- [x] Home has one visually dominant daily-focus panel, immediate Today navigation, and a compact local operational snapshot
+- [x] New collapse preferences start lower-priority sections closed while any stored user preference remains unchanged
+- [x] TypeScript, automated tests, and the production build pass
+- [ ] The Stage 86 performance guard currently reports an existing entry-budget breach (282,387 bytes vs. 280,000 bytes); resolve it before a release claim
+- [ ] Manually inspect Home at 360px, 390px, 430px, and desktop width with both a fresh profile and an existing collapsed-section preference
+
 ### Stage 86 performance regression guard
 
 - [x] `pnpm performance:check` builds a manifest and enforces the entry-byte budget, no forms preload, and no Vite chunk-size warning
