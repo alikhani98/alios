@@ -662,3 +662,11 @@ Personal Insights starts with the three operational signals most useful for dail
 AliOS keeps route-level lazy loading. When a browser requests a removed hashed module after a static deployment, the shared lazy loader may reload the same canonical route once through a cache-busting URL. A session-only marker prevents a second automatic reload; if loading still fails, the existing local error boundary remains the safe recovery surface.
 
 This avoids globally disabling code splitting or clearing user data for a temporary deployment-cache mismatch. The recovery changes no record, route meaning, storage schema, backup, dependency, backend, sync, cloud, AI, telemetry, or automation behavior.
+
+## ADR-062: Separate immediate work from planning context on Home
+
+**Status:** Accepted (Stage 119)
+
+Home may visually prioritize existing overdue, today, and tomorrow Task buckets while showing existing this-week and later buckets as compact planning context. This is a derived presentation rule only: all Tasks remain visible through Today and no Task status, due date, MIT, or preference is changed.
+
+The stage adds no record, route, schema, migration, backup change, dependency, backend, sync, cloud, AI, telemetry, or automation.

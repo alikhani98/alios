@@ -34,6 +34,7 @@ AliOS 1.0 is a local-first static web app.
 - On wide screens, Home may assign presentational grid spans by section role while preserving the user’s local section order and visibility; narrow screens remain single-column
 - Home may group non-daily panels behind a local, session-only expandable surface to make the initial dashboard a bounded daily workspace; the grouping does not alter stored section preferences or data
 - The Home calendar may default to a seven-day read-only view and expose its existing month grid only through an explicit local view switch; Personal Insights may show a bounded KPI subset before its supporting signals
+- Home may distinguish immediate Task attention from later planning context through derived date buckets; it never changes Task status, dates, MIT selection, or the existing Today editing boundary
 
 ## Core Page Presentation Boundary
 

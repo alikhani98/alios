@@ -2,6 +2,11 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 119 - Home Priority Lanes
+
+- Restructured upcoming work around immediate lanes for overdue, today, and tomorrow instead of giving every future bucket equal visual weight
+- Moved this-week and later work into a compact planning lane while preserving every count and the existing Today destination
+
 ## Stage 118 - Deployment Recovery and Compact Home Reminder
 
 - Added a one-time cache-busting recovery path for stale lazy-route chunks after a static deployment, without disabling route-level code splitting or creating a reload loop
