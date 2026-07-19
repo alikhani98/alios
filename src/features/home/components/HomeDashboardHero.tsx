@@ -117,8 +117,8 @@ export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
   return (
     <PremiumCard className="overflow-hidden border-primary/20 bg-card shadow-sm">
       <CardContent className="p-0">
-        <div className="grid xl:grid-cols-[minmax(0,1.2fr)_minmax(19rem,0.8fr)]">
-          <div className="border-b border-primary/10 p-5 sm:p-6 xl:border-b-0 xl:border-e">
+        <div className="grid xl:grid-cols-[minmax(0,1.35fr)_minmax(19rem,0.65fr)]">
+          <div className="p-5 sm:p-6 xl:border-e xl:border-primary/10">
             <div className="rounded-[1.75rem] bg-primary p-5 text-primary-foreground shadow-sm sm:p-6">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="space-y-1">
@@ -174,9 +174,48 @@ export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
               {actions ? <div className="mt-3 flex flex-wrap gap-2">{actions}</div> : null}
             </div>
 
-            <div className="mt-4 grid gap-3 lg:grid-cols-2">
+          </div>
+
+          <div className="border-t border-primary/10 p-5 sm:p-6 xl:border-t-0">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-sm font-semibold">{t("home.quickActions")}</p>
+                <p className="text-xs leading-6 text-muted-foreground">
+                  {t("home.description")}
+                </p>
+              </div>
+              <Button asChild size="sm" variant="ghost" className="shrink-0">
+                <Link to="/weekly-review">
+                  {t("nav.weeklyReview")}
+                  <ArrowUpLeft className="ms-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+            <div className="mt-3 grid grid-cols-2 gap-3">
+              {heroMetrics.map((metric) => (
+                <SoftPanel
+                  key={metric.label}
+                  className="min-w-0 space-y-2 border-primary/10 bg-muted/30 p-4"
+                >
+                  <div className="flex items-center justify-between gap-2 text-muted-foreground">
+                    {metric.icon}
+                    <span className="text-xl font-semibold tabular-nums text-foreground">
+                      {metric.value}
+                    </span>
+                  </div>
+                  <p className="text-xs font-medium leading-5">{metric.label}</p>
+                  <div className="hidden xl:block">{metric.status}</div>
+                </SoftPanel>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {(planningFocus || weeklyPlan) ? (
+          <div className="border-t border-primary/10 p-5 sm:p-6">
+            <div className="grid gap-3 lg:grid-cols-2">
               {planningFocus ? (
-                <SoftPanel className="space-y-3 border-primary/10 bg-background/85">
+                <SoftPanel className="space-y-3 border-primary/10 bg-muted/20">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-2 text-sm font-medium">
                     <Target className="h-4 w-4 text-primary" />
@@ -213,7 +252,7 @@ export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
               ) : null}
 
               {weeklyPlan ? (
-                <SoftPanel className="space-y-3 border-primary/10 bg-background/85">
+                <SoftPanel className="space-y-3 border-primary/10 bg-muted/20">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className="text-sm font-medium">{t("weeklyReview.nextFocusLabel")}</p>
                   <Button asChild size="sm" variant="ghost"><Link to="/weekly-review">{t("nav.weeklyReview")}</Link></Button>
@@ -239,41 +278,7 @@ export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
               ) : null}
             </div>
           </div>
-
-          <div className="flex h-full flex-col gap-3 p-5 sm:p-6">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <p className="text-sm font-semibold">{t("home.quickActions")}</p>
-                <p className="text-xs leading-6 text-muted-foreground">
-                  {t("home.description")}
-                </p>
-              </div>
-              <Button asChild size="sm" variant="ghost" className="shrink-0">
-                <Link to="/weekly-review">
-                  {t("nav.weeklyReview")}
-                  <ArrowUpLeft className="ms-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
-            <div className="grid flex-1 auto-rows-fr grid-cols-2 gap-3">
-              {heroMetrics.map((metric) => (
-                <SoftPanel
-                  key={metric.label}
-                  className="min-w-0 space-y-2 border-primary/10 bg-muted/30 p-4 xl:h-full"
-                >
-                  <div className="flex items-center justify-between gap-2 text-muted-foreground">
-                    {metric.icon}
-                    <span className="text-xl font-semibold tabular-nums text-foreground">
-                      {metric.value}
-                    </span>
-                  </div>
-                  <p className="text-xs font-medium leading-5">{metric.label}</p>
-                  <div className="hidden xl:block">{metric.status}</div>
-                </SoftPanel>
-              ))}
-            </div>
-          </div>
-        </div>
+        ) : null}
       </CardContent>
     </PremiumCard>
   );

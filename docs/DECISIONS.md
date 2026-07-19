@@ -678,3 +678,11 @@ The stage adds no record, route, schema, migration, backup change, dependency, b
 The compact week view uses a responsive seven-column grid rather than an oversized horizontally scrolling strip. Narrow screens may show abbreviated visual task counts, while the button’s accessible date label retains full context and wider screens retain descriptive task text.
 
 Desktop Home summary metrics may stretch within their existing hero column to match the adjacent daily-focus and planning context. This is presentation-only and changes no record, route, schema, migration, backup, dependency, backend, sync, cloud, AI, telemetry, or automation behavior.
+
+## ADR-064: Separate Home planning context from the desktop metric column
+
+**Status:** Accepted (Stage 121)
+
+Home presents daily focus and quick metrics as peers in the upper desktop row. Existing goal and weekly-plan context follows in a full-width row instead of determining a neighbouring metric column's height. On narrow screens the reading order remains focus, planning context, then quick metrics.
+
+This is presentation-only. It changes no record, route, schema, migration, backup, dependency, backend, sync, cloud, AI, telemetry, or automation behavior.

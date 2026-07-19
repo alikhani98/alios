@@ -2,6 +2,11 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 121 - Home Hero Composition
+
+- Rebuilt the populated Home hero into a compact focus-and-metrics row, with planning context in its own full-width follow-up row
+- Removed the desktop column-height dependency that left a large unused area under quick metrics, while retaining the mobile focus → context → metrics reading order
+
 ## Stage 120 - Home Hero and Mobile Calendar Fit
 
 - Balanced the desktop Home hero’s quick metrics against the daily focus column so populated planning context no longer leaves an unused blank panel
