@@ -574,3 +574,11 @@ The direct actions remain ordinary route navigation. They create no record, chan
 Today, Inbox, and Projects have the same page-entry need: an icon, title, purpose, and optional foreground action. They apply that composition through the existing shared card and header primitives, while every feature retains responsibility for its own forms, filters, records, actions, and data states.
 
 This prevents visual drift without forming a feature abstraction or moving business behavior into shared UI. It adds no schema, migration, backup change, route, dependency, backend, sync, cloud, AI, telemetry, or automation.
+
+## ADR-051: Preserve data-safety behavior during visual alignment
+
+**Status:** Accepted (Stage 107)
+
+Journal, Knowledge, and Settings may align their entry surfaces with the application’s established icon and accent hierarchy. Settings remains a data-safety surface: visual changes must not obscure backup, restore, recovery, export, or destructive-data controls.
+
+The alignment changes no records, preferences, form behavior, navigation, schema, migration, backup format, dependency, backend, sync, cloud, AI, telemetry, or automation.

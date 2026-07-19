@@ -245,6 +245,13 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] TypeScript, automated tests, production build, and the performance guard pass
 - [ ] Complete the Stage 106 manual smoke pass at 360px, 390px, and 430px in Persian and English
 
+### Stage 107 knowledge and settings visual alignment
+
+- [x] Journal, Knowledge, and Settings have consistent page-entry hierarchy with meaningful iconography
+- [x] Settings data-safety controls remain unchanged and legible
+- [x] TypeScript, automated tests, production build, and the performance guard pass
+- [ ] Complete the Stage 107 manual smoke pass at 360px, 390px, and 430px in Persian and English
+
 ### Stage 86 performance regression guard
 
 - [x] `pnpm performance:check` builds a manifest and enforces the entry-byte budget, no forms preload, and no Vite chunk-size warning

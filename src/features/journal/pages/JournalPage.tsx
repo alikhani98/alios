@@ -147,9 +147,10 @@ export function JournalPage() {
 
   return (
     <section className="alios-page space-y-6">
-      <PremiumCard>
+      <PremiumCard className="border-primary/15 bg-primary/5">
         <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
           <SectionHeader
+            icon={<BookOpenText className="h-5 w-5" />}
             title={t("journal.title")}
             description={t("journal.description")}
           />
