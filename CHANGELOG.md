@@ -2,6 +2,11 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 139 - Full Calendar Page Foundation
+
+- Added a dedicated calendar route with local month and week views, task counts, and selected-day task previews
+- Added a direct selected-day route into Today while preserving ISO/Gregorian storage and the existing local-only architecture
+
 ## Stage 138 - Calendar Entry Foundation
 
 - Added a shared date-display hint to core task, project, goal, decision, journal, and finance forms
