@@ -2,6 +2,11 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 129 - Goal and Manual Reading Boundaries
+
+- Reduced the initial Goal and Personal Manual card views to six records, with focused Goal navigation preserved outside the initial view
+- Kept Life Areas fully visible because its canonical seven-area whole is a deliberate overview rather than an unbounded collection
+
 ## Stage 128 - Operational List Density
 
 - Reduced the initial Routine collection to six cards, making the mobile routine manager substantially shorter while retaining a clear local reveal control

@@ -87,7 +87,7 @@ export function PersonalManualPage() {
   const [formRevision, setFormRevision] = useState(0);
   const [showAllEntries, setShowAllEntries] = useState(false);
   const focusId = searchParams.get("focusId");
-  const manualPreviewLimit = 12;
+  const manualPreviewLimit = 6;
 
   const summary = useMemo(() => getManualEntrySummary(entries), [entries]);
   const templateCards = useMemo(

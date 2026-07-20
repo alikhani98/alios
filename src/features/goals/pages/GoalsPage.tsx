@@ -123,6 +123,7 @@ export function GoalsPage() {
   const [draftGoalSeed, setDraftGoalSeed] = useState<GoalFormSeed | undefined>();
   const [draftGoalTemplateId, setDraftGoalTemplateId] = useState<string | null>(null);
   const [formRevision, setFormRevision] = useState(0);
+  const [showAllGoals, setShowAllGoals] = useState(false);
   const goalRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const formRef = useRef<HTMLDivElement | null>(null);
   const focusId = searchParams.get("focusId");
@@ -166,6 +167,16 @@ export function GoalsPage() {
     timeframeFilter !== "all" ||
     importanceFilter !== "all" ||
     appliedQuery.length > 0;
+  const goalPreviewLimit = 6;
+  const focusRequiresAllGoals = filteredEntries.findIndex((goal) => goal.id === focusId) >= goalPreviewLimit;
+  const displayedGoals = showAllGoals || focusRequiresAllGoals
+    ? filteredEntries
+    : filteredEntries.slice(0, goalPreviewLimit);
+  const hiddenGoalCount = Math.max(filteredEntries.length - displayedGoals.length, 0);
+
+  useEffect(() => {
+    setShowAllGoals(false);
+  }, [statusFilter, areaFilter, timeframeFilter, importanceFilter, appliedQuery]);
 
   const clearMessages = () => {
     setActionError(null);
@@ -710,7 +721,7 @@ export function GoalsPage() {
         />
       ) : (
         <div className="grid min-w-0 gap-4 xl:grid-cols-2">
-          {filteredEntries.map((goal) => (
+          {displayedGoals.map((goal) => (
             <div
               key={goal.id}
               ref={(node) => {
@@ -737,6 +748,15 @@ export function GoalsPage() {
           ))}
         </div>
       )}
+      {filteredEntries.length > goalPreviewLimit && !focusRequiresAllGoals ? (
+        <div className="flex justify-start">
+          <Button type="button" variant="outline" onClick={() => setShowAllGoals((current) => !current)}>
+            {showAllGoals
+              ? t("common.showFewer")
+              : t("common.showMoreCount", { count: hiddenGoalCount })}
+          </Button>
+        </div>
+      ) : null}
 
       {reviewDueGoals.length > 0 ? (
         <PremiumCard>

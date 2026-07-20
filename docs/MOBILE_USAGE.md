@@ -49,6 +49,7 @@ Stage 125 keeps the same mobile stack and only fills an absent immediate desktop
 Stage 126 keeps routine suggestions single-column on narrow screens, reveals no more than six initially, and makes the remaining existing suggestions explicitly reachable.
 Stage 127 limits dense collections to twelve initially rendered cards on mobile and desktop, with a full-width explicit reveal control for the existing remaining records.
 Stage 128 reduces initial Routine cards to six on every viewport, and bounds Inbox and Decision Log to twelve cards while retaining their complete existing filtered result sets behind a clear reveal control.
+Stage 129 limits the initially rendered Goal and Personal Manual cards to six. Life Areas retain their complete seven-area overview, avoiding a fragmented mobile life-balance view.
 The Personal Insights section stays local to the device and only reflects stored tasks, projects, inbox items, journal entries, knowledge items, and wellness checklist state.
 
 ## Personal Manual smoke test

@@ -401,6 +401,12 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 2. With more than twelve Inbox items, filter a subset, select all visible filtered items, and confirm bulk actions still apply to the complete filtered set after using the display control.
 3. With more than twelve Decisions, switch every filter and confirm the visible-card boundary resets without changing records or filter counts.
 
+### Stage 129 Goal and Manual reading boundaries
+
+1. With more than six Goals or Personal Manual entries, confirm six cards appear initially and the reveal control exposes every remaining record.
+2. Open a Goal focus link beyond the boundary and confirm that Goal remains visible and highlighted.
+3. Confirm all seven canonical Life Areas remain visible together on desktop and mobile.
+
 - [x] Routines, Projects, Knowledge, and Personal Manual initially render no more than twelve cards
 - [x] Existing cards beyond the initial limit remain explicitly reachable through a local display control
 - [x] A focused item outside the initial limit is rendered for existing search and navigation destinations
