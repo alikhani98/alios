@@ -742,3 +742,11 @@ The stage adds no record, route, schema, migration, backup change, dependency, b
 Routines initially render at most six cards. Inbox and Decision Log initially render at most twelve cards, with a local reveal control. Inbox filtering, focused search navigation, selected IDs, and bulk actions continue to operate on the complete filtered collection rather than just the initial card preview.
 
 The stage adds no record, route, schema, migration, backup change, dependency, backend, sync, cloud, AI, telemetry, or automation.
+
+## ADR-072: Preserve the complete canonical life-area overview
+
+**Status:** Accepted (Stage 129)
+
+Goals and Personal Manual entries initially render at most six cards. The Goal focus route can expand that boundary when needed. Life Areas retain all seven canonical areas together because hiding part of that fixed overview weakens its intended cross-life comparison.
+
+The stage adds no record, route, schema, migration, backup change, dependency, backend, sync, cloud, AI, telemetry, or automation.

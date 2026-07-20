@@ -254,6 +254,11 @@ AliOS does not require a Node.js server in production. Node.js is allowed for de
 - Inbox’s selection and bulk operations still derive from the complete filtered collection, not from the rendered preview
 - Reveal state is page-local and does not modify records, filters, routing, repositories, schemas, or backups
 
+## Whole-Life Overview Boundary
+
+- Goals and Personal Manual have a six-card initial boundary because both can grow without a natural product limit
+- Life Areas remain fully rendered because their seven canonical categories are one fixed holistic overview
+
 ## Layering
 
 ```text

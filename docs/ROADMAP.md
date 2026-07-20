@@ -148,6 +148,8 @@ Stage 127 applies the same progressive-disclosure boundary to the primary dense 
 
 Stage 128 reduces the initial Routine view further for actual mobile use and adds the same display-only boundary to Inbox and Decision Log collections without weakening filtering, search focus, or Inbox bulk triage.
 
+Stage 129 applies the six-card reading boundary to Goals and Personal Manual, while retaining the seven Life Areas together as one intentional whole-life overview.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1
