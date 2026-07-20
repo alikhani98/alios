@@ -202,6 +202,7 @@ export function SettingsPage() {
   const [pwaUpdateStatus, setPwaUpdateStatus] = useState<
     ServiceWorkerUpdateResult | "checking" | null
   >(null);
+  const [showAllDataCounts, setShowAllDataCounts] = useState(false);
   const dataManagement = useLocalDataManagement();
   const backup = useBackupRestore(dataManagement.loadSummary);
   const restorePreview = backup.pendingBackup
@@ -211,6 +212,29 @@ export function SettingsPage() {
   const totalLocalRecords = dataManagement.summary
     ? getTotalRecords(dataManagement.summary)
     : 0;
+  const localDataCounts = dataManagement.summary
+    ? [
+        { label: t("settings.projectsCount"), value: dataManagement.summary.projects },
+        { label: t("settings.tasksCount"), value: dataManagement.summary.tasks },
+        { label: t("settings.goalsCount"), value: dataManagement.summary.goals },
+        { label: t("settings.lifeAreasCount"), value: dataManagement.summary.lifeAreas },
+        { label: t("settings.decisionLogsCount"), value: dataManagement.summary.decisionLogEntries },
+        { label: t("settings.manualEntriesCount"), value: dataManagement.summary.manualEntries },
+        { label: t("settings.financeTransactionsCount"), value: dataManagement.summary.financeTransactions },
+        { label: t("settings.financeObligationsCount"), value: dataManagement.summary.financeObligations },
+        { label: t("settings.journalCount"), value: dataManagement.summary.journalEntries },
+        { label: t("settings.knowledgeCount"), value: dataManagement.summary.knowledgeItems },
+        { label: t("settings.checkinsCount"), value: dataManagement.summary.dailyCheckins },
+        { label: t("settings.inboxCount"), value: dataManagement.summary.inboxItems },
+        { label: t("settings.settingsCount"), value: dataManagement.summary.settings },
+        { label: t("settings.routinesCount"), value: dataManagement.summary.routines },
+      ]
+    : [];
+  const dataCountPreviewLimit = 5;
+  const displayedDataCounts = showAllDataCounts
+    ? localDataCounts
+    : localDataCounts.slice(0, dataCountPreviewLimit);
+  const hiddenDataCount = Math.max(localDataCounts.length - displayedDataCounts.length, 0);
 
   const resetFileInput = () => {
     if (fileInputRef.current) {
@@ -534,63 +558,21 @@ export function SettingsPage() {
                   label={t("settings.totalLocalRecords")}
                   value={totalLocalRecords}
                 />
-                <CountItem
-                  label={t("settings.projectsCount")}
-                  value={dataManagement.summary.projects}
-                />
-                <CountItem
-                  label={t("settings.tasksCount")}
-                  value={dataManagement.summary.tasks}
-                />
-                <CountItem
-                  label={t("settings.goalsCount")}
-                  value={dataManagement.summary.goals}
-                />
-                <CountItem
-                  label={t("settings.lifeAreasCount")}
-                  value={dataManagement.summary.lifeAreas}
-                />
-                <CountItem
-                  label={t("settings.decisionLogsCount")}
-                  value={dataManagement.summary.decisionLogEntries}
-                />
-                <CountItem
-                  label={t("settings.manualEntriesCount")}
-                  value={dataManagement.summary.manualEntries}
-                />
-                <CountItem
-                  label={t("settings.financeTransactionsCount")}
-                  value={dataManagement.summary.financeTransactions}
-                />
-                <CountItem
-                  label={t("settings.financeObligationsCount")}
-                  value={dataManagement.summary.financeObligations}
-                />
-                <CountItem
-                  label={t("settings.journalCount")}
-                  value={dataManagement.summary.journalEntries}
-                />
-                <CountItem
-                  label={t("settings.knowledgeCount")}
-                  value={dataManagement.summary.knowledgeItems}
-                />
-                <CountItem
-                  label={t("settings.checkinsCount")}
-                  value={dataManagement.summary.dailyCheckins}
-                />
-                <CountItem
-                  label={t("settings.inboxCount")}
-                  value={dataManagement.summary.inboxItems}
-                />
-                <CountItem
-                  label={t("settings.settingsCount")}
-                  value={dataManagement.summary.settings}
-                />
-                <CountItem
-                  label={t("settings.routinesCount")}
-                  value={dataManagement.summary.routines}
-                />
+                {displayedDataCounts.map((item) => (
+                  <CountItem key={item.label} label={item.label} value={item.value} />
+                ))}
               </div>
+              {localDataCounts.length > dataCountPreviewLimit ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowAllDataCounts((current) => !current)}
+                >
+                  {showAllDataCounts
+                    ? t("common.showFewer")
+                    : t("common.showMoreCount", { count: hiddenDataCount })}
+                </Button>
+              ) : null}
               <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
                 <p className="text-sm leading-7 text-muted-foreground">
                   {t("settings.localDataWarning")}

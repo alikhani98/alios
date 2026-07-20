@@ -2,6 +2,11 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 130 - Settings Reading Density
+
+- Kept the AliOS Help Center available but collapsed every guide topic initially so Settings opens to actionable controls instead of a long reference document
+- Reduced the initial local-data count grid to essential records plus an explicit local reveal control; backup status and all safety actions remain immediately visible
+
 ## Stage 129 - Goal and Manual Reading Boundaries
 
 - Reduced the initial Goal and Personal Manual card views to six records, with focused Goal navigation preserved outside the initial view

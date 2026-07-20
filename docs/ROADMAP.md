@@ -150,6 +150,8 @@ Stage 128 reduces the initial Routine view further for actual mobile use and add
 
 Stage 129 applies the six-card reading boundary to Goals and Personal Manual, while retaining the seven Life Areas together as one intentional whole-life overview.
 
+Stage 130 makes Settings open as a compact operational page: Help Center sections remain available but initially closed, while secondary local record counts use progressive disclosure.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1

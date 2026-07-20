@@ -407,6 +407,11 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 2. Open a Goal focus link beyond the boundary and confirm that Goal remains visible and highlighted.
 3. Confirm all seven canonical Life Areas remain visible together on desktop and mobile.
 
+### Stage 130 Settings reading density
+
+1. Open Settings at 360px and desktop width; confirm all Help Center topics begin closed but each topic expands with its complete existing content.
+2. Confirm the local-data summary shows the total and a compact subset, then reveals every existing count without altering backup freshness or any safety action.
+
 - [x] Routines, Projects, Knowledge, and Personal Manual initially render no more than twelve cards
 - [x] Existing cards beyond the initial limit remain explicitly reachable through a local display control
 - [x] A focused item outside the initial limit is rendered for existing search and navigation destinations

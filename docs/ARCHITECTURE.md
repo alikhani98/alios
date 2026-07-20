@@ -259,6 +259,12 @@ AliOS does not require a Node.js server in production. Node.js is allowed for de
 - Goals and Personal Manual have a six-card initial boundary because both can grow without a natural product limit
 - Life Areas remain fully rendered because their seven canonical categories are one fixed holistic overview
 
+## Settings Reading Density Boundary
+
+- Help Center content and detailed local-data counts remain present but do not dominate the first Settings viewport
+- Backup status, export, restore, recovery, and error-log actions retain their existing direct paths
+- Collapsed state and count reveal are display-only and never change records, preferences, repositories, schemas, or backups
+
 ## Layering
 
 ```text
