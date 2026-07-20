@@ -2,6 +2,11 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 136 - Today Task List Density
+
+- Limited the initial Today task list to twelve cards, with an explicit local reveal control for the remaining tasks
+- Kept filtered task counts, task actions, and focused search navigation based on the complete local collection
+
 ## Stage 135 - Journal Archive Density
 
 - Limited the initial journal archive to twelve entries with a local reveal control, while ensuring a focused search result outside the boundary remains rendered and reachable

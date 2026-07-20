@@ -270,6 +270,12 @@ AliOS does not require a Node.js server in production. Node.js is allowed for de
 - Backup status, export, restore, recovery, and error-log actions retain their existing direct paths
 - Collapsed state and count reveal are display-only and never change records, preferences, repositories, schemas, or backups
 
+## Today Task Density Boundary
+
+- Today initially renders twelve filtered task cards; an explicit local reveal control exposes the complete existing set
+- A focused task outside the preview remains rendered, so existing search navigation and scrolling continue to work
+- The boundary changes neither task actions nor route filters, stored records, repositories, schemas, or backups
+
 ## Layering
 
 ```text

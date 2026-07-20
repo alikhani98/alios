@@ -162,6 +162,8 @@ Stage 134 bounds Global Search to twelve initially rendered matching results, wh
 
 Stage 135 bounds the Journal archive to twelve initially rendered entries and preserves focused search navigation outside that initial view.
 
+Stage 136 bounds Today to twelve initially rendered filtered task cards, while retaining every task action and focused navigation target through an explicit reveal control.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1
