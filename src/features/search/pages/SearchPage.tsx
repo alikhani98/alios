@@ -73,9 +73,15 @@ export function SearchPage() {
   const { direction, t } = useI18n();
   const { data, hasError, isLoading, reload } = useGlobalSearch();
   const [query, setQuery] = useState("");
+  const [showAllResults, setShowAllResults] = useState(false);
 
   const results = useMemo(() => (data ? searchLocalData(data, query) : []), [data, query]);
   const hasQuery = query.trim().length > 0;
+  const resultPreviewLimit = 12;
+  const displayedResults = showAllResults
+    ? results
+    : results.slice(0, resultPreviewLimit);
+  const hiddenResultCount = Math.max(results.length - displayedResults.length, 0);
 
   return (
     <section className="alios-page space-y-6">
@@ -108,7 +114,10 @@ export function SearchPage() {
             <Input
               aria-label={t("search.inputLabel")}
               value={query}
-              onChange={(event) => setQuery(event.target.value)}
+              onChange={(event) => {
+                setQuery(event.target.value);
+                setShowAllResults(false);
+              }}
               placeholder={t("search.placeholder")}
               className={direction === "rtl" ? "h-11 pr-9" : "h-11 pl-9"}
             />
@@ -160,13 +169,25 @@ export function SearchPage() {
             {t("search.resultsSummary", { count: results.length })}
           </p>
           <div className="grid gap-4 lg:grid-cols-2">
-            {results.map((result) => (
+            {displayedResults.map((result) => (
               <SearchResultCard
                 key={`${result.kind}-${result.href}-${result.title}`}
                 result={result}
               />
             ))}
           </div>
+          {results.length > resultPreviewLimit ? (
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full sm:w-auto"
+              onClick={() => setShowAllResults((current) => !current)}
+            >
+              {showAllResults
+                ? t("common.showFewer")
+                : t("common.showMoreCount", { count: hiddenResultCount })}
+            </Button>
+          ) : null}
         </div>
       )}
     </section>

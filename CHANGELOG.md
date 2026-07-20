@@ -2,6 +2,10 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 134 - Search Result Density
+
+- Limited the initial global-search result grid to twelve matching records and kept every existing result and focus-navigation link available through an explicit local reveal control
+
 ## Stage 133 - Weekly Review Detail Density
 
 - Limited the initially shown due Goal and Personal Manual review cards to six per section, with local reveal controls that keep every existing review action available

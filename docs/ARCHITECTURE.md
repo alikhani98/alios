@@ -43,6 +43,7 @@ AliOS 1.0 is a local-first static web app.
 - A page-entry surface may render existing titles, descriptions, icons, and foreground actions, but does not own form, filter, record, navigation, or storage behavior
 - Journal, Knowledge, and Settings retain their feature-owned content and data-safety behavior while consuming the same established visual primitives
 - Search and Routines retain their local search and explicit Task-creation boundaries while consuming the same established visual primitives
+- Global Search may apply a local presentation-only reveal boundary to matching results; matching, result counts, facets, and focused feature navigation remain complete and local
 
 ## Finance Module Boundary
 

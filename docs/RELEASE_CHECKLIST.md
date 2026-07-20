@@ -427,6 +427,11 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 1. With more than six due Goals and more than six due Personal Manual entries, confirm each Weekly Review detail section initially shows six and can reveal all remaining existing records at desktop and 360px widths.
 2. Mark a revealed Goal or Manual entry reviewed and navigate to its feature page; confirm the correct existing record is affected and no summary count or record is removed by the presentation boundary.
 
+### Stage 134 Search result density
+
+1. Search a term with more than twelve matches at desktop and 360px widths; confirm twelve result cards appear initially and the control exposes every remaining existing match.
+2. Change the search term after expanding results and open a revealed focused result; confirm the new query starts compact and the result navigates to its original feature record.
+
 - [x] Routines, Projects, Knowledge, and Personal Manual initially render no more than twelve cards
 - [x] Existing cards beyond the initial limit remain explicitly reachable through a local display control
 - [x] A focused item outside the initial limit is rendered for existing search and navigation destinations
