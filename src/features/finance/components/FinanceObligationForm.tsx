@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 
 import type { FinanceObligation } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
-import { Button, Input, Textarea, Select } from "@/shared/ui";
+import { Button, DateValueHint, Input, Textarea, Select } from "@/shared/ui";
 import {
   DEFAULT_FINANCE_OBLIGATION_STATUS,
   DEFAULT_FINANCE_OBLIGATION_TYPE,
@@ -12,7 +12,6 @@ import {
   FINANCE_OBLIGATION_TYPE_OPTIONS,
   type FinanceObligationFormValues,
 } from "../domain/finance";
-import { getJalaliDatePreview } from "../financeDate";
 import { financeObligationSchema } from "@/shared/types";
 
 type FinanceObligationFormProps = {
@@ -44,7 +43,7 @@ export function FinanceObligationForm({
   onSubmit,
   onCancel,
 }: FinanceObligationFormProps) {
-  const { language, t } = useI18n();
+  const { t } = useI18n();
   const {
     register,
     watch,
@@ -67,7 +66,6 @@ export function FinanceObligationForm({
     },
   });
   const dueDateValue = watch("dueDate");
-  const jalaliDueDatePreview = getJalaliDatePreview(dueDateValue, language);
 
   return (
     <form
@@ -220,11 +218,7 @@ export function FinanceObligationForm({
             })}
           />
           <div className="space-y-1 text-xs leading-5 text-muted-foreground">
-            {jalaliDueDatePreview ? (
-              <p className="break-words">
-                {t("finance.jalaliDueDatePreview")} {jalaliDueDatePreview}
-              </p>
-            ) : null}
+            <DateValueHint value={dueDateValue} className="break-words" />
             <p>{t("finance.dueDateStorageNote")}</p>
           </div>
           {errors.dueDate ? (

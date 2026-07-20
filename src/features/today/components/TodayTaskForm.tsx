@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { PROJECT_STATUS_LABEL_KEYS } from "@/features/projects/constants";
 import type { Project, Task } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
-import { Button, Input, Textarea, Select } from "@/shared/ui";
+import { Button, DateValueHint, Input, Textarea, Select } from "@/shared/ui";
 import { TASK_PRIORITY_OPTIONS, TASK_STATUS_OPTIONS } from "../constants";
 import { todayTaskFormSchema, type TodayTaskFormValues } from "../types";
 
@@ -32,6 +32,7 @@ export function TodayTaskForm({
   const { t } = useI18n();
   const {
     register,
+    watch,
     handleSubmit,
     formState: { errors },
   } = useForm<TodayTaskFormValues>({
@@ -46,6 +47,7 @@ export function TodayTaskForm({
       projectId: task?.projectId ?? "",
     },
   });
+  const dueDateValue = watch("dueDate");
 
   return (
     <form
@@ -154,6 +156,7 @@ export function TodayTaskForm({
           aria-invalid={Boolean(errors.dueDate)}
           {...register("dueDate")}
         />
+        <DateValueHint value={dueDateValue} />
         <p
           id="today-task-due-date-help"
           className="text-xs leading-5 text-muted-foreground"

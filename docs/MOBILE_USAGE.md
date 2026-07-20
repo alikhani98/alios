@@ -60,6 +60,8 @@ Stage 135 initially shows twelve Journal entries on any viewport; a focused Jour
 Stage 136 initially shows twelve Today task cards on any viewport; the remaining filtered tasks stay reachable through one local reveal control, and a focused task remains visible.
 
 Stage 137 initially shows six Weekly Review project-attention entries, focus observations, and suggested-focus entries per collection; all remaining calculated items remain locally reachable.
+
+Stage 138 shows the selected calendar representation directly under populated native date inputs, including on narrow screens; the stored value remains unchanged ISO/Gregorian text.
 The Personal Insights section stays local to the device and only reflects stored tasks, projects, inbox items, journal entries, knowledge items, and wellness checklist state.
 
 ## Personal Manual smoke test

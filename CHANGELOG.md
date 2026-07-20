@@ -2,6 +2,11 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 138 - Calendar Entry Foundation
+
+- Added a shared date-display hint to core task, project, goal, decision, journal, and finance forms
+- Kept native date input and ISO/Gregorian storage intact while making the selected Settings calendar visible at entry time
+
 ## Stage 137 - Weekly Review Insight Density
 
 - Bounded long project-attention, weekly-observation, and suggested-focus lists to six items initially

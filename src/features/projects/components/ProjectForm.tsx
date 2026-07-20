@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { GOAL_STATUS_LABEL_KEYS } from "@/features/goals/constants";
 import type { Goal, Project } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
-import { Button, Input, Textarea, Select } from "@/shared/ui";
+import { Button, DateValueHint, Input, Textarea, Select } from "@/shared/ui";
 import {
   PROJECT_PRIORITY_OPTIONS,
   PROJECT_STATUS_OPTIONS,
@@ -33,6 +33,7 @@ export function ProjectForm({
   const { t } = useI18n();
   const {
     register,
+    watch,
     handleSubmit,
     formState: { errors },
   } = useForm<ProjectFormValues>({
@@ -48,6 +49,7 @@ export function ProjectForm({
       reviewIntervalDays: project?.reviewIntervalDays ? String(project.reviewIntervalDays) : "",
     },
   });
+  const reviewDateValue = watch("reviewDate");
 
   return (
     <form
@@ -161,6 +163,7 @@ export function ProjectForm({
             {t("projects.reviewDate")}
           </label>
           <Input id="project-review-date" type="date" {...register("reviewDate")} />
+          <DateValueHint value={reviewDateValue} />
         </div>
       </div>
 

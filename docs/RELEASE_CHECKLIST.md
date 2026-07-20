@@ -449,6 +449,12 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 2. Open a revealed project-attention item’s Goal and Today-task links; confirm they preserve the original record destination.
 3. Confirm collapsing a revealed collection does not persist a preference or alter any review, planning, or summary calculation.
 
+### Stage 138 Calendar entry foundation
+
+1. In Persian with Jalali display selected, enter a date in each core form and confirm the visible hint is Jalali while the submitted value remains an ISO date.
+2. Switch Settings to Gregorian and English; confirm the same entered date’s hint follows the selected display without modifying the form input.
+3. Clear an optional date and confirm its display hint disappears without an error or stray value.
+
 - [x] Routines, Projects, Knowledge, and Personal Manual initially render no more than twelve cards
 - [x] Existing cards beyond the initial limit remain explicitly reachable through a local display control
 - [x] A focused item outside the initial limit is rendered for existing search and navigation destinations

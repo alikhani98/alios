@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 
 import type { JournalEntry } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
-import { Button, Input, Textarea, Select } from "@/shared/ui";
+import { Button, DateValueHint, Input, Textarea, Select } from "@/shared/ui";
 import { JOURNAL_TYPE_OPTIONS, LEVEL_OPTIONS } from "../constants";
 import {
   journalEntryFormSchema,
@@ -27,6 +27,7 @@ export function JournalEntryForm({
   const { t } = useI18n();
   const {
     register,
+    watch,
     handleSubmit,
     formState: { errors },
   } = useForm<JournalEntryFormValues>({
@@ -40,6 +41,7 @@ export function JournalEntryForm({
       energyLevel: entry?.energyLevel ?? "",
     },
   });
+  const dateValue = watch("date");
 
   return (
     <form
@@ -57,6 +59,7 @@ export function JournalEntryForm({
             aria-invalid={Boolean(errors.date)}
             {...register("date")}
           />
+          <DateValueHint value={dateValue} />
           {errors.date ? (
             <p className="text-sm text-destructive">{t("common.validation")}</p>
           ) : null}
