@@ -710,3 +710,11 @@ This changes no record, route meaning, schema, migration, backup, dependency, ba
 Home may group existing overdue, today, and tomorrow buckets as compact immediate-work lanes. Existing this-week and later buckets share one explicit planning row and retain the existing Today destination. The arrangement is derived presentation only; task records, task editing, due dates, MIT selection, and status behavior remain solely within Today.
 
 The stage adds no record, route, schema, migration, backup change, dependency, backend, sync, cloud, AI, telemetry, or automation.
+
+## ADR-068: Keep the Home action workspace structurally balanced
+
+**Status:** Accepted (Stage 125)
+
+The Home upcoming-work workspace occupies its full desktop dashboard row. If fewer than three existing immediate task horizons contain work, the remaining visual slot is a non-destructive link to the existing Today workspace. It is not an inferred Task and cannot mutate task data.
+
+The stage adds no record, route, schema, migration, backup change, dependency, backend, sync, cloud, AI, telemetry, or automation.

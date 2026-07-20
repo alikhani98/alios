@@ -233,6 +233,11 @@ AliOS does not require a Node.js server in production. Node.js is allowed for de
 - Immediate and later horizons retain their existing task counts and Today route
 - The workspace does not edit a Task, create a record, or alter routing, repositories, schemas, backups, or storage behavior
 
+## Home Action Workspace Balance Boundary
+
+- A missing immediate horizon may render an existing Today navigation action as a presentational slot
+- The action is not a placeholder Task and does not add, modify, or infer a stored record
+
 ## Layering
 
 ```text
