@@ -146,6 +146,8 @@ Stage 126 makes repeated routine suggestions on Today compact by default while r
 
 Stage 127 applies the same progressive-disclosure boundary to the primary dense card collections: Routines, Projects, Knowledge, and Personal Manual.
 
+Stage 128 reduces the initial Routine view further for actual mobile use and adds the same display-only boundary to Inbox and Decision Log collections without weakening filtering, search focus, or Inbox bulk triage.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1

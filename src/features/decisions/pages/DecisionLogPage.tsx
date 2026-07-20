@@ -86,9 +86,11 @@ export function DecisionLogPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [showAllDecisions, setShowAllDecisions] = useState(false);
   const formRef = useRef<HTMLDivElement | null>(null);
   const referenceDate = useMemo(() => new Date(), []);
   const hasActiveFilter = selectedFilter !== "all";
+  const decisionPreviewLimit = 12;
 
   const filterCounts = useMemo(
     () => getDecisionLogFilterCounts(entries, referenceDate),
@@ -102,6 +104,14 @@ export function DecisionLogPage() {
     () => entries.filter((entry) => isDecisionNeedsReview(entry, referenceDate)),
     [entries, referenceDate]
   );
+  const displayedEntries = showAllDecisions
+    ? filteredEntries
+    : filteredEntries.slice(0, decisionPreviewLimit);
+  const hiddenDecisionCount = Math.max(filteredEntries.length - displayedEntries.length, 0);
+
+  useEffect(() => {
+    setShowAllDecisions(false);
+  }, [selectedFilter]);
 
   useEffect(() => {
     if (!editingDecision) {
@@ -381,7 +391,7 @@ export function DecisionLogPage() {
         />
       ) : (
         <div className="grid gap-4 xl:grid-cols-2">
-          {filteredEntries.map((decision) => (
+          {displayedEntries.map((decision) => (
             <DecisionLogCard
               key={decision.id}
               decision={decision}
@@ -394,6 +404,15 @@ export function DecisionLogPage() {
           ))}
         </div>
       )}
+      {filteredEntries.length > decisionPreviewLimit ? (
+        <div className="flex justify-start">
+          <Button type="button" variant="outline" onClick={() => setShowAllDecisions((current) => !current)}>
+            {showAllDecisions
+              ? t("common.showFewer")
+              : t("common.showMoreCount", { count: hiddenDecisionCount })}
+          </Button>
+        </div>
+      ) : null}
     </section>
   );
 }

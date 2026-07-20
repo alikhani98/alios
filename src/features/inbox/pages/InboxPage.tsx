@@ -59,8 +59,10 @@ export function InboxPage() {
   const [typeFilter, setTypeFilter] = useState<InboxTypeFilter>("all");
   const [focusedItemId, setFocusedItemId] = useState<string | null>(null);
   const [focusMessage, setFocusMessage] = useState<string | null>(null);
+  const [showAllItems, setShowAllItems] = useState(false);
   const itemRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const focusId = searchParams.get("focusId");
+  const inboxPreviewLimit = 12;
 
   const filteredItems = filterInboxItems(items, {
     query: searchQuery,
@@ -69,6 +71,11 @@ export function InboxPage() {
   });
   const filtersActive =
     searchQuery.trim().length > 0 || statusFilter !== "all" || typeFilter !== "all";
+  const focusRequiresAllItems = filteredItems.findIndex((item) => item.id === focusId) >= inboxPreviewLimit;
+  const displayedItems = showAllItems || focusRequiresAllItems
+    ? filteredItems
+    : filteredItems.slice(0, inboxPreviewLimit);
+  const hiddenItemCount = Math.max(filteredItems.length - displayedItems.length, 0);
   const visibleItemIds = useMemo(
     () => selectVisibleInboxItemIds(filteredItems),
     [filteredItems]
@@ -81,6 +88,7 @@ export function InboxPage() {
   useEffect(() => {
     setSelectedIds([]);
     setConfirmingBulkDelete(false);
+    setShowAllItems(false);
   }, [searchQuery, statusFilter, typeFilter]);
 
   useEffect(() => {
@@ -385,7 +393,7 @@ export function InboxPage() {
         />
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
-          {filteredItems.map((item) => (
+          {displayedItems.map((item) => (
             <div
               key={item.id}
               ref={(node) => {
@@ -428,6 +436,15 @@ export function InboxPage() {
           ))}
         </div>
       )}
+      {filteredItems.length > inboxPreviewLimit && !focusRequiresAllItems ? (
+        <div className="flex justify-start">
+          <Button type="button" variant="outline" onClick={() => setShowAllItems((current) => !current)}>
+            {showAllItems
+              ? t("common.showFewer")
+              : t("common.showMoreCount", { count: hiddenItemCount })}
+          </Button>
+        </div>
+      ) : null}
     </section>
   );
 }

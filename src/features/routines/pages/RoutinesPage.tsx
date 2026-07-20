@@ -59,7 +59,7 @@ export function RoutinesPage() {
   const [actionError, setActionError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [showAllRoutines, setShowAllRoutines] = useState(false);
-  const routinePreviewLimit = 12;
+  const routinePreviewLimit = 6;
   const focusRequiresAllRoutines = entries.findIndex((routine) => routine.id === focusId) >= routinePreviewLimit;
   const displayedRoutines = showAllRoutines || focusRequiresAllRoutines
     ? entries
