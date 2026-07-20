@@ -243,6 +243,11 @@ AliOS does not require a Node.js server in production. Node.js is allowed for de
 - The Today display may limit the initially rendered eligible-routine cards, but it does not change the routine suggestion calculation
 - Revealing additional cards is local UI state only and does not save a preference or create a Task
 
+## Dense Collection View Boundary
+
+- The initial card limit applies only to rendered collection presentation in Routines, Projects, Knowledge, and Personal Manual
+- Search-focus destinations outside that limit remain available; no stored record, filter result, or CRUD behavior is removed
+
 ## Layering
 
 ```text

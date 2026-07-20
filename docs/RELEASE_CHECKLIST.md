@@ -390,6 +390,13 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] Narrow screens retain a readable single-column routine suggestion sequence
 - [ ] Manually inspect Today with 0, 1, 6, and more than 6 eligible routine suggestions at desktop and 360px, 390px, and 430px widths
 
+### Stage 127 Dense collection views
+
+- [x] Routines, Projects, Knowledge, and Personal Manual initially render no more than twelve cards
+- [x] Existing cards beyond the initial limit remain explicitly reachable through a local display control
+- [x] A focused item outside the initial limit is rendered for existing search and navigation destinations
+- [ ] Manually inspect each collection with 0, 1, 12, and more than 12 records at desktop and 360px, 390px, and 430px widths
+
 ### Stage 86 performance regression guard
 
 - [x] `pnpm performance:check` builds a manifest and enforces the entry-byte budget, no forms preload, and no Vite chunk-size warning

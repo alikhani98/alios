@@ -114,6 +114,8 @@ export const messagesEn = {
   "common.archived": "Archived",
   "common.expandSection": "Expand section",
   "common.collapseSection": "Collapse section",
+  "common.showMoreCount": "Show {count} more",
+  "common.showFewer": "Show fewer",
   "common.validation": "Please check this field.",
   "goals.title": "Goals",
   "goals.description": "Define local, manually managed goals with a time horizon, then review them without leaving AliOS.",

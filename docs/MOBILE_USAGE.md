@@ -47,6 +47,7 @@ Stage 123 stacks the three Home planning actions in a clear mobile sequence and 
 Stage 124 keeps each immediate task lane readable at narrow widths, then stacks the later-planning context and its existing Today route without horizontal scrolling.
 Stage 125 keeps the same mobile stack and only fills an absent immediate desktop lane with a compact route to Today; no task is created or hidden.
 Stage 126 keeps routine suggestions single-column on narrow screens, reveals no more than six initially, and makes the remaining existing suggestions explicitly reachable.
+Stage 127 limits dense collections to twelve initially rendered cards on mobile and desktop, with a full-width explicit reveal control for the existing remaining records.
 The Personal Insights section stays local to the device and only reflects stored tasks, projects, inbox items, journal entries, knowledge items, and wellness checklist state.
 
 ## Personal Manual smoke test

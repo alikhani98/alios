@@ -58,6 +58,13 @@ export function RoutinesPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [showAllRoutines, setShowAllRoutines] = useState(false);
+  const routinePreviewLimit = 12;
+  const focusRequiresAllRoutines = entries.findIndex((routine) => routine.id === focusId) >= routinePreviewLimit;
+  const displayedRoutines = showAllRoutines || focusRequiresAllRoutines
+    ? entries
+    : entries.slice(0, routinePreviewLimit);
+  const hiddenRoutineCount = Math.max(entries.length - displayedRoutines.length, 0);
 
   const loadRoutineTasks = async () => {
     setIsTasksLoading(true);
@@ -222,7 +229,7 @@ export function RoutinesPage() {
         />
       ) : (
         <div className="grid gap-4 xl:grid-cols-2">
-          {entries.map((routine) => {
+          {displayedRoutines.map((routine) => {
             const progress = getRoutineTaskProgress(routine.id, tasks);
 
             return (
@@ -308,6 +315,15 @@ export function RoutinesPage() {
           })}
         </div>
       )}
+      {entries.length > routinePreviewLimit && !focusRequiresAllRoutines ? (
+        <div className="flex justify-start">
+          <Button type="button" variant="outline" onClick={() => setShowAllRoutines((current) => !current)}>
+            {showAllRoutines
+              ? t("common.showFewer")
+              : t("common.showMoreCount", { count: hiddenRoutineCount })}
+          </Button>
+        </div>
+      ) : null}
     </section>
   );
 }
