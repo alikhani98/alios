@@ -2,6 +2,10 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 132 - Weekly Review Queue Density
+
+- Bounded the initial weekly review queue to six actionable items with an explicit local reveal control, while preserving every review action and queued record
+
 ## Stage 131 - Finance Collection Density
 
 - Added local progressive disclosure to long filtered transaction and obligation collections without changing finance calculations, filters, CRUD, or local records

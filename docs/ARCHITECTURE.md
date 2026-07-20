@@ -83,6 +83,7 @@ AliOS 1.0 is a local-first static web app.
 ## Unified Review Queue Boundary
 
 - Weekly Review may assemble one foreground-only queue from existing Project, Goal, Life Area, Personal Manual, and Decision review-due rules
+- Long weekly review queues may use a local presentation-only reveal boundary; every queued record retains its original review action and navigation destination
 - The queue is derived on load and is never persisted, cached, scheduled, or treated as a user priority score
 - Each action delegates to the owning repository and refreshes the derived summary; no action cascades to linked records
 - Decision due status uses the shared deterministic rule, so older overdue Decisions remain visible until explicitly marked reviewed
