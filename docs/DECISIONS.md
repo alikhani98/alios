@@ -790,3 +790,11 @@ The stage adds no record, route, schema, migration, backup change, dependency, b
 Global Search initially renders twelve matching records. The result total, matching logic, facets, and focused navigation links continue to use the complete local result collection. A query change restores the compact presentation so each new search begins with a readable result set.
 
 The stage adds no record, route, schema, migration, backup change, dependency, backend, sync, cloud, AI, telemetry, or automation.
+
+## ADR-078: Keep the journal archive compact without hiding a focused entry
+
+**Status:** Accepted (Stage 135)
+
+Journal initially renders twelve entries. The complete local archive stays reachable through an explicit reveal control. When existing Global Search navigation targets a Journal entry outside the initial view, that entry is additionally rendered so the established focus and scroll behavior continues to work.
+
+The stage adds no record, route, schema, migration, backup change, dependency, backend, sync, cloud, AI, telemetry, or automation.
