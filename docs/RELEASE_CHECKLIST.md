@@ -383,6 +383,13 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] Mobile remains a readable single-column action sequence
 - [ ] Manually inspect sparse and populated Home data at desktop and 360px, 390px, and 430px widths
 
+### Stage 126 Today routine suggestion density
+
+- [x] Today initially renders no more than six eligible routine suggestion cards
+- [x] The explicit reveal control shows the existing full set without changing routine eligibility or creating Tasks
+- [x] Narrow screens retain a readable single-column routine suggestion sequence
+- [ ] Manually inspect Today with 0, 1, 6, and more than 6 eligible routine suggestions at desktop and 360px, 390px, and 430px widths
+
 ### Stage 86 performance regression guard
 
 - [x] `pnpm performance:check` builds a manifest and enforces the entry-byte budget, no forms preload, and no Vite chunk-size warning

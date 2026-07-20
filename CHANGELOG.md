@@ -2,6 +2,11 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 126 - Today Routine Suggestion Density
+
+- Reduced the initial visual density of repeated Today routine suggestions while retaining a clear control to reveal every eligible routine
+- Kept routine-to-Task creation, scheduling rules, and all local routine data unchanged
+
 ## Stage 125 - Home Action Workspace Balance
 
 - Made the Home upcoming-work workspace use its full desktop dashboard row instead of leaving a neighbouring empty column

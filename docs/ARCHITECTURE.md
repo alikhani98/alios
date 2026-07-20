@@ -238,6 +238,11 @@ AliOS does not require a Node.js server in production. Node.js is allowed for de
 - A missing immediate horizon may render an existing Today navigation action as a presentational slot
 - The action is not a placeholder Task and does not add, modify, or infer a stored record
 
+## Today Routine Suggestion Density Boundary
+
+- The Today display may limit the initially rendered eligible-routine cards, but it does not change the routine suggestion calculation
+- Revealing additional cards is local UI state only and does not save a preference or create a Task
+
 ## Layering
 
 ```text

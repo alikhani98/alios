@@ -742,6 +742,8 @@ export const messagesFa: Record<TranslationKey, string> = {
   "home.dailyPlan": "برنامه امروز",
   "home.dailyPlanDescription": "هدف، تمرکز هفته و اقدام بعدی را در یک نگاه نگه دارید.",
   "home.captureNextActionDescription": "فکر، کار یا یادآوری بعدی را همین حالا ثبت کنید و بعداً سامان دهید.",
+  "today.showMoreRoutineSuggestions": "نمایش {count} پیشنهاد روتین دیگر",
+  "today.showFewerRoutineSuggestions": "نمایش پیشنهادهای کمتر",
   "home.goToday": "رفتن به امروز",
   "home.goInbox": "رفتن به صندوق ورودی",
   "home.unprocessedInbox": "ورودی‌های بررسی‌نشده",

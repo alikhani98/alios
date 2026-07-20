@@ -636,6 +636,8 @@ export const messagesEn = {
   "home.dailyPlan": "Today's plan",
   "home.dailyPlanDescription": "Keep your goal, weekly focus, and next action in one view.",
   "home.captureNextActionDescription": "Capture the next thought, task, or reminder now and organize it later.",
+  "today.showMoreRoutineSuggestions": "Show {count} more routine suggestions",
+  "today.showFewerRoutineSuggestions": "Show fewer routine suggestions",
   "home.goToday": "Go to Today",
   "home.goInbox": "Go to Inbox",
   "home.unprocessedInbox": "Unprocessed inbox",

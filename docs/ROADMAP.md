@@ -142,6 +142,8 @@ Stage 124 composes the existing upcoming-task buckets into a compact action work
 
 Stage 125 gives that action workspace its full desktop row and uses a calm Today route as a presentational third slot when one immediate horizon has no tasks.
 
+Stage 126 makes repeated routine suggestions on Today compact by default while retaining a local display-only control to reveal all eligible suggestions.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1

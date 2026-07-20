@@ -12,6 +12,7 @@ import { useI18n } from "@/shared/i18n";
 import { useDateFormatter } from "@/shared/date";
 import {
   Button,
+  Badge,
   Card,
   CardContent,
   CardHeader,
@@ -88,6 +89,7 @@ export function TodayPage() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [focusedTaskId, setFocusedTaskId] = useState<string | null>(null);
   const [focusMessage, setFocusMessage] = useState<string | null>(null);
+  const [showAllRoutineSuggestions, setShowAllRoutineSuggestions] = useState(false);
   const taskRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const plannedTaskRef = useRef<HTMLDivElement | null>(null);
   const focusId = searchParams.get("focusId");
@@ -113,6 +115,14 @@ export function TodayPage() {
     tasks,
     today,
     new Date().getDay()
+  );
+  const routineSuggestionPreviewLimit = 6;
+  const visibleRoutineSuggestions = showAllRoutineSuggestions
+    ? routineSuggestions
+    : routineSuggestions.slice(0, routineSuggestionPreviewLimit);
+  const hiddenRoutineSuggestionCount = Math.max(
+    routineSuggestions.length - visibleRoutineSuggestions.length,
+    0
   );
   const reviewDueProjects = projects.filter((project) => isProjectReviewDue(project));
 
@@ -382,16 +392,21 @@ export function TodayPage() {
       <TodayWeeklyPlanCard focus={weeklyPlanFocus} isLoading={isWeeklyPlanLoading} />
 
       <PremiumCard>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Repeat2 className="h-5 w-5 text-primary" />
-            {t("routines.todayTitle")}
-          </CardTitle>
+        <CardHeader className="gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="space-y-1">
+            <CardTitle className="flex items-center gap-2">
+              <Repeat2 className="h-5 w-5 text-primary" />
+              {t("routines.todayTitle")}
+            </CardTitle>
+            <p className="text-sm leading-6 text-muted-foreground">
+              {t("routines.todayDescription")}
+            </p>
+          </div>
+          {routineSuggestions.length > 0 ? (
+            <Badge variant="secondary">{routineSuggestions.length}</Badge>
+          ) : null}
         </CardHeader>
         <CardContent className="space-y-3">
-          <p className="text-sm leading-7 text-muted-foreground">
-            {t("routines.todayDescription")}
-          </p>
           {routinesError ? (
             <div className="flex flex-col gap-3 rounded-xl border p-3 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-sm text-muted-foreground">{t("routines.todayUnavailable")}</p>
@@ -400,14 +415,50 @@ export function TodayPage() {
           ) : isRoutinesLoading ? (
             <div className="h-16 animate-pulse rounded-xl bg-muted/60" />
           ) : routineSuggestions.length > 0 ? (
-            <div className="grid gap-3 md:grid-cols-2">
-              {routineSuggestions.map((routine) => (
-                <div key={routine.id} className="flex min-w-0 flex-col gap-3 rounded-xl border bg-muted/20 p-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="min-w-0"><p className="break-words font-medium">{routine.title}</p>{routine.description ? <p className="break-words text-sm text-muted-foreground">{routine.description}</p> : null}</div>
-                  <Button size="sm" className="w-full shrink-0 sm:w-auto" disabled={busyRoutineId === routine.id} onClick={() => void handleAddRoutine(routine)}><Plus className="me-2 h-4 w-4" />{t("routines.addToToday")}</Button>
+            <>
+              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                {visibleRoutineSuggestions.map((routine) => (
+                  <div
+                    key={routine.id}
+                    className="grid min-w-0 gap-3 rounded-xl border bg-muted/20 p-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
+                  >
+                    <div className="min-w-0">
+                      <p className="break-words font-medium">{routine.title}</p>
+                      {routine.description ? (
+                        <p className="mt-1 line-clamp-1 break-words text-sm leading-6 text-muted-foreground">
+                          {routine.description}
+                        </p>
+                      ) : null}
+                    </div>
+                    <Button
+                      size="sm"
+                      className="w-full shrink-0 sm:w-auto"
+                      disabled={busyRoutineId === routine.id}
+                      onClick={() => void handleAddRoutine(routine)}
+                    >
+                      <Plus className="me-2 h-4 w-4" />
+                      {t("routines.addToToday")}
+                    </Button>
+                  </div>
+                ))}
+              </div>
+              {hiddenRoutineSuggestionCount > 0 || showAllRoutineSuggestions ? (
+                <div className="flex justify-start border-t border-border/60 pt-3">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setShowAllRoutineSuggestions((current) => !current)}
+                  >
+                    {showAllRoutineSuggestions
+                      ? t("today.showFewerRoutineSuggestions")
+                      : t("today.showMoreRoutineSuggestions", {
+                          count: hiddenRoutineSuggestionCount,
+                        })}
+                  </Button>
                 </div>
-              ))}
-            </div>
+              ) : null}
+            </>
           ) : null}
         </CardContent>
       </PremiumCard>
