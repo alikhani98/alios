@@ -278,6 +278,8 @@ export function WeeklyReviewPage() {
   } = useWeeklyReview();
   const [isSavingWeeklyPlan, setIsSavingWeeklyPlan] = useState(false);
   const [showAllReviewQueueItems, setShowAllReviewQueueItems] = useState(false);
+  const [showAllDueGoals, setShowAllDueGoals] = useState(false);
+  const [showAllDueManualEntries, setShowAllDueManualEntries] = useState(false);
 
   const reviewQueue = useMemo(
     () => (summary ? getReviewQueue(summary) : []),
@@ -289,6 +291,21 @@ export function WeeklyReviewPage() {
     : reviewQueue.slice(0, reviewQueuePreviewLimit);
   const hiddenReviewQueueCount = Math.max(
     reviewQueue.length - displayedReviewQueue.length,
+    0
+  );
+  const reviewDetailPreviewLimit = 6;
+  const displayedDueGoals = showAllDueGoals
+    ? summary?.goalSummary.dueEntries ?? []
+    : summary?.goalSummary.dueEntries.slice(0, reviewDetailPreviewLimit) ?? [];
+  const displayedDueManualEntries = showAllDueManualEntries
+    ? summary?.manualSummary.dueEntries ?? []
+    : summary?.manualSummary.dueEntries.slice(0, reviewDetailPreviewLimit) ?? [];
+  const hiddenDueGoalCount = Math.max(
+    (summary?.goalSummary.dueEntries.length ?? 0) - displayedDueGoals.length,
+    0
+  );
+  const hiddenDueManualEntryCount = Math.max(
+    (summary?.manualSummary.dueEntries.length ?? 0) - displayedDueManualEntries.length,
     0
   );
   const weeklyPlanLinks = useMemo(
@@ -1038,8 +1055,9 @@ export function WeeklyReviewPage() {
                   }
                 />
               ) : (
-                <div className="grid gap-3 lg:grid-cols-2">
-                  {summary.goalSummary.dueEntries.map((goal) => (
+                <>
+                  <div className="grid gap-3 lg:grid-cols-2">
+                    {displayedDueGoals.map((goal) => (
                     <SoftPanel key={goal.id} className="space-y-3">
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div className="space-y-1">
@@ -1089,8 +1107,21 @@ export function WeeklyReviewPage() {
                         </Button>
                       </div>
                     </SoftPanel>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                  {summary.goalSummary.dueEntries.length > reviewDetailPreviewLimit ? (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full sm:w-auto"
+                      onClick={() => setShowAllDueGoals((current) => !current)}
+                    >
+                      {showAllDueGoals
+                        ? t("common.showFewer")
+                        : t("common.showMoreCount", { count: hiddenDueGoalCount })}
+                    </Button>
+                  ) : null}
+                </>
               )}
             </CollapsibleSection>
 
@@ -1220,8 +1251,9 @@ export function WeeklyReviewPage() {
                   }
                 />
               ) : (
-                <div className="grid gap-3 lg:grid-cols-2">
-                  {summary.manualSummary.dueEntries.map((entry) => (
+                <>
+                  <div className="grid gap-3 lg:grid-cols-2">
+                    {displayedDueManualEntries.map((entry) => (
                     <SoftPanel key={entry.id} className="space-y-3">
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div className="space-y-1">
@@ -1259,8 +1291,23 @@ export function WeeklyReviewPage() {
                         </Button>
                       </div>
                     </SoftPanel>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                  {summary.manualSummary.dueEntries.length > reviewDetailPreviewLimit ? (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full sm:w-auto"
+                      onClick={() => setShowAllDueManualEntries((current) => !current)}
+                    >
+                      {showAllDueManualEntries
+                        ? t("common.showFewer")
+                        : t("common.showMoreCount", {
+                            count: hiddenDueManualEntryCount,
+                          })}
+                    </Button>
+                  ) : null}
+                </>
               )}
             </CollapsibleSection>
 

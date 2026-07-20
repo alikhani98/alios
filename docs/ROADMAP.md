@@ -156,6 +156,8 @@ Stage 131 bounds long Finance transaction and obligation collections at twelve c
 
 Stage 132 makes Weekly Review start with a six-item actionable review queue; remaining existing review items stay explicitly reachable without changing their review action or destination.
 
+Stage 133 applies the same six-card reading boundary to long due Goal and Personal Manual review details inside Weekly Review, while keeping the fixed seven-area overview complete.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1

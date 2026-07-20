@@ -774,3 +774,11 @@ The stage adds no record, route, schema, migration, backup change, dependency, b
 Weekly Review initially renders six actionable queue items. The explicit local reveal control exposes all remaining due Projects, Goals, Life Areas, Personal Manual entries, and Decisions. Review completion and route navigation continue to refer to the original queued item, without reordering, persisting, or scoring the queue.
 
 The stage adds no record, route, schema, migration, backup change, dependency, backend, sync, cloud, AI, telemetry, or automation.
+
+## ADR-076: Keep due-review detail sections readable
+
+**Status:** Accepted (Stage 133)
+
+Weekly Review initially renders six due Goals and six due Personal Manual entries per respective detail section. Explicit local reveal controls expose the complete existing due set; review actions and feature navigation retain their existing record identity. The canonical seven Life Areas remain fully visible because that section is a fixed whole rather than an unbounded collection.
+
+The stage adds no record, route, schema, migration, backup change, dependency, backend, sync, cloud, AI, telemetry, or automation.
