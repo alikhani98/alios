@@ -166,6 +166,8 @@ Stage 136 bounds Today to twelve initially rendered filtered task cards, while r
 
 Stage 137 bounds long Weekly Review insight collections to six initially rendered entries each, while retaining every calculated item and navigation destination through explicit local reveal controls.
 
+Stage 138 establishes consistent calendar-aware date-entry feedback in core forms. It preserves ISO storage and is the safe foundation for a future full calendar and Jalali-native picker.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1

@@ -2,6 +2,7 @@ export * from "./badge";
 export * from "./button";
 export * from "./card";
 export * from "./collapsible-section";
+export * from "./date-value-hint";
 export * from "./charts";
 export * from "./input";
 export * from "./premium";

@@ -50,6 +50,7 @@ export const messagesEn = {
   "common.status": "Status",
   "common.priority": "Priority",
   "common.date": "Date",
+  "common.dateDisplayPreview": "Shown in the selected calendar: {date}",
   "common.type": "Type",
   "common.content": "Content",
   "common.notes": "Notes",

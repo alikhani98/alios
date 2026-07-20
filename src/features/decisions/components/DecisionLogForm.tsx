@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 
 import type { DecisionLogEntry } from "@/shared/types";
 import { useI18n, type TranslationKey } from "@/shared/i18n";
-import { Button, Input, Textarea, CollapsibleSection, Select } from "@/shared/ui";
+import { Button, DateValueHint, Input, Textarea, CollapsibleSection, Select } from "@/shared/ui";
 
 import { decisionLogStatusValues } from "@/shared/types";
 import { decisionLogFormSchema, type DecisionLogFormValues } from "../types";
@@ -55,12 +55,15 @@ export function DecisionLogForm({
   const { t } = useI18n();
   const {
     register,
+    watch,
     handleSubmit,
     formState: { errors },
   } = useForm<DecisionLogFormValues>({
     resolver: zodResolver(decisionLogFormSchema),
     defaultValues: getDefaultValues(decision),
   });
+  const decisionDateValue = watch("decisionDate");
+  const reviewDateValue = watch("reviewDate");
 
   return (
     <form
@@ -89,6 +92,7 @@ export function DecisionLogForm({
               aria-invalid={Boolean(errors.title)}
               {...register("title")}
             />
+            <DateValueHint value={decisionDateValue} />
             {errors.title ? (
               <p className="text-sm text-destructive">{t("common.validation")}</p>
             ) : null}
@@ -280,6 +284,7 @@ export function DecisionLogForm({
               {t("decisions.reviewDate")}
             </label>
             <Input id="decision-review-date" type="date" {...register("reviewDate")} />
+            <DateValueHint value={reviewDateValue} />
           </div>
 
           <div className="grid gap-2">

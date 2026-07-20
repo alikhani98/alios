@@ -1,7 +1,7 @@
-import { useMemo, type FormEvent } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 
 import { useI18n } from "@/shared/i18n";
-import { Button, Input, Textarea, Select } from "@/shared/ui";
+import { Button, DateValueHint, Input, Textarea, Select } from "@/shared/ui";
 
 import {
   GOAL_AREA_OPTIONS,
@@ -31,6 +31,7 @@ export function GoalForm({
 }: GoalFormProps) {
   const { t } = useI18n();
   const initialTags = useMemo(() => goal?.tags.join(", ") ?? "", [goal]);
+  const [targetDateValue, setTargetDateValue] = useState(goal?.targetDate ?? "");
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -160,7 +161,9 @@ export function GoalForm({
             name="targetDate"
             type="date"
             defaultValue={goal?.targetDate ?? ""}
+            onChange={(event) => setTargetDateValue(event.target.value)}
           />
+          <DateValueHint value={targetDateValue} />
         </label>
 
         <label className="space-y-2">

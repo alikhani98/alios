@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 
 import type { FinanceTransaction } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
-import { Button, Input, Textarea, Select } from "@/shared/ui";
+import { Button, DateValueHint, Input, Textarea, Select } from "@/shared/ui";
 import {
   DEFAULT_FINANCE_TRANSACTION_CATEGORY,
   FINANCE_CATEGORY_OPTIONS,
@@ -40,6 +40,7 @@ export function FinanceTransactionForm({
   const { t } = useI18n();
   const {
     register,
+    watch,
     handleSubmit,
     formState: { errors },
   } = useForm<FinanceTransactionFormValues>({
@@ -55,6 +56,7 @@ export function FinanceTransactionForm({
       notes: transaction?.notes ?? "",
     },
   });
+  const occurredAtValue = watch("occurredAt");
 
   return (
     <form
@@ -73,6 +75,7 @@ export function FinanceTransactionForm({
             aria-invalid={Boolean(errors.title)}
             {...register("title")}
           />
+          <DateValueHint value={occurredAtValue} />
           {errors.title ? (
             <p className="text-sm text-destructive">{t("common.validation")}</p>
           ) : null}

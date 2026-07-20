@@ -513,6 +513,7 @@ export const messagesFa: Record<TranslationKey, string> = {
   "common.status": "وضعیت",
   "common.priority": "اولویت",
   "common.date": "تاریخ",
+  "common.dateDisplayPreview": "نمایش در تقویم انتخاب‌شده: {date}",
   "common.type": "نوع",
   "common.content": "محتوا",
   "common.notes": "یادداشت‌ها",

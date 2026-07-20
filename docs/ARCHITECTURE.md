@@ -282,6 +282,12 @@ AliOS does not require a Node.js server in production. Node.js is allowed for de
 - Explicit page-local reveal controls expose the complete derived lists without reordering, persisting, or modifying their source data
 - Existing project and goal navigation continues to use the original record identities
 
+## Calendar Entry Boundary
+
+- Native browser date inputs remain the canonical ISO/Gregorian entry mechanism in v1
+- A shared, display-only hint renders the entered date through the current Settings calendar choice
+- The entry hint does not parse Jalali input, alter stored values, or change schemas, backups, and routes
+
 ## Layering
 
 ```text
