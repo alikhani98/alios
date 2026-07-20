@@ -2,6 +2,11 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 124 - Home Action Workspace Composition
+
+- Restructured the Home upcoming-work area into compact, scannable action lanes for immediate and later work
+- Kept every task bucket and the existing Today destination intact while making later-planning context use its full desktop row deliberately
+
 ## Stage 123 - Home Daily Planning Strip
 
 - Replaced the empty planning area below the Home hero with a three-part daily planning strip for the current goal, weekly focus, and quick capture

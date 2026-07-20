@@ -227,6 +227,12 @@ AliOS does not require a Node.js server in production. Node.js is allowed for de
 - Empty planning data produces a link to the appropriate existing local-first feature; it does not create placeholder records
 - The strip does not change routing semantics, repositories, schemas, backups, or storage behavior
 
+## Home Action Workspace Boundary
+
+- The workspace consumes the existing derived task timeline and only changes its responsive presentation
+- Immediate and later horizons retain their existing task counts and Today route
+- The workspace does not edit a Task, create a record, or alter routing, repositories, schemas, backups, or storage behavior
+
 ## Layering
 
 ```text

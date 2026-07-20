@@ -90,7 +90,7 @@ function SectionPreview({
   const extraCount = tasks.length - previewTasks.length;
 
   return (
-    <SoftPanel className="space-y-3 border-primary/10 bg-background/90 p-4">
+    <SoftPanel className="flex h-full flex-col space-y-3 border-primary/10 bg-background/90 p-4">
       <div className="flex items-center justify-between gap-3">
         <p className="flex items-center gap-2 text-sm font-semibold">
           <Icon className="h-4 w-4 text-primary" />
@@ -101,12 +101,12 @@ function SectionPreview({
         </StatusChip>
       </div>
 
-      <div className="mt-3 space-y-2">
+      <div className="mt-1 space-y-2">
         {previewTasks.map((task) => (
           <div
             key={task.id}
             className={cn(
-              "rounded-2xl border border-dashed px-3 py-2 text-sm",
+              "rounded-xl border border-dashed px-3 py-2 text-sm",
               aliosSurfaceMotion,
               "hover:border-primary/20 hover:bg-background hover:shadow-sm"
             )}
@@ -136,7 +136,7 @@ function PlanningLane({
   const firstTask = tasks[0];
 
   return (
-    <div className="min-w-0 rounded-2xl border border-primary/10 bg-background/85 p-3">
+    <div className="min-w-0 rounded-xl border border-primary/10 bg-background/85 p-3">
       <div className="flex items-center justify-between gap-2">
         <p className="flex min-w-0 items-center gap-2 text-sm font-semibold">
           <Icon className="h-4 w-4 shrink-0 text-primary" />
@@ -202,8 +202,8 @@ export function HomeUpcomingTasksCard({
           ) : null}
           {planningSections.length > 0 ? (
             <SoftPanel className="border-primary/10 bg-primary/5 p-3 sm:p-4">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div>
+              <div className="grid gap-3 lg:grid-cols-[minmax(12rem,0.8fr)_minmax(0,1.6fr)_auto] lg:items-center">
+                <div className="min-w-0">
                   <p className="text-sm font-semibold">{t("home.planForLater")}</p>
                   <p className="text-xs leading-6 text-muted-foreground">
                     {t("home.futureTasks")}
@@ -218,10 +218,17 @@ export function HomeUpcomingTasksCard({
                     />
                   ))}
                 </div>
+                <Button asChild variant="outline" size="sm" className="w-full lg:w-auto">
+                  <Link to="/today">
+                    {t("home.planForLater")}
+                    <ArrowUpLeft className="ms-2 h-4 w-4" />
+                  </Link>
+                </Button>
               </div>
             </SoftPanel>
           ) : null}
-          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+          <div className="flex flex-col gap-2 border-t border-border/60 pt-1 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-xs text-muted-foreground">{t("home.futureTasks")}</p>
             <Button asChild variant="outline" size="sm" className="w-full sm:w-auto">
               <Link to="/today">
                 {t("home.planForLater")}
