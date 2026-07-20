@@ -47,8 +47,10 @@ export function KnowledgePage() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [focusedItemId, setFocusedItemId] = useState<string | null>(null);
   const [focusMessage, setFocusMessage] = useState<string | null>(null);
+  const [showAllItems, setShowAllItems] = useState(false);
   const itemRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const focusId = searchParams.get("focusId");
+  const knowledgePreviewLimit = 12;
 
   const visibleItems = useMemo(
     () =>
@@ -57,6 +59,11 @@ export function KnowledgePage() {
         : items.filter((item) => item.type === typeFilter),
     [items, typeFilter]
   );
+  const focusRequiresAllItems = visibleItems.findIndex((item) => item.id === focusId) >= knowledgePreviewLimit;
+  const displayedItems = showAllItems || focusRequiresAllItems
+    ? visibleItems
+    : visibleItems.slice(0, knowledgePreviewLimit);
+  const hiddenItemCount = Math.max(visibleItems.length - displayedItems.length, 0);
 
   const openCreateForm = () => {
     setEditingItem(undefined);
@@ -335,7 +342,7 @@ export function KnowledgePage() {
         />
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {visibleItems.map((item) => (
+          {displayedItems.map((item) => (
             <div
               key={item.id}
               ref={(node) => {
@@ -358,6 +365,15 @@ export function KnowledgePage() {
           ))}
         </div>
       )}
+      {visibleItems.length > knowledgePreviewLimit && !focusRequiresAllItems ? (
+        <div className="flex justify-start">
+          <Button type="button" variant="outline" onClick={() => setShowAllItems((current) => !current)}>
+            {showAllItems
+              ? t("common.showFewer")
+              : t("common.showMoreCount", { count: hiddenItemCount })}
+          </Button>
+        </div>
+      ) : null}
     </section>
   );
 }

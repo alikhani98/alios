@@ -2,6 +2,11 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 127 - Dense Collection Views
+
+- Added one consistent initial collection limit and explicit reveal control across Routines, Projects, Knowledge, and Personal Manual
+- Preserved filtering, focus navigation, CRUD actions, and every local record while reducing long repetitive card grids in real-world data
+
 ## Stage 126 - Today Routine Suggestion Density
 
 - Reduced the initial visual density of repeated Today routine suggestions while retaining a clear control to reveal every eligible routine

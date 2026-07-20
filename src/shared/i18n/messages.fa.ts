@@ -538,6 +538,8 @@ export const messagesFa: Record<TranslationKey, string> = {
   "common.archived": "بایگانی‌شده",
   "common.expandSection": "بخش را باز کن",
   "common.collapseSection": "بخش را ببند",
+  "common.showMoreCount": "نمایش {count} مورد دیگر",
+  "common.showFewer": "نمایش موارد کمتر",
   "common.validation": "این فیلد را بررسی کنید.",
   "home.title": "خانه",
   "home.description": "آنچه امروز مهم است ببینید و سریع به کارهای اخیر برگردید.",

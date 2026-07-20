@@ -59,6 +59,7 @@ export function ProjectsPage() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [focusedProjectId, setFocusedProjectId] = useState<string | null>(null);
   const [focusMessage, setFocusMessage] = useState<string | null>(null);
+  const [showAllProjects, setShowAllProjects] = useState(false);
   const [tasks, setTasks] = useState<Task[]>([]);
   const projectRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const focusId = searchParams.get("focusId");
@@ -67,6 +68,12 @@ export function ProjectsPage() {
   const visibleProjects = goalId
     ? projects.filter((project) => project.goalId === goalId)
     : projects;
+  const projectPreviewLimit = 12;
+  const focusRequiresAllProjects = visibleProjects.findIndex((project) => project.id === focusId) >= projectPreviewLimit;
+  const displayedProjects = showAllProjects || focusRequiresAllProjects
+    ? visibleProjects
+    : visibleProjects.slice(0, projectPreviewLimit);
+  const hiddenProjectCount = Math.max(visibleProjects.length - displayedProjects.length, 0);
 
   useEffect(() => {
     void tasksRepository.list().then(setTasks).catch(() => setTasks([]));
@@ -338,7 +345,7 @@ export function ProjectsPage() {
         />
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {visibleProjects.map((project) => (
+          {displayedProjects.map((project) => (
             <div
               key={project.id}
               ref={(node) => {
@@ -366,6 +373,15 @@ export function ProjectsPage() {
           ))}
         </div>
       )}
+      {visibleProjects.length > projectPreviewLimit && !focusRequiresAllProjects ? (
+        <div className="flex justify-start">
+          <Button type="button" variant="outline" onClick={() => setShowAllProjects((current) => !current)}>
+            {showAllProjects
+              ? t("common.showFewer")
+              : t("common.showMoreCount", { count: hiddenProjectCount })}
+          </Button>
+        </div>
+      ) : null}
     </section>
   );
 }

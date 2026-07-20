@@ -85,7 +85,9 @@ export function PersonalManualPage() {
   const [focusedEntryId, setFocusedEntryId] = useState<string | null>(null);
   const [focusMessage, setFocusMessage] = useState<string | null>(null);
   const [formRevision, setFormRevision] = useState(0);
+  const [showAllEntries, setShowAllEntries] = useState(false);
   const focusId = searchParams.get("focusId");
+  const manualPreviewLimit = 12;
 
   const summary = useMemo(() => getManualEntrySummary(entries), [entries]);
   const templateCards = useMemo(
@@ -113,6 +115,11 @@ export function PersonalManualPage() {
 
   const hasActiveFilters =
     categoryFilter !== "all" || statusFilter !== "all" || appliedQuery.length > 0;
+  const focusRequiresAllEntries = filteredEntries.findIndex((entry) => entry.id === focusId) >= manualPreviewLimit;
+  const displayedEntries = showAllEntries || focusRequiresAllEntries
+    ? filteredEntries
+    : filteredEntries.slice(0, manualPreviewLimit);
+  const hiddenEntryCount = Math.max(filteredEntries.length - displayedEntries.length, 0);
 
   useEffect(() => {
     if (!focusId) {
@@ -529,7 +536,7 @@ export function PersonalManualPage() {
         />
       ) : (
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {filteredEntries.map((entry) => (
+          {displayedEntries.map((entry) => (
             <div
               key={entry.id}
               ref={(node) => {
@@ -551,6 +558,15 @@ export function PersonalManualPage() {
           ))}
         </div>
       )}
+      {filteredEntries.length > manualPreviewLimit && !focusRequiresAllEntries ? (
+        <div className="flex justify-start">
+          <Button type="button" variant="outline" onClick={() => setShowAllEntries((current) => !current)}>
+            {showAllEntries
+              ? t("common.showFewer")
+              : t("common.showMoreCount", { count: hiddenEntryCount })}
+          </Button>
+        </div>
+      ) : null}
     </section>
   );
 }

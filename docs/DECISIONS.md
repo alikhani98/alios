@@ -726,3 +726,11 @@ The stage adds no record, route, schema, migration, backup change, dependency, b
 Today initially shows at most six eligible routine suggestions. A display-only local control reveals the complete existing set. Eligibility, scheduling, creation of a Task, routine records, and task records remain unchanged.
 
 The stage adds no record, route, schema, migration, backup change, dependency, backend, sync, cloud, AI, telemetry, or automation.
+
+## ADR-070: Bound initial rendering of dense local card collections
+
+**Status:** Accepted (Stage 127)
+
+Routines, Projects, Knowledge, and Personal Manual initially render at most twelve existing cards. A local display-only control reveals the remaining cards. A focused item outside that boundary remains rendered so search and navigation destinations stay reachable.
+
+The stage adds no record, route, schema, migration, backup change, dependency, backend, sync, cloud, AI, telemetry, or automation.
