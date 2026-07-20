@@ -6,6 +6,7 @@ import type {
   UpdateTaskInput,
 } from "@/core/repositories";
 import { taskSchema, type Task } from "@/shared/types";
+import { getNextTaskRecurrenceDate } from "@/shared/task-recurrence";
 import type { AliosDatabase } from "../db";
 import { DexieRepositoryBase } from "./DexieRepositoryBase";
 
@@ -33,7 +34,12 @@ export class DexieTasksRepository
 
   async create(input: CreateTaskInput): Promise<Task> {
     return this.execute("creating a task", async () => {
-      const task = taskSchema.parse({ ...input, ...this.createMetadata() });
+      const metadata = this.createMetadata();
+      const task = taskSchema.parse({
+        ...input,
+        ...metadata,
+        recurrenceSeriesId: input.recurrence ? metadata.id : undefined,
+      });
       await this.database.tasks.add(task);
       return task;
     });
@@ -70,6 +76,32 @@ export class DexieTasksRepository
           updatedAt: new Date().toISOString(),
         });
         await this.database.tasks.put(task);
+        const nextDueDate =
+          current.status !== "done" && input.status === "done"
+            ? getNextTaskRecurrenceDate(task)
+            : undefined;
+
+        if (nextDueDate && task.recurrence) {
+          const recurrenceSeriesId = task.recurrenceSeriesId ?? task.id;
+          const existingNextTask = await this.database.tasks
+            .where("[recurrenceSeriesId+dueDate]")
+            .equals([recurrenceSeriesId, nextDueDate])
+            .first();
+
+          if (!existingNextTask) {
+            const metadata = this.createMetadata();
+            const nextTask = taskSchema.parse({
+              ...task,
+              ...metadata,
+              status: "todo",
+              isMit: false,
+              dueDate: nextDueDate,
+              recurrenceSeriesId,
+              completedAt: undefined,
+            });
+            await this.database.tasks.add(nextTask);
+          }
+        }
         return task;
       })
     );

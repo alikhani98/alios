@@ -45,6 +45,7 @@ export function TodayTaskForm({
       isMit: task?.isMit ?? false,
       dueDate: task?.dueDate ?? defaultDueDate,
       projectId: task?.projectId ?? "",
+      recurrenceFrequency: task?.recurrence?.frequency ?? "none",
     },
   });
   const dueDateValue = watch("dueDate");
@@ -68,6 +69,18 @@ export function TodayTaskForm({
         {errors.title ? (
           <p className="text-sm text-destructive">{t("common.validation")}</p>
         ) : null}
+      </div>
+
+      <div className="grid gap-2">
+        <label htmlFor="today-task-recurrence" className="text-sm font-medium">
+          {t("today.recurrence")}
+        </label>
+        <Select id="today-task-recurrence" {...register("recurrenceFrequency")}>
+          <option value="none">{t("today.recurrenceNone")}</option>
+          <option value="daily">{t("today.recurrenceDaily")}</option>
+          <option value="weekly">{t("today.recurrenceWeekly")}</option>
+        </Select>
+        <p className="text-xs leading-5 text-muted-foreground">{t("today.recurrenceHint")}</p>
       </div>
 
       <div className="grid gap-2">

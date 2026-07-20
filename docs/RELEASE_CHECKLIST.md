@@ -547,3 +547,10 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 2. Change month and week, select a date with and without tasks, and confirm labels follow the selected display calendar.
 3. Use **Open selected day** and confirm Today displays that ISO date's tasks without modifying records.
 4. Confirm the calendar still loads after a refresh and that no horizontal overflow is created by the seven-day grid.
+
+## Stage 140 recurring task smoke test
+
+1. Create a daily and a weekly Task in Persian RTL and English LTR; confirm each shows its repeat label in Today.
+2. Mark each Task done and confirm exactly one next local occurrence uses the expected ISO date (+1 or +7 days) and is not marked MIT.
+3. Refresh, re-open the completed Task, and repeat the status save; confirm no duplicate next occurrence exists.
+4. Confirm legacy Tasks with no recurrence still load, edit, export, restore, and complete without changed behavior.

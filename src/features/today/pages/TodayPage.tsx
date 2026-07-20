@@ -194,10 +194,15 @@ export function TodayPage() {
     setIsTaskSubmitting(true);
     setActionError(null);
     setSuccessMessage(null);
+    const { recurrenceFrequency, ...taskValues } = values;
     const input = {
-      ...values,
+      ...taskValues,
       description: values.description || undefined,
       projectId: values.projectId || undefined,
+      recurrence:
+        recurrenceFrequency === "none"
+          ? undefined
+          : { frequency: recurrenceFrequency },
     };
 
     try {

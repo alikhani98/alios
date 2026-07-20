@@ -294,6 +294,12 @@ AliOS does not require a Node.js server in production. Node.js is allowed for de
 - Month and week navigation are client-side display controls; changing the selected calendar in Settings affects labels only, not stored values.
 - Opening a day uses `/today?date=YYYY-MM-DD`; this preserves the canonical ISO date and avoids a new calendar data model, dependency, or backend.
 
+## Local Task Recurrence Boundary
+
+- Recurrence is an optional Task field with `daily` or `weekly` frequency and an internal local series identity.
+- Completing a recurring Task creates at most one next Task inside the Task repository transaction; the compound `[recurrenceSeriesId+dueDate]` index prevents duplicate occurrences.
+- Recurrence uses the Task's stored ISO `dueDate` as its anchor. It does not implement background scheduling, reminders, external calendar synchronization, or cloud processing.
+
 ## Layering
 
 ```text

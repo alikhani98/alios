@@ -1,4 +1,4 @@
-import { FolderKanban, Pencil, Star, Trash2 } from "lucide-react";
+import { FolderKanban, Pencil, Repeat2, Star, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -68,6 +68,14 @@ export function TodayTaskCard({
               </Badge>
             ) : null}
             {contextLabel ? <Badge variant="secondary">{contextLabel}</Badge> : null}
+            {task.recurrence ? (
+              <Badge variant="secondary">
+                <Repeat2 className="me-1 h-3.5 w-3.5" />
+                {task.recurrence.frequency === "daily"
+                  ? t("today.recurrenceDaily")
+                  : t("today.recurrenceWeekly")}
+              </Badge>
+            ) : null}
             <Badge
               variant="outline"
               className="max-w-full break-words whitespace-normal text-start"

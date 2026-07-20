@@ -9,6 +9,8 @@ export const TASK_STATUS_VALUES = [
 export const PRIORITY_VALUES = ["low", "medium", "high"] as const;
 export const TASK_PRIORITY_VALUES = PRIORITY_VALUES;
 
+export const TASK_RECURRENCE_FREQUENCY_VALUES = ["daily", "weekly"] as const;
+
 export const PROJECT_STATUS_VALUES = [
   "active",
   "waiting",
