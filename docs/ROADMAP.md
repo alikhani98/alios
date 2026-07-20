@@ -158,6 +158,8 @@ Stage 132 makes Weekly Review start with a six-item actionable review queue; rem
 
 Stage 133 applies the same six-card reading boundary to long due Goal and Personal Manual review details inside Weekly Review, while keeping the fixed seven-area overview complete.
 
+Stage 134 bounds Global Search to twelve initially rendered matching results, while preserving the complete local search result set and its focused feature navigation behind an explicit reveal control.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1

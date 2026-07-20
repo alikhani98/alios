@@ -782,3 +782,11 @@ The stage adds no record, route, schema, migration, backup change, dependency, b
 Weekly Review initially renders six due Goals and six due Personal Manual entries per respective detail section. Explicit local reveal controls expose the complete existing due set; review actions and feature navigation retain their existing record identity. The canonical seven Life Areas remain fully visible because that section is a fixed whole rather than an unbounded collection.
 
 The stage adds no record, route, schema, migration, backup change, dependency, backend, sync, cloud, AI, telemetry, or automation.
+
+## ADR-077: Bound global-search presentation, not search scope
+
+**Status:** Accepted (Stage 134)
+
+Global Search initially renders twelve matching records. The result total, matching logic, facets, and focused navigation links continue to use the complete local result collection. A query change restores the compact presentation so each new search begins with a readable result set.
+
+The stage adds no record, route, schema, migration, backup change, dependency, backend, sync, cloud, AI, telemetry, or automation.
