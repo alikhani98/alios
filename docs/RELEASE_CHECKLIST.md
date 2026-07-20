@@ -412,6 +412,11 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 1. Open Settings at 360px and desktop width; confirm all Help Center topics begin closed but each topic expands with its complete existing content.
 2. Confirm the local-data summary shows the total and a compact subset, then reveals every existing count without altering backup freshness or any safety action.
 
+### Stage 131 Finance collection density
+
+1. With more than twelve transactions and more than twelve obligations, confirm each active Finance filter initially renders at most twelve matching cards and its local reveal control exposes all remaining existing records.
+2. Switch Finance filters after expanding a collection; confirm the new filter returns to its compact initial view while filter counts, summaries, forms, edit/delete actions, and stored records remain unchanged.
+
 - [x] Routines, Projects, Knowledge, and Personal Manual initially render no more than twelve cards
 - [x] Existing cards beyond the initial limit remain explicitly reachable through a local display control
 - [x] A focused item outside the initial limit is rendered for existing search and navigation destinations

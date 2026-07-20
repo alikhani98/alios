@@ -51,6 +51,7 @@ Stage 127 limits dense collections to twelve initially rendered cards on mobile 
 Stage 128 reduces initial Routine cards to six on every viewport, and bounds Inbox and Decision Log to twelve cards while retaining their complete existing filtered result sets behind a clear reveal control.
 Stage 129 limits the initially rendered Goal and Personal Manual cards to six. Life Areas retain their complete seven-area overview, avoiding a fragmented mobile life-balance view.
 Stage 130 opens Settings with every Help Center topic collapsed and five secondary local-data counts beside the total; the remaining counts are available through a single full-width control.
+Stage 131 initially shows at most twelve Finance transactions and twelve obligations for the active filter on any viewport; local reveal controls expose the remaining existing records without changing totals or calculations.
 The Personal Insights section stays local to the device and only reflects stored tasks, projects, inbox items, journal entries, knowledge items, and wellness checklist state.
 
 ## Personal Manual smoke test

@@ -152,6 +152,8 @@ Stage 129 applies the six-card reading boundary to Goals and Personal Manual, wh
 
 Stage 130 makes Settings open as a compact operational page: Help Center sections remain available but initially closed, while secondary local record counts use progressive disclosure.
 
+Stage 131 bounds long Finance transaction and obligation collections at twelve cards per active filter, retaining all calculations, filters, forms, edit/delete actions, and local records behind explicit reveal controls.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1

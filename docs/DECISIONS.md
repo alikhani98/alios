@@ -758,3 +758,11 @@ The stage adds no record, route, schema, migration, backup change, dependency, b
 Settings opens with Help Center topics closed and only a compact local-data count summary. Every guide section and every stored-data count remains available through explicit local controls. Backup freshness, export, restore, recovery, and error-log access are not hidden by this presentation rule.
 
 The stage adds no record, route, schema, migration, backup change, dependency, backend, sync, cloud, AI, telemetry, or automation.
+
+## ADR-074: Bound finance collection rendering without narrowing financial scope
+
+**Status:** Accepted (Stage 131)
+
+Finance initially renders at most twelve transactions and twelve obligations for the active filter. Summaries, filter counts, calculations, and every existing form and CRUD action continue to use the complete local collection. A filter change restores the compact view so a newly selected result set remains readable.
+
+The stage adds no record, route, schema, migration, backup change, dependency, backend, sync, cloud, AI, telemetry, or automation.

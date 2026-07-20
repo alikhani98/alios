@@ -2,6 +2,10 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 131 - Finance Collection Density
+
+- Added local progressive disclosure to long filtered transaction and obligation collections without changing finance calculations, filters, CRUD, or local records
+
 ## Stage 130 - Settings Reading Density
 
 - Kept the AliOS Help Center available but collapsed every guide topic initially so Settings opens to actionable controls instead of a long reference document
