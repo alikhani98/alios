@@ -554,3 +554,10 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 2. Mark each Task done and confirm exactly one next local occurrence uses the expected ISO date (+1 or +7 days) and is not marked MIT.
 3. Refresh, re-open the completed Task, and repeat the status save; confirm no duplicate next occurrence exists.
 4. Confirm legacy Tasks with no recurrence still load, edit, export, restore, and complete without changed behavior.
+
+## Stage 141 ICS export smoke test
+
+1. Create at least one active Task with an ISO due date, then download the Calendar ICS file in Persian RTL and English LTR.
+2. Open the file in a compatible calendar and confirm the title, all-day date, and optional description match the source Task.
+3. Confirm Tasks with no date, `done`, or `cancelled` status do not appear in the file.
+4. Confirm downloading the file makes no Task, setting, backup, authentication, or synchronization change in AliOS.

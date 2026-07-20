@@ -1,5 +1,5 @@
 import { addDays, format, startOfMonth, startOfWeek } from "date-fns";
-import { CalendarDays, ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
+import { CalendarDays, ChevronLeft, ChevronRight, Download, RotateCcw } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -18,6 +18,7 @@ import { useI18n, type TranslationKey } from "@/shared/i18n";
 import type { Task } from "@/shared/types";
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle, PremiumCard, SectionHeader } from "@/shared/ui";
 import { cn } from "@/shared/utils";
+import { downloadCalendarIcs, getCalendarExportTasks } from "../calendarIcsExport";
 
 const taskStatusLabelKeys: Record<Task["status"], TranslationKey> = {
   todo: "today.todo",
@@ -67,6 +68,7 @@ export function CalendarPage() {
   const PreviousIcon = direction === "rtl" ? ChevronRight : ChevronLeft;
   const NextIcon = direction === "rtl" ? ChevronLeft : ChevronRight;
   const todayIsoDate = format(today, "yyyy-MM-dd");
+  const exportableTaskCount = getCalendarExportTasks(tasks).length;
 
   const movePeriod = (directionOffset: -1 | 1) => {
     setSelectedDate((current) =>
@@ -84,9 +86,12 @@ export function CalendarPage() {
             icon={<CalendarDays className="h-5 w-5" />}
             title={t("calendar.title")}
             description={t("calendar.description")}
+            actions={<Button type="button" size="sm" variant="outline" disabled={exportableTaskCount === 0} onClick={() => downloadCalendarIcs(tasks)}><Download className="me-2 h-4 w-4" />{t("calendar.exportIcs")}</Button>}
           />
         </CardContent>
       </PremiumCard>
+
+      <p className="text-sm text-muted-foreground">{t("calendar.exportIcsHint", { count: exportableTaskCount })}</p>
 
       <PremiumCard>
         <CardHeader className="gap-4 lg:flex-row lg:items-center lg:justify-between">

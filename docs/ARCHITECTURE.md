@@ -300,6 +300,12 @@ AliOS does not require a Node.js server in production. Node.js is allowed for de
 - Completing a recurring Task creates at most one next Task inside the Task repository transaction; the compound `[recurrenceSeriesId+dueDate]` index prevents duplicate occurrences.
 - Recurrence uses the Task's stored ISO `dueDate` as its anchor. It does not implement background scheduling, reminders, external calendar synchronization, or cloud processing.
 
+## ICS Calendar Export Boundary
+
+- Calendar export serializes active dated Tasks into a standards-based local `.ics` download with all-day `VEVENT` entries.
+- It does not read or write Google Calendar, Outlook, Apple Calendar, or any remote calendar; importing the downloaded file remains a user-controlled external action.
+- Task records, backups, schemas, and the local-first data source remain unchanged by generating or downloading the export.
+
 ## Layering
 
 ```text
