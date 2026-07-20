@@ -2,6 +2,11 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 140 - Local Recurring Tasks Foundation
+
+- Added optional daily and weekly Task recurrence, with one next local occurrence created when a recurring task is completed
+- Added a recurrence control in the Task form and an explicit recurrence badge in Today
+
 ## Stage 139 - Full Calendar Page Foundation
 
 - Added a dedicated calendar route with local month and week views, task counts, and selected-day task previews

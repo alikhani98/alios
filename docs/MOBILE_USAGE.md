@@ -353,3 +353,9 @@ Use [`REAL_WORLD_USAGE_QA.md`](./REAL_WORLD_USAGE_QA.md) during normal daily use
 1. Open **Calendar** from the navigation menu.
 2. Switch between month and week, select a day, then use **Open selected day** to manage that day's tasks.
 3. At narrow widths, confirm all seven day controls remain visible, tappable, and without horizontal page overflow.
+
+## Recurring tasks
+
+1. In Today, create or edit a Task and choose **Every day** or **Every week** under **Repeat**.
+2. Mark the Task done and confirm one next occurrence appears on the next planned daily or weekly date.
+3. Marking the same completed Task done again must not create a duplicate occurrence.

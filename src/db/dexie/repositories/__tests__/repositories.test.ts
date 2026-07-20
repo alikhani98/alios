@@ -335,4 +335,29 @@ describe("Dexie repositories", () => {
     expect(await storage.routines.list()).toEqual([]);
     expect(await storage.tasks.list()).toEqual([first.task]);
   });
+
+  it("creates one next local occurrence when a recurring task is completed", async () => {
+    const recurring = await storage.tasks.create({
+      ...taskInput,
+      isMit: false,
+      dueDate: "2026-07-05",
+      recurrence: { frequency: "weekly" },
+    });
+
+    await storage.tasks.update(recurring.id, {
+      status: "done",
+      completedAt: "2026-07-05T09:00:00.000Z",
+    });
+    await storage.tasks.update(recurring.id, { status: "done" });
+
+    const tasks = await storage.tasks.list();
+    expect(tasks).toHaveLength(2);
+    expect(tasks.find((task) => task.id !== recurring.id)).toMatchObject({
+      status: "todo",
+      dueDate: "2026-07-12",
+      recurrence: { frequency: "weekly" },
+      recurrenceSeriesId: recurring.id,
+      isMit: false,
+    });
+  });
 });

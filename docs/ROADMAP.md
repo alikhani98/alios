@@ -422,6 +422,11 @@ The Stage 84 real-world usage pass remains pending. Future product scope should 
 - Selected-day Task preview and direct date-aware Today navigation
 - Recurring tasks, ICS export, external calendar integration, notifications, and cloud sync remain future work
 
+## Stage 140 delivered in v1
+
+- Local daily and weekly Task recurrence with next-occurrence creation on completion
+- Future work remains broader recurrence rules, reminders, ICS export, and external calendar integration
+
 ## Version 2.5
 
 - Optional Tauri desktop app
