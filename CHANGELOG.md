@@ -2,6 +2,11 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 141 - ICS Calendar Export Foundation
+
+- Added a standards-based local `.ics` export for scheduled Tasks from the full Calendar page
+- Kept export account-free and local: active dated Tasks become all-day events, while completed and cancelled Tasks stay excluded
+
 ## Stage 140 - Local Recurring Tasks Foundation
 
 - Added optional daily and weekly Task recurrence, with one next local occurrence created when a recurring task is completed

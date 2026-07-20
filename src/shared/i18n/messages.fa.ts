@@ -561,6 +561,8 @@ export const messagesFa: Record<TranslationKey, string> = {
   "calendar.noTasks": "برای این روز کاری برنامه‌ریزی نشده است.",
   "calendar.tasksForDate": "کارهای {date}",
   "calendar.loadError": "تقویم از داده‌های محلی بارگذاری نشد.",
+  "calendar.exportIcs": "خروجی تقویم (.ics)",
+  "calendar.exportIcsHint": "{count} کارِ زمان‌بندی‌شده‌ی محلی را به‌صورت فایل ICS تمام‌روزه خروجی می‌گیرد. کارهای انجام‌شده و لغوشده وارد نمی‌شوند.",
   "home.homeLayout": "چیدمان خانه",
   "home.customizeDashboard": "سفارشی‌سازی داشبورد",
   "home.customizeDashboardDescription": "بخش‌های خانه را در این دستگاه محلی نمایش، پنهان یا جابه‌جا کنید.",

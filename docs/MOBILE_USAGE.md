@@ -359,3 +359,9 @@ Use [`REAL_WORLD_USAGE_QA.md`](./REAL_WORLD_USAGE_QA.md) during normal daily use
 1. In Today, create or edit a Task and choose **Every day** or **Every week** under **Repeat**.
 2. Mark the Task done and confirm one next occurrence appears on the next planned daily or weekly date.
 3. Marking the same completed Task done again must not create a duplicate occurrence.
+
+## ICS calendar export
+
+1. Open **Calendar** and select **Export calendar (.ics)**.
+2. Import the downloaded file manually into a compatible calendar such as Google Calendar, Outlook, or Apple Calendar.
+3. The export is one-way and local; it does not sign in, connect an account, or synchronize future changes.

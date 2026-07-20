@@ -425,7 +425,12 @@ The Stage 84 real-world usage pass remains pending. Future product scope should 
 ## Stage 140 delivered in v1
 
 - Local daily and weekly Task recurrence with next-occurrence creation on completion
-- Future work remains broader recurrence rules, reminders, ICS export, and external calendar integration
+- Future work remains broader recurrence rules, reminders, and external calendar integration
+
+## Stage 141 delivered in v1
+
+- Standard local ICS export for active scheduled Tasks
+- Future work remains interactive import, bidirectional calendar sync, OAuth, external calendar APIs, and notifications
 
 ## Version 2.5
 

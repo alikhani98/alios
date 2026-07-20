@@ -450,6 +450,8 @@ export const messagesEn = {
   "calendar.noTasks": "No tasks are planned for this day.",
   "calendar.tasksForDate": "Tasks for {date}",
   "calendar.loadError": "The calendar could not be loaded from local storage.",
+  "calendar.exportIcs": "Export calendar (.ics)",
+  "calendar.exportIcsHint": "Exports {count} scheduled local tasks as an all-day ICS calendar file. Completed and cancelled tasks are excluded.",
   "home.homeLayout": "Home layout",
   "home.customizeDashboard": "Customize dashboard",
   "home.customizeDashboardDescription": "Show, hide, and reorder Home sections locally on this device.",
