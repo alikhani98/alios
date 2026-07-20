@@ -416,6 +416,12 @@ The Stage 84 real-world usage pass remains pending. Future product scope should 
 - Knowledge assistant
 - Decision assistant
 
+## Stage 142 delivered in v2.0 preparation
+
+- Optional, user-triggered local Ollama connection check in Settings
+- No prompt execution or AliOS-data access; the endpoint only reports locally installed model names
+- Future work remains explicit local AI actions with per-action data disclosure and approval
+
 ## Stage 139 delivered in v1
 
 - Dedicated local full-calendar route with month and week views

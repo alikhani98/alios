@@ -26,6 +26,13 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] Persian/English i18n utility coverage
 - [x] Gregorian/Jalali display utility coverage
 
+### Stage 142 optional local AI connection readiness
+
+- [x] The default local endpoint can be edited and remains device-local in browser storage
+- [x] Connection checking is explicit and reports connected, unavailable, and invalid-address states without blocking Settings
+- [x] The check uses only local Ollama model discovery; it does not submit AliOS content, prompts, backups, account credentials, or telemetry
+- [ ] On a device with Ollama installed, verify the browser is allowed to access the local endpoint and installed model count is shown correctly
+
 ### Stage 77 Goals and Life Areas hardening
 
 - [x] Every canonical area produces stable filtered Goals and focused Life Areas paths

@@ -53,6 +53,7 @@ import { SettingsHelpCenter } from "../components/SettingsHelpCenter";
 import { RecoveryModeSection } from "../components/RecoveryModeSection";
 import { ExportCenterSection } from "../components/ExportCenterSection";
 import { LocalErrorLogSection } from "../components/LocalErrorLogSection";
+import { LocalAiSetupCard } from "@/features/localAi";
 import { resetHomeDashboardLayoutPreference } from "@/features/home/hooks/useHomeDashboardLayout";
 import { createBackupPreview } from "../backupPreview";
 import { useBackupRestore } from "../hooks/useBackupRestore";
@@ -301,6 +302,8 @@ export function SettingsPage() {
       />
 
       <LocalErrorLogSection id="settings-local-error-log" />
+
+      <LocalAiSetupCard />
 
       <Card>
         <CardHeader>
