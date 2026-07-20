@@ -718,3 +718,11 @@ The stage adds no record, route, schema, migration, backup change, dependency, b
 The Home upcoming-work workspace occupies its full desktop dashboard row. If fewer than three existing immediate task horizons contain work, the remaining visual slot is a non-destructive link to the existing Today workspace. It is not an inferred Task and cannot mutate task data.
 
 The stage adds no record, route, schema, migration, backup change, dependency, backend, sync, cloud, AI, telemetry, or automation.
+
+## ADR-069: Use progressive disclosure for repeated Today routine suggestions
+
+**Status:** Accepted (Stage 126)
+
+Today initially shows at most six eligible routine suggestions. A display-only local control reveals the complete existing set. Eligibility, scheduling, creation of a Task, routine records, and task records remain unchanged.
+
+The stage adds no record, route, schema, migration, backup change, dependency, backend, sync, cloud, AI, telemetry, or automation.
