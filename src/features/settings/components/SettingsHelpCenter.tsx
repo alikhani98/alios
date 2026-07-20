@@ -141,14 +141,14 @@ export function SettingsHelpCenter() {
         />
 
         <div className="space-y-4">
-          {settingsHelpCenterSections.map((section, index) => (
+          {settingsHelpCenterSections.map((section) => (
             <CollapsibleSection
               key={section.id}
               id={`settings-help-${section.id}`}
               title={getLocalizedText(language, section.title)}
               description={getLocalizedText(language, section.summary)}
               icon={<ShieldCheck className="h-4 w-4" />}
-              defaultOpen={index === 0}
+              defaultOpen={false}
               className="border-border/60 bg-background/70"
             >
               <SectionBody section={section} language={language} />

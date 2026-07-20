@@ -750,3 +750,11 @@ The stage adds no record, route, schema, migration, backup change, dependency, b
 Goals and Personal Manual entries initially render at most six cards. The Goal focus route can expand that boundary when needed. Life Areas retain all seven canonical areas together because hiding part of that fixed overview weakens its intended cross-life comparison.
 
 The stage adds no record, route, schema, migration, backup change, dependency, backend, sync, cloud, AI, telemetry, or automation.
+
+## ADR-073: Keep Settings oriented around immediate local actions
+
+**Status:** Accepted (Stage 130)
+
+Settings opens with Help Center topics closed and only a compact local-data count summary. Every guide section and every stored-data count remains available through explicit local controls. Backup freshness, export, restore, recovery, and error-log access are not hidden by this presentation rule.
+
+The stage adds no record, route, schema, migration, backup change, dependency, backend, sync, cloud, AI, telemetry, or automation.
