@@ -153,6 +153,30 @@ function PlanningLane({
   );
 }
 
+function TodayWorkspaceLink() {
+  const { t } = useI18n();
+
+  return (
+    <SoftPanel className="flex h-full min-h-40 flex-col justify-between border-primary/10 bg-primary/5 p-4">
+      <div>
+        <p className="flex items-center gap-2 text-sm font-semibold">
+          <CalendarDays className="h-4 w-4 text-primary" />
+          {t("home.todayTasks")}
+        </p>
+        <p className="mt-3 text-sm leading-6 text-muted-foreground">
+          {t("home.planForLater")}
+        </p>
+      </div>
+      <Button asChild variant="outline" size="sm" className="mt-4 w-full">
+        <Link to="/today">
+          {t("home.goToday")}
+          <ArrowUpLeft className="ms-2 h-4 w-4" />
+        </Link>
+      </Button>
+    </SoftPanel>
+  );
+}
+
 export function HomeUpcomingTasksCard({
   tasks,
   sectionId,
@@ -198,8 +222,11 @@ export function HomeUpcomingTasksCard({
                   tasks={timeline[section]}
                 />
               ))}
+              {immediateSections.length < 3 ? <TodayWorkspaceLink /> : null}
             </div>
-          ) : null}
+          ) : (
+            <TodayWorkspaceLink />
+          )}
           {planningSections.length > 0 ? (
             <SoftPanel className="border-primary/10 bg-primary/5 p-3 sm:p-4">
               <div className="grid gap-3 lg:grid-cols-[minmax(12rem,0.8fr)_minmax(0,1.6fr)_auto] lg:items-center">

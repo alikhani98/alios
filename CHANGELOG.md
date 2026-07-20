@@ -2,6 +2,11 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 125 - Home Action Workspace Balance
+
+- Made the Home upcoming-work workspace use its full desktop dashboard row instead of leaving a neighbouring empty column
+- Added a presentational Today route when an immediate task horizon is absent, keeping the workspace balanced without creating or changing Task data
+
 ## Stage 124 - Home Action Workspace Composition
 
 - Restructured the Home upcoming-work area into compact, scannable action lanes for immediate and later work

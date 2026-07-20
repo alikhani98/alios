@@ -45,6 +45,7 @@ Stage 121 keeps the Home hero in a single deliberate mobile reading sequence: da
 Stage 122 leaves the compact mobile calendar unchanged while giving its desktop equivalent dedicated width before any side-by-side day detail is used.
 Stage 123 stacks the three Home planning actions in a clear mobile sequence and keeps their existing Goals, Weekly Review, and Inbox destinations reachable.
 Stage 124 keeps each immediate task lane readable at narrow widths, then stacks the later-planning context and its existing Today route without horizontal scrolling.
+Stage 125 keeps the same mobile stack and only fills an absent immediate desktop lane with a compact route to Today; no task is created or hidden.
 The Personal Insights section stays local to the device and only reflects stored tasks, projects, inbox items, journal entries, knowledge items, and wellness checklist state.
 
 ## Personal Manual smoke test
