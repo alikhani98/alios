@@ -2,6 +2,11 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 137 - Weekly Review Insight Density
+
+- Bounded long project-attention, weekly-observation, and suggested-focus lists to six items initially
+- Kept every calculated item available through explicit local reveal controls without changing review calculations or routes
+
 ## Stage 136 - Today Task List Density
 
 - Limited the initial Today task list to twelve cards, with an explicit local reveal control for the remaining tasks

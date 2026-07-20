@@ -164,6 +164,8 @@ Stage 135 bounds the Journal archive to twelve initially rendered entries and pr
 
 Stage 136 bounds Today to twelve initially rendered filtered task cards, while retaining every task action and focused navigation target through an explicit reveal control.
 
+Stage 137 bounds long Weekly Review insight collections to six initially rendered entries each, while retaining every calculated item and navigation destination through explicit local reveal controls.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1

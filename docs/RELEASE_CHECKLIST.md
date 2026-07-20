@@ -443,6 +443,12 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 2. Open a Today `focusId` link targeting a task after the twelfth item; confirm it remains visible, scrolls into view, and highlights without needing the reveal control.
 3. Apply every supported Today route filter and confirm the count and task actions still operate on the complete filtered local collection.
 
+### Stage 137 Weekly Review insight density
+
+1. With more than six project-attention entries, focus observations, or suggested-focus entries, confirm each collection initially shows six and can reveal all remaining calculated items.
+2. Open a revealed project-attention item’s Goal and Today-task links; confirm they preserve the original record destination.
+3. Confirm collapsing a revealed collection does not persist a preference or alter any review, planning, or summary calculation.
+
 - [x] Routines, Projects, Knowledge, and Personal Manual initially render no more than twelve cards
 - [x] Existing cards beyond the initial limit remain explicitly reachable through a local display control
 - [x] A focused item outside the initial limit is rendered for existing search and navigation destinations

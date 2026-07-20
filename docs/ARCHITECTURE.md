@@ -276,6 +276,12 @@ AliOS does not require a Node.js server in production. Node.js is allowed for de
 - A focused task outside the preview remains rendered, so existing search navigation and scrolling continue to work
 - The boundary changes neither task actions nor route filters, stored records, repositories, schemas, or backups
 
+## Weekly Review Insight Density Boundary
+
+- Project attention, focus observations, and suggested-focus collections initially render at most six calculated entries
+- Explicit page-local reveal controls expose the complete derived lists without reordering, persisting, or modifying their source data
+- Existing project and goal navigation continues to use the original record identities
+
 ## Layering
 
 ```text

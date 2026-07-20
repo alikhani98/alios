@@ -58,6 +58,8 @@ Stage 134 initially shows twelve Global Search results on any viewport; changing
 Stage 135 initially shows twelve Journal entries on any viewport; a focused Journal result remains visible even when it falls outside that initial archive view.
 
 Stage 136 initially shows twelve Today task cards on any viewport; the remaining filtered tasks stay reachable through one local reveal control, and a focused task remains visible.
+
+Stage 137 initially shows six Weekly Review project-attention entries, focus observations, and suggested-focus entries per collection; all remaining calculated items remain locally reachable.
 The Personal Insights section stays local to the device and only reflects stored tasks, projects, inbox items, journal entries, knowledge items, and wellness checklist state.
 
 ## Personal Manual smoke test
