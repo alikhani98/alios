@@ -56,6 +56,8 @@ Stage 132 initially shows six actionable Weekly Review queue items on any viewpo
 Stage 133 initially shows six due Goals and six due Personal Manual entries inside Weekly Review; each section can reveal its remaining existing records locally.
 Stage 134 initially shows twelve Global Search results on any viewport; changing the query restores the compact view and a local reveal control exposes every remaining existing match.
 Stage 135 initially shows twelve Journal entries on any viewport; a focused Journal result remains visible even when it falls outside that initial archive view.
+
+Stage 136 initially shows twelve Today task cards on any viewport; the remaining filtered tasks stay reachable through one local reveal control, and a focused task remains visible.
 The Personal Insights section stays local to the device and only reflects stored tasks, projects, inbox items, journal entries, knowledge items, and wellness checklist state.
 
 ## Personal Manual smoke test

@@ -1,6 +1,6 @@
 import { AlertCircle, CalendarDays, CheckSquare2, Clock3, Plus, Repeat2, RotateCcw } from "lucide-react";
 import { format } from "date-fns";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 
@@ -90,6 +90,7 @@ export function TodayPage() {
   const [focusedTaskId, setFocusedTaskId] = useState<string | null>(null);
   const [focusMessage, setFocusMessage] = useState<string | null>(null);
   const [showAllRoutineSuggestions, setShowAllRoutineSuggestions] = useState(false);
+  const [showAllTasks, setShowAllTasks] = useState(false);
   const taskRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const plannedTaskRef = useRef<HTMLDivElement | null>(null);
   const focusId = searchParams.get("focusId");
@@ -109,6 +110,22 @@ export function TodayPage() {
       (!projectId || task.projectId === projectId) &&
       (!routineId || task.routineId === routineId)
   );
+  const taskPreviewLimit = 12;
+  const displayedTasks = useMemo(() => {
+    if (showAllTasks || visibleTasks.length <= taskPreviewLimit) {
+      return visibleTasks;
+    }
+
+    const preview = visibleTasks.slice(0, taskPreviewLimit);
+    const focusedTask = focusId
+      ? visibleTasks.find((task) => task.id === focusId)
+      : undefined;
+
+    return focusedTask && !preview.some((task) => task.id === focusedTask.id)
+      ? [...preview, focusedTask]
+      : preview;
+  }, [focusId, showAllTasks, visibleTasks]);
+  const hiddenTaskCount = Math.max(visibleTasks.length - displayedTasks.length, 0);
   const plannedTaskOutsideToday = getPlannedTaskOutsideToday(weeklyPlanFocus, today);
   const routineSuggestions = getRoutineSuggestions(
     routines,
@@ -665,7 +682,7 @@ export function TodayPage() {
         />
       ) : (
         <div className="space-y-3">
-          {visibleTasks.map((task) => (
+          {displayedTasks.map((task) => (
             <div
               key={task.id}
               ref={(node) => {
@@ -690,6 +707,18 @@ export function TodayPage() {
               />
             </div>
           ))}
+          {visibleTasks.length > taskPreviewLimit ? (
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full sm:w-auto"
+              onClick={() => setShowAllTasks((current) => !current)}
+            >
+              {showAllTasks
+                ? t("common.showFewer")
+                : t("common.showMoreCount", { count: hiddenTaskCount })}
+            </Button>
+          ) : null}
         </div>
       )}
     </section>
