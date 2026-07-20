@@ -51,6 +51,7 @@ AliOS 1.0 is a local-first static web app.
 - Finance calculations and visual summaries stay deterministic and local, with no advice engine, bank integration, chart library, or cloud dependency
 - The Finance Monthly Plan is derived-only from recorded local transactions and obligations, keeps monthly budget rules out of storage, and does not change the Dexie schema or backup format
 - Backup and restore include finance data additively without breaking older backups that do not contain the finance arrays
+- Long Finance collections may apply local presentation-only reveal boundaries; calculations, filters, forms, CRUD actions, and repository queries continue to operate on the complete filtered record set
 
 ## Decision Log Module Boundary
 

@@ -175,6 +175,8 @@ export function FinancePage() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [selectedFilter, setSelectedFilter] =
     useState<FinanceViewFilter>("all");
+  const [showAllTransactions, setShowAllTransactions] = useState(false);
+  const [showAllObligations, setShowAllObligations] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<
     FinanceTransaction | undefined
   >();
@@ -199,6 +201,11 @@ export function FinancePage() {
   useEffect(() => {
     writeStoredFinanceCollapsedSectionIds(collapsedSectionIds);
   }, [collapsedSectionIds]);
+
+  useEffect(() => {
+    setShowAllTransactions(false);
+    setShowAllObligations(false);
+  }, [selectedFilter]);
 
   const currencyLocale = language === "fa" ? "fa-IR" : "en-US";
   const calendarLocale = resolvedCalendar === "jalali" ? "persian" : "gregory";
@@ -449,6 +456,21 @@ export function FinancePage() {
         : sortedTransactions;
   const filteredObligations =
     selectedFilter === "paidObligations" ? paidObligations : activeObligations;
+  const financePreviewLimit = 12;
+  const displayedTransactions = showAllTransactions
+    ? filteredTransactions
+    : filteredTransactions.slice(0, financePreviewLimit);
+  const displayedObligations = showAllObligations
+    ? filteredObligations
+    : filteredObligations.slice(0, financePreviewLimit);
+  const hiddenTransactionCount = Math.max(
+    filteredTransactions.length - displayedTransactions.length,
+    0
+  );
+  const hiddenObligationCount = Math.max(
+    filteredObligations.length - displayedObligations.length,
+    0
+  );
   const hasRecords = transactions.length > 0 || obligations.length > 0;
   const transactionSectionTitleKey = getFinanceSectionTitleKey(selectedFilter);
   const transactionSectionDescriptionKey =
@@ -1091,7 +1113,7 @@ export function FinancePage() {
                           </Button>
                         </SoftPanel>
                       ) : (
-                        filteredTransactions.map((transaction) => (
+                        displayedTransactions.map((transaction) => (
                           <FinanceTransactionCard
                             key={transaction.id}
                             transaction={transaction}
@@ -1108,6 +1130,19 @@ export function FinancePage() {
                           />
                         ))
                       )}
+                      {filteredTransactions.length > financePreviewLimit ? (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => setShowAllTransactions((current) => !current)}
+                        >
+                          {showAllTransactions
+                            ? t("common.showFewer")
+                            : t("common.showMoreCount", {
+                                count: hiddenTransactionCount,
+                              })}
+                        </Button>
+                      ) : null}
                     </div>
                   </div>
                 </PremiumCard>
@@ -1151,7 +1186,7 @@ export function FinancePage() {
                           </Button>
                         </SoftPanel>
                       ) : (
-                        filteredObligations.map((obligation) => (
+                        displayedObligations.map((obligation) => (
                           <FinanceObligationCard
                             key={obligation.id}
                             obligation={obligation}
@@ -1168,6 +1203,19 @@ export function FinancePage() {
                           />
                         ))
                       )}
+                      {filteredObligations.length > financePreviewLimit ? (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => setShowAllObligations((current) => !current)}
+                        >
+                          {showAllObligations
+                            ? t("common.showFewer")
+                            : t("common.showMoreCount", {
+                                count: hiddenObligationCount,
+                              })}
+                        </Button>
+                      ) : null}
                     </div>
                   </div>
                 </PremiumCard>
