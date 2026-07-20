@@ -2,6 +2,10 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 133 - Weekly Review Detail Density
+
+- Limited the initially shown due Goal and Personal Manual review cards to six per section, with local reveal controls that keep every existing review action available
+
 ## Stage 132 - Weekly Review Queue Density
 
 - Bounded the initial weekly review queue to six actionable items with an explicit local reveal control, while preserving every review action and queued record
