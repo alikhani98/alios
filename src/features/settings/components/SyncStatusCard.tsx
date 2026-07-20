@@ -1,0 +1,36 @@
+import { CloudOff, ShieldCheck } from "lucide-react";
+
+import { localOnlySyncProvider } from "@/core/sync";
+import { useI18n } from "@/shared/i18n";
+import { Badge, Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui";
+
+export function SyncStatusCard() {
+  const { t } = useI18n();
+  const provider = localOnlySyncProvider;
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <CloudOff className="h-5 w-5 text-primary" />
+          {t("settings.syncTitle")}
+        </CardTitle>
+        <CardDescription>{t("settings.syncDescription")}</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="flex flex-col gap-3 rounded-xl border bg-muted/30 p-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex items-start gap-2">
+            <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+            <p className="text-sm leading-7 text-muted-foreground">
+              {t("settings.syncLocalOnly")}
+            </p>
+          </div>
+          <Badge variant="secondary" className="w-fit shrink-0">
+            {provider.name === "local-only" ? t("settings.syncStatusLocalOnly") : provider.name}
+          </Badge>
+        </div>
+        <p className="text-xs leading-5 text-muted-foreground">{t("settings.syncFutureNote")}</p>
+      </CardContent>
+    </Card>
+  );
+}
