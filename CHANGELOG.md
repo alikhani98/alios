@@ -2,6 +2,11 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 128 - Operational List Density
+
+- Reduced the initial Routine collection to six cards, making the mobile routine manager substantially shorter while retaining a clear local reveal control
+- Added the same progressive disclosure boundary to long Inbox and Decision Log collections without changing filtering, search focus, bulk triage, or local records
+
 ## Stage 127 - Dense Collection Views
 
 - Added one consistent initial collection limit and explicit reveal control across Routines, Projects, Knowledge, and Personal Manual

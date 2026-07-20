@@ -392,6 +392,15 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 
 ### Stage 127 Dense collection views
 
+1. With more than twelve records in Routines, Projects, Knowledge, and Personal Manual, confirm only the initial boundary appears and the reveal control exposes every remaining existing record.
+2. Open a focused search result beyond the boundary and confirm it remains visible and highlighted.
+
+### Stage 128 Operational list density
+
+1. With more than six Routines, confirm mobile and desktop initially show six, and the reveal control exposes the remaining existing routines.
+2. With more than twelve Inbox items, filter a subset, select all visible filtered items, and confirm bulk actions still apply to the complete filtered set after using the display control.
+3. With more than twelve Decisions, switch every filter and confirm the visible-card boundary resets without changing records or filter counts.
+
 - [x] Routines, Projects, Knowledge, and Personal Manual initially render no more than twelve cards
 - [x] Existing cards beyond the initial limit remain explicitly reachable through a local display control
 - [x] A focused item outside the initial limit is rendered for existing search and navigation destinations

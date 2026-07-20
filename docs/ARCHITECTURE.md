@@ -248,6 +248,12 @@ AliOS does not require a Node.js server in production. Node.js is allowed for de
 - The initial card limit applies only to rendered collection presentation in Routines, Projects, Knowledge, and Personal Manual
 - Search-focus destinations outside that limit remain available; no stored record, filter result, or CRUD behavior is removed
 
+## Operational List Density Boundary
+
+- Routines use a smaller six-card initial boundary; Inbox and Decision Log use a twelve-card boundary
+- Inbox’s selection and bulk operations still derive from the complete filtered collection, not from the rendered preview
+- Reveal state is page-local and does not modify records, filters, routing, repositories, schemas, or backups
+
 ## Layering
 
 ```text

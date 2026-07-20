@@ -734,3 +734,11 @@ The stage adds no record, route, schema, migration, backup change, dependency, b
 Routines, Projects, Knowledge, and Personal Manual initially render at most twelve existing cards. A local display-only control reveals the remaining cards. A focused item outside that boundary remains rendered so search and navigation destinations stay reachable.
 
 The stage adds no record, route, schema, migration, backup change, dependency, backend, sync, cloud, AI, telemetry, or automation.
+
+## ADR-071: Keep operational list controls independent from visible-card density
+
+**Status:** Accepted (Stage 128)
+
+Routines initially render at most six cards. Inbox and Decision Log initially render at most twelve cards, with a local reveal control. Inbox filtering, focused search navigation, selected IDs, and bulk actions continue to operate on the complete filtered collection rather than just the initial card preview.
+
+The stage adds no record, route, schema, migration, backup change, dependency, backend, sync, cloud, AI, telemetry, or automation.
