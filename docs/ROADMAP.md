@@ -154,6 +154,8 @@ Stage 130 makes Settings open as a compact operational page: Help Center section
 
 Stage 131 bounds long Finance transaction and obligation collections at twelve cards per active filter, retaining all calculations, filters, forms, edit/delete actions, and local records behind explicit reveal controls.
 
+Stage 132 makes Weekly Review start with a six-item actionable review queue; remaining existing review items stay explicitly reachable without changing their review action or destination.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1

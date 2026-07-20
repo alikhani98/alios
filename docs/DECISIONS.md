@@ -766,3 +766,11 @@ The stage adds no record, route, schema, migration, backup change, dependency, b
 Finance initially renders at most twelve transactions and twelve obligations for the active filter. Summaries, filter counts, calculations, and every existing form and CRUD action continue to use the complete local collection. A filter change restores the compact view so a newly selected result set remains readable.
 
 The stage adds no record, route, schema, migration, backup change, dependency, backend, sync, cloud, AI, telemetry, or automation.
+
+## ADR-075: Keep the weekly review queue focused but complete
+
+**Status:** Accepted (Stage 132)
+
+Weekly Review initially renders six actionable queue items. The explicit local reveal control exposes all remaining due Projects, Goals, Life Areas, Personal Manual entries, and Decisions. Review completion and route navigation continue to refer to the original queued item, without reordering, persisting, or scoring the queue.
+
+The stage adds no record, route, schema, migration, backup change, dependency, backend, sync, cloud, AI, telemetry, or automation.

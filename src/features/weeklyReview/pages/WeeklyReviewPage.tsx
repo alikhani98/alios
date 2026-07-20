@@ -277,10 +277,19 @@ export function WeeklyReviewPage() {
     saveWeeklyPlan,
   } = useWeeklyReview();
   const [isSavingWeeklyPlan, setIsSavingWeeklyPlan] = useState(false);
+  const [showAllReviewQueueItems, setShowAllReviewQueueItems] = useState(false);
 
   const reviewQueue = useMemo(
     () => (summary ? getReviewQueue(summary) : []),
     [summary]
+  );
+  const reviewQueuePreviewLimit = 6;
+  const displayedReviewQueue = showAllReviewQueueItems
+    ? reviewQueue
+    : reviewQueue.slice(0, reviewQueuePreviewLimit);
+  const hiddenReviewQueueCount = Math.max(
+    reviewQueue.length - displayedReviewQueue.length,
+    0
   );
   const weeklyPlanLinks = useMemo(
     () => getWeeklyPlanLinks(weeklyPlan, planningOptions.goals, planningOptions.projects, planningOptions.tasks),
@@ -597,7 +606,7 @@ export function WeeklyReviewPage() {
               contentClassName="space-y-3"
             >
               <div className="grid gap-3 lg:grid-cols-2">
-                {reviewQueue.map((item) => (
+                {displayedReviewQueue.map((item) => (
                   <SoftPanel key={`${item.kind}-${item.id}`} className="space-y-3">
                     <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
                       <p className="min-w-0 break-words font-semibold leading-7">{item.title}</p>
@@ -623,6 +632,20 @@ export function WeeklyReviewPage() {
                   </SoftPanel>
                 ))}
               </div>
+              {reviewQueue.length > reviewQueuePreviewLimit ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full sm:w-auto"
+                  onClick={() => setShowAllReviewQueueItems((current) => !current)}
+                >
+                  {showAllReviewQueueItems
+                    ? t("common.showFewer")
+                    : t("common.showMoreCount", {
+                        count: hiddenReviewQueueCount,
+                      })}
+                </Button>
+              ) : null}
             </CollapsibleSection>
           ) : null}
 
