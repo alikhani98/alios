@@ -280,6 +280,9 @@ export function WeeklyReviewPage() {
   const [showAllReviewQueueItems, setShowAllReviewQueueItems] = useState(false);
   const [showAllDueGoals, setShowAllDueGoals] = useState(false);
   const [showAllDueManualEntries, setShowAllDueManualEntries] = useState(false);
+  const [showAllPlanningAttentionEntries, setShowAllPlanningAttentionEntries] = useState(false);
+  const [showAllFocusObservations, setShowAllFocusObservations] = useState(false);
+  const [showAllSuggestedFocus, setShowAllSuggestedFocus] = useState(false);
 
   const reviewQueue = useMemo(
     () => (summary ? getReviewQueue(summary) : []),
@@ -306,6 +309,28 @@ export function WeeklyReviewPage() {
   );
   const hiddenDueManualEntryCount = Math.max(
     (summary?.manualSummary.dueEntries.length ?? 0) - displayedDueManualEntries.length,
+    0
+  );
+  const insightPreviewLimit = 6;
+  const displayedPlanningAttentionEntries = showAllPlanningAttentionEntries
+    ? summary?.planningSummary.attentionEntries ?? []
+    : summary?.planningSummary.attentionEntries.slice(0, insightPreviewLimit) ?? [];
+  const displayedFocusObservations = showAllFocusObservations
+    ? summary?.focusObservations ?? []
+    : summary?.focusObservations.slice(0, insightPreviewLimit) ?? [];
+  const displayedSuggestedFocus = showAllSuggestedFocus
+    ? summary?.suggestedFocus ?? []
+    : summary?.suggestedFocus.slice(0, insightPreviewLimit) ?? [];
+  const hiddenPlanningAttentionCount = Math.max(
+    (summary?.planningSummary.attentionEntries.length ?? 0) - displayedPlanningAttentionEntries.length,
+    0
+  );
+  const hiddenFocusObservationCount = Math.max(
+    (summary?.focusObservations.length ?? 0) - displayedFocusObservations.length,
+    0
+  );
+  const hiddenSuggestedFocusCount = Math.max(
+    (summary?.suggestedFocus.length ?? 0) - displayedSuggestedFocus.length,
     0
   );
   const weeklyPlanLinks = useMemo(
@@ -770,7 +795,7 @@ export function WeeklyReviewPage() {
 
               {summary.planningSummary.attentionEntries.length > 0 ? (
                 <div className="grid gap-3 lg:grid-cols-2">
-                  {summary.planningSummary.attentionEntries.map((entry) => (
+                  {displayedPlanningAttentionEntries.map((entry) => (
                     <SoftPanel key={entry.project.id} className="space-y-3">
                       <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
                         <div className="min-w-0 space-y-1">
@@ -806,6 +831,18 @@ export function WeeklyReviewPage() {
                   }
                 />
               )}
+
+              {summary.planningSummary.attentionEntries.length > insightPreviewLimit ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowAllPlanningAttentionEntries((current) => !current)}
+                >
+                  {showAllPlanningAttentionEntries
+                    ? t("common.showFewer")
+                    : t("common.showMoreCount", { count: hiddenPlanningAttentionCount })}
+                </Button>
+              ) : null}
 
               {summary.planningSummary.unavailableGoalProjectCount > 0 ? (
                 <SoftPanel className="text-sm leading-7 text-muted-foreground">
@@ -1410,7 +1447,7 @@ export function WeeklyReviewPage() {
                   status={<StatusChip tone="neutral">{summary.focusObservations.length}</StatusChip>}
                 />
                 <div className="mt-5 space-y-3">
-                  {summary.focusObservations.map((observation, index) => (
+                  {displayedFocusObservations.map((observation, index) => (
                     <SoftPanel key={`${observation.kind}-${index}`} className="space-y-2">
                       <div className="flex flex-wrap items-center gap-2">
                         <StatusChip tone={getObservationTone(observation) as "neutral" | "success" | "warning"}>
@@ -1434,6 +1471,17 @@ export function WeeklyReviewPage() {
                       </p>
                     </SoftPanel>
                   ))}
+                  {summary.focusObservations.length > insightPreviewLimit ? (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setShowAllFocusObservations((current) => !current)}
+                    >
+                      {showAllFocusObservations
+                        ? t("common.showFewer")
+                        : t("common.showMoreCount", { count: hiddenFocusObservationCount })}
+                    </Button>
+                  ) : null}
                 </div>
               </div>
             </PremiumCard>
@@ -1447,7 +1495,7 @@ export function WeeklyReviewPage() {
                   status={<StatusChip tone="neutral">{summary.suggestedFocus.length}</StatusChip>}
                 />
                 <div className="mt-5 space-y-3">
-                  {summary.suggestedFocus.map((suggestion, index) => (
+                  {displayedSuggestedFocus.map((suggestion, index) => (
                     <SoftPanel key={`${suggestion.kind}-${index}`} className="space-y-2">
                       <div className="flex flex-wrap items-center gap-2">
                         <StatusChip tone="primary">{t("weeklyReview.nextFocusLabel")}</StatusChip>
@@ -1458,6 +1506,17 @@ export function WeeklyReviewPage() {
                       </p>
                     </SoftPanel>
                   ))}
+                  {summary.suggestedFocus.length > insightPreviewLimit ? (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setShowAllSuggestedFocus((current) => !current)}
+                    >
+                      {showAllSuggestedFocus
+                        ? t("common.showFewer")
+                        : t("common.showMoreCount", { count: hiddenSuggestedFocusCount })}
+                    </Button>
+                  ) : null}
 
                   <div className="grid gap-3 pt-2 sm:flex sm:flex-wrap">
                     {quickLinks.map(({ to, labelKey }) => (
