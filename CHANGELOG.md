@@ -2,6 +2,10 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 135 - Journal Archive Density
+
+- Limited the initial journal archive to twelve entries with a local reveal control, while ensuring a focused search result outside the boundary remains rendered and reachable
+
 ## Stage 134 - Search Result Density
 
 - Limited the initial global-search result grid to twelve matching records and kept every existing result and focus-navigation link available through an explicit local reveal control

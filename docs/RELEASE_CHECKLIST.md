@@ -432,6 +432,11 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 1. Search a term with more than twelve matches at desktop and 360px widths; confirm twelve result cards appear initially and the control exposes every remaining existing match.
 2. Change the search term after expanding results and open a revealed focused result; confirm the new query starts compact and the result navigates to its original feature record.
 
+### Stage 135 Journal archive density
+
+1. With more than twelve Journal entries, confirm desktop and 360px views initially show twelve entries and the local reveal control exposes all remaining existing entries.
+2. Open a Global Search Journal result beyond the initial boundary and confirm it is rendered, scrolled into view, and highlighted without opening every archive entry.
+
 - [x] Routines, Projects, Knowledge, and Personal Manual initially render no more than twelve cards
 - [x] Existing cards beyond the initial limit remain explicitly reachable through a local display control
 - [x] A focused item outside the initial limit is rendered for existing search and navigation destinations

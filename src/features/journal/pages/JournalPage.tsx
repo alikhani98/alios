@@ -1,5 +1,5 @@
 import { AlertCircle, BookOpenText, Plus, RotateCcw } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
 import type { CreateJournalEntryInput } from "@/core/repositories";
@@ -41,8 +41,25 @@ export function JournalPage() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [focusedEntryId, setFocusedEntryId] = useState<string | null>(null);
   const [focusMessage, setFocusMessage] = useState<string | null>(null);
+  const [showAllEntries, setShowAllEntries] = useState(false);
   const entryRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const focusId = searchParams.get("focusId");
+  const journalPreviewLimit = 12;
+  const displayedEntries = useMemo(() => {
+    if (showAllEntries) {
+      return entries;
+    }
+
+    const initialEntries = entries.slice(0, journalPreviewLimit);
+    const focusedEntry = focusId
+      ? entries.find((entry) => entry.id === focusId)
+      : undefined;
+
+    return focusedEntry && !initialEntries.some((entry) => entry.id === focusedEntry.id)
+      ? [...initialEntries, focusedEntry]
+      : initialEntries;
+  }, [entries, focusId, showAllEntries]);
+  const hiddenEntryCount = Math.max(entries.length - displayedEntries.length, 0);
 
   const openCreateForm = () => {
     setEditingEntry(undefined);
@@ -244,7 +261,7 @@ export function JournalPage() {
         />
       ) : (
         <div className="space-y-4">
-          {entries.map((entry) => (
+          {displayedEntries.map((entry) => (
             <div
               key={entry.id}
               ref={(node) => {
@@ -265,6 +282,18 @@ export function JournalPage() {
               />
             </div>
           ))}
+          {entries.length > journalPreviewLimit ? (
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full sm:w-auto"
+              onClick={() => setShowAllEntries((current) => !current)}
+            >
+              {showAllEntries
+                ? t("common.showFewer")
+                : t("common.showMoreCount", { count: hiddenEntryCount })}
+            </Button>
+          ) : null}
         </div>
       )}
     </section>
