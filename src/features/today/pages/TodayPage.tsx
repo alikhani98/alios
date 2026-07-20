@@ -1,5 +1,5 @@
 import { AlertCircle, CalendarDays, CheckSquare2, Clock3, Plus, Repeat2, RotateCcw } from "lucide-react";
-import { format } from "date-fns";
+import { format, isValid, parseISO } from "date-fns";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Link } from "react-router-dom";
@@ -45,7 +45,12 @@ export function TodayPage() {
   const { t } = useI18n();
   const { formatDate } = useDateFormatter();
   const [searchParams] = useSearchParams();
-  const today = format(new Date(), "yyyy-MM-dd");
+  const requestedDate = searchParams.get("date");
+  const requestedDateValue = requestedDate ? parseISO(requestedDate) : undefined;
+  const today =
+    requestedDate && requestedDateValue && isValid(requestedDateValue)
+      ? format(requestedDateValue, "yyyy-MM-dd")
+      : format(new Date(), "yyyy-MM-dd");
   const {
     tasks,
     checkin,

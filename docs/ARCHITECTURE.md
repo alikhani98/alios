@@ -288,6 +288,12 @@ AliOS does not require a Node.js server in production. Node.js is allowed for de
 - A shared, display-only hint renders the entered date through the current Settings calendar choice
 - The entry hint does not parse Jalali input, alter stored values, or change schemas, backups, and routes
 
+## Full Calendar Page Boundary
+
+- The `/calendar` route reads existing Task records through the Storage Adapter and groups them by their existing ISO `dueDate`.
+- Month and week navigation are client-side display controls; changing the selected calendar in Settings affects labels only, not stored values.
+- Opening a day uses `/today?date=YYYY-MM-DD`; this preserves the canonical ISO date and avoids a new calendar data model, dependency, or backend.
+
 ## Layering
 
 ```text

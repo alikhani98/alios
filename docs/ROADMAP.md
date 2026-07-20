@@ -416,6 +416,12 @@ The Stage 84 real-world usage pass remains pending. Future product scope should 
 - Knowledge assistant
 - Decision assistant
 
+## Stage 139 delivered in v1
+
+- Dedicated local full-calendar route with month and week views
+- Selected-day Task preview and direct date-aware Today navigation
+- Recurring tasks, ICS export, external calendar integration, notifications, and cloud sync remain future work
+
 ## Version 2.5
 
 - Optional Tauri desktop app

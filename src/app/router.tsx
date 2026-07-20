@@ -15,6 +15,11 @@ const TodayPage = lazyWithRetry(() =>
     default: module.TodayPage,
   }))
 );
+const CalendarPage = lazyWithRetry(() =>
+  import("@/features/calendar/pages/CalendarPage").then((module) => ({
+    default: module.CalendarPage,
+  }))
+);
 const RoutinesPage = lazyWithRetry(() =>
   import("@/features/routines/pages/RoutinesPage").then((module) => ({ default: module.RoutinesPage }))
 );
@@ -97,6 +102,14 @@ const router = createHashRouter([
         element: (
           <Suspense fallback={<RouteLoadingFallback />}>
             <TodayPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "calendar",
+        element: (
+          <Suspense fallback={<RouteLoadingFallback />}>
+            <CalendarPage />
           </Suspense>
         ),
       },

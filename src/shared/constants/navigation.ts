@@ -38,6 +38,11 @@ export const mainNavigation: NavItem[] = [
     icon: "calendar-check",
   },
   {
+    titleKey: "nav.calendar",
+    href: "/calendar",
+    icon: "calendar-range",
+  },
+  {
     titleKey: "nav.routines",
     href: "/routines",
     icon: "repeat",

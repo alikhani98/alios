@@ -347,3 +347,9 @@ Use [`REAL_WORLD_USAGE_QA.md`](./REAL_WORLD_USAGE_QA.md) during normal daily use
 - Cloud backup
 - Push notifications
 - Native Android/iOS application
+
+## Full calendar page
+
+1. Open **Calendar** from the navigation menu.
+2. Switch between month and week, select a day, then use **Open selected day** to manage that day's tasks.
+3. At narrow widths, confirm all seven day controls remain visible, tappable, and without horizontal page overflow.

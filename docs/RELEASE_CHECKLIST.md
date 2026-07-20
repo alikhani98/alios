@@ -540,3 +540,10 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 5. Commit with `chore(release): prepare v1.0`.
 6. Deploy the contents of `dist/` to static hosting and smoke-test the deployed origin.
 7. Create and push the `v1.0.0` annotated tag only after approval.
+
+## Stage 139 full calendar smoke test
+
+1. Open **Calendar** in Persian RTL and English LTR at 360px and at least 1280px.
+2. Change month and week, select a date with and without tasks, and confirm labels follow the selected display calendar.
+3. Use **Open selected day** and confirm Today displays that ISO date's tasks without modifying records.
+4. Confirm the calendar still loads after a refresh and that no horizontal overflow is created by the seven-day grid.
