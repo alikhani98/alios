@@ -702,3 +702,11 @@ This is presentation-only. It changes no record, route, schema, migration, backu
 The Home daily-planning strip reserves three presentational actions: existing goal/project focus, existing weekly focus, and Inbox quick capture. If a goal or weekly plan is absent, the same slot presents a non-destructive route to the existing Goals or Weekly Review flow rather than leaving visual space unused.
 
 This changes no record, route meaning, schema, migration, backup, dependency, backend, sync, cloud, AI, telemetry, or automation behavior.
+
+## ADR-067: Compose Home upcoming work by action horizon
+
+**Status:** Accepted (Stage 124)
+
+Home may group existing overdue, today, and tomorrow buckets as compact immediate-work lanes. Existing this-week and later buckets share one explicit planning row and retain the existing Today destination. The arrangement is derived presentation only; task records, task editing, due dates, MIT selection, and status behavior remain solely within Today.
+
+The stage adds no record, route, schema, migration, backup change, dependency, backend, sync, cloud, AI, telemetry, or automation.

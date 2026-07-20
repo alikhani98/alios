@@ -369,6 +369,13 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] Mobile stacks the same three actions in a readable order
 - [ ] Manually inspect populated and sparse Home data on desktop and 360px, 390px, and 430px widths
 
+### Stage 124 Home action workspace composition
+
+- [x] Immediate existing task buckets remain individually scannable
+- [x] This-week and later task context share a responsive planning row with the existing Today route
+- [x] Mobile stacks the same action horizons without horizontal scrolling
+- [ ] Manually inspect populated and sparse Home data on desktop and 360px, 390px, and 430px widths
+
 ### Stage 86 performance regression guard
 
 - [x] `pnpm performance:check` builds a manifest and enforces the entry-byte budget, no forms preload, and no Vite chunk-size warning

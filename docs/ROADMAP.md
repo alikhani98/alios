@@ -138,6 +138,8 @@ Stage 122 ensures the Home calendar has its own full desktop row before it prese
 
 Stage 123 turns the remaining Home hero planning space into an actionable, responsive daily-planning strip instead of leaving an empty surface when planning data is sparse.
 
+Stage 124 composes the existing upcoming-task buckets into a compact action workspace: immediate work stays scannable and later work receives one intentional planning row.
+
 The Stage 84 real-world usage pass remains pending. Future product scope should still follow its observed evidence.
 
 ## Version 1.1
