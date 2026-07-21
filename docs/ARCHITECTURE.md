@@ -346,3 +346,9 @@ Dexie / IndexedDB in v1
 - `SyncProvider` is an application boundary, not a database replacement. Features continue to use repositories and the injected Storage Adapter.
 - The only shipped provider is `LocalOnlySyncProvider`; both its status and `syncNow` result are non-mutating and have no network activity.
 - A remote provider must be opt-in, retain a local-first source of truth, preserve backup/restore compatibility, publish conflict behavior, and never make authentication or remote transfer a prerequisite for using AliOS.
+
+## Optional sync consent boundary
+
+- The future remote-provider direction is Supabase, but no SDK, endpoint, credential, account state, or network request is shipped in this stage.
+- `assessOptionalSyncConsent` is a pure pre-activation guard. A future provider must prove a user-controlled account, explicit consent, visible data-scope disclosure, retained local copy, and backup compatibility before it can activate.
+- The guard never persists consent or claims that a provider is configured; that action belongs to a separate approved account-and-sync implementation.

@@ -798,3 +798,11 @@ The stage adds no record, route, schema, migration, backup change, dependency, b
 Journal initially renders twelve entries. The complete local archive stays reachable through an explicit reveal control. When existing Global Search navigation targets a Journal entry outside the initial view, that entry is additionally rendered so the established focus and scroll behavior continues to work.
 
 The stage adds no record, route, schema, migration, backup change, dependency, backend, sync, cloud, AI, telemetry, or automation.
+
+## ADR-079: Require explicit consent before optional remote sync
+
+**Status:** Accepted (Stage 144)
+
+AliOS remains usable with its browser-local data as the source of truth. The planned remote-provider direction is Supabase rather than Firebase, but this decision introduces neither provider configuration nor account behavior. A pure consent guard requires a user-controlled account, an explicit opt-in action, clear data-scope disclosure, a retained local copy, and backup compatibility before any future remote adapter may activate.
+
+The stage adds no credential, endpoint, request, account state, record, schema, migration, backup-format change, dependency, remote sync, cloud copy, telemetry, or automation.

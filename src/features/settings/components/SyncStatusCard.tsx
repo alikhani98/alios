@@ -1,6 +1,6 @@
 import { CloudOff, ShieldCheck } from "lucide-react";
 
-import { localOnlySyncProvider } from "@/core/sync";
+import { OPTIONAL_SYNC_PROVIDER_ID, localOnlySyncProvider } from "@/core/sync";
 import { useI18n } from "@/shared/i18n";
 import { Badge, Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/ui";
 
@@ -28,6 +28,19 @@ export function SyncStatusCard() {
           <Badge variant="secondary" className="w-fit shrink-0">
             {provider.name === "local-only" ? t("settings.syncStatusLocalOnly") : provider.name}
           </Badge>
+        </div>
+        <div className="rounded-xl border border-dashed bg-background/60 p-4 text-sm">
+          <p className="font-medium">{t("settings.syncConsentTitle")}</p>
+          <p className="mt-2 leading-7 text-muted-foreground">{t("settings.syncConsentDescription")}</p>
+          <ul className="mt-3 list-disc space-y-1 ps-5 leading-6 text-muted-foreground">
+            <li>{t("settings.syncConsentAccount")}</li>
+            <li>{t("settings.syncConsentExplicit")}</li>
+            <li>{t("settings.syncConsentScope")}</li>
+            <li>{t("settings.syncConsentLocal")}</li>
+          </ul>
+          <p className="mt-3 text-xs leading-5 text-muted-foreground">
+            {t("settings.syncPlannedProvider", { provider: OPTIONAL_SYNC_PROVIDER_ID })}
+          </p>
         </div>
         <p className="text-xs leading-5 text-muted-foreground">{t("settings.syncFutureNote")}</p>
       </CardContent>

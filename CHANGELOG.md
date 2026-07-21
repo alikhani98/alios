@@ -2,6 +2,11 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 144 - Optional Sync Consent Foundation
+
+- Added a pure local consent contract that blocks any future remote-sync activation until account control, explicit consent, data-scope disclosure, local-copy retention, and backup compatibility are all present
+- Made the planned provider direction visible in Settings without adding configuration, credentials, network activity, or an account flow
+
 ## Stage 143 - Local-First Sync Boundary
 
 - Added a provider contract and a safe local-only sync provider, so a future optional adapter can be added without bypassing AliOS storage or backup boundaries

@@ -427,6 +427,11 @@ The Stage 84 real-world usage pass remains pending. Future product scope should 
 - A local-only `SyncProvider` boundary makes the current no-sync state explicit and keeps future adapters outside feature and storage code
 - Remote authentication, automatic synchronization, cloud backup, conflict handling, and provider credentials remain unimplemented and require a separately approved integration stage
 
+## Stage 144 delivered in v2.0 preparation
+
+- A pure optional-sync consent guard defines the local-first prerequisites for a future remote adapter: account control, explicit consent, visible data scope, retained local copy, and backup compatibility
+- Supabase is documented as the provider direction instead of Firebase, but no SDK, backend, account, credential, endpoint, or network operation is present
+
 ## Stage 139 delivered in v1
 
 - Dedicated local full-calendar route with month and week views

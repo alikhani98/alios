@@ -39,6 +39,12 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] The shipped `LocalOnlySyncProvider` has no network call and reports zero changed records
 - [x] Existing Backup/Restore remains the only cross-device transfer workflow
 
+### Stage 144 optional sync consent foundation
+
+- [x] The Settings explanation states that Sync remains local-only and does not expose sign-in, credentials, or activation controls
+- [x] The consent guard requires account control, explicit consent, data-scope disclosure, retained local data, and backup compatibility before a future remote adapter could activate
+- [x] No Supabase package, endpoint, project key, account state, network activity, or persisted consent was added
+
 ### Stage 77 Goals and Life Areas hardening
 
 - [x] Every canonical area produces stable filtered Goals and focused Life Areas paths
