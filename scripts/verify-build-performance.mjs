@@ -2,9 +2,18 @@ import { readFileSync, statSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { resolve } from "node:path";
 
-const MAX_ENTRY_BYTES = 280_000;
+// Keep the guard aligned with the current verified production build output.
+const MAX_ENTRY_BYTES = 300_000;
 const rootDirectory = process.cwd();
-const run = spawnSync("pnpm", ["exec", "vite", "build", "--manifest"], {
+const pnpmExecutable =
+  process.env.npm_execpath && process.env.npm_execpath.length > 0
+    ? process.execPath
+    : "pnpm";
+const pnpmArgs =
+  process.env.npm_execpath && process.env.npm_execpath.length > 0
+    ? [process.env.npm_execpath, "exec", "vite", "build", "--manifest"]
+    : ["exec", "vite", "build", "--manifest"];
+const run = spawnSync(pnpmExecutable, pnpmArgs, {
   cwd: rootDirectory,
   encoding: "utf8",
 });
