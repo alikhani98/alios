@@ -2,6 +2,11 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 146 - Backup Restore Impact Preview
+
+- Added a read-only comparison of the selected backup and current local record counts before destructive restore confirmation
+- Included weekly plans in Backup/Restore preview totals so every supported backup table is visible
+
 ## Stage 145 - Local Device Transfer Guide
 
 - Added a Settings guide that turns the existing versioned JSON Backup/Restore flow into a clear cross-device handoff path

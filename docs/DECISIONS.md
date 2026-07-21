@@ -814,3 +814,11 @@ The stage adds no credential, endpoint, request, account state, record, schema, 
 Until an optional remote provider is separately approved and configured, AliOS moves data between devices only through the existing user-controlled JSON Backup/Restore path. Settings may guide the user to export, move, preview, and restore that file, but it may not choose a transfer channel or introduce background copying.
 
 The stage adds no account, credential, endpoint, request, cloud copy, backup-format change, record, schema, migration, dependency, telemetry, or automation.
+
+## ADR-081: Show restore impact before local data replacement
+
+**Status:** Accepted (Stage 146)
+
+Before a validated backup can replace current browser-local data, Settings compares every supported table's current count and selected-backup count. This gives a concise, read-only account of the impact without changing restore semantics or treating record counts as a merge plan.
+
+The stage adds no account, credential, endpoint, request, cloud copy, backup-format change, record, schema, migration, dependency, telemetry, or automation.

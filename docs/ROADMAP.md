@@ -437,6 +437,11 @@ The Stage 84 real-world usage pass remains pending. Future product scope should 
 - A Settings device-transfer guide turns the existing local JSON Backup/Restore workflow into a clear manual cross-device path
 - Sync remains inactive: the guide does not add a transfer provider, account, remote copy, background upload, or backend
 
+## Stage 146 delivered in v2.0 preparation
+
+- Restore confirmation compares the selected local backup with current local counts before replacement
+- The preview is read-only; it does not add merge behavior, cloud transfer, account state, or backend work
+
 ## Stage 139 delivered in v1
 
 - Dedicated local full-calendar route with month and week views
