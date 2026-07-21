@@ -138,6 +138,10 @@ Both commands must pass before a stage is reported complete. Generated build out
 Every completed work response must include:
 
 - Stage Summary
+- Implementation Status: what code or features changed
+- Automated Validation Status: tests, TypeScript, build, and CI status
+- Real-World Validation Status: manual testing, device or browser validation, user acceptance, or external verification
+- Passing automated tests does not equal real-world validation
 - Files Added
 - Files Modified
 - Files Removed
