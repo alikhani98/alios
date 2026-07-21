@@ -2,6 +2,11 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 142 - Optional Local AI Connection Readiness
+
+- Added an optional Settings connection check for a user-run local Ollama service, with no account, prompt, cloud API, or AliOS data transfer
+- Kept the feature inert until a user explicitly tests their local endpoint; model discovery only reports locally installed model names
+
 ## Stage 141 - ICS Calendar Export Foundation
 
 - Added a standards-based local `.ics` export for scheduled Tasks from the full Calendar page

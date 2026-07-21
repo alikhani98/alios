@@ -38,6 +38,7 @@ Stage 114 makes the Home entry point a compact command center: the existing dail
 Stage 115 keeps that hierarchy on desktop with a role-based grid while preserving the same single-column readable order on 360px, 390px, and 430px screens.
 Stage 116 keeps first-run Home compact on mobile by placing supporting panels behind one explicit expansion without removing any local information or changing the existing section controls.
 Stage 117 replaces the tall month grid in the initial Home view with a horizontally safe seven-day strip; the complete month and supporting insight details remain explicitly available without changing local data.
+Stage 142 adds an optional local Ollama connection check in Settings. It is not required for AliOS, sends no personal records, and can be skipped if Ollama is not installed or browser access is unavailable on the device.
 Stage 118 keeps a stale post-deployment lazy chunk from stranding a mobile route by allowing one cache-busting reload; a repeated failure stays visible through the existing local error boundary. The Home backup reminder uses a compact shared surface and keeps its Settings action reachable at narrow widths.
 Stage 119 keeps immediate task buckets readable in one column and moves this-week/later context into a compact planning surface; all task editing remains in Today.
 Stage 120 makes the seven-day calendar fit 360px, 390px, and 430px widths without horizontal scrolling; its day buttons retain full accessible date labels.

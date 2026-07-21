@@ -333,3 +333,10 @@ Dexie / IndexedDB in v1
 - No plugins
 - No event system
 - No financial advice engine
+
+## Optional local AI readiness boundary
+
+- The Version 2 readiness check may call only a user-configured local Ollama endpoint and only after an explicit user action in Settings.
+- The current check requests `/api/tags` to list locally installed model names. It never sends an AliOS record, backup, prompt, credential, or telemetry.
+- A failing, unavailable, or browser-blocked local endpoint is a non-fatal optional state; no existing local workflow depends on it.
+- Future AI actions must declare the exact local data being supplied, require explicit action-level user intent, and remain separate from cloud providers, authentication, and synchronization.
