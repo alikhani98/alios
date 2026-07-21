@@ -352,3 +352,8 @@ Dexie / IndexedDB in v1
 - The future remote-provider direction is Supabase, but no SDK, endpoint, credential, account state, or network request is shipped in this stage.
 - `assessOptionalSyncConsent` is a pure pre-activation guard. A future provider must prove a user-controlled account, explicit consent, visible data-scope disclosure, retained local copy, and backup compatibility before it can activate.
 - The guard never persists consent or claims that a provider is configured; that action belongs to a separate approved account-and-sync implementation.
+
+## Local device transfer guide
+
+- The cross-device path continues to use the existing versioned JSON backup and restore services; the guide only makes that safe handoff visible next to the local-only sync status.
+- It never reads the backup contents, creates a transfer channel, or changes validation, atomic restore, Backup status, or the Backup file format.

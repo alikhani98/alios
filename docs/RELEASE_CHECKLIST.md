@@ -45,6 +45,12 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] The consent guard requires account control, explicit consent, data-scope disclosure, retained local data, and backup compatibility before a future remote adapter could activate
 - [x] No Supabase package, endpoint, project key, account state, network activity, or persisted consent was added
 
+### Stage 145 local device transfer guide
+
+- [x] Settings presents export, trusted-file move, preview, and restore as separate user-controlled steps
+- [x] The guide reaches the existing Backup/Restore controls without beginning an export or restore
+- [x] No transfer channel, account, cloud copy, background upload, network activity, or backup-format change was added
+
 ### Stage 77 Goals and Life Areas hardening
 
 - [x] Every canonical area produces stable filtered Goals and focused Life Areas paths

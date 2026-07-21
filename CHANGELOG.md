@@ -2,6 +2,11 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 145 - Local Device Transfer Guide
+
+- Added a Settings guide that turns the existing versioned JSON Backup/Restore flow into a clear cross-device handoff path
+- Kept transfer manual and local: no account, cloud copy, background upload, provider request, or change to the backup format
+
 ## Stage 144 - Optional Sync Consent Foundation
 
 - Added a pure local consent contract that blocks any future remote-sync activation until account control, explicit consent, data-scope disclosure, local-copy retention, and backup compatibility are all present
