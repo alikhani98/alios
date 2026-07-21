@@ -14,7 +14,7 @@ export const taskRecurrenceSchema = z.object({
   frequency: taskRecurrenceFrequencySchema,
 });
 
-export const taskSchema = z.object({
+export const taskBaseSchema = z.object({
   id: z.string().min(1),
   title: z.string().trim().min(1),
   description: z.string().optional(),
@@ -29,6 +29,16 @@ export const taskSchema = z.object({
   createdAt: isoDateTimeSchema,
   updatedAt: isoDateTimeSchema,
   completedAt: isoDateTimeSchema.optional(),
+});
+
+export const taskSchema = taskBaseSchema.superRefine((task, ctx) => {
+  if (task.routineId && task.recurrenceSeriesId) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["routineId"],
+      message: "A task cannot have both routineId and recurrenceSeriesId.",
+    });
+  }
 });
 
 export type TaskStatus = z.infer<typeof taskStatusSchema>;

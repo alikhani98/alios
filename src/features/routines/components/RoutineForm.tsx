@@ -31,6 +31,7 @@ export function RoutineForm({ routine, isSubmitting, onSubmit, onCancel }: Props
   return <form className="space-y-4" onSubmit={handleSubmit}>
     <label className="block space-y-2"><span className="text-sm font-medium">{t("routines.titleLabel")}</span><Input name="title" required defaultValue={routine?.title ?? ""} /></label>
     <label className="block space-y-2"><span className="text-sm font-medium">{t("routines.descriptionLabel")}</span><Textarea name="description" rows={3} defaultValue={routine?.description ?? ""} /></label>
+    <p className="text-xs leading-5 text-muted-foreground">{t("routines.routineVsRecurringNote")}</p>
     <fieldset className="space-y-2">
       <legend className="text-sm font-medium">{t("routines.weekdaysLabel")}</legend>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-7">
