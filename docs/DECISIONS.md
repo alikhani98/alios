@@ -806,3 +806,11 @@ The stage adds no record, route, schema, migration, backup change, dependency, b
 AliOS remains usable with its browser-local data as the source of truth. The planned remote-provider direction is Supabase rather than Firebase, but this decision introduces neither provider configuration nor account behavior. A pure consent guard requires a user-controlled account, an explicit opt-in action, clear data-scope disclosure, a retained local copy, and backup compatibility before any future remote adapter may activate.
 
 The stage adds no credential, endpoint, request, account state, record, schema, migration, backup-format change, dependency, remote sync, cloud copy, telemetry, or automation.
+
+## ADR-080: Keep cross-device transfer explicit until optional sync exists
+
+**Status:** Accepted (Stage 145)
+
+Until an optional remote provider is separately approved and configured, AliOS moves data between devices only through the existing user-controlled JSON Backup/Restore path. Settings may guide the user to export, move, preview, and restore that file, but it may not choose a transfer channel or introduce background copying.
+
+The stage adds no account, credential, endpoint, request, cloud copy, backup-format change, record, schema, migration, dependency, telemetry, or automation.

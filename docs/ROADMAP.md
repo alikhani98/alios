@@ -432,6 +432,11 @@ The Stage 84 real-world usage pass remains pending. Future product scope should 
 - A pure optional-sync consent guard defines the local-first prerequisites for a future remote adapter: account control, explicit consent, visible data scope, retained local copy, and backup compatibility
 - Supabase is documented as the provider direction instead of Firebase, but no SDK, backend, account, credential, endpoint, or network operation is present
 
+## Stage 145 delivered in v2.0 preparation
+
+- A Settings device-transfer guide turns the existing local JSON Backup/Restore workflow into a clear manual cross-device path
+- Sync remains inactive: the guide does not add a transfer provider, account, remote copy, background upload, or backend
+
 ## Stage 139 delivered in v1
 
 - Dedicated local full-calendar route with month and week views

@@ -304,7 +304,7 @@ export function SettingsPage() {
 
       <LocalErrorLogSection id="settings-local-error-log" />
 
-      <SyncStatusCard />
+      <SyncStatusCard onGoToBackupRestore={() => scrollToSection("settings-backup-restore")} />
 
       <LocalAiSetupCard />
 
