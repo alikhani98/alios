@@ -7,6 +7,11 @@ This changelog records completed AliOS development stages.
 - Added a read-only comparison of the selected backup and current local record counts before destructive restore confirmation
 - Included weekly plans in Backup/Restore preview totals so every supported backup table is visible
 
+## Stage 147 - Real-World Validation & Product Readiness Audit
+
+- Added an honest real-world validation audit document that separates implementation evidence, automated validation evidence, and manual user-session evidence
+- Recorded the current manual-validation gap for first launch, Today, Projects, Goals, Life Areas, Weekly Review, Settings, backup preview, the sync boundary, and the local AI boundary
+
 ## Stage 145 - Local Device Transfer Guide
 
 - Added a Settings guide that turns the existing versioned JSON Backup/Restore flow into a clear cross-device handoff path
