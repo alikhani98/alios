@@ -81,6 +81,7 @@ export function TodayTaskForm({
           <option value="weekly">{t("today.recurrenceWeekly")}</option>
         </Select>
         <p className="text-xs leading-5 text-muted-foreground">{t("today.recurrenceHint")}</p>
+        <p className="text-xs leading-5 text-muted-foreground">{t("today.routineVsRecurringNote")}</p>
       </div>
 
       <div className="grid gap-2">

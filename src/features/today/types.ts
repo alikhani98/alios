@@ -1,8 +1,8 @@
 import { z } from "zod";
 
-import { dailyCheckinSchema, taskSchema } from "@/shared/types";
+import { dailyCheckinSchema, taskBaseSchema } from "@/shared/types";
 
-export const todayTaskFormSchema = taskSchema
+export const todayTaskFormSchema = taskBaseSchema
   .pick({
     title: true,
     description: true,

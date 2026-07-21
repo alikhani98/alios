@@ -62,6 +62,39 @@ describe("core domain schemas", () => {
     );
   });
 
+  it("accepts a valid routine task", () => {
+    expect(
+      taskSchema.safeParse({
+        ...taskRecord,
+        routineId: "routine-id",
+        recurrence: undefined,
+        recurrenceSeriesId: undefined,
+      }).success
+    ).toBe(true);
+  });
+
+  it("accepts a valid recurring task", () => {
+    expect(
+      taskSchema.safeParse({
+        ...taskRecord,
+        recurrence: { frequency: "daily" },
+        recurrenceSeriesId: "series-id",
+        routineId: undefined,
+      }).success
+    ).toBe(true);
+  });
+
+  it("rejects a task that mixes routine and recurring task fields", () => {
+    expect(
+      taskSchema.safeParse({
+        ...taskRecord,
+        routineId: "routine-id",
+        recurrence: { frequency: "weekly" },
+        recurrenceSeriesId: "series-id",
+      }).success
+    ).toBe(false);
+  });
+
   it.each([
     ["project", projectSchema, projectRecord],
     ["task", taskSchema, taskRecord],
