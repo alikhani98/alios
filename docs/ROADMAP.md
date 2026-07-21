@@ -422,6 +422,11 @@ The Stage 84 real-world usage pass remains pending. Future product scope should 
 - No prompt execution or AliOS-data access; the endpoint only reports locally installed model names
 - Future work remains explicit local AI actions with per-action data disclosure and approval
 
+## Stage 143 delivered in v2.0 preparation
+
+- A local-only `SyncProvider` boundary makes the current no-sync state explicit and keeps future adapters outside feature and storage code
+- Remote authentication, automatic synchronization, cloud backup, conflict handling, and provider credentials remain unimplemented and require a separately approved integration stage
+
 ## Stage 139 delivered in v1
 
 - Dedicated local full-calendar route with month and week views

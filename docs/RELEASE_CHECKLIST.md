@@ -33,6 +33,12 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] The check uses only local Ollama model discovery; it does not submit AliOS content, prompts, backups, account credentials, or telemetry
 - [ ] On a device with Ollama installed, verify the browser is allowed to access the local endpoint and installed model count is shown correctly
 
+### Stage 143 local-first sync boundary
+
+- [x] Settings clearly reports the local-only state without suggesting an account or remote copy exists
+- [x] The shipped `LocalOnlySyncProvider` has no network call and reports zero changed records
+- [x] Existing Backup/Restore remains the only cross-device transfer workflow
+
 ### Stage 77 Goals and Life Areas hardening
 
 - [x] Every canonical area produces stable filtered Goals and focused Life Areas paths

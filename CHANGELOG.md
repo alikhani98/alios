@@ -2,6 +2,11 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 143 - Local-First Sync Boundary
+
+- Added a provider contract and a safe local-only sync provider, so a future optional adapter can be added without bypassing AliOS storage or backup boundaries
+- Added a Settings status surface that clearly confirms no account, remote copy, or synchronization is active
+
 ## Stage 142 - Optional Local AI Connection Readiness
 
 - Added an optional Settings connection check for a user-run local Ollama service, with no account, prompt, cloud API, or AliOS data transfer
