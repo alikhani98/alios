@@ -1,66 +1,133 @@
-# AliOS Real-World Usage QA
+# AliOS Real-World Validation Audit
 
-Status: Stage 84 usage-validation and product-prioritization protocol
+Stage 147 - Real-World Validation & Product Readiness Audit
 
-This guide turns normal AliOS use into actionable evidence. It is deliberately local and manual: it does not add telemetry, analytics, accounts, cloud storage, or any new runtime behavior.
+Date: 2026-07-21
 
-## Before starting
+Status: Documentation audit only. No manual user-session validation was performed in this turn.
 
-1. Use the deployed AliOS site in the same browser and device you normally use.
-2. Open **Settings** and export a fresh backup. Save it somewhere outside the browser.
-3. Use ordinary personal data where comfortable; do not enter sensitive data solely for testing.
-4. Keep this guide available and record only observed behavior, not guesses about a solution.
+## Test Environment
 
-## Seven-day usage pass
+- Browser: not executed in this session
+- OS: not executed in this session
+- Screen sizes: not executed in this session
+- Device type: not executed in this session
 
-The goal is not to use every screen every day. Use AliOS naturally and complete the relevant checks during the week.
+## Validation Rule
 
-| Day | Real workflow | What to observe |
-| --- | --- | --- |
-| 1 | Quick-capture ideas, tasks, and notes in Inbox | Was capture faster than another app? Was the intended type obvious? |
-| 2 | Plan Today, add a daily check-in, choose one MIT, and change a task status | Could you identify the next action without searching? |
-| 3 | Link a Task to a Project and a Project to a Goal, then navigate the chain | Did the relationship labels and unavailable states make sense? |
-| 4 | Add or review a Goal and Life Area, then use Weekly Review | Did the derived summaries help without feeling noisy or confusing? |
-| 5 | Add a Journal, Knowledge, Decision, or Personal Manual entry and find it again through Search | Could you retrieve the exact record quickly? |
-| 6 | Add a small Finance record or obligation, inspect the monthly summary, and export one readable file | Were labels, totals, and exports understandable? |
-| 7 | Export a backup, inspect the restore preview without confirming it, then use the app again | Did data safety and destructive warnings feel clear and trustworthy? |
+- Implementation status records what code or documentation exists.
+- Automated validation status records TypeScript, tests, build, and CI evidence only.
+- Real-world validation status records only manually observed behavior in a real browser or device.
+- Passing automated tests does not equal real-world validation.
 
-## Required environment pass
+## Flow Audit
 
-Do this once during the week:
+### First Launch
 
-1. Repeat one capture-and-plan flow in Persian RTL and English LTR.
-2. At 360px, 390px, and 430px widths, open the mobile menu, a Topbar panel, one form, one filter, and one long-content card.
-3. Use Tab, Shift+Tab, Enter or Space, and Escape for the Topbar and mobile menu paths.
-4. Switch light/dark appearance and one non-default accent, then confirm focus and selected states are still clear.
-5. Use a long Persian title, a long English title, and mixed Persian/English text; confirm no horizontal overflow or clipped action.
+- Expected behavior: the app opens normally, shows the shell, and loads the current local state without requiring a network account.
+- Actual behavior: not manually tested in this session.
+- Pass/Fail: Not real-world validated
+- Screenshots or evidence: none collected
+- Issues discovered: none observed in this session
 
-## Issue log
+### Today Tasks
 
-Record one row for each observed issue. Screenshots are useful when they show the problem, but never include private content you do not want to share.
+- Expected behavior: Today lists and edits the user's local tasks, project links, and task status changes.
+- Actual behavior: not manually tested in this session.
+- Pass/Fail: Not real-world validated
+- Screenshots or evidence: none collected
+- Issues discovered: none observed in this session
 
-| Date | Area and route | What you tried | Actual result | Expected result | Frequency | Severity | Screenshot or note |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-|  |  |  |  |  | once / repeated | blocker / high / medium / low |  |
+### Projects
 
-Severity definitions:
+- Expected behavior: Projects open, edit, and show linked Goal or Task context without forcing cascades.
+- Actual behavior: not manually tested in this session.
+- Pass/Fail: Not real-world validated
+- Screenshots or evidence: none collected
+- Issues discovered: none observed in this session
 
-- **blocker**: prevents safe use, data access, backup, restore, or an essential workflow.
-- **high**: a common workflow succeeds only with confusion, repeated retries, or a workaround.
-- **medium**: workflow works but costs time or causes a clear usability or accessibility problem.
-- **low**: visual polish, wording, or a minor inconvenience with no meaningful workflow impact.
+### Goals
 
-## Prioritization rule
+- Expected behavior: Goals open, edit, and show project/task summaries derived from local data only.
+- Actual behavior: not manually tested in this session.
+- Pass/Fail: Not real-world validated
+- Screenshots or evidence: none collected
+- Issues discovered: none observed in this session
 
-At the end of the week, group issues by repeated workflow rather than by screen. The next approved implementation stage should address one of these only:
+### Life Areas
 
-1. a blocker or data-safety problem;
-2. a high-severity issue repeated in normal daily use;
-3. a medium issue that affects at least two workflows or both language directions;
-4. a narrowly evidenced accessibility or narrow-screen defect.
+- Expected behavior: Life Areas display canonical categories, user edits, and related goal summaries.
+- Actual behavior: not manually tested in this session.
+- Pass/Fail: Not real-world validated
+- Screenshots or evidence: none collected
+- Issues discovered: none observed in this session
 
-Do not turn a one-off preference into a broad redesign. Features such as sync, accounts, hosted AI, notifications, cloud backup, semantic search, tags, attachments, or a new analytics system remain outside this protocol and require a separately approved stage.
+### Weekly Review
 
-## Handoff to release consolidation or the next stage
+- Expected behavior: Weekly Review summarizes local records, review queues, and planning context without persisting a roll-up.
+- Actual behavior: not manually tested in this session.
+- Pass/Fail: Not real-world validated
+- Screenshots or evidence: none collected
+- Issues discovered: none observed in this session
 
-Complete `RELEASE_READINESS.md` after this seven-day pass when preparing a release. Send the completed issue rows, the device/browser used, language and viewport where relevant, and the exact route. The project architect will then propose only a narrowly evidenced scope with acceptance criteria, risk assessment, and no unrelated changes.
+### Settings
+
+- Expected behavior: Settings exposes backup, restore, export, recovery, sync boundary, and local AI boundary surfaces.
+- Actual behavior: not manually tested in this session.
+- Pass/Fail: Not real-world validated
+- Screenshots or evidence: none collected
+- Issues discovered: none observed in this session
+
+### Backup Export / Import Preview
+
+- Expected behavior: backup export downloads versioned JSON and restore preview shows read-only counts before confirmation.
+- Actual behavior: not manually tested in this session.
+- Pass/Fail: Not real-world validated
+- Screenshots or evidence: none collected
+- Issues discovered: none observed in this session
+
+### Sync Boundary Surface
+
+- Expected behavior: the UI states that sync is local-only and no remote synchronization is active.
+- Actual behavior: not manually tested in this session.
+- Pass/Fail: Not real-world validated
+- Screenshots or evidence: none collected
+- Issues discovered: none observed in this session
+
+### Local AI Boundary Surface
+
+- Expected behavior: the UI offers an optional local Ollama connection check only, with no AliOS data transfer.
+- Actual behavior: not manually tested in this session.
+- Pass/Fail: Not real-world validated
+- Screenshots or evidence: none collected
+- Issues discovered: none observed in this session
+
+## Real-World Validation Summary
+
+- Real-world validated flows: none in this session
+- Partially real-world validated flows: none in this session
+- Not real-world validated flows: all listed flows above
+
+## Manual QA Checklist
+
+Use this checklist during an actual browser or device session:
+
+1. Confirm the environment details at the top of this document.
+2. Test first launch on the target browser and device.
+3. Create or edit Today tasks and verify the UI response.
+4. Open Projects and verify linked Goal context and unavailable-link states.
+5. Open Goals and confirm derived summaries are readable.
+6. Open Life Areas and confirm canonical area presentation and goal counts.
+7. Open Weekly Review and verify the queue, summaries, and navigation.
+8. Open Settings and verify backup, restore preview, sync boundary, and local AI boundary surfaces.
+9. Export a backup and inspect the downloaded file name and format.
+10. Import or preview a backup file and verify the read-only counts before confirmation.
+11. Inspect any sync boundary copy and confirm no account or remote sync is presented.
+12. Inspect any local AI boundary copy and confirm the check is local-only and optional.
+13. Record screenshots or notes only for issues that are actually observed.
+
+## Issues Discovered
+
+- None observed in this session.
+- Any future real-world issue should be recorded with route, expected behavior, actual behavior, frequency, severity, and evidence.
+
