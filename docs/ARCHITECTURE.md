@@ -357,3 +357,8 @@ Dexie / IndexedDB in v1
 
 - The cross-device path continues to use the existing versioned JSON backup and restore services; the guide only makes that safe handoff visible next to the local-only sync status.
 - It never reads the backup contents, creates a transfer channel, or changes validation, atomic restore, Backup status, or the Backup file format.
+
+## Backup restore impact preview
+
+- A pure Settings preview compares validated backup table counts with the current local BackupStorage summary before `restoreBackup` is called.
+- The comparison is read-only and does not alter the validated payload, migration logic, atomic replacement path, or backup format.

@@ -51,6 +51,12 @@ When a newer commit is pushed to the same pull request, the superseded validatio
 - [x] The guide reaches the existing Backup/Restore controls without beginning an export or restore
 - [x] No transfer channel, account, cloud copy, background upload, network activity, or backup-format change was added
 
+### Stage 146 backup restore impact preview
+
+- [x] A validated selected backup is compared with current local table counts before Restore remains available
+- [x] Weekly plans appear in the complete backup preview totals
+- [x] The comparison is read-only and does not change validation, migration, atomic replacement, or the backup format
+
 ### Stage 77 Goals and Life Areas hardening
 
 - [x] Every canonical area produces stable filtered Goals and focused Life Areas paths

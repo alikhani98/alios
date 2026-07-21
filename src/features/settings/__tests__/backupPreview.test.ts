@@ -19,7 +19,10 @@ import {
 } from "@/test/factories";
 import { createTestStorage, destroyTestDatabase } from "@/test/database";
 import { BackupService } from "@/core/backup";
-import { createBackupPreview } from "../backupPreview";
+import {
+  createBackupPreview,
+  createBackupRestoreImpactPreview,
+} from "../backupPreview";
 
 describe("backup preview", () => {
   let database: AliosDatabase;
@@ -71,6 +74,32 @@ describe("backup preview", () => {
       { key: "settings", count: 1 },
       { key: "inboxItems", count: 1 },
       { key: "routines", count: 1 },
+      { key: "weeklyPlans", count: 0 },
     ]);
+  });
+
+  it("compares the selected backup with current local data before restore", async () => {
+    await storage.tasks.create(taskInput);
+    await storage.projects.create(projectInput);
+    const backup = await service.createBackup();
+
+    const impact = createBackupRestoreImpactPreview(backup, {
+      dailyCheckins: 0, tasks: 4, goals: 0, lifeAreas: 0, decisionLogEntries: 0,
+      manualEntries: 0, financeTransactions: 0, financeObligations: 0, projects: 0,
+      journalEntries: 0, knowledgeItems: 0, settings: 0, inboxItems: 0,
+      routines: 0, weeklyPlans: 2,
+    });
+
+    expect(impact).toMatchObject({
+      currentTotalRecords: 6,
+      backupTotalRecords: 2,
+      difference: -4,
+      changedTableCount: 3,
+    });
+    expect(impact.tableImpacts).toEqual(expect.arrayContaining([
+      { key: "tasks", currentCount: 4, backupCount: 1, difference: -3 },
+      { key: "projects", currentCount: 0, backupCount: 1, difference: 1 },
+      { key: "weeklyPlans", currentCount: 2, backupCount: 0, difference: -2 },
+    ]));
   });
 });

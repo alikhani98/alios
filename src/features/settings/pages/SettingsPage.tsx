@@ -56,7 +56,11 @@ import { LocalErrorLogSection } from "../components/LocalErrorLogSection";
 import { SyncStatusCard } from "../components/SyncStatusCard";
 import { LocalAiSetupCard } from "@/features/localAi";
 import { resetHomeDashboardLayoutPreference } from "@/features/home/hooks/useHomeDashboardLayout";
-import { createBackupPreview } from "../backupPreview";
+import {
+  BACKUP_TABLE_KEYS,
+  createBackupPreview,
+  createBackupRestoreImpactPreview,
+} from "../backupPreview";
 import { useBackupRestore } from "../hooks/useBackupRestore";
 import { useLocalDataManagement } from "../hooks/useLocalDataManagement";
 import type { BackupStatusFreshness } from "@/shared/preferences";
@@ -99,6 +103,7 @@ const backupTableLabelKeys = [
   "settings.settingsCount",
   "settings.inboxCount",
   "settings.routinesCount",
+  "settings.weeklyPlansCount",
 ] as const;
 
 const appearanceOptions = [
@@ -122,6 +127,7 @@ function getTotalRecords(summary: {
   settings: number;
   inboxItems: number;
   routines: number;
+  weeklyPlans: number;
 }): number {
   return (
     summary.dailyCheckins +
@@ -137,7 +143,8 @@ function getTotalRecords(summary: {
     summary.knowledgeItems +
     summary.settings +
     summary.inboxItems +
-    summary.routines
+    summary.routines +
+    summary.weeklyPlans
   );
 }
 
@@ -210,6 +217,9 @@ export function SettingsPage() {
   const restorePreview = backup.pendingBackup
     ? createBackupPreview(backup.pendingBackup)
     : null;
+  const restoreImpact = backup.pendingBackup && dataManagement.summary
+    ? createBackupRestoreImpactPreview(backup.pendingBackup, dataManagement.summary)
+    : null;
   const currentAppearance = parseAppearancePreference(appearancePreference);
   const totalLocalRecords = dataManagement.summary
     ? getTotalRecords(dataManagement.summary)
@@ -230,6 +240,7 @@ export function SettingsPage() {
         { label: t("settings.inboxCount"), value: dataManagement.summary.inboxItems },
         { label: t("settings.settingsCount"), value: dataManagement.summary.settings },
         { label: t("settings.routinesCount"), value: dataManagement.summary.routines },
+        { label: t("settings.weeklyPlansCount"), value: dataManagement.summary.weeklyPlans },
       ]
     : [];
   const dataCountPreviewLimit = 5;
@@ -723,6 +734,46 @@ export function SettingsPage() {
                 value={String(restorePreview.totalRecords)}
               />
             </div>
+            {restoreImpact ? (
+              <div className="rounded-xl border border-destructive/25 bg-destructive/5 p-4">
+                <p className="text-sm font-semibold">
+                  {t("settings.restoreImpactTitle")}
+                </p>
+                <p className="mt-1 text-sm leading-7 text-muted-foreground">
+                  {t("settings.restoreImpactDescription", {
+                    count: restoreImpact.changedTableCount,
+                  })}
+                </p>
+                <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                  <InfoItem
+                    label={t("settings.restoreCurrentRecords")}
+                    value={String(restoreImpact.currentTotalRecords)}
+                  />
+                  <InfoItem
+                    label={t("settings.restoreBackupRecords")}
+                    value={String(restoreImpact.backupTotalRecords)}
+                  />
+                  <InfoItem
+                    label={t("settings.restoreRecordDifference")}
+                    value={String(restoreImpact.difference)}
+                  />
+                </div>
+                {restoreImpact.changedTableCount > 0 ? (
+                  <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                    {restoreImpact.tableImpacts
+                      .filter((table) => table.difference !== 0)
+                      .map((table) => (
+                        <p
+                          key={table.key}
+                          className="rounded-lg border bg-background/70 px-3 py-2 text-sm"
+                        >
+                          {t(backupTableLabelKeys[BACKUP_TABLE_KEYS.indexOf(table.key)])}: {table.currentCount} → {table.backupCount}
+                        </p>
+                      ))}
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {restorePreview.tableCounts.map((tableCount, index) => (
                 <CountItem

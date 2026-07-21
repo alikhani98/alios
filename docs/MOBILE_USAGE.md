@@ -42,6 +42,7 @@ Stage 142 adds an optional local Ollama connection check in Settings. It is not 
 Stage 143 makes the local-only sync state visible in Settings. No account, cloud copy, or background transfer is enabled; use Backup/Restore to move data between devices.
 Stage 144 lists the safeguards for a future optional Sync connection in Settings. It has no sign-in action, request, account state, or transfer, and remains readable as a stacked card on narrow screens.
 Stage 145 adds a short mobile-safe device-transfer checklist and one button that scrolls to the existing Backup/Restore controls. It never starts a download or restore without the user's next explicit action.
+Stage 146 keeps Restore impact readable at narrow widths by stacking current, post-restore, and net record counts before the destructive action; only changed data groups are listed.
 Stage 118 keeps a stale post-deployment lazy chunk from stranding a mobile route by allowing one cache-busting reload; a repeated failure stays visible through the existing local error boundary. The Home backup reminder uses a compact shared surface and keeps its Settings action reachable at narrow widths.
 Stage 119 keeps immediate task buckets readable in one column and moves this-week/later context into a compact planning surface; all task editing remains in Today.
 Stage 120 makes the seven-day calendar fit 360px, 390px, and 430px widths without horizontal scrolling; its day buttons retain full accessible date labels.

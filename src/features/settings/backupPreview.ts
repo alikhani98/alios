@@ -1,4 +1,4 @@
-import type { AliosBackup, AliosBackupData } from "@/core/backup";
+import type { AliosBackup, AliosBackupData, LocalDataSummary } from "@/core/backup";
 
 export const BACKUP_TABLE_KEYS = [
   "dailyCheckins",
@@ -15,6 +15,7 @@ export const BACKUP_TABLE_KEYS = [
   "settings",
   "inboxItems",
   "routines",
+  "weeklyPlans",
 ] as const satisfies readonly (keyof AliosBackupData)[];
 
 export type BackupTableKey = (typeof BACKUP_TABLE_KEYS)[number];
@@ -31,6 +32,21 @@ export type BackupPreview = {
   tableCounts: BackupTableCount[];
 };
 
+export type BackupRestoreImpact = {
+  key: BackupTableKey;
+  currentCount: number;
+  backupCount: number;
+  difference: number;
+};
+
+export type BackupRestoreImpactPreview = {
+  currentTotalRecords: number;
+  backupTotalRecords: number;
+  difference: number;
+  changedTableCount: number;
+  tableImpacts: BackupRestoreImpact[];
+};
+
 export function createBackupPreview(backup: AliosBackup): BackupPreview {
   const tableCounts = BACKUP_TABLE_KEYS.map((key) => ({
     key,
@@ -42,5 +58,38 @@ export function createBackupPreview(backup: AliosBackup): BackupPreview {
     exportedAt: backup.exportedAt,
     totalRecords: tableCounts.reduce((total, table) => total + table.count, 0),
     tableCounts,
+  };
+}
+
+export function createBackupRestoreImpactPreview(
+  backup: AliosBackup,
+  currentData: LocalDataSummary
+): BackupRestoreImpactPreview {
+  const tableImpacts = BACKUP_TABLE_KEYS.map((key) => {
+    const currentCount = currentData[key];
+    const backupCount = backup.data[key].length;
+
+    return {
+      key,
+      currentCount,
+      backupCount,
+      difference: backupCount - currentCount,
+    };
+  });
+  const currentTotalRecords = tableImpacts.reduce(
+    (total, table) => total + table.currentCount,
+    0
+  );
+  const backupTotalRecords = tableImpacts.reduce(
+    (total, table) => total + table.backupCount,
+    0
+  );
+
+  return {
+    currentTotalRecords,
+    backupTotalRecords,
+    difference: backupTotalRecords - currentTotalRecords,
+    changedTableCount: tableImpacts.filter((table) => table.difference !== 0).length,
+    tableImpacts,
   };
 }
