@@ -10,12 +10,11 @@ export const todayTaskFormSchema = taskSchema
     priority: true,
     isMit: true,
     dueDate: true,
-    projectId: true,
   })
   .extend({
     description: z.string().optional(),
     projectId: z.union([z.string().min(1), z.literal("")]).optional(),
-    recurrenceFrequency: z.enum(["none", "daily", "weekly"]),
+    recurrenceFrequency: z.enum(["none", "daily", "weekly"]).default("none"),
   });
 
 export type TodayTaskFormValues = z.infer<typeof todayTaskFormSchema>;
