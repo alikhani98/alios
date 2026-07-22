@@ -2,6 +2,14 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 149 - Premium Interactions Architecture
+
+- Added a documentation-only architecture strategy for Scroll-driven Sticky Card Stack, Infinite Draggable Marquee, and Dynamic Slider with Live Metric Cards
+- Adopted Infinite Draggable Marquee with constraints for optional template and discovery surfaces as the lowest-risk future implementation candidate
+- Adopted Scroll-driven Sticky Card Stack with constraints for educational or onboarding-style guidance, while keeping it out of high-frequency operational workflows
+- Deferred Dynamic Slider with Live Metric Cards until weekly capacity, task effort, and planning-risk calculations have an approved data model
+- Kept Stage 149 free of product interaction, component, CSS, route, schema, dependency, workflow, Sync, Cloud, AI, and runtime behavior changes
+
 ## Stage 148 - Real-World Validation Execution
 
 - Recorded the user-executed real-world QA pass for the live GitHub Pages deployment at commit `28ce4eb2a67f11ac7c98baee7eaea51e170fe2de`
