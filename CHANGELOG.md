@@ -2,6 +2,15 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 152 - Planning Capacity Model and Dynamic Slider Feasibility
+
+- Added `docs/PLANNING_CAPACITY_FEASIBILITY.md` as a documentation-only feasibility audit for future planning-capacity work
+- Inventoried existing Tasks, Projects, Goals, Life Areas, Routines, Weekly Plans, Daily Check-ins, preferences, recurrence behavior, and backup boundaries
+- Chose final decision **B - FEASIBLE_WITH_MINIMAL_MODEL**: a future slider is not feasible from current data alone, but may be feasible after a separately approved explicit user-declared planning budget model
+- Recommended a weekly task-count planning budget as the safest minimal future model, clearly labeled as a user-declared cap rather than an AliOS prediction or advice
+- Documented missing-data behavior, accessibility requirements, performance constraints, schema/persistence implications, rejected approaches, risks, user-research needs, and a recommended Stage 153 scope
+- Added no product code, UI runtime, schema, persistence, migration, backup/restore behavior, Today calculation, Weekly Review runtime behavior, Task form change, route, dependency, lockfile, Sync, Cloud, AI, telemetry, backend, or workflow change
+
 ## Stage 151 - Planning Loop Sticky Guide
 
 - Added a constrained Scroll-driven Sticky Card Stack implementation inside the existing Settings Help Center as an educational AliOS planning-loop guide
