@@ -14,7 +14,7 @@ Stage 149 evaluates three premium interaction patterns for AliOS and defines whe
 | --- | --- | --- | --- | --- |
 | Infinite Draggable Marquee | Adopt with constraints | Template and discovery surfaces, especially Goals, Projects, Personal Manual, and Routines starter examples | Stage 150 candidate | Lowest risk because it can present static optional examples without changing records or workflows |
 | Scroll-driven Sticky Card Stack | Adopt with constraints | Settings Help Center educational guide | Stage 151 implemented | Useful for narrative education, but risky inside repeated operational workflows |
-| Dynamic Slider with Live Metric Cards | Defer | Future Weekly Planning capacity setup only after a data model is approved | Stage 152 candidate only after model approval | Current data can support some counts, but not trustworthy capacity, effort, or overplanning calculations |
+| Dynamic Slider with Live Metric Cards | Defer pending minimal model | Future Weekly Planning capacity setup only after a user-declared planning budget model is approved | Stage 152 feasibility completed; Stage 153 model foundation recommended only if approved | Current data can support descriptive counts, but not trustworthy capacity, effort, or overplanning calculations |
 
 No interaction should be implemented in Stage 149. Future work must remain local-first, dependency-light, static-hosting compatible, accessible, bilingual, and respectful of reduced-motion preferences.
 
@@ -186,8 +186,11 @@ Candidate outputs:
 
 Decision:
 
-- Defer.
-- It may be future Stage 152 only after a separate data-model and calculation-rules stage approves capacity, effort, and persistence rules.
+- Defer runtime implementation.
+- Stage 152 completed the data-model feasibility audit in `docs/PLANNING_CAPACITY_FEASIBILITY.md`.
+- Final Stage 152 decision: **B - FEASIBLE_WITH_MINIMAL_MODEL**.
+- A future slider is not feasible from current data alone. It becomes feasible only after a separately approved, explicit, user-declared planning budget model exists.
+- The safest first model is a weekly task-count planning budget. It must be labeled as a user-declared planning cap, not as an AliOS prediction, productivity score, AI advice, or automatic recommendation.
 
 ## 5. Mobile and Responsive Behavior
 
@@ -220,13 +223,21 @@ Decision:
 
 ## 8. Data Feasibility for Dynamic Slider
 
-The Dynamic Slider is the only candidate that may require product-model work. AliOS currently has enough local data to count open tasks, active projects, linked goals, and weekly plan references. It does not have enough data to calculate real capacity, task effort, focus time, or overplanning risk without either asking the user for more information or introducing new fields.
+The Dynamic Slider is the only candidate that may require product-model work. AliOS currently has enough local data to count open tasks, active projects, linked goals, routine-originated tasks, recurring materialized tasks, and weekly plan references. It does not have enough data to calculate real capacity, task effort, focus time, or overplanning risk without either asking the user for more information or introducing new fields.
 
-Stage 149 does not approve a schema change. A future slider stage must first answer:
+Stage 152 resolved the initial feasibility question:
 
-- Should weekly capacity be stored, session-only, or avoided?
-- Should Tasks gain estimated duration?
-- Should planning intensity be a preference, a one-time planning input, or a purely educational control?
+- Current-data-only slider: rejected because there is no capacity denominator and no task demand estimate.
+- Time-based, effort-point, and hybrid capacity models: rejected for now because they require new task fields, user calibration, and validation.
+- Minimal user-declared planning budget model: selected as the only honest path toward a future slider.
+- Missing capacity or estimate data must be shown as unknown, not silently treated as zero.
+
+A future slider stage must first answer:
+
+- Should the minimal planning budget be session-only, a reusable default, or stored on the Weekly Plan?
+- Should the first model be limited to a weekly task-count budget?
+- How should overdue and undated tasks count against that budget?
+- How should recurring materialized tasks and routine-originated tasks appear?
 - Which calculations are acceptable as guidance without becoming advice?
 - How should the app explain uncertainty when data is missing?
 
@@ -264,7 +275,8 @@ Suggested future budgets:
 
 1. Stage 150 - Template Discovery Marquee. Implemented in Goals only.
 2. Stage 151 - AliOS Planning Loop Sticky Guide. Implemented in Settings Help Center only.
-3. Stage 152 - Planning Capacity Model and Slider Feasibility.
+3. Stage 152 - Planning Capacity Model and Slider Feasibility. Completed as documentation-only feasibility audit.
+4. Stage 153 - User-Declared Planning Budget Model Foundation. Recommended only if explicitly approved.
 
 The order differs slightly from a purely visual ambition path: the marquee is first because it has the lowest architecture risk, can use static examples, and does not need new persisted data. The slider is last because it requires a trustworthy model.
 
@@ -307,16 +319,25 @@ The order differs slightly from a purely visual ambition path: the marquee is fi
 
 ### Stage 152 - Planning Capacity Model and Slider Feasibility
 
+- Status: completed as documentation-only feasibility audit.
+- Source: `docs/PLANNING_CAPACITY_FEASIBILITY.md`.
 - Goal: decide whether a real planning capacity model exists before any slider UI is built.
-- Scope: architecture and data-model proposal first; implementation only after explicit approval.
-- Possible files: architecture docs, domain proposal, maybe later Weekly Review planning files.
-- Dependencies: explicit product approval for any persisted capacity or Task duration field.
-- Acceptance criteria: formulas are deterministic, explainable, and honest about missing data.
-- Accessibility criteria: future slider must announce value and output changes clearly.
-- Performance criteria: no layout shift; no animated counters unless reduced-motion safe.
-- Required tests: calculation tests before UI tests.
-- Risks: false precision, hidden advice, schema creep, user distrust.
-- Out of scope: permanent Today control, AI prioritization, automatic scheduling, backend or cloud.
+- Final decision: **B - FEASIBLE_WITH_MINIMAL_MODEL**.
+- Current data can honestly support descriptive counts such as open tasks, overdue tasks, active projects, linked plan references, routine-originated tasks, and recurring materialized tasks.
+- Current data cannot honestly support capacity percentage, focus-time estimate, effort load, overplanning risk, optimal task count, or AI-like recommendation.
+- Required future model: an explicit, local, user-declared planning budget, preferably a weekly task-count budget.
+- Missing data behavior: unknown values must remain unknown and must not be converted to zero or hidden defaults.
+- No product code, UI runtime, schema, persistence, migration, backup/restore behavior, Today calculation, Weekly Review runtime behavior, dependency, lockfile, Sync, Cloud, or AI change was implemented in Stage 152.
+- Real-world user research is still required before a slider can be accepted as useful rather than anxiety-producing.
+
+### Stage 153 - User-Declared Planning Budget Model Foundation
+
+- Status: recommended future stage only; not started.
+- Goal: choose and implement the minimal local planning budget model, if approved.
+- Preferred semantic: weekly task-count budget declared by the user.
+- Required before UI polish: pure deterministic calculation helpers, missing-data behavior, accessibility wording, and automated calculation tests.
+- If persistence is approved, the stage must include Zod schema handling, repository behavior, backup compatibility review, migration decision, and tests.
+- Out of scope unless separately approved: Dynamic Slider production UI, time estimates, effort points, AI prioritization, automatic scheduling, Sync, Cloud, backend, telemetry, or hosted services.
 
 ## 13. Acceptance Criteria for Future Interaction Stages
 
@@ -354,6 +375,10 @@ The order differs slightly from a purely visual ambition path: the marquee is fi
 ## Final Stage 151 Result
 
 `STAGE_151_PLANNING_LOOP_STICKY_GUIDE_COMPLETE`
+
+## Final Stage 152 Result
+
+`STAGE_152_PLANNING_CAPACITY_FEASIBILITY_COMPLETE`
 
 ## Final Stage 149 Result
 
