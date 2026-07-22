@@ -2,7 +2,6 @@ import {
   AlertCircle,
   CheckCircle2,
   Clock3,
-  ChevronRight,
   Plus,
   RotateCcw,
   Search,
@@ -35,7 +34,6 @@ import {
   GOAL_STATUS_OPTIONS,
   GOAL_TIMEFRAME_OPTIONS,
   GOAL_AREA_LABEL_KEYS,
-  GOAL_IMPORTANCE_LABEL_KEYS,
   GOAL_STATUS_LABEL_KEYS,
   GOAL_TIMEFRAME_LABEL_KEYS,
 } from "../constants";
@@ -57,6 +55,7 @@ import {
 } from "../goalTemplates";
 import { GoalCard } from "../components/GoalCard";
 import { GoalForm } from "../components/GoalForm";
+import { GoalTemplateDiscoveryMarquee } from "../components/GoalTemplateDiscoveryMarquee";
 import { getGoalProjectProgress } from "../goalProjectProgress";
 import { useGoals } from "../hooks/useGoals";
 import type { GoalFormSeed, GoalFormValues } from "../types";
@@ -450,69 +449,21 @@ export function GoalsPage() {
         />
       </div>
 
-      <PremiumCard>
-        <div className="space-y-3 p-5 sm:space-y-4 sm:p-6">
-          <SectionHeader
-            title={t("goals.templatesTitle")}
-            description={t("goals.templatesDescription")}
-            status={<StatusChip tone="neutral">{t("goals.localOnlyNote")}</StatusChip>}
-          />
-          <p className="max-w-3xl text-sm leading-7 text-muted-foreground">
-            {t("goals.templatesNote")}
-          </p>
-          <div className="grid gap-2 sm:gap-3 md:grid-cols-2 xl:grid-cols-3">
-            {templateCards.map((template) => (
-              <button
-                key={template.id}
-                type="button"
-                onClick={() => openTemplateForm(template.id)}
-                className="min-w-0 rounded-[1.5rem] border border-border/70 bg-background/80 p-3 text-start shadow-sm transition hover:-translate-y-0.5 hover:border-primary/35 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:p-4"
-              >
-                <div className="flex min-w-0 items-start justify-between gap-3">
-                  <div className="min-w-0 flex-1 space-y-1">
-                    <p className="break-words text-[0.95rem] font-semibold leading-6 sm:text-base">
-                      {template.title}
-                    </p>
-                    <p className="break-words text-sm leading-6 text-muted-foreground">
-                      {template.description}
-                    </p>
-                  </div>
-                  <Target className="mt-1 h-4 w-4 shrink-0 text-primary" />
-                </div>
-                <div className="mt-3 flex flex-wrap gap-2 sm:mt-4">
-                  <StatusChip tone="neutral">
-                    {t("goals.useTemplate")}
-                  </StatusChip>
-                  <StatusChip tone="neutral">
-                    {t(GOAL_AREA_LABEL_KEYS[template.defaultArea])}
-                  </StatusChip>
-                  <StatusChip tone="neutral">
-                    {t(GOAL_TIMEFRAME_LABEL_KEYS[template.defaultTimeframe])}
-                  </StatusChip>
-                  <StatusChip tone="neutral">
-                    {t(GOAL_IMPORTANCE_LABEL_KEYS[template.defaultImportance])}
-                  </StatusChip>
-                  <StatusChip tone="neutral">
-                    {t("goals.progressLabel")}: {template.defaultProgressPercent}%
-                  </StatusChip>
-                  {template.defaultReviewIntervalDays ? (
-                    <StatusChip tone="neutral">
-                      {t("goals.reviewIntervalDaysLabel")}: {template.defaultReviewIntervalDays}
-                    </StatusChip>
-                  ) : null}
-                </div>
-                <p className="mt-3 break-words text-sm leading-6 text-muted-foreground">
-                  {template.bodyPreview}
-                </p>
-                <div className="mt-3 flex items-center gap-2 text-sm font-medium text-primary">
-                  <span>{t("goals.useTemplate")}</span>
-                  <ChevronRight className="h-4 w-4" />
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-      </PremiumCard>
+      <GoalTemplateDiscoveryMarquee
+        templates={templateCards}
+        title={t("goals.templatesTitle")}
+        description={t("goals.templatesDescription")}
+        note={t("goals.templatesNote")}
+        localOnlyLabel={t("goals.localOnlyNote")}
+        useTemplateLabel={t("goals.useTemplate")}
+        progressLabel={t("goals.progressLabel")}
+        reviewIntervalDaysLabel={t("goals.reviewIntervalDaysLabel")}
+        emptyTitle={t("goals.emptyTitle")}
+        emptyDescription={t("goals.emptyDescription")}
+        sectionLabel={t("goals.templatesTitle")}
+        onSelectTemplate={openTemplateForm}
+        t={t}
+      />
 
       {successMessage ? (
         <div
