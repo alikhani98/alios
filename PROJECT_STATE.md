@@ -6,7 +6,7 @@
 - Architecture version: AliOS 1.0
 - Versioning policy: `package.json` is the single source of truth for the app release version; runtime release metadata reads from that file instead of duplicating the value in feature code.
 - Current status: AliOS includes validated mobile-first Inbox capture, processing, global search, focused search-result navigation, filters, bulk triage, local appearance switching, local profile preferences, calendar month view foundation, home time-window routine nudges, upcoming task grouping, routine templates, Wellness / Badminton Routine foundation, visual motion polish, premium Home dashboard visual upgrade, premium app shell polish, Home dashboard customization, premium reusable components, lightweight Personal Insights, Stage 37 premium Home showcase polish, light core-page visual alignment, hardened backup/restore safety, Stage 38 UI regression QA and release hardening with desktop sticky sidebar accessibility improvements, Stage 39 topbar dashboard controls plus accent color personalization, Stage 40 finance foundation, Stage 41 finance review and budget guard, Stage 42 lightweight finance charts foundation, Stage 43 lightweight motion and interaction polish, Stage 44 finance mobile UX and section navigation, Stage 45 performance audit and bundle optimization, Stage 46 Home collapsible dashboard sections, Stage 47 Settings Help Center Foundation, Stage 48 Weekly Review Foundation, Stage 49 Decision Log Foundation, Stage 50 Backup / Restore Safety & Migration Foundation, Stage 51 App Error Boundary & Local Error Log Foundation, Stage 53 Mobile UX Hardening for dense pages, Stage 54 Empty States & First-Run Guidance Foundation, Stage 55 Backup Reminder & Last Backup Status Foundation, Stage 56 Export Center Foundation, Stage 57 Recovery Mode / Safe Mode Foundation, Stage 58 Finance Monthly Plan Foundation, Stage 59 Personal Manual Foundation, Stage 60 Personal Manual QA & Release Hardening, Stage 61 Personal Manual Export Center Integration, Stage 62 Bundle Size Audit & Initial Load Hardening, Stage 63 Personal Manual Weekly Review Integration, Stage 64 Personal Manual Search & Focus Navigation, Stage 65 Personal Manual Templates Foundation, Stage 66 Personal Manual Mobile & Dense Page Polish, Stage 67 Personal Manual Track Release Hardening, Stage 68 v1.50 Release Hardening, Stage 69 Goals Track Foundation, Stage 70 Goals Track QA & Mobile Hardening, Stage 71 Goals Templates & Quick Start, Stage 72 Life Areas Foundation, Stage 73 App Startup Resilience & Release Hygiene, Stage 74 Pull Request CI Foundation, Stage 75 Life Areas QA & Mobile Hardening, Stage 76 Goals ↔ Life Areas Derived Integration, Stage 77 Goals & Life Areas Release Hardening, Stage 78 Projects → Goals Link Foundation, Stage 79 Tasks → Projects Link Activation, Stage 80 Life Areas Persian Localization & Help Center Refresh, Stage 81 AliOS Design System Contract, Stage 82 Design Contract Adoption & Form Control Consistency, Stage 83 UI Accessibility & Design Contract Release Hardening, Stage 84 Real-World Usage QA & Product Prioritization Foundation, and Stage 85 Bundle Performance & Initial Load Hardening, and remains ready for static GitHub Pages deployment.
-- Current Stage: Stage 148 Completed (user-executed real-world validation recorded; no Critical or High issue reported)
+- Current Stage: Stage 149 Completed (premium interactions architecture defined; no product interaction implemented)
 
 ## Architecture References
 
@@ -95,6 +95,14 @@
 - The user reported Pass results for initial load, internal routing and refresh, Task create/edit/complete/delete, Today, Projects, Goals, Life Areas, Routines and Recurrence, forms and validation, persistence after refresh, empty/loading states, responsive behavior, and the main application paths.
 - No Critical or High issue was reported in the user-executed QA handoff. The evidence is recorded as user-provided manual validation, not as Codex-executed browser validation.
 - Scroll-driven Sticky Card Stack, Infinite Draggable Marquee, and Dynamic Slider with Live Metric Cards are documented only as future-stage interaction candidates; none were implemented.
+
+## Stage 149 Premium Interactions Architecture
+
+- `docs/PREMIUM_INTERACTIONS_ARCHITECTURE.md` now defines the architecture, placement, behavior, accessibility, reduced-motion, performance, and future-stage strategy for Scroll-driven Sticky Card Stack, Infinite Draggable Marquee, and Dynamic Slider with Live Metric Cards.
+- Infinite Draggable Marquee is adopted with constraints as the lowest-risk future implementation candidate for optional template and discovery surfaces.
+- Scroll-driven Sticky Card Stack is adopted with constraints for educational or onboarding-style guidance only, not high-frequency operational workflows.
+- Dynamic Slider with Live Metric Cards is deferred until weekly capacity, task effort, and planning-risk calculations have an approved data model.
+- Stage 149 adds no product interaction, component, CSS, route, schema, dependency, workflow, Sync, Cloud, AI, or runtime behavior.
 
 ## Completed Stages
 
@@ -501,7 +509,7 @@ Stage 35 completion is evidenced by the premium app shell polish across the side
 
 ## Next Stage
 
-No further implementation scope is currently approved. The next decision should follow evidence gathered through the Stage 148 user-executed real-world validation pass; project conversion, bulk conversion, tags, attachments, reminders, AI classification, semantic search, offline service-worker caching, automatic sync, cloud backup, and further visual redesign remain deferred. Advanced wellness coaching, medical guidance, treatment logic, charts, deeper interaction systems, and the three Stage 148 interaction-pattern candidates remain deferred beyond the approved local-first model until a separate stage is approved.
+No further implementation scope is currently approved. The next decision should follow evidence gathered through the Stage 148 user-executed real-world validation pass and the Stage 149 premium-interactions architecture. Project conversion, bulk conversion, tags, attachments, reminders, AI classification, semantic search, offline service-worker caching, automatic sync, cloud backup, and further visual redesign remain deferred. Advanced wellness coaching, medical guidance, treatment logic, charts, and deeper interaction systems remain deferred beyond the approved local-first model until a separate stage is approved.
 
 ## Git Latest Recommended Commit
 
