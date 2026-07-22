@@ -262,7 +262,7 @@ Suggested future budgets:
 
 ## 11. Recommended Implementation Order
 
-1. Stage 150 - Template Discovery Marquee.
+1. Stage 150 - Template Discovery Marquee. Implemented in Goals only.
 2. Stage 151 - AliOS Planning Loop Sticky Guide.
 3. Stage 152 - Planning Capacity Model and Slider Feasibility.
 
@@ -272,16 +272,20 @@ The order differs slightly from a purely visual ambition path: the marquee is fi
 
 ### Stage 150 - Template Discovery Marquee
 
+- Status: implemented in Goals only.
 - Goal: add one constrained optional marquee or static fallback for starter examples.
-- Scope: one route only, preferably Goals templates or Personal Manual starter prompts.
-- Possible files: one feature page, localized copy files, shared UI only if a second consumer is proven.
-- Dependencies: none new.
-- Acceptance criteria: examples are readable, pausable, keyboard reachable, hidden duplicates are inaccessible to screen readers, and reduced motion renders static content.
-- Accessibility criteria: focus visibility, no focus trap, pause on focus, no screen-reader duplication.
-- Performance criteria: CSS transform only, no entry-bundle growth, no animation when off-screen.
-- Required tests: helper tests for item duplication and reduced-motion mode if logic exists; focused rendering tests if a component is introduced.
-- Risks: distraction, accidental drag selection, screen-reader duplication.
-- Out of scope: user records, task lists, finance data, workflow automation, new route unless separately approved.
+- Final location: `/goals`, replacing the previous static Goal template grid.
+- Reason: Goals already had real static templates and an approved `useTemplate` path that seeds the existing Goal form, so the marquee improves discovery without inventing template behavior or mutating records.
+- Data type: static Goal template definitions from the feature layer. The marquee never displays user records, sensitive data, alerts, Finance data, Backup/Restore state, Sync state, or AI output.
+- Implementation boundary: feature-local component and helper only. It did not become shared UI because there is only one real consumer.
+- Desktop behavior: fine-pointer contexts use one calm transform-only marquee row. Motion pauses on hover, focus, drag, off-viewport, and document-hidden states, then resumes after a predictable delay.
+- Mobile behavior: coarse-pointer and narrow contexts use a static horizontal manual-scroll row. Auto-scroll is disabled until future real-device QA proves it is calm and readable.
+- Reduced motion: renders the same canonical cards as a static horizontal list with no auto-motion or duplicated visual loop items.
+- Accessibility: duplicate loop items are marked visual-only and removed from keyboard navigation; canonical cards remain in one semantic list, keyboard reachable once, with visible focus and no focus trap.
+- Performance: no new dependency, no animation library, no per-frame React rerender, no layout-property animation, no schema or storage work, bounded static item count, observer/listener cleanup, and transform-only animation.
+- Automated coverage: helper tests cover auto/static decisions, reduced-motion/touch fallback decisions, duplicate loop item generation, drag/click separation, and empty state rendering.
+- Real-browser QA requirement: desktop pointer drag, hover/focus pause, keyboard path, reduced motion, mobile touch swipe, resize stability, light/dark readability, console cleanliness, and CPU smoothness still require manual browser/device validation before claiming real-world validation.
+- Out of scope: user records, task lists, Today operational workflow, Finance, Backup/Restore, Sync, AI, workflow automation, new route, dependency, schema, persistence, and Stage 151 or Stage 152 work.
 
 ### Stage 151 - AliOS Planning Loop Sticky Guide
 
@@ -337,6 +341,10 @@ The order differs slightly from a purely visual ambition path: the marquee is fi
 - Should Task duration estimates exist in AliOS v1, or is that too much planning overhead?
 - What real-device performance threshold should be used before allowing any continuous animation on mobile?
 - What evidence should be required before a premium interaction graduates from optional surface to shared primitive?
+
+## Final Stage 150 Result
+
+`STAGE_150_TEMPLATE_DISCOVERY_MARQUEE_COMPLETE`
 
 ## Final Stage 149 Result
 

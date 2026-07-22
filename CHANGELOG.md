@@ -2,6 +2,15 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 150 - Template Discovery Marquee
+
+- Replaced the Goals template grid with a constrained feature-local discovery marquee for the existing static Goal starter templates
+- Kept template behavior honest: selecting a card only seeds the existing Goal form, and no record is created until the user explicitly saves
+- Added reduced-motion and touch-first static/manual-scroll fallback behavior, with desktop auto-motion paused on hover, focus, drag, document-hidden, and off-viewport states
+- Hid duplicated loop cards from assistive technology while keeping the canonical template cards keyboard reachable once with visible focus
+- Added focused automated coverage for marquee rendering, duplicate-loop markers, reduced-motion/touch fallback decisions, drag/click separation, and empty state
+- Added no dependency, route, schema, persistence, backup, Sync, Cloud, AI, Finance, Today task-form, or unrelated product behavior change
+
 ## Stage 149 - Premium Interactions Architecture
 
 - Added a documentation-only architecture strategy for Scroll-driven Sticky Card Stack, Infinite Draggable Marquee, and Dynamic Slider with Live Metric Cards
