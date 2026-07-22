@@ -2,6 +2,15 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 151 - Planning Loop Sticky Guide
+
+- Added a constrained Scroll-driven Sticky Card Stack implementation inside the existing Settings Help Center as an educational AliOS planning-loop guide
+- Explained the real AliOS loop: Capture, Prioritize, Plan, Execute, and Review, with links only to existing app routes
+- Kept the guide static and honest: it does not create, modify, prioritize, schedule, sync, analyze, automate, or persist user records
+- Used CSS-only sticky behavior on desktop and static readable fallback behavior for mobile, short viewport, and reduced-motion contexts
+- Preserved one semantic ordered list and one accessible content instance, with no duplicate assistive content, scroll listeners, observers, animation runtime, dependency, lockfile, route, schema, persistence, Sync, Cloud, AI, Finance, Backup/Restore, or Today task-form changes
+- Added focused automated coverage for stage order, route honesty, semantic rendering, reduced-motion and short-viewport fallback classes, no duplicate accessible cards, and empty fallback
+
 ## Stage 150 - Template Discovery Marquee
 
 - Replaced the Goals template grid with a constrained feature-local discovery marquee for the existing static Goal starter templates

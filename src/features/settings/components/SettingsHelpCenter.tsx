@@ -9,6 +9,7 @@ import {
   type HelpCenterModule,
   type HelpCenterSection,
 } from "../helpCenterContent";
+import { PlanningLoopStickyGuide } from "./PlanningLoopStickyGuide";
 
 function HelpParagraphs({
   section,
@@ -141,6 +142,8 @@ export function SettingsHelpCenter() {
         />
 
         <div className="space-y-4">
+          <PlanningLoopStickyGuide />
+
           {settingsHelpCenterSections.map((section) => (
             <CollapsibleSection
               key={section.id}
