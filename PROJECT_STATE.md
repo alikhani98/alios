@@ -6,7 +6,7 @@
 - Architecture version: AliOS 1.0
 - Versioning policy: `package.json` is the single source of truth for the app release version; runtime release metadata reads from that file instead of duplicating the value in feature code.
 - Current status: AliOS includes validated mobile-first Inbox capture, processing, global search, focused search-result navigation, filters, bulk triage, local appearance switching, local profile preferences, calendar month view foundation, home time-window routine nudges, upcoming task grouping, routine templates, Wellness / Badminton Routine foundation, visual motion polish, premium Home dashboard visual upgrade, premium app shell polish, Home dashboard customization, premium reusable components, lightweight Personal Insights, Stage 37 premium Home showcase polish, light core-page visual alignment, hardened backup/restore safety, Stage 38 UI regression QA and release hardening with desktop sticky sidebar accessibility improvements, Stage 39 topbar dashboard controls plus accent color personalization, Stage 40 finance foundation, Stage 41 finance review and budget guard, Stage 42 lightweight finance charts foundation, Stage 43 lightweight motion and interaction polish, Stage 44 finance mobile UX and section navigation, Stage 45 performance audit and bundle optimization, Stage 46 Home collapsible dashboard sections, Stage 47 Settings Help Center Foundation, Stage 48 Weekly Review Foundation, Stage 49 Decision Log Foundation, Stage 50 Backup / Restore Safety & Migration Foundation, Stage 51 App Error Boundary & Local Error Log Foundation, Stage 53 Mobile UX Hardening for dense pages, Stage 54 Empty States & First-Run Guidance Foundation, Stage 55 Backup Reminder & Last Backup Status Foundation, Stage 56 Export Center Foundation, Stage 57 Recovery Mode / Safe Mode Foundation, Stage 58 Finance Monthly Plan Foundation, Stage 59 Personal Manual Foundation, Stage 60 Personal Manual QA & Release Hardening, Stage 61 Personal Manual Export Center Integration, Stage 62 Bundle Size Audit & Initial Load Hardening, Stage 63 Personal Manual Weekly Review Integration, Stage 64 Personal Manual Search & Focus Navigation, Stage 65 Personal Manual Templates Foundation, Stage 66 Personal Manual Mobile & Dense Page Polish, Stage 67 Personal Manual Track Release Hardening, Stage 68 v1.50 Release Hardening, Stage 69 Goals Track Foundation, Stage 70 Goals Track QA & Mobile Hardening, Stage 71 Goals Templates & Quick Start, Stage 72 Life Areas Foundation, Stage 73 App Startup Resilience & Release Hygiene, Stage 74 Pull Request CI Foundation, Stage 75 Life Areas QA & Mobile Hardening, Stage 76 Goals ↔ Life Areas Derived Integration, Stage 77 Goals & Life Areas Release Hardening, Stage 78 Projects → Goals Link Foundation, Stage 79 Tasks → Projects Link Activation, Stage 80 Life Areas Persian Localization & Help Center Refresh, Stage 81 AliOS Design System Contract, Stage 82 Design Contract Adoption & Form Control Consistency, Stage 83 UI Accessibility & Design Contract Release Hardening, Stage 84 Real-World Usage QA & Product Prioritization Foundation, and Stage 85 Bundle Performance & Initial Load Hardening, and remains ready for static GitHub Pages deployment.
-- Current Stage: Stage 150 Completed (Goals template discovery marquee implemented; real-browser validation pending)
+- Current Stage: Stage 151 Completed (Planning Loop Sticky Guide implemented in Settings Help Center; real-browser validation pending)
 
 ## Architecture References
 
@@ -94,7 +94,7 @@
 - `docs/REAL_WORLD_USAGE_QA.md` now records the user-executed manual QA pass against the live GitHub Pages deployment at commit `28ce4eb2a67f11ac7c98baee7eaea51e170fe2de`.
 - The user reported Pass results for initial load, internal routing and refresh, Task create/edit/complete/delete, Today, Projects, Goals, Life Areas, Routines and Recurrence, forms and validation, persistence after refresh, empty/loading states, responsive behavior, and the main application paths.
 - No Critical or High issue was reported in the user-executed QA handoff. The evidence is recorded as user-provided manual validation, not as Codex-executed browser validation.
-- Scroll-driven Sticky Card Stack, Infinite Draggable Marquee, and Dynamic Slider with Live Metric Cards are documented only as future-stage interaction candidates; none were implemented.
+- Infinite Draggable Marquee and Scroll-driven Sticky Card Stack now have one constrained implementation each. Dynamic Slider with Live Metric Cards remains a future-stage interaction candidate only.
 
 ## Stage 149 Premium Interactions Architecture
 
@@ -112,6 +112,15 @@
 - Duplicate loop items are visual-only and hidden from assistive technology; the canonical template cards remain keyboard reachable once, with visible focus and no focus trap.
 - Stage 150 adds no route, schema, persistence, backup, dependency, workflow, Sync, Cloud, AI, Finance, Today task-form, or product-data behavior change.
 - Automated validation covers marquee motion-mode helpers, duplicate loop accessibility markers, drag/click separation, empty state, TypeScript, related tests, full test suite, and production build. Real-browser QA for desktop/mobile pointer drag, touch swipe, reduced motion, resize, dark/light, and performance remains required before claiming real-world validation.
+
+## Stage 151 Planning Loop Sticky Guide
+
+- Settings Help Center now includes a feature-local Planning Loop Sticky Guide that explains the real AliOS loop: Capture, Prioritize, Plan, Execute, and Review.
+- The guide is educational and static. It does not create, modify, prioritize, schedule, sync, analyze, or automate user records.
+- Placement audit selected Settings Help Center because it is the existing non-operational guide surface. No new route was added, and Today, Task forms, Finance, Backup/Restore, Sync, Cloud, AI, schema, persistence, and data-model files remain untouched.
+- Desktop uses CSS-only sticky stacking with existing AliOS cards and tokens. Mobile, short viewport, and reduced-motion contexts fall back to a normal static vertical list that preserves the same content.
+- The guide uses one semantic ordered list, one accessible content instance, real hash links to existing routes only, visible focus through existing controls, and no scroll listeners, observers, animation runtime, dependency, or lockfile change.
+- Automated validation covers stage order, semantic rendering, route honesty, no duplicate accessible cards, reduced-motion and short-viewport fallback classes, empty fallback, TypeScript, related tests, Stage 150 regression tests, full test suite, and production build. Real-browser QA for sticky release, resize/orientation, keyboard focus travel, 360/390/430 px mobile, reduced motion, 200% zoom, light/dark readability, and bundle/performance remains required before claiming real-world validation.
 
 ## Completed Stages
 
@@ -518,7 +527,7 @@ Stage 35 completion is evidenced by the premium app shell polish across the side
 
 ## Next Stage
 
-No further implementation scope is currently approved. Stage 151 - AliOS Planning Loop Sticky Guide remains only a candidate from the premium-interactions architecture and must not start without explicit approval. Project conversion, bulk conversion, tags, attachments, reminders, AI classification, semantic search, automatic sync, cloud backup, and further visual redesign remain deferred. Advanced wellness coaching, medical guidance, treatment logic, charts, and deeper interaction systems remain deferred beyond the approved local-first model until a separate stage is approved.
+No further implementation scope is currently approved. Stage 152 - Planning Capacity Model and Slider Feasibility remains only a candidate from the premium-interactions architecture and must not start without explicit approval. Project conversion, bulk conversion, tags, attachments, reminders, AI classification, semantic search, automatic sync, cloud backup, and further visual redesign remain deferred. Advanced wellness coaching, medical guidance, treatment logic, charts, and deeper interaction systems remain deferred beyond the approved local-first model until a separate stage is approved.
 
 ## Git Latest Recommended Commit
 

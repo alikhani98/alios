@@ -13,7 +13,7 @@ Stage 149 evaluates three premium interaction patterns for AliOS and defines whe
 | Interaction | Decision | Primary placement | Implementation priority | Reason |
 | --- | --- | --- | --- | --- |
 | Infinite Draggable Marquee | Adopt with constraints | Template and discovery surfaces, especially Goals, Projects, Personal Manual, and Routines starter examples | Stage 150 candidate | Lowest risk because it can present static optional examples without changing records or workflows |
-| Scroll-driven Sticky Card Stack | Adopt with constraints | A future onboarding or guide surface, or a bounded Weekly Review explanation section | Stage 151 candidate | Useful for narrative education, but risky inside repeated operational workflows |
+| Scroll-driven Sticky Card Stack | Adopt with constraints | Settings Help Center educational guide | Stage 151 implemented | Useful for narrative education, but risky inside repeated operational workflows |
 | Dynamic Slider with Live Metric Cards | Defer | Future Weekly Planning capacity setup only after a data model is approved | Stage 152 candidate only after model approval | Current data can support some counts, but not trustworthy capacity, effort, or overplanning calculations |
 
 No interaction should be implemented in Stage 149. Future work must remain local-first, dependency-light, static-hosting compatible, accessible, bilingual, and respectful of reduced-motion preferences.
@@ -84,7 +84,7 @@ Behavior:
 
 Visual rules:
 
-- Use 3 to 4 cards. More cards create a long scroll tax without improving comprehension.
+- Use 3 to 5 cards. Stage 151 uses five because the approved AliOS planning loop has five distinct steps.
 - Avoid aggressive parallax. Depth may use small scale and opacity changes only when motion is allowed.
 - Previous cards may reduce to 0.96 scale and 0.72 to 0.85 opacity, but text must remain readable.
 - Release the section with a final spacer equal to the sticky area so the next section does not jump.
@@ -263,7 +263,7 @@ Suggested future budgets:
 ## 11. Recommended Implementation Order
 
 1. Stage 150 - Template Discovery Marquee. Implemented in Goals only.
-2. Stage 151 - AliOS Planning Loop Sticky Guide.
+2. Stage 151 - AliOS Planning Loop Sticky Guide. Implemented in Settings Help Center only.
 3. Stage 152 - Planning Capacity Model and Slider Feasibility.
 
 The order differs slightly from a purely visual ambition path: the marquee is first because it has the lowest architecture risk, can use static examples, and does not need new persisted data. The slider is last because it requires a trustworthy model.
@@ -289,16 +289,21 @@ The order differs slightly from a purely visual ambition path: the marquee is fi
 
 ### Stage 151 - AliOS Planning Loop Sticky Guide
 
+- Status: implemented in Settings Help Center only.
 - Goal: create a bounded educational guide explaining the AliOS planning loop.
-- Scope: future onboarding/guide route or a static Help Center section; not the daily dashboard.
-- Possible files: Settings Help Center or a future guide page, localized copy, optional shared presentation primitive only if reused.
+- Final location: `/settings`, inside the existing static Help Center narrative.
+- Placement decision: Settings Help Center was selected because it is the existing educational guide surface. A new route was not needed, and the guide stays away from Today, Task forms, Backup/Restore, Finance, Sync, AI, and other high-frequency or safety-sensitive surfaces.
+- Data type: static guide content only. The cards explain Capture, Prioritize, Plan, Execute, and Review, and link only to existing routes.
+- Implementation boundary: feature-local Settings component and static content helper only. It did not become a shared UI primitive because there is still only one real consumer.
 - Dependencies: none new.
-- Acceptance criteria: 3 to 4 cards, no scroll jank, mobile static fallback, reduced-motion static fallback, keyboard reading order preserved.
-- Accessibility criteria: semantic headings, no focus trap, no required scroll-linked animation, visible focus on actions.
-- Performance criteria: reserved height, transform/opacity only, no repeated scroll listeners without cleanup.
-- Required tests: static rendering and reduced-motion fallback if implemented as a component.
-- Risks: long scroll path, mobile awkwardness, over-explaining familiar workflows.
-- Out of scope: Task forms, Home dashboard, Backup/Restore, data mutation.
+- Desktop behavior: roomy desktop viewports use CSS-only sticky cards below the shell header. There are no scroll listeners, observers, timers, per-frame React rerenders, or animation dependencies.
+- Mobile behavior: narrow screens render as a normal vertical card list with native scroll and full text readability.
+- Short viewport and reduced motion: the same semantic content falls back to static layout through CSS classes.
+- Accessibility: one ordered list is present in DOM order; no duplicated card content is added for the sticky effect; actions are ordinary links to real routes; focus remains visible through existing shared controls.
+- Performance: no dependency or lockfile change; no schema, storage, or route work; static card count is bounded to five stages; sticky behavior uses CSS only.
+- Automated coverage: focused tests cover stage order, semantic rendering, real route links, no duplicate accessible cards, reduced-motion and short-viewport fallback classes, and empty fallback.
+- Real-browser QA requirement: desktop sticky release, resize/orientation behavior, keyboard focus travel, 360/390/430 px mobile, reduced motion, 200% zoom, light/dark readability, and bundle/performance still require manual browser/device validation before claiming real-world validation.
+- Out of scope: Task forms, Home dashboard, Backup/Restore, Finance, Sync, Cloud, AI, data mutation, schema, persistence, new route, dependency, and Stage 152.
 
 ### Stage 152 - Planning Capacity Model and Slider Feasibility
 
@@ -334,7 +339,7 @@ The order differs slightly from a purely visual ambition path: the marquee is fi
 
 ## 15. Open Questions and Unresolved Dependencies
 
-- Does AliOS need a dedicated onboarding or guide route, or should educational content remain inside Settings Help Center?
+- Dedicated onboarding route question for the first sticky guide is resolved for now: Stage 151 uses Settings Help Center. A future onboarding route still requires separate approval if the guide content grows beyond Settings.
 - Which single route should host the first marquee so the pattern can be evaluated without broad visual churn?
 - Should template discovery eventually become a central route or remain feature-local?
 - Should weekly capacity be stored, session-only, or avoided entirely?
@@ -345,6 +350,10 @@ The order differs slightly from a purely visual ambition path: the marquee is fi
 ## Final Stage 150 Result
 
 `STAGE_150_TEMPLATE_DISCOVERY_MARQUEE_COMPLETE`
+
+## Final Stage 151 Result
+
+`STAGE_151_PLANNING_LOOP_STICKY_GUIDE_COMPLETE`
 
 ## Final Stage 149 Result
 
