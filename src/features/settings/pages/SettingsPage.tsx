@@ -54,6 +54,7 @@ import { RecoveryModeSection } from "../components/RecoveryModeSection";
 import { ExportCenterSection } from "../components/ExportCenterSection";
 import { LocalErrorLogSection } from "../components/LocalErrorLogSection";
 import { SyncStatusCard } from "../components/SyncStatusCard";
+import { WeeklyTaskBudgetSection } from "../components/WeeklyTaskBudgetSection";
 import { LocalAiSetupCard } from "@/features/localAi";
 import { resetHomeDashboardLayoutPreference } from "@/features/home/hooks/useHomeDashboardLayout";
 import {
@@ -318,6 +319,8 @@ export function SettingsPage() {
       <SyncStatusCard onGoToBackupRestore={() => scrollToSection("settings-backup-restore")} />
 
       <LocalAiSetupCard />
+
+      <WeeklyTaskBudgetSection />
 
       <Card>
         <CardHeader>
