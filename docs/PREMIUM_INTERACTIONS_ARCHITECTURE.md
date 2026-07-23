@@ -18,6 +18,12 @@ Stage 149 evaluates three premium interaction patterns for AliOS and defines whe
 
 No interaction should be implemented in Stage 149. Future work must remain local-first, dependency-light, static-hosting compatible, accessible, bilingual, and respectful of reduced-motion preferences.
 
+Stage 156 follow-up:
+
+- Simple View / Full View did not refactor, relocate, or expand the Stage 150 marquee, Stage 151 sticky guide, or Stage 154 weekly budget slider.
+- Full View keeps those interactions at their approved density and placement.
+- Simple View may reduce the prominence of surrounding discovery or explanation surfaces through explicit disclosure, but the underlying approved interaction behavior remains unchanged.
+
 ## 2. Current Product Architecture Findings
 
 - Routing uses `createHashRouter` with lazy route boundaries, which keeps GitHub Pages compatible and makes new heavy interaction surfaces safer when route-scoped.

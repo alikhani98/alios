@@ -82,8 +82,40 @@ function parseOptionalDate(value: string): string | undefined {
   return trimmed.length > 0 ? trimmed : undefined;
 }
 
+function readSimpleViewMode() {
+  try {
+    return typeof window !== "undefined"
+      && window.localStorage.getItem("alios.viewDensityMode") === "simple";
+  } catch {
+    return false;
+  }
+}
+
+function useSimpleViewMode() {
+  const [isSimpleView, setIsSimpleView] = useState(readSimpleViewMode);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return undefined;
+    }
+
+    const update = () => setIsSimpleView(readSimpleViewMode());
+
+    window.addEventListener("alios-local-preference-change", update);
+    window.addEventListener("storage", update);
+
+    return () => {
+      window.removeEventListener("alios-local-preference-change", update);
+      window.removeEventListener("storage", update);
+    };
+  }, []);
+
+  return isSimpleView;
+}
+
 export function GoalsPage() {
   const { t } = useI18n();
+  const isSimpleView = useSimpleViewMode();
   const { tasks: tasksRepository } = useStorageAdapter();
   const [searchParams, setSearchParams] = useSearchParams();
   const {
@@ -123,6 +155,7 @@ export function GoalsPage() {
   const [draftGoalTemplateId, setDraftGoalTemplateId] = useState<string | null>(null);
   const [formRevision, setFormRevision] = useState(0);
   const [showAllGoals, setShowAllGoals] = useState(false);
+  const [showSimpleTemplates, setShowSimpleTemplates] = useState(false);
   const goalRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const formRef = useRef<HTMLDivElement | null>(null);
   const focusId = searchParams.get("focusId");
@@ -166,7 +199,7 @@ export function GoalsPage() {
     timeframeFilter !== "all" ||
     importanceFilter !== "all" ||
     appliedQuery.length > 0;
-  const goalPreviewLimit = 6;
+  const goalPreviewLimit = isSimpleView ? 4 : 6;
   const focusRequiresAllGoals = filteredEntries.findIndex((goal) => goal.id === focusId) >= goalPreviewLimit;
   const displayedGoals = showAllGoals || focusRequiresAllGoals
     ? filteredEntries
@@ -449,21 +482,42 @@ export function GoalsPage() {
         />
       </div>
 
-      <GoalTemplateDiscoveryMarquee
-        templates={templateCards}
-        title={t("goals.templatesTitle")}
-        description={t("goals.templatesDescription")}
-        note={t("goals.templatesNote")}
-        localOnlyLabel={t("goals.localOnlyNote")}
-        useTemplateLabel={t("goals.useTemplate")}
-        progressLabel={t("goals.progressLabel")}
-        reviewIntervalDaysLabel={t("goals.reviewIntervalDaysLabel")}
-        emptyTitle={t("goals.emptyTitle")}
-        emptyDescription={t("goals.emptyDescription")}
-        sectionLabel={t("goals.templatesTitle")}
-        onSelectTemplate={openTemplateForm}
-        t={t}
-      />
+      {isSimpleView && !showSimpleTemplates ? (
+        <PremiumCard>
+          <div className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+            <SectionHeader
+              eyebrow={t("goals.templatesTitle")}
+              title={t("goals.templatesTitle")}
+              description={t("goals.templatesDescription")}
+              status={<StatusChip tone="neutral">{templateCards.length}</StatusChip>}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowSimpleTemplates(true)}
+              aria-expanded={showSimpleTemplates}
+            >
+              {t("common.expandSection")}
+            </Button>
+          </div>
+        </PremiumCard>
+      ) : (
+        <GoalTemplateDiscoveryMarquee
+          templates={templateCards}
+          title={t("goals.templatesTitle")}
+          description={t("goals.templatesDescription")}
+          note={t("goals.templatesNote")}
+          localOnlyLabel={t("goals.localOnlyNote")}
+          useTemplateLabel={t("goals.useTemplate")}
+          progressLabel={t("goals.progressLabel")}
+          reviewIntervalDaysLabel={t("goals.reviewIntervalDaysLabel")}
+          emptyTitle={t("goals.emptyTitle")}
+          emptyDescription={t("goals.emptyDescription")}
+          sectionLabel={t("goals.templatesTitle")}
+          onSelectTemplate={openTemplateForm}
+          t={t}
+        />
+      )}
 
       {successMessage ? (
         <div

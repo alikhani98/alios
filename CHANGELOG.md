@@ -2,6 +2,17 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 156 - Simple View / Full View Presentation Mode
+
+- Added the local `viewDensityMode` presentation preference with values `full` and `simple`, stored only in browser localStorage under `alios.viewDensityMode`
+- Kept `full` as the default for missing, cleared, and invalid values so existing behavior remains unchanged until the user opts into Simple View
+- Added a bilingual Settings View density / تراکم نمایش radio group with Full View and Simple View options
+- Applied Simple View only to Home, Today, Weekly Review, Settings, Goals, Personal Manual, and Finance using progressive disclosure and tighter preview limits instead of duplicate pages or CSS-only hiding
+- Preserved primary actions, forms, active filters, selected/count context, loading/error/empty states, destructive confirmations, and all product-data behavior
+- Added focused automated coverage for preference parsing/persistence/reset/storage-event behavior, the Settings control, and source-level scope safeguards
+- Added no dependency, lockfile change, route, schema, migration, backup-format change, Sync, Cloud, AI, telemetry, analytics, onboarding flow, header toggle, floating toggle, or product-data mutation
+- Real-world validation is still required after deployment; automated tests and a successful production build are not equivalent to browser/device QA
+
 ## Stage 155 - UI Density Audit and Simple View / Full View Design
 
 - Added `docs/UI_DENSITY_AND_VIEW_MODES_AUDIT.md` as a documentation-only audit for current UI density and future Simple View / Full View architecture

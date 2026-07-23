@@ -6,7 +6,18 @@ Date: 2026-07-23
 
 Base commit: `4367f659231cf96aec4f40ca7d92ee13f61256b7`
 
-Status: Audit and architecture design only. No Simple View, Full View, toggle, preference, route, schema, CSS, source component, product layout, or runtime behavior was implemented in this stage.
+Status: Stage 155 audit and architecture design completed. Stage 156 later implemented the approved local presentation-only Simple View / Full View mode without adding routes, schema, backup support, Sync, Cloud, AI, dependencies, header toggles, floating toggles, or duplicate pages.
+
+Stage 156 implementation note:
+
+- Preference: `viewDensityMode`
+- localStorage key: `alios.viewDensityMode`
+- Values: `full`, `simple`
+- Default/fallback: `full` for missing, cleared, or invalid values
+- Control location: Settings appearance/interface area only
+- Scoped pages: Home, Today, Weekly Review, Settings, Goals, Personal Manual, Finance
+- Method: progressive disclosure and tighter preview limits only; no data mutation or product calculation change
+- Validation rule: automated tests and production build results must be reported separately from real-world browser/device validation
 
 ## 1. Executive summary
 

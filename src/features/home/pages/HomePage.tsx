@@ -13,7 +13,7 @@ import {
   Sparkles,
   ShieldCheck,
 } from "lucide-react";
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { useDateFormatter } from "@/shared/date";
@@ -86,6 +86,44 @@ const primaryDashboardSectionIds = new Set<HomeDashboardSectionId>([
   "personalInsights",
 ]);
 
+const simplePrimaryDashboardSectionIds = new Set<HomeDashboardSectionId>([
+  "emptyState",
+  "routineNudge",
+  "upcomingTasks",
+  "calendar",
+]);
+
+function readSimpleViewMode() {
+  try {
+    return typeof window !== "undefined"
+      && window.localStorage.getItem("alios.viewDensityMode") === "simple";
+  } catch {
+    return false;
+  }
+}
+
+function useSimpleViewMode() {
+  const [isSimpleView, setIsSimpleView] = useState(readSimpleViewMode);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return undefined;
+    }
+
+    const update = () => setIsSimpleView(readSimpleViewMode());
+
+    window.addEventListener("alios-local-preference-change", update);
+    window.addEventListener("storage", update);
+
+    return () => {
+      window.removeEventListener("alios-local-preference-change", update);
+      window.removeEventListener("storage", update);
+    };
+  }, []);
+
+  return isSimpleView;
+}
+
 type SummaryCardProps = {
   icon: ReactNode;
   label: string;
@@ -111,6 +149,7 @@ function OverviewPanel({
 export function HomePage() {
   const { t } = useI18n();
   const { formatDate } = useDateFormatter();
+  const isSimpleView = useSimpleViewMode();
   const { freshness: backupFreshness } = useBackupStatus();
   const { data, isLoading, hasError, loadDashboard } = useHomeDashboard();
   const { layout } = useHomeDashboardLayout();
@@ -415,8 +454,11 @@ export function HomePage() {
   const dashboardSections = renderedSections.filter(
     (section) => section.sectionId !== "hero"
   );
+  const primarySectionIds = isSimpleView
+    ? simplePrimaryDashboardSectionIds
+    : primaryDashboardSectionIds;
   const primaryDashboardSections = dashboardSections.filter((section) =>
-    primaryDashboardSectionIds.has(section.sectionId)
+    primarySectionIds.has(section.sectionId)
   );
   const secondaryDashboardSections = dashboardSections.filter(
     (section) => !primaryDashboardSectionIds.has(section.sectionId)
