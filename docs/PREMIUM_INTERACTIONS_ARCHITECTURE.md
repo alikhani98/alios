@@ -14,7 +14,7 @@ Stage 149 evaluates three premium interaction patterns for AliOS and defines whe
 | --- | --- | --- | --- | --- |
 | Infinite Draggable Marquee | Adopt with constraints | Template and discovery surfaces, especially Goals, Projects, Personal Manual, and Routines starter examples | Stage 150 candidate | Lowest risk because it can present static optional examples without changing records or workflows |
 | Scroll-driven Sticky Card Stack | Adopt with constraints | Settings Help Center educational guide | Stage 151 implemented | Useful for narrative education, but risky inside repeated operational workflows |
-| Dynamic Slider with Live Metric Cards | Defer pending real-world validation of minimal model | Future Weekly Planning capacity setup only after the user-declared planning budget model is validated | Stage 153 budget foundation implemented; slider remains deferred | Current data plus user-declared task budget can support descriptive comparison only, not real capacity, effort, or overplanning calculations |
+| Dynamic Slider with Live Metric Cards | Adopt only as a constrained budget control | Existing Settings weekly task budget section only | Stage 154 implements a native slider companion with descriptive summaries | Current data plus user-declared task budget can support descriptive comparison only, not real capacity, effort, or overplanning calculations |
 
 No interaction should be implemented in Stage 149. Future work must remain local-first, dependency-light, static-hosting compatible, accessible, bilingual, and respectful of reduced-motion preferences.
 
@@ -144,11 +144,11 @@ Decision:
 
 ### Dynamic Slider with Live Metric Cards
 
-Recommended placement:
+Implemented placement:
 
-- Candidate location: future Weekly Review planning capacity setup.
-- Secondary candidate: onboarding around planning intensity, if the model is explicitly educational.
-- Do not place it as a permanent Today dashboard control or as a hidden prioritization engine.
+- Stage 154 location: existing Settings weekly task budget section only.
+- The control is a native range input that edits the existing user-declared `weeklyTaskBudget` draft beside the exact numeric input.
+- Do not place it as a permanent Today dashboard control, Home dashboard control, Weekly Review dashboard, or hidden prioritization engine.
 
 Product purpose:
 
@@ -184,13 +184,14 @@ Candidate outputs:
 | Planning load | label | Open tasks plus active projects | Low, steady, heavy, overloaded thresholds | Needs future calibration | Label only | Show unknown | "A simple workload label, not advice." |
 | Overplanning risk | label | Capacity, task count, project count | Low, medium, high if capacity exists | Not reliable without effort estimates | Label only | Hide risk | "Risk appears only when enough inputs exist." |
 
-Decision:
+- Decision:
 
-- Defer runtime implementation.
+- Implement only the constrained Settings budget control from Stage 154.
 - Stage 152 completed the data-model feasibility audit in `docs/PLANNING_CAPACITY_FEASIBILITY.md`.
 - Final Stage 152 decision: **B - FEASIBLE_WITH_MINIMAL_MODEL**.
 - A future slider is not feasible from current data alone. It becomes feasible only after a separately approved, explicit, user-declared planning budget model exists.
 - The safest first model is a weekly task-count planning budget. It must be labeled as a user-declared planning cap, not as an AliOS prediction, productivity score, AI advice, or automatic recommendation.
+- Stage 154 does not implement live metric cards, capacity percentage, risk score, ideal workload, recommendation, Today/Home/Weekly Review placement, task mutation, scheduling, or a new model.
 
 ## 5. Mobile and Responsive Behavior
 
@@ -267,7 +268,7 @@ Suggested future budgets:
 
 - Infinite Draggable Marquee: Adopt with constraints. It has the clearest low-risk product value for optional starter examples and can be implemented without schema changes.
 - Scroll-driven Sticky Card Stack: Adopt with constraints. It is valuable for education, but must stay out of operational paths and repeated daily work.
-- Dynamic Slider with Live Metric Cards: Defer. It needs more data-model and calculation-rule decisions before it can be trustworthy.
+- Dynamic Slider with Live Metric Cards: Adopt only as the constrained Stage 154 Settings budget slider. Rich metric cards, capacity percentage, effort, time, risk, and recommendation outputs remain rejected until a separate model exists.
 - Permanent dashboard motion for Today: Reject.
 - Premium interactions for Backup/Restore, Finance data, safety settings, and alerts: Reject.
 
@@ -277,7 +278,7 @@ Suggested future budgets:
 2. Stage 151 - AliOS Planning Loop Sticky Guide. Implemented in Settings Help Center only.
 3. Stage 152 - Planning Capacity Model and Slider Feasibility. Completed as documentation-only feasibility audit.
 4. Stage 153 - User-Declared Planning Budget Model Foundation. Recommended only if explicitly approved.
-5. Future Stage 154 or later - Dynamic Slider exploration only after Stage 153 real-world QA and user research.
+5. Stage 154 - Dynamic Weekly Planning Budget Control. Implemented as a constrained Settings-only native slider for the existing weekly task-count budget.
 
 The order differs slightly from a purely visual ambition path: the marquee is first because it has the lowest architecture risk, can use static examples, and does not need new persisted data. The slider is last because it requires a trustworthy model.
 
@@ -342,6 +343,19 @@ The order differs slightly from a purely visual ambition path: the marquee is fi
 - UI: minimal Settings control with numeric input, Save, Clear, validation text, status badge, and non-advisory explanation.
 - Out of scope: Dynamic Slider production UI, capacity percentage, advanced metric cards, time estimates, effort points, AI prioritization, automatic scheduling, Sync, Cloud, backend, telemetry, hosted services, Today redesign, Weekly Review redesign, and Stage 154.
 
+### Stage 154 - Dynamic Weekly Planning Budget Control
+
+- Status: implemented in Settings only.
+- Goal: make the existing Stage 153 `weeklyTaskBudget` easier to adjust without creating a new capacity model.
+- Final location: `/settings`, inside the existing Weekly Task Budget section.
+- Control: native horizontal range input paired with the existing numeric input. Both stay synchronized as one draft value, while persistence remains explicit through Save.
+- Not configured: no slider value is shown, no default or midpoint is invented, and unknown is never treated as zero.
+- Metrics: only budget, planned count, difference, and neutral descriptive status are shown.
+- Data boundary: Tasks are loaded once through the existing Storage Adapter and summarized through the Stage 153 weekly planned count selector.
+- Dependencies: none new.
+- Performance: no lockfile change, no slider library, no animation library, no chart library, no route change, no broad refactor, and the guarded primary entry remains below 300,000 bytes.
+- Real-browser QA requirement: mouse drag, touch drag, keyboard Arrow/Home/End, numeric input, Save/Refresh, Clear, light/dark, English/Persian, RTL/LTR, 200% zoom, reduced motion, console cleanliness, layout shift, 360/390/430 px mobile widths, short viewport, and horizontal overflow remain required before claiming real-world validation.
+
 ## 13. Acceptance Criteria for Future Interaction Stages
 
 - The interaction is route-scoped or lazy-loaded so it does not grow the initial app entry.
@@ -386,6 +400,10 @@ The order differs slightly from a purely visual ambition path: the marquee is fi
 ## Final Stage 153 Result
 
 `STAGE_153_WEEKLY_PLANNING_BUDGET_FOUNDATION_COMPLETE`
+
+## Final Stage 154 Result
+
+`STAGE_154_DYNAMIC_WEEKLY_BUDGET_CONTROL_COMPLETE`
 
 ## Final Stage 149 Result
 

@@ -2,6 +2,16 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 154 - Dynamic Weekly Planning Budget Control
+
+- Added a constrained native range slider inside the existing Settings weekly task budget section as a companion to the exact numeric input
+- Kept the same Stage 153 `weeklyTaskBudget` preference, integer validation, min 1, max 999, step 1, explicit Save, and Clear behavior
+- Kept the not-configured state honest: no synthetic midpoint, no default, no zero fallback, and no slider value until the user enters or stores a valid number
+- Added live descriptive summaries for only the approved values: weekly budget, weekly planned count, difference, and neutral status text
+- Loaded Tasks once through the existing storage adapter boundary for the Settings summary and reused the Stage 153 weekly planned count selector instead of rereading storage on slider movement
+- Added keyboard helper coverage for Arrow, Home, and End behavior plus static component coverage for slider labels, aria value wiring, Persian/English copy, and banned metric language
+- Added no capacity percentage, progress ring, gauge, chart, smart recommendation, ideal workload, risk score, task mutation, Today/Home/Weekly Review surface, route, dependency, lockfile, schema, migration, backup-format change, Sync, Cloud, AI, telemetry, backend, Simple View, or Full View
+
 ## Stage 153 - User-Declared Weekly Planning Budget Foundation
 
 - Added a minimal Settings control for an optional user-declared weekly task budget
