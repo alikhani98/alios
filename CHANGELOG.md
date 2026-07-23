@@ -2,6 +2,16 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 157C - Complete Remaining View Modes Real-World QA
+
+- Rechecked Stage 156 and Stage 157 prerequisites after PR #139 merged into `main` at commit `4c9b854b705b9a74142a0342c10fc157b6facdcd`
+- Verified PR #138 and PR #139 are merged, `Validate Pull Request` succeeded for PR #139 head commit `9ae9ec75539a13b3a10585970663ac2179ec810b`, and current `main` has successful `build` and `deploy` check-runs
+- Verified the current GitHub Pages deployment completed successfully, the live site responds with HTTP 200, and live static assets still include the Stage 156 application bundle family
+- Recorded that the remaining Simple View / Full View real-world QA still cannot be completed by Codex because this environment lacks an interactive browser/device, viewport emulation, keyboard traversal, console/network panels, screenshots, and screen-reader surface
+- Kept desktop, tablet, 360 px, 390 px, 430 px, 200% zoom, English/LTR, Persian/RTL, light/dark, all accents, reduced motion, keyboard-only, screen-reader, multi-tab, draft preservation, data safety, backup, network, console, and horizontal-overflow checks as `NOT TESTED` or `BLOCKED`
+- Added no product code, UI, CSS, tests, route, schema, migration, backup-format change, dependency, lockfile, Sync, Cloud, AI, telemetry, analytics, or workflow change
+- Final Stage 157C result is `STAGE_157C_VIEW_MODES_REAL_WORLD_QA_BLOCKED`; deployment and automated checks are not treated as real-world validation
+
 ## Stage 157 - Simple View / Full View Real-World Validation Gate
 
 - Verified that Stage 156 PR #138 is merged into `main` at commit `d41021fe2cb5038270caad0c80bc6725c41f78c7`
