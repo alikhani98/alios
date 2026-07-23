@@ -35,6 +35,10 @@ import {
   parseAppearancePreference,
 } from "@/shared/preferences";
 import {
+  type ViewDensityMode,
+  useViewDensityMode,
+} from "@/shared/preferences/viewDensityMode";
+import {
   Button,
   Card,
   CardContent,
@@ -113,6 +117,113 @@ const appearanceOptions = [
   { value: "system", icon: MonitorSmartphone, labelKey: "settings.system" },
 ] as const;
 
+const viewDensityOptions: {
+  value: ViewDensityMode;
+  label: Record<"en" | "fa", string>;
+  description: Record<"en" | "fa", string>;
+}[] = [
+  {
+    value: "full",
+    label: { en: "Full View", fa: "نمای کامل" },
+    description: {
+      en: "Show the current detailed layout with all supporting panels visible.",
+      fa: "چیدمان کامل فعلی را با پنل‌های پشتیبان قابل مشاهده نگه می‌دارد.",
+    },
+  },
+  {
+    value: "simple",
+    label: { en: "Simple View", fa: "نمای ساده" },
+    description: {
+      en: "Keep primary actions visible and tuck lower-priority context behind clear disclosures.",
+      fa: "اقدام‌های اصلی را آشکار نگه می‌دارد و زمینه‌های کم‌اولویت را پشت بخش‌های بازشدنی قرار می‌دهد.",
+    },
+  },
+] as const;
+
+export function ViewDensityModeControl() {
+  const { language } = useI18n();
+  const { value, setValue, reset } = useViewDensityMode();
+  const labels =
+    language === "fa"
+      ? {
+          title: "تراکم نمایش",
+          description: "این گزینه فقط چیدمان نمایشی همین مرورگر را تغییر می‌دهد؛ داده‌ها، بکاپ و همگام‌سازی را تغییر نمی‌دهد.",
+          selected: "انتخاب‌شده",
+          active: "حالت فعال",
+          reset: "بازنشانی به نمای کامل",
+        }
+      : {
+          title: "View density",
+          description: "This only changes the presentation in this browser; it does not change data, backups, or sync.",
+          selected: "Selected",
+          active: "Active mode",
+          reset: "Reset to Full View",
+        };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <SlidersHorizontal className="h-5 w-5 text-primary" />
+          {labels.title}
+        </CardTitle>
+        <CardDescription>{labels.description}</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div
+          role="radiogroup"
+          aria-label={labels.title}
+          className="grid gap-3 sm:grid-cols-2"
+        >
+          {viewDensityOptions.map((option) => {
+            const isSelected = value === option.value;
+
+            return (
+              <label
+                key={option.value}
+                className={`flex min-w-0 cursor-pointer gap-3 rounded-xl border p-4 transition-colors ${
+                  isSelected
+                    ? "border-primary/40 bg-primary/10"
+                    : "border-border bg-muted/20 hover:bg-muted/40"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="viewDensityMode"
+                  value={option.value}
+                  checked={isSelected}
+                  onChange={() => setValue(option.value)}
+                  className="mt-1 h-4 w-4 accent-primary"
+                />
+                <span className="min-w-0 space-y-1">
+                  <span className="flex flex-wrap items-center gap-2 font-medium">
+                    {option.label[language]}
+                    {isSelected ? (
+                      <Badge variant="secondary">{labels.selected}</Badge>
+                    ) : null}
+                  </span>
+                  <span className="block text-sm leading-6 text-muted-foreground">
+                    {option.description[language]}
+                  </span>
+                </span>
+              </label>
+            );
+          })}
+        </div>
+        <div className="flex flex-col gap-3 rounded-xl border bg-muted/30 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-muted-foreground">
+            {labels.active}: {viewDensityOptions.find((option) => option.value === value)?.label[language]}
+          </p>
+          <Button type="button" variant="outline" onClick={reset}>
+            <RotateCcw className="me-2 h-4 w-4" />
+            {labels.reset}
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 function getTotalRecords(summary: {
   dailyCheckins: number;
   tasks: number;
@@ -185,6 +296,7 @@ export function SettingsPage() {
   const { language, setLanguage, t } = useI18n();
   const { calendarDisplay, formatDateTime, setCalendarDisplay } =
     useDateFormatter();
+  const { isSimpleView } = useViewDensityMode();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { value: appearancePreference, setValue: setAppearancePreference } =
     usePersistentString({
@@ -213,6 +325,9 @@ export function SettingsPage() {
     ServiceWorkerUpdateResult | "checking" | null
   >(null);
   const [showAllDataCounts, setShowAllDataCounts] = useState(false);
+  const [showSimpleHelpCenter, setShowSimpleHelpCenter] = useState(false);
+  const [showSimpleSyncDetails, setShowSimpleSyncDetails] = useState(false);
+  const [showSimpleAiDetails, setShowSimpleAiDetails] = useState(false);
   const dataManagement = useLocalDataManagement();
   const backup = useBackupRestore(dataManagement.loadSummary);
   const restorePreview = backup.pendingBackup
@@ -304,7 +419,32 @@ export function SettingsPage() {
         </div>
       ) : null}
 
-      <SettingsHelpCenter />
+      {isSimpleView && !showSimpleHelpCenter ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              {language === "fa" ? "راهنمای استفاده" : "Help Center"}
+            </CardTitle>
+            <CardDescription>
+              {language === "fa"
+                ? "راهنمای طولانی برنامه در نمای ساده خلاصه شده است و هر زمان لازم باشد باز می‌شود."
+                : "Long product guidance is summarized in Simple View and remains available when needed."}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowSimpleHelpCenter(true)}
+              aria-expanded={showSimpleHelpCenter}
+            >
+              {t("common.expandSection")}
+            </Button>
+          </CardContent>
+        </Card>
+      ) : (
+        <SettingsHelpCenter />
+      )}
 
       <RecoveryModeSection
         enabled={recoveryModeEnabled}
@@ -316,9 +456,48 @@ export function SettingsPage() {
 
       <LocalErrorLogSection id="settings-local-error-log" />
 
-      <SyncStatusCard onGoToBackupRestore={() => scrollToSection("settings-backup-restore")} />
+      {isSimpleView && !showSimpleSyncDetails ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>{t("settings.syncTitle")}</CardTitle>
+            <CardDescription>{t("settings.syncLocalOnly")}</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <Badge variant="secondary">{t("settings.syncStatusLocalOnly")}</Badge>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowSimpleSyncDetails(true)}
+              aria-expanded={showSimpleSyncDetails}
+            >
+              {t("common.expandSection")}
+            </Button>
+          </CardContent>
+        </Card>
+      ) : (
+        <SyncStatusCard onGoToBackupRestore={() => scrollToSection("settings-backup-restore")} />
+      )}
 
-      <LocalAiSetupCard />
+      {isSimpleView && !showSimpleAiDetails ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>{t("settings.localAiTitle")}</CardTitle>
+            <CardDescription>{t("settings.localAiPrivacy")}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowSimpleAiDetails(true)}
+              aria-expanded={showSimpleAiDetails}
+            >
+              {t("common.expandSection")}
+            </Button>
+          </CardContent>
+        </Card>
+      ) : (
+        <LocalAiSetupCard />
+      )}
 
       <WeeklyTaskBudgetSection />
 
@@ -351,6 +530,8 @@ export function SettingsPage() {
           </div>
         </CardContent>
       </Card>
+
+      <ViewDensityModeControl />
 
       <Card>
         <CardHeader>

@@ -41,9 +41,41 @@ import type { DailyCheckinFormValues, TodayTaskFormValues } from "../types";
 import { createRoutineTaskInput, getRoutineSuggestions } from "../routineSuggestions";
 import { clearDueProjectReviewDate, isProjectReviewDue } from "@/features/projects/projectReviews";
 
+function readSimpleViewMode() {
+  try {
+    return typeof window !== "undefined"
+      && window.localStorage.getItem("alios.viewDensityMode") === "simple";
+  } catch {
+    return false;
+  }
+}
+
+function useSimpleViewMode() {
+  const [isSimpleView, setIsSimpleView] = useState(readSimpleViewMode);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return undefined;
+    }
+
+    const update = () => setIsSimpleView(readSimpleViewMode());
+
+    window.addEventListener("alios-local-preference-change", update);
+    window.addEventListener("storage", update);
+
+    return () => {
+      window.removeEventListener("alios-local-preference-change", update);
+      window.removeEventListener("storage", update);
+    };
+  }, []);
+
+  return isSimpleView;
+}
+
 export function TodayPage() {
   const { t } = useI18n();
   const { formatDate } = useDateFormatter();
+  const isSimpleView = useSimpleViewMode();
   const [searchParams] = useSearchParams();
   const requestedDate = searchParams.get("date");
   const requestedDateValue = requestedDate ? parseISO(requestedDate) : undefined;
@@ -115,7 +147,7 @@ export function TodayPage() {
       (!projectId || task.projectId === projectId) &&
       (!routineId || task.routineId === routineId)
   );
-  const taskPreviewLimit = 12;
+  const taskPreviewLimit = isSimpleView ? 6 : 12;
   const displayedTasks = useMemo(() => {
     if (showAllTasks || visibleTasks.length <= taskPreviewLimit) {
       return visibleTasks;
@@ -138,7 +170,7 @@ export function TodayPage() {
     today,
     new Date().getDay()
   );
-  const routineSuggestionPreviewLimit = 6;
+  const routineSuggestionPreviewLimit = isSimpleView ? 3 : 6;
   const visibleRoutineSuggestions = showAllRoutineSuggestions
     ? routineSuggestions
     : routineSuggestions.slice(0, routineSuggestionPreviewLimit);

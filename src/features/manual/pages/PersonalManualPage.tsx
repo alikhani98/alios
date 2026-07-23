@@ -63,9 +63,41 @@ function previewTemplateBody(value: string): string {
   return `${firstLine.slice(0, 88)}…`;
 }
 
+function readSimpleViewMode() {
+  try {
+    return typeof window !== "undefined"
+      && window.localStorage.getItem("alios.viewDensityMode") === "simple";
+  } catch {
+    return false;
+  }
+}
+
+function useSimpleViewMode() {
+  const [isSimpleView, setIsSimpleView] = useState(readSimpleViewMode);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return undefined;
+    }
+
+    const update = () => setIsSimpleView(readSimpleViewMode());
+
+    window.addEventListener("alios-local-preference-change", update);
+    window.addEventListener("storage", update);
+
+    return () => {
+      window.removeEventListener("alios-local-preference-change", update);
+      window.removeEventListener("storage", update);
+    };
+  }, []);
+
+  return isSimpleView;
+}
+
 export function PersonalManualPage() {
   const { t } = useI18n();
   const { formatDateTime } = useDateFormatter();
+  const isSimpleView = useSimpleViewMode();
   const [searchParams] = useSearchParams();
   const { entries, isLoading, error, loadEntries, createEntry, updateEntry, deleteEntry } =
     useManualEntries();
@@ -86,8 +118,9 @@ export function PersonalManualPage() {
   const [focusMessage, setFocusMessage] = useState<string | null>(null);
   const [formRevision, setFormRevision] = useState(0);
   const [showAllEntries, setShowAllEntries] = useState(false);
+  const [showSimpleTemplates, setShowSimpleTemplates] = useState(false);
   const focusId = searchParams.get("focusId");
-  const manualPreviewLimit = 6;
+  const manualPreviewLimit = isSimpleView ? 4 : 6;
 
   const summary = useMemo(() => getManualEntrySummary(entries), [entries]);
   const templateCards = useMemo(
@@ -358,7 +391,26 @@ export function PersonalManualPage() {
         </div>
       ) : null}
 
-      <PremiumCard>
+      {isSimpleView && !showSimpleTemplates ? (
+        <PremiumCard>
+          <div className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+            <SectionHeader
+              title={t("manual.templatesTitle")}
+              description={t("manual.templatesDescription")}
+              status={<Badge variant="secondary">{templateCards.length}</Badge>}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowSimpleTemplates(true)}
+              aria-expanded={showSimpleTemplates}
+            >
+              {t("common.expandSection")}
+            </Button>
+          </div>
+        </PremiumCard>
+      ) : (
+        <PremiumCard>
         <div className="space-y-3 p-5 sm:space-y-4 sm:p-6">
           <SectionHeader
             title={t("manual.templatesTitle")}
@@ -414,7 +466,8 @@ export function PersonalManualPage() {
             ))}
           </div>
         </div>
-      </PremiumCard>
+        </PremiumCard>
+      )}
 
       <PremiumCard>
         <div className="space-y-3 p-5 sm:space-y-4 sm:p-6">

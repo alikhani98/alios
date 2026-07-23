@@ -149,9 +149,41 @@ function getFinanceSectionDescriptionKey(filter: FinanceViewFilter) {
   }
 }
 
+function readSimpleViewMode() {
+  try {
+    return typeof window !== "undefined"
+      && window.localStorage.getItem("alios.viewDensityMode") === "simple";
+  } catch {
+    return false;
+  }
+}
+
+function useSimpleViewMode() {
+  const [isSimpleView, setIsSimpleView] = useState(readSimpleViewMode);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return undefined;
+    }
+
+    const update = () => setIsSimpleView(readSimpleViewMode());
+
+    window.addEventListener("alios-local-preference-change", update);
+    window.addEventListener("storage", update);
+
+    return () => {
+      window.removeEventListener("alios-local-preference-change", update);
+      window.removeEventListener("storage", update);
+    };
+  }, []);
+
+  return isSimpleView;
+}
+
 export function FinancePage() {
   const { language, t } = useI18n();
   const { formatDate, resolvedCalendar } = useDateFormatter();
+  const isSimpleView = useSimpleViewMode();
   const referenceDate = useMemo(() => new Date(), []);
   const {
     transactions,
@@ -456,7 +488,7 @@ export function FinancePage() {
         : sortedTransactions;
   const filteredObligations =
     selectedFilter === "paidObligations" ? paidObligations : activeObligations;
-  const financePreviewLimit = 12;
+  const financePreviewLimit = isSimpleView ? 6 : 12;
   const displayedTransactions = showAllTransactions
     ? filteredTransactions
     : filteredTransactions.slice(0, financePreviewLimit);

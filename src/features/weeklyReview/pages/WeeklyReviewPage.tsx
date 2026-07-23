@@ -18,7 +18,7 @@ import {
   Target,
   Wallet,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { useDateFormatter } from "@/shared/date";
@@ -73,6 +73,37 @@ type ReviewQueueItem = {
   title: string;
   to: string;
 };
+
+function readSimpleViewMode() {
+  try {
+    return typeof window !== "undefined"
+      && window.localStorage.getItem("alios.viewDensityMode") === "simple";
+  } catch {
+    return false;
+  }
+}
+
+function useSimpleViewMode() {
+  const [isSimpleView, setIsSimpleView] = useState(readSimpleViewMode);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return undefined;
+    }
+
+    const update = () => setIsSimpleView(readSimpleViewMode());
+
+    window.addEventListener("alios-local-preference-change", update);
+    window.addEventListener("storage", update);
+
+    return () => {
+      window.removeEventListener("alios-local-preference-change", update);
+      window.removeEventListener("storage", update);
+    };
+  }, []);
+
+  return isSimpleView;
+}
 
 const quickLinks: ReadonlyArray<{ to: string; labelKey: TranslationKey }> = [
   { to: "/today", labelKey: "nav.today" },
@@ -261,6 +292,7 @@ function getReviewQueueReasonKey(item: ReviewQueueItem): TranslationKey {
 export function WeeklyReviewPage() {
   const { language, t } = useI18n();
   const { formatDate, formatDateTime } = useDateFormatter();
+  const isSimpleView = useSimpleViewMode();
   const {
     summary,
     isLoading,
@@ -288,7 +320,7 @@ export function WeeklyReviewPage() {
     () => (summary ? getReviewQueue(summary) : []),
     [summary]
   );
-  const reviewQueuePreviewLimit = 6;
+  const reviewQueuePreviewLimit = isSimpleView ? 3 : 6;
   const displayedReviewQueue = showAllReviewQueueItems
     ? reviewQueue
     : reviewQueue.slice(0, reviewQueuePreviewLimit);
@@ -296,7 +328,7 @@ export function WeeklyReviewPage() {
     reviewQueue.length - displayedReviewQueue.length,
     0
   );
-  const reviewDetailPreviewLimit = 6;
+  const reviewDetailPreviewLimit = isSimpleView ? 3 : 6;
   const displayedDueGoals = showAllDueGoals
     ? summary?.goalSummary.dueEntries ?? []
     : summary?.goalSummary.dueEntries.slice(0, reviewDetailPreviewLimit) ?? [];
@@ -311,7 +343,7 @@ export function WeeklyReviewPage() {
     (summary?.manualSummary.dueEntries.length ?? 0) - displayedDueManualEntries.length,
     0
   );
-  const insightPreviewLimit = 6;
+  const insightPreviewLimit = isSimpleView ? 3 : 6;
   const displayedPlanningAttentionEntries = showAllPlanningAttentionEntries
     ? summary?.planningSummary.attentionEntries ?? []
     : summary?.planningSummary.attentionEntries.slice(0, insightPreviewLimit) ?? [];
