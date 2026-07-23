@@ -4,7 +4,7 @@ Stage 152 - Planning Capacity Model and Dynamic Slider Feasibility
 
 Date: 2026-07-22
 
-Status: Stage 152 completed the documentation, architecture audit, and feasibility decision only. Stage 153 later implemented the minimal user-declared weekly task-count budget foundation without adding a slider, chart, capacity percentage, time estimate, effort model, Sync, Cloud, or AI.
+Status: Stage 152 completed the documentation, architecture audit, and feasibility decision only. Stage 153 later implemented the minimal user-declared weekly task-count budget foundation. Stage 154 added a constrained native slider companion inside Settings for the same budget value without adding a capacity percentage, chart, gauge, time estimate, effort model, Sync, Cloud, or AI.
 
 ## 1. Executive Summary
 
@@ -274,7 +274,14 @@ Stage 153 implementation note:
 - The budget is not included in the versioned JSON backup because current localStorage preferences are not part of that backup boundary.
 - Weekly planned task count is derived from real Task records with a valid `dueDate` inside the Monday-starting current week. Cancelled, undated, invalid-date, deleted, non-materialized recurring commitments, and routine templates/suggestions are excluded.
 - The derived comparison is descriptive only: budget, planned count, difference, and non-judgmental status.
-- Dynamic Slider, advanced metric cards, capacity percentage, effort, duration, and automatic recommendations remain unimplemented.
+- Stage 154 implementation note:
+
+- A constrained native horizontal slider now accompanies the existing exact numeric input in Settings only.
+- The slider edits only the existing optional `weeklyTaskBudget` draft and persists only through the existing explicit Save action.
+- Not configured still means absence of a valid stored value; the slider is hidden until a valid number exists and unknown is never converted to zero or a midpoint.
+- Live summaries remain descriptive only: weekly budget, weekly planned Task count, difference, and neutral status text.
+- The planned count still comes from real Task records through the Stage 153 selector and excludes cancelled, undated, invalid-date, non-materialized recurrence commitments, and routine templates/suggestions.
+- Advanced metric cards, capacity percentage, effort, duration, risk score, ideal workload, smart recommendation, automatic scheduling, and task mutation remain unimplemented.
 
 ## 20. Explicit Non-Implementation Statement
 
