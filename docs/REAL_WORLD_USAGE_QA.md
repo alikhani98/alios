@@ -97,6 +97,187 @@ These patterns are recorded as future-stage candidates only. None were implement
 
 ---
 
+# Stage 157C - Complete Remaining View Modes Real-World QA
+
+Date: 2026-07-23
+
+Status: `STAGE_157C_VIEW_MODES_REAL_WORLD_QA_BLOCKED`
+
+Stage 157C rechecked the deployed Simple View / Full View prerequisites after Stage 157 was merged, then attempted to close the remaining real-world QA gap. The prerequisite deployment and CI evidence is available, but the required real interactive browser/device QA still cannot be executed from the current Codex environment. No product code, UI, CSS, tests, package files, lockfiles, routes, schema, migration, backup, Sync, Cloud, AI, or workflow files were changed.
+
+## Validation Target
+
+- Repository: `alikhani98/alios`
+- Live site: `https://alikhani98.github.io/alios/`
+- Stage 156 PR: `https://github.com/alikhani98/alios/pull/138`
+- Stage 157 PR: `https://github.com/alikhani98/alios/pull/139`
+- Stage 156 merge commit / product deploy commit checked: `d41021fe2cb5038270caad0c80bc6725c41f78c7`
+- Stage 157 merge commit / current deploy commit checked: `4c9b854b705b9a74142a0342c10fc157b6facdcd`
+- Stage 157C branch: `codex/stage-157c-complete-view-modes-qa`
+
+## Prerequisite Evidence
+
+| Check | Status | Evidence |
+| --- | --- | --- |
+| PR #138 merged | PASS | GitHub API reported `merged=True`, merge commit `d41021fe2cb5038270caad0c80bc6725c41f78c7` |
+| PR #139 merged | PASS | GitHub API reported `merged=True`, merge commit `4c9b854b705b9a74142a0342c10fc157b6facdcd` |
+| Stage 156 PR validation | PASS | `Validate Pull Request`, head `6269673ec11a1ffb7c04e6e258199e203ef3bc0a`, completed success, `https://github.com/alikhani98/alios/actions/runs/30020000084` |
+| Stage 157 PR validation | PASS | `Validate Pull Request`, head `9ae9ec75539a13b3a10585970663ac2179ec810b`, completed success, `https://github.com/alikhani98/alios/actions/runs/30022928276` |
+| Current main deploy workflow | PASS | `Deploy GitHub Pages`, head `4c9b854b705b9a74142a0342c10fc157b6facdcd`, completed success, `https://github.com/alikhani98/alios/actions/runs/30022934316` |
+| Current main build check-run | PASS | Check-run `build`, completed success, `https://github.com/alikhani98/alios/actions/runs/30022934316/job/89260036255` |
+| Current main deploy check-run | PASS | Check-run `deploy`, completed success, `https://github.com/alikhani98/alios/actions/runs/30022934316/job/89260385662` |
+| Live site HTTP | PASS | `https://alikhani98.github.io/alios/` returned HTTP `200` |
+| Live assets | PASS | Live HTML referenced `/alios/assets/index-COZnbLy8.js`, `/alios/assets/index-CoDP7Gh5.css`, `/alios/assets/react-vendor-Da0zeSqt.js`, and `/alios/assets/icons-vendor-yF18FKTy.js` |
+| View density control deployed | PASS | Prior Stage 157 live asset verification found `alios.viewDensityMode`, `View density`, and `تراکم نمایش` in the deployed Settings chunk |
+
+## Codex Environment Limitation
+
+Stage 157C required real checks across desktop, tablet, 360 px, 390 px, 430 px, 200% zoom, English/LTR, Persian/RTL, light theme, dark theme, all accents, reduced motion, keyboard-only navigation, screen-reader smoke testing, and multi-tab behavior.
+
+The current environment can run shell commands, inspect repository files, query GitHub APIs, and fetch live static assets. It still does not provide a real interactive browser/device QA surface for this task:
+
+- No browser command such as Chrome, Chromium, Edge, Firefox, or a browser automation CLI was available from the shell path.
+- No Playwright, Puppeteer, Selenium, or Cypress runtime is installed in the project.
+- No screenshots, console panel, network panel, accessibility tree, device emulation, touch interaction, keyboard traversal, 200% zoom control, reduced-motion OS toggle, or screen-reader smoke test could be performed.
+
+Because of that limitation, Stage 157C does not mark any remaining interactive Simple View / Full View flow as PASS. Automated checks, successful deployment, HTTP 200, and static asset verification are not substitutes for real-world validation.
+
+## Test Environment
+
+| Environment item | Status | Evidence / Blocker |
+| --- | --- | --- |
+| Desktop browser | NOT TESTED | No interactive browser available in this Codex environment |
+| Tablet | NOT TESTED | No device or device emulator available |
+| 360 px width | NOT TESTED | No browser viewport emulation available |
+| 390 px width | NOT TESTED | No browser viewport emulation available |
+| 430 px width | NOT TESTED | No browser viewport emulation available |
+| Zoom 200% | NOT TESTED | No browser zoom control available |
+| English / LTR | NOT TESTED | No rendered browser UI session available |
+| Persian / RTL | NOT TESTED | No rendered browser UI session available |
+| Light theme | NOT TESTED | No rendered browser UI session available |
+| Dark theme | NOT TESTED | No rendered browser UI session available |
+| Accent presets | NOT TESTED | No rendered browser UI session available |
+| Reduced Motion | NOT TESTED | No browser or OS setting control available |
+| Keyboard-only | NOT TESTED | No interactive focus traversal available |
+| Screen-reader smoke test | NOT TESTED | No screen reader or accessibility tree available |
+| Multi-tab behavior | NOT TESTED | No live multi-tab browser environment available |
+
+## Seven-Page View Mode Results
+
+No page below is marked PASS because the required live browser/device QA was not executable.
+
+| Page | Full View | Simple View | Primary action visible | Active filters/counts/validation visible | Disclosure keyboard access | Focus visible | Text not clipped | No horizontal overflow | No layout shift | No AliOS console error | Evidence / Blocker |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Home | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | Requires live browser/device QA |
+| Today | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | Requires live browser/device QA |
+| Weekly Review | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | Requires live browser/device QA |
+| Settings | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | Requires live browser/device QA |
+| Goals | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | Requires live browser/device QA |
+| Personal Manual | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | Requires live browser/device QA |
+| Finance | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | Requires live browser/device QA |
+
+## Preference and Data-Safety Results
+
+| Scenario | Status | Evidence / Blocker |
+| --- | --- | --- |
+| Missing `alios.viewDensityMode` resolves to `full` | NOT TESTED | Requires live browser localStorage manipulation and observation |
+| Invalid `alios.viewDensityMode` resolves to `full` | NOT TESTED | Requires live browser localStorage manipulation and observation |
+| Selecting `simple` applies immediately | NOT TESTED | Requires interactive Settings control use |
+| Refresh preserves selected value | NOT TESTED | Requires live browser refresh after selection |
+| Clear/reset returns to `full` | NOT TESTED | Requires interactive Settings control use |
+| Only the approved view-mode key is added | PARTIALLY VERIFIED | Static deploy/source evidence uses `alios.viewDensityMode`; real browser storage inspection was not available |
+| Mode change causes no new network request | NOT TESTED | Requires browser network panel or equivalent |
+| Mode change does not mutate product data | NOT TESTED | Requires before/after browser data counts |
+| Multi-tab behavior | NOT TESTED | Requires two live browser tabs |
+| Task count unchanged | NOT TESTED | Requires live before/after data counts |
+| Goals unchanged | NOT TESTED | Requires live before/after data counts |
+| Projects unchanged | NOT TESTED | Requires live before/after data counts |
+| Routines unchanged | NOT TESTED | Requires live before/after data counts |
+| Weekly Plan unchanged | NOT TESTED | Requires live before/after data counts |
+| Finance records unchanged | NOT TESTED | Requires live before/after data counts |
+| Backup export/import unaffected | NOT TESTED | Requires live browser backup flow with safe test data |
+| Sync/Cloud/AI boundary unchanged | PARTIALLY VERIFIED | Stage 156 and Stage 157 documentation/source/deploy evidence show no Sync/Cloud/AI implementation change; live UI was not interactively tested |
+
+## Draft Preservation Results
+
+| Draft flow | Status | Evidence / Blocker |
+| --- | --- | --- |
+| Task create/edit while switching mode | NOT TESTED | Requires interactive browser form session |
+| Goal create/edit while switching mode | NOT TESTED | Requires interactive browser form session |
+| Finance item create/edit while switching mode | NOT TESTED | Requires interactive browser form session |
+| Weekly Plan edit while switching mode | NOT TESTED | Requires interactive browser form session |
+
+## Prior Interaction Results
+
+| Interaction | Full View | Simple View | Evidence / Blocker |
+| --- | --- | --- | --- |
+| Goals Marquee | NOT TESTED | NOT TESTED | Requires live browser/device QA |
+| Planning Loop Sticky Guide | NOT TESTED | NOT TESTED | Requires live browser/device QA |
+| Weekly Budget Slider | NOT TESTED | NOT TESTED | Requires live browser/device QA |
+| Save/Clear behavior | NOT TESTED | NOT TESTED | Requires live browser interaction |
+| Weekly Budget draft preservation | NOT TESTED | NOT TESTED | Requires live browser form session |
+
+## Accessibility Results
+
+| Accessibility check | Status | Evidence / Blocker |
+| --- | --- | --- |
+| Keyboard-only navigation | NOT TESTED | Requires browser focus traversal |
+| Visible focus | NOT TESTED | Requires visual browser inspection |
+| Heading order | NOT TESTED | Requires rendered DOM inspection |
+| Radio semantics | NOT TESTED | Requires rendered accessibility inspection |
+| Disclosure semantics | NOT TESTED | Requires rendered DOM/accessibility inspection |
+| Screen-reader name/state announcement | NOT TESTED | Requires screen reader or accessibility tree |
+| Reduced Motion | NOT TESTED | Requires OS/browser setting |
+| Zoom 200% | NOT TESTED | Requires browser zoom |
+| RTL/LTR | NOT TESTED | Requires rendered UI inspection |
+| Label wrapping | NOT TESTED | Requires viewport checks |
+| Touch targets | NOT TESTED | Requires device or emulation |
+| State not communicated by color alone | NOT TESTED | Requires visual review |
+| No focus trap | NOT TESTED | Requires keyboard traversal |
+| Focus preservation during mode switching | NOT TESTED | Requires interactive browser session |
+
+## Issue Summary
+
+- Critical issues observed: none, because real browser/device QA was not executed.
+- High issues observed: none, because real browser/device QA was not executed.
+- Medium issues observed: none, because real browser/device QA was not executed.
+- Low issues observed: none, because real browser/device QA was not executed.
+- Blocking issue: Codex environment still lacks a real interactive browser/device QA surface for Stage 157C.
+
+## Recommended Follow-Up
+
+Create a user-executed or browser-enabled QA pass against the live deployment at commit `4c9b854b705b9a74142a0342c10fc157b6facdcd`. Record exact browser, OS, device, viewport, route, mode, language, direction, theme, accent, zoom, input method, expected behavior, actual behavior, PASS/FAIL/BLOCKED/NOT TESTED, screenshots or precise evidence, console status, network status, and before/after local data counts.
+
+## Three-Level Completion Status
+
+### Implementation Status
+
+- Stage 157C is documentation-only.
+- No product implementation, UI, CSS, tests, routes, schema, migration, backup, Sync, Cloud, AI, dependency, lockfile, or workflow changed.
+- Documentation now records that PR #138 and PR #139 are merged, required CI and deploy evidence are successful, the live site responds with HTTP 200, and the remaining interactive real-world QA is blocked in this environment.
+
+### Automated Validation Status
+
+- Stage 156 PR validation: PASS via `Validate Pull Request`.
+- Stage 157 PR validation: PASS via `Validate Pull Request`.
+- Current main build check-run: PASS.
+- Current main deploy check-run: PASS.
+- Current main GitHub Pages deploy workflow: PASS.
+- Stage 157C documentation validation is limited to Git/status/diff/scope checks recorded in the Stage 157C PR/report.
+- Automated checks and deployment evidence do not equal real-world validation.
+
+### Real-World Validation Status
+
+- Result: BLOCKED / NOT TESTED.
+- Reason: no interactive browser/device QA environment was available to Codex.
+- No Simple View / Full View user flow is claimed as real-world validated in this record.
+
+## Final Stage 157C Result
+
+`STAGE_157C_VIEW_MODES_REAL_WORLD_QA_BLOCKED`
+
+---
+
 # Stage 157 - Simple View / Full View Real-World Validation
 
 Date: 2026-07-23
