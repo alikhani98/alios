@@ -2,6 +2,18 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 155 - UI Density Audit and Simple View / Full View Design
+
+- Added `docs/UI_DENSITY_AND_VIEW_MODES_AUDIT.md` as a documentation-only audit for current UI density and future Simple View / Full View architecture
+- Inventoried the real routes, navigation, shell, page components, forms, cards, filters, toolbars, mobile navigation, empty states, and responsive states from repository source instead of guessing page structure
+- Classified pages and surfaces by density, with Weekly Review marked CRITICAL and Home, Today, Goals, Settings, Help Center, Personal Manual, Finance, Header, Forms, Cards, Filters, and Toolbars marked CROWDED
+- Defined Simple View as presentation-only progressive disclosure that preserves every primary action and never mutates records, routes, schemas, validation, backup/restore, recurrence, routines, weekly-plan calculations, Sync, Cloud, AI, or stored product data
+- Defined Full View as the default mode that preserves current behavior for existing and new users
+- Proposed a future local preference design named `viewDensityMode` with valid values `full` and `simple`, default `full`, and no backup/schema migration requirement
+- Documented the Stage 156 scope, allowed-file candidates, required automated tests, real-world QA plan, accessibility requirements, responsive requirements, and bundle strategy
+- Recorded the current status of the Stage 150 marquee, Stage 151 sticky guide, and Stage 154 native budget slider without refactoring or expanding those implementations
+- Added no product feature, toggle, preference, localStorage key, CSS, route, source component, test, dependency, lockfile, schema, migration, backup-format change, Sync, Cloud, AI, telemetry, analytics, or runtime behavior
+
 ## Stage 154 - Dynamic Weekly Planning Budget Control
 
 - Added a constrained native range slider inside the existing Settings weekly task budget section as a companion to the exact numeric input

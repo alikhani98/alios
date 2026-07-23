@@ -356,6 +356,18 @@ The order differs slightly from a purely visual ambition path: the marquee is fi
 - Performance: no lockfile change, no slider library, no animation library, no chart library, no route change, no broad refactor, and the guarded primary entry remains below 300,000 bytes.
 - Real-browser QA requirement: mouse drag, touch drag, keyboard Arrow/Home/End, numeric input, Save/Refresh, Clear, light/dark, English/Persian, RTL/LTR, 200% zoom, reduced motion, console cleanliness, layout shift, 360/390/430 px mobile widths, short viewport, and horizontal overflow remain required before claiming real-world validation.
 
+### Stage 155 - UI Density Audit and Simple View / Full View Design
+
+- Status: completed as documentation-only density audit and future mode architecture.
+- Source: `docs/UI_DENSITY_AND_VIEW_MODES_AUDIT.md`.
+- Goal: decide how Simple View and Full View should work before any preference, toggle, CSS, layout, route, or component implementation is built.
+- Relationship to premium interactions: Stage 155 does not refactor or expand the Stage 150 marquee, Stage 151 sticky guide, or Stage 154 native budget slider. It only records how those constrained implementations should appear in a future presentation-density mode.
+- Simple View direction: reduce initial visible density through progressive disclosure and summarization while keeping primary actions, active filters, validation, safety controls, and all stored user data reachable.
+- Full View direction: preserve current behavior and current approved density boundaries as the default for missing or invalid preference values.
+- Preference design: a future local presentation preference named `viewDensityMode`, valid values `full` and `simple`, default `full`, stored locally only if Stage 156 is separately approved.
+- Performance direction: Stage 156 should avoid dependencies, page duplication, new routes, global floating controls, and entry-bundle growth; reuse existing components and route-local helpers.
+- Out of scope: Simple View implementation, Full View implementation, toggle, preference key, localStorage write, schema, migration, backup change, Sync, Cloud, AI, telemetry, analytics, source component, CSS, test, route, dependency, and lockfile change.
+
 ## 13. Acceptance Criteria for Future Interaction Stages
 
 - The interaction is route-scoped or lazy-loaded so it does not grow the initial app entry.
@@ -384,6 +396,7 @@ The order differs slightly from a purely visual ambition path: the marquee is fi
 - Should Task duration estimates exist in AliOS v1, or is that too much planning overhead?
 - What real-device performance threshold should be used before allowing any continuous animation on mobile?
 - What evidence should be required before a premium interaction graduates from optional surface to shared primitive?
+- Stage 155 resolves the first Simple View / Full View architecture pass, but Stage 156 still needs separate approval before any preference or runtime presentation behavior exists.
 
 ## Final Stage 150 Result
 
@@ -404,6 +417,10 @@ The order differs slightly from a purely visual ambition path: the marquee is fi
 ## Final Stage 154 Result
 
 `STAGE_154_DYNAMIC_WEEKLY_BUDGET_CONTROL_COMPLETE`
+
+## Final Stage 155 Result
+
+`STAGE_155_UI_DENSITY_AUDIT_COMPLETE`
 
 ## Final Stage 149 Result
 
