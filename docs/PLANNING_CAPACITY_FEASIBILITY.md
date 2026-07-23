@@ -4,7 +4,7 @@ Stage 152 - Planning Capacity Model and Dynamic Slider Feasibility
 
 Date: 2026-07-22
 
-Status: Documentation, architecture audit, and feasibility decision only. No product code, runtime UI, schema, persistence, migration, backup/restore behavior, Sync, Cloud, AI, Today calculation, Weekly Review behavior, dependency, lockfile, route, or workflow change was implemented.
+Status: Stage 152 completed the documentation, architecture audit, and feasibility decision only. Stage 153 later implemented the minimal user-declared weekly task-count budget foundation without adding a slider, chart, capacity percentage, time estimate, effort model, Sync, Cloud, or AI.
 
 ## 1. Executive Summary
 
@@ -265,11 +265,20 @@ Suggested scope for Stage 153, if approved:
 - Keep the feature local-first and user-controlled.
 - Do not add AI, Sync, Cloud, automatic scheduling, task estimates, or time-based capacity unless separately approved.
 
-Stage 153 has not started.
+Stage 153 implementation note:
+
+- The approved first model is `weeklyTaskBudget`, an optional integer local preference.
+- Valid range: 1 to 999, step 1, default none.
+- Zero is invalid; not configured is represented by the absence of a valid stored value, not by zero.
+- The preference is stored locally through the existing browser localStorage preference pattern used by other Settings preferences.
+- The budget is not included in the versioned JSON backup because current localStorage preferences are not part of that backup boundary.
+- Weekly planned task count is derived from real Task records with a valid `dueDate` inside the Monday-starting current week. Cancelled, undated, invalid-date, deleted, non-materialized recurring commitments, and routine templates/suggestions are excluded.
+- The derived comparison is descriptive only: budget, planned count, difference, and non-judgmental status.
+- Dynamic Slider, advanced metric cards, capacity percentage, effort, duration, and automatic recommendations remain unimplemented.
 
 ## 20. Explicit Non-Implementation Statement
 
-Stage 152 does not implement:
+Stage 152 did not implement:
 
 - Dynamic Slider runtime UI.
 - Live metric cards.

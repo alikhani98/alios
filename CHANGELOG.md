@@ -2,6 +2,17 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 153 - User-Declared Weekly Planning Budget Foundation
+
+- Added a minimal Settings control for an optional user-declared weekly task budget
+- Stored `weeklyTaskBudget` through the existing localStorage preference pattern with no generated default for existing users
+- Validated the budget as an integer from 1 to 999 with step 1; zero, negative numbers, decimals, letters, empty input, invalid pasted values, and oversized values are handled explicitly
+- Added pure weekly planning helpers for Monday-starting weekly planned task counts and descriptive budget difference status
+- Counted only real Task records with valid scheduled `dueDate` values inside the current week; excluded cancelled, undated, invalid-date, deleted, non-materialized recurring commitments, and routine templates/suggestions
+- Added English and Persian localized copy that states the budget is user-declared, not recommended by AliOS, not real capacity, and not a task-mutating control
+- Added focused tests for parsing, validation, legacy normalization, weekly boundaries, planned-count inclusion/exclusion, recurrence/routine-originated task behavior, descriptive status, and static accessibility wiring
+- Added no slider, chart, gauge, capacity percentage, advanced metric card, recommendation engine, effort model, duration estimate, Today redesign, Weekly Review redesign, route, dependency, lockfile, Dexie schema, migration, backup-format change, Sync, Cloud, AI, telemetry, backend, or automatic scheduling
+
 ## Stage 152 - Planning Capacity Model and Dynamic Slider Feasibility
 
 - Added `docs/PLANNING_CAPACITY_FEASIBILITY.md` as a documentation-only feasibility audit for future planning-capacity work
