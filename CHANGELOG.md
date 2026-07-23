@@ -2,6 +2,15 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 157 - Simple View / Full View Real-World Validation Gate
+
+- Verified that Stage 156 PR #138 is merged into `main` at commit `d41021fe2cb5038270caad0c80bc6725c41f78c7`
+- Verified GitHub Actions evidence for Stage 156: `Validate Pull Request` succeeded for the PR head, and the merge commit has successful `build` and `deploy` check-runs
+- Verified the live GitHub Pages site responds with HTTP 200 and serves Stage 156 assets, including the deployed Settings chunk with `alios.viewDensityMode`, `View density`, and `تراکم نمایش`
+- Recorded that Codex could not execute real browser/device QA in the current environment, so Simple View / Full View route behavior, persistence, multi-tab behavior, draft preservation, accessibility, responsive widths, themes, zoom, reduced motion, console status, network status, and data-safety checks remain `NOT TESTED` or `BLOCKED`
+- Added no product code, UI, CSS, tests, route, schema, migration, backup-format change, dependency, lockfile, Sync, Cloud, AI, telemetry, analytics, or workflow change
+- Final Stage 157 result is `STAGE_157_VIEW_MODES_REAL_WORLD_QA_BLOCKED`; deployment and automated checks are not treated as real-world validation
+
 ## Stage 156 - Simple View / Full View Presentation Mode
 
 - Added the local `viewDensityMode` presentation preference with values `full` and `simple`, stored only in browser localStorage under `alios.viewDensityMode`
