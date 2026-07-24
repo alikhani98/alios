@@ -2,6 +2,15 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 160 - Decision Log QA and Contextual Help Expansion
+
+- Recorded the user-executed Stage 159B QA pass for the live Decision Log contextual help pilot: Help button visible, open/close works, primary form remains reachable, text was understandable, Full View remained okay, and no obvious layout problem was reported
+- Added the same lightweight contextual Help / راهنما inline disclosure pattern to Personal Manual and Goals in Simple View only
+- Kept Full View introductory guidance close to the previous behavior on both pages
+- Preserved Personal Manual and Goals create/edit/delete, filters, templates, review behavior, linked progress, repository boundaries, storage, backup, and local data behavior
+- Added focused server-rendered tests for Manual and Goals help triggers, expanded content, Persian labels, and primary create action presence
+- Added no dependency, route, schema, repository, backup-format, localStorage key, Sync, Cloud, AI, analytics, telemetry, backend, marquee, sticky guide, slider, score, or recommendation behavior
+
 ## Stage 159 - Contextual Help Pilot for Decision Log
 
 - Added the first small contextual help pilot to Decision Log / دفترچه تصمیم‌ها in Simple View only, using the existing `alios.viewDensityMode` presentation preference

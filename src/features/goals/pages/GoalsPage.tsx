@@ -2,6 +2,7 @@ import {
   AlertCircle,
   CheckCircle2,
   Clock3,
+  Info,
   Plus,
   RotateCcw,
   Search,
@@ -15,6 +16,7 @@ import type { CreateGoalInput } from "@/core/repositories";
 import { useStorageAdapter } from "@/core/storage";
 import { useProjects } from "@/features/projects/hooks/useProjects";
 import { useI18n } from "@/shared/i18n";
+import { useViewDensityMode } from "@/shared/preferences/viewDensityMode";
 import type { Goal, Task } from "@/shared/types";
 import {
   Button,
@@ -82,40 +84,75 @@ function parseOptionalDate(value: string): string | undefined {
   return trimmed.length > 0 ? trimmed : undefined;
 }
 
-function readSimpleViewMode() {
-  try {
-    return typeof window !== "undefined"
-      && window.localStorage.getItem("alios.viewDensityMode") === "simple";
-  } catch {
-    return false;
-  }
-}
+type GoalsContextualHelpProps = {
+  isOpen: boolean;
+  onToggle: () => void;
+  panelId?: string;
+};
 
-function useSimpleViewMode() {
-  const [isSimpleView, setIsSimpleView] = useState(readSimpleViewMode);
+const goalsContextualHelpCopy = {
+  en: {
+    button: "Help",
+    buttonAria: "Help for Goals",
+    title: "How to use goals",
+    details: "Define clear, reviewable goals and connect them to projects or tasks when that connection is useful.",
+    progress: "Progress should describe what you know from your own records; AliOS does not fake progress or decide priorities automatically.",
+  },
+  fa: {
+    button: "راهنما",
+    buttonAria: "راهنمای هدف‌ها",
+    title: "هدف‌ها را چطور بنویسم؟",
+    details: "هدف‌های روشن و قابل مرور بنویسید و هر جا لازم بود آن‌ها را به پروژه‌ها یا کارها وصل کنید.",
+    progress: "پیشرفت باید از رکوردهای خودتان بیاید؛ AliOS پیشرفت ساختگی نمی‌سازد و اولویت‌ها را خودکار تصمیم نمی‌گیرد.",
+  },
+} as const;
 
-  useEffect(() => {
-    if (typeof window === "undefined") {
-      return undefined;
-    }
+export function GoalsContextualHelp({
+  isOpen,
+  onToggle,
+  panelId = "goals-contextual-help",
+}: GoalsContextualHelpProps) {
+  const { language, t } = useI18n();
+  const copy = goalsContextualHelpCopy[language];
 
-    const update = () => setIsSimpleView(readSimpleViewMode());
+  return (
+    <div className="mt-4 max-w-3xl space-y-3">
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        onClick={onToggle}
+        aria-label={copy.buttonAria}
+        aria-expanded={isOpen}
+        aria-controls={panelId}
+        className="min-h-11"
+      >
+        <Info className="me-2 h-4 w-4" aria-hidden="true" />
+        {copy.button}
+      </Button>
 
-    window.addEventListener("alios-local-preference-change", update);
-    window.addEventListener("storage", update);
-
-    return () => {
-      window.removeEventListener("alios-local-preference-change", update);
-      window.removeEventListener("storage", update);
-    };
-  }, []);
-
-  return isSimpleView;
+      {isOpen ? (
+        <div
+          id={panelId}
+          role="note"
+          className="rounded-xl border border-primary/15 bg-background/95 p-4 text-sm leading-7 text-muted-foreground shadow-sm"
+        >
+          <p className="font-medium text-foreground">{copy.title}</p>
+          <div className="mt-2 space-y-2">
+            <p>{copy.details}</p>
+            <p>{copy.progress}</p>
+            <p>{t("goals.localOnlyDescription")}</p>
+            <p>{t("goals.nonAdvisoryNote")}</p>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
 }
 
 export function GoalsPage() {
   const { t } = useI18n();
-  const isSimpleView = useSimpleViewMode();
+  const { isSimpleView } = useViewDensityMode();
   const { tasks: tasksRepository } = useStorageAdapter();
   const [searchParams, setSearchParams] = useSearchParams();
   const {
@@ -156,6 +193,7 @@ export function GoalsPage() {
   const [formRevision, setFormRevision] = useState(0);
   const [showAllGoals, setShowAllGoals] = useState(false);
   const [showSimpleTemplates, setShowSimpleTemplates] = useState(false);
+  const [isContextualHelpOpen, setIsContextualHelpOpen] = useState(false);
   const goalRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const formRef = useRef<HTMLDivElement | null>(null);
   const focusId = searchParams.get("focusId");
@@ -445,10 +483,17 @@ export function GoalsPage() {
             description={t("goals.description")}
             status={<StatusChip tone="neutral">{t("goals.localOnlyNote")}</StatusChip>}
           />
-          <div className="mt-4 max-w-3xl space-y-2 text-sm leading-7 text-muted-foreground">
-            <p>{t("goals.nonAdvisoryNote")}</p>
-            <p>{t("goals.localOnlyDescription")}</p>
-          </div>
+          {isSimpleView ? (
+            <GoalsContextualHelp
+              isOpen={isContextualHelpOpen}
+              onToggle={() => setIsContextualHelpOpen((current) => !current)}
+            />
+          ) : (
+            <div className="mt-4 max-w-3xl space-y-2 text-sm leading-7 text-muted-foreground">
+              <p>{t("goals.nonAdvisoryNote")}</p>
+              <p>{t("goals.localOnlyDescription")}</p>
+            </div>
+          )}
         </div>
       </PremiumCard>
 
