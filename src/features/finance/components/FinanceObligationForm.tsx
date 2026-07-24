@@ -39,7 +39,15 @@ function toOptionalString(value: string): string | undefined {
   return trimmed.length > 0 ? trimmed : undefined;
 }
 
-function toOptionalNumber(value: string): number | undefined {
+export function toOptionalNumber(value: unknown): number | undefined {
+  if (typeof value === "number") {
+    return Number.isFinite(value) && value >= 0 ? value : undefined;
+  }
+
+  if (typeof value !== "string") {
+    return undefined;
+  }
+
   const trimmed = value.trim();
   return trimmed.length > 0 ? Number(trimmed) : undefined;
 }
