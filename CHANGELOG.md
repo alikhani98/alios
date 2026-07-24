@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 163 - Real-World QA Evidence Enrichment and Release Hardening
+
+- Added a reusable real-world QA template, a GitHub Pages smoke-test checklist, and a QA coverage matrix for current AliOS v1 surfaces
+- Updated the real-world usage QA log, project state, and changelog to record the new release-hardening evidence framework
+- Kept the stage documentation-only and did not ship a product feature
+- Added no product code, source files, tests, dependencies, routes, schemas, migrations, backup-format changes, storage changes, localStorage keys, Sync, Cloud, AI, analytics, telemetry, backend, or runtime behavior
+
 ## Stage 162 - Post-Contextual-Help Product Priority Audit
 
 - Added a documentation-only product priority audit after the Stage 161 contextual help rollout closure
