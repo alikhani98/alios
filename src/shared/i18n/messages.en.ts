@@ -1366,7 +1366,7 @@ export const messagesEn = {
   "nav.decisions": "Decisions",
   "home.goDecisions": "Go to Decisions",
   "decisions.title": "Decision Log",
-  "decisions.description": "Capture what you decided, why you decided it, what you considered, and what happened next.",
+  "decisions.description": "Capture the choice, why, what you considered, and what happened next.",
   "decisions.localOnlyNote": "Local-only decisions",
   "decisions.localOnlyDescription": "Decisions stay on this device unless you export or restore a backup.",
   "decisions.nonAdvisoryNote": "AliOS helps you record and review your decisions; it does not decide for you.",

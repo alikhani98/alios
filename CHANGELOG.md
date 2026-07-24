@@ -2,6 +2,15 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 159 - Contextual Help Pilot for Decision Log
+
+- Added the first small contextual help pilot to Decision Log / دفترچه تصمیم‌ها in Simple View only, using the existing `alios.viewDensityMode` presentation preference
+- Replaced the large always-visible Simple View intro help text with a compact Help / راهنما button and inline disclosure near the page intro
+- Kept Full View's existing introductory guidance visible and preserved Decision Log CRUD, filters, review-due summaries, form behavior, repository boundaries, and local data behavior
+- Added bilingual English/Persian help copy covering what to record, tradeoffs/options, local-only data, and the non-advisory AliOS boundary
+- Added focused server-rendered regression coverage for the trigger semantics, `aria-expanded`, `aria-controls`, expanded content, and Persian labels
+- Added no dependency, route, schema, repository, backup-format, localStorage key, Sync, Cloud, AI, analytics, telemetry, backend, marquee, sticky guide, slider, score, or recommendation behavior
+
 ## Stage 158A - View Mode QA Evidence and Contextual Help Design
 
 - Recorded user-executed real-world QA evidence for Simple View / Full View across Home, Today, Weekly Review, Settings, Goals, Personal Manual, and Finance

@@ -1366,7 +1366,7 @@ export const messagesFa: Record<TranslationKey, string> = {
   "nav.decisions": "تصمیم‌ها",
   "home.goDecisions": "رفتن به تصمیم‌ها",
   "decisions.title": "دفترچه تصمیم‌ها",
-  "decisions.description": "اینجا بگویید چه چیزی را انتخاب کردید، چرا این انتخاب را گرفتید، چه چیزهایی را بررسی کردید و در نهایت چه رخ داد.",
+  "decisions.description": "اینجا تصمیم، دلیل، گزینه‌های بررسی‌شده و نتیجه بعدی را ثبت کنید.",
   "decisions.localOnlyNote": "تصمیم‌ها فقط محلی",
   "decisions.localOnlyDescription": "تصمیم‌ها تا زمانی که یک پشتیبان صادر یا وارد کنید روی همین دستگاه می‌مانند.",
   "decisions.nonAdvisoryNote": "AliOS به شما کمک می‌کند تصمیم‌های خود را ثبت و بررسی کنید، اما به‌جای شما تصمیم نمی‌گیرد.",
