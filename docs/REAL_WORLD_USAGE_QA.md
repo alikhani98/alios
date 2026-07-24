@@ -1,5 +1,51 @@
 # AliOS Real-World Usage QA
 
+Stage 170 - Deploy Freshness and Service Worker Diagnosis
+
+Date: 2026-07-24
+
+Status: `STAGE_170_DEPLOY_FRESHNESS_SERVICE_WORKER_DIAGNOSIS_COMPLETE`
+
+Stage 170 checked the live deployment after PR #152 merged and compared it against a fresh local production build. The deployed GitHub Pages shell is current, but the user's persistent stale Finance bundle report still points to client-side cache or service-worker state rather than to a stale Pages deployment.
+
+## Validation Target
+
+- Repository: `alikhani98/alios`
+- Branch: `codex/stage-170-deploy-freshness-service-worker-diagnosis`
+- QA executor: Codex for repository/build/deployment diagnosis; user provided the live-app crash evidence
+- QA target: live AliOS app and the fresh local production build
+
+## Environment Limitation
+
+- Codex browser QA: not run.
+- Exact browser, OS, device, viewport, language/direction combination, appearance mode, accent color, zoom, keyboard-only, screen-reader, console, network, and destructive-restore details were not provided for the user report.
+
+## Stage 170 Outcome
+
+- Latest upstream main: `f3203da125a0cc80639d512a804c1e555b3a69fb`
+- Live shell bundle: `index-CDlRViBB.js`
+- Live Finance chunk reference: `FinancePage-XzIPjh5V.js`
+- Live Finance chunk availability: present on the live shell reference, not `FinancePage-BOm9KxNX.js`
+- Local Finance chunk: `FinancePage-XzIPjh5V.js`
+- Local sourcemap result: `FinancePage-BOm9KxNX.js:1:13008` maps to `src/features/finance/components/FinanceObligationForm.tsx:43`
+- Fresh build status: the current source fix remains present in the local build
+- Remaining stale-bundle report: most consistent with client-side cache or service-worker state, not a stale GitHub Pages deployment
+- No source fix was started in this stage
+- No product code changed
+
+## Validation Notes
+
+- Live `index.html` was fetched directly from GitHub Pages and referenced the fresh shell and Finance chunks.
+- The older `FinancePage-BOm9KxNX.js` file was not present on the live server.
+- The service worker uses a fixed shell cache name and caches same-origin responses, so an old controlled client can still retain an older app shell even when the deployed site is current.
+- This stage does not prove which client cache state the user had when the stale bundle was observed; it only shows the live deployment itself is fresh.
+
+## Release Decision
+
+PASS WITH KNOWN EVIDENCE LIMITATIONS
+
+---
+
 Stage 169 - Finance Trim Crash Source Mapping
 
 Date: 2026-07-24

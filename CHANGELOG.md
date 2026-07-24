@@ -2,6 +2,15 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 170 - Deploy Freshness and Service Worker Diagnosis
+
+- Verified that the latest `origin/main` head includes PR #152 at merge commit `f3203da125a0cc80639d512a804c1e555b3a69fb`
+- Built the current `main` head locally and confirmed the Finance route now bundles as `FinancePage-XzIPjh5V.js`
+- Mapped the live crash offset back to the existing Finance obligation helper path in the current source map, confirming the earlier source fix is present in the fresh build
+- Fetched the live GitHub Pages shell and confirmed it references the fresh `FinancePage-XzIPjh5V.js` chunk; the older `FinancePage-BOm9KxNX.js` is not present on the live server
+- Recorded that the remaining stale bundle symptom is most consistent with a client-side cache or service-worker state on the user device, not with a stale GitHub Pages deployment
+- Kept the stage diagnostic only and did not add a product feature, source fix, schema change, migration, backup-format change, dependency change, or new localStorage key
+
 ## Stage 169 - Finance Trim Crash Source Mapping
 
 - Mapped the live Finance route crash `TypeError: n.trim is not a function` from `FinancePage-BOm9KxNX.js:1:13008` back to `FinanceObligationForm.tsx:43` in `toOptionalNumber()`
