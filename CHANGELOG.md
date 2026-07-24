@@ -2,6 +2,15 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 162 - Post-Contextual-Help Product Priority Audit
+
+- Added a documentation-only product priority audit after the Stage 161 contextual help rollout closure
+- Evaluated Weekly Review / Planning Loop improvement, Finance improvement, Calendar improvement, Today / Task Flow improvement, QA / Release Hardening, and Version 2 architecture preparation against repository evidence, user-observed need, product value, risk, architecture impact, local-first compatibility, bundle/performance impact, test burden, and real-world QA burden
+- Recommended Stage 163 as a small Real-World QA Evidence Enrichment and Release Hardening stage before any new product feature scope
+- Deferred Weekly Review feature work, Finance improvements, Calendar improvements, Today / Task Flow changes, Version 2 architecture expansion, app-wide contextual help rollout, AI/cloud behavior, fake productivity scores, capacity percentages, and automatic recommendations until separate evidence-backed stages are approved
+- Confirmed contextual help remains limited to Decision Log, Personal Manual, and Goals, with future rollout requiring specific real-world evidence
+- Added no product code, source files, tests, dependencies, routes, schemas, migrations, backup-format changes, storage changes, localStorage keys, Sync, Cloud, AI, analytics, telemetry, backend, or runtime behavior
+
 ## Stage 161 - Contextual Help QA Closure
 
 - Recorded the user-executed Stage 160B live-app QA result for Personal Manual and Goals contextual help: Help button acceptable, open/close acceptable, primary actions remained reachable, no issue reported, and Full View was not reported as broken
