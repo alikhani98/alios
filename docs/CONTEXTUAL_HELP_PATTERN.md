@@ -10,6 +10,12 @@ Contextual Help should help users understand a page or section without keeping l
 
 The pattern should reduce always-visible explanation, not remove help. It should make guidance easier to find at the moment of need while preserving the existing local-first, single-user, static-hosting architecture.
 
+## Current Rollout Status
+
+Contextual Help is currently implemented on Decision Log, Personal Manual, and Goals. The current rollout is paused after the successful pilot expansion and Stage 160B user-executed QA evidence.
+
+Do not add this pattern app-wide by default. Reuse it only when real usage, QA notes, or support observations show that a specific page is confusing, overly dense, or needs guidance near the relevant action or section.
+
 ## Control
 
 Use a small, familiar help affordance near a page intro, section header, or compact intro box.

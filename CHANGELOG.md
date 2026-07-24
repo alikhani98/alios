@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 161 - Contextual Help QA Closure
+
+- Recorded the user-executed Stage 160B live-app QA result for Personal Manual and Goals contextual help: Help button acceptable, open/close acceptable, primary actions remained reachable, no issue reported, and Full View was not reported as broken
+- Closed the current contextual help rollout track with an evidence-based rollout decision
+- Confirmed contextual help currently exists on Decision Log, Personal Manual, and Goals only
+- Added no product code, source files, tests, dependencies, routes, schemas, migrations, backup-format changes, localStorage keys, Sync, Cloud, AI, analytics, telemetry, backend, or additional contextual help pages
+
 ## Stage 160 - Decision Log QA and Contextual Help Expansion
 
 - Recorded the user-executed Stage 159B QA pass for the live Decision Log contextual help pilot: Help button visible, open/close works, primary form remains reachable, text was understandable, Full View remained okay, and no obvious layout problem was reported
