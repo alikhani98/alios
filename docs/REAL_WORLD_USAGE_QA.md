@@ -1,5 +1,35 @@
 # AliOS Real-World Usage QA
 
+Stage 166 - Focused Weekly Review Real-World QA
+
+Date: 2026-07-24
+
+Status: `STAGE_166_FOCUSED_WEEKLY_REVIEW_QA_COMPLETE`
+
+The earlier Codex attempt for this stage was blocked because no browser access was available. The user later completed a live real-world QA pass on the deployed AliOS app and reported Weekly Review as OK.
+
+## Validation Target
+
+- Repository: `alikhani98/alios`
+- Branch: `codex/stage-166-focused-weekly-review-qa`
+- QA executor: user
+- QA target: live AliOS app
+
+## Environment Limitation
+
+- Codex browser QA: not run for the final Stage 166 evidence.
+- Exact browser, OS, device, viewport, language/direction, appearance mode, accent color, zoom, keyboard-only, screen-reader, console, and network details were not provided by the user.
+
+## Stage 166 Outcome
+
+- Weekly Review: OK.
+- No issue was reported.
+- No source fix was required.
+- Recommendation: no Weekly Review product implementation is required before design-system discovery.
+- Release/design gate decision: PASS WITH KNOWN EVIDENCE LIMITATIONS.
+
+---
+
 Stage 164 - Structured Real-World QA Completion
 
 Date: 2026-07-24

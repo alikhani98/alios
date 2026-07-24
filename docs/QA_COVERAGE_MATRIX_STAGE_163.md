@@ -9,7 +9,7 @@ Status: documentation-only evidence matrix. No product behavior is changed by th
 | Home | partial | partial | Stage 148 | medium | Include in the next structured browser pass at desktop and 360/390/430 px. |
 | Inbox | partial | partial | Stage 23 | medium | Smoke-test capture, filtering, and bulk actions with long item lists. |
 | Today | partial | known | Stage 154 | high | Verify create/edit/complete/delete, MIT, filters, recurrence, and task handoff. |
-| Weekly Review | partial | known | Stage 162 | high | Prioritize the next deeper browser pass, especially for density and review workflow. |
+| Weekly Review | partial | partial | Stage 166 | high | Follow up with the next browser pass only if exact environment details or review-density friction need confirmation. |
 | Goals | known | partial | Stage 161 | medium | Check Simple/Full View, templates, and primary create actions. |
 | Personal Manual | known | partial | Stage 161 | medium | Check Simple/Full View, templates, search, and edit flows. |
 | Decision Log | known | partial | Stage 160 | medium | Check contextual help, record creation, and review flow. |
@@ -46,8 +46,10 @@ Status: documentation-only evidence matrix. No product behavior is changed by th
 4. Finance.
 5. Calendar.
 
-## Stage 164 Attempt
+## Stage 166 User QA
 
 - Stage 164 attempted to run the structured real-world QA pass referenced by this matrix, but the current Codex environment did not expose a usable browser surface.
-- Coverage in this matrix remains unchanged until a browser-enabled QA pass records new real-world evidence.
-6. Simple / Full View on the highest-risk surfaces.
+- Stage 166 adds user-reported real-world coverage for Weekly Review on the live AliOS app.
+- Weekly Review was reported OK with no issue reported.
+- Coverage for Weekly Review is now partial user-reported coverage only; exact browser, device, viewport, and other environment details remain incomplete.
+- This update applies only to Weekly Review and does not upgrade the other surface rows in this matrix.
