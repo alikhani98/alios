@@ -2,6 +2,14 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 169 - Finance Trim Crash Source Mapping
+
+- Mapped the live Finance route crash `TypeError: n.trim is not a function` from `FinancePage-BOm9KxNX.js:1:13008` back to `FinanceObligationForm.tsx:43` in `toOptionalNumber()`
+- Confirmed the non-string value was the numeric Finance obligation `monthlyAmount` path used by the active debt edit flow, and hardened the helper to accept unknown values safely
+- Added a focused regression that drives React Hook Form's `setValue` path with a numeric monthly amount so the trim failure stays blocked
+- Kept the change local to Finance form normalization and did not add a product feature, data-model change, backup-format change, dependency change, or new localStorage key
+- Verified the fix with TypeScript, focused Finance regressions, the full test suite, and the production build
+
 ## Stage 168 - Finance Trim Type Crash Fix
 
 - Fixed the remaining Finance route crash from PR #150 / Stage 167 by guarding the finance summary path that trimmed a malformed transaction category value
@@ -66,7 +74,7 @@ This changelog records completed AliOS development stages.
 ## Stage 160 - Decision Log QA and Contextual Help Expansion
 
 - Recorded the user-executed Stage 159B QA pass for the live Decision Log contextual help pilot: Help button visible, open/close works, primary form remains reachable, text was understandable, Full View remained okay, and no obvious layout problem was reported
-- Added the same lightweight contextual Help / راهنما inline disclosure pattern to Personal Manual and Goals in Simple View only
+- Added the same lightweight contextual Help / ÃƒËœÃ‚Â±ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â¡Ãƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â§ inline disclosure pattern to Personal Manual and Goals in Simple View only
 - Kept Full View introductory guidance close to the previous behavior on both pages
 - Preserved Personal Manual and Goals create/edit/delete, filters, templates, review behavior, linked progress, repository boundaries, storage, backup, and local data behavior
 - Added focused server-rendered tests for Manual and Goals help triggers, expanded content, Persian labels, and primary create action presence
@@ -74,8 +82,8 @@ This changelog records completed AliOS development stages.
 
 ## Stage 159 - Contextual Help Pilot for Decision Log
 
-- Added the first small contextual help pilot to Decision Log / دفترچه تصمیم‌ها in Simple View only, using the existing `alios.viewDensityMode` presentation preference
-- Replaced the large always-visible Simple View intro help text with a compact Help / راهنما button and inline disclosure near the page intro
+- Added the first small contextual help pilot to Decision Log / ÃƒËœÃ‚Â¯Ãƒâ„¢Ã‚ÂÃƒËœÃ‚ÂªÃƒËœÃ‚Â±ÃƒÅ¡Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Â¡ ÃƒËœÃ‚ÂªÃƒËœÃ‚ÂµÃƒâ„¢Ã¢â‚¬Â¦Ãƒâ€ºÃ…â€™Ãƒâ„¢Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€™Ãƒâ„¢Ã¢â‚¬Â¡ÃƒËœÃ‚Â§ in Simple View only, using the existing `alios.viewDensityMode` presentation preference
+- Replaced the large always-visible Simple View intro help text with a compact Help / ÃƒËœÃ‚Â±ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â¡Ãƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â§ button and inline disclosure near the page intro
 - Kept Full View's existing introductory guidance visible and preserved Decision Log CRUD, filters, review-due summaries, form behavior, repository boundaries, and local data behavior
 - Added bilingual English/Persian help copy covering what to record, tradeoffs/options, local-only data, and the non-advisory AliOS boundary
 - Added focused server-rendered regression coverage for the trigger semantics, `aria-expanded`, `aria-controls`, expanded content, and Persian labels
@@ -86,8 +94,8 @@ This changelog records completed AliOS development stages.
 - Recorded user-executed real-world QA evidence for Simple View / Full View across Home, Today, Weekly Review, Settings, Goals, Personal Manual, and Finance
 - Documented that Codex did not execute the browser/device QA, and that exact browser, OS, device, viewport, console, network, screen-reader, and multi-browser details remain not fully specified
 - Recorded the user-reported functional result: no Critical or High functional issue was reported for the checked Simple View / Full View cases
-- Recorded the product observation that Simple View still needs stronger contextual guidance for non-technical or older users, with screenshot evidence from Decision Log / دفترچه تصمیم‌ها in Simple View showing a large introductory help panel and a proposed smaller contextual help affordance
-- Added a documentation-only contextual help pattern for a small Help / راهنما / info-icon control near page or section intros, with keyboard, click, touch, focus, Escape, outside-click, zoom, and mobile requirements
+- Recorded the product observation that Simple View still needs stronger contextual guidance for non-technical or older users, with screenshot evidence from Decision Log / ÃƒËœÃ‚Â¯Ãƒâ„¢Ã‚ÂÃƒËœÃ‚ÂªÃƒËœÃ‚Â±ÃƒÅ¡Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Â¡ ÃƒËœÃ‚ÂªÃƒËœÃ‚ÂµÃƒâ„¢Ã¢â‚¬Â¦Ãƒâ€ºÃ…â€™Ãƒâ„¢Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€™Ãƒâ„¢Ã¢â‚¬Â¡ÃƒËœÃ‚Â§ in Simple View showing a large introductory help panel and a proposed smaller contextual help affordance
+- Added a documentation-only contextual help pattern for a small Help / ÃƒËœÃ‚Â±ÃƒËœÃ‚Â§Ãƒâ„¢Ã¢â‚¬Â¡Ãƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â§ / info-icon control near page or section intros, with keyboard, click, touch, focus, Escape, outside-click, zoom, and mobile requirements
 - Clarified that the contextual help pilot should start on one or two pages, likely Decision Log, Personal Manual, or Goals, and must not become a broad redesign
 - Confirmed the Stage 150 marquee, Stage 151 sticky guide, and Stage 154 native budget slider are not the right reusable patterns for small section help; contextual help should be lighter
 - Added no product code, UI, CSS, tests, route, schema, migration, backup-format change, dependency, lockfile, localStorage key, Sync, Cloud, AI, telemetry, analytics, or backend behavior
@@ -106,7 +114,7 @@ This changelog records completed AliOS development stages.
 
 - Verified that Stage 156 PR #138 is merged into `main` at commit `d41021fe2cb5038270caad0c80bc6725c41f78c7`
 - Verified GitHub Actions evidence for Stage 156: `Validate Pull Request` succeeded for the PR head, and the merge commit has successful `build` and `deploy` check-runs
-- Verified the live GitHub Pages site responds with HTTP 200 and serves Stage 156 assets, including the deployed Settings chunk with `alios.viewDensityMode`, `View density`, and `تراکم نمایش`
+- Verified the live GitHub Pages site responds with HTTP 200 and serves Stage 156 assets, including the deployed Settings chunk with `alios.viewDensityMode`, `View density`, and `ÃƒËœÃ‚ÂªÃƒËœÃ‚Â±ÃƒËœÃ‚Â§ÃƒÅ¡Ã‚Â©Ãƒâ„¢Ã¢â‚¬Â¦ Ãƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â§Ãƒâ€ºÃ…â€™ÃƒËœÃ‚Â´`
 - Recorded that Codex could not execute real browser/device QA in the current environment, so Simple View / Full View route behavior, persistence, multi-tab behavior, draft preservation, accessibility, responsive widths, themes, zoom, reduced motion, console status, network status, and data-safety checks remain `NOT TESTED` or `BLOCKED`
 - Added no product code, UI, CSS, tests, route, schema, migration, backup-format change, dependency, lockfile, Sync, Cloud, AI, telemetry, analytics, or workflow change
 - Final Stage 157 result is `STAGE_157_VIEW_MODES_REAL_WORLD_QA_BLOCKED`; deployment and automated checks are not treated as real-world validation
@@ -115,7 +123,7 @@ This changelog records completed AliOS development stages.
 
 - Added the local `viewDensityMode` presentation preference with values `full` and `simple`, stored only in browser localStorage under `alios.viewDensityMode`
 - Kept `full` as the default for missing, cleared, and invalid values so existing behavior remains unchanged until the user opts into Simple View
-- Added a bilingual Settings View density / تراکم نمایش radio group with Full View and Simple View options
+- Added a bilingual Settings View density / ÃƒËœÃ‚ÂªÃƒËœÃ‚Â±ÃƒËœÃ‚Â§ÃƒÅ¡Ã‚Â©Ãƒâ„¢Ã¢â‚¬Â¦ Ãƒâ„¢Ã¢â‚¬Â Ãƒâ„¢Ã¢â‚¬Â¦ÃƒËœÃ‚Â§Ãƒâ€ºÃ…â€™ÃƒËœÃ‚Â´ radio group with Full View and Simple View options
 - Applied Simple View only to Home, Today, Weekly Review, Settings, Goals, Personal Manual, and Finance using progressive disclosure and tighter preview limits instead of duplicate pages or CSS-only hiding
 - Preserved primary actions, forms, active filters, selected/count context, loading/error/empty states, destructive confirmations, and all product-data behavior
 - Added focused automated coverage for preference parsing/persistence/reset/storage-event behavior, the Settings control, and source-level scope safeguards
@@ -325,11 +333,11 @@ This changelog records completed AliOS development stages.
 ## Stage 121 - Home Hero Composition
 
 - Rebuilt the populated Home hero into a compact focus-and-metrics row, with planning context in its own full-width follow-up row
-- Removed the desktop column-height dependency that left a large unused area under quick metrics, while retaining the mobile focus → context → metrics reading order
+- Removed the desktop column-height dependency that left a large unused area under quick metrics, while retaining the mobile focus ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ context ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ metrics reading order
 
 ## Stage 120 - Home Hero and Mobile Calendar Fit
 
-- Balanced the desktop Home hero’s quick metrics against the daily focus column so populated planning context no longer leaves an unused blank panel
+- Balanced the desktop Home heroÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s quick metrics against the daily focus column so populated planning context no longer leaves an unused blank panel
 - Made the seven-day mobile calendar fit the available width without a hidden horizontal scroll while keeping the full date labels accessible
 
 ## Stage 119 - Home Priority Lanes
@@ -355,7 +363,7 @@ This changelog records completed AliOS development stages.
 ## Stage 115 - Home Visual System
 
 - Replaced the sequence of wide Home panels with a deliberate 12-column desktop grid while retaining the existing single-column mobile reading path
-- Gave daily work, calendar, routines, and local reference panels stable visual proportions without changing a user’s selected sections or their ordering
+- Gave daily work, calendar, routines, and local reference panels stable visual proportions without changing a userÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s selected sections or their ordering
 
 ## Stage 114 - Home Command Center
 
@@ -365,7 +373,7 @@ This changelog records completed AliOS development stages.
 ## Stage 113 - Home Real Visual Redesign
 
 - Rebuilt the Home reading path around a compact daily-workspace hero, distinct operational metrics, and clearer Today, Inbox, and Weekly Review actions
-- Paired compatible secondary sections on wide screens while preserving mobile stacking and each user’s dashboard order
+- Paired compatible secondary sections on wide screens while preserving mobile stacking and each userÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s dashboard order
 
 ## Stage 112 - PWA Update Controls
 
@@ -395,7 +403,7 @@ This changelog records completed AliOS development stages.
 ## Stage 107 - Knowledge and Settings Visual Alignment
 
 - Aligned the Journal, Knowledge, and Settings entry surfaces with the primary visual hierarchy used across the application
-- Added meaningful existing iconography and restrained accent treatment while preserving each page’s current primary action and content flow
+- Added meaningful existing iconography and restrained accent treatment while preserving each pageÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s current primary action and content flow
 - Kept all records, preferences, forms, data safety controls, and local-first behavior unchanged
 
 ## Stage 106 - Core Pages Visual Alignment
@@ -406,21 +414,21 @@ This changelog records completed AliOS development stages.
 
 ## Stage 105 - Home Visual Hierarchy
 
-- Promoted the three primary local workflows—Today, Inbox capture, and Weekly Review—to clear actions in the Home hero
+- Promoted the three primary local workflowsÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬ÂToday, Inbox capture, and Weekly ReviewÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Âto clear actions in the Home hero
 - Reduced the large hero metric grid to the four operational signals needed for daily orientation, while retaining broader local context as compact badges
 - Kept every count and link derived from the existing dashboard data with no new storage, route, dependency, or behavior change
 
 ## Stage 104 - Weekly Plan Retrospective
 
 - Added a read-only previous-week planning card to Weekly Review, keeping its focus, intention, safe linked destinations, and plan-scoped Task progress visible
-- Kept the prior plan’s execution distinct from current-week planning, broad weekly activity, and the review queue
+- Kept the prior planÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s execution distinct from current-week planning, broad weekly activity, and the review queue
 - Derived every signal from existing local records without saving a score or changing any Task or plan
 
 ## Stage 103 - Planned Task Execution Handoff
 
 - Made a directly selected Weekly Plan Task visible in Today even when it is not due on the current date
-- Kept the planned Task clearly separated from Today’s date-bound task list, with direct user-controlled status, edit, and delete actions
-- Preserved Today’s MIT boundary: an out-of-date planned Task is never promoted to MIT from this handoff
+- Kept the planned Task clearly separated from TodayÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s date-bound task list, with direct user-controlled status, edit, and delete actions
+- Preserved TodayÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s MIT boundary: an out-of-date planned Task is never promoted to MIT from this handoff
 
 ## Stage 102 - Planning Execution Clarity
 
@@ -436,7 +444,7 @@ This changelog records completed AliOS development stages.
 
 ## Stage 100 - Weekly Planning Dashboard
 
-- Promoted the current week’s focus, linked destinations, and three calm task/review signals to the top of Weekly Review
+- Promoted the current weekÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s focus, linked destinations, and three calm task/review signals to the top of Weekly Review
 - Moved the full derived metric grid into a secondary collapsible overview so planning is the first reading path
 - Preserved the existing plan editor, review queue, local-only behavior, and every underlying data record
 
@@ -466,20 +474,20 @@ This changelog records completed AliOS development stages.
 
 ## Stage 95 - Integrated Planning Review
 
-- Added a read-only Goal → Project → Task planning-chain section to Weekly Review, including linked progress, open work, attention items, and safe unavailable-Goal context
+- Added a read-only Goal ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Project ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Task planning-chain section to Weekly Review, including linked progress, open work, attention items, and safe unavailable-Goal context
 - Added a compact Home focus path that selects one active Goal and its actionable linked Project/Task without mutating any record
 - Hardened the integrated planning flow with derived-only tests, Help Center guidance, mobile-safe wrapping, and navigation into existing Goals, Projects, and Today routes
 
 ## Stage 94 - Goal Progress & Planning Navigation
 
 - Added a derived, read-only Goal progress summary from existing linked Projects and their Tasks; manual Goal progress remains unchanged
-- Added reversible Goal → Projects and Goal → Today navigation, including calm unavailable and no-linked-record states
+- Added reversible Goal ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Projects and Goal ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Today navigation, including calm unavailable and no-linked-record states
 - Extended the existing Today query composition so Goal, Project, and Routine filters can safely coexist
 
 ## Stage 93 - Routine Progress & Review Integration
 
 - Added derived Routine task totals, completed/open counts, and completion percentage on Routine cards using the existing `Task.routineId` relationship
-- Added stable Routine → Today filtering with visible, reversible context that safely handles deleted Routines and composes with the existing Project filter
+- Added stable Routine ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Today filtering with visible, reversible context that safely handles deleted Routines and composes with the existing Project filter
 - Added a read-only seven-day Routine section to Weekly Review that reports only Tasks explicitly created from Routines, never treating an unadded suggestion as missed
 
 ## Stage 92 - Recurring Routines & Daily Planning Foundation
@@ -496,7 +504,7 @@ This changelog records completed AliOS development stages.
 
 ## Stage 90 - Project Planning Chain QA & Mobile Hardening
 
-- Added regression coverage for the Goal → Project → Today handoff, linked-task summary, stable filtered route, and long-content mobile layout contract
+- Added regression coverage for the Goal ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Project ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Today handoff, linked-task summary, stable filtered route, and long-content mobile layout contract
 - Added a concise bilingual, narrow-screen smoke pass covering filter refresh, reset, and a safely unavailable Project
 - Kept the stage local-first and compatibility-only: no storage, backup, route, dependency, backend, or product-scope change
 
@@ -508,12 +516,12 @@ This changelog records completed AliOS development stages.
 ## Stage 88 - Project Task Progress View
 
 - Added derived linked-task totals and completed counts to Project cards using existing `Task.projectId` data
-- Added stable Project → Today filtered navigation without changing task, project, backup, or storage contracts
+- Added stable Project ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Today filtered navigation without changing task, project, backup, or storage contracts
 
 ## Stage 87 - Backup / Restore Round-Trip Integrity Guard
 
-- Strengthened the full Dexie backup test into a true export → clear → restore → re-export round trip across every supported table
-- Added explicit identity-link assertions for Goal → Project → Task so optional planning links cannot silently disappear from backups
+- Strengthened the full Dexie backup test into a true export ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ clear ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ restore ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ re-export round trip across every supported table
+- Added explicit identity-link assertions for Goal ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Project ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Task so optional planning links cannot silently disappear from backups
 - Kept the stage test-only and local-first, with no runtime behavior, route, storage schema, backup version, dependency, backend, sync, cloud, AI, telemetry, or user-data change
 
 ## Stage 86 - Performance Regression Guard
@@ -560,17 +568,17 @@ This changelog records completed AliOS development stages.
 
 - Completed the Persian catalog for every visible Life Areas message and added a regression guard that rejects silent English fallback in the Persian interface
 - Re-localized untouched canonical Life Area titles and descriptions that may already have been persisted in English, while preserving user-authored custom text
-- Updated the bilingual Settings Help Center for Life Areas, Weekly Review, Decisions, Personal Manual, readable exports, Recovery Mode, and the Life Area → Goal → Project → Task planning chain
+- Updated the bilingual Settings Help Center for Life Areas, Weekly Review, Decisions, Personal Manual, readable exports, Recovery Mode, and the Life Area ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Goal ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Project ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Task planning chain
 - Kept the stage presentation- and documentation-only, with no dependency, route, repository contract, Dexie schema, backup format, backup version, backend, sync, cloud, or AI change
 
-## Stage 79 - Tasks → Projects Link Activation
+## Stage 79 - Tasks ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Projects Link Activation
 
 - Activated the existing optional `Task.projectId` relationship in the Today task form so tasks can be linked, relinked, or unlinked from Projects
 - Added bilingual linked-Project context and focused Project navigation to Today task cards, with calm loading and unavailable states
 - Preserved task usability when a linked Project is missing or deleted, with no cascade behavior or reverse Project mutation
 - Kept the existing Task field, Dexie index, database schema version, and backup version 1 unchanged, with no dependency, backend, sync, cloud, or AI change
 
-## Stage 78 - Projects → Goals Link Foundation
+## Stage 78 - Projects ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Goals Link Foundation
 
 - Added an optional `Project.goalId` relationship so a project can be linked, relinked, or unlinked from one existing Goal
 - Added bilingual project-form goal selection and project-card navigation to the linked Goal, with calm loading and unavailable states
@@ -584,7 +592,7 @@ This changelog records completed AliOS development stages.
 - Tightened Goal cards, filters, badges, tags, metadata, empty states, and actions for long content and narrow mobile widths
 - Kept the stage behavior-preserving and local-only, with no dependency, route, repository, Dexie schema, backup format, backup version, backend, sync, cloud, AI, or user-data change
 
-## Stage 76 - Goals ↔ Life Areas Derived Integration
+## Stage 76 - Goals ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬Â Life Areas Derived Integration
 
 - Added derived linked-goal summaries to every Life Area using the existing shared canonical area key
 - Added two-way navigation from Life Areas to area-filtered Goals and from each Goal back to its focused Life Area
@@ -913,7 +921,7 @@ This changelog records completed AliOS development stages.
 - Added focused helper tests for appearance parsing/resolution and profile initials generation
 - Kept authentication, accounts, backend services, sync, cloud, paid APIs, AI, new tables, and backup-format changes out of scope
 
-## Stage 25 — Global Search Foundation
+## Stage 25 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Global Search Foundation
 
 - Added a local Search page and topbar entry for Inbox, Today, Projects, Journal, and Knowledge
 - Added plain case-insensitive text search with trimmed queries and simple relevance ordering
@@ -921,7 +929,7 @@ This changelog records completed AliOS development stages.
 - Added focused tests for empty queries, case-insensitive matching, trimming, multi-type search, no-results, and type labels
 - Kept the Dexie schema, backup format, backup version, backend, sync, cloud, dependency list, semantic search, and AI out of scope
 
-## Stage 24 — Data Safety / Backup Hardening
+## Stage 24 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Data Safety / Backup Hardening
 
 - Added safer backup export filenames with hour and minute precision
 - Added persisted last successful backup and restore timestamps in Settings
@@ -932,7 +940,7 @@ This changelog records completed AliOS development stages.
 - Kept the Dexie schema and backup version unchanged
 - Added no sync, cloud backup, backend, authentication, AI, dependency, schema migration, or new abstraction
 
-## Stage 23 — Inbox Bulk Triage
+## Stage 23 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Inbox Bulk Triage
 
 - Added Inbox multi-select with per-item selection controls
 - Added select all visible for the current filtered Inbox view
@@ -944,7 +952,7 @@ This changelog records completed AliOS development stages.
 - Kept the Dexie schema and backup format unchanged
 - Added no dependency, backend, sync, authentication, AI, tags, bulk conversion, workflow engine, batch-processing engine, or new storage abstraction
 
-## Stage 22 — Inbox Search & Filters
+## Stage 22 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Inbox Search & Filters
 
 - Added case-insensitive local Inbox content search
 - Added status filtering for all, unprocessed, and processed items
@@ -955,7 +963,7 @@ This changelog records completed AliOS development stages.
 - Kept the Dexie schema and backup format unchanged
 - Added no dependency, search index, backend, sync, authentication, AI, tags, bulk workflow, or new abstraction
 
-## Stage 21 — Inbox Processing / Triage
+## Stage 21 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Inbox Processing / Triage
 
 - Added mobile-friendly Inbox processing actions
 - Added conversion from Inbox items to Today tasks
@@ -967,7 +975,7 @@ This changelog records completed AliOS development stages.
 - Kept backup version and format unchanged
 - Added no dependency, schema migration, table, field, backend, sync, authentication, AI, or workflow engine
 
-## Stage 20 — Quick Capture Inbox
+## Stage 20 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Quick Capture Inbox
 
 - Added the Inbox domain model, Zod schema, repository contract, and Dexie repository
 - Added a safe additive Dexie schema v2 migration with the `inboxItems` table
@@ -979,7 +987,7 @@ This changelog records completed AliOS development stages.
 - Added Inbox repository, schema, backup, restore, and clear behavior tests
 - Added no conversion or processing workflow, search, tags, attachments, due dates, reminders, backend, sync, authentication, AI, service worker, dependency, or new abstraction layer
 
-## Stage 19 — Static Deployment / GitHub Pages
+## Stage 19 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Static Deployment / GitHub Pages
 
 - Added a least-privilege GitHub Pages deployment workflow for pushes to `main` and manual runs
 - Added TypeScript, automated test, and production-build gates before deployment
@@ -990,7 +998,7 @@ This changelog records completed AliOS development stages.
 - Documented that data remains local to each browser/device and Backup/Restore remains the manual transfer method
 - Added no synchronization, backend, authentication, dependency, storage change, backup-format change, or product feature
 
-## Stage 18 — Mobile / PWA Readiness
+## Stage 18 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Mobile / PWA Readiness
 
 - Added mobile-responsive spacing, overflow protection, and safe-area-aware navigation
 - Increased important touch targets and mobile form control sizing
@@ -1003,7 +1011,7 @@ This changelog records completed AliOS development stages.
 - Kept Backup/Restore as the only manual transfer method between mobile and laptop
 - Added no automatic sync, cloud backup, service worker cache, dependency, backend, authentication, storage change, or product feature
 
-## Stage 17 — v1.0 Final QA / Release
+## Stage 17 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â v1.0 Final QA / Release
 
 - Replaced the stale foundation README with complete AliOS v1.0 documentation
 - Documented local development, tests, production builds, previews, and static-hosting deployment
@@ -1016,7 +1024,7 @@ This changelog records completed AliOS development stages.
 - Prepared the AliOS v1.0 release candidate without adding product features or dependencies
 - Kept storage schemas, repository contracts, backup format, and architecture unchanged
 
-## Stage 16 — Performance / Code Splitting
+## Stage 16 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Performance / Code Splitting
 
 - Added route-level code splitting with `React.lazy` and `Suspense`
 - Added lazy-loaded Home, Today, Projects, Journal, Knowledge, and Settings pages
@@ -1028,7 +1036,7 @@ This changelog records completed AliOS development stages.
 - Added no product behavior changes, dependencies, schemas, repositories, storage changes, or backup format changes
 - Kept deeper bundle analysis, visualizer plugins, manual chunking, PWA, caching, and future performance audits deferred
 
-## Stage 15 — Testing Foundation
+## Stage 15 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Testing Foundation
 
 - Added a Vitest testing foundation compatible with the existing Vite stack
 - Added isolated fake IndexedDB setup for Dexie tests
@@ -1042,7 +1050,7 @@ This changelog records completed AliOS development stages.
 - Added an architecture decision requiring concrete current need before introducing new abstractions
 - Kept UI tests, end-to-end tests, Routines, Wellness, Weekly Review, Decision Log, Personal Manual, AI, Google Calendar, and ICS export deferred
 
-## Stage 14 — Calendar Display Foundation
+## Stage 14 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Calendar Display Foundation
 
 - Added `src/shared/date`
 - Added calendar display type definitions
@@ -1057,7 +1065,7 @@ This changelog records completed AliOS development stages.
 - Kept schemas, repository contracts, Dexie tables, and the backup format unchanged
 - Kept Google Calendar, ICS export, date pickers, recurring events, notifications, scheduling, timezone management, and a full calendar page deferred
 
-## Stage 13 — Settings Polish + Local Data Management
+## Stage 13 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Settings Polish + Local Data Management
 
 - Polished Settings into a bilingual local-first control center
 - Added local record counts for all six supported data tables
@@ -1069,7 +1077,7 @@ This changelog records completed AliOS development stages.
 - Extended the existing BackupStorage boundary without changing repository contracts or backup format
 - Kept cloud sync, automatic or scheduled backup, encryption, accounts, authentication, backend services, AI settings, notifications, analytics, and charts out of scope
 
-## Stage 12 — Home Dashboard Real Data
+## Stage 12 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Home Dashboard Real Data
 
 - Replaced the Home placeholder with a real read-only local dashboard
 - Added Today task counts, completed-task count, MIT, and daily check-in summary
@@ -1080,7 +1088,7 @@ This changelog records completed AliOS development stages.
 - Loaded all data through existing repositories on the injected StorageAdapter
 - Kept charts, analytics, trends, weekly review, AI insights, recommendations, notifications, customization, and cross-feature automation out of scope
 
-## Stage 11 — Internationalization Foundation
+## Stage 11 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Internationalization Foundation
 
 - Added a custom lightweight i18n layer under `src/shared/i18n`
 - Added Persian and English message catalogs
@@ -1093,7 +1101,7 @@ This changelog records completed AliOS development stages.
 - Added English UI support with LTR direction
 - Kept advanced pluralization, date localization, AI translation, database-backed language settings, and user-content translation deferred
 
-## Stage 10 — Backup / Restore
+## Stage 10 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Backup / Restore
 
 - Added manual export of all six IndexedDB data tables to versioned JSON
 - Added strict backup structure and domain-record validation before restore
@@ -1102,18 +1110,18 @@ This changelog records completed AliOS development stages.
 - Added a backup-specific port to the Storage Adapter boundary without changing repository contracts
 - Kept automatic/cloud/remote backup, encryption, compression, attachments, scheduling, notifications, AI, authentication, and backend services out of scope
 
-## Stage 9 — Today + Tasks + Daily Check-in
+## Stage 9 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Today + Tasks + Daily Check-in
 
 - Added Today page with a daily check-in section and date-scoped task list
 - Added daily check-in create/update using approved health-status fields only
 - Added task create, list, edit, delete, and status-update behavior
-- Added single-MIT selection synchronized with today’s daily check-in
+- Added single-MIT selection synchronized with todayÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢s daily check-in
 - Added completed-task styling and completion timestamps
 - Added loading, empty, error, success, and delete-confirmation states
 - Verified tasks and daily check-in persistence across browser refreshes
 - Kept health advice, Home dashboard data, recurring tasks, notifications, analytics, backup, AI, and cross-feature workflows out of scope
 
-## Stage 8 — Knowledge CRUD UI + Simple Search
+## Stage 8 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Knowledge CRUD UI + Simple Search
 
 - Added Knowledge create, list, edit, and delete UI
 - Added inline Knowledge forms using React Hook Form and Zod validation
@@ -1124,7 +1132,7 @@ This changelog records completed AliOS development stages.
 - Verified IndexedDB persistence and search behavior in the browser
 - Kept semantic/vector/AI search, summarization, tags, attachments, backup, and cross-feature linking out of scope
 
-## Stage 7 — Journal CRUD UI
+## Stage 7 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Journal CRUD UI
 
 - Added Journal create, list, edit, and delete UI
 - Added inline Journal forms using React Hook Form and Zod validation
@@ -1134,7 +1142,7 @@ This changelog records completed AliOS development stages.
 - Verified IndexedDB persistence across a browser refresh
 - Kept AI analysis, summarization, search, analytics, weekly review, Knowledge integration, backup, and AI out of scope
 
-## Stage 6 — Projects CRUD UI
+## Stage 6 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Projects CRUD UI
 
 - Added Projects create, list, edit, and delete UI
 - Added inline project forms using React Hook Form and Zod validation
@@ -1144,7 +1152,7 @@ This changelog records completed AliOS development stages.
 - Verified IndexedDB persistence across a browser refresh
 - Kept archive, search, details, tasks, backup, and AI out of scope
 
-## Stage 5 — Repository CRUD Foundation
+## Stage 5 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Repository CRUD Foundation
 
 - Implemented list, read, create, update, and delete operations for all six repositories
 - Added UUID generation and ISO creation/update timestamps
@@ -1154,7 +1162,7 @@ This changelog records completed AliOS development stages.
 - Kept knowledge search and project archiving deferred as non-CRUD behavior
 - Kept UI, hooks, workflows, backup, and AI out of scope
 
-## Stage 4 — Dexie Foundation
+## Stage 4 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Dexie Foundation
 
 - Initialized the typed Dexie database
 - Defined schema version 1, table names, and store indexes
@@ -1163,7 +1171,7 @@ This changelog records completed AliOS development stages.
 - Added and wired the DexieStorageAdapter
 - Kept CRUD, business logic, search, UI, backup, and AI out of scope
 
-## Stage 3 — Domain Foundation
+## Stage 3 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Domain Foundation
 
 - Added Task, Project, DailyCheckin, JournalEntry, KnowledgeItem, and Setting domain models
 - Added a Zod schema for each domain entity
@@ -1171,7 +1179,7 @@ This changelog records completed AliOS development stages.
 - Added the shared application error hierarchy
 - Reviewed and retained repository interfaces for the domain contracts
 
-## Stage 2 — App Shell
+## Stage 2 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â App Shell
 
 - Added the responsive AppShell
 - Added the desktop Sidebar and mobile drawer
@@ -1179,7 +1187,7 @@ This changelog records completed AliOS development stages.
 - Added React Router navigation
 - Added placeholder pages for the primary features
 
-## Stage 1 — Foundation
+## Stage 1 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Foundation
 
 - Initialized the Vite, React, and TypeScript project
 - Added Tailwind CSS
@@ -1189,7 +1197,7 @@ This changelog records completed AliOS development stages.
 - Added initial architecture documentation
 - Added the AIProvider placeholder
 - Added the StorageAdapter placeholder
-## Stage 26 — Search Result Focus Navigation
+## Stage 26 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Search Result Focus Navigation
 
 - Added lightweight `focusId` deep links from global search results into Inbox, Today, Projects, Journal, and Knowledge
 - Added subtle focused-item highlighting and auto-scroll on target pages when the matching record is visible

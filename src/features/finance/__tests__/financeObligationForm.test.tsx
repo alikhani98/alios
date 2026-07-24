@@ -1,4 +1,5 @@
 import { renderToStaticMarkup } from "react-dom/server";
+import { createFormControl } from "react-hook-form";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { DateDisplayProvider } from "@/shared/date";
@@ -8,7 +9,22 @@ import type { FinanceObligation } from "@/shared/types";
 import {
   FinanceObligationForm,
   normalizeFinanceObligationFormValues,
+  toOptionalNumber,
 } from "../components/FinanceObligationForm";
+
+const liveLikeActiveDebt: FinanceObligation = {
+  id: "debt-live-1",
+  type: "debt",
+  title: "بانک مهر شماره 1",
+  totalAmount: 39114120,
+  paidAmount: 0,
+  monthlyAmount: 1476000,
+  dueDay: 5,
+  counterparty: "بانک مهر",
+  status: "active",
+  createdAt: "2026-07-05T08:30:00.000Z",
+  updatedAt: "2026-07-24T08:30:00.000Z",
+};
 
 const brokenActiveDebt: FinanceObligation = {
   id: "debt-rtl-1",
@@ -66,5 +82,19 @@ describe("FinanceObligationForm", () => {
 
     expect(html).toContain("ذخیره تغییرات");
     expect(html).toContain("مقدار ذخیره‌شده همچنان ISO/Gregorian می‌ماند.");
+  });
+
+  it("keeps numeric obligation values out of the trim path during RHF setValue handling", () => {
+    const control = createFormControl({
+      defaultValues: normalizeFinanceObligationFormValues(liveLikeActiveDebt),
+    });
+
+    control.register("monthlyAmount", { setValueAs: toOptionalNumber });
+
+    expect(() => {
+      control.setValue("monthlyAmount", 1476000);
+    }).not.toThrow();
+
+    expect(control.getValues("monthlyAmount")).toBe(1476000);
   });
 });
