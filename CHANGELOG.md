@@ -2,6 +2,17 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 158A - View Mode QA Evidence and Contextual Help Design
+
+- Recorded user-executed real-world QA evidence for Simple View / Full View across Home, Today, Weekly Review, Settings, Goals, Personal Manual, and Finance
+- Documented that Codex did not execute the browser/device QA, and that exact browser, OS, device, viewport, console, network, screen-reader, and multi-browser details remain not fully specified
+- Recorded the user-reported functional result: no Critical or High functional issue was reported for the checked Simple View / Full View cases
+- Recorded the product observation that Simple View still needs stronger contextual guidance for non-technical or older users, with screenshot evidence from Decision Log / دفترچه تصمیم‌ها in Simple View showing a large introductory help panel and a proposed smaller contextual help affordance
+- Added a documentation-only contextual help pattern for a small Help / راهنما / info-icon control near page or section intros, with keyboard, click, touch, focus, Escape, outside-click, zoom, and mobile requirements
+- Clarified that the contextual help pilot should start on one or two pages, likely Decision Log, Personal Manual, or Goals, and must not become a broad redesign
+- Confirmed the Stage 150 marquee, Stage 151 sticky guide, and Stage 154 native budget slider are not the right reusable patterns for small section help; contextual help should be lighter
+- Added no product code, UI, CSS, tests, route, schema, migration, backup-format change, dependency, lockfile, localStorage key, Sync, Cloud, AI, telemetry, analytics, or backend behavior
+
 ## Stage 157C - Complete Remaining View Modes Real-World QA
 
 - Rechecked Stage 156 and Stage 157 prerequisites after PR #139 merged into `main` at commit `4c9b854b705b9a74142a0342c10fc157b6facdcd`

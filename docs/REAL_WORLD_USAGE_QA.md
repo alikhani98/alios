@@ -278,6 +278,97 @@ Create a user-executed or browser-enabled QA pass against the live deployment at
 
 ---
 
+# Stage 158A - Close View Mode QA Evidence and Contextual Help Design
+
+Date: 2026-07-24
+
+Status: `STAGE_158A_VIEW_MODE_QA_CONTEXTUAL_HELP_DESIGN_COMPLETE`
+
+Stage 158A records new user-executed real-world QA evidence for Simple View / Full View and records a documentation-only design direction for small contextual help affordances. Codex did not execute this browser/device QA. No product code, UI, CSS, tests, package files, lockfiles, routes, schema, migration, backup, Sync, Cloud, AI, localStorage key, dependency, analytics, telemetry, or backend behavior was changed.
+
+## Validation Target
+
+- Repository: `alikhani98/alios`
+- Live site: `https://alikhani98.github.io/alios/`
+- View mode preference under review: `viewDensityMode`
+- View mode localStorage key under review: `alios.viewDensityMode`
+- Modes checked by the user: Full View and Simple View
+- Codex role: documentation recording and architecture design only; Codex did not perform the real-world browser/device usage pass
+
+## Test Environment
+
+- QA executor: user
+- QA type: real-world browser/device usage
+- Browser: not fully specified in the handoff
+- OS: not fully specified in the handoff
+- Device: not fully specified in the handoff
+- Viewport widths: not fully specified in the handoff
+- Language, theme, accent, zoom, reduced-motion, screen-reader, console, and network details: not fully specified in the handoff
+
+This record must not be interpreted as full accessibility validation, screen-reader validation, all-device validation, multi-browser validation, console validation, network validation, or exact responsive viewport validation.
+
+## Scenario Results
+
+| Scenario ID | Flow | Preconditions | Steps performed | Expected result | Actual result | Status | Browser and viewport | Evidence | Severity | Reproducibility | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| RW-158A-001 | Simple View / Full View page pass | Live app with Stage 156 view mode implementation available | User checked the requested Simple View / Full View cases on Home, Today, Weekly Review, Settings, Goals, Personal Manual, and Finance | The checked pages remain usable in both modes without Critical or High functional defects | User reported that all requested cases were checked and no Critical or High functional issue was reported | Pass with limitations | User browser/device; exact browser, device, and viewport not provided | User-reported real-world QA result | None reported | User-executed handoff | Codex did not execute the browser/device QA |
+| RW-158A-002 | Decision Log Simple View product observation | Decision Log / دفترچه تصمیم‌ها opened in Simple View | User provided screenshot evidence and product feedback | Simple View should be easier for non-technical or older users to understand without a large always-open help panel | User observed that Simple View is still not simple/helpful enough and suggested a smaller contextual Help / راهنما / info affordance near section headers or intro boxes | Product follow-up | User browser/device; exact browser, device, and viewport not provided | Screenshot from Decision Log / دفترچه تصمیم‌ها in Simple View showing a large introductory help panel and proposed smaller contextual help affordance | Product observation, not functional blocker | User-observed once in this handoff | Candidate for a future small contextual help pilot |
+
+## Pages Checked
+
+| Page | Full View | Simple View | Evidence source | Limitation |
+| --- | --- | --- | --- | --- |
+| Home | Checked by user | Checked by user | User-reported real-world QA result | Exact browser/device/viewport details not provided |
+| Today | Checked by user | Checked by user | User-reported real-world QA result | Exact browser/device/viewport details not provided |
+| Weekly Review | Checked by user | Checked by user | User-reported real-world QA result | Exact browser/device/viewport details not provided |
+| Settings | Checked by user | Checked by user | User-reported real-world QA result | Exact browser/device/viewport details not provided |
+| Goals | Checked by user | Checked by user | User-reported real-world QA result | Exact browser/device/viewport details not provided |
+| Personal Manual | Checked by user | Checked by user | User-reported real-world QA result | Exact browser/device/viewport details not provided |
+| Finance | Checked by user | Checked by user | User-reported real-world QA result | Exact browser/device/viewport details not provided |
+
+## Issue Summary
+
+- Critical functional issues reported by user: none.
+- High functional issues reported by user: none.
+- Medium functional issues reported by user: none in this handoff.
+- Low functional issues reported by user: none in this handoff.
+- Product observation: Simple View still needs stronger contextual guidance for non-technical or older users.
+- Evidence: screenshot from Decision Log / دفترچه تصمیم‌ها in Simple View showing the current large introductory help panel and the user-proposed smaller contextual help affordance.
+
+## Contextual Help Follow-Up
+
+The user suggested a small Help / راهنما / info affordance near each relevant section header or intro box. The affordance should open concise guidance that reuses the Help Center or page description content where possible.
+
+The proposed next product stage should be a small contextual help pilot, not a broad redesign. Candidate pilot pages are Decision Log / دفترچه تصمیم‌ها, Personal Manual, and Goals. Any pilot must work by hover, keyboard focus, click, and touch; it must not be hover-only; it must preserve button semantics, accessible names, visible focus, mobile usability at 360 px, 390 px, and 430 px, 200% zoom readability, Persian RTL, English LTR, and the existing local-first architecture boundaries.
+
+## Three-Level Completion Status
+
+### Implementation Status
+
+- Stage 158A is documentation-only.
+- `docs/CONTEXTUAL_HELP_PATTERN.md` records the lightweight contextual help design and future pilot boundary.
+- Documentation now records user-executed Simple View / Full View QA evidence and the product follow-up.
+- No source code, UI, CSS, tests, routes, schemas, migrations, backup behavior, preferences, localStorage key, dependency, Sync, Cloud, AI, analytics, telemetry, or backend behavior changed.
+
+### Automated Validation Status
+
+- Documentation scope checks are required for Stage 158A.
+- Full TypeScript, test, and build validation are not required for this documentation-only stage unless separately requested.
+- Automated checks must not be treated as real-world validation.
+
+### Real-World Validation Status
+
+- Real-world validation source: user-executed manual QA.
+- Result: no Critical or High functional issue was reported by the user for the checked Simple View / Full View cases.
+- Limitation: exact browser, OS, device, viewport, console, network, zoom, reduced-motion, screen-reader, and multi-browser details were not provided.
+- Codex did not execute this QA.
+
+## Final Stage 158A Result
+
+`STAGE_158A_VIEW_MODE_QA_CONTEXTUAL_HELP_DESIGN_COMPLETE`
+
+---
+
 # Stage 157 - Simple View / Full View Real-World Validation
 
 Date: 2026-07-23
