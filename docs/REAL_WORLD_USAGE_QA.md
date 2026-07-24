@@ -345,7 +345,7 @@ Stage 157C rechecked the deployed Simple View / Full View prerequisites after St
 | Current main deploy check-run | PASS | Check-run `deploy`, completed success, `https://github.com/alikhani98/alios/actions/runs/30022934316/job/89260385662` |
 | Live site HTTP | PASS | `https://alikhani98.github.io/alios/` returned HTTP `200` |
 | Live assets | PASS | Live HTML referenced `/alios/assets/index-COZnbLy8.js`, `/alios/assets/index-CoDP7Gh5.css`, `/alios/assets/react-vendor-Da0zeSqt.js`, and `/alios/assets/icons-vendor-yF18FKTy.js` |
-| View density control deployed | PASS | Prior Stage 157 live asset verification found `alios.viewDensityMode`, `View density`, and `ØªØ±Ø§Ú©Ù… Ù†Ù…Ø§ÛŒØ´` in the deployed Settings chunk |
+| View density control deployed | PASS | Prior Stage 157 live asset verification found `alios.viewDensityMode`, `View density`, and `Ã˜ÂªÃ˜Â±Ã˜Â§ÃšÂ©Ã™â€¦ Ã™â€ Ã™â€¦Ã˜Â§Ã›Å’Ã˜Â´` in the deployed Settings chunk |
 
 ## Codex Environment Limitation
 
@@ -529,7 +529,7 @@ This record must not be interpreted as full accessibility validation, screen-rea
 | Scenario ID | Flow | Preconditions | Steps performed | Expected result | Actual result | Status | Browser and viewport | Evidence | Severity | Reproducibility | Notes |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | RW-158A-001 | Simple View / Full View page pass | Live app with Stage 156 view mode implementation available | User checked the requested Simple View / Full View cases on Home, Today, Weekly Review, Settings, Goals, Personal Manual, and Finance | The checked pages remain usable in both modes without Critical or High functional defects | User reported that all requested cases were checked and no Critical or High functional issue was reported | Pass with limitations | User browser/device; exact browser, device, and viewport not provided | User-reported real-world QA result | None reported | User-executed handoff | Codex did not execute the browser/device QA |
-| RW-158A-002 | Decision Log Simple View product observation | Decision Log / Ø¯ÙØªØ±Ú†Ù‡ ØªØµÙ…ÛŒÙ…â€ŒÙ‡Ø§ opened in Simple View | User provided screenshot evidence and product feedback | Simple View should be easier for non-technical or older users to understand without a large always-open help panel | User observed that Simple View is still not simple/helpful enough and suggested a smaller contextual Help / Ø±Ø§Ù‡Ù†Ù…Ø§ / info affordance near section headers or intro boxes | Product follow-up | User browser/device; exact browser, device, and viewport not provided | Screenshot from Decision Log / Ø¯ÙØªØ±Ú†Ù‡ ØªØµÙ…ÛŒÙ…â€ŒÙ‡Ø§ in Simple View showing a large introductory help panel and proposed smaller contextual help affordance | Product observation, not functional blocker | User-observed once in this handoff | Candidate for a future small contextual help pilot |
+| RW-158A-002 | Decision Log Simple View product observation | Decision Log / Ã˜Â¯Ã™ÂÃ˜ÂªÃ˜Â±Ãšâ€ Ã™â€¡ Ã˜ÂªÃ˜ÂµÃ™â€¦Ã›Å’Ã™â€¦Ã¢â‚¬Å’Ã™â€¡Ã˜Â§ opened in Simple View | User provided screenshot evidence and product feedback | Simple View should be easier for non-technical or older users to understand without a large always-open help panel | User observed that Simple View is still not simple/helpful enough and suggested a smaller contextual Help / Ã˜Â±Ã˜Â§Ã™â€¡Ã™â€ Ã™â€¦Ã˜Â§ / info affordance near section headers or intro boxes | Product follow-up | User browser/device; exact browser, device, and viewport not provided | Screenshot from Decision Log / Ã˜Â¯Ã™ÂÃ˜ÂªÃ˜Â±Ãšâ€ Ã™â€¡ Ã˜ÂªÃ˜ÂµÃ™â€¦Ã›Å’Ã™â€¦Ã¢â‚¬Å’Ã™â€¡Ã˜Â§ in Simple View showing a large introductory help panel and proposed smaller contextual help affordance | Product observation, not functional blocker | User-observed once in this handoff | Candidate for a future small contextual help pilot |
 
 ## Pages Checked
 
@@ -550,13 +550,13 @@ This record must not be interpreted as full accessibility validation, screen-rea
 - Medium functional issues reported by user: none in this handoff.
 - Low functional issues reported by user: none in this handoff.
 - Product observation: Simple View still needs stronger contextual guidance for non-technical or older users.
-- Evidence: screenshot from Decision Log / Ø¯ÙØªØ±Ú†Ù‡ ØªØµÙ…ÛŒÙ…â€ŒÙ‡Ø§ in Simple View showing the current large introductory help panel and the user-proposed smaller contextual help affordance.
+- Evidence: screenshot from Decision Log / Ã˜Â¯Ã™ÂÃ˜ÂªÃ˜Â±Ãšâ€ Ã™â€¡ Ã˜ÂªÃ˜ÂµÃ™â€¦Ã›Å’Ã™â€¦Ã¢â‚¬Å’Ã™â€¡Ã˜Â§ in Simple View showing the current large introductory help panel and the user-proposed smaller contextual help affordance.
 
 ## Contextual Help Follow-Up
 
-The user suggested a small Help / Ø±Ø§Ù‡Ù†Ù…Ø§ / info affordance near each relevant section header or intro box. The affordance should open concise guidance that reuses the Help Center or page description content where possible.
+The user suggested a small Help / Ã˜Â±Ã˜Â§Ã™â€¡Ã™â€ Ã™â€¦Ã˜Â§ / info affordance near each relevant section header or intro box. The affordance should open concise guidance that reuses the Help Center or page description content where possible.
 
-The proposed next product stage should be a small contextual help pilot, not a broad redesign. Candidate pilot pages are Decision Log / Ø¯ÙØªØ±Ú†Ù‡ ØªØµÙ…ÛŒÙ…â€ŒÙ‡Ø§, Personal Manual, and Goals. Any pilot must work by hover, keyboard focus, click, and touch; it must not be hover-only; it must preserve button semantics, accessible names, visible focus, mobile usability at 360 px, 390 px, and 430 px, 200% zoom readability, Persian RTL, English LTR, and the existing local-first architecture boundaries.
+The proposed next product stage should be a small contextual help pilot, not a broad redesign. Candidate pilot pages are Decision Log / Ã˜Â¯Ã™ÂÃ˜ÂªÃ˜Â±Ãšâ€ Ã™â€¡ Ã˜ÂªÃ˜ÂµÃ™â€¦Ã›Å’Ã™â€¦Ã¢â‚¬Å’Ã™â€¡Ã˜Â§, Personal Manual, and Goals. Any pilot must work by hover, keyboard focus, click, and touch; it must not be hover-only; it must preserve button semantics, accessible names, visible focus, mobile usability at 360 px, 390 px, and 430 px, 200% zoom readability, Persian RTL, English LTR, and the existing local-first architecture boundaries.
 
 ## Three-Level Completion Status
 
@@ -598,7 +598,7 @@ Status: Stage 159B user-executed QA evidence recorded; Stage 160 implementation 
 - Live site: `https://alikhani98.github.io/alios/`
 - Stage 159 PR: `https://github.com/alikhani98/alios/pull/142`
 - Stage 159 merge commit: `2eda8022bbb03925d34869704a8dd15b232fbc4a`
-- Stage 159 feature: Decision Log / Ø¯ÙØªØ±Ú†Ù‡ ØªØµÙ…ÛŒÙ…â€ŒÙ‡Ø§ contextual help pilot in Simple View
+- Stage 159 feature: Decision Log / Ã˜Â¯Ã™ÂÃ˜ÂªÃ˜Â±Ãšâ€ Ã™â€¡ Ã˜ÂªÃ˜ÂµÃ™â€¦Ã›Å’Ã™â€¦Ã¢â‚¬Å’Ã™â€¡Ã˜Â§ contextual help pilot in Simple View
 - Stage 160 feature scope: Personal Manual and Goals contextual help expansion in Simple View
 
 ## Stage 159B User-Executed QA Evidence
@@ -626,8 +626,8 @@ The user reported checking the live Stage 159 Decision Log contextual help pilot
 
 | Page | Simple View contextual help | Primary action reachable | Persian RTL | English LTR | 360 px | 390 px | 430 px | Desktop | Evidence / Blocker |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Personal Manual | PASS with limitations | PASS with limitations | PASS with limitations | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | PASS with limitations | Codex in-app browser against `vite preview` at `http://127.0.0.1:4173/alios/#/manual`; Simple View selected through Settings; Persian Help button found, `aria-expanded` changed from `false` to `true`, help note appeared, and `ÛŒØ§Ø¯Ø¯Ø§Ø´Øª Ø¬Ø¯ÛŒØ¯` remained present. Chrome extension control was unavailable. |
-| Goals | PASS with limitations | PASS with limitations | PASS with limitations | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | PASS with limitations | Codex in-app browser against `vite preview` at `http://127.0.0.1:4173/alios/#/goals`; Simple View selected through Settings; Persian Help button found, `aria-expanded` changed from `false` to `true`, help note appeared, and `Ù‡Ø¯Ù Ø¬Ø¯ÛŒØ¯` remained present. Chrome extension control was unavailable. |
+| Personal Manual | PASS with limitations | PASS with limitations | PASS with limitations | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | PASS with limitations | Codex in-app browser against `vite preview` at `http://127.0.0.1:4173/alios/#/manual`; Simple View selected through Settings; Persian Help button found, `aria-expanded` changed from `false` to `true`, help note appeared, and `Ã›Å’Ã˜Â§Ã˜Â¯Ã˜Â¯Ã˜Â§Ã˜Â´Ã˜Âª Ã˜Â¬Ã˜Â¯Ã›Å’Ã˜Â¯` remained present. Chrome extension control was unavailable. |
+| Goals | PASS with limitations | PASS with limitations | PASS with limitations | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | PASS with limitations | Codex in-app browser against `vite preview` at `http://127.0.0.1:4173/alios/#/goals`; Simple View selected through Settings; Persian Help button found, `aria-expanded` changed from `false` to `true`, help note appeared, and `Ã™â€¡Ã˜Â¯Ã™Â Ã˜Â¬Ã˜Â¯Ã›Å’Ã˜Â¯` remained present. Chrome extension control was unavailable. |
 
 Stage 160 automated checks, source review, and the limited in-app browser pass show implementation readiness for the checked desktop Persian Simple View flow. They are not full multi-device, multi-browser, viewport, zoom, keyboard-only, touch, console, network, or screen-reader validation.
 
@@ -742,7 +742,7 @@ This stage verifies that Stage 156 is merged, validated by automation, and deplo
 | Live site HTTP | PASS | `https://alikhani98.github.io/alios/` returned HTTP `200` |
 | Live entry asset | PASS | Live HTML referenced `/alios/assets/index-COZnbLy8.js` |
 | Stage 156 deployed chunks | PASS | Live entry referenced affected page chunks: `HomePage-DKDe6qoF.js`, `TodayPage-4W5t-D9h.js`, `WeeklyReviewPage-Co-lGo20.js`, `SettingsPage-CwEWd-7m.js`, `GoalsPage-BL8jeiFJ.js`, `PersonalManualPage-CP_HsTi4.js`, `FinancePage-BB1SX9af.js` |
-| Settings view mode code deployed | PASS | Live Settings chunk contained `alios.viewDensityMode`, `View density`, and `ØªØ±Ø§Ú©Ù… Ù†Ù…Ø§ÛŒØ´` |
+| Settings view mode code deployed | PASS | Live Settings chunk contained `alios.viewDensityMode`, `View density`, and `Ã˜ÂªÃ˜Â±Ã˜Â§ÃšÂ©Ã™â€¦ Ã™â€ Ã™â€¦Ã˜Â§Ã›Å’Ã˜Â´` |
 | Affected page mode readers deployed | PASS | Live affected page chunks contained `alios.viewDensityMode` |
 
 ## Codex Environment Limitation
@@ -795,7 +795,7 @@ Because of that limitation, Codex did not mark any Simple View / Full View user 
 | Control appears only in Settings | PARTIALLY VERIFIED | Source and live chunks place view-mode control in Settings and page readers in scoped pages; live UI navigation was not tested |
 | No Header, Navigation, or floating duplicate control | PARTIALLY VERIFIED | Source audit showed no route/header/nav changes; live UI was not manually traversed |
 | English label `View density` | PARTIALLY VERIFIED | Live Settings chunk contains `View density`; rendered accessible label not browser-tested |
-| Persian label `ØªØ±Ø§Ú©Ù… Ù†Ù…Ø§ÛŒØ´` | PARTIALLY VERIFIED | Live Settings chunk contains `ØªØ±Ø§Ú©Ù… Ù†Ù…Ø§ÛŒØ´`; rendered accessible label not browser-tested |
+| Persian label `Ã˜ÂªÃ˜Â±Ã˜Â§ÃšÂ©Ã™â€¦ Ã™â€ Ã™â€¦Ã˜Â§Ã›Å’Ã˜Â´` | PARTIALLY VERIFIED | Live Settings chunk contains `Ã˜ÂªÃ˜Â±Ã˜Â§ÃšÂ©Ã™â€¦ Ã™â€ Ã™â€¦Ã˜Â§Ã›Å’Ã˜Â´`; rendered accessible label not browser-tested |
 | Selected state is not color-only | NOT TESTED | Requires visual and assistive review |
 | Keyboard and screen-reader usability | NOT TESTED | Requires interactive browser/screen-reader smoke test |
 | Touch target size | NOT TESTED | Requires device or viewport inspection |
