@@ -8,15 +8,15 @@ Status: documentation-only evidence matrix. No product behavior is changed by th
 | --- | --- | --- | --- | --- | --- |
 | Home | partial | partial | Stage 148 | medium | Include in the next structured browser pass at desktop and 360/390/430 px. |
 | Inbox | partial | partial | Stage 23 | medium | Smoke-test capture, filtering, and bulk actions with long item lists. |
-| Today | partial | partial | Stage 154 | high | Verify create/edit/complete/delete, MIT, filters, recurrence, and task handoff. |
-| Weekly Review | partial | missing | Stage 162 | high | Prioritize in the next real-world QA pass because it is the densest planning surface. |
+| Today | partial | known | Stage 154 | high | Verify create/edit/complete/delete, MIT, filters, recurrence, and task handoff. |
+| Weekly Review | partial | known | Stage 162 | high | Prioritize the next deeper browser pass, especially for density and review workflow. |
 | Goals | known | partial | Stage 161 | medium | Check Simple/Full View, templates, and primary create actions. |
 | Personal Manual | known | partial | Stage 161 | medium | Check Simple/Full View, templates, search, and edit flows. |
 | Decision Log | known | partial | Stage 160 | medium | Check contextual help, record creation, and review flow. |
 | Finance | partial | partial | Stage 154 | high | Smoke-test transactions, obligations, summaries, and list density. |
 | Calendar | partial | missing | Stage 141 | medium | Confirm date handoff, month/week navigation, and ICS export. |
-| Settings | partial | partial | Stage 156 | high | Verify appearance, language, view mode, backup, and help sections. |
-| Backup/Restore | known | partial | Stage 146 | high | Confirm backup export, restore preview, cancel, and restore confirmation. |
+| Settings | partial | known | Stage 156 | high | Verify appearance, language, view mode, backup, and help sections. |
+| Backup/Restore | known | known | Stage 146 | high | Confirm backup export, restore preview, cancel, and restore confirmation. |
 | Search | partial | partial | Stage 26 | medium | Confirm query, results, and focus navigation still work. |
 | Simple/Full View | known | partial | Stage 157C | high | Repeat the browser/device matrix because Stage 157C was blocked. |
 | RTL/LTR | partial | partial | Stage 80 | medium | Check Persian and English in the same browser pass. |
@@ -45,4 +45,9 @@ Status: documentation-only evidence matrix. No product behavior is changed by th
 3. Settings and Backup/Restore.
 4. Finance.
 5. Calendar.
+
+## Stage 164 Attempt
+
+- Stage 164 attempted to run the structured real-world QA pass referenced by this matrix, but the current Codex environment did not expose a usable browser surface.
+- Coverage in this matrix remains unchanged until a browser-enabled QA pass records new real-world evidence.
 6. Simple / Full View on the highest-risk surfaces.
