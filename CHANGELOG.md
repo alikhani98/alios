@@ -2,6 +2,14 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 168 - Finance Trim Type Crash Fix
+
+- Fixed the remaining Finance route crash from PR #150 / Stage 167 by guarding the finance summary path that trimmed a malformed transaction category value
+- Identified the runtime error as `TypeError: n.trim is not a function` and traced it to `groupExpensesByCategory()` in the Finance calculations path
+- Added a route-level Finance regression that renders the live page container with the active debt data and the malformed category value that would have crashed before the fix
+- Kept the change local to the Finance calculations path and did not add a product feature, data-model change, backup-format change, dependency change, or new localStorage key
+- Verified the fix with TypeScript, focused Finance regressions, the full test suite, and the production build
+
 ## Stage 167 - Finance Debt Edit Crash Fix
 
 - Fixed the Finance obligation edit path so active debt/liability records with missing or invalid optional fields open safely instead of crashing the Finance route
