@@ -422,6 +422,52 @@ Stage 160 automated checks, source review, and the limited in-app browser pass s
 
 ---
 
+# Stage 160B and Stage 161 - Contextual Help QA Closure
+
+Date: 2026-07-24
+
+Status: Stage 160B user-executed real-world QA evidence recorded. Stage 161 is documentation-only and closes the current contextual help rollout track without adding more contextual help surfaces.
+
+## Validation Target
+
+- Repository: `alikhani98/alios`
+- Live site: `https://alikhani98.github.io/alios/`
+- Stage 160 PR: `https://github.com/alikhani98/alios/pull/143`
+- Stage 160 merge commit: `c285f9aaa96bc7b0a73ee5605300b805f8af1663`
+- Stage 160 feature scope: contextual help expansion to Personal Manual and Goals in Simple View
+
+## Stage 160B User-Executed QA Evidence
+
+The user reported checking the live app after Stage 160 and reported that the Personal Manual and Goals contextual help changes were OK. This is user-executed real-world QA evidence, not Codex-executed browser/device validation.
+
+| Scenario ID | Flow | Preconditions | Steps performed | Expected result | Actual result | Status | Browser and viewport | Evidence | Severity | Reproducibility | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| RW-160B-001 | Personal Manual contextual help | Live app includes Stage 160 Personal Manual help expansion | User checked the Personal Manual help surface | Help button is acceptable, open/close behavior works acceptably, and the primary action remains reachable | User reported OK / no issue reported | Pass with limitations | User browser/device; exact browser, OS, device, and viewport not provided | User-reported QA result | None reported | User-executed handoff | Codex did not execute this live-app QA |
+| RW-160B-002 | Goals contextual help | Live app includes Stage 160 Goals help expansion | User checked the Goals help surface | Help button is acceptable, open/close behavior works acceptably, and the primary action remains reachable | User reported OK / no issue reported | Pass with limitations | User browser/device; exact browser, OS, device, and viewport not provided | User-reported QA result | None reported | User-executed handoff | Codex did not execute this live-app QA |
+| RW-160B-003 | Full View regression signal | Live app includes Stage 160 contextual help expansion | User did not report Full View as broken after checking the Stage 160 rollout | Full View should not be broken by Simple View contextual help additions | Full View was not reported as broken | Pass with limitations | User browser/device; exact browser, OS, device, and viewport not provided | User-reported QA result | None reported | User-executed handoff | This is not a full Full View regression pass |
+
+## Stage 160B Evidence Limitations
+
+- Exact browser, OS, device, and viewport were not specified.
+- Console and network status were not specified.
+- Screen-reader behavior was not tested or not specified.
+- Keyboard-only behavior was not specified.
+- 200% zoom behavior was not specified.
+- Multi-browser behavior was not specified.
+- This record must not be interpreted as complete accessibility validation, all-device validation, viewport validation, console validation, network validation, or Codex-executed browser QA.
+
+## Stage 161 Rollout Decision
+
+The current contextual help rollout track is closed for now. Contextual help exists on Decision Log, Personal Manual, and Goals. Further expansion should not happen automatically or app-wide by default.
+
+Future contextual help rollout should be evidence-based. A page should become a candidate only when real usage, QA notes, or support observations show that the page is confusing, overly dense, or needs guidance near the relevant action or section. Automated tests and successful builds do not equal real-world validation.
+
+## Final Stage 161 Result
+
+`STAGE_161_CONTEXTUAL_HELP_QA_CLOSURE_COMPLETE`
+
+---
+
 # Stage 157 - Simple View / Full View Real-World Validation
 
 Date: 2026-07-23
