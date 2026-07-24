@@ -238,6 +238,28 @@ describe("finance calculations", () => {
     ]);
   });
 
+  it("keeps malformed transaction categories out of the trim path", () => {
+    expect(
+      groupExpensesByCategory([
+        {
+          id: "expense-legacy-category",
+          type: "expense",
+          title: "Legacy expense",
+          amount: 725,
+          category: 0 as unknown as string,
+          occurredAt: "2026-07-09",
+          createdAt: "2026-07-09T08:30:00.000Z",
+          updatedAt: "2026-07-09T08:30:00.000Z",
+        },
+      ])
+    ).toEqual({
+      other: {
+        amount: 725,
+        transactionCount: 1,
+      },
+    });
+  });
+
   it("keeps paused obligations out of the monthly estimate but in the remaining total", () => {
     expect(
       calculateMonthlyObligationEstimate(obligations, new Date("2026-07-09T12:00:00.000Z"))

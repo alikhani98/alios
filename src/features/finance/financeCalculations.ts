@@ -199,6 +199,15 @@ function getMonthSeriesStart(referenceDate: Date, monthCount: number): Date {
   return addMonths(getMonthStart(referenceDate), 1 - monthCount);
 }
 
+function normalizeFinanceTransactionCategory(category: unknown): string {
+  if (typeof category !== "string") {
+    return "other";
+  }
+
+  const trimmed = category.trim();
+  return trimmed.length > 0 ? trimmed : "other";
+}
+
 export function getCurrentMonthTransactions(
   transactions: FinanceTransaction[],
   referenceDate = new Date()
@@ -213,7 +222,7 @@ export function groupExpensesByCategory(
 ): Record<string, { amount: number; transactionCount: number }> {
   return transactions.reduce<Record<string, { amount: number; transactionCount: number }>>(
     (groups, transaction) => {
-      const category = transaction.category.trim();
+      const category = normalizeFinanceTransactionCategory(transaction.category);
       const currentGroup = groups[category] ?? { amount: 0, transactionCount: 0 };
       groups[category] = {
         amount: currentGroup.amount + toSafeAmount(transaction.amount),

@@ -1,5 +1,38 @@
 # AliOS Real-World Usage QA
 
+Stage 168 - Finance Trim Type Crash Fix
+
+Date: 2026-07-24
+
+Status: `STAGE_168_FINANCE_TRIM_TYPE_CRASH_FIX_COMPLETE`
+
+The user had previously reported a live Finance route crash after clicking Edit on an active debt/liability, and the runtime error was identified as `TypeError: n.trim is not a function`. Stage 168 fixed the remaining Finance calculations path that could still crash on malformed category data. Codex browser QA for the post-fix live app was not run.
+
+## Validation Target
+
+- Repository: `alikhani98/alios`
+- Branch: `codex/stage-168-finance-trim-type-crash-fix`
+- QA executor: Codex for the targeted source fix and automated validation; user real-world post-fix QA was not provided yet
+- QA target: live AliOS app for the reported bug; local repository for the fix
+
+## Environment Limitation
+
+- Codex browser QA: not run.
+- Exact browser, OS, device, viewport, language/direction combination, appearance mode, accent color, zoom, keyboard-only, screen-reader, console, network, and destructive-restore details were not provided for the post-fix stage.
+
+## Stage 168 Outcome
+
+- User-reported bug: the Finance route could crash when malformed category data reached the calculations path.
+- Targeted source fix: the Finance calculations path now normalizes malformed transaction category values before grouping expenses.
+- Focused regression tests: passed.
+- TypeScript validation: passed.
+- Full test suite: passed.
+- Production build: passed.
+- Release decision: PASS WITH KNOWN EVIDENCE LIMITATIONS.
+- No schema, migration, backup-format, package, lockfile, dependency, or localStorage key changes were introduced.
+
+---
+
 Stage 167 - Finance Debt Edit Crash Fix
 
 Date: 2026-07-24
