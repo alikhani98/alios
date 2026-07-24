@@ -1,5 +1,38 @@
 # AliOS Real-World Usage QA
 
+Stage 167 - Finance Debt Edit Crash Fix
+
+Date: 2026-07-24
+
+Status: `STAGE_167_FINANCE_DEBT_EDIT_CRASH_FIX_COMPLETE`
+
+The user reported a live/mobile Persian RTL Finance crash when clicking Edit on an active debt/liability. The Finance route showed the AliOS error boundary, and the report noted that the local data was not deleted. Codex did not execute browser QA for this stage.
+
+## Validation Target
+
+- Repository: `alikhani98/alios`
+- Branch: `codex/stage-167-finance-debt-edit-crash-fix`
+- QA executor: user for the live-app bug report; Codex for the targeted source fix and automated validation
+- QA target: live AliOS app for the bug report; local repository for the fix
+
+## Environment Limitation
+
+- Codex browser QA: not run.
+- Exact browser, OS, device, viewport, language/direction combination, appearance mode, accent color, zoom, keyboard-only, screen-reader, console, and network details were not provided by the user.
+
+## Stage 167 Outcome
+
+- User-reported bug: clicking Edit on an active debt/liability in Finance crashed the route and showed the error boundary.
+- Targeted source fix: the Finance obligation form now normalizes missing or invalid optional fields before mounting the edit form.
+- Focused regression test: passed.
+- TypeScript validation: passed.
+- Production build: passed.
+- Full test suite: attempted; one Weekly Review worker timeout occurred in the aggregate run, but the timed-out suite passed when rerun in isolation.
+- Release decision: PASS WITH KNOWN EVIDENCE LIMITATIONS for the code fix validation, with browser QA still not run by Codex.
+- No schema, migration, backup-format, package, lockfile, dependency, or localStorage key changes were introduced.
+
+---
+
 Stage 166 - Focused Weekly Review Real-World QA
 
 Date: 2026-07-24

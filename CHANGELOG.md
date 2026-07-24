@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 167 - Finance Debt Edit Crash Fix
+
+- Fixed the Finance obligation edit path so active debt/liability records with missing or invalid optional fields open safely instead of crashing the Finance route
+- Added a focused regression test that normalizes a messy active debt record and renders the Persian edit form without throwing
+- Kept the change targeted to the existing obligation form and did not add a product feature, data-model change, backup-format change, dependency change, or new localStorage key
+- Verified the fix with TypeScript, the focused regression test, the full test suite rerun for the previously timed-out Weekly Review suite, and the production build
+
 ## Stage 166 - Focused Weekly Review Real-World QA
 
 - Recorded the user-executed live QA pass for Weekly Review on the live AliOS app
