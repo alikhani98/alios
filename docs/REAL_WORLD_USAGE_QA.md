@@ -369,6 +369,59 @@ The proposed next product stage should be a small contextual help pilot, not a b
 
 ---
 
+# Stage 159B and Stage 160 - Contextual Help QA and Expansion
+
+Date: 2026-07-24
+
+Status: Stage 159B user-executed QA evidence recorded; Stage 160 implementation has limited Codex browser validation through the in-app browser static preview. Chrome extension control was unavailable in this Codex session.
+
+## Validation Target
+
+- Repository: `alikhani98/alios`
+- Live site: `https://alikhani98.github.io/alios/`
+- Stage 159 PR: `https://github.com/alikhani98/alios/pull/142`
+- Stage 159 merge commit: `2eda8022bbb03925d34869704a8dd15b232fbc4a`
+- Stage 159 feature: Decision Log / دفترچه تصمیم‌ها contextual help pilot in Simple View
+- Stage 160 feature scope: Personal Manual and Goals contextual help expansion in Simple View
+
+## Stage 159B User-Executed QA Evidence
+
+The user reported checking the live Stage 159 Decision Log contextual help pilot and reported that all checked items were OK. This is user-executed real-world QA evidence, not Codex-executed browser/device validation.
+
+| Scenario ID | Flow | Preconditions | Steps performed | Expected result | Actual result | Status | Browser and viewport | Evidence | Severity | Reproducibility | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| RW-159B-001 | Decision Log contextual help visibility | Live app includes Stage 159 Decision Log pilot | User opened Decision Log in the checked environment | Help button is visible near the page intro | User reported the Help button was visible | Pass with limitations | User browser/device; exact browser, device, and viewport not provided | User-reported QA result | None reported | User-executed handoff | Codex did not execute this browser/device QA |
+| RW-159B-002 | Decision Log contextual help open/close | Help button visible | User opened and closed contextual help | Help opens and closes without relying on hover | User reported open/close works | Pass with limitations | User browser/device; exact browser, device, and viewport not provided | User-reported QA result | None reported | User-executed handoff | Keyboard, touch, and screen-reader details were not specified |
+| RW-159B-003 | Decision Log primary form reachability | Decision Log page open | User checked the primary form after using help | Primary Decision Log form remains reachable | User reported the primary form was still reachable | Pass with limitations | User browser/device; exact browser, device, and viewport not provided | User-reported QA result | None reported | User-executed handoff | No data mutation issue was reported |
+| RW-159B-004 | Decision Log layout and copy | Help content opened and page reviewed | User checked layout and text | No obvious layout problem and copy is understandable | User reported no obvious layout problem and understandable text | Pass with limitations | User browser/device; exact browser, device, and viewport not provided | User-reported QA result | None reported | User-executed handoff | Exact 360/390/430 px, console, zoom, and screen-reader checks were not specified |
+| RW-159B-005 | Decision Log Full View | Full View checked after Stage 159 | User checked the Full View surface | Full View remains okay after the Simple View pilot | User reported Full View was still okay | Pass with limitations | User browser/device; exact browser, device, and viewport not provided | User-reported QA result | None reported | User-executed handoff | Full View exact viewport and accessibility details were not specified |
+
+## Stage 159B Evidence Limitations
+
+- Browser: not fully specified in the handoff.
+- OS: not fully specified in the handoff.
+- Device: not fully specified in the handoff.
+- Viewport widths: not fully specified in the handoff.
+- Console, network, zoom, reduced-motion, keyboard-only traversal, touch details, and screen-reader behavior: not fully specified in the handoff.
+- This record must not be interpreted as full accessibility validation, all-device validation, multi-browser validation, console validation, or exact responsive viewport validation.
+
+## Stage 160 Codex Visual QA Status
+
+| Page | Simple View contextual help | Primary action reachable | Persian RTL | English LTR | 360 px | 390 px | 430 px | Desktop | Evidence / Blocker |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Personal Manual | PASS with limitations | PASS with limitations | PASS with limitations | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | PASS with limitations | Codex in-app browser against `vite preview` at `http://127.0.0.1:4173/alios/#/manual`; Simple View selected through Settings; Persian Help button found, `aria-expanded` changed from `false` to `true`, help note appeared, and `یادداشت جدید` remained present. Chrome extension control was unavailable. |
+| Goals | PASS with limitations | PASS with limitations | PASS with limitations | NOT TESTED | NOT TESTED | NOT TESTED | NOT TESTED | PASS with limitations | Codex in-app browser against `vite preview` at `http://127.0.0.1:4173/alios/#/goals`; Simple View selected through Settings; Persian Help button found, `aria-expanded` changed from `false` to `true`, help note appeared, and `هدف جدید` remained present. Chrome extension control was unavailable. |
+
+Stage 160 automated checks, source review, and the limited in-app browser pass show implementation readiness for the checked desktop Persian Simple View flow. They are not full multi-device, multi-browser, viewport, zoom, keyboard-only, touch, console, network, or screen-reader validation.
+
+## Stage 160 Real-World Validation Status
+
+- Stage 159B Decision Log contextual help: user-executed pass with limitations recorded above.
+- Stage 160 Personal Manual and Goals contextual help: Codex-run in-app browser desktop Persian Simple View pass with limitations recorded above.
+- Remaining real-world validation gaps: Chrome, mobile widths 360/390/430 px, English LTR, zoom, reduced motion, keyboard-only traversal, touch, console, network, and screen-reader checks.
+
+---
+
 # Stage 157 - Simple View / Full View Real-World Validation
 
 Date: 2026-07-23

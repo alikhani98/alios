@@ -1,4 +1,4 @@
-import { AlertCircle, BookText, Clock3, Plus, RotateCcw, Search, Sparkles, X } from "lucide-react";
+import { AlertCircle, BookText, Clock3, Info, Plus, RotateCcw, Search, Sparkles, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
@@ -6,6 +6,7 @@ import type { CreateManualEntryInput } from "@/core/repositories";
 import { useDateFormatter } from "@/shared/date";
 import type { ManualEntry } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
+import { useViewDensityMode } from "@/shared/preferences/viewDensityMode";
 import {
   Badge,
   Button,
@@ -63,41 +64,76 @@ function previewTemplateBody(value: string): string {
   return `${firstLine.slice(0, 88)}…`;
 }
 
-function readSimpleViewMode() {
-  try {
-    return typeof window !== "undefined"
-      && window.localStorage.getItem("alios.viewDensityMode") === "simple";
-  } catch {
-    return false;
-  }
-}
+type ManualContextualHelpProps = {
+  isOpen: boolean;
+  onToggle: () => void;
+  panelId?: string;
+};
 
-function useSimpleViewMode() {
-  const [isSimpleView, setIsSimpleView] = useState(readSimpleViewMode);
+const manualContextualHelpCopy = {
+  en: {
+    button: "Help",
+    buttonAria: "Help for Personal Manual",
+    title: "What belongs here",
+    details: "Keep personal operating instructions, preferences, principles, reminders, and self-knowledge here.",
+    review: "These notes can support future planning and review, but AliOS does not infer private meaning automatically.",
+  },
+  fa: {
+    button: "راهنما",
+    buttonAria: "راهنمای دفترچه شخصی",
+    title: "اینجا چه چیزی بنویسم؟",
+    details: "دستورالعمل‌های شخصی، ترجیح‌ها، اصل‌ها، یادآورها و شناخت خودتان را اینجا نگه دارید.",
+    review: "این نوشته‌ها می‌توانند به برنامه‌ریزی و مرور بعدی کمک کنند، اما AliOS معنی خصوصی آن‌ها را خودکار حدس نمی‌زند.",
+  },
+} as const;
 
-  useEffect(() => {
-    if (typeof window === "undefined") {
-      return undefined;
-    }
+export function ManualContextualHelp({
+  isOpen,
+  onToggle,
+  panelId = "personal-manual-contextual-help",
+}: ManualContextualHelpProps) {
+  const { language, t } = useI18n();
+  const copy = manualContextualHelpCopy[language];
 
-    const update = () => setIsSimpleView(readSimpleViewMode());
+  return (
+    <div className="mt-4 max-w-3xl space-y-3">
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        onClick={onToggle}
+        aria-label={copy.buttonAria}
+        aria-expanded={isOpen}
+        aria-controls={panelId}
+        className="min-h-11"
+      >
+        <Info className="me-2 h-4 w-4" aria-hidden="true" />
+        {copy.button}
+      </Button>
 
-    window.addEventListener("alios-local-preference-change", update);
-    window.addEventListener("storage", update);
-
-    return () => {
-      window.removeEventListener("alios-local-preference-change", update);
-      window.removeEventListener("storage", update);
-    };
-  }, []);
-
-  return isSimpleView;
+      {isOpen ? (
+        <div
+          id={panelId}
+          role="note"
+          className="rounded-xl border border-primary/15 bg-background/95 p-4 text-sm leading-7 text-muted-foreground shadow-sm"
+        >
+          <p className="font-medium text-foreground">{copy.title}</p>
+          <div className="mt-2 space-y-2">
+            <p>{copy.details}</p>
+            <p>{copy.review}</p>
+            <p>{t("manual.localOnlyDescription")}</p>
+            <p>{t("manual.nonAdvisoryNote")}</p>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
 }
 
 export function PersonalManualPage() {
   const { t } = useI18n();
   const { formatDateTime } = useDateFormatter();
-  const isSimpleView = useSimpleViewMode();
+  const { isSimpleView } = useViewDensityMode();
   const [searchParams] = useSearchParams();
   const { entries, isLoading, error, loadEntries, createEntry, updateEntry, deleteEntry } =
     useManualEntries();
@@ -119,6 +155,7 @@ export function PersonalManualPage() {
   const [formRevision, setFormRevision] = useState(0);
   const [showAllEntries, setShowAllEntries] = useState(false);
   const [showSimpleTemplates, setShowSimpleTemplates] = useState(false);
+  const [isContextualHelpOpen, setIsContextualHelpOpen] = useState(false);
   const focusId = searchParams.get("focusId");
   const manualPreviewLimit = isSimpleView ? 4 : 6;
 
@@ -323,10 +360,17 @@ export function PersonalManualPage() {
             description={t("manual.description")}
             status={<StatusChip tone="neutral">{t("manual.localOnlyNote")}</StatusChip>}
           />
-          <div className="mt-4 max-w-3xl space-y-2 text-sm leading-7 text-muted-foreground">
-            <p>{t("manual.nonAdvisoryNote")}</p>
-            <p>{t("manual.localOnlyDescription")}</p>
-          </div>
+          {isSimpleView ? (
+            <ManualContextualHelp
+              isOpen={isContextualHelpOpen}
+              onToggle={() => setIsContextualHelpOpen((current) => !current)}
+            />
+          ) : (
+            <div className="mt-4 max-w-3xl space-y-2 text-sm leading-7 text-muted-foreground">
+              <p>{t("manual.nonAdvisoryNote")}</p>
+              <p>{t("manual.localOnlyDescription")}</p>
+            </div>
+          )}
         </div>
       </PremiumCard>
 
