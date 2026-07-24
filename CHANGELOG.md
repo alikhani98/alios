@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 165 - Weekly Review Improvement Discovery
+
+- Reviewed the current Weekly Review implementation, its adjacent local dependencies, and the existing QA evidence trail to define the smallest safe next step
+- Recommended focused QA as the next stage before any route-local Weekly Review product change
+- Kept the stage documentation-only and did not ship a product feature
+- Added no product code, source files, tests, dependencies, routes, schemas, migrations, backup-format changes, storage changes, localStorage keys, Sync, Cloud, AI, analytics, telemetry, backend, or runtime behavior
+
 ## Stage 164 - Structured Real-World QA Completion
 
 - Recorded the user-executed live QA pass for Weekly Review, Today, Settings, and Backup / Restore
