@@ -16,6 +16,14 @@ Stage 149 evaluates three premium interaction patterns for AliOS and defines whe
 | Scroll-driven Sticky Card Stack | Adopt with constraints | Settings Help Center educational guide | Stage 151 implemented | Useful for narrative education, but risky inside repeated operational workflows |
 | Dynamic Slider with Live Metric Cards | Adopt only as a constrained budget control | Existing Settings weekly task budget section only | Stage 154 implements a native slider companion with descriptive summaries | Current data plus user-declared task budget can support descriptive comparison only, not real capacity, effort, or overplanning calculations |
 
+Stage 158A contextual help status:
+
+| Interaction | Implemented | Current location | Relevant to contextual help? | Reuse in contextual help pilot? |
+| --- | --- | --- | --- | --- |
+| Infinite Draggable Marquee | Yes | Goals templates only | No. It is for optional starter discovery, not section-level explanation. | No. Do not use marquee motion for Help / راهنما affordances. |
+| Scroll-driven Sticky Card Stack | Yes | Settings Help Center planning guide only | Limited. It can inspire a bounded educational flow, but it is too heavy for repeated section help. | No for page/section popovers. Consider only for a separately approved larger guide. |
+| Dynamic Slider with Live Metric Cards | Partially. Stage 154 implemented a native budget slider only, not live metric cards. | Settings weekly task budget section only | No. It is a planning-budget input pattern. | No. It is unrelated to contextual help. |
+
 No interaction should be implemented in Stage 149. Future work must remain local-first, dependency-light, static-hosting compatible, accessible, bilingual, and respectful of reduced-motion preferences.
 
 Stage 156 follow-up:
@@ -23,6 +31,15 @@ Stage 156 follow-up:
 - Simple View / Full View did not refactor, relocate, or expand the Stage 150 marquee, Stage 151 sticky guide, or Stage 154 weekly budget slider.
 - Full View keeps those interactions at their approved density and placement.
 - Simple View may reduce the prominence of surrounding discovery or explanation surfaces through explicit disclosure, but the underlying approved interaction behavior remains unchanged.
+
+Stage 158A follow-up:
+
+- User-executed Simple View / Full View QA identified a product need for smaller contextual guidance, especially for non-technical or older users.
+- Contextual Help should be a lightweight Help / راهنما / info-icon control near page or section intros, not a premium motion pattern.
+- Infinite Draggable Marquee is not appropriate for section help because it is a discovery pattern for optional examples and would distract from concise guidance.
+- Scroll-driven Sticky Card Stack may inspire bounded educational flows, but it should not be reused for every section or small help popover.
+- Dynamic Slider with Live Metric Cards is unrelated to contextual help.
+- A future contextual help pilot should use a lighter disclosure or popover pattern and should start on one or two pages only.
 
 ## 2. Current Product Architecture Findings
 
