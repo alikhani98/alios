@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { format } from "date-fns";
 import { useForm } from "react-hook-form";
 
 import type { FinanceObligation } from "@/shared/types";
@@ -27,6 +26,14 @@ const financeObligationFormSchema = financeObligationSchema.omit({
   updatedAt: true,
 });
 
+const FINANCE_OBLIGATION_TYPE_VALUES = new Set(
+  FINANCE_OBLIGATION_TYPE_OPTIONS.map((option) => option.value)
+);
+
+const FINANCE_OBLIGATION_STATUS_VALUES = new Set(
+  FINANCE_OBLIGATION_STATUS_OPTIONS.map((option) => option.value)
+);
+
 function toOptionalString(value: string): string | undefined {
   const trimmed = value.trim();
   return trimmed.length > 0 ? trimmed : undefined;
@@ -35,6 +42,100 @@ function toOptionalString(value: string): string | undefined {
 function toOptionalNumber(value: string): number | undefined {
   const trimmed = value.trim();
   return trimmed.length > 0 ? Number(trimmed) : undefined;
+}
+
+function toSafeString(value: unknown): string {
+  return typeof value === "string" ? value : "";
+}
+
+function toOptionalSafeString(value: unknown): string | undefined {
+  const trimmed = toSafeString(value).trim();
+
+  return trimmed.length > 0 ? trimmed : undefined;
+}
+
+function toSafeNumber(value: unknown, fallback = 0): number {
+  return typeof value === "number" && Number.isFinite(value) && value >= 0
+    ? value
+    : fallback;
+}
+
+function toOptionalSafeNumber(value: unknown): number | undefined {
+  return typeof value === "number" && Number.isFinite(value) && value >= 0
+    ? value
+    : undefined;
+}
+
+function toOptionalSafeDate(value: unknown): string | undefined {
+  if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return undefined;
+  }
+
+  const parsed = new Date(`${value}T00:00:00`);
+
+  return Number.isNaN(parsed.getTime()) ? undefined : value;
+}
+
+function isFinanceObligationType(
+  value: unknown
+): value is FinanceObligationFormValues["type"] {
+  return (
+    typeof value === "string" &&
+    FINANCE_OBLIGATION_TYPE_VALUES.has(
+      value as FinanceObligationFormValues["type"]
+    )
+  );
+}
+
+function isFinanceObligationStatus(
+  value: unknown
+): value is FinanceObligationFormValues["status"] {
+  return (
+    typeof value === "string" &&
+    FINANCE_OBLIGATION_STATUS_VALUES.has(
+      value as FinanceObligationFormValues["status"]
+    )
+  );
+}
+
+function toSafeObligationType(
+  value: unknown
+): FinanceObligationFormValues["type"] {
+  return isFinanceObligationType(value)
+    ? value
+    : DEFAULT_FINANCE_OBLIGATION_TYPE;
+}
+
+function toSafeObligationStatus(
+  value: unknown
+): FinanceObligationFormValues["status"] {
+  return isFinanceObligationStatus(value)
+    ? value
+    : DEFAULT_FINANCE_OBLIGATION_STATUS;
+}
+
+export function normalizeFinanceObligationFormValues(
+  obligation?: FinanceObligation
+): FinanceObligationFormValues {
+  return {
+    type: toSafeObligationType(obligation?.type),
+    title: toSafeString(obligation?.title),
+    totalAmount: toSafeNumber(obligation?.totalAmount),
+    paidAmount: toSafeNumber(obligation?.paidAmount),
+    dueAmount: toOptionalSafeNumber(obligation?.dueAmount),
+    monthlyAmount: toOptionalSafeNumber(obligation?.monthlyAmount),
+    dueDay:
+      typeof obligation?.dueDay === "number" &&
+      Number.isInteger(obligation.dueDay) &&
+      obligation.dueDay >= 1 &&
+      obligation.dueDay <= 31
+        ? obligation.dueDay
+        : undefined,
+    dueDate: toOptionalSafeDate(obligation?.dueDate),
+    counterparty: toOptionalSafeString(obligation?.counterparty),
+    status: toSafeObligationStatus(obligation?.status),
+    notes: toOptionalSafeString(obligation?.notes),
+  };
 }
 
 export function FinanceObligationForm({
@@ -51,19 +152,7 @@ export function FinanceObligationForm({
     formState: { errors },
   } = useForm<FinanceObligationFormValues>({
     resolver: zodResolver(financeObligationFormSchema),
-    defaultValues: {
-      type: obligation?.type ?? DEFAULT_FINANCE_OBLIGATION_TYPE,
-      title: obligation?.title ?? "",
-      totalAmount: obligation?.totalAmount ?? 0,
-      paidAmount: obligation?.paidAmount ?? 0,
-      dueAmount: obligation?.dueAmount,
-      monthlyAmount: obligation?.monthlyAmount,
-      dueDay: obligation?.dueDay,
-      dueDate: obligation?.dueDate ?? "",
-      counterparty: obligation?.counterparty ?? "",
-      status: obligation?.status ?? DEFAULT_FINANCE_OBLIGATION_STATUS,
-      notes: obligation?.notes ?? "",
-    },
+    defaultValues: normalizeFinanceObligationFormValues(obligation),
   });
   const dueDateValue = watch("dueDate");
 
