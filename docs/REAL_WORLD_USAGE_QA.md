@@ -468,6 +468,33 @@ Future contextual help rollout should be evidence-based. A page should become a 
 
 ---
 
+# Stage 163 - Real-World QA Evidence Enrichment and Release Hardening
+
+Date: 2026-07-24
+
+Status: `STAGE_163_REAL_WORLD_QA_RELEASE_HARDENING_COMPLETE`
+
+This stage adds reusable QA evidence documentation only. No user-executed browser QA was performed by Codex in this stage, and no product behavior was validated by these documents alone.
+
+## Deliverables
+
+- `docs/REAL_WORLD_QA_TEMPLATE.md`
+- `docs/RELEASE_SMOKE_TEST_CHECKLIST.md`
+- `docs/QA_COVERAGE_MATRIX_STAGE_163.md`
+
+## Stage 163 Validation Status
+
+- Documentation-only stage.
+- No product code, UI, CSS, tests, routes, schema, migration, backup, Sync, Cloud, AI, analytics, telemetry, backend, or runtime behavior changed.
+- No new user-executed QA evidence was recorded in this stage.
+- The new documents improve future QA consistency and release judgment, but they do not themselves validate product behavior.
+
+## Final Stage 163 Result
+
+`STAGE_163_REAL_WORLD_QA_RELEASE_HARDENING_COMPLETE`
+
+---
+
 # Stage 157 - Simple View / Full View Real-World Validation
 
 Date: 2026-07-23
