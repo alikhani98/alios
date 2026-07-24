@@ -1,9 +1,10 @@
-import { AlertCircle, GitBranch, Plus, RotateCcw } from "lucide-react";
+import { AlertCircle, GitBranch, Info, Plus, RotateCcw } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import type { CreateDecisionLogEntryInput } from "@/core/repositories";
 import type { DecisionLogEntry } from "@/shared/types";
 import { useI18n, type TranslationKey } from "@/shared/i18n";
+import { useViewDensityMode } from "@/shared/preferences/viewDensityMode";
 import {
   Button,
   CardContent,
@@ -66,8 +67,81 @@ function parseRating(value: string): 1 | 2 | 3 | 4 | 5 | undefined {
   }
 }
 
+type DecisionLogContextualHelpProps = {
+  isOpen: boolean;
+  onToggle: () => void;
+  panelId?: string;
+};
+
+const decisionLogHelpContentKeys: TranslationKey[] = [
+  "decisions.description",
+  "decisions.localOnlyDescription",
+  "decisions.nonAdvisoryNote",
+];
+
+const decisionLogContextualHelpCopy = {
+  en: {
+    button: "Help",
+    buttonAria: "Help for Decision Log",
+    title: "What to record here",
+    details: "Record the choice, why, tradeoffs or options, and what happened later.",
+  },
+  fa: {
+    button: "راهنما",
+    buttonAria: "راهنمای دفترچه تصمیم‌ها",
+    title: "اینجا چه چیزی را ثبت کنم؟",
+    details: "انتخاب، دلیل، گزینه‌ها یا بده‌بستان‌ها، و نتیجه بعدی را بنویسید.",
+  },
+} as const;
+
+export function DecisionLogContextualHelp({
+  isOpen,
+  onToggle,
+  panelId = "decision-log-contextual-help",
+}: DecisionLogContextualHelpProps) {
+  const { language, t } = useI18n();
+  const copy = decisionLogContextualHelpCopy[language];
+
+  return (
+    <div className="mt-4 max-w-3xl space-y-3">
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        onClick={onToggle}
+        aria-label={copy.buttonAria}
+        aria-expanded={isOpen}
+        aria-controls={panelId}
+        className="min-h-11"
+      >
+        <Info className="me-2 h-4 w-4" aria-hidden="true" />
+        {copy.button}
+      </Button>
+
+      {isOpen ? (
+        <div
+          id={panelId}
+          role="note"
+          className="rounded-xl border border-primary/15 bg-background/95 p-4 text-sm leading-7 text-muted-foreground shadow-sm"
+        >
+          <p className="font-medium text-foreground">
+            {copy.title}
+          </p>
+          <div className="mt-2 space-y-2">
+            <p>{copy.details}</p>
+            {decisionLogHelpContentKeys.map((key) => (
+              <p key={key}>{t(key)}</p>
+            ))}
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export function DecisionLogPage() {
   const { t } = useI18n();
+  const { isSimpleView } = useViewDensityMode();
   const {
     entries,
     isLoading,
@@ -87,6 +161,7 @@ export function DecisionLogPage() {
   const [actionError, setActionError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [showAllDecisions, setShowAllDecisions] = useState(false);
+  const [isContextualHelpOpen, setIsContextualHelpOpen] = useState(false);
   const formRef = useRef<HTMLDivElement | null>(null);
   const referenceDate = useMemo(() => new Date(), []);
   const hasActiveFilter = selectedFilter !== "all";
@@ -230,10 +305,17 @@ export function DecisionLogPage() {
             description={t("decisions.description")}
             status={<StatusChip tone="neutral">{t("decisions.localOnlyNote")}</StatusChip>}
           />
-          <div className="mt-4 max-w-3xl space-y-2 text-sm leading-7 text-muted-foreground">
-            <p>{t("decisions.nonAdvisoryNote")}</p>
-            <p>{t("decisions.localOnlyDescription")}</p>
-          </div>
+          {isSimpleView ? (
+            <DecisionLogContextualHelp
+              isOpen={isContextualHelpOpen}
+              onToggle={() => setIsContextualHelpOpen((current) => !current)}
+            />
+          ) : (
+            <div className="mt-4 max-w-3xl space-y-2 text-sm leading-7 text-muted-foreground">
+              <p>{t("decisions.nonAdvisoryNote")}</p>
+              <p>{t("decisions.localOnlyDescription")}</p>
+            </div>
+          )}
         </div>
       </PremiumCard>
 
