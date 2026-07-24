@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 164 - Structured Real-World QA Completion
+
+- Recorded the user-executed live QA pass for Weekly Review, Today, Settings, and Backup / Restore
+- Captured that all four reported surfaces were OK and that no issue was reported
+- Kept the stage documentation-only and did not ship a product feature
+- Added no product code, source files, tests, dependencies, routes, schemas, migrations, backup-format changes, storage changes, localStorage keys, Sync, Cloud, AI, analytics, telemetry, backend, or runtime behavior
+
 ## Stage 163 - Real-World QA Evidence Enrichment and Release Hardening
 
 - Added a reusable real-world QA template, a GitHub Pages smoke-test checklist, and a QA coverage matrix for current AliOS v1 surfaces

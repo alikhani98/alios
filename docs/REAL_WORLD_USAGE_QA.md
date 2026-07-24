@@ -1,5 +1,44 @@
 # AliOS Real-World Usage QA
 
+Stage 164 - Structured Real-World QA Completion
+
+Date: 2026-07-24
+
+Status: `STAGE_164_STRUCTURED_QA_COMPLETE`
+
+Stage 164 first attempted to run the Stage 163 structured real-world QA framework in Codex, but the environment did not expose a usable interactive browser surface. The user later completed a live real-world QA pass on the deployed AliOS app and reported that Weekly Review, Today, Settings, and Backup / Restore were all OK.
+
+## Validation Target
+
+- Repository: `alikhani98/alios`
+- Branch: `codex/stage-164-structured-qa-targeted-hardening`
+- Current HEAD: `f626c5aba25289ca04bb8308cb55b7192f7c81d3`
+- Upstream reference: `origin/main` at `f626c5aba25289ca04bb8308cb55b7192f7c81d3`
+- QA executor: user
+- QA target: live AliOS app
+
+## Environment Limitation
+
+- Codex browser QA: not run for the final Stage 164 evidence.
+- Exact browser, OS, device, viewport, language/direction, appearance mode, accent color, zoom, keyboard-only, screen-reader, console, and network details were not provided by the user.
+
+## Stage 164 Outcome
+
+- Structured browser QA: user-executed and complete for the reported surfaces.
+- Weekly Review: OK.
+- Today: OK.
+- Settings: OK.
+- Backup / Restore: OK.
+- No issue was reported.
+- No source fix was required.
+- Phase B targeted hardening: not required.
+
+## Final Stage 164 Result
+
+`STAGE_164_STRUCTURED_QA_COMPLETE`
+
+---
+
 Stage 148 - Real-World Validation Execution
 
 Date: 2026-07-22
