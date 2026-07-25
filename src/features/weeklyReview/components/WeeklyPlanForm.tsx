@@ -1,6 +1,6 @@
 import type { Goal, Project, Task, WeeklyPlan } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
-import { Button, Input, Select, Textarea } from "@/shared/ui";
+import { Button, Input, Select, SoftPanel, Textarea } from "@/shared/ui";
 
 export type WeeklyPlanFormProps = {
   weekStart: string;
@@ -29,19 +29,21 @@ export function WeeklyPlanForm({ weekStart, plan, goals, projects, tasks, isSavi
         });
       }}
     >
-      <div className="grid gap-2">
-        <label htmlFor="weekly-plan-title" className="text-sm font-semibold">
-          {t("weeklyReview.nextFocusLabel")}
-        </label>
-        <Input id="weekly-plan-title" name="focusTitle" required defaultValue={plan?.focusTitle ?? ""} />
-      </div>
-      <div className="grid gap-2">
-        <label htmlFor="weekly-plan-intention" className="text-sm font-medium">
-          {t("common.notes")}
-        </label>
-        <Textarea id="weekly-plan-intention" name="intention" defaultValue={plan?.intention ?? ""} />
-      </div>
-      <div className="grid gap-3 md:grid-cols-3">
+      <SoftPanel className="space-y-4 alios-surface-muted">
+        <div className="grid gap-2">
+          <label htmlFor="weekly-plan-title" className="text-sm font-semibold">
+            {t("weeklyReview.nextFocusLabel")}
+          </label>
+          <Input id="weekly-plan-title" name="focusTitle" required defaultValue={plan?.focusTitle ?? ""} />
+        </div>
+        <div className="grid gap-2">
+          <label htmlFor="weekly-plan-intention" className="text-sm font-medium">
+            {t("common.notes")}
+          </label>
+          <Textarea id="weekly-plan-intention" name="intention" defaultValue={plan?.intention ?? ""} />
+        </div>
+      </SoftPanel>
+      <SoftPanel className="grid gap-3 alios-surface-muted md:grid-cols-3">
         <div className="grid gap-2">
           <label htmlFor="weekly-plan-goal" className="text-sm font-medium">{t("projects.linkedGoal")}</label>
           <Select id="weekly-plan-goal" name="goalId" defaultValue={plan?.goalId ?? ""}>
@@ -63,9 +65,11 @@ export function WeeklyPlanForm({ weekStart, plan, goals, projects, tasks, isSavi
             {tasks.filter((task) => task.status !== "done" && task.status !== "cancelled").map((task) => <option key={task.id} value={task.id}>{task.title}</option>)}
           </Select>
         </div>
-      </div>
+      </SoftPanel>
       <input type="hidden" name="weekStart" value={weekStart} />
-      <Button type="submit" className="w-full sm:w-auto" disabled={isSaving}>{isSaving ? t("common.saving") : t("common.saveChanges")}</Button>
+      <div className="flex border-t border-border/70 pt-4">
+        <Button type="submit" className="w-full sm:w-auto" disabled={isSaving}>{isSaving ? t("common.saving") : t("common.saveChanges")}</Button>
+      </div>
     </form>
   );
 }
