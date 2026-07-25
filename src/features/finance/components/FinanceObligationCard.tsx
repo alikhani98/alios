@@ -46,9 +46,15 @@ export function FinanceObligationCard({
       : null;
 
   return (
-    <SoftPanel className="space-y-4">
+    <SoftPanel className="space-y-4 border-border/70">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0 space-y-2">
+          <h3 className="text-lg font-semibold leading-7">{obligation.title}</h3>
+          <p className="text-sm text-muted-foreground">
+            {obligation.dueDate ? formatDate(obligation.dueDate) : null}
+            {obligation.dueDate && obligation.dueDay ? " - " : null}
+            {obligation.dueDay ? `${t("finance.dueDay")}: ${obligation.dueDay}` : null}
+          </p>
           <div className="flex flex-wrap items-center gap-2">
             <StatusChip tone={getStatusTone(obligation.status)}>
               {t(
@@ -65,21 +71,15 @@ export function FinanceObligationCard({
               )}
             </StatusChip>
           </div>
-          <h3 className="text-lg font-semibold leading-7">{obligation.title}</h3>
-          <p className="text-sm text-muted-foreground">
-            {obligation.dueDate ? formatDate(obligation.dueDate) : null}
-            {obligation.dueDate && obligation.dueDay ? " - " : null}
-            {obligation.dueDay ? `${t("finance.dueDay")}: ${obligation.dueDay}` : null}
-          </p>
         </div>
-        <p className="max-w-[11rem] break-words text-end text-lg font-semibold tabular-nums leading-7">
+        <p className="max-w-[11rem] break-words text-end text-xl font-semibold tabular-nums leading-8">
           {formatFinanceAmount(remainingAmount, language === "fa" ? "fa-IR" : "en-US")}{" "}
           {t("finance.currency")}
         </p>
       </div>
 
       <div className="grid gap-2 text-sm sm:grid-cols-2 xl:grid-cols-4">
-        <div className="rounded-2xl border bg-background/70 px-4 py-3">
+        <div className="alios-surface-muted px-4 py-3">
           <p className="text-xs text-muted-foreground">{t("finance.totalAmount")}</p>
           <p className="mt-1 font-medium tabular-nums">
             {formatFinanceAmount(
@@ -89,7 +89,7 @@ export function FinanceObligationCard({
             {t("finance.currency")}
           </p>
         </div>
-        <div className="rounded-2xl border bg-background/70 px-4 py-3">
+        <div className="alios-surface-muted px-4 py-3">
           <p className="text-xs text-muted-foreground">{t("finance.paidAmount")}</p>
           <p className="mt-1 font-medium tabular-nums">
             {formatFinanceAmount(
@@ -99,7 +99,7 @@ export function FinanceObligationCard({
             {t("finance.currency")}
           </p>
         </div>
-        <div className="rounded-2xl border bg-background/70 px-4 py-3">
+        <div className="alios-surface-muted px-4 py-3">
           <p className="text-xs text-muted-foreground">{t("finance.remainingAmount")}</p>
           <p className="mt-1 font-medium tabular-nums">
             {formatFinanceAmount(remainingAmount, language === "fa" ? "fa-IR" : "en-US")}{" "}
@@ -107,7 +107,7 @@ export function FinanceObligationCard({
           </p>
         </div>
         {paidPercentage !== null ? (
-          <div className="rounded-2xl border bg-background/70 px-4 py-3">
+          <div className="alios-surface-muted px-4 py-3">
             <p className="text-xs text-muted-foreground">{t("finance.paidProgress")}</p>
             <p className="mt-1 font-medium tabular-nums">
               {t("finance.paidPercentage", {
@@ -118,7 +118,7 @@ export function FinanceObligationCard({
         ) : null}
       </div>
 
-      <div className="grid gap-2 text-sm text-muted-foreground">
+      <div className="alios-surface-muted grid gap-2 px-4 py-3 text-sm text-muted-foreground">
         {obligation.dueAmount !== undefined ? (
           <p>
             {t("finance.dueAmount")}:{" "}
@@ -147,7 +147,7 @@ export function FinanceObligationCard({
         {obligation.notes ? <p className="leading-7">{obligation.notes}</p> : null}
       </div>
 
-      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+      <div className="flex flex-col gap-2 border-t border-border/70 pt-3 sm:flex-row sm:flex-wrap">
         <Button
           type="button"
           size="sm"

@@ -33,9 +33,11 @@ export function FinanceTransactionCard({
   const typeTone = transaction.type === "income" ? "success" : "danger";
 
   return (
-    <SoftPanel className="space-y-4">
+    <SoftPanel className="space-y-4 border-border/70">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0 space-y-2">
+          <h3 className="text-lg font-semibold leading-7">{transaction.title}</h3>
+          <p className="text-sm text-muted-foreground">{formatDate(transaction.occurredAt)}</p>
           <div className="flex flex-wrap items-center gap-2">
             <StatusChip tone={typeTone}>
               {t(
@@ -48,15 +50,11 @@ export function FinanceTransactionCard({
               {t(getFinanceTransactionCategoryLabelKey(transaction.category))}
             </StatusChip>
           </div>
-          <h3 className="text-lg font-semibold leading-7">{transaction.title}</h3>
-          <p className="text-sm text-muted-foreground">{formatDate(transaction.occurredAt)}</p>
         </div>
         <p
           className={cn(
-            "max-w-[10rem] break-words text-end text-lg font-semibold tabular-nums leading-7",
-            transaction.type === "income"
-              ? "text-emerald-700 dark:text-emerald-300"
-              : "text-destructive"
+            "max-w-[10rem] break-words text-end text-xl font-semibold tabular-nums leading-8",
+            transaction.type === "income" ? "text-success" : "text-destructive"
           )}
         >
           {amountLabel}
@@ -64,10 +62,12 @@ export function FinanceTransactionCard({
       </div>
 
       {transaction.notes ? (
-        <p className="text-sm leading-7 text-muted-foreground">{transaction.notes}</p>
+        <div className="alios-surface-muted px-4 py-3">
+          <p className="text-sm leading-7 text-muted-foreground">{transaction.notes}</p>
+        </div>
       ) : null}
 
-      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+      <div className="flex flex-col gap-2 border-t border-border/70 pt-3 sm:flex-row sm:flex-wrap">
         <Button
           type="button"
           size="sm"
