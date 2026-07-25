@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 172 - Visual Design System Discovery and Figma Direction
+
+- Audited the current AliOS visual system from source and documentation without changing UI code, CSS, tests, schema, backup format, dependencies, or product behavior
+- Documented the current shell, shared controls, surface vocabulary, density rules, RTL/LTR considerations, accessibility risks, and page-template patterns
+- Produced a Figma-ready design direction and a phased implementation roadmap that keeps the next stage small, reviewable, and low risk
+- Kept the stage docs-only and did not perform browser QA or Figma file work
+
 ## Stage 170 - Deploy Freshness and Service Worker Diagnosis
 
 - Verified that the latest `origin/main` head includes PR #152 at merge commit `f3203da125a0cc80639d512a804c1e555b3a69fb`
