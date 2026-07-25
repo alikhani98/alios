@@ -61,7 +61,7 @@ export function CollapsibleSection({
     <section
       id={id}
       className={cn(
-        "overflow-hidden rounded-[1.75rem] border border-border/70 bg-card/90 shadow-sm",
+        "alios-surface-soft overflow-hidden bg-card/90",
         aliosSurfaceMotion,
         className
       )}
@@ -79,7 +79,7 @@ export function CollapsibleSection({
       >
         <span className="flex w-full min-w-0 items-start gap-3 text-start sm:w-auto">
           {icon ? (
-            <span className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-primary/10 bg-primary/10 text-primary">
+            <span className="alios-icon-primary mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl">
               {icon}
             </span>
           ) : null}

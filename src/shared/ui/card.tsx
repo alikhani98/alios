@@ -13,7 +13,7 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "rounded-2xl border bg-card text-card-foreground shadow-sm",
+      "alios-surface-card",
       aliosSurfaceMotion,
       aliosInteractiveLift,
       "hover:border-border/80 focus-within:shadow-md",

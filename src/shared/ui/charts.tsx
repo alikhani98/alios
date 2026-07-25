@@ -1,6 +1,7 @@
 import * as React from "react";
 
 import { cn } from "@/shared/utils/cn";
+import { aliosInteractiveLift, aliosSurfaceMotion } from "./motion";
 
 function clampPercent(value: number): number {
   if (!Number.isFinite(value)) {
@@ -43,7 +44,11 @@ export function HorizontalBarList({
         return (
           <li
             key={item.id}
-            className="group space-y-3 rounded-2xl border border-border/70 bg-background/70 p-4 transition-[transform,box-shadow,border-color,background-color] duration-200 ease-out motion-reduce:transition-none hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-sm"
+            className={cn(
+              "alios-surface-muted group space-y-3 p-4 hover:border-primary/20 hover:shadow-sm",
+              aliosSurfaceMotion,
+              aliosInteractiveLift
+            )}
           >
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="min-w-0 space-y-1">
@@ -136,7 +141,11 @@ export function MiniCashflowBars({
         return (
           <div
             key={item.id}
-            className="group space-y-3 rounded-2xl border border-border/70 bg-background/70 p-4 transition-[transform,box-shadow,border-color,background-color] duration-200 ease-out motion-reduce:transition-none hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-sm"
+            className={cn(
+              "alios-surface-muted group space-y-3 p-4 hover:border-primary/20 hover:shadow-sm",
+              aliosSurfaceMotion,
+              aliosInteractiveLift
+            )}
           >
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="min-w-0 space-y-1">
@@ -161,7 +170,7 @@ export function MiniCashflowBars({
 
             <div className="space-y-2">
               <BarRow label={incomeLabel} value={item.income} scale={scale} tone="bg-primary" />
-              <BarRow label={expensesLabel} value={item.expenses} scale={scale} tone="bg-amber-500" />
+              <BarRow label={expensesLabel} value={item.expenses} scale={scale} tone="bg-warning" />
               <BarRow label={obligationsLabel} value={item.obligations} scale={scale} tone="bg-slate-400 dark:bg-slate-500" />
             </div>
           </div>
@@ -233,7 +242,11 @@ export function ProgressBarList({
         return (
           <li
             key={item.id}
-            className="group space-y-3 rounded-2xl border border-border/70 bg-background/70 p-4 transition-[transform,box-shadow,border-color,background-color] duration-200 ease-out motion-reduce:transition-none hover:-translate-y-0.5 hover:border-primary/20 hover:shadow-sm"
+            className={cn(
+              "alios-surface-muted group space-y-3 p-4 hover:border-primary/20 hover:shadow-sm",
+              aliosSurfaceMotion,
+              aliosInteractiveLift
+            )}
           >
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="min-w-0 space-y-1">

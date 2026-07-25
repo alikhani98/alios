@@ -39,6 +39,14 @@ const config = {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
         },
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
+        },
         muted: {
           DEFAULT: "hsl(var(--muted))",
           foreground: "hsl(var(--muted-foreground))",
@@ -57,14 +65,18 @@ const config = {
         },
       },
       borderRadius: {
+        control: "var(--alios-radius-control)",
+        surface: "var(--alios-radius-surface)",
+        section: "var(--alios-radius-section)",
+        shell: "var(--alios-radius-shell)",
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
       boxShadow: {
-        aliosCard: "0 1px 2px 0 rgb(15 23 42 / 0.05)",
-        aliosFloating:
-          "0 10px 15px -3px rgb(15 23 42 / 0.1), 0 4px 6px -4px rgb(15 23 42 / 0.1)",
+        aliosCard: "var(--alios-shadow-card)",
+        aliosRaised: "var(--alios-shadow-raised)",
+        aliosFloating: "var(--alios-shadow-floating)",
       },
     },
   },

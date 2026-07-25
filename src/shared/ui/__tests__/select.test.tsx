@@ -13,7 +13,7 @@ describe("Select", () => {
 
     expect(markup).toContain("h-11");
     expect(markup).toContain("min-w-0");
-    expect(markup).toContain("rounded-xl");
+    expect(markup).toContain("alios-control-field");
     expect(markup).toContain("focus-visible:ring-2");
     expect(markup).toContain("focus-visible:ring-offset-2");
     expect(markup).toContain("motion-reduce:transition-none");
@@ -32,6 +32,5 @@ describe("Select", () => {
     expect(markup).toContain("w-auto");
     expect(markup).toContain("rounded-lg");
     expect(markup).not.toContain("w-full");
-    expect(markup).not.toContain("rounded-xl");
   });
 });
