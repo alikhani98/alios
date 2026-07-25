@@ -2,6 +2,14 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 175 - Today Visual Hierarchy Refinement
+
+- Applied the Stage 173 shared visual foundation to the Today route as the second page-level visual refinement pilot after Finance
+- Elevated today's date and new-task action into the primary Today entry path while keeping existing task creation behavior unchanged
+- Refined Today task cards so titles lead before MIT, recurrence, priority, linked-project context, descriptions, and action controls
+- Grouped Today task and daily check-in forms with shared muted surfaces and replaced local support panels, loading states, and status messages with shared surface/status utilities
+- Kept the stage UI-only with no Task business logic change, recurrence change, filter change, route change, storage change, schema change, migration, backup change, localStorage key, dependency, backend, sync, cloud, auth, AI, telemetry, analytics, or Simple View / Full View behavior change
+
 ## Stage 174 - Finance Visual Hierarchy and Density Refinement
 
 - Applied the Stage 173 shared visual foundation to the Finance route as the first page-level refinement pilot

@@ -23,7 +23,7 @@ export function TodayWeeklyPlanCard({ focus, isLoading }: TodayWeeklyPlanCardPro
       : { label: t("common.active"), tone: "primary" as const };
 
   if (isLoading) {
-    return <div className="h-40 animate-pulse rounded-[1.75rem] border bg-muted/60" />;
+    return <div className="alios-surface-muted h-40 animate-pulse bg-muted/60" />;
   }
 
   if (!focus.plan) {
@@ -80,7 +80,7 @@ export function TodayWeeklyPlanCard({ focus, isLoading }: TodayWeeklyPlanCardPro
           </div>
         </div>
 
-        <div className="rounded-2xl border border-primary/10 bg-background/80 p-4">
+        <div className="alios-surface-muted border-primary/10 bg-background/80 p-4">
           <div className="flex items-center justify-between gap-3">
             <p className="text-sm font-semibold">{t("projects.taskProgress")}</p>
             <div className="flex flex-wrap justify-end gap-2">

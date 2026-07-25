@@ -45,53 +45,57 @@ export function TodayTaskCard({
     <Card
       className={
         completed
-          ? "min-w-0 overflow-hidden bg-muted/40"
-          : "min-w-0 overflow-hidden"
+          ? "min-w-0 overflow-hidden border-border/70 bg-muted/40"
+          : "min-w-0 overflow-hidden border-border/70"
       }
     >
-      <CardContent className="grid min-w-0 gap-4 p-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
-        <div className="min-w-0 space-y-2">
-          <div className="flex flex-wrap items-center gap-2">
+      <CardContent className="grid min-w-0 gap-4 p-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
+        <div className="min-w-0 space-y-3">
+          <div className="space-y-2">
             <h3
               className={
                 completed
-                  ? "min-w-0 break-words font-semibold text-muted-foreground line-through"
-                  : "min-w-0 break-words font-semibold"
+                  ? "min-w-0 break-words text-lg font-semibold leading-7 text-muted-foreground line-through"
+                  : "min-w-0 break-words text-lg font-semibold leading-7"
               }
             >
               {task.title}
             </h3>
-            {task.isMit ? (
-              <Badge>
-                <Star className="me-1 h-3.5 w-3.5 fill-current" />
-                {t("today.mit")}
+            <div className="flex flex-wrap items-center gap-2">
+              {task.isMit ? (
+                <Badge>
+                  <Star className="me-1 h-3.5 w-3.5 fill-current" />
+                  {t("today.mit")}
+                </Badge>
+              ) : null}
+              {contextLabel ? <Badge variant="secondary">{contextLabel}</Badge> : null}
+              {task.recurrence ? (
+                <Badge variant="secondary">
+                  <Repeat2 className="me-1 h-3.5 w-3.5" />
+                  {task.recurrence.frequency === "daily"
+                    ? t("today.recurrenceDaily")
+                    : t("today.recurrenceWeekly")}
+                </Badge>
+              ) : null}
+              <Badge
+                variant="outline"
+                className="max-w-full break-words whitespace-normal text-start"
+              >
+                {t("today.priority", {
+                  value: t(TASK_PRIORITY_LABEL_KEYS[task.priority]),
+                })}
               </Badge>
-            ) : null}
-            {contextLabel ? <Badge variant="secondary">{contextLabel}</Badge> : null}
-            {task.recurrence ? (
-              <Badge variant="secondary">
-                <Repeat2 className="me-1 h-3.5 w-3.5" />
-                {task.recurrence.frequency === "daily"
-                  ? t("today.recurrenceDaily")
-                  : t("today.recurrenceWeekly")}
-              </Badge>
-            ) : null}
-            <Badge
-              variant="outline"
-              className="max-w-full break-words whitespace-normal text-start"
-            >
-              {t("today.priority", {
-                value: t(TASK_PRIORITY_LABEL_KEYS[task.priority]),
-              })}
-            </Badge>
+            </div>
           </div>
           {task.description ? (
-            <p className="break-words whitespace-pre-wrap text-sm leading-7 text-muted-foreground">
-              {task.description}
-            </p>
+            <div className="alios-surface-muted px-4 py-3">
+              <p className="break-words whitespace-pre-wrap text-sm leading-7 text-muted-foreground">
+                {task.description}
+              </p>
+            </div>
           ) : null}
           {task.projectId ? (
-            <div className="min-w-0 rounded-xl border border-primary/15 bg-primary/5 p-3">
+            <div className="alios-surface-muted min-w-0 border-primary/15 bg-primary/5 p-3">
               <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="min-w-0 space-y-1">
                   <p className="flex min-w-0 items-center gap-2 text-xs font-medium text-muted-foreground">
@@ -132,7 +136,7 @@ export function TodayTaskCard({
           ) : null}
         </div>
 
-        <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center lg:justify-end">
+        <div className="flex min-w-0 flex-col gap-2 border-t border-border/70 pt-4 sm:flex-row sm:flex-wrap sm:items-center lg:justify-end lg:border-t-0 lg:pt-0">
           <Select
             aria-label={t("today.statusFor", { title: task.title })}
             value={task.status}
