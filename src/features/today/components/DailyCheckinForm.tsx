@@ -44,7 +44,7 @@ export function DailyCheckinForm({
       className="grid gap-5"
       onSubmit={handleSubmit((values) => void onSubmit(values))}
     >
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="alios-surface-muted grid gap-4 p-4 sm:grid-cols-2 xl:grid-cols-4">
         {[
           ["sleepQuality", t("today.sleepQuality")],
           ["energyLevel", t("today.energy")],
@@ -84,7 +84,7 @@ export function DailyCheckinForm({
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="alios-surface-muted grid gap-4 p-4 md:grid-cols-2">
         <div className="grid gap-2">
           <label htmlFor="checkin-smoking" className="text-sm font-medium">
             {t("today.smokingStatus")}
@@ -101,7 +101,7 @@ export function DailyCheckinForm({
           </Select>
         </div>
 
-        <label className="flex min-h-11 items-center gap-3 rounded-xl border px-4 py-2 text-sm font-medium">
+        <label className="flex min-h-11 items-center gap-3 rounded-control border border-input bg-background px-4 py-2 text-sm font-medium">
           <input
             type="checkbox"
             className="h-5 w-5 rounded border-input accent-primary"
@@ -111,7 +111,7 @@ export function DailyCheckinForm({
         </label>
       </div>
 
-      <div className="grid gap-2">
+      <div className="alios-surface-muted grid gap-2 p-4">
         <label htmlFor="checkin-notes" className="text-sm font-medium">
           {t("common.notes")}
         </label>
@@ -122,8 +122,8 @@ export function DailyCheckinForm({
         />
       </div>
 
-      <div>
-        <Button type="submit" disabled={isSubmitting}>
+      <div className="border-t border-border/70 pt-4">
+        <Button type="submit" className="w-full sm:w-auto" disabled={isSubmitting}>
           {isSubmitting
             ? t("common.saving")
             : checkin

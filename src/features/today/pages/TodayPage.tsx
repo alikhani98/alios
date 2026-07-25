@@ -12,7 +12,6 @@ import { useI18n } from "@/shared/i18n";
 import { useDateFormatter } from "@/shared/date";
 import {
   Button,
-  Badge,
   Card,
   CardContent,
   CardHeader,
@@ -20,6 +19,8 @@ import {
   EmptyState,
   PremiumCard,
   SectionHeader,
+  SoftPanel,
+  StatusChip,
 } from "@/shared/ui";
 import { cn } from "@/shared/utils";
 import { DailyCheckinForm } from "../components/DailyCheckinForm";
@@ -376,26 +377,41 @@ export function TodayPage() {
 
   return (
     <section className="alios-page space-y-6">
-      <PremiumCard className="border-primary/15 bg-primary/5">
-        <CardContent className="p-5 sm:p-6">
-          <SectionHeader
-            icon={<CalendarDays className="h-5 w-5" />}
-            title={t("today.title")}
-            description={t("today.description")}
-            actions={
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <CalendarDays className="h-4 w-4" />
-                <span>{formatDate(today)}</span>
+      <PremiumCard className="border-primary/15 bg-gradient-to-br from-primary/10 via-background to-background">
+        <CardContent className="grid gap-5 p-5 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.55fr)] sm:p-6">
+          <div>
+            <SectionHeader
+              icon={<CalendarDays className="h-5 w-5" />}
+              title={t("today.title")}
+              description={t("today.description")}
+            />
+          </div>
+          <SoftPanel className="space-y-4 border-primary/20 bg-primary/5">
+            <div className="flex items-start gap-3">
+              <span className="alios-icon-primary">
+                <CalendarDays className="h-5 w-5" aria-hidden="true" />
+              </span>
+              <div className="min-w-0 space-y-1">
+                <p className="text-sm font-medium text-muted-foreground">
+                  {t("home.taskDate")}
+                </p>
+                <p className="break-words text-xl font-semibold leading-8">
+                  {formatDate(today)}
+                </p>
               </div>
-            }
-          />
+            </div>
+            <Button type="button" className="w-full" onClick={openCreateTask}>
+              <Plus className="me-2 h-4 w-4" />
+              {t("today.newTask")}
+            </Button>
+          </SoftPanel>
         </CardContent>
       </PremiumCard>
 
       {projectId ? (
         <div
           role="status"
-          className="flex flex-col gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-4 sm:flex-row sm:items-center sm:justify-between"
+          className="alios-surface-muted flex flex-col gap-3 border-primary/20 bg-primary/5 p-4 sm:flex-row sm:items-center sm:justify-between"
         >
           <p className="min-w-0 break-words text-sm text-foreground">
             {filteredProject
@@ -413,7 +429,7 @@ export function TodayPage() {
       {goalId ? (
         <div
           role="status"
-          className="flex flex-col gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-4 sm:flex-row sm:items-center sm:justify-between"
+          className="alios-surface-muted flex flex-col gap-3 border-primary/20 bg-primary/5 p-4 sm:flex-row sm:items-center sm:justify-between"
         >
           <p className="min-w-0 break-words text-sm text-foreground">
             {linkedGoalProjectIds.size > 0
@@ -433,7 +449,7 @@ export function TodayPage() {
       {routineId ? (
         <div
           role="status"
-          className="flex flex-col gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-4 sm:flex-row sm:items-center sm:justify-between"
+          className="alios-surface-muted flex flex-col gap-3 border-primary/20 bg-primary/5 p-4 sm:flex-row sm:items-center sm:justify-between"
         >
           <p className="min-w-0 break-words text-sm text-foreground">
             {filteredRoutine
@@ -450,7 +466,7 @@ export function TodayPage() {
 
       <TodayWeeklyPlanCard focus={weeklyPlanFocus} isLoading={isWeeklyPlanLoading} />
 
-      <PremiumCard>
+      <PremiumCard className="border-border/70 bg-card/95">
         <CardHeader className="gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-1">
             <CardTitle className="flex items-center gap-2">
@@ -462,24 +478,24 @@ export function TodayPage() {
             </p>
           </div>
           {routineSuggestions.length > 0 ? (
-            <Badge variant="secondary">{routineSuggestions.length}</Badge>
+            <StatusChip tone="neutral">{routineSuggestions.length}</StatusChip>
           ) : null}
         </CardHeader>
         <CardContent className="space-y-3">
           {routinesError ? (
-            <div className="flex flex-col gap-3 rounded-xl border p-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="alios-surface-muted flex flex-col gap-3 p-3 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-sm text-muted-foreground">{t("routines.todayUnavailable")}</p>
               <Button size="sm" variant="outline" onClick={() => void loadRoutines()}>{t("common.tryAgain")}</Button>
             </div>
           ) : isRoutinesLoading ? (
-            <div className="h-16 animate-pulse rounded-xl bg-muted/60" />
+            <div className="alios-surface-muted h-16 animate-pulse bg-muted/60" />
           ) : routineSuggestions.length > 0 ? (
             <>
               <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                 {visibleRoutineSuggestions.map((routine) => (
                   <div
                     key={routine.id}
-                    className="grid min-w-0 gap-3 rounded-xl border bg-muted/20 p-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
+                    className="alios-surface-muted grid min-w-0 gap-3 p-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
                   >
                     <div className="min-w-0">
                       <p className="break-words font-medium">{routine.title}</p>
@@ -523,7 +539,7 @@ export function TodayPage() {
       </PremiumCard>
 
       {reviewDueProjects.length > 0 ? (
-        <PremiumCard>
+        <PremiumCard className="border-border/70 bg-card/95">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Clock3 className="h-5 w-5 text-primary" />
@@ -534,7 +550,7 @@ export function TodayPage() {
             {reviewDueProjects.map((project) => (
               <div
                 key={project.id}
-                className="flex min-w-0 flex-col gap-3 rounded-xl border bg-muted/20 p-3 sm:flex-row sm:items-center sm:justify-between"
+                className="alios-surface-muted flex min-w-0 flex-col gap-3 p-3 sm:flex-row sm:items-center sm:justify-between"
               >
                 <p className="min-w-0 break-words font-medium">{project.title}</p>
                 <Button
@@ -556,7 +572,7 @@ export function TodayPage() {
       {successMessage ? (
         <div
           role="status"
-          className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm"
+          className="alios-status-success px-4 py-3 text-sm"
         >
           {successMessage}
         </div>
@@ -565,7 +581,7 @@ export function TodayPage() {
       {error || actionError ? (
         <div
           role="alert"
-          className="flex flex-col gap-3 rounded-xl border border-destructive/30 bg-destructive/5 p-4 sm:flex-row sm:items-center sm:justify-between"
+          className="alios-status-danger flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between"
         >
           <div className="flex items-start gap-2 text-sm text-destructive">
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
@@ -582,19 +598,19 @@ export function TodayPage() {
       {focusMessage ? (
         <div
           role="status"
-          className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-foreground"
+          className="alios-surface-muted border-primary/20 bg-primary/5 px-4 py-3 text-sm text-foreground"
         >
           {focusMessage}
         </div>
       ) : null}
 
-      <PremiumCard>
+      <PremiumCard className="border-border/70 bg-card/95">
         <CardHeader>
           <CardTitle>{t("today.checkin")}</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className="h-72 animate-pulse rounded-xl bg-muted/60" />
+            <div className="alios-surface-muted h-72 animate-pulse bg-muted/60" />
           ) : (
             <DailyCheckinForm
               key={checkin?.updatedAt ?? "new-checkin"}
@@ -606,13 +622,13 @@ export function TodayPage() {
         </CardContent>
       </PremiumCard>
 
-      <PremiumCard>
+      <PremiumCard className="border-border/70 bg-card/95">
         <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
           <SectionHeader
             title={t("today.tasks")}
             description={t("today.tasksDescription")}
           />
-          <Button type="button" onClick={openCreateTask}>
+          <Button type="button" variant="outline" onClick={openCreateTask}>
             <Plus className="me-2 h-4 w-4" />
             {t("today.newTask")}
           </Button>
@@ -620,7 +636,7 @@ export function TodayPage() {
       </PremiumCard>
 
       {taskFormOpen ? (
-        <PremiumCard>
+        <PremiumCard className="border-border/70 bg-card/95">
           <CardHeader>
             <CardTitle>{editingTask ? t("today.editTask") : t("today.createTask")}</CardTitle>
           </CardHeader>
@@ -643,7 +659,7 @@ export function TodayPage() {
       {projectsError ? (
         <div
           role="alert"
-          className="flex flex-col gap-3 rounded-xl border border-border/70 bg-muted/30 p-4 sm:flex-row sm:items-center sm:justify-between"
+          className="alios-surface-muted flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between"
         >
           <div className="flex items-start gap-2 text-sm text-muted-foreground">
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
@@ -707,7 +723,7 @@ export function TodayPage() {
       {isLoading ? (
         <div className="space-y-3" aria-label={t("today.loadingTasks")}>
           {[0, 1, 2].map((item) => (
-            <div key={item} className="h-28 animate-pulse rounded-2xl border bg-muted/60" />
+            <div key={item} className="alios-surface-muted h-28 animate-pulse bg-muted/60" />
           ))}
         </div>
       ) : visibleTasks.length === 0 ? (

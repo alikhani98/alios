@@ -55,7 +55,7 @@ export function TodayTaskForm({
       className="grid gap-5"
       onSubmit={handleSubmit((values) => void onSubmit(values))}
     >
-      <div className="grid gap-2">
+      <div className="alios-surface-muted grid gap-2 p-4">
         <label htmlFor="today-task-title" className="text-sm font-medium">
           {t("today.taskTitle")}
         </label>
@@ -71,20 +71,7 @@ export function TodayTaskForm({
         ) : null}
       </div>
 
-      <div className="grid gap-2">
-        <label htmlFor="today-task-recurrence" className="text-sm font-medium">
-          {t("today.recurrence")}
-        </label>
-        <Select id="today-task-recurrence" {...register("recurrenceFrequency")}>
-          <option value="none">{t("today.recurrenceNone")}</option>
-          <option value="daily">{t("today.recurrenceDaily")}</option>
-          <option value="weekly">{t("today.recurrenceWeekly")}</option>
-        </Select>
-        <p className="text-xs leading-5 text-muted-foreground">{t("today.recurrenceHint")}</p>
-        <p className="text-xs leading-5 text-muted-foreground">{t("today.routineVsRecurringNote")}</p>
-      </div>
-
-      <div className="grid gap-2">
+      <div className="alios-surface-muted grid gap-2 p-4">
         <label htmlFor="today-task-description" className="text-sm font-medium">
           {t("common.description")}
         </label>
@@ -95,7 +82,7 @@ export function TodayTaskForm({
         />
       </div>
 
-      <div className="grid min-w-0 gap-2">
+      <div className="alios-surface-muted grid min-w-0 gap-2 p-4">
         <label htmlFor="today-task-project" className="text-sm font-medium">
           {t("today.linkedProject")}
         </label>
@@ -125,7 +112,7 @@ export function TodayTaskForm({
         </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="alios-surface-muted grid gap-4 p-4 md:grid-cols-2">
         <div className="grid gap-2">
           <label htmlFor="today-task-status" className="text-sm font-medium">
             {t("common.status")}
@@ -159,30 +146,49 @@ export function TodayTaskForm({
         </div>
       </div>
 
-      <div className="grid gap-2">
-        <label htmlFor="today-task-due-date" className="text-sm font-medium">
-          {t("home.taskDate")}
-        </label>
-        <Input
-          id="today-task-due-date"
-          type="date"
-          aria-describedby="today-task-due-date-help"
-          aria-invalid={Boolean(errors.dueDate)}
-          {...register("dueDate")}
-        />
-        <DateValueHint value={dueDateValue} />
-        <p
-          id="today-task-due-date-help"
-          className="text-xs leading-5 text-muted-foreground"
-        >
-          {t("home.duePlannedDate")}
-        </p>
-        {errors.dueDate ? (
-          <p className="text-sm text-destructive">{t("common.validation")}</p>
-        ) : null}
+      <div className="alios-surface-muted grid gap-4 p-4 md:grid-cols-2">
+        <div className="grid gap-2">
+          <label htmlFor="today-task-due-date" className="text-sm font-medium">
+            {t("home.taskDate")}
+          </label>
+          <Input
+            id="today-task-due-date"
+            type="date"
+            aria-describedby="today-task-due-date-help"
+            aria-invalid={Boolean(errors.dueDate)}
+            {...register("dueDate")}
+          />
+          <DateValueHint value={dueDateValue} className="break-words" />
+          <p
+            id="today-task-due-date-help"
+            className="text-xs leading-5 text-muted-foreground"
+          >
+            {t("home.duePlannedDate")}
+          </p>
+          {errors.dueDate ? (
+            <p className="text-sm text-destructive">{t("common.validation")}</p>
+          ) : null}
+        </div>
+
+        <div className="grid gap-2">
+          <label htmlFor="today-task-recurrence" className="text-sm font-medium">
+            {t("today.recurrence")}
+          </label>
+          <Select id="today-task-recurrence" {...register("recurrenceFrequency")}>
+            <option value="none">{t("today.recurrenceNone")}</option>
+            <option value="daily">{t("today.recurrenceDaily")}</option>
+            <option value="weekly">{t("today.recurrenceWeekly")}</option>
+          </Select>
+          <p className="text-xs leading-5 text-muted-foreground">
+            {t("today.recurrenceHint")}
+          </p>
+          <p className="text-xs leading-5 text-muted-foreground">
+            {t("today.routineVsRecurringNote")}
+          </p>
+        </div>
       </div>
 
-      <label className="flex min-h-11 items-center gap-3 text-sm font-medium">
+      <label className="alios-surface-muted flex min-h-11 items-center gap-3 p-4 text-sm font-medium">
         <input
           type="checkbox"
           className="h-5 w-5 rounded border-input accent-primary"
@@ -191,7 +197,7 @@ export function TodayTaskForm({
         {t("today.makeMit")}
       </label>
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+      <div className="flex flex-col gap-3 border-t border-border/70 pt-4 sm:flex-row sm:flex-wrap">
         <Button
           type="submit"
           className="w-full sm:w-auto"
