@@ -2,6 +2,14 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 174 - Finance Visual Hierarchy and Density Refinement
+
+- Applied the Stage 173 shared visual foundation to the Finance route as the first page-level refinement pilot
+- Elevated remaining liquidity and obligation pressure into the primary Finance summary path while keeping existing monthly summary metrics available as secondary cards
+- Refined Finance transaction and obligation cards so titles, dates, and amounts lead before secondary status chips, notes, details, and actions
+- Grouped Finance form fields with shared muted surfaces and replaced local support panels with semantic shared surface utilities where appropriate
+- Kept the stage UI-only with no Finance calculation change, repository change, storage change, schema change, migration, backup change, route change, localStorage key, dependency, backend, sync, cloud, AI, telemetry, analytics, or advice engine
+
 ## Stage 173 - Design System Foundation Refinement
 
 - Added named foundation tokens for AliOS spacing, radii, elevation, status color roles, and shared surface vocabulary

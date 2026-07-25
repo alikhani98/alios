@@ -570,25 +570,65 @@ export function FinancePage() {
     <section className="alios-page space-y-6">
       <section id={FINANCE_SECTION_ANCHORS.summary} className="scroll-mt-32 space-y-4">
         <PremiumCard className="border-primary/15 bg-gradient-to-br from-primary/10 via-background to-background shadow-sm">
-          <div className="p-5 sm:p-6">
-            <SectionHeader
-              icon={<Landmark className="h-5 w-5" />}
-              eyebrow={t("finance.title")}
-              title={t("finance.title")}
-              description={t("finance.description")}
-              status={
-                <StatusChip tone="neutral">{t("finance.localSummaryNote")}</StatusChip>
-              }
-            />
-            <div className="mt-4 max-w-3xl space-y-2 text-sm leading-7 text-muted-foreground">
-              <p>{t("finance.reviewIntro")}</p>
-              <p>{t("finance.reviewLiquidityExplanation")}</p>
-              <p>{t("finance.noAdviceNote")}</p>
+          <div className="grid gap-5 p-5 lg:grid-cols-[minmax(0,1.25fr)_minmax(18rem,0.75fr)] sm:p-6">
+            <div>
+              <SectionHeader
+                icon={<Landmark className="h-5 w-5" />}
+                eyebrow={t("finance.title")}
+                title={t("finance.title")}
+                description={t("finance.description")}
+                status={
+                  <StatusChip tone="neutral">{t("finance.localSummaryNote")}</StatusChip>
+                }
+              />
+              <div className="mt-4 max-w-3xl space-y-2 text-sm leading-7 text-muted-foreground">
+                <p>{t("finance.reviewIntro")}</p>
+                <p>{t("finance.noAdviceNote")}</p>
+              </div>
             </div>
+
+            <SoftPanel className="space-y-4 border-primary/20 bg-primary/5">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="min-w-0 space-y-1">
+                  <p className="text-sm font-medium text-muted-foreground">
+                    {t("finance.remainingLiquidity")}
+                  </p>
+                  <p className="break-words text-2xl font-semibold leading-9 tabular-nums sm:text-3xl">
+                    {formatAmount(summary.remainingLiquidity)}
+                  </p>
+                </div>
+                <StatusChip tone={summary.remainingLiquidity >= 0 ? "success" : "danger"}>
+                  {summary.remainingLiquidity >= 0
+                    ? t("finance.liquidityPositive")
+                    : t("finance.liquidityNegative")}
+                </StatusChip>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+                <div className="alios-surface-muted px-4 py-3">
+                  <p className="text-xs text-muted-foreground">
+                    {t("finance.obligationEstimateThisMonth")}
+                  </p>
+                  <p className="mt-1 text-base font-semibold tabular-nums">
+                    {formatAmount(summary.monthlyObligationsEstimate)}
+                  </p>
+                </div>
+                <div className="alios-surface-muted px-4 py-3">
+                  <p className="text-xs text-muted-foreground">
+                    {t("finance.budgetGuardPressure")}
+                  </p>
+                  <p className="mt-1 text-base font-semibold tabular-nums">
+                    {formatAmount(
+                      budgetGuard.expensesThisMonth +
+                        budgetGuard.monthlyObligationsEstimate
+                    )}
+                  </p>
+                </div>
+              </div>
+            </SoftPanel>
           </div>
         </PremiumCard>
 
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {summaryCards.map((card) => (
             <MetricCard
               key={card.label}
@@ -602,7 +642,7 @@ export function FinancePage() {
         </div>
       </section>
 
-      <div className="sticky top-[calc(4rem+env(safe-area-inset-top))] z-20 rounded-3xl border border-border/70 bg-background/95 px-3 py-2 backdrop-blur-xl sm:px-4 md:top-20">
+      <div className="alios-surface-card sticky top-[calc(4rem+env(safe-area-inset-top))] z-20 px-3 py-2 backdrop-blur-xl sm:px-4 md:top-20">
         <nav className="flex gap-2 overflow-x-auto pb-1" aria-label={t("finance.quickNavigation")}>
           {financeQuickNavItems.map((item) => (
             <Button
@@ -950,7 +990,7 @@ export function FinancePage() {
                 </p>
               </SoftPanel>
               <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-2xl border bg-background/70 px-4 py-3">
+                <div className="alios-surface-muted px-4 py-3">
                   <p className="text-xs text-muted-foreground">
                     {t("finance.incomeThisMonth")}
                   </p>
@@ -958,7 +998,7 @@ export function FinancePage() {
                     {formatAmount(budgetGuard.incomeThisMonth)}
                   </p>
                 </div>
-                <div className="rounded-2xl border bg-background/70 px-4 py-3">
+                <div className="alios-surface-muted px-4 py-3">
                   <p className="text-xs text-muted-foreground">
                     {t("finance.budgetGuardPressure")}
                   </p>
@@ -998,9 +1038,12 @@ export function FinancePage() {
             </SoftPanel>
           ) : (
             review.upcomingObligations.map((item) => (
-              <SoftPanel key={item.obligation.id} className="space-y-3">
+              <SoftPanel key={item.obligation.id} className="space-y-3 border-border/70">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0 space-y-2">
+                    <h3 className="text-base font-semibold leading-7">
+                      {item.obligation.title}
+                    </h3>
                     <div className="flex flex-wrap items-center gap-2">
                       <StatusChip tone={item.label === "dueSoon" ? "warning" : "neutral"}>
                         {t(
@@ -1019,14 +1062,11 @@ export function FinancePage() {
                         )}
                       </StatusChip>
                     </div>
-                    <h3 className="text-base font-semibold leading-7">
-                      {item.obligation.title}
-                    </h3>
                     <p className="text-xs text-muted-foreground">
                       {item.nextDueDate ? formatDate(item.nextDueDate) : t("finance.noDueDate")}
                     </p>
                   </div>
-                  <p className="text-base font-semibold tabular-nums">
+                  <p className="max-w-[11rem] break-words text-end text-base font-semibold tabular-nums">
                     {formatAmount(item.remainingAmount)}
                   </p>
                 </div>
@@ -1082,7 +1122,7 @@ export function FinancePage() {
               {[0, 1].map((index) => (
                 <div
                   key={index}
-                  className="h-80 animate-pulse rounded-2xl border bg-muted/60"
+                  className="alios-surface-muted h-80 animate-pulse bg-muted/60"
                 />
               ))}
             </div>
@@ -1113,7 +1153,7 @@ export function FinancePage() {
           ) : (
             <div className={selectedFilter === "all" ? "grid gap-4 xl:grid-cols-2" : "space-y-4"}>
               {showTransactionSection ? (
-                <PremiumCard>
+                <PremiumCard className="border-border/70 bg-card/95">
                   <div className="p-5 sm:p-6">
                     <SectionHeader
                       title={t(transactionSectionTitleKey)}
@@ -1181,7 +1221,7 @@ export function FinancePage() {
               ) : null}
 
               {showObligationSection ? (
-                <PremiumCard>
+                <PremiumCard className="border-border/70 bg-card/95">
                   <div className="p-5 sm:p-6">
                     <SectionHeader
                       title={t(obligationSectionTitleKey)}

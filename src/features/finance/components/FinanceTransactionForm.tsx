@@ -63,7 +63,7 @@ export function FinanceTransactionForm({
       className="grid gap-5"
       onSubmit={handleSubmit((values) => void onSubmit(values))}
     >
-      <div className="grid gap-4 md:grid-cols-[2fr_1fr]">
+      <div className="alios-surface-muted grid gap-4 p-4 md:grid-cols-[2fr_1fr]">
         <div className="grid gap-2">
           <label htmlFor="finance-transaction-title" className="text-sm font-medium">
             {t("common.title")}
@@ -75,7 +75,6 @@ export function FinanceTransactionForm({
             aria-invalid={Boolean(errors.title)}
             {...register("title")}
           />
-          <DateValueHint value={occurredAtValue} />
           {errors.title ? (
             <p className="text-sm text-destructive">{t("common.validation")}</p>
           ) : null}
@@ -98,7 +97,7 @@ export function FinanceTransactionForm({
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="alios-surface-muted grid gap-4 p-4 md:grid-cols-3">
         <div className="grid gap-2">
           <label htmlFor="finance-transaction-amount" className="text-sm font-medium">
             {t("finance.amount")}
@@ -143,13 +142,14 @@ export function FinanceTransactionForm({
             aria-invalid={Boolean(errors.occurredAt)}
             {...register("occurredAt")}
           />
+          <DateValueHint value={occurredAtValue} className="break-words" />
           {errors.occurredAt ? (
             <p className="text-sm text-destructive">{t("common.validation")}</p>
           ) : null}
         </div>
       </div>
 
-      <div className="grid gap-2">
+      <div className="alios-surface-muted grid gap-2 p-4">
         <label htmlFor="finance-transaction-notes" className="text-sm font-medium">
           {t("common.notes")}
         </label>
@@ -160,7 +160,7 @@ export function FinanceTransactionForm({
         />
       </div>
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+      <div className="flex flex-col gap-3 border-t border-border/70 pt-4 sm:flex-row sm:flex-wrap">
         <Button type="submit" className="w-full sm:w-auto" disabled={isSubmitting}>
           {isSubmitting
             ? t("common.saving")

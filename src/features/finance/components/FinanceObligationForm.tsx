@@ -169,7 +169,7 @@ export function FinanceObligationForm({
       className="grid gap-5"
       onSubmit={handleSubmit((values) => void onSubmit(values))}
     >
-      <div className="grid gap-4 md:grid-cols-[2fr_1fr]">
+      <div className="alios-surface-muted grid gap-4 p-4 md:grid-cols-[2fr_1fr]">
         <div className="grid gap-2">
           <label htmlFor="finance-obligation-title" className="text-sm font-medium">
             {t("common.title")}
@@ -203,7 +203,7 @@ export function FinanceObligationForm({
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="alios-surface-muted grid gap-4 p-4 md:grid-cols-2">
         <div className="grid gap-2">
           <label htmlFor="finance-obligation-total" className="text-sm font-medium">
             {t("finance.totalAmount")}
@@ -241,7 +241,7 @@ export function FinanceObligationForm({
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="alios-surface-muted grid gap-4 p-4 md:grid-cols-2">
         <div className="grid gap-2">
           <label htmlFor="finance-obligation-due-amount" className="text-sm font-medium">
             {t("finance.dueAmount")}
@@ -279,7 +279,7 @@ export function FinanceObligationForm({
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="alios-surface-muted grid gap-4 p-4 md:grid-cols-2">
         <div className="grid gap-2">
           <label htmlFor="finance-obligation-due-day" className="text-sm font-medium">
             {t("finance.dueDay")}
@@ -324,7 +324,7 @@ export function FinanceObligationForm({
         </div>
       </div>
 
-      <div className="grid gap-2">
+      <div className="alios-surface-muted grid gap-2 p-4">
         <label htmlFor="finance-obligation-counterparty" className="text-sm font-medium">
           {t("finance.counterparty")}
         </label>
@@ -335,7 +335,7 @@ export function FinanceObligationForm({
         />
       </div>
 
-      <div className="grid gap-2">
+      <div className="alios-surface-muted grid gap-2 p-4">
         <label htmlFor="finance-obligation-status" className="text-sm font-medium">
           {t("common.status")}
         </label>
@@ -351,7 +351,7 @@ export function FinanceObligationForm({
         </Select>
       </div>
 
-      <div className="grid gap-2">
+      <div className="alios-surface-muted grid gap-2 p-4">
         <label htmlFor="finance-obligation-notes" className="text-sm font-medium">
           {t("common.notes")}
         </label>
@@ -362,7 +362,7 @@ export function FinanceObligationForm({
         />
       </div>
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+      <div className="flex flex-col gap-3 border-t border-border/70 pt-4 sm:flex-row sm:flex-wrap">
         <Button type="submit" className="w-full sm:w-auto" disabled={isSubmitting}>
           {isSubmitting
             ? t("common.saving")
