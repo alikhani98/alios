@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 173 - Design System Foundation Refinement
+
+- Added named foundation tokens for AliOS spacing, radii, elevation, status color roles, and shared surface vocabulary
+- Exposed semantic success and warning roles through the existing CSS/Tailwind token path while preserving dark mode and runtime accent support
+- Refined shared primitives to consume the named foundation utilities for cards, elevated surfaces, soft panels, controls, badges, status chips, empty states, chart surfaces, loading states, and the route error warning treatment
+- Kept the stage foundation-only with no page redesign, route change, data behavior change, schema change, migration, backup change, localStorage key, dependency, backend, sync, cloud, AI, telemetry, analytics, or Figma integration
+
 ## Stage 172 - Visual Design System Discovery and Figma Direction
 
 - Audited the current AliOS visual system from source and documentation without changing UI code, CSS, tests, schema, backup format, dependencies, or product behavior

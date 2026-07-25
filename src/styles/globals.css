@@ -64,6 +64,11 @@
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
+    --success: 158 64% 38%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 24 9.8% 10%;
+
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 221 83% 53%;
@@ -95,6 +100,11 @@
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 98%;
+
+    --success: 158 64% 52%;
+    --success-foreground: 240 10% 3.9%;
+    --warning: 38 92% 58%;
+    --warning-foreground: 240 10% 3.9%;
 
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
@@ -157,7 +167,43 @@
   }
 
   .alios-card {
-    @apply rounded-xl border bg-card text-card-foreground shadow-sm;
+    @apply rounded-surface border bg-card text-card-foreground shadow-sm;
+  }
+
+  .alios-surface-card {
+    @apply rounded-surface border bg-card text-card-foreground shadow-sm;
+  }
+
+  .alios-surface-elevated {
+    @apply rounded-surface border border-primary/10 bg-gradient-to-br from-background via-background to-primary/5 text-card-foreground shadow-sm backdrop-blur-sm;
+  }
+
+  .alios-surface-soft {
+    @apply rounded-section border border-border/70 bg-background/90 shadow-sm;
+  }
+
+  .alios-surface-muted {
+    @apply rounded-surface border border-border/70 bg-background/70;
+  }
+
+  .alios-control-field {
+    @apply rounded-control border border-input bg-background ring-offset-background;
+  }
+
+  .alios-icon-primary {
+    @apply border border-primary/10 bg-primary/10 text-primary shadow-sm;
+  }
+
+  .alios-status-success {
+    @apply border-transparent bg-success/10 text-success;
+  }
+
+  .alios-status-warning {
+    @apply border-transparent bg-warning/10 text-warning;
+  }
+
+  .alios-status-danger {
+    @apply border-transparent bg-destructive/10 text-destructive;
   }
 }
 

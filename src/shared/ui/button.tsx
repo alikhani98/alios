@@ -11,7 +11,7 @@ import {
 
 const buttonVariants = cva(
   cn(
-    "inline-flex items-center justify-center whitespace-normal rounded-xl text-center text-sm font-medium leading-5 ring-offset-background disabled:pointer-events-none disabled:opacity-50",
+    "inline-flex items-center justify-center whitespace-normal rounded-control text-center text-sm font-medium leading-5 ring-offset-background disabled:pointer-events-none disabled:opacity-50",
     aliosFocusRing,
     aliosInteractiveMotion,
     aliosInteractiveLift
@@ -32,7 +32,7 @@ const buttonVariants = cva(
       size: {
         default: "min-h-11 px-4 py-2",
         sm: "min-h-10 rounded-lg px-3",
-        lg: "min-h-12 rounded-xl px-8",
+        lg: "min-h-12 rounded-control px-8",
         icon: "h-11 w-11 shrink-0",
       },
     },

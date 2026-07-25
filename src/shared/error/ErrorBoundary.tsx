@@ -45,7 +45,7 @@ export function ErrorFallback({
       <Card className="w-full border-border/70 bg-background/95 shadow-sm">
         <CardHeader className="space-y-3">
           <div className="flex items-center gap-3">
-            <div className="rounded-full border border-amber-500/30 bg-amber-500/10 p-2 text-amber-600">
+            <div className="alios-status-warning rounded-full border p-2">
               <AlertTriangle className="h-5 w-5" />
             </div>
             <div className="space-y-1">

@@ -15,11 +15,11 @@ function toneClassName(tone: Tone) {
     case "primary":
       return "border-transparent bg-primary/10 text-primary";
     case "success":
-      return "border-transparent bg-emerald-500/10 text-emerald-700 dark:text-emerald-300";
+      return "alios-status-success";
     case "warning":
-      return "border-transparent bg-amber-500/10 text-amber-700 dark:text-amber-300";
+      return "alios-status-warning";
     case "danger":
-      return "border-transparent bg-destructive/10 text-destructive";
+      return "alios-status-danger";
     case "neutral":
     default:
       return "border-transparent bg-muted text-muted-foreground";
@@ -32,7 +32,7 @@ export function PremiumCard({ className, ...props }: PremiumCardProps) {
   return (
     <Card
       className={cn(
-        "overflow-hidden border-primary/10 bg-gradient-to-br from-background via-background to-primary/5 shadow-sm backdrop-blur-sm",
+        "alios-surface-elevated overflow-hidden",
         "hover:border-primary/20 hover:shadow-lg",
         className
       )}
@@ -47,7 +47,7 @@ export function SoftPanel({ className, ...props }: SoftPanelProps) {
   return (
     <div
       className={cn(
-        "rounded-3xl border border-border/70 bg-background/90 p-4 shadow-sm",
+        "alios-surface-soft p-4",
         aliosSubtleOutlineMotion,
         "hover:border-border/90 hover:bg-background",
         className
@@ -179,7 +179,7 @@ export function MetricCard({
     <PremiumCard className={cn("h-full min-h-40", className)}>
       <CardContent className="flex h-full flex-col justify-between gap-5 p-5 sm:p-6">
         <div className="flex items-center justify-between gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-[1.15rem] border border-primary/10 bg-primary/10 text-primary shadow-sm">
+          <div className="alios-icon-primary flex h-12 w-12 items-center justify-center rounded-[1.15rem]">
             {icon}
           </div>
           {status ? <div className="shrink-0">{status}</div> : null}
@@ -229,7 +229,7 @@ export function InsightStatCard({
     <PremiumCard className={cn("h-full min-h-44", className)}>
       <CardContent className="flex h-full flex-col gap-5 p-5 sm:p-6">
         <div className="flex items-start justify-between gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-[1.15rem] border border-primary/10 bg-primary/10 text-primary shadow-sm">
+          <div className="alios-icon-primary flex h-11 w-11 items-center justify-center rounded-[1.15rem]">
             {icon}
           </div>
           {status ? <div className="shrink-0">{status}</div> : null}
@@ -276,7 +276,7 @@ export function EmptyState({
     <PremiumCard className={cn("border-dashed", className)}>
       <CardContent className="flex flex-col items-center px-6 py-12 text-center sm:px-8">
         {icon ? (
-          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-[1.25rem] border border-primary/10 bg-primary/10 text-primary shadow-sm">
+          <div className="alios-icon-primary mb-4 flex h-14 w-14 items-center justify-center rounded-[1.25rem]">
             {icon}
           </div>
         ) : null}

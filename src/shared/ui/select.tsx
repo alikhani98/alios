@@ -12,7 +12,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
     <select
       ref={ref}
       className={cn(
-        "flex h-11 w-full min-w-0 rounded-xl border border-input bg-background px-3 py-2 text-base ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm",
+        "alios-control-field flex h-11 w-full min-w-0 px-3 py-2 text-base disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm",
         aliosFocusRing,
         aliosInteractiveMotion,
         className
