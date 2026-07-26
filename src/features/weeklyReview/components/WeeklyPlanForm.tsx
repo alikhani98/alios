@@ -29,43 +29,56 @@ export function WeeklyPlanForm({ weekStart, plan, goals, projects, tasks, isSavi
         });
       }}
     >
-      <SoftPanel className="space-y-4 alios-surface-muted">
-        <div className="grid gap-2">
-          <label htmlFor="weekly-plan-title" className="text-sm font-semibold">
-            {t("weeklyReview.nextFocusLabel")}
-          </label>
-          <Input id="weekly-plan-title" name="focusTitle" required defaultValue={plan?.focusTitle ?? ""} />
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)]">
+        <div className="grid gap-5">
+          <SoftPanel className="space-y-4 alios-surface-muted">
+            <div className="grid gap-2">
+              <label htmlFor="weekly-plan-title" className="text-sm font-semibold">
+                {t("weeklyReview.nextFocusLabel")}
+              </label>
+              <Input id="weekly-plan-title" name="focusTitle" required defaultValue={plan?.focusTitle ?? ""} />
+            </div>
+            <div className="grid gap-2">
+              <label htmlFor="weekly-plan-intention" className="text-sm font-medium">
+                {t("common.notes")}
+              </label>
+              <Textarea
+                id="weekly-plan-intention"
+                name="intention"
+                defaultValue={plan?.intention ?? ""}
+                className="min-h-28"
+              />
+            </div>
+          </SoftPanel>
         </div>
-        <div className="grid gap-2">
-          <label htmlFor="weekly-plan-intention" className="text-sm font-medium">
-            {t("common.notes")}
-          </label>
-          <Textarea id="weekly-plan-intention" name="intention" defaultValue={plan?.intention ?? ""} />
+
+        <div className="grid gap-5">
+          <SoftPanel className="grid gap-4 alios-surface-muted">
+            <div className="grid gap-2">
+              <label htmlFor="weekly-plan-goal" className="text-sm font-medium">{t("projects.linkedGoal")}</label>
+              <Select id="weekly-plan-goal" name="goalId" defaultValue={plan?.goalId ?? ""}>
+                <option value="">{t("projects.noLinkedGoal")}</option>
+                {goals.filter((goal) => goal.status === "active").map((goal) => <option key={goal.id} value={goal.id}>{goal.title}</option>)}
+              </Select>
+            </div>
+            <div className="grid gap-2">
+              <label htmlFor="weekly-plan-project" className="text-sm font-medium">{t("today.linkedProject")}</label>
+              <Select id="weekly-plan-project" name="projectId" defaultValue={plan?.projectId ?? ""}>
+                <option value="">{t("nav.projects")}</option>
+                {projects.filter((project) => project.status === "active").map((project) => <option key={project.id} value={project.id}>{project.title}</option>)}
+              </Select>
+            </div>
+            <div className="grid gap-2">
+              <label htmlFor="weekly-plan-task" className="text-sm font-medium">{t("nav.today")}</label>
+              <Select id="weekly-plan-task" name="taskId" defaultValue={plan?.taskId ?? ""}>
+                <option value="">{t("nav.today")}</option>
+                {tasks.filter((task) => task.status !== "done" && task.status !== "cancelled").map((task) => <option key={task.id} value={task.id}>{task.title}</option>)}
+              </Select>
+            </div>
+          </SoftPanel>
         </div>
-      </SoftPanel>
-      <SoftPanel className="grid gap-3 alios-surface-muted md:grid-cols-3">
-        <div className="grid gap-2">
-          <label htmlFor="weekly-plan-goal" className="text-sm font-medium">{t("projects.linkedGoal")}</label>
-          <Select id="weekly-plan-goal" name="goalId" defaultValue={plan?.goalId ?? ""}>
-            <option value="">{t("projects.noLinkedGoal")}</option>
-            {goals.filter((goal) => goal.status === "active").map((goal) => <option key={goal.id} value={goal.id}>{goal.title}</option>)}
-          </Select>
-        </div>
-        <div className="grid gap-2">
-          <label htmlFor="weekly-plan-project" className="text-sm font-medium">{t("today.linkedProject")}</label>
-          <Select id="weekly-plan-project" name="projectId" defaultValue={plan?.projectId ?? ""}>
-            <option value="">{t("nav.projects")}</option>
-            {projects.filter((project) => project.status === "active").map((project) => <option key={project.id} value={project.id}>{project.title}</option>)}
-          </Select>
-        </div>
-        <div className="grid gap-2">
-          <label htmlFor="weekly-plan-task" className="text-sm font-medium">{t("nav.today")}</label>
-          <Select id="weekly-plan-task" name="taskId" defaultValue={plan?.taskId ?? ""}>
-            <option value="">{t("nav.today")}</option>
-            {tasks.filter((task) => task.status !== "done" && task.status !== "cancelled").map((task) => <option key={task.id} value={task.id}>{task.title}</option>)}
-          </Select>
-        </div>
-      </SoftPanel>
+      </div>
+
       <input type="hidden" name="weekStart" value={weekStart} />
       <div className="flex border-t border-border/70 pt-4">
         <Button type="submit" className="w-full sm:w-auto" disabled={isSaving}>{isSaving ? t("common.saving") : t("common.saveChanges")}</Button>

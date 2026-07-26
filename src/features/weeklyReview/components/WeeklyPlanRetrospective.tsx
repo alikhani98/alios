@@ -36,7 +36,7 @@ export function WeeklyPlanRetrospective({
 
   return (
     <PremiumCard className="alios-surface-muted border-border/70 shadow-none">
-      <CardContent className="grid gap-5 p-5 sm:p-6 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,0.55fr)]">
+      <CardContent className="grid gap-5 p-5 sm:p-6 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,0.7fr)]">
         <div className="min-w-0 space-y-4">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="flex min-w-0 items-start gap-3">
@@ -45,33 +45,36 @@ export function WeeklyPlanRetrospective({
               </span>
               <div className="min-w-0 space-y-1">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                  {t("weeklyReview.title")}
+                  {t("weeklyReview.last7Days")}
                 </p>
-                <h2 className="break-words text-lg font-semibold">{t("weeklyReview.last7Days")}</h2>
+                <h2 className="break-words text-lg font-semibold">{plan.focusTitle}</h2>
               </div>
             </div>
             {weekLabel ? <StatusChip tone="neutral">{weekLabel}</StatusChip> : null}
           </div>
 
-          <div className="space-y-2">
-            <p className="break-words text-base font-semibold leading-7 sm:text-lg">{plan.focusTitle}</p>
-            {plan.intention ? (
-              <p className="break-words text-sm leading-7 text-muted-foreground">{plan.intention}</p>
-            ) : null}
-          </div>
+          {plan.intention ? (
+            <p className="break-words text-sm leading-7 text-muted-foreground">{plan.intention}</p>
+          ) : null}
 
           <WeeklyPlanLinks links={links} compact />
         </div>
 
-        <SoftPanel className="alios-surface-card">
+        <SoftPanel className="alios-surface-card space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="text-sm font-semibold">{t("projects.taskProgress")}</p>
             <StatusChip tone={status.tone}>{status.label}</StatusChip>
           </div>
-          <MiniProgressBar value={progress} label={t("home.completion")} className="mt-4" />
-          <div className="mt-4 flex flex-wrap gap-2 text-sm text-muted-foreground">
-            <span>{t("weeklyReview.completedTasks")}: {execution.completed}</span>
-            <span>{t("weeklyReview.openTasks")}: {execution.open}</span>
+          <MiniProgressBar value={progress} label={t("home.completion")} />
+          <div className="grid gap-3 sm:grid-cols-2">
+            <SoftPanel className="alios-surface-muted">
+              <p className="text-xs text-muted-foreground">{t("weeklyReview.completedTasks")}</p>
+              <p className="mt-1 text-lg font-semibold tabular-nums">{execution.completed}</p>
+            </SoftPanel>
+            <SoftPanel className="alios-surface-muted">
+              <p className="text-xs text-muted-foreground">{t("weeklyReview.openTasks")}</p>
+              <p className="mt-1 text-lg font-semibold tabular-nums">{execution.open}</p>
+            </SoftPanel>
           </div>
         </SoftPanel>
       </CardContent>
