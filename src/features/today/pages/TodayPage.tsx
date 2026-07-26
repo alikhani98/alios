@@ -1,4 +1,4 @@
-import { AlertCircle, CalendarDays, CheckSquare2, Clock3, Plus, Repeat2, RotateCcw } from "lucide-react";
+import { AlertCircle, CalendarDays, CheckCircle2, CheckSquare2, Clock3, Plus, Repeat2, RotateCcw, Sparkles, Target } from "lucide-react";
 import { format, isValid, parseISO } from "date-fns";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
@@ -148,21 +148,55 @@ export function TodayPage() {
       (!projectId || task.projectId === projectId) &&
       (!routineId || task.routineId === routineId)
   );
+  const orderedVisibleTasks = useMemo(() => {
+    const rank = (task: Task) => {
+      if (task.isMit) {
+        return 0;
+      }
+      if (task.status === "doing") {
+        return 1;
+      }
+      if (task.status === "todo") {
+        return 2;
+      }
+      if (task.status === "deferred") {
+        return 3;
+      }
+      if (task.status === "done") {
+        return 4;
+      }
+      return 5;
+    };
+
+    return [...visibleTasks].sort((left, right) => {
+      const rankDiff = rank(left) - rank(right);
+      if (rankDiff !== 0) {
+        return rankDiff;
+      }
+
+      if (left.priority !== right.priority) {
+        const priorityOrder = { high: 0, medium: 1, low: 2 };
+        return priorityOrder[left.priority] - priorityOrder[right.priority];
+      }
+
+      return left.createdAt.localeCompare(right.createdAt);
+    });
+  }, [visibleTasks]);
   const taskPreviewLimit = isSimpleView ? 6 : 12;
   const displayedTasks = useMemo(() => {
-    if (showAllTasks || visibleTasks.length <= taskPreviewLimit) {
-      return visibleTasks;
+    if (showAllTasks || orderedVisibleTasks.length <= taskPreviewLimit) {
+      return orderedVisibleTasks;
     }
 
-    const preview = visibleTasks.slice(0, taskPreviewLimit);
+    const preview = orderedVisibleTasks.slice(0, taskPreviewLimit);
     const focusedTask = focusId
-      ? visibleTasks.find((task) => task.id === focusId)
+      ? orderedVisibleTasks.find((task) => task.id === focusId)
       : undefined;
 
     return focusedTask && !preview.some((task) => task.id === focusedTask.id)
       ? [...preview, focusedTask]
       : preview;
-  }, [focusId, showAllTasks, visibleTasks]);
+  }, [focusId, orderedVisibleTasks, showAllTasks]);
   const hiddenTaskCount = Math.max(visibleTasks.length - displayedTasks.length, 0);
   const plannedTaskOutsideToday = getPlannedTaskOutsideToday(weeklyPlanFocus, today);
   const routineSuggestions = getRoutineSuggestions(
@@ -180,6 +214,15 @@ export function TodayPage() {
     0
   );
   const reviewDueProjects = projects.filter((project) => isProjectReviewDue(project));
+  const mitTask = orderedVisibleTasks.find((task) => task.isMit);
+  const activeTaskCount = orderedVisibleTasks.filter(
+    (task) => task.status === "todo" || task.status === "doing"
+  ).length;
+  const completedTaskCount = orderedVisibleTasks.filter((task) => task.status === "done").length;
+  const deferredTaskCount = orderedVisibleTasks.filter((task) => task.status === "deferred").length;
+  const completionRate = visibleTasks.length > 0
+    ? Math.round((completedTaskCount / visibleTasks.length) * 100)
+    : 0;
 
   const showError = (caught: unknown, fallback: string) => {
     setActionError(caught instanceof Error ? caught.message : fallback);
@@ -378,26 +421,56 @@ export function TodayPage() {
   return (
     <section className="alios-page space-y-6">
       <PremiumCard className="border-primary/15 bg-gradient-to-br from-primary/10 via-background to-background">
-        <CardContent className="grid gap-5 p-5 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.55fr)] sm:p-6">
-          <div>
+        <CardContent className="grid gap-5 p-5 sm:p-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)]">
+          <div className="space-y-5">
             <SectionHeader
+              eyebrow={t("home.dailyPlan")}
               icon={<CalendarDays className="h-5 w-5" />}
               title={t("today.title")}
               description={t("today.description")}
             />
+            <div className="grid gap-3 sm:grid-cols-3">
+              <SoftPanel className="gap-2 border-primary/15 bg-background/80">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                  {t("home.taskDate")}
+                </p>
+                <p className="text-lg font-semibold leading-8">{formatDate(today)}</p>
+              </SoftPanel>
+              <SoftPanel className="gap-2 border-primary/15 bg-background/80">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                  {t("today.tasks")}
+                </p>
+                <p className="text-lg font-semibold tabular-nums">{activeTaskCount}</p>
+                <p className="text-sm text-muted-foreground">{t("common.active")}</p>
+              </SoftPanel>
+              <SoftPanel className="gap-2 border-primary/15 bg-background/80">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                  {t("common.completed")}
+                </p>
+                <p className="text-lg font-semibold tabular-nums">{completionRate}%</p>
+                <p className="text-sm text-muted-foreground">
+                  {completedTaskCount} / {visibleTasks.length || 0}
+                </p>
+              </SoftPanel>
+            </div>
           </div>
           <SoftPanel className="space-y-4 border-primary/20 bg-primary/5">
             <div className="flex items-start gap-3">
               <span className="alios-icon-primary">
-                <CalendarDays className="h-5 w-5" aria-hidden="true" />
+                {mitTask ? <Target className="h-5 w-5" aria-hidden="true" /> : <Sparkles className="h-5 w-5" aria-hidden="true" />}
               </span>
               <div className="min-w-0 space-y-1">
                 <p className="text-sm font-medium text-muted-foreground">
-                  {t("home.taskDate")}
+                  {mitTask ? t("today.mit") : t("today.tasks")}
                 </p>
                 <p className="break-words text-xl font-semibold leading-8">
-                  {formatDate(today)}
+                  {mitTask ? mitTask.title : t("today.noTasks")}
                 </p>
+                {mitTask ? (
+                  <p className="text-sm leading-6 text-muted-foreground">
+                    {t("today.tasksDescription")}
+                  </p>
+                ) : null}
               </div>
             </div>
             <Button type="button" className="w-full" onClick={openCreateTask}>
@@ -464,111 +537,6 @@ export function TodayPage() {
         </div>
       ) : null}
 
-      <TodayWeeklyPlanCard focus={weeklyPlanFocus} isLoading={isWeeklyPlanLoading} />
-
-      <PremiumCard className="border-border/70 bg-card/95">
-        <CardHeader className="gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="space-y-1">
-            <CardTitle className="flex items-center gap-2">
-              <Repeat2 className="h-5 w-5 text-primary" />
-              {t("routines.todayTitle")}
-            </CardTitle>
-            <p className="text-sm leading-6 text-muted-foreground">
-              {t("routines.todayDescription")}
-            </p>
-          </div>
-          {routineSuggestions.length > 0 ? (
-            <StatusChip tone="neutral">{routineSuggestions.length}</StatusChip>
-          ) : null}
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {routinesError ? (
-            <div className="alios-surface-muted flex flex-col gap-3 p-3 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-sm text-muted-foreground">{t("routines.todayUnavailable")}</p>
-              <Button size="sm" variant="outline" onClick={() => void loadRoutines()}>{t("common.tryAgain")}</Button>
-            </div>
-          ) : isRoutinesLoading ? (
-            <div className="alios-surface-muted h-16 animate-pulse bg-muted/60" />
-          ) : routineSuggestions.length > 0 ? (
-            <>
-              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-                {visibleRoutineSuggestions.map((routine) => (
-                  <div
-                    key={routine.id}
-                    className="alios-surface-muted grid min-w-0 gap-3 p-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
-                  >
-                    <div className="min-w-0">
-                      <p className="break-words font-medium">{routine.title}</p>
-                      {routine.description ? (
-                        <p className="mt-1 line-clamp-1 break-words text-sm leading-6 text-muted-foreground">
-                          {routine.description}
-                        </p>
-                      ) : null}
-                    </div>
-                    <Button
-                      size="sm"
-                      className="w-full shrink-0 sm:w-auto"
-                      disabled={busyRoutineId === routine.id}
-                      onClick={() => void handleAddRoutine(routine)}
-                    >
-                      <Plus className="me-2 h-4 w-4" />
-                      {t("routines.addToToday")}
-                    </Button>
-                  </div>
-                ))}
-              </div>
-              {hiddenRoutineSuggestionCount > 0 || showAllRoutineSuggestions ? (
-                <div className="flex justify-start border-t border-border/60 pt-3">
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setShowAllRoutineSuggestions((current) => !current)}
-                  >
-                    {showAllRoutineSuggestions
-                      ? t("today.showFewerRoutineSuggestions")
-                      : t("today.showMoreRoutineSuggestions", {
-                          count: hiddenRoutineSuggestionCount,
-                        })}
-                  </Button>
-                </div>
-              ) : null}
-            </>
-          ) : null}
-        </CardContent>
-      </PremiumCard>
-
-      {reviewDueProjects.length > 0 ? (
-        <PremiumCard className="border-border/70 bg-card/95">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Clock3 className="h-5 w-5 text-primary" />
-              {t("projects.title")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {reviewDueProjects.map((project) => (
-              <div
-                key={project.id}
-                className="alios-surface-muted flex min-w-0 flex-col gap-3 p-3 sm:flex-row sm:items-center sm:justify-between"
-              >
-                <p className="min-w-0 break-words font-medium">{project.title}</p>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="w-full shrink-0 sm:w-auto"
-                  disabled={busyProjectReviewId === project.id}
-                  onClick={() => void handleMarkProjectReviewed(project)}
-                >
-                  <Clock3 className="me-2 h-4 w-4" />
-                  {t("goals.markReviewed")}
-                </Button>
-              </div>
-            ))}
-          </CardContent>
-        </PremiumCard>
-      ) : null}
-
       {successMessage ? (
         <div
           role="status"
@@ -605,28 +573,16 @@ export function TodayPage() {
       ) : null}
 
       <PremiumCard className="border-border/70 bg-card/95">
-        <CardHeader>
-          <CardTitle>{t("today.checkin")}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <div className="alios-surface-muted h-72 animate-pulse bg-muted/60" />
-          ) : (
-            <DailyCheckinForm
-              key={checkin?.updatedAt ?? "new-checkin"}
-              checkin={checkin}
-              isSubmitting={isCheckinSubmitting}
-              onSubmit={handleCheckinSubmit}
-            />
-          )}
-        </CardContent>
-      </PremiumCard>
-
-      <PremiumCard className="border-border/70 bg-card/95">
         <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
           <SectionHeader
+            eyebrow={mitTask ? t("today.mit") : undefined}
             title={t("today.tasks")}
             description={t("today.tasksDescription")}
+            status={
+              <StatusChip tone={activeTaskCount > 0 ? "primary" : "neutral"}>
+                {activeTaskCount} {t("common.active")}
+              </StatusChip>
+            }
           />
           <Button type="button" variant="outline" onClick={openCreateTask}>
             <Plus className="me-2 h-4 w-4" />
@@ -679,106 +635,258 @@ export function TodayPage() {
         </div>
       ) : null}
 
-      {plannedTaskOutsideToday ? (
-        <div
-          ref={plannedTaskRef}
-          className={cn(
-            "scroll-mt-24 rounded-2xl transition-[transform,box-shadow,border-color] duration-200 ease-out motion-reduce:transition-none motion-reduce:transform-none",
-            focusedTaskId === plannedTaskOutsideToday.id
-              ? "ring-2 ring-primary/50 ring-offset-2 ring-offset-background shadow-lg shadow-primary/10"
-              : null
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)]">
+        <div className="space-y-6">
+          {isLoading ? (
+            <div className="space-y-3" aria-label={t("today.loadingTasks")}>
+              {[0, 1, 2].map((item) => (
+                <div key={item} className="alios-surface-muted h-28 animate-pulse bg-muted/60" />
+              ))}
+            </div>
+          ) : visibleTasks.length === 0 ? (
+            <EmptyState
+              icon={<CheckSquare2 className="h-6 w-6" />}
+              title={t("today.noTasks")}
+              description={t("today.noTasksDescription")}
+              actions={
+                <Button type="button" onClick={openCreateTask}>
+                  <Plus className="me-2 h-4 w-4" />
+                  {t("today.firstTask")}
+                </Button>
+              }
+            />
+          ) : (
+            <div className="space-y-3">
+              {displayedTasks.map((task) => (
+                <div
+                  key={task.id}
+                  ref={(node) => {
+                    taskRefs.current[task.id] = node;
+                  }}
+                  className={cn(
+                    "scroll-mt-24 rounded-2xl transition-[transform,box-shadow,border-color] duration-200 ease-out motion-reduce:transition-none motion-reduce:transform-none",
+                    focusedTaskId === task.id
+                      ? "ring-2 ring-primary/50 ring-offset-2 ring-offset-background shadow-lg shadow-primary/10"
+                      : null
+                  )}
+                >
+                  <TodayTaskCard
+                    task={task}
+                    linkedProject={findLinkedProject(task, projects)}
+                    isLinkedProjectLoading={isProjectsLoading}
+                    isBusy={busyTaskId === task.id}
+                    onEdit={() => openEditTask(task)}
+                    onStatusChange={(status) => handleStatusChange(task, status)}
+                    onSelectMit={() => handleSelectMit(task)}
+                    onDelete={() => handleDeleteTask(task)}
+                  />
+                </div>
+              ))}
+              {visibleTasks.length > taskPreviewLimit ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full sm:w-auto"
+                  onClick={() => setShowAllTasks((current) => !current)}
+                >
+                  {showAllTasks
+                    ? t("common.showFewer")
+                    : t("common.showMoreCount", { count: hiddenTaskCount })}
+                </Button>
+              ) : null}
+            </div>
           )}
-        >
-          <PremiumCard className="border-primary/25 bg-primary/5">
-            <CardContent className="space-y-4 p-5 sm:p-6">
-              <SectionHeader
-                eyebrow={t("weeklyReview.title")}
-                title={t("weeklyReview.nextFocusLabel")}
-                description={weeklyPlanFocus.plan?.focusTitle}
-                actions={
-                  <span className="text-sm text-muted-foreground">
-                    {plannedTaskOutsideToday.dueDate
-                      ? formatDate(plannedTaskOutsideToday.dueDate)
-                      : t("common.notRecorded")}
-                  </span>
-                }
-              />
-              <TodayTaskCard
-                task={plannedTaskOutsideToday}
-                linkedProject={findLinkedProject(plannedTaskOutsideToday, projects)}
-                isLinkedProjectLoading={isProjectsLoading}
-                isBusy={busyTaskId === plannedTaskOutsideToday.id}
-                contextLabel={t("weeklyReview.title")}
-                allowMit={false}
-                onEdit={() => openEditTask(plannedTaskOutsideToday)}
-                onStatusChange={(status) => handleStatusChange(plannedTaskOutsideToday, status)}
-                onSelectMit={() => handleSelectMit(plannedTaskOutsideToday)}
-                onDelete={() => handleDeleteTask(plannedTaskOutsideToday)}
-              />
+        </div>
+
+        <div className="space-y-6">
+          <TodayWeeklyPlanCard focus={weeklyPlanFocus} isLoading={isWeeklyPlanLoading} />
+
+          <PremiumCard className="border-border/70 bg-card/95">
+            <CardHeader className="gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="space-y-1">
+                <CardTitle className="flex items-center gap-2">
+                  <Repeat2 className="h-5 w-5 text-primary" />
+                  {t("routines.todayTitle")}
+                </CardTitle>
+                <p className="text-sm leading-6 text-muted-foreground">
+                  {t("routines.todayDescription")}
+                </p>
+              </div>
+              {routineSuggestions.length > 0 ? (
+                <StatusChip tone="neutral">{routineSuggestions.length}</StatusChip>
+              ) : null}
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {routinesError ? (
+                <div className="alios-surface-muted flex flex-col gap-3 p-3 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="text-sm text-muted-foreground">{t("routines.todayUnavailable")}</p>
+                  <Button size="sm" variant="outline" onClick={() => void loadRoutines()}>{t("common.tryAgain")}</Button>
+                </div>
+              ) : isRoutinesLoading ? (
+                <div className="alios-surface-muted h-16 animate-pulse bg-muted/60" />
+              ) : routineSuggestions.length > 0 ? (
+                <>
+                  <div className="grid gap-3">
+                    {visibleRoutineSuggestions.map((routine) => (
+                      <div
+                        key={routine.id}
+                        className="alios-surface-muted grid min-w-0 gap-3 p-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
+                      >
+                        <div className="min-w-0">
+                          <p className="break-words font-medium">{routine.title}</p>
+                          {routine.description ? (
+                            <p className="mt-1 line-clamp-2 break-words text-sm leading-6 text-muted-foreground">
+                              {routine.description}
+                            </p>
+                          ) : null}
+                        </div>
+                        <Button
+                          size="sm"
+                          className="w-full shrink-0 sm:w-auto"
+                          disabled={busyRoutineId === routine.id}
+                          onClick={() => void handleAddRoutine(routine)}
+                        >
+                          <Plus className="me-2 h-4 w-4" />
+                          {t("routines.addToToday")}
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                  {hiddenRoutineSuggestionCount > 0 || showAllRoutineSuggestions ? (
+                    <div className="flex justify-start border-t border-border/60 pt-3">
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setShowAllRoutineSuggestions((current) => !current)}
+                      >
+                        {showAllRoutineSuggestions
+                          ? t("today.showFewerRoutineSuggestions")
+                          : t("today.showMoreRoutineSuggestions", {
+                              count: hiddenRoutineSuggestionCount,
+                            })}
+                      </Button>
+                    </div>
+                  ) : null}
+                </>
+              ) : null}
             </CardContent>
           </PremiumCard>
-        </div>
-      ) : null}
 
-      {isLoading ? (
-        <div className="space-y-3" aria-label={t("today.loadingTasks")}>
-          {[0, 1, 2].map((item) => (
-            <div key={item} className="alios-surface-muted h-28 animate-pulse bg-muted/60" />
-          ))}
-        </div>
-      ) : visibleTasks.length === 0 ? (
-        <EmptyState
-          icon={<CheckSquare2 className="h-6 w-6" />}
-          title={t("today.noTasks")}
-          description={t("today.noTasksDescription")}
-          actions={
-            <Button type="button" onClick={openCreateTask}>
-              <Plus className="me-2 h-4 w-4" />
-              {t("today.firstTask")}
-            </Button>
-          }
-        />
-      ) : (
-        <div className="space-y-3">
-          {displayedTasks.map((task) => (
-            <div
-              key={task.id}
-              ref={(node) => {
-                taskRefs.current[task.id] = node;
-              }}
-              className={cn(
-                "scroll-mt-24 rounded-2xl transition-[transform,box-shadow,border-color] duration-200 ease-out motion-reduce:transition-none motion-reduce:transform-none",
-                focusedTaskId === task.id
-                  ? "ring-2 ring-primary/50 ring-offset-2 ring-offset-background shadow-lg shadow-primary/10"
-                  : null
+          <PremiumCard className="border-border/70 bg-card/95">
+            <CardHeader>
+              <CardTitle>{t("today.checkin")}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {isLoading ? (
+                <div className="alios-surface-muted h-72 animate-pulse bg-muted/60" />
+              ) : (
+                <DailyCheckinForm
+                  key={checkin?.updatedAt ?? "new-checkin"}
+                  checkin={checkin}
+                  isSubmitting={isCheckinSubmitting}
+                  onSubmit={handleCheckinSubmit}
+                />
               )}
-            >
-              <TodayTaskCard
-                task={task}
-                linkedProject={findLinkedProject(task, projects)}
-                isLinkedProjectLoading={isProjectsLoading}
-                isBusy={busyTaskId === task.id}
-                onEdit={() => openEditTask(task)}
-                onStatusChange={(status) => handleStatusChange(task, status)}
-                onSelectMit={() => handleSelectMit(task)}
-                onDelete={() => handleDeleteTask(task)}
-              />
-            </div>
-          ))}
-          {visibleTasks.length > taskPreviewLimit ? (
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full sm:w-auto"
-              onClick={() => setShowAllTasks((current) => !current)}
-            >
-              {showAllTasks
-                ? t("common.showFewer")
-                : t("common.showMoreCount", { count: hiddenTaskCount })}
-            </Button>
+            </CardContent>
+          </PremiumCard>
+
+          {(reviewDueProjects.length > 0 || plannedTaskOutsideToday || deferredTaskCount > 0) ? (
+            <PremiumCard className="border-border/70 bg-card/95">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Clock3 className="h-5 w-5 text-primary" />
+                  {t("home.dailyInsights")}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {plannedTaskOutsideToday ? (
+                  <div
+                    ref={plannedTaskRef}
+                    className={cn(
+                      "rounded-2xl transition-[transform,box-shadow,border-color] duration-200 ease-out motion-reduce:transition-none motion-reduce:transform-none",
+                      focusedTaskId === plannedTaskOutsideToday.id
+                        ? "ring-2 ring-primary/50 ring-offset-2 ring-offset-background shadow-lg shadow-primary/10"
+                        : null
+                    )}
+                  >
+                    <SoftPanel className="space-y-3 border-primary/15 bg-primary/5">
+                      <SectionHeader
+                        eyebrow={t("weeklyReview.title")}
+                        title={t("weeklyReview.nextFocusLabel")}
+                        description={weeklyPlanFocus.plan?.focusTitle}
+                        actions={
+                          <span className="text-sm text-muted-foreground">
+                            {plannedTaskOutsideToday.dueDate
+                              ? formatDate(plannedTaskOutsideToday.dueDate)
+                              : t("common.notRecorded")}
+                          </span>
+                        }
+                      />
+                      <TodayTaskCard
+                        task={plannedTaskOutsideToday}
+                        linkedProject={findLinkedProject(plannedTaskOutsideToday, projects)}
+                        isLinkedProjectLoading={isProjectsLoading}
+                        isBusy={busyTaskId === plannedTaskOutsideToday.id}
+                        contextLabel={t("weeklyReview.title")}
+                        allowMit={false}
+                        onEdit={() => openEditTask(plannedTaskOutsideToday)}
+                        onStatusChange={(status) => handleStatusChange(plannedTaskOutsideToday, status)}
+                        onSelectMit={() => handleSelectMit(plannedTaskOutsideToday)}
+                        onDelete={() => handleDeleteTask(plannedTaskOutsideToday)}
+                      />
+                    </SoftPanel>
+                  </div>
+                ) : null}
+
+                {reviewDueProjects.length > 0 ? (
+                  <div className="space-y-3">
+                    {reviewDueProjects.map((project) => (
+                      <div
+                        key={project.id}
+                        className="alios-surface-muted flex min-w-0 flex-col gap-3 p-3 sm:flex-row sm:items-center sm:justify-between"
+                      >
+                        <p className="min-w-0 break-words font-medium">{project.title}</p>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="w-full shrink-0 sm:w-auto"
+                          disabled={busyProjectReviewId === project.id}
+                          onClick={() => void handleMarkProjectReviewed(project)}
+                        >
+                          <Clock3 className="me-2 h-4 w-4" />
+                          {t("goals.markReviewed")}
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+
+                {deferredTaskCount > 0 ? (
+                  <SoftPanel className="border-border/80 bg-background/80">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-sm font-medium">{t("today.deferred")}</p>
+                      <StatusChip tone="warning">{deferredTaskCount}</StatusChip>
+                    </div>
+                  </SoftPanel>
+                ) : null}
+
+                {completedTaskCount > 0 ? (
+                  <SoftPanel className="border-border/80 bg-background/80">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-sm font-medium">{t("common.completed")}</p>
+                      <span className="inline-flex items-center gap-2 text-sm text-muted-foreground">
+                        <CheckCircle2 className="h-4 w-4 text-primary" aria-hidden="true" />
+                        {completedTaskCount}
+                      </span>
+                    </div>
+                  </SoftPanel>
+                ) : null}
+              </CardContent>
+            </PremiumCard>
           ) : null}
         </div>
-      )}
+      </div>
     </section>
   );
 }
