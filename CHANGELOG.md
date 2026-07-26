@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 202 - Figma Foundations Page Implementation Workflow
+
+- Created `docs/FIGMA_FOUNDATIONS_IMPLEMENTATION_STAGE_202.md` to define the implementation workflow for manually creating the AliOS `01 Foundations` Figma page
+- Documented the Foundations page structure, color setup checklist, typography setup checklist, layout token setup, Figma variable mapping workflow, and pre-approval QA checklist
+- Explicitly recorded that this stage does not claim a real Figma page or variable collection was created and that the repository remains the source of truth
+- Kept the stage documentation-only with no `src` change, test change, package/dependency change, storage/schema/migration/backup change, localStorage/route/business-logic change, or application behavior change
+
 ## Stage 200 - Dashboard Home Screen Figma Specification
 
 - Created `docs/FIGMA_DASHBOARD_SCREEN_SPECIFICATION_STAGE_200.md` to define the AliOS Dashboard / Home screen as the primary Figma reference screen based on the current implementation
