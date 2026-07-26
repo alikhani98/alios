@@ -2,6 +2,15 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 188 - Figma Screen Assembly and Handoff Workflow
+
+- Created `docs/FIGMA_SCREEN_ASSEMBLY_HANDOFF_STAGE_188.md` to define the end-to-end workflow for assembling AliOS Figma screens from approved design-system layers
+- Documented the assembly pipeline from foundations and variables through components, page patterns, and application screens, with explicit mapping back to `DESIGN.md`, `src/styles`, `src/shared/ui`, and feature components
+- Documented screen assembly rules, frame/page/component/variable naming, Auto Layout expectations, responsive handling, RTL/LTR handling, dark mode handling, and accent-mode handling
+- Created a screen inventory for Dashboard / Home, Finance, Today, Weekly Review, Settings, Goals, Personal Manual, and Decision Log with required sections, components, states, and viewport considerations
+- Added a designer-to-developer handoff checklist, Figma library structure, and the future Figma creation plan for Stages 189-192
+- Kept the stage documentation-only with no `src` change, test change, package/dependency change, storage/schema/migration/backup change, localStorage/route/business-logic change, or application behavior change
+
 ## Stage 187C - Figma Page Pattern Mapping
 
 - Created `docs/FIGMA_PAGE_PATTERN_MAPPING_STAGE_187C.md` to map reusable AliOS page patterns for future Figma screen construction
