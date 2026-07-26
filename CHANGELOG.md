@@ -2,6 +2,14 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 200 - Dashboard Home Screen Figma Specification
+
+- Created `docs/FIGMA_DASHBOARD_SCREEN_SPECIFICATION_STAGE_200.md` to define the AliOS Dashboard / Home screen as the primary Figma reference screen based on the current implementation
+- Documented the Dashboard purpose, structure, component mapping, information hierarchy, screen states, responsive behavior, theme behavior, RTL/LTR rules, and assembly rules
+- Mapped the implemented Home hero, task and progress surfaces, weekly focus, manual summary, personal insights, secondary ecosystem sections, and quick actions to the current shared UI vocabulary
+- Explicitly documented that dedicated Home Finance snapshot and Recent Decisions sections are not currently implemented on the Dashboard and should not be invented in Figma ahead of source-backed product work
+- Kept the stage documentation-only with no `src` change, test change, package/dependency change, storage/schema/migration/backup change, localStorage/route/business-logic change, or application behavior change
+
 ## Stage 199 - Decision Log Screen Figma Specification
 
 - Created `docs/FIGMA_DECISION_LOG_SCREEN_SPECIFICATION_STAGE_199.md` to define the Decision Log screen as a complete Figma-ready specification based on the current implementation
