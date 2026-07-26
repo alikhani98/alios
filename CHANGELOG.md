@@ -2,6 +2,12 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 192 - Finance Figma Screen Build
+
+- Created `docs/FIGMA_FINANCE_SCREEN_BUILD_STAGE_192.md` to define the actual Figma construction process for the first AliOS application screen
+- Documented the `03 Screens` page structure with Finance desktop and mobile frames, the ordered layout build, component usage mapping, responsive behavior, theme support, RTL/LTR validation, and QA checklist
+- Kept the stage documentation-only with no `src` change, test change, package/dependency change, storage/schema/route change, or application behavior change
+
 ## Stage 191 - Finance Figma Screen Specification
 
 - Created `docs/FIGMA_FINANCE_SCREEN_SPECIFICATION_STAGE_191.md` to define the Finance screen as a complete Figma construction specification
