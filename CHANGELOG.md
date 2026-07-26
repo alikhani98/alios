@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 201 - AliOS Master Figma File Architecture
+
+- Created `docs/FIGMA_MASTER_FILE_ARCHITECTURE_STAGE_201.md` to define the complete master-file structure for AliOS Figma work
+- Documented page architecture for Cover, Foundations, Components, Patterns, Screens, Prototypes, and Documentation
+- Defined foundation organization, component organization, screen organization, naming conventions, a Figma Free plan strategy, and the code-to-Figma-to-implementation workflow
+- Kept the stage documentation-only with no `src` change, test change, package/dependency change, storage/schema/migration/backup change, localStorage/route/business-logic change, or application behavior change
+
 ## Stage 200 - Dashboard Home Screen Figma Specification
 
 - Created `docs/FIGMA_DASHBOARD_SCREEN_SPECIFICATION_STAGE_200.md` to define the AliOS Dashboard / Home screen as the primary Figma reference screen based on the current implementation
