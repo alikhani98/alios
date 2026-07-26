@@ -642,7 +642,7 @@ export function GoalsPage() {
             status={<StatusChip tone="neutral">{filteredEntries.length}</StatusChip>}
           />
 
-          <SoftPanel className="grid min-w-0 gap-3 md:grid-cols-[minmax(0,1fr)_11rem_11rem_11rem_11rem_auto]">
+          <SoftPanel className="grid min-w-0 gap-3 xl:grid-cols-[minmax(0,1fr)_11rem_11rem_11rem_11rem_auto]">
             <div className="relative min-w-0">
               <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -707,7 +707,7 @@ export function GoalsPage() {
                 </option>
               ))}
             </Select>
-            <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+            <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap xl:flex-col">
               <Button
                 type="button"
                 className="w-full sm:w-auto"

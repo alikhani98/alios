@@ -555,8 +555,8 @@ export function PersonalManualPage() {
             status={<StatusChip tone="neutral">{filteredEntries.length}</StatusChip>}
           />
 
-          <SoftPanel className="grid gap-3 md:grid-cols-[minmax(0,1fr)_12rem_12rem_auto]">
-            <div className="relative">
+          <SoftPanel className="grid min-w-0 gap-3 xl:grid-cols-[minmax(0,1fr)_12rem_12rem_auto]">
+            <div className="relative min-w-0">
               <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 value={query}
@@ -592,7 +592,7 @@ export function PersonalManualPage() {
                 </option>
               ))}
             </Select>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap xl:flex-col">
               <Button type="button" className="w-full sm:w-auto" onClick={handleSearch}>
                 {t("manual.search")}
               </Button>
