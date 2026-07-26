@@ -2,6 +2,15 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 179 - Personal Manual Visual Hierarchy and Density Refinement
+
+- Applied the Stage 173 shared visual foundation to Personal Manual as the sixth page-level visual refinement pilot after Finance, Today, Weekly Review, Settings, and Goals
+- Refined Manual entry cards so title and body preview lead first, followed by status, category/importance, review metadata, tags, and actions in clearer bands
+- Grouped the Manual entry form into shared soft surfaces for identity/content, status/importance/review cadence, and tags while preserving every submitted field and handler
+- Replaced local Manual status, filter, loading, focus, success, and error surfaces with shared semantic surface/status utilities where appropriate
+- Kept template selection, search/filter behavior, focused navigation, review marking, delete confirmation, and Simple View preview limits unchanged
+- Kept the stage UI-only with no Manual business logic change, CRUD behavior change, search/filter behavior change, repository change, storage change, schema change, migration, backup change, route change, localStorage key, dependency, backend, sync, cloud, AI, telemetry, analytics, or Simple View / Full View behavior change
+
 ## Stage 178 - Goals Visual Hierarchy and Density Refinement
 
 - Applied the Stage 173 shared visual foundation to Goals as the fifth page-level visual refinement pilot after Finance, Today, Weekly Review, and Settings
