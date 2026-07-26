@@ -2,6 +2,15 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 180 - Decision Log Visual Hierarchy and Density Refinement
+
+- Applied the Stage 173 shared visual foundation to Decision Log as the seventh page-level visual refinement pilot after Finance, Today, Weekly Review, Settings, Goals, and Personal Manual
+- Refined decision cards so title and context lead first, followed by status, dates, category/tags, chosen option, reasoning/outcome details, ratings, and actions in clearer bands
+- Grouped the Decision form content with shared soft surfaces inside the existing collapsible basics, options, and review sections while preserving every submitted field and handler
+- Replaced local Decision Log help, status, filter, review-due, and loading surfaces with shared semantic surface/status utilities where appropriate
+- Kept Decision CRUD, review marking, archive/delete behavior, filters, reveal limits, and Simple View / Full View behavior unchanged
+- Kept the stage UI-only with no Decision Log logic change, data model change, repository change, storage change, schema change, migration, backup change, route change, localStorage key, dependency, backend, sync, cloud, AI, telemetry, or analytics change
+
 ## Stage 179 - Personal Manual Visual Hierarchy and Density Refinement
 
 - Applied the Stage 173 shared visual foundation to Personal Manual as the sixth page-level visual refinement pilot after Finance, Today, Weekly Review, Settings, and Goals

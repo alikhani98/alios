@@ -12,6 +12,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
+  SoftPanel,
   StatusChip,
 } from "@/shared/ui";
 import { decisionLogStatusValues } from "@/shared/types";
@@ -60,10 +61,10 @@ export function DecisionLogCard({
   const needsReview = isDecisionNeedsReview(decision);
 
   return (
-    <Card className="flex h-full flex-col">
-      <CardHeader className="gap-3">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <CardTitle className="leading-7">{decision.title}</CardTitle>
+    <Card className="flex h-full min-w-0 flex-col overflow-hidden">
+      <CardHeader className="gap-4">
+        <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
+          <CardTitle className="break-words text-xl leading-7">{decision.title}</CardTitle>
           <div className="flex flex-wrap justify-end gap-2">
             <StatusChip
               tone={
@@ -81,30 +82,41 @@ export function DecisionLogCard({
             {needsReview ? <StatusChip tone="warning">{t("decisions.reviewDue")}</StatusChip> : null}
           </div>
         </div>
-        <p className="text-sm leading-7 text-muted-foreground">
+        <p className="max-w-3xl break-words text-sm leading-7 text-muted-foreground">
           {previewText(decision.context, t("decisions.noContext"))}
         </p>
       </CardHeader>
 
-      <CardContent className="flex-1 space-y-4">
+      <CardContent className="min-w-0 flex-1 space-y-4">
         <div className="grid gap-3 sm:grid-cols-2">
-          <div className="rounded-2xl border bg-background/70 px-4 py-3">
+          <SoftPanel className="rounded-surface px-4 py-3">
             <p className="text-xs text-muted-foreground">{t("decisions.decisionDate")}</p>
             <p className="mt-1 text-sm font-medium">{formatDate(decision.decisionDate)}</p>
-          </div>
-          <div className="rounded-2xl border bg-background/70 px-4 py-3">
+          </SoftPanel>
+          <SoftPanel className="rounded-surface px-4 py-3">
             <p className="text-xs text-muted-foreground">{t("decisions.reviewDate")}</p>
             <p className="mt-1 text-sm font-medium">
               {decision.reviewDate ? formatDate(decision.reviewDate) : t("common.notRecorded")}
             </p>
-          </div>
+          </SoftPanel>
         </div>
 
         {decision.category || decision.tags.length > 0 ? (
-          <div className="flex flex-wrap gap-2">
-            {decision.category ? <Badge variant="secondary">{decision.category}</Badge> : null}
+          <div className="flex flex-wrap gap-2 border-t border-border/70 pt-4">
+            {decision.category ? (
+              <Badge
+                variant="secondary"
+                className="max-w-full break-words whitespace-normal text-start leading-5"
+              >
+                {decision.category}
+              </Badge>
+            ) : null}
             {decision.tags.map((tag) => (
-              <Badge key={tag} variant="outline">
+              <Badge
+                key={tag}
+                variant="outline"
+                className="max-w-full break-words whitespace-normal text-start leading-5"
+              >
                 {tag}
               </Badge>
             ))}
@@ -112,16 +124,16 @@ export function DecisionLogCard({
         ) : null}
 
         {decision.chosenOption ? (
-          <div className="space-y-1 text-sm">
+          <SoftPanel className="space-y-1 rounded-surface px-4 py-3 text-sm">
             <p className="font-medium">{t("decisions.chosenOption")}</p>
-            <p className="text-muted-foreground">{decision.chosenOption}</p>
-          </div>
+            <p className="break-words text-muted-foreground">{decision.chosenOption}</p>
+          </SoftPanel>
         ) : null}
 
         {decision.reasoning ? (
-          <div className="space-y-1 text-sm">
+          <div className="space-y-1 border-t border-border/70 pt-4 text-sm">
             <p className="font-medium">{t("decisions.reasoning")}</p>
-            <p className="text-muted-foreground">
+            <p className="break-words text-muted-foreground">
               {previewText(decision.reasoning, t("common.notRecorded"))}
             </p>
           </div>
@@ -130,7 +142,7 @@ export function DecisionLogCard({
         {decision.expectedOutcome ? (
           <div className="space-y-1 text-sm">
             <p className="font-medium">{t("decisions.expectedOutcome")}</p>
-            <p className="text-muted-foreground">
+            <p className="break-words text-muted-foreground">
               {previewText(decision.expectedOutcome, t("common.notRecorded"))}
             </p>
           </div>
@@ -141,7 +153,7 @@ export function DecisionLogCard({
             {decision.actualOutcome ? (
               <div className="space-y-1 text-sm">
                 <p className="font-medium">{t("decisions.actualOutcome")}</p>
-                <p className="text-muted-foreground">
+                <p className="break-words text-muted-foreground">
                   {previewText(decision.actualOutcome, t("common.notRecorded"))}
                 </p>
               </div>
@@ -149,7 +161,7 @@ export function DecisionLogCard({
             {decision.lesson ? (
               <div className="space-y-1 text-sm">
                 <p className="font-medium">{t("decisions.lesson")}</p>
-                <p className="text-muted-foreground">
+                <p className="break-words text-muted-foreground">
                   {previewText(decision.lesson, t("common.notRecorded"))}
                 </p>
               </div>
@@ -157,7 +169,7 @@ export function DecisionLogCard({
           </div>
         ) : null}
 
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 border-t border-border/70 pt-4">
           {decision.confidence ? (
             <StatusChip tone="neutral">
               {t("decisions.confidence")}: {decision.confidence}/5
@@ -171,7 +183,7 @@ export function DecisionLogCard({
         </div>
       </CardContent>
 
-      <CardFooter className="flex flex-col gap-2 border-t pt-4 sm:flex-row sm:flex-wrap sm:items-center">
+      <CardFooter className="flex flex-col gap-2 border-t border-border/70 pt-4 sm:flex-row sm:flex-wrap sm:items-center">
         {confirmingDelete ? (
           <>
             <Button
