@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 189 - Figma Foundation Variable Implementation Preparation
+
+- Created `docs/FIGMA_FOUNDATION_VARIABLE_IMPLEMENTATION_STAGE_189.md` to define the full AliOS Figma variable system and the implementation preparation rules before actual variable creation
+- Documented primitive and semantic color variables, light/dark mode aliasing, accent-mode aliasing, typography variables, spacing scale, radius variables, elevation variables, surface-system guidance, RTL/LTR rules, naming conventions, and the Figma variable creation checklist
+- Explicitly documented that Figma primitive/reference variables may exist for authoring, but publishable semantic variables must map back to the existing AliOS code tokens and approved shared behavior
+- Kept the stage documentation-only with no `src` change, logic change, test change, dependency change, package change, route/storage/schema/migration/backend/sync change, or AI/telemetry/analytics change
+
 ## Stage 188 - Figma Screen Assembly and Handoff Workflow
 
 - Created `docs/FIGMA_SCREEN_ASSEMBLY_HANDOFF_STAGE_188.md` to define the end-to-end workflow for assembling AliOS Figma screens from approved design-system layers
