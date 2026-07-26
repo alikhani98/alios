@@ -800,7 +800,7 @@ export function FinancePage() {
       {successMessage ? (
         <div
           role="status"
-          className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm"
+          className="alios-status-success rounded-surface border px-4 py-3 text-sm"
         >
           {successMessage}
         </div>
@@ -809,7 +809,7 @@ export function FinancePage() {
       {error || transactionError || obligationError ? (
         <div
           role="alert"
-          className="flex flex-col gap-3 rounded-xl border border-destructive/30 bg-destructive/5 p-4 sm:flex-row sm:items-center sm:justify-between"
+          className="alios-status-danger flex flex-col gap-3 rounded-surface border p-4 sm:flex-row sm:items-center sm:justify-between"
         >
           <div className="flex items-start gap-2 text-sm text-destructive">
             <Landmark className="mt-0.5 h-4 w-4 shrink-0" />
