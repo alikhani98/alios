@@ -533,7 +533,7 @@ export function WeeklyReviewPage() {
         </div>
       ) : null}
 
-      <PremiumCard className="border-primary/15 bg-gradient-to-br from-primary/10 via-background to-background shadow-sm">
+      <PremiumCard className="border-primary/15 bg-gradient-to-br from-primary/10 via-card to-background shadow-sm">
         <div className="p-5 sm:p-6">
           <SectionHeader
             eyebrow={t("weeklyReview.title")}
@@ -545,13 +545,13 @@ export function WeeklyReviewPage() {
             }
           />
 
-          <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
-            <div className="space-y-3">
-              <div className="rounded-2xl border border-border/70 bg-background/70 px-4 py-3">
+          <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
+            <div className="space-y-4">
+              <div className="alios-surface-card rounded-[var(--radius-section)] px-4 py-3">
                 <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
                   {t("weeklyReview.reviewWindow")}
                 </p>
-                <p className="mt-1 text-sm font-medium">{windowLabel}</p>
+                <p className="mt-1 break-words text-base font-semibold leading-7">{windowLabel}</p>
               </div>
               <p className="max-w-3xl text-sm leading-7 text-muted-foreground">
                 {t("weeklyReview.windowDescription")}
@@ -559,7 +559,7 @@ export function WeeklyReviewPage() {
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2">
-              <SoftPanel className="space-y-1">
+              <SoftPanel className="space-y-1 alios-surface-muted">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                   {t("weeklyReview.reviewScope")}
                 </p>
@@ -568,7 +568,7 @@ export function WeeklyReviewPage() {
                   {t("weeklyReview.scopeDescription")}
                 </p>
               </SoftPanel>
-              <SoftPanel className="space-y-1">
+              <SoftPanel className="space-y-1 alios-surface-muted">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                   {t("weeklyReview.localFirst")}
                 </p>
@@ -584,10 +584,10 @@ export function WeeklyReviewPage() {
 
       {isLoading ? (
         <div className="space-y-4" aria-label={t("common.loading")}>
-          <div className="h-64 animate-pulse rounded-[2rem] border bg-muted/60" />
+          <div className="h-64 animate-pulse rounded-[var(--radius-section)] border bg-muted/60" />
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {[0, 1, 2, 3].map((item) => (
-              <div key={item} className="h-40 animate-pulse rounded-[2rem] border bg-muted/60" />
+              <div key={item} className="h-40 animate-pulse rounded-[var(--radius-section)] border bg-muted/60" />
             ))}
           </div>
         </div>
@@ -634,7 +634,7 @@ export function WeeklyReviewPage() {
             description={windowLabel}
             icon={<CalendarDays className="h-5 w-5" />}
             status={<StatusChip tone={weeklyPlan ? "primary" : "neutral"}>{weeklyPlan ? t("common.changesSaved") : t("common.notRecorded")}</StatusChip>}
-            contentClassName="space-y-5"
+            contentClassName="space-y-5 bg-background/30"
           >
             <WeeklyPlanForm
               key={weeklyPlan?.updatedAt ?? "new-weekly-plan"}
@@ -677,19 +677,22 @@ export function WeeklyReviewPage() {
               description={t("weeklyReview.localOnlyNote")}
               icon={<Clock3 className="h-5 w-5" />}
               status={<StatusChip tone="warning">{reviewQueue.length}</StatusChip>}
-              contentClassName="space-y-3"
+              contentClassName="space-y-4"
             >
               <div className="grid gap-3 lg:grid-cols-2">
                 {displayedReviewQueue.map((item) => (
-                  <SoftPanel key={`${item.kind}-${item.id}`} className="space-y-3">
+                  <SoftPanel key={`${item.kind}-${item.id}`} className="space-y-4 border-warning/20">
                     <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
-                      <p className="min-w-0 break-words font-semibold leading-7">{item.title}</p>
-                      <div className="flex flex-wrap gap-2">
+                      <div className="min-w-0 space-y-1">
+                        <p className="min-w-0 break-words text-base font-semibold leading-7">{item.title}</p>
+                        <p className="text-sm text-muted-foreground">{t("weeklyReview.localOnlyNote")}</p>
+                      </div>
+                      <div className="flex shrink-0 flex-wrap gap-2">
                         <Badge variant="secondary">{t(getReviewQueueLabelKey(item))}</Badge>
                         <StatusChip tone="warning">{t(getReviewQueueReasonKey(item))}</StatusChip>
                       </div>
                     </div>
-                    <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                    <div className="flex flex-col gap-2 border-t border-border/70 pt-3 sm:flex-row sm:flex-wrap">
                       <Button
                         type="button"
                         size="sm"
@@ -723,29 +726,29 @@ export function WeeklyReviewPage() {
             </CollapsibleSection>
           ) : null}
 
-          <div className="grid gap-4 xl:grid-cols-2">
+          <div className="grid gap-5 xl:grid-cols-2">
             <CollapsibleSection
               id="weekly-review-tasks"
               title={t("weeklyReview.tasksSection")}
               description={t("weeklyReview.tasksSectionDescription")}
               icon={<ClipboardList className="h-5 w-5" />}
               status={<StatusChip tone="neutral">{summary.taskSummary.totalCount}</StatusChip>}
-              contentClassName="space-y-3"
+              contentClassName="space-y-4"
             >
               <div className="grid gap-3 sm:grid-cols-2">
-                <SoftPanel>
+                <SoftPanel className="alios-surface-muted">
                   <p className="text-xs text-muted-foreground">{t("weeklyReview.completedTasks")}</p>
                   <p className="mt-1 text-lg font-semibold tabular-nums">{summary.taskSummary.completedInWindowCount}</p>
                 </SoftPanel>
-                <SoftPanel>
+                <SoftPanel className="alios-surface-muted">
                   <p className="text-xs text-muted-foreground">{t("weeklyReview.overdueTasks")}</p>
                   <p className="mt-1 text-lg font-semibold tabular-nums">{summary.taskSummary.overdueCount}</p>
                 </SoftPanel>
-                <SoftPanel>
+                <SoftPanel className="alios-surface-muted">
                   <p className="text-xs text-muted-foreground">{t("weeklyReview.openTasks")}</p>
                   <p className="mt-1 text-lg font-semibold tabular-nums">{summary.taskSummary.openCount}</p>
                 </SoftPanel>
-                <SoftPanel>
+                <SoftPanel className="alios-surface-muted">
                   <p className="text-xs text-muted-foreground">{t("weeklyReview.dueSoonTasks")}</p>
                   <p className="mt-1 text-lg font-semibold tabular-nums">{summary.taskSummary.dueSoonCount}</p>
                 </SoftPanel>
@@ -766,22 +769,22 @@ export function WeeklyReviewPage() {
               description={t("weeklyReview.projectsSectionDescription")}
               icon={<FolderKanban className="h-5 w-5" />}
               status={<StatusChip tone="neutral">{summary.projectSummary.activeCount}</StatusChip>}
-              contentClassName="space-y-3"
+              contentClassName="space-y-4"
             >
               <div className="grid gap-3 sm:grid-cols-2">
-                <SoftPanel>
+                <SoftPanel className="alios-surface-muted">
                   <p className="text-xs text-muted-foreground">{t("weeklyReview.activeProjects")}</p>
                   <p className="mt-1 text-lg font-semibold tabular-nums">{summary.projectSummary.activeCount}</p>
                 </SoftPanel>
-                <SoftPanel>
+                <SoftPanel className="alios-surface-muted">
                   <p className="text-xs text-muted-foreground">{t("weeklyReview.projectsWithNextAction")}</p>
                   <p className="mt-1 text-lg font-semibold tabular-nums">{summary.projectSummary.projectsWithNextActionCount}</p>
                 </SoftPanel>
-                <SoftPanel>
+                <SoftPanel className="alios-surface-muted">
                   <p className="text-xs text-muted-foreground">{t("weeklyReview.projectsNeedsAttention")}</p>
                   <p className="mt-1 text-lg font-semibold tabular-nums">{summary.projectSummary.needsAttentionCount}</p>
                 </SoftPanel>
-                <SoftPanel>
+                <SoftPanel className="alios-surface-muted">
                   <p className="text-xs text-muted-foreground">{t("weeklyReview.reviewWindow")}</p>
                   <p className="mt-1 text-sm font-medium">{windowLabel}</p>
                 </SoftPanel>
@@ -802,24 +805,24 @@ export function WeeklyReviewPage() {
               description={t("weeklyReview.projectsSectionDescription")}
               icon={<Target className="h-5 w-5" />}
               status={<StatusChip tone="neutral">{summary.planningSummary.linkedProjectCount}</StatusChip>}
-              contentClassName="space-y-3"
+              contentClassName="space-y-4"
             >
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                <SoftPanel>
+                <SoftPanel className="alios-surface-muted">
                   <p className="text-xs text-muted-foreground">{t("nav.projects")}</p>
                   <p className="mt-1 text-lg font-semibold tabular-nums">{summary.planningSummary.linkedProjectCount}</p>
                 </SoftPanel>
-                <SoftPanel>
+                <SoftPanel className="alios-surface-muted">
                   <p className="text-xs text-muted-foreground">{t("weeklyReview.completedTasks")}</p>
                   <p className="mt-1 text-lg font-semibold tabular-nums">
                     {summary.planningSummary.completedLinkedTaskCount} / {summary.planningSummary.linkedTaskCount}
                   </p>
                 </SoftPanel>
-                <SoftPanel>
+                <SoftPanel className="alios-surface-muted">
                   <p className="text-xs text-muted-foreground">{t("weeklyReview.openTasks")}</p>
                   <p className="mt-1 text-lg font-semibold tabular-nums">{summary.planningSummary.openLinkedTaskCount}</p>
                 </SoftPanel>
-                <SoftPanel>
+                <SoftPanel className="alios-surface-muted">
                   <p className="text-xs text-muted-foreground">{t("goals.progressLabel")}</p>
                   <p className="mt-1 text-lg font-semibold tabular-nums">{summary.planningSummary.completionPercent}%</p>
                 </SoftPanel>
@@ -828,7 +831,7 @@ export function WeeklyReviewPage() {
               {summary.planningSummary.attentionEntries.length > 0 ? (
                 <div className="grid gap-3 lg:grid-cols-2">
                   {displayedPlanningAttentionEntries.map((entry) => (
-                    <SoftPanel key={entry.project.id} className="space-y-3">
+                    <SoftPanel key={entry.project.id} className="space-y-4">
                       <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
                         <div className="min-w-0 space-y-1">
                           <p className="break-words font-semibold leading-7">{entry.project.title}</p>
@@ -838,7 +841,7 @@ export function WeeklyReviewPage() {
                         </div>
                         <StatusChip tone="warning">{entry.openTaskCount}</StatusChip>
                       </div>
-                      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                      <div className="flex flex-col gap-2 border-t border-border/70 pt-3 sm:flex-row sm:flex-wrap">
                         {entry.goal ? (
                           <Button asChild size="sm" variant="outline" className="w-full sm:w-auto">
                             <Link to={createLinkedGoalPath(entry.goal.id)}>{t("nav.goals")}</Link>
@@ -877,7 +880,7 @@ export function WeeklyReviewPage() {
               ) : null}
 
               {summary.planningSummary.unavailableGoalProjectCount > 0 ? (
-                <SoftPanel className="text-sm leading-7 text-muted-foreground">
+                <SoftPanel className="alios-surface-muted text-sm leading-7 text-muted-foreground">
                   {t("projects.linkedGoalUnavailable")}: {summary.planningSummary.unavailableGoalProjectCount}
                 </SoftPanel>
               ) : null}
@@ -889,27 +892,27 @@ export function WeeklyReviewPage() {
               description={t("weeklyReview.routinesSectionDescription")}
               icon={<Repeat2 className="h-5 w-5" />}
               status={<StatusChip tone="neutral">{summary.routineSummary.plannedInWindowCount}</StatusChip>}
-              contentClassName="space-y-3"
+              contentClassName="space-y-4"
             >
               <div className="grid gap-3 sm:grid-cols-2">
-                <SoftPanel>
+                <SoftPanel className="alios-surface-muted">
                   <p className="text-xs text-muted-foreground">{t("weeklyReview.routinePlannedTasks")}</p>
                   <p className="mt-1 text-lg font-semibold tabular-nums">{summary.routineSummary.plannedInWindowCount}</p>
                 </SoftPanel>
-                <SoftPanel>
+                <SoftPanel className="alios-surface-muted">
                   <p className="text-xs text-muted-foreground">{t("weeklyReview.routineCompletedTasks")}</p>
                   <p className="mt-1 text-lg font-semibold tabular-nums">{summary.routineSummary.completedInWindowCount}</p>
                 </SoftPanel>
-                <SoftPanel>
+                <SoftPanel className="alios-surface-muted">
                   <p className="text-xs text-muted-foreground">{t("weeklyReview.routineOpenTasks")}</p>
                   <p className="mt-1 text-lg font-semibold tabular-nums">{summary.routineSummary.openInWindowCount}</p>
                 </SoftPanel>
-                <SoftPanel>
+                <SoftPanel className="alios-surface-muted">
                   <p className="text-xs text-muted-foreground">{t("weeklyReview.routineCompletionRate")}</p>
                   <p className="mt-1 text-lg font-semibold tabular-nums">{summary.routineSummary.completionPercent}%</p>
                 </SoftPanel>
               </div>
-              <SoftPanel className="space-y-3">
+              <SoftPanel className="space-y-3 alios-surface-muted">
                 <p className="text-sm leading-7 text-muted-foreground">
                   {t("weeklyReview.routinesSectionNote")}
                 </p>
@@ -937,22 +940,22 @@ export function WeeklyReviewPage() {
               description={t("weeklyReview.inboxSectionDescription")}
               icon={<Inbox className="h-5 w-5" />}
               status={<StatusChip tone="neutral">{summary.inboxSummary.pendingCount}</StatusChip>}
-              contentClassName="space-y-3"
+              contentClassName="space-y-4"
             >
               <div className="grid gap-3 sm:grid-cols-2">
-                <SoftPanel>
+                <SoftPanel className="alios-surface-muted">
                   <p className="text-xs text-muted-foreground">{t("weeklyReview.pendingInbox")}</p>
                   <p className="mt-1 text-lg font-semibold tabular-nums">{summary.inboxSummary.pendingCount}</p>
                 </SoftPanel>
-                <SoftPanel>
+                <SoftPanel className="alios-surface-muted">
                   <p className="text-xs text-muted-foreground">{t("weeklyReview.processedInbox")}</p>
                   <p className="mt-1 text-lg font-semibold tabular-nums">{summary.inboxSummary.processedCount}</p>
                 </SoftPanel>
-                <SoftPanel>
+                <SoftPanel className="alios-surface-muted">
                   <p className="text-xs text-muted-foreground">{t("weeklyReview.capturedInWindow")}</p>
                   <p className="mt-1 text-lg font-semibold tabular-nums">{summary.inboxSummary.capturedInWindowCount}</p>
                 </SoftPanel>
-                <SoftPanel>
+                <SoftPanel className="alios-surface-muted">
                   <p className="text-xs text-muted-foreground">{t("weeklyReview.totalInbox")}</p>
                   <p className="mt-1 text-lg font-semibold tabular-nums">{summary.inboxSummary.totalCount}</p>
                 </SoftPanel>
@@ -976,25 +979,25 @@ export function WeeklyReviewPage() {
               contentClassName="space-y-4"
             >
               <div className="grid gap-4 lg:grid-cols-2">
-                <SoftPanel className="space-y-3">
+                <SoftPanel className="space-y-4">
                   <div className="flex items-center justify-between gap-3">
                     <p className="font-semibold">{t("weeklyReview.journalSection")}</p>
                     <StatusChip tone="neutral">{summary.journalSummary.entriesInWindowCount}</StatusChip>
                   </div>
                   <div className="grid gap-3 sm:grid-cols-2">
-                    <SoftPanel>
+                    <SoftPanel className="alios-surface-muted">
                       <p className="text-xs text-muted-foreground">{t("weeklyReview.journalEntries")}</p>
                       <p className="mt-1 text-lg font-semibold tabular-nums">{summary.journalSummary.entriesInWindowCount}</p>
                     </SoftPanel>
-                    <SoftPanel>
+                    <SoftPanel className="alios-surface-muted">
                       <p className="text-xs text-muted-foreground">{t("weeklyReview.averageMood")}</p>
                       <p className="mt-1 text-lg font-semibold tabular-nums">{formatAverage(summary.journalSummary.averageMoodLevel)}</p>
                     </SoftPanel>
-                    <SoftPanel>
+                    <SoftPanel className="alios-surface-muted">
                       <p className="text-xs text-muted-foreground">{t("weeklyReview.averageEnergy")}</p>
                       <p className="mt-1 text-lg font-semibold tabular-nums">{formatAverage(summary.journalSummary.averageEnergyLevel)}</p>
                     </SoftPanel>
-                    <SoftPanel>
+                    <SoftPanel className="alios-surface-muted">
                       <p className="text-xs text-muted-foreground">{t("weeklyReview.journalTotal")}</p>
                       <p className="mt-1 text-lg font-semibold tabular-nums">{summary.journalSummary.totalCount}</p>
                     </SoftPanel>
@@ -1008,17 +1011,17 @@ export function WeeklyReviewPage() {
                   ) : null}
                 </SoftPanel>
 
-                <SoftPanel className="space-y-3">
+                <SoftPanel className="space-y-4">
                   <div className="flex items-center justify-between gap-3">
                     <p className="font-semibold">{t("weeklyReview.knowledgeSection")}</p>
                     <StatusChip tone="neutral">{summary.knowledgeSummary.createdInWindowCount}</StatusChip>
                   </div>
                   <div className="grid gap-3 sm:grid-cols-2">
-                    <SoftPanel>
+                    <SoftPanel className="alios-surface-muted">
                       <p className="text-xs text-muted-foreground">{t("weeklyReview.knowledgeItems")}</p>
                       <p className="mt-1 text-lg font-semibold tabular-nums">{summary.knowledgeSummary.totalCount}</p>
                     </SoftPanel>
-                    <SoftPanel>
+                    <SoftPanel className="alios-surface-muted">
                       <p className="text-xs text-muted-foreground">{t("weeklyReview.knowledgeCreatedInWindow")}</p>
                       <p className="mt-1 text-lg font-semibold tabular-nums">{summary.knowledgeSummary.createdInWindowCount}</p>
                     </SoftPanel>
@@ -1044,27 +1047,27 @@ export function WeeklyReviewPage() {
                   {summary.decisionSummary.needsReviewCount}
                 </StatusChip>
               }
-              contentClassName="space-y-3"
+              contentClassName="space-y-4"
             >
               <div className="grid gap-3 sm:grid-cols-2">
-                <SoftPanel>
+                <SoftPanel className="alios-surface-muted">
                   <p className="text-xs text-muted-foreground">{t("weeklyReview.decisionsCreated")}</p>
                   <p className="mt-1 text-lg font-semibold tabular-nums">{summary.decisionSummary.createdInWindowCount}</p>
                 </SoftPanel>
-                <SoftPanel>
+                <SoftPanel className="alios-surface-muted">
                   <p className="text-xs text-muted-foreground">{t("weeklyReview.decisionReviewDue")}</p>
                   <p className="mt-1 text-lg font-semibold tabular-nums">{summary.decisionSummary.needsReviewCount}</p>
                 </SoftPanel>
-                <SoftPanel>
+                <SoftPanel className="alios-surface-muted">
                   <p className="text-xs text-muted-foreground">{t("weeklyReview.reviewedDecisions")}</p>
                   <p className="mt-1 text-lg font-semibold tabular-nums">{summary.decisionSummary.reviewedInWindowCount}</p>
                 </SoftPanel>
-                <SoftPanel>
+                <SoftPanel className="alios-surface-muted">
                   <p className="text-xs text-muted-foreground">{t("weeklyReview.totalDecisions")}</p>
                   <p className="mt-1 text-lg font-semibold tabular-nums">{summary.decisionSummary.totalCount}</p>
                 </SoftPanel>
               </div>
-              <SoftPanel className="space-y-2">
+              <SoftPanel className="space-y-2 alios-surface-muted">
                 <p className="text-sm leading-7 text-muted-foreground">
                   {t("weeklyReview.decisionWindowDescription")}
                 </p>
@@ -1088,9 +1091,9 @@ export function WeeklyReviewPage() {
               description={t("weeklyReview.goalsSectionDescription")}
               icon={<Target className="h-5 w-5" />}
               status={<StatusChip tone={summary.goalSummary.dueCount > 0 ? "warning" : "neutral"}>{summary.goalSummary.dueCount}</StatusChip>}
-              contentClassName="space-y-3"
+              contentClassName="space-y-4"
             >
-              <SoftPanel className="space-y-2">
+              <SoftPanel className="space-y-3 alios-surface-muted">
                 <p className="text-sm leading-7 text-muted-foreground">
                   {t("weeklyReview.goalsSectionNote")}
                 </p>
@@ -1127,7 +1130,7 @@ export function WeeklyReviewPage() {
                 <>
                   <div className="grid gap-3 lg:grid-cols-2">
                     {displayedDueGoals.map((goal) => (
-                    <SoftPanel key={goal.id} className="space-y-3">
+                    <SoftPanel key={goal.id} className="space-y-4">
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div className="space-y-1">
                           <p className="font-semibold leading-7">{goal.title}</p>
@@ -1153,7 +1156,7 @@ export function WeeklyReviewPage() {
                         </Badge>
                       </div>
 
-                      <div className="space-y-2">
+                      <div className="space-y-2 alios-surface-muted rounded-[var(--radius-card)] px-3 py-2">
                         <p className="text-sm leading-7 text-muted-foreground">
                           {goal.description}
                         </p>
@@ -1162,7 +1165,7 @@ export function WeeklyReviewPage() {
                         </p>
                       </div>
 
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap gap-2 border-t border-border/70 pt-3">
                         <Button
                           type="button"
                           size="sm"
@@ -1206,9 +1209,9 @@ export function WeeklyReviewPage() {
                   {summary.lifeAreaSummary.dueCount}
                 </StatusChip>
               }
-              contentClassName="space-y-3"
+              contentClassName="space-y-4"
             >
-              <SoftPanel className="space-y-2">
+              <SoftPanel className="space-y-3 alios-surface-muted">
                 <p className="text-sm leading-7 text-muted-foreground">
                   {t("weeklyReview.lifeAreasSectionNote")}
                 </p>
@@ -1244,7 +1247,7 @@ export function WeeklyReviewPage() {
               ) : (
                 <div className="grid gap-3 lg:grid-cols-2">
                   {summary.lifeAreaSummary.dueEntries.map((area) => (
-                    <SoftPanel key={area.id} className="space-y-3">
+                    <SoftPanel key={area.id} className="space-y-4">
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div className="space-y-1">
                           <p className="font-semibold leading-7">{area.title}</p>
@@ -1265,13 +1268,13 @@ export function WeeklyReviewPage() {
                         </Badge>
                       </div>
 
-                      <div className="flex flex-wrap gap-2">
-                          <Button
-                            type="button"
-                            size="sm"
-                            variant="outline"
+                      <div className="flex flex-wrap gap-2 border-t border-border/70 pt-3">
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
                           onClick={() => void markLifeAreaReviewed(area.areaKey)}
-                          >
+                        >
                           {t("weeklyReview.lifeAreasMarkReviewed")}
                         </Button>
                         <Button asChild size="sm" variant="ghost">
@@ -1296,9 +1299,9 @@ export function WeeklyReviewPage() {
                   {summary.manualSummary.dueCount}
                 </StatusChip>
               }
-              contentClassName="space-y-3"
+              contentClassName="space-y-4"
             >
-              <SoftPanel className="space-y-2">
+              <SoftPanel className="space-y-3 alios-surface-muted">
                 <p className="text-sm leading-7 text-muted-foreground">
                   {t("weeklyReview.manualSectionNote")}
                 </p>
@@ -1323,7 +1326,7 @@ export function WeeklyReviewPage() {
                 <>
                   <div className="grid gap-3 lg:grid-cols-2">
                     {displayedDueManualEntries.map((entry) => (
-                    <SoftPanel key={entry.id} className="space-y-3">
+                    <SoftPanel key={entry.id} className="space-y-4">
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div className="space-y-1">
                           <p className="font-semibold leading-7">{entry.title}</p>
@@ -1346,7 +1349,7 @@ export function WeeklyReviewPage() {
                         </Badge>
                       </div>
 
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap gap-2 border-t border-border/70 pt-3">
                         <Button
                           type="button"
                           size="sm"
@@ -1386,27 +1389,27 @@ export function WeeklyReviewPage() {
               description={t("weeklyReview.financeSectionDescription")}
               icon={<Wallet className="h-5 w-5" />}
               status={<StatusChip tone={summary.financeSummary.netCashflowInWindow >= 0 ? "success" : "warning"}>{formatAmount(summary.financeSummary.netCashflowInWindow)}</StatusChip>}
-              contentClassName="space-y-3"
+              contentClassName="space-y-4"
             >
               <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                <SoftPanel>
+                <SoftPanel className="alios-surface-muted">
                   <p className="text-xs text-muted-foreground">{t("weeklyReview.income")}</p>
                   <p className="mt-1 text-lg font-semibold tabular-nums">{formatAmount(summary.financeSummary.incomeInWindow)}</p>
                 </SoftPanel>
-                <SoftPanel>
+                <SoftPanel className="alios-surface-muted">
                   <p className="text-xs text-muted-foreground">{t("weeklyReview.expenses")}</p>
                   <p className="mt-1 text-lg font-semibold tabular-nums">{formatAmount(summary.financeSummary.expensesInWindow)}</p>
                 </SoftPanel>
-                <SoftPanel>
+                <SoftPanel className="alios-surface-muted">
                   <p className="text-xs text-muted-foreground">{t("weeklyReview.activeObligations")}</p>
                   <p className="mt-1 text-lg font-semibold tabular-nums">{summary.financeSummary.activeObligationsCount}</p>
                 </SoftPanel>
-                <SoftPanel>
+                <SoftPanel className="alios-surface-muted">
                   <p className="text-xs text-muted-foreground">{t("weeklyReview.remainingObligationTotal")}</p>
                   <p className="mt-1 text-lg font-semibold tabular-nums">{formatAmount(summary.financeSummary.remainingObligationTotal)}</p>
                 </SoftPanel>
               </div>
-              <SoftPanel className="space-y-2">
+              <SoftPanel className="space-y-2 alios-surface-muted">
                 <p className="text-sm leading-7 text-muted-foreground">
                   {t("weeklyReview.financeWindowDescription")}
                 </p>
@@ -1430,27 +1433,27 @@ export function WeeklyReviewPage() {
               description={t("weeklyReview.wellnessSectionDescription")}
               icon={<CalendarDays className="h-5 w-5" />}
               status={<StatusChip tone="neutral">{summary.wellnessSummary.checkinCountInWindow}</StatusChip>}
-              contentClassName="space-y-3"
+              contentClassName="space-y-4"
             >
               <div className="grid gap-3 sm:grid-cols-2">
-                <SoftPanel>
+                <SoftPanel className="alios-surface-muted">
                   <p className="text-xs text-muted-foreground">{t("weeklyReview.checkins")}</p>
                   <p className="mt-1 text-lg font-semibold tabular-nums">{summary.wellnessSummary.checkinCountInWindow}</p>
                 </SoftPanel>
-                <SoftPanel>
+                <SoftPanel className="alios-surface-muted">
                   <p className="text-xs text-muted-foreground">{t("weeklyReview.notesCount")}</p>
                   <p className="mt-1 text-lg font-semibold tabular-nums">{summary.wellnessSummary.notesCountInWindow}</p>
                 </SoftPanel>
-                <SoftPanel>
+                <SoftPanel className="alios-surface-muted">
                   <p className="text-xs text-muted-foreground">{t("weeklyReview.averageMood")}</p>
                   <p className="mt-1 text-lg font-semibold tabular-nums">{formatAverage(summary.wellnessSummary.averageMoodLevel)}</p>
                 </SoftPanel>
-                <SoftPanel>
+                <SoftPanel className="alios-surface-muted">
                   <p className="text-xs text-muted-foreground">{t("weeklyReview.averageEnergy")}</p>
                   <p className="mt-1 text-lg font-semibold tabular-nums">{formatAverage(summary.wellnessSummary.averageEnergyLevel)}</p>
                 </SoftPanel>
               </div>
-              <SoftPanel className="space-y-2">
+              <SoftPanel className="space-y-2 alios-surface-muted">
                 <p className="text-sm leading-7 text-muted-foreground">
                   {t("weeklyReview.wellnessAwarenessNote")}
                 </p>
@@ -1469,8 +1472,8 @@ export function WeeklyReviewPage() {
             </CollapsibleSection>
           </div>
 
-          <div className="grid gap-4 xl:grid-cols-2">
-            <PremiumCard className="border-primary/10">
+          <div className="grid gap-5 xl:grid-cols-2">
+            <PremiumCard className="border-primary/10 bg-card/95">
               <div className="p-5 sm:p-6">
                 <SectionHeader
                   icon={<Sparkles className="h-5 w-5" />}
@@ -1480,7 +1483,7 @@ export function WeeklyReviewPage() {
                 />
                 <div className="mt-5 space-y-3">
                   {displayedFocusObservations.map((observation, index) => (
-                    <SoftPanel key={`${observation.kind}-${index}`} className="space-y-2">
+                    <SoftPanel key={`${observation.kind}-${index}`} className="space-y-3 alios-surface-muted">
                       <div className="flex flex-wrap items-center gap-2">
                         <StatusChip tone={getObservationTone(observation) as "neutral" | "success" | "warning"}>
                           {t(
@@ -1518,7 +1521,7 @@ export function WeeklyReviewPage() {
               </div>
             </PremiumCard>
 
-            <PremiumCard className="border-primary/10">
+            <PremiumCard className="border-primary/10 bg-card/95">
               <div className="p-5 sm:p-6">
                 <SectionHeader
                   icon={<ArrowUpRight className="h-5 w-5" />}
@@ -1528,7 +1531,7 @@ export function WeeklyReviewPage() {
                 />
                 <div className="mt-5 space-y-3">
                   {displayedSuggestedFocus.map((suggestion, index) => (
-                    <SoftPanel key={`${suggestion.kind}-${index}`} className="space-y-2">
+                    <SoftPanel key={`${suggestion.kind}-${index}`} className="space-y-3 alios-surface-muted">
                       <div className="flex flex-wrap items-center gap-2">
                         <StatusChip tone="primary">{t("weeklyReview.nextFocusLabel")}</StatusChip>
                         <StatusChip tone="neutral">{t("weeklyReview.localOnlyNote")}</StatusChip>
@@ -1550,7 +1553,7 @@ export function WeeklyReviewPage() {
                     </Button>
                   ) : null}
 
-                  <div className="grid gap-3 pt-2 sm:flex sm:flex-wrap">
+                  <div className="grid gap-3 border-t border-border/70 pt-4 sm:flex sm:flex-wrap">
                     {quickLinks.map(({ to, labelKey }) => (
                       <Button key={to} asChild variant="outline" className="w-full justify-start shadow-sm sm:w-auto">
                         <Link to={to}>

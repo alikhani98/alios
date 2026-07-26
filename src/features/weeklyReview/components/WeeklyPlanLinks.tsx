@@ -60,7 +60,7 @@ export function WeeklyPlanLinks({ links, compact = false }: WeeklyPlanLinksProps
         }
 
         return (
-          <SoftPanel key={`${link.kind}-${link.id}`} className="flex min-w-0 flex-col gap-3 p-4">
+          <SoftPanel key={`${link.kind}-${link.id}`} className="flex min-w-0 flex-col gap-3 alios-surface-muted p-4">
             <Badge variant="secondary" className="w-fit">
               {label}
             </Badge>

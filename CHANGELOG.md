@@ -2,6 +2,15 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 176 - Weekly Review Visual Hierarchy Refinement
+
+- Applied the Stage 173 shared visual foundation to Weekly Review as the third page-level visual refinement pilot after Finance and Today
+- Elevated the current weekly focus and plan execution dashboard with clearer hierarchy, stronger primary action placement, and calmer secondary stat surfaces
+- Grouped the Weekly Plan editor fields with shared muted surfaces and separated form submission from input groups
+- Refined the actionable review queue and due-review cards so title, status context, details, and actions scan in a clearer order
+- Replaced local surface/radius/status class combinations with shared semantic surface and warning utilities where appropriate
+- Kept the stage UI-only with no Weekly Plan behavior change, review queue logic change, retrospective logic change, Goals integration change, storage change, schema change, migration, backup change, route change, localStorage key, dependency, backend, sync, cloud, AI, telemetry, analytics, or Simple View / Full View behavior change
+
 ## Stage 175 - Today Visual Hierarchy Refinement
 
 - Applied the Stage 173 shared visual foundation to the Today route as the second page-level visual refinement pilot after Finance
