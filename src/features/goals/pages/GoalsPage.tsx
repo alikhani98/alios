@@ -136,7 +136,7 @@ export function GoalsContextualHelp({
         <div
           id={panelId}
           role="note"
-          className="rounded-xl border border-primary/15 bg-background/95 p-4 text-sm leading-7 text-muted-foreground shadow-sm"
+          className="alios-surface-muted p-4 text-sm leading-7 text-muted-foreground"
         >
           <p className="font-medium text-foreground">{copy.title}</p>
           <div className="mt-2 space-y-2">

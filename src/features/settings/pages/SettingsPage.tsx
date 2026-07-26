@@ -608,7 +608,7 @@ export function SettingsPage() {
           {homeLayoutResetMessage ? (
             <div
               role="status"
-              className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-primary"
+              className="alios-status-success rounded-surface border px-4 py-3 text-sm"
             >
               {homeLayoutResetMessage}
             </div>

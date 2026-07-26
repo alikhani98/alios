@@ -2,6 +2,14 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 181 - Visual System Release Hardening
+
+- Ran a source-level hardening audit across the Stage 174-180 visual refinement routes for responsive wrapping, shared surface usage, semantic status treatment, keyboard-focus ownership, and documentation consistency
+- Aligned remaining Finance, Weekly Review, Goals, and Settings status/help surfaces with Stage 173 semantic surface/status utilities without changing any workflow behavior
+- Confirmed the refined routes use mobile-first stacking, wrapping action rows, shared buttons/selects/inputs, and text-wrapping patterns for long Persian and English content
+- Documented light/dark/accent compatibility expectations and the remaining need for browser/device QA at 360px, 390px, 430px, and desktop widths
+- Kept the stage release-hardening only with no feature redesign, business logic change, storage change, schema change, migration, backup change, route change, localStorage key, dependency, backend, sync, cloud, AI, telemetry, or analytics change
+
 ## Stage 180 - Decision Log Visual Hierarchy and Density Refinement
 
 - Applied the Stage 173 shared visual foundation to Decision Log as the seventh page-level visual refinement pilot after Finance, Today, Weekly Review, Settings, Goals, and Personal Manual
