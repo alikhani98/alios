@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 203 - Dashboard Visual Upgrade Implementation Phase 1
+
+- Refined shared visual primitives for surfaces, buttons, status chips, metric cards, and empty-state composition to create a clearer hierarchy across the running application
+- Upgraded the Dashboard / Home hero with stronger MIT emphasis, calmer supporting context, clearer primary actions, and more readable quick-summary panels across mobile and desktop layouts
+- Improved Dashboard loading skeletons, error presentation, backup reminder treatment, overview card depth, and secondary-dashboard section framing to reduce visual flatness and improve scanability
+- Preserved all business logic, calculations, repositories, storage, schemas, migrations, routes, localStorage keys, backend boundaries, and dependency choices while making visible UI changes in the running app
+
 ## Stage 203 - Figma Components Page Implementation Workflow
 
 - Created `docs/FIGMA_COMPONENTS_IMPLEMENTATION_STAGE_203.md` to define the implementation workflow for manually creating the AliOS `02 Components` Figma page

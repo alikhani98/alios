@@ -47,7 +47,7 @@ export function SoftPanel({ className, ...props }: SoftPanelProps) {
   return (
     <div
       className={cn(
-        "alios-surface-soft p-4",
+        "alios-surface-soft p-4 sm:p-4.5",
         aliosSubtleOutlineMotion,
         "hover:border-border/90 hover:bg-background",
         className
@@ -86,13 +86,13 @@ export function SectionHeader({
     >
       <div className="min-w-0 space-y-1">
         {eyebrow ? (
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
             {eyebrow}
           </p>
         ) : null}
         <div className="flex flex-wrap items-center gap-2">
           {icon ? <span className="text-primary">{icon}</span> : null}
-          <h3 className="break-words text-xl font-semibold tracking-tight sm:text-[1.35rem]">
+          <h3 className="break-words text-xl font-semibold tracking-tight sm:text-[1.4rem]">
             {title}
           </h3>
           {status ? <div className="shrink-0">{status}</div> : null}
@@ -120,7 +120,7 @@ export function StatusChip({
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold leading-none",
+        "inline-flex min-h-6 items-center rounded-full border px-2.5 py-1 text-xs font-semibold leading-none",
         aliosSubtleOutlineMotion,
         "hover:border-border/80",
         toneClassName(tone),
@@ -179,7 +179,7 @@ export function MetricCard({
     <PremiumCard className={cn("h-full min-h-40", className)}>
       <CardContent className="flex h-full flex-col justify-between gap-5 p-5 sm:p-6">
         <div className="flex items-center justify-between gap-3">
-          <div className="alios-icon-primary flex h-12 w-12 items-center justify-center rounded-[1.15rem]">
+          <div className="alios-icon-primary flex h-12 w-12 items-center justify-center rounded-[1.15rem] shadow-sm">
             {icon}
           </div>
           {status ? <div className="shrink-0">{status}</div> : null}
@@ -188,7 +188,7 @@ export function MetricCard({
           <p className="break-words text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
             {label}
           </p>
-          <p className="text-[1.85rem] font-semibold tabular-nums leading-none tracking-tight sm:text-[2.25rem]">
+          <p className="text-[2rem] font-semibold tabular-nums leading-none tracking-tight sm:text-[2.35rem]">
             {value}
           </p>
           {description ? (
@@ -274,9 +274,9 @@ export function EmptyState({
 }: EmptyStateProps) {
   return (
     <PremiumCard className={cn("border-dashed", className)}>
-      <CardContent className="flex flex-col items-center px-6 py-12 text-center sm:px-8">
+      <CardContent className="flex flex-col items-center px-6 py-12 text-center sm:px-8 sm:py-14">
         {icon ? (
-          <div className="alios-icon-primary mb-4 flex h-14 w-14 items-center justify-center rounded-[1.25rem]">
+          <div className="alios-icon-primary mb-4 flex h-14 w-14 items-center justify-center rounded-[1.25rem] shadow-sm">
             {icon}
           </div>
         ) : null}
