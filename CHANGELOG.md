@@ -2,11 +2,11 @@
 
 This changelog records completed AliOS development stages.
 
-## Stage 195 - Weekly Review Screen Figma Specification
+## Stage 196 - Settings Screen Figma Specification
 
-- Created `docs/FIGMA_WEEKLY_REVIEW_SCREEN_SPECIFICATION_STAGE_195.md` as the complete Figma specification for the AliOS Weekly Review screen
-- Documented Weekly Review purpose, structure, planning patterns, review queue specification, retrospective behavior, screen states, responsive rules, theme handling, and RTL/LTR handling from the real implementation
-- Kept the stage documentation-only and grounded the specification in the merged AliOS source of truth instead of introducing new review behavior or a parallel design layer
+- Created `docs/FIGMA_SETTINGS_SCREEN_SPECIFICATION_STAGE_196.md` as the complete Figma specification for the AliOS Settings screen
+- Documented Settings purpose, structure, component mapping, preference patterns, backup and recovery patterns, danger-zone behavior, screen states, responsive rules, theme handling, and RTL/LTR handling from the real implementation
+- Kept the stage documentation-only and grounded the specification in the merged AliOS source of truth instead of introducing new configuration behavior or a parallel design layer
 - Made no `src` change, test change, package/dependency change, storage/schema/migration/backup change, localStorage/route/business-logic change, or application behavior change
 
 ## Stage 188 - Figma Screen Assembly and Handoff Workflow
