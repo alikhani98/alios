@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 199 - Decision Log Screen Figma Specification
+
+- Created `docs/FIGMA_DECISION_LOG_SCREEN_SPECIFICATION_STAGE_199.md` to define the Decision Log screen as a complete Figma-ready specification based on the current implementation
+- Documented the screen purpose, structure, component mapping, decision-card hierarchy, form grouping, review workflow, shared feedback states, responsive behavior, theme behavior, and RTL/LTR rules
+- Mapped the existing Decision Log hero, metrics, always-available form, filter controls, review-due section, and decision grid to the current shared UI vocabulary including `PremiumCard`, `SectionHeader`, `MetricCard`, `SoftPanel`, `CollapsibleSection`, `DecisionLogCard`, `DecisionLogForm`, `Badge`, `StatusChip`, `Input`, `Select`, `Textarea`, and `EmptyState`
+- Kept the stage documentation-only with no `src` change, test change, package/dependency change, storage/schema/migration/backup change, localStorage/route/business-logic change, or application behavior change
+
 ## Stage 188 - Figma Screen Assembly and Handoff Workflow
 
 - Created `docs/FIGMA_SCREEN_ASSEMBLY_HANDOFF_STAGE_188.md` to define the end-to-end workflow for assembling AliOS Figma screens from approved design-system layers
