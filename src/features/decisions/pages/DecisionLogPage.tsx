@@ -12,6 +12,7 @@ import {
   MetricCard,
   PremiumCard,
   SectionHeader,
+  SoftPanel,
   StatusChip,
   CollapsibleSection,
 } from "@/shared/ui";
@@ -122,7 +123,7 @@ export function DecisionLogContextualHelp({
         <div
           id={panelId}
           role="note"
-          className="rounded-xl border border-primary/15 bg-background/95 p-4 text-sm leading-7 text-muted-foreground shadow-sm"
+          className="alios-surface-muted p-4 text-sm leading-7 text-muted-foreground"
         >
           <p className="font-medium text-foreground">
             {copy.title}
@@ -345,7 +346,7 @@ export function DecisionLogPage() {
       {successMessage ? (
         <div
           role="status"
-          className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm"
+          className="alios-status-success rounded-surface border px-4 py-3 text-sm"
         >
           {successMessage}
         </div>
@@ -354,7 +355,7 @@ export function DecisionLogPage() {
       {error || actionError ? (
         <div
           role="alert"
-          className="flex flex-col gap-3 rounded-xl border border-destructive/30 bg-destructive/5 p-4 sm:flex-row sm:items-center sm:justify-between"
+          className="alios-status-danger flex flex-col gap-3 rounded-surface border p-4 sm:flex-row sm:items-center sm:justify-between"
         >
           <div className="flex items-start gap-2 text-sm text-destructive">
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
@@ -371,26 +372,26 @@ export function DecisionLogPage() {
 
       <div ref={formRef}>
         <PremiumCard>
-        <CardContent className="p-5 sm:p-6">
-          <SectionHeader
-            title={editingDecision ? t("decisions.editDecision") : t("decisions.createDecision")}
-            description={t("decisions.formDescription")}
-            status={<StatusChip tone="neutral">{t("decisions.formStatus")}</StatusChip>}
-          />
-          <div className="mt-5">
-            <DecisionLogForm
-              key={editingDecision?.id ?? "decision-log-form"}
-              decision={editingDecision}
-              isSubmitting={isSubmitting}
-              onSubmit={handleSubmit}
-              onCancel={editingDecision ? closeEditor : undefined}
+          <CardContent className="p-5 sm:p-6">
+            <SectionHeader
+              title={editingDecision ? t("decisions.editDecision") : t("decisions.createDecision")}
+              description={t("decisions.formDescription")}
+              status={<StatusChip tone="neutral">{t("decisions.formStatus")}</StatusChip>}
             />
-          </div>
-        </CardContent>
+            <div className="mt-5">
+              <DecisionLogForm
+                key={editingDecision?.id ?? "decision-log-form"}
+                decision={editingDecision}
+                isSubmitting={isSubmitting}
+                onSubmit={handleSubmit}
+                onCancel={editingDecision ? closeEditor : undefined}
+              />
+            </div>
+          </CardContent>
         </PremiumCard>
       </div>
 
-      <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
+      <SoftPanel className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
         {decisionLogFilters.map((filter) => {
           const isSelected = selectedFilter === filter.value;
 
@@ -409,7 +410,7 @@ export function DecisionLogPage() {
             </Button>
           );
         })}
-      </div>
+      </SoftPanel>
 
       <CollapsibleSection
         id="decision-log-review-due"
@@ -418,6 +419,7 @@ export function DecisionLogPage() {
         icon={<AlertCircle className="h-5 w-5" />}
         status={<StatusChip tone="warning">{needsReviewEntries.length}</StatusChip>}
         defaultOpen={needsReviewEntries.length > 0}
+        className="alios-surface-soft"
         contentClassName="space-y-4"
         expandLabel={t("common.expandSection")}
         collapseLabel={t("common.collapseSection")}
@@ -448,7 +450,7 @@ export function DecisionLogPage() {
       {isLoading ? (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" aria-label={t("decisions.loading")}>
           {[0, 1, 2].map((item) => (
-            <div key={item} className="h-72 animate-pulse rounded-[1.75rem] border bg-muted/60" />
+            <div key={item} className="alios-surface-muted h-72 animate-pulse bg-muted/60" />
           ))}
         </div>
       ) : filteredEntries.length === 0 ? (

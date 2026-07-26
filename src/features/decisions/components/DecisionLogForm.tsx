@@ -3,7 +3,15 @@ import { useForm } from "react-hook-form";
 
 import type { DecisionLogEntry } from "@/shared/types";
 import { useI18n, type TranslationKey } from "@/shared/i18n";
-import { Button, DateValueHint, Input, Textarea, CollapsibleSection, Select } from "@/shared/ui";
+import {
+  Button,
+  DateValueHint,
+  Input,
+  Textarea,
+  CollapsibleSection,
+  Select,
+  SoftPanel,
+} from "@/shared/ui";
 
 import { decisionLogStatusValues } from "@/shared/types";
 import { decisionLogFormSchema, type DecisionLogFormValues } from "../types";
@@ -75,12 +83,12 @@ export function DecisionLogForm({
         title={t("decisions.formBasics")}
         description={t("decisions.formBasicsDescription")}
         defaultOpen
-        className="border border-border/70 bg-background/70 shadow-none"
+        className="alios-surface-soft shadow-none"
         contentClassName="space-y-4"
         expandLabel={t("common.expandSection")}
         collapseLabel={t("common.collapseSection")}
       >
-        <div className="grid gap-4 md:grid-cols-2">
+        <SoftPanel className="grid gap-4 md:grid-cols-2">
           <div className="grid gap-2 md:col-span-2">
             <label htmlFor="decision-title" className="text-sm font-medium">
               {t("common.title")}
@@ -171,7 +179,7 @@ export function DecisionLogForm({
               ))}
             </Select>
           </div>
-        </div>
+        </SoftPanel>
       </CollapsibleSection>
 
       <CollapsibleSection
@@ -179,12 +187,12 @@ export function DecisionLogForm({
         title={t("decisions.formOptions")}
         description={t("decisions.formOptionsDescription")}
         defaultOpen
-        className="border border-border/70 bg-background/70 shadow-none"
+        className="alios-surface-soft shadow-none"
         contentClassName="space-y-4"
         expandLabel={t("common.expandSection")}
         collapseLabel={t("common.collapseSection")}
       >
-        <div className="grid gap-4">
+        <SoftPanel className="grid gap-4">
           <div className="grid gap-2">
             <label htmlFor="decision-context" className="text-sm font-medium">
               {t("decisions.context")}
@@ -265,7 +273,7 @@ export function DecisionLogForm({
               {t("decisions.tagsHelp")}
             </p>
           </div>
-        </div>
+        </SoftPanel>
       </CollapsibleSection>
 
       <CollapsibleSection
@@ -273,12 +281,12 @@ export function DecisionLogForm({
         title={t("decisions.formReview")}
         description={t("decisions.formReviewDescription")}
         defaultOpen={Boolean(decision)}
-        className="border border-border/70 bg-background/70 shadow-none"
+        className="alios-surface-soft shadow-none"
         contentClassName="space-y-4"
         expandLabel={t("common.expandSection")}
         collapseLabel={t("common.collapseSection")}
       >
-        <div className="grid gap-4 md:grid-cols-2">
+        <SoftPanel className="grid gap-4 md:grid-cols-2">
           <div className="grid gap-2">
             <label htmlFor="decision-review-date" className="text-sm font-medium">
               {t("decisions.reviewDate")}
@@ -309,10 +317,10 @@ export function DecisionLogForm({
               {...register("lesson")}
             />
           </div>
-        </div>
+        </SoftPanel>
       </CollapsibleSection>
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+      <div className="flex flex-col gap-3 border-t border-border/70 pt-4 sm:flex-row sm:flex-wrap">
         <Button type="submit" className="w-full sm:w-auto" disabled={isSubmitting}>
           {isSubmitting
             ? t("common.saving")
