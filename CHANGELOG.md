@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 187C - Figma Page Pattern Mapping
+
+- Created `docs/FIGMA_PAGE_PATTERN_MAPPING_STAGE_187C.md` to map reusable AliOS page patterns for future Figma screen construction
+- Documented page shell, header, section, data display, interaction, and state patterns using the existing shared UI vocabulary
+- Mapped Finance, Today, Weekly Review, Settings, Goals, Personal Manual, and Decision Log to the patterns and shared components they already use
+- Kept the stage documentation-only with no `src` change, behavior change, business-logic change, storage/schema/migration/backup change, route/dependency/localStorage change, or Simple View / Full View behavior change
+
 ## Stage 187B - Figma Foundation Variable Specification
 
 - Created `docs/FIGMA_FOUNDATION_VARIABLE_SPEC_STAGE_187B.md` to define the exact Figma foundation variables for manual Figma creation
