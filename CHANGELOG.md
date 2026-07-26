@@ -2,11 +2,11 @@
 
 This changelog records completed AliOS development stages.
 
-## Stage 194 - Today Screen Figma Specification
+## Stage 195 - Weekly Review Screen Figma Specification
 
-- Created `docs/FIGMA_TODAY_SCREEN_SPECIFICATION_STAGE_194.md` as the complete Figma specification for the AliOS Today screen
-- Documented Today screen purpose, structure, shared-component mapping, task-card hierarchy, screen states, responsive rules, theme behavior, and RTL/LTR handling based on the current implementation
-- Kept the stage documentation-only and grounded the specification in the merged AliOS source of truth instead of introducing new UI behavior or a parallel design system
+- Created `docs/FIGMA_WEEKLY_REVIEW_SCREEN_SPECIFICATION_STAGE_195.md` as the complete Figma specification for the AliOS Weekly Review screen
+- Documented Weekly Review purpose, structure, planning patterns, review queue specification, retrospective behavior, screen states, responsive rules, theme handling, and RTL/LTR handling from the real implementation
+- Kept the stage documentation-only and grounded the specification in the merged AliOS source of truth instead of introducing new review behavior or a parallel design layer
 - Made no `src` change, test change, package/dependency change, storage/schema/migration/backup change, localStorage/route/business-logic change, or application behavior change
 
 ## Stage 188 - Figma Screen Assembly and Handoff Workflow
