@@ -2,6 +2,15 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 186A - Figma Component Inventory and Handoff Checklist
+
+- Created `docs/FIGMA_COMPONENT_INVENTORY_STAGE_186.md` as a controlled handoff package before creating the actual AliOS Figma library
+- Inventoried design foundations for colors, semantic colors, accent modes, typography, spacing, radius, elevation, and surface hierarchy
+- Inventoried core shared components for Button, Card, SoftPanel, StatusChip, Input, Select, Textarea, Empty State, Loading State, and Error State with code locations, Figma names, variants, states, and build priority
+- Defined the recommended Figma build order: foundations, core components, patterns, then screens
+- Added a designer handoff checklist to keep Figma aligned with the repository-owned design contract and current implementation
+- Kept the stage documentation-only with no source behavior change, UI source change, storage change, schema change, migration, backup change, route change, localStorage key change, dependency, backend/cloud/auth, AI, telemetry, analytics, or Simple View / Full View behavior change
+
 ## Stage 185 - Figma Design System Foundation Preparation
 
 - Created `docs/FIGMA_DESIGN_SYSTEM_MAPPING_STAGE_185.md` to prepare AliOS for a professional Figma Design System workflow
