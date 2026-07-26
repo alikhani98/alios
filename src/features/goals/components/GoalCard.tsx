@@ -13,6 +13,7 @@ import {
   CardHeader,
   CardTitle,
   MiniProgressBar,
+  SoftPanel,
   StatusChip,
 } from "@/shared/ui";
 
@@ -55,12 +56,12 @@ export function GoalCard({
   const { formatDateTime, formatDate } = useDateFormatter();
 
   return (
-    <Card className="min-w-0 overflow-hidden border-border/70 bg-background/90 shadow-sm">
-      <CardHeader className="space-y-3">
+    <Card className="min-w-0 overflow-hidden">
+      <CardHeader className="space-y-4">
         <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
-          <div className="min-w-0 flex-1 space-y-1">
-            <CardTitle className="break-words">{goal.title}</CardTitle>
-            <CardDescription className="break-words whitespace-pre-wrap">
+          <div className="min-w-0 flex-1 space-y-2">
+            <CardTitle className="break-words text-xl leading-7">{goal.title}</CardTitle>
+            <CardDescription className="max-w-3xl break-words whitespace-pre-wrap">
               {goal.description}
             </CardDescription>
           </div>
@@ -69,7 +70,7 @@ export function GoalCard({
           </StatusChip>
         </div>
 
-        <div className="flex min-w-0 flex-wrap gap-2">
+        <div className="flex min-w-0 flex-wrap gap-2 border-t border-border/70 pt-3">
           <Badge
             variant="secondary"
             className="max-w-full break-words whitespace-normal text-start"
@@ -98,12 +99,14 @@ export function GoalCard({
       </CardHeader>
 
       <CardContent className="min-w-0 space-y-4">
-        <MiniProgressBar
-          value={goal.progressPercent}
-          label={t("goals.progressLabel")}
-        />
+        <SoftPanel className="space-y-3">
+          <MiniProgressBar
+            value={goal.progressPercent}
+            label={t("goals.progressLabel")}
+          />
+        </SoftPanel>
 
-        <div className="min-w-0 rounded-2xl border border-primary/15 bg-primary/5 p-3">
+        <SoftPanel className="min-w-0">
           <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0 space-y-1">
               <p className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
@@ -140,9 +143,9 @@ export function GoalCard({
               </Button>
             </div>
           </div>
-        </div>
+        </SoftPanel>
 
-        <div className="grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
+        <div className="grid gap-2 border-t border-border/70 pt-4 text-sm text-muted-foreground sm:grid-cols-2">
           <p className="min-w-0 break-words">
             {t("goals.targetDateLabel")}:{" "}
             {goal.targetDate ? formatDate(goal.targetDate) : t("common.notRecorded")}
@@ -176,7 +179,7 @@ export function GoalCard({
           </div>
         ) : null}
 
-        <div className="flex flex-col gap-2 pt-1 sm:flex-row sm:flex-wrap">
+        <div className="flex flex-col gap-2 border-t border-border/70 pt-4 sm:flex-row sm:flex-wrap">
           <Button size="sm" className="w-full sm:w-auto" asChild>
             <Link to={createLifeAreaFocusPath(goal.area)}>
               <Compass className="me-2 h-4 w-4" />

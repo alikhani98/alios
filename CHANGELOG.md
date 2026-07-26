@@ -2,6 +2,15 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 178 - Goals Visual Hierarchy and Density Refinement
+
+- Applied the Stage 173 shared visual foundation to Goals as the fifth page-level visual refinement pilot after Finance, Today, Weekly Review, and Settings
+- Refined Goal cards so title and intent lead first, followed by status, progress, linked project/task context, metadata, tags, and actions in clearer bands
+- Grouped the Goal form into shared soft surfaces for identity, classification/progress, and review metadata while preserving every submitted field and handler
+- Replaced local Goals status, filter, loading, and review-due surfaces with shared semantic surface/status utilities where appropriate
+- Kept review-due cards, project/task progress summaries, Life Area navigation, Today task navigation, filters, Simple View preview limits, and template selection behavior unchanged
+- Kept the stage UI-only with no Goal calculation change, progress logic change, relationship change, repository change, storage change, schema change, migration, backup change, route change, localStorage key, dependency, backend, sync, cloud, AI, telemetry, analytics, or Simple View / Full View behavior change
+
 ## Stage 177 - Settings Visual Hierarchy Refinement
 
 - Applied the Stage 173 shared visual foundation to Settings as the fourth page-level visual refinement pilot after Finance, Today, and Weekly Review
