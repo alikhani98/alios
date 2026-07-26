@@ -2,6 +2,15 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 182 - Real Browser and Device Visual QA
+
+- Ran real in-app browser QA against the refined visual-system routes: Finance, Today, Weekly Review, Settings, Goals, Personal Manual, and Decision Log
+- Covered 360px, 390px, 430px, and 1366px viewports across Persian RTL and English LTR in light and dark mode with the default accent
+- Swept all supported accent colors across Persian mobile light mode and English desktop dark mode, confirming the runtime primary token updated for default, violet, rose, amber, emerald, and slate
+- Checked keyboard focus visibility on the audited routes in representative mobile RTL and desktop LTR scenarios, with no confirmed focus-visibility defect
+- Confirmed zero console errors during QA and made no source UI changes because no confirmed visual defect was found
+- Kept the stage QA/documentation-only with no redesign, product behavior change, storage change, schema change, migration, backup change, route change, localStorage key change, dependency, backend, sync, cloud, AI, telemetry, or analytics change
+
 ## Stage 181 - Visual System Release Hardening
 
 - Ran a source-level hardening audit across the Stage 174-180 visual refinement routes for responsive wrapping, shared surface usage, semantic status treatment, keyboard-focus ownership, and documentation consistency
