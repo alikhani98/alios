@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 193 - Developer Handoff Validation Workflow
+
+- Created `docs/FIGMA_DEVELOPER_HANDOFF_VALIDATION_STAGE_193.md` to define the validation workflow between AliOS Figma artifacts and the production codebase
+- Documented design-token validation, component validation, Finance screen validation, responsive QA, theme QA, RTL/LTR QA, and the designer-to-developer handoff checklist
+- Kept the stage documentation-only and anchored every validation step to the merged AliOS source of truth in `DESIGN.md`, `src/styles`, `src/shared/ui`, and existing feature composition
+- Made no `src` change, test change, package/dependency change, storage/schema/migration/backup change, localStorage/route/business-logic change, or application behavior change
+
 ## Stage 188 - Figma Screen Assembly and Handoff Workflow
 
 - Created `docs/FIGMA_SCREEN_ASSEMBLY_HANDOFF_STAGE_188.md` to define the end-to-end workflow for assembling AliOS Figma screens from approved design-system layers
