@@ -335,6 +335,13 @@ export function FinancePage() {
     [review.obligationProgress]
   );
   const budgetGuard = review.budgetGuard;
+  const dueSoonCount = review.upcomingObligations.filter(
+    (item) => item.label === "dueSoon"
+  ).length;
+  const currentMoneySignal =
+    summary.remainingLiquidity >= 0
+      ? t("finance.liquidityPositive")
+      : t("finance.liquidityNegative");
 
   type SummaryCard = {
     icon: ReactNode;
@@ -441,13 +448,13 @@ export function FinancePage() {
       icon: <BadgeDollarSign className="h-5 w-5" />,
       label: t("finance.expensesThisMonth"),
       value: formatAmount(summary.expensesThisMonth),
-      description: t("finance.thisMonthSummaryNote"),
+      description: t("finance.recordFiltersDescription"),
     },
     {
       icon: <ReceiptText className="h-5 w-5" />,
       label: t("finance.obligationEstimateThisMonth"),
       value: formatAmount(summary.monthlyObligationsEstimate),
-      description: t("finance.thisMonthSummaryNote"),
+      description: t("finance.upcomingObligationPressureDescription"),
     },
     {
       icon: <Wallet className="h-5 w-5" />,
@@ -571,7 +578,7 @@ export function FinancePage() {
       <section id={FINANCE_SECTION_ANCHORS.summary} className="scroll-mt-32 space-y-4">
         <PremiumCard className="border-primary/15 bg-gradient-to-br from-primary/10 via-background to-background shadow-sm">
           <div className="grid gap-5 p-5 lg:grid-cols-[minmax(0,1.25fr)_minmax(18rem,0.75fr)] sm:p-6">
-            <div>
+            <div className="space-y-5">
               <SectionHeader
                 icon={<Landmark className="h-5 w-5" />}
                 eyebrow={t("finance.title")}
@@ -581,48 +588,89 @@ export function FinancePage() {
                   <StatusChip tone="neutral">{t("finance.localSummaryNote")}</StatusChip>
                 }
               />
-              <div className="mt-4 max-w-3xl space-y-2 text-sm leading-7 text-muted-foreground">
+
+              <div className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                  {t("finance.budgetGuard")}
+                </p>
+                <p className="max-w-3xl text-2xl font-semibold leading-9 tracking-tight sm:text-3xl">
+                  {currentMoneySignal}
+                </p>
+                <p className="max-w-3xl text-sm leading-7 text-muted-foreground">
+                  {t(getBudgetGuardSummaryKey(budgetGuard.status))}
+                </p>
+              </div>
+
+              <div className="max-w-3xl space-y-2 text-sm leading-7 text-muted-foreground">
                 <p>{t("finance.reviewIntro")}</p>
                 <p>{t("finance.noAdviceNote")}</p>
               </div>
-            </div>
 
-            <SoftPanel className="space-y-4 border-primary/20 bg-primary/5">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div className="min-w-0 space-y-1">
-                  <p className="text-sm font-medium text-muted-foreground">
+              <div className="grid gap-3 sm:grid-cols-3">
+                <SoftPanel className="gap-2 border-primary/15 bg-background/80">
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                     {t("finance.remainingLiquidity")}
                   </p>
-                  <p className="break-words text-2xl font-semibold leading-9 tabular-nums sm:text-3xl">
+                  <p className="text-lg font-semibold tabular-nums">
                     {formatAmount(summary.remainingLiquidity)}
                   </p>
-                </div>
-                <StatusChip tone={summary.remainingLiquidity >= 0 ? "success" : "danger"}>
-                  {summary.remainingLiquidity >= 0
-                    ? t("finance.liquidityPositive")
-                    : t("finance.liquidityNegative")}
-                </StatusChip>
-              </div>
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-                <div className="alios-surface-muted px-4 py-3">
-                  <p className="text-xs text-muted-foreground">
-                    {t("finance.obligationEstimateThisMonth")}
+                  <p className="text-sm text-muted-foreground">{t("finance.localSummaryNote")}</p>
+                </SoftPanel>
+                <SoftPanel className="gap-2 border-primary/15 bg-background/80">
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                    {t("finance.dueSoon")}
                   </p>
-                  <p className="mt-1 text-base font-semibold tabular-nums">
-                    {formatAmount(summary.monthlyObligationsEstimate)}
+                  <p className="text-lg font-semibold tabular-nums">{dueSoonCount}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {t("finance.upcomingObligationPressureDescription")}
                   </p>
-                </div>
-                <div className="alios-surface-muted px-4 py-3">
-                  <p className="text-xs text-muted-foreground">
+                </SoftPanel>
+                <SoftPanel className="gap-2 border-primary/15 bg-background/80">
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                     {t("finance.budgetGuardPressure")}
                   </p>
-                  <p className="mt-1 text-base font-semibold tabular-nums">
+                  <p className="text-lg font-semibold tabular-nums">
                     {formatAmount(
                       budgetGuard.expensesThisMonth +
                         budgetGuard.monthlyObligationsEstimate
                     )}
                   </p>
-                </div>
+                  <p className="text-sm text-muted-foreground">
+                    {t(getBudgetGuardLabelKey(budgetGuard.status))}
+                  </p>
+                </SoftPanel>
+              </div>
+            </div>
+
+            <SoftPanel className="space-y-4 border-primary/20 bg-primary/5">
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-muted-foreground">
+                  {t("finance.sectionAdd")}
+                </p>
+                <p className="text-xl font-semibold leading-8">
+                  {t("finance.localOnlyData")}
+                </p>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+                <Button
+                  type="button"
+                  className="w-full"
+                  onClick={() => handleQuickNav(FINANCE_SECTION_ANCHORS.addTransaction)}
+                >
+                  {t("finance.addTransaction")}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => handleQuickNav(FINANCE_SECTION_ANCHORS.addObligation)}
+                >
+                  {t("finance.addObligation")}
+                </Button>
+              </div>
+              <div className="space-y-2 text-sm leading-7 text-muted-foreground">
+                <p>{t("finance.localSummaryNote")}</p>
+                <p>{t("finance.monthlyPlanRecordedDataNote")}</p>
               </div>
             </SoftPanel>
           </div>
@@ -1104,7 +1152,7 @@ export function FinancePage() {
                 key={option.value}
                 type="button"
                 variant={isSelected ? "default" : "outline"}
-                className="flex w-full items-start justify-between gap-3 text-start"
+                className="flex w-full items-start justify-between gap-3 rounded-2xl text-start"
                 onClick={() => setSelectedFilter(option.value)}
               >
                 <span className="min-w-0 flex-1 break-words">{t(option.labelKey)}</span>
@@ -1158,6 +1206,15 @@ export function FinancePage() {
                     <SectionHeader
                       title={t(transactionSectionTitleKey)}
                       description={t(transactionSectionDescriptionKey)}
+                      actions={
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => handleQuickNav(FINANCE_SECTION_ANCHORS.addTransaction)}
+                        >
+                          {t("finance.addTransaction")}
+                        </Button>
+                      }
                       status={
                         <StatusChip tone="neutral">{filteredTransactions.length}</StatusChip>
                       }
@@ -1226,6 +1283,15 @@ export function FinancePage() {
                     <SectionHeader
                       title={t(obligationSectionTitleKey)}
                       description={t(obligationSectionDescriptionKey)}
+                      actions={
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => handleQuickNav(FINANCE_SECTION_ANCHORS.addObligation)}
+                        >
+                          {t("finance.addObligation")}
+                        </Button>
+                      }
                       status={
                         selectedFilter === "paidObligations" ? (
                           <StatusChip tone="neutral">{filteredObligations.length}</StatusChip>
