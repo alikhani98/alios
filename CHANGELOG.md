@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 198 - Personal Manual Screen Figma Specification
+
+- Created `docs/FIGMA_PERSONAL_MANUAL_SCREEN_SPECIFICATION_STAGE_198.md` to define the Personal Manual screen as a complete Figma-ready specification based on the current implementation
+- Documented the screen purpose, structure, component mapping, entry-card hierarchy, form grouping, search/filter patterns, shared feedback states, responsive behavior, theme behavior, and RTL/LTR rules
+- Mapped the existing Personal Manual hero, metrics, templates, authoring form, filters, and entry grid to the current shared UI vocabulary including `PremiumCard`, `SectionHeader`, `MetricCard`, `SoftPanel`, `ManualEntryCard`, `ManualEntryForm`, `Badge`, `StatusChip`, `Input`, `Select`, `Textarea`, and `EmptyState`
+- Kept the stage documentation-only with no `src` change, test change, package/dependency change, storage/schema/migration/backup change, localStorage/route/business-logic change, or application behavior change
+
 ## Stage 188 - Figma Screen Assembly and Handoff Workflow
 
 - Created `docs/FIGMA_SCREEN_ASSEMBLY_HANDOFF_STAGE_188.md` to define the end-to-end workflow for assembling AliOS Figma screens from approved design-system layers
