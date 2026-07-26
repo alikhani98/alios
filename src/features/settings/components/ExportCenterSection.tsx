@@ -8,6 +8,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  SoftPanel,
 } from "@/shared/ui";
 import { useI18n } from "@/shared/i18n";
 import { useExportCenter } from "../hooks/useExportCenter";
@@ -131,7 +132,7 @@ export function ExportCenterSection({ id }: ExportCenterSectionProps) {
           />
         </div>
 
-        <div className="rounded-xl border bg-muted/30 p-4">
+        <SoftPanel className="alios-surface-muted">
           <p className="text-sm leading-7 text-muted-foreground">
             {t("settings.exportCenterNote")}
           </p>
@@ -154,12 +155,12 @@ export function ExportCenterSection({ id }: ExportCenterSectionProps) {
             </Badge>
             <Badge variant="secondary">{t("settings.exportManualMarkdown")}</Badge>
           </div>
-        </div>
+        </SoftPanel>
 
         {exportCenter.success ? (
           <div
             role="status"
-            className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-primary"
+            className="alios-status-success rounded-xl px-4 py-3 text-sm"
           >
             {exportCenter.success}
           </div>
@@ -168,7 +169,7 @@ export function ExportCenterSection({ id }: ExportCenterSectionProps) {
         {exportCenter.error ? (
           <div
             role="alert"
-            className="rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+            className="alios-status-danger rounded-xl px-4 py-3 text-sm"
           >
             {exportCenter.error}
           </div>

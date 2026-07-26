@@ -2,6 +2,15 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 177 - Settings Visual Hierarchy Refinement
+
+- Applied the Stage 173 shared visual foundation to Settings as the fourth page-level visual refinement pilot after Finance, Today, and Weekly Review
+- Added clearer Settings reading bands for safety/support, normal preferences, backup/restore data operations, app/system information, and destructive actions
+- Elevated local record count, last manual backup, and local-only sync status into the Settings entry surface without changing any stored preference or data behavior
+- Replaced local muted/status boxes in Settings, Recovery, Sync, Export Center, Local Error Log, and Weekly Task Budget panels with shared semantic surface and status utilities
+- Kept destructive clear-all controls visually separated from normal preferences and backup/restore actions
+- Kept the stage UI-only with no Settings logic change, preference behavior change, backup/restore behavior change, recovery behavior change, storage change, schema change, migration, route change, localStorage key, backup format, dependency, backend, sync, cloud, AI, telemetry, analytics, or Simple View / Full View behavior change
+
 ## Stage 176 - Weekly Review Visual Hierarchy Refinement
 
 - Applied the Stage 173 shared visual foundation to Weekly Review as the third page-level visual refinement pilot after Finance and Today

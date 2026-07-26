@@ -11,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
   EmptyState,
+  SoftPanel,
 } from "@/shared/ui";
 
 import {
@@ -33,7 +34,7 @@ function ErrorEntryCard({
   const { formatDateTime } = useDateFormatter();
 
   return (
-    <div className="rounded-2xl border bg-muted/30 p-4">
+    <SoftPanel className="alios-surface-muted">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-2">
           <p className="break-words text-sm font-medium text-foreground">
@@ -73,7 +74,7 @@ function ErrorEntryCard({
             : t("settings.copyError")}
         </Button>
       </div>
-    </div>
+    </SoftPanel>
   );
 }
 

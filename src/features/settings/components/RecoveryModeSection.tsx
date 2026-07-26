@@ -9,6 +9,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  SoftPanel,
 } from "@/shared/ui";
 
 type RecoveryModeSectionProps = {
@@ -38,7 +39,7 @@ export function RecoveryModeSection({
         <CardDescription>{t("recovery.description")}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="rounded-xl border bg-muted/30 p-4">
+        <SoftPanel className="alios-surface-muted">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div className="space-y-1">
               <p className="text-sm font-medium">
@@ -55,7 +56,7 @@ export function RecoveryModeSection({
               {enabled ? t("recovery.statusActive") : t("recovery.statusInactive")}
             </Badge>
           </div>
-        </div>
+        </SoftPanel>
 
         <Button
           type="button"
@@ -68,7 +69,7 @@ export function RecoveryModeSection({
         </Button>
 
         {enabled ? (
-          <div className="space-y-3 rounded-xl border bg-background/80 p-4">
+          <SoftPanel className="space-y-3 alios-surface-card">
             <p className="text-sm leading-7 text-muted-foreground">
               {t("recovery.actions")}
             </p>
@@ -101,16 +102,16 @@ export function RecoveryModeSection({
                 <span className="min-w-0 truncate">{t("recovery.localErrorLog")}</span>
               </Button>
             </div>
-          </div>
+          </SoftPanel>
         ) : (
-          <div className="rounded-xl border bg-background/80 p-4">
+          <SoftPanel className="alios-surface-card">
             <p className="text-sm leading-7 text-muted-foreground">
               {t("recovery.sectionHint")}
             </p>
             <p className="mt-2 text-xs leading-5 text-muted-foreground">
               {t("recovery.actions")}
             </p>
-          </div>
+          </SoftPanel>
         )}
       </CardContent>
     </Card>
