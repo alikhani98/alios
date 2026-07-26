@@ -2,6 +2,24 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 184 - Design System Documentation and Figma Preparation
+
+- Created a complete AliOS design-system documentation layer for future Figma work and future project architects
+- Documented semantic design tokens for colors, typography, spacing, radius, elevation, surfaces, and status semantics
+- Documented shared component usage rules for buttons, cards, PremiumCard, SoftPanel, StatusChip, Badge, inputs, selects, textareas, forms, loading states, empty states, and error states
+- Documented page-pattern guidance for Finance, Today, Weekly Review, Settings, Goals, Personal Manual, and Decision Log
+- Added code-component to Figma-component mapping guidance for variants, states, RTL/LTR direction handling, light/dark modes, and accent-variable preparation
+- Kept the stage documentation-only with no source behavior, storage, schema, migration, route, localStorage key, dependency, backend/cloud/sync, AI, telemetry, analytics, or Simple View / Full View behavior change
+
+## Stage 183 - User Data Smoke Pass and Live Data Validation
+
+- Restored a schema-valid synthetic AliOS backup through the existing Settings backup/restore UI to validate the refined visual system against 123 realistic non-empty records
+- Covered Finance, Today, Weekly Review, Goals, Personal Manual, and Decision Log with dense tasks, long titles/descriptions, mixed statuses, review-due records, Finance obligations/transactions, Manual tags/search, and Decision review data
+- Checked 360px, 390px, 430px, and desktop widths in English LTR dark mode, plus 390px and desktop spot checks in English light, Persian RTL light, and Persian RTL dark mode
+- Confirmed root horizontal overflow stayed at zero on audited routes; mobile sidebar off-canvas positioning was observed as expected and did not create document overflow
+- Checked Manual search/filter behavior and keyboard focus visibility on a representative Today control; no confirmed visual defect required a source fix
+- Kept the stage QA/documentation-only with no business logic, calculation, repository, storage, localStorage key, schema, migration, backup-format, route, dependency, backend/cloud/sync, AI, telemetry, analytics, or Simple View / Full View behavior change
+
 ## Stage 182 - Real Browser and Device Visual QA
 
 - Ran real in-app browser QA against the refined visual-system routes: Finance, Today, Weekly Review, Settings, Goals, Personal Manual, and Decision Log
