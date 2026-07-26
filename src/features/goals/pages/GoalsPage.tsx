@@ -25,6 +25,7 @@ import {
   MetricCard,
   PremiumCard,
   SectionHeader,
+  SoftPanel,
   StatusChip,
   Select,
 } from "@/shared/ui";
@@ -567,7 +568,7 @@ export function GoalsPage() {
       {successMessage ? (
         <div
           role="status"
-          className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-foreground"
+          className="alios-status-success rounded-surface border px-4 py-3 text-sm"
         >
           {successMessage}
         </div>
@@ -576,7 +577,7 @@ export function GoalsPage() {
       {error || actionError ? (
         <div
           role="alert"
-          className="flex flex-col gap-3 rounded-xl border border-destructive/30 bg-destructive/5 p-4 sm:flex-row sm:items-center sm:justify-between"
+          className="alios-status-danger flex flex-col gap-3 rounded-surface border p-4 sm:flex-row sm:items-center sm:justify-between"
         >
           <div className="flex items-start gap-2 text-sm text-destructive">
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
@@ -594,7 +595,7 @@ export function GoalsPage() {
       {focusMessage ? (
         <div
           role="status"
-          className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-foreground"
+          className="alios-surface-muted px-4 py-3 text-sm text-foreground"
         >
           {focusMessage}
         </div>
@@ -641,7 +642,7 @@ export function GoalsPage() {
             status={<StatusChip tone="neutral">{filteredEntries.length}</StatusChip>}
           />
 
-          <div className="grid min-w-0 gap-3 md:grid-cols-[minmax(0,1fr)_11rem_11rem_11rem_11rem_auto]">
+          <SoftPanel className="grid min-w-0 gap-3 md:grid-cols-[minmax(0,1fr)_11rem_11rem_11rem_11rem_auto]">
             <div className="relative min-w-0">
               <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -726,7 +727,7 @@ export function GoalsPage() {
                 </Button>
               ) : null}
             </div>
-          </div>
+          </SoftPanel>
         </div>
       </PremiumCard>
 
@@ -736,7 +737,7 @@ export function GoalsPage() {
           aria-label={t("goals.loading")}
         >
           {[0, 1, 2].map((item) => (
-            <div key={item} className="h-72 animate-pulse rounded-[1.75rem] border bg-muted/60" />
+            <div key={item} className="alios-surface-muted h-72 animate-pulse bg-muted/60" />
           ))}
         </div>
       ) : filteredEntries.length === 0 ? (
@@ -809,32 +810,30 @@ export function GoalsPage() {
       ) : null}
 
       {reviewDueGoals.length > 0 ? (
-        <PremiumCard>
-          <div className="space-y-4 p-5 sm:p-6">
-            <SectionHeader
-              title={t("goals.reviewDueSection")}
-              description={t("goals.reviewDueSectionDescription")}
-              status={<StatusChip tone="warning">{reviewDueGoals.length}</StatusChip>}
-            />
-            <div className="grid min-w-0 gap-4 xl:grid-cols-2">
-              {reviewDueGoals.slice(0, 4).map((goal) => (
-                <GoalCard
-                  key={`review-${goal.id}`}
-                  goal={goal}
-                  isReviewDue
-                  projectProgress={getGoalProjectProgress(goal.id, projects, tasks)}
-                  isProjectProgressLoading={isProjectProgressLoading}
-                  isDeleting={deletingId === goal.id}
-                  onEdit={() => openEditForm(goal)}
-                  onDelete={() => void handleDelete(goal)}
-                  onMarkReviewed={() => void handleMarkReviewed(goal)}
-                  onMarkCompleted={() => void handleMarkCompleted(goal)}
-                  onReactivate={() => void handleReactivate(goal)}
-                />
-              ))}
-            </div>
+        <section className="alios-surface-soft space-y-4 p-5 sm:p-6">
+          <SectionHeader
+            title={t("goals.reviewDueSection")}
+            description={t("goals.reviewDueSectionDescription")}
+            status={<StatusChip tone="warning">{reviewDueGoals.length}</StatusChip>}
+          />
+          <div className="grid min-w-0 gap-4 xl:grid-cols-2">
+            {reviewDueGoals.slice(0, 4).map((goal) => (
+              <GoalCard
+                key={`review-${goal.id}`}
+                goal={goal}
+                isReviewDue
+                projectProgress={getGoalProjectProgress(goal.id, projects, tasks)}
+                isProjectProgressLoading={isProjectProgressLoading}
+                isDeleting={deletingId === goal.id}
+                onEdit={() => openEditForm(goal)}
+                onDelete={() => void handleDelete(goal)}
+                onMarkReviewed={() => void handleMarkReviewed(goal)}
+                onMarkCompleted={() => void handleMarkCompleted(goal)}
+                onReactivate={() => void handleReactivate(goal)}
+              />
+            ))}
           </div>
-        </PremiumCard>
+        </section>
       ) : null}
     </section>
   );

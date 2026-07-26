@@ -1,7 +1,7 @@
 import { useMemo, useState, type FormEvent } from "react";
 
 import { useI18n } from "@/shared/i18n";
-import { Button, DateValueHint, Input, Textarea, Select } from "@/shared/ui";
+import { Button, DateValueHint, Input, SoftPanel, Textarea, Select } from "@/shared/ui";
 
 import {
   GOAL_AREA_OPTIONS,
@@ -53,46 +53,48 @@ export function GoalForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid gap-4 xl:grid-cols-2">
+      <SoftPanel className="space-y-4">
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_14rem]">
+          <label className="space-y-2">
+            <span className="text-sm font-medium">{t("goals.titleLabel")}</span>
+            <Input
+              name="title"
+              defaultValue={goal?.title ?? ""}
+              required
+              placeholder={t("goals.titlePlaceholder")}
+            />
+          </label>
+
+          <label className="space-y-2">
+            <span className="text-sm font-medium">{t("goals.statusLabel")}</span>
+            <Select
+              name="status"
+              defaultValue={goal?.status ?? "active"}
+            >
+              {GOAL_STATUS_OPTIONS.filter((option) => option.value !== "all").map(
+                (option) => (
+                  <option key={String(option.value)} value={option.value}>
+                    {t(option.labelKey)}
+                  </option>
+                )
+              )}
+            </Select>
+          </label>
+        </div>
+
         <label className="space-y-2">
-          <span className="text-sm font-medium">{t("goals.titleLabel")}</span>
-          <Input
-            name="title"
-            defaultValue={goal?.title ?? ""}
+          <span className="text-sm font-medium">{t("goals.descriptionLabel")}</span>
+          <Textarea
+            name="description"
+            defaultValue={goal?.description ?? ""}
             required
-            placeholder={t("goals.titlePlaceholder")}
+            rows={4}
+            placeholder={t("goals.descriptionPlaceholder")}
           />
         </label>
+      </SoftPanel>
 
-        <label className="space-y-2">
-          <span className="text-sm font-medium">{t("goals.statusLabel")}</span>
-          <Select
-            name="status"
-            defaultValue={goal?.status ?? "active"}
-          >
-            {GOAL_STATUS_OPTIONS.filter((option) => option.value !== "all").map(
-              (option) => (
-                <option key={String(option.value)} value={option.value}>
-                  {t(option.labelKey)}
-                </option>
-              )
-            )}
-          </Select>
-        </label>
-      </div>
-
-      <label className="space-y-2">
-        <span className="text-sm font-medium">{t("goals.descriptionLabel")}</span>
-        <Textarea
-          name="description"
-          defaultValue={goal?.description ?? ""}
-          required
-          rows={4}
-          placeholder={t("goals.descriptionPlaceholder")}
-        />
-      </label>
-
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <SoftPanel className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <label className="space-y-2">
           <span className="text-sm font-medium">{t("goals.areaLabel")}</span>
           <Select
@@ -152,9 +154,9 @@ export function GoalForm({
             placeholder="0"
           />
         </label>
-      </div>
+      </SoftPanel>
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <SoftPanel className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <label className="space-y-2">
           <span className="text-sm font-medium">{t("goals.targetDateLabel")}</span>
           <Input
@@ -185,9 +187,9 @@ export function GoalForm({
             placeholder={t("goals.tagsPlaceholder")}
           />
         </label>
-      </div>
+      </SoftPanel>
 
-      <div className="flex flex-wrap gap-3 pt-2">
+      <div className="flex flex-wrap gap-3 border-t border-border/70 pt-4">
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting ? t("common.saving") : goal ? t("goals.saveGoal") : t("goals.createGoal")}
         </Button>
