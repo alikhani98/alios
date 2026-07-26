@@ -27,6 +27,7 @@ import {
   CardHeader,
   CardTitle,
   Input,
+  SoftPanel,
 } from "@/shared/ui";
 import { cn } from "@/shared/utils/cn";
 
@@ -128,10 +129,10 @@ function BudgetSummaryCard({
   tone = "default",
 }: BudgetSummaryCardProps) {
   return (
-    <div
+    <SoftPanel
       className={cn(
-        "min-w-0 rounded-xl border px-4 py-3",
-        tone === "muted" ? "bg-muted/30" : "bg-background"
+        "min-w-0 px-4 py-3",
+        tone === "muted" ? "alios-surface-muted" : "alios-surface-card"
       )}
     >
       <p className="text-xs font-medium text-muted-foreground">{label}</p>
@@ -141,7 +142,7 @@ function BudgetSummaryCard({
       <p className="mt-2 break-words text-xs leading-5 text-muted-foreground">
         {description}
       </p>
-    </div>
+    </SoftPanel>
   );
 }
 
@@ -275,7 +276,7 @@ export function WeeklyTaskBudgetSection() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="rounded-xl border bg-muted/30 p-4">
+        <SoftPanel className="alios-surface-muted">
           <p
             id="weekly-task-budget-description"
             className="text-sm leading-7 text-muted-foreground"
@@ -285,7 +286,7 @@ export function WeeklyTaskBudgetSection() {
           <p className="mt-2 text-xs leading-5 text-muted-foreground">
             {t("settings.wbN")}
           </p>
-        </div>
+        </SoftPanel>
 
         <div className="flex flex-col gap-2">
           <label
@@ -325,14 +326,14 @@ export function WeeklyTaskBudgetSection() {
         </div>
 
         {draftBudget === undefined ? (
-          <div
-            className="rounded-xl border border-dashed bg-muted/20 p-4 text-sm leading-7 text-muted-foreground"
+          <SoftPanel
+            className="border-dashed bg-muted/20 text-sm leading-7 text-muted-foreground"
             id="weekly-task-budget-slider-description"
           >
             {tx("wbSt")}
-          </div>
+          </SoftPanel>
         ) : (
-          <div className="space-y-2 rounded-2xl border bg-muted/20 p-4">
+          <SoftPanel className="space-y-2 alios-surface-muted">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <label
                 htmlFor="weekly-task-budget-slider"
@@ -374,7 +375,7 @@ export function WeeklyTaskBudgetSection() {
             >
               {tx("wbSh")}
             </p>
-          </div>
+          </SoftPanel>
         )}
 
         <div
@@ -456,7 +457,7 @@ export function WeeklyTaskBudgetSection() {
         {statusMessage ? (
           <p
             role="status"
-            className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-primary"
+            className="alios-status-success rounded-xl px-4 py-3 text-sm"
           >
             {statusMessage}
           </p>

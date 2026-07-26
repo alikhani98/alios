@@ -49,6 +49,8 @@ import {
   Input,
   PremiumCard,
   SectionHeader,
+  SoftPanel,
+  StatusChip,
 } from "@/shared/ui";
 import {
   WELLNESS_BADMINTON_ROUTINE_ENABLED_STORAGE_KEY,
@@ -75,10 +77,10 @@ type CountItemProps = { label: string; value: number };
 
 function CountItem({ label, value }: CountItemProps) {
   return (
-    <div className="rounded-xl border bg-background px-4 py-3">
+    <SoftPanel className="alios-surface-muted px-4 py-3">
       <p className="text-2xl font-bold tabular-nums leading-none">{value}</p>
       <p className="mt-1 break-words text-sm text-muted-foreground">{label}</p>
-    </div>
+    </SoftPanel>
   );
 }
 
@@ -161,7 +163,7 @@ export function ViewDensityModeControl() {
         };
 
   return (
-    <Card>
+    <PremiumCard>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <SlidersHorizontal className="h-5 w-5 text-primary" />
@@ -184,7 +186,7 @@ export function ViewDensityModeControl() {
                 className={`flex min-w-0 cursor-pointer gap-3 rounded-xl border p-4 transition-colors ${
                   isSelected
                     ? "border-primary/40 bg-primary/10"
-                    : "border-border bg-muted/20 hover:bg-muted/40"
+                    : "alios-surface-muted hover:bg-muted/40"
                 }`}
               >
                 <input
@@ -210,7 +212,7 @@ export function ViewDensityModeControl() {
             );
           })}
         </div>
-        <div className="flex flex-col gap-3 rounded-xl border bg-muted/30 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <SoftPanel className="flex flex-col gap-3 alios-surface-muted sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-muted-foreground">
             {labels.active}: {viewDensityOptions.find((option) => option.value === value)?.label[language]}
           </p>
@@ -218,9 +220,9 @@ export function ViewDensityModeControl() {
             <RotateCcw className="me-2 h-4 w-4" />
             {labels.reset}
           </Button>
-        </div>
+        </SoftPanel>
       </CardContent>
-    </Card>
+    </PremiumCard>
   );
 }
 
@@ -389,20 +391,50 @@ export function SettingsPage() {
 
   return (
     <section className="alios-page space-y-6">
-      <PremiumCard className="border-primary/15 bg-primary/5">
-        <CardContent className="p-5 sm:p-6">
+      <PremiumCard className="border-primary/15 bg-gradient-to-br from-primary/10 via-card to-background shadow-sm">
+        <CardContent className="grid gap-5 p-5 sm:p-6 lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)]">
           <SectionHeader
             icon={<SlidersHorizontal className="h-5 w-5" />}
             title={t("settings.title")}
             description={t("settings.description")}
           />
+          <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
+            <SoftPanel className="alios-surface-muted">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                {t("settings.totalLocalRecords")}
+              </p>
+              <p className="mt-1 text-2xl font-semibold tabular-nums leading-none">
+                {dataManagement.isLoading ? "..." : totalLocalRecords}
+              </p>
+            </SoftPanel>
+            <SoftPanel className="alios-surface-muted">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                {t("settings.backupLastManualBackup")}
+              </p>
+              <p className="mt-1 text-sm font-medium">
+                {backup.lastBackupExportedAt
+                  ? formatDateTime(backup.lastBackupExportedAt)
+                  : t("common.notRecorded")}
+              </p>
+            </SoftPanel>
+            <SoftPanel className="alios-surface-muted">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                {t("settings.syncTitle")}
+              </p>
+              <div className="mt-2">
+                <StatusChip tone="neutral">
+                  {t("settings.syncStatusLocalOnly")}
+                </StatusChip>
+              </div>
+            </SoftPanel>
+          </div>
         </CardContent>
       </PremiumCard>
 
       {backup.success || dataManagement.success ? (
         <div
           role="status"
-          className="flex items-start gap-2 rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm"
+          className="alios-status-success flex items-start gap-2 rounded-xl px-4 py-3 text-sm"
         >
           <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
           <span>{dataManagement.success ?? backup.success}</span>
@@ -412,12 +444,24 @@ export function SettingsPage() {
       {backup.error || dataManagement.error ? (
         <div
           role="alert"
-          className="flex items-start gap-2 rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+          className="alios-status-danger flex items-start gap-2 rounded-xl px-4 py-3 text-sm"
         >
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
           <span>{dataManagement.error ?? backup.error}</span>
         </div>
       ) : null}
+
+      <section className="space-y-4">
+        <SectionHeader
+          icon={<ShieldCheck className="h-5 w-5" />}
+          title={t("settings.localDataSafety")}
+          description={t("settings.localDataSafetyDescription")}
+          status={
+            <StatusChip tone={backup.backupFreshness === "overdue" ? "warning" : "neutral"}>
+              {t(getBackupStatusLabelKey(backup.backupFreshness))}
+            </StatusChip>
+          }
+        />
 
       {isSimpleView && !showSimpleHelpCenter ? (
         <Card>
@@ -499,6 +543,17 @@ export function SettingsPage() {
         <LocalAiSetupCard />
       )}
 
+      </section>
+
+      <section className="space-y-4">
+        <SectionHeader
+          icon={<SlidersHorizontal className="h-5 w-5" />}
+          title={t("settings.appearance")}
+          description={t("settings.appearanceDescription")}
+          status={<StatusChip tone="neutral">{t("settings.localFirst")}</StatusChip>}
+        />
+
+        <div className="grid gap-4 xl:grid-cols-2">
       <WeeklyTaskBudgetSection />
 
       <Card>
@@ -542,14 +597,14 @@ export function SettingsPage() {
           <CardDescription>{t("home.localOnlyDashboardPreference")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="rounded-xl border bg-muted/30 p-4">
+          <SoftPanel className="alios-surface-muted">
             <p className="text-sm leading-7 text-muted-foreground">
               {t("home.customizeDashboardDescription")}
             </p>
             <p className="mt-2 text-xs leading-5 text-muted-foreground">
               {t("home.dashboardSections")}
             </p>
-          </div>
+          </SoftPanel>
           {homeLayoutResetMessage ? (
             <div
               role="status"
@@ -583,7 +638,7 @@ export function SettingsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="rounded-xl border bg-muted/30 p-4">
+          <SoftPanel className="alios-surface-muted">
             <p className="text-sm leading-7 text-muted-foreground">
               {t("settings.enableMorningWarmupReminder")}
             </p>
@@ -593,7 +648,7 @@ export function SettingsPage() {
             <p className="text-xs leading-5 text-muted-foreground">
               {t("settings.noPushNotification")}
             </p>
-          </div>
+          </SoftPanel>
           <Button
             type="button"
             variant={morningWarmupEnabled ? "default" : "outline"}
@@ -618,7 +673,7 @@ export function SettingsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="rounded-xl border bg-muted/30 p-4">
+          <SoftPanel className="alios-surface-muted">
             <p className="text-sm leading-7 text-muted-foreground">
               {t("settings.localOnlyChecklist")}
             </p>
@@ -628,7 +683,7 @@ export function SettingsPage() {
             <p className="text-xs leading-5 text-muted-foreground">
               {t("settings.noPushNotification")}
             </p>
-          </div>
+          </SoftPanel>
           <Button
             type="button"
             variant={wellnessRoutineEnabled ? "default" : "outline"}
@@ -728,6 +783,17 @@ export function SettingsPage() {
           </p>
         </CardContent>
       </Card>
+        </div>
+
+      </section>
+
+      <section className="space-y-4">
+        <SectionHeader
+          icon={<FileJson className="h-5 w-5" />}
+          title={t("settings.backupExport")}
+          description={t("settings.backupExportDescription")}
+          status={<StatusChip tone="neutral">{t("settings.localFirst")}</StatusChip>}
+        />
 
       <Card>
         <CardHeader>
@@ -774,12 +840,12 @@ export function SettingsPage() {
                     : t("common.showMoreCount", { count: hiddenDataCount })}
                 </Button>
               ) : null}
-              <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
+              <SoftPanel className="alios-surface-muted border-primary/20">
                 <p className="text-sm leading-7 text-muted-foreground">
                   {t("settings.localDataWarning")}
                 </p>
-              </div>
-              <div className="rounded-xl border bg-muted/30 p-4">
+              </SoftPanel>
+              <SoftPanel className="alios-surface-muted">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div className="space-y-1">
                     <p className="text-sm font-medium">
@@ -798,7 +864,7 @@ export function SettingsPage() {
                 <p className="mt-3 text-sm leading-7 text-muted-foreground">
                   {t(getBackupStatusSummaryKey(backup.backupFreshness))}
                 </p>
-              </div>
+              </SoftPanel>
               <div className="grid gap-3 md:grid-cols-2">
                 <InfoItem
                   label={t("settings.lastBackupExportedAt")}
@@ -919,7 +985,7 @@ export function SettingsPage() {
               />
             </div>
             {restoreImpact ? (
-              <div className="rounded-xl border border-destructive/25 bg-destructive/5 p-4">
+              <SoftPanel className="alios-status-danger">
                 <p className="text-sm font-semibold">
                   {t("settings.restoreImpactTitle")}
                 </p>
@@ -956,7 +1022,7 @@ export function SettingsPage() {
                       ))}
                   </div>
                 ) : null}
-              </div>
+              </SoftPanel>
             ) : null}
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {restorePreview.tableCounts.map((tableCount, index) => (
@@ -999,6 +1065,16 @@ export function SettingsPage() {
         </Card>
       ) : null}
 
+      </section>
+
+      <section className="space-y-4">
+        <SectionHeader
+          icon={<Info className="h-5 w-5" />}
+          title={t("settings.appInfo")}
+          description={t("settings.appInfoDescription")}
+          status={<StatusChip tone="neutral">{appConfig.version}</StatusChip>}
+        />
+
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -1030,7 +1106,7 @@ export function SettingsPage() {
             {t("settings.pwaUpdateLifecycleNote")}
           </p>
           {pwaUpdateStatus ? (
-            <p role="status" className="rounded-xl border bg-muted/30 px-4 py-3 text-sm text-muted-foreground">
+            <p role="status" className="alios-surface-muted rounded-xl px-4 py-3 text-sm text-muted-foreground">
               {t(
                 pwaUpdateStatus === "checking"
                   ? "settings.pwaUpdateChecking"
@@ -1059,6 +1135,16 @@ export function SettingsPage() {
         </CardContent>
       </Card>
 
+      </section>
+
+      <section className="space-y-4">
+        <SectionHeader
+          icon={<HardDrive className="h-5 w-5" />}
+          title={t("settings.dangerZone")}
+          description={t("settings.dangerDescription")}
+          status={<StatusChip tone="danger">{t("settings.clearAll")}</StatusChip>}
+        />
+
       <Card className="border-destructive/40">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-destructive">
@@ -1072,7 +1158,7 @@ export function SettingsPage() {
             {t("settings.clearWarning")}
           </p>
           {dataManagement.isConfirmingClear ? (
-            <div className="rounded-xl border border-destructive/40 bg-destructive/5 p-4">
+            <SoftPanel className="alios-status-danger">
               <h3 className="font-semibold text-destructive">
                 {t("settings.clearConfirmTitle")}
               </h3>
@@ -1102,7 +1188,7 @@ export function SettingsPage() {
                 {t("common.cancel")}
                 </Button>
               </div>
-            </div>
+            </SoftPanel>
           ) : (
             <Button
               type="button"
@@ -1116,6 +1202,7 @@ export function SettingsPage() {
           )}
         </CardContent>
       </Card>
+      </section>
     </section>
   );
 }
