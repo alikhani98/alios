@@ -140,7 +140,7 @@ function OverviewPanel({
   children: ReactNode;
 }) {
   return (
-    <Card className="overflow-hidden border-primary/10 bg-gradient-to-br from-background via-background to-primary/5 shadow-sm">
+    <Card className="overflow-hidden border-primary/10 bg-gradient-to-br from-background via-background to-primary/5 shadow-md">
       <CardContent className="space-y-4 p-5 sm:p-6">{children}</CardContent>
     </Card>
   );
@@ -469,7 +469,7 @@ export function HomePage() {
       {hasError ? (
         <div
           role="alert"
-          className="flex flex-col gap-3 rounded-xl border border-destructive/30 bg-destructive/5 p-4 sm:flex-row sm:items-center sm:justify-between"
+          className="alios-status-danger flex flex-col gap-3 rounded-[1.5rem] border p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between"
         >
           <div className="flex items-start gap-2 text-sm text-destructive">
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
@@ -488,7 +488,7 @@ export function HomePage() {
       ) : null}
 
       {showBackupReminder ? (
-        <SoftPanel className="flex flex-col gap-3 border-primary/10 bg-gradient-to-l from-primary/5 via-background to-background p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
+        <SoftPanel className="flex flex-col gap-3 border-primary/10 bg-gradient-to-l from-primary/5 via-background to-background p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:gap-5">
           <div className="flex min-w-0 items-start gap-3">
             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-primary/10 bg-primary/10 text-primary">
               <ShieldCheck className="h-5 w-5" aria-hidden="true" />
@@ -517,23 +517,23 @@ export function HomePage() {
 
       {isLoading ? (
         <div className="space-y-4" aria-label={t("home.loading")}>
-          <div className="h-64 animate-pulse rounded-[2rem] border bg-muted/60" />
-          <div className="h-56 animate-pulse rounded-[2rem] border bg-muted/60" />
+          <div className="h-72 animate-pulse rounded-[2rem] border border-primary/10 bg-gradient-to-br from-muted/70 via-muted/55 to-muted/70 shadow-sm" />
+          <div className="h-60 animate-pulse rounded-[2rem] border border-primary/10 bg-gradient-to-br from-muted/65 via-muted/50 to-muted/65 shadow-sm" />
           <div className="grid gap-4 xl:grid-cols-2">
             {[0, 1].map((item) => (
               <div
                 key={item}
-                className="h-72 animate-pulse rounded-[2rem] border bg-muted/60"
+                className="h-72 animate-pulse rounded-[2rem] border border-primary/10 bg-gradient-to-br from-muted/60 via-muted/50 to-muted/60 shadow-sm"
               />
             ))}
           </div>
-          <div className="h-80 animate-pulse rounded-[2rem] border bg-muted/60" />
+          <div className="h-80 animate-pulse rounded-[2rem] border border-primary/10 bg-gradient-to-br from-muted/60 via-muted/50 to-muted/60 shadow-sm" />
         </div>
       ) : data ? (
         <>
           {heroSection?.content ?? null}
           <section className="space-y-4 sm:space-y-5" aria-label={t("home.todayOverview")}>
-            <div className="flex flex-col gap-1 px-1 sm:flex-row sm:items-end sm:justify-between">
+            <div className="flex flex-col gap-2 px-1 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <p className="text-lg font-semibold tracking-tight sm:text-xl">
                   {t("home.todayOverview")}
@@ -555,7 +555,7 @@ export function HomePage() {
             </div>
           </section>
           {secondaryDashboardSections.length ? (
-            <Card className="overflow-hidden border-primary/15 bg-card shadow-sm">
+            <Card className="overflow-hidden border-primary/15 bg-card shadow-md">
               <CardHeader className="gap-4 border-b border-primary/10 bg-muted/20 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
                 <div className="min-w-0 space-y-1">
                   <CardTitle className="text-lg">{t("home.moreDashboard")}</CardTitle>
