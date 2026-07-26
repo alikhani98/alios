@@ -2,6 +2,14 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 203 - Figma Components Page Implementation Workflow
+
+- Created `docs/FIGMA_COMPONENTS_IMPLEMENTATION_STAGE_203.md` to define the implementation workflow for manually creating the AliOS `02 Components` Figma page
+- Documented the Components page structure, button checklist, form checklist, card checklist, feedback and status checklist, component naming rules, developer mapping rules, and pre-approval QA checklist
+- Explicitly recorded that this stage does not claim a real Figma components page or live Figma component set was created and that the repository remains the source of truth
+- Explicitly documented that checkbox and toggle primitives are not currently exported from `src/shared/ui` and should not be treated as implemented shared components without a future code stage
+- Kept the stage documentation-only with no `src` change, test change, package/dependency change, storage/schema/migration/backup change, localStorage/route/business-logic change, or application behavior change
+
 ## Stage 202 - Figma Foundations Page Implementation Workflow
 
 - Created `docs/FIGMA_FOUNDATIONS_IMPLEMENTATION_STAGE_202.md` to define the implementation workflow for manually creating the AliOS `01 Foundations` Figma page
