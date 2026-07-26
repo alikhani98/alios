@@ -3,7 +3,17 @@ import { useState } from "react";
 
 import { useDateFormatter } from "@/shared/date";
 import { useI18n } from "@/shared/i18n";
-import { Badge, Button, Card, CardContent, CardFooter, CardHeader, CardTitle, StatusChip } from "@/shared/ui";
+import {
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  SoftPanel,
+  StatusChip,
+} from "@/shared/ui";
 import type { ManualEntry } from "@/shared/types";
 
 import {
@@ -43,10 +53,10 @@ export function ManualEntryCard({
   const reviewDue = isManualEntryReviewDue(entry);
 
   return (
-    <Card className="flex h-full min-w-0 flex-col">
-      <CardHeader className="min-w-0 gap-3">
+    <Card className="flex h-full min-w-0 flex-col overflow-hidden">
+      <CardHeader className="min-w-0 gap-4">
         <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
-          <CardTitle className="break-words leading-7">{entry.title}</CardTitle>
+          <CardTitle className="break-words text-xl leading-7">{entry.title}</CardTitle>
           <div className="flex min-w-0 flex-wrap justify-end gap-2">
             <StatusChip
               tone={
@@ -64,13 +74,13 @@ export function ManualEntryCard({
             ) : null}
           </div>
         </div>
-        <p className="break-words text-sm leading-7 whitespace-pre-wrap text-muted-foreground">
+        <p className="max-w-3xl break-words text-sm leading-7 whitespace-pre-wrap text-muted-foreground">
           {previewText(entry.body, t("manual.noBodyPreview"))}
         </p>
       </CardHeader>
 
       <CardContent className="min-w-0 flex-1 space-y-4">
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 border-t border-border/70 pt-4">
           <Badge
             variant="secondary"
             className="max-w-full break-words whitespace-normal text-start leading-5"
@@ -94,16 +104,16 @@ export function ManualEntryCard({
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">
-          <div className="rounded-2xl border bg-background/70 px-4 py-3">
+          <SoftPanel className="rounded-surface px-4 py-3">
             <p className="text-xs text-muted-foreground">{t("manual.updatedAt")}</p>
             <p className="mt-1 text-sm font-medium">{formatDateTime(entry.updatedAt)}</p>
-          </div>
-          <div className="rounded-2xl border bg-background/70 px-4 py-3">
+          </SoftPanel>
+          <SoftPanel className="rounded-surface px-4 py-3">
             <p className="text-xs text-muted-foreground">{t("manual.lastReviewedAt")}</p>
             <p className="mt-1 text-sm font-medium">
               {entry.lastReviewedAt ? formatDateTime(entry.lastReviewedAt) : t("common.notRecorded")}
             </p>
-          </div>
+          </SoftPanel>
         </div>
 
         {entry.tags.length > 0 ? (
@@ -121,7 +131,7 @@ export function ManualEntryCard({
         ) : null}
       </CardContent>
 
-      <CardFooter className="flex flex-col gap-2 border-t pt-4 sm:flex-row sm:flex-wrap sm:items-center">
+      <CardFooter className="flex flex-col gap-2 border-t border-border/70 pt-4 sm:flex-row sm:flex-wrap sm:items-center">
         {confirmingDelete ? (
           <>
             <Button

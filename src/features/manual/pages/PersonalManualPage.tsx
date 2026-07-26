@@ -15,6 +15,7 @@ import {
   MetricCard,
   PremiumCard,
   SectionHeader,
+  SoftPanel,
   StatusChip,
   Select,
 } from "@/shared/ui";
@@ -115,7 +116,7 @@ export function ManualContextualHelp({
         <div
           id={panelId}
           role="note"
-          className="rounded-xl border border-primary/15 bg-background/95 p-4 text-sm leading-7 text-muted-foreground shadow-sm"
+          className="alios-surface-muted p-4 text-sm leading-7 text-muted-foreground"
         >
           <p className="font-medium text-foreground">{copy.title}</p>
           <div className="mt-2 space-y-2">
@@ -403,7 +404,7 @@ export function PersonalManualPage() {
       </div>
 
       {successMessage ? (
-        <div role="status" className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm">
+        <div role="status" className="alios-status-success rounded-surface border px-4 py-3 text-sm">
           {successMessage}
         </div>
       ) : null}
@@ -411,7 +412,7 @@ export function PersonalManualPage() {
       {error || actionError ? (
         <div
           role="alert"
-          className="flex flex-col gap-3 rounded-xl border border-destructive/30 bg-destructive/5 p-4 sm:flex-row sm:items-center sm:justify-between"
+          className="alios-status-danger flex flex-col gap-3 rounded-surface border p-4 sm:flex-row sm:items-center sm:justify-between"
         >
           <div className="flex items-start gap-2 text-sm text-destructive">
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
@@ -429,7 +430,7 @@ export function PersonalManualPage() {
       {focusMessage ? (
         <div
           role="status"
-          className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-foreground"
+          className="alios-surface-muted px-4 py-3 text-sm text-foreground"
         >
           {focusMessage}
         </div>
@@ -441,7 +442,7 @@ export function PersonalManualPage() {
             <SectionHeader
               title={t("manual.templatesTitle")}
               description={t("manual.templatesDescription")}
-              status={<Badge variant="secondary">{templateCards.length}</Badge>}
+              status={<StatusChip tone="neutral">{templateCards.length}</StatusChip>}
             />
             <Button
               type="button"
@@ -455,61 +456,61 @@ export function PersonalManualPage() {
         </PremiumCard>
       ) : (
         <PremiumCard>
-        <div className="space-y-3 p-5 sm:space-y-4 sm:p-6">
-          <SectionHeader
-            title={t("manual.templatesTitle")}
-            description={t("manual.templatesDescription")}
-            status={<Badge variant="secondary">{t("manual.localOnlyNote")}</Badge>}
-          />
-          <p className="max-w-3xl text-sm leading-7 text-muted-foreground">
-            {t("manual.templatesNote")}
-          </p>
-          <div className="grid gap-2 sm:gap-3 md:grid-cols-2 xl:grid-cols-3">
-            {templateCards.map((template) => (
-              <button
-                key={template.id}
-                type="button"
-                onClick={() => openTemplateForm(template.id)}
-                className="min-w-0 rounded-[1.5rem] border border-border/70 bg-background/80 p-3 text-start shadow-sm transition hover:-translate-y-0.5 hover:border-primary/35 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:p-4"
-              >
-                <div className="flex min-w-0 items-start justify-between gap-3">
-                  <div className="min-w-0 flex-1 space-y-1">
-                    <p className="break-words text-[0.95rem] font-semibold leading-6 sm:text-base">
-                      {template.title}
-                    </p>
-                    <p className="break-words text-sm leading-6 text-muted-foreground">
-                      {template.description}
-                    </p>
+          <div className="space-y-3 p-5 sm:space-y-4 sm:p-6">
+            <SectionHeader
+              title={t("manual.templatesTitle")}
+              description={t("manual.templatesDescription")}
+              status={<StatusChip tone="neutral">{t("manual.localOnlyNote")}</StatusChip>}
+            />
+            <p className="max-w-3xl text-sm leading-7 text-muted-foreground">
+              {t("manual.templatesNote")}
+            </p>
+            <div className="grid gap-2 sm:gap-3 md:grid-cols-2 xl:grid-cols-3">
+              {templateCards.map((template) => (
+                <button
+                  key={template.id}
+                  type="button"
+                  onClick={() => openTemplateForm(template.id)}
+                  className="alios-surface-muted min-w-0 p-3 text-start transition hover:-translate-y-0.5 hover:border-primary/35 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:p-4"
+                >
+                  <div className="flex min-w-0 items-start justify-between gap-3">
+                    <div className="min-w-0 flex-1 space-y-1">
+                      <p className="break-words text-[0.95rem] font-semibold leading-6 sm:text-base">
+                        {template.title}
+                      </p>
+                      <p className="break-words text-sm leading-6 text-muted-foreground">
+                        {template.description}
+                      </p>
+                    </div>
+                    <Sparkles className="mt-1 h-4 w-4 shrink-0 text-primary" />
                   </div>
-                  <Sparkles className="mt-1 h-4 w-4 shrink-0 text-primary" />
-                </div>
-                <div className="mt-3 flex flex-wrap gap-2 sm:mt-4">
-                  <Badge
-                    variant="secondary"
-                    className="max-w-full break-words whitespace-normal text-start leading-5"
-                  >
-                    {t(MANUAL_CATEGORY_LABEL_KEYS[template.defaultCategory])}
-                  </Badge>
-                  <Badge
-                    variant="outline"
-                    className="max-w-full break-words whitespace-normal text-start leading-5"
-                  >
-                    {t(MANUAL_IMPORTANCE_LABEL_KEYS[template.defaultImportance])}
-                  </Badge>
-                  <Badge
-                    variant="outline"
-                    className="max-w-full break-words whitespace-normal text-start leading-5"
-                  >
-                    {t(MANUAL_STATUS_LABEL_KEYS[template.defaultStatus])}
-                  </Badge>
-                </div>
-                <p className="mt-3 hidden break-words text-sm leading-6 text-muted-foreground sm:block">
-                  {template.bodyPreview}
-                </p>
-              </button>
-            ))}
+                  <div className="mt-3 flex flex-wrap gap-2 border-t border-border/70 pt-3 sm:mt-4">
+                    <Badge
+                      variant="secondary"
+                      className="max-w-full break-words whitespace-normal text-start leading-5"
+                    >
+                      {t(MANUAL_CATEGORY_LABEL_KEYS[template.defaultCategory])}
+                    </Badge>
+                    <Badge
+                      variant="outline"
+                      className="max-w-full break-words whitespace-normal text-start leading-5"
+                    >
+                      {t(MANUAL_IMPORTANCE_LABEL_KEYS[template.defaultImportance])}
+                    </Badge>
+                    <Badge
+                      variant="outline"
+                      className="max-w-full break-words whitespace-normal text-start leading-5"
+                    >
+                      {t(MANUAL_STATUS_LABEL_KEYS[template.defaultStatus])}
+                    </Badge>
+                  </div>
+                  <p className="mt-3 hidden break-words text-sm leading-6 text-muted-foreground sm:block">
+                    {template.bodyPreview}
+                  </p>
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
         </PremiumCard>
       )}
 
@@ -524,7 +525,7 @@ export function PersonalManualPage() {
                 : t("manual.newEntry")
             }
             description={t("manual.formDescription")}
-            status={<Badge variant="secondary">{t("manual.userWrittenOnly")}</Badge>}
+            status={<StatusChip tone="neutral">{t("manual.userWrittenOnly")}</StatusChip>}
           />
           {!formOpen ? (
             <Button type="button" onClick={openCreateForm}>
@@ -551,10 +552,10 @@ export function PersonalManualPage() {
           <SectionHeader
             title={t("manual.filters")}
             description={t("manual.filtersDescription")}
-            status={<Badge variant="secondary">{filteredEntries.length}</Badge>}
+            status={<StatusChip tone="neutral">{filteredEntries.length}</StatusChip>}
           />
 
-          <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_12rem_12rem_auto]">
+          <SoftPanel className="grid gap-3 md:grid-cols-[minmax(0,1fr)_12rem_12rem_auto]">
             <div className="relative">
               <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -592,24 +593,24 @@ export function PersonalManualPage() {
               ))}
             </Select>
             <div className="flex flex-wrap gap-2">
-              <Button type="button" onClick={handleSearch}>
+              <Button type="button" className="w-full sm:w-auto" onClick={handleSearch}>
                 {t("manual.search")}
               </Button>
               {hasActiveFilters ? (
-                <Button type="button" variant="ghost" onClick={() => void clearFilters()}>
+                <Button type="button" variant="ghost" className="w-full sm:w-auto" onClick={() => void clearFilters()}>
                   <X className="me-2 h-4 w-4" />
                   {t("manual.clearFilters")}
                 </Button>
               ) : null}
             </div>
-          </div>
+          </SoftPanel>
         </div>
       </PremiumCard>
 
       {isLoading ? (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" aria-label={t("manual.loading")}>
           {[0, 1, 2].map((item) => (
-            <div key={item} className="h-72 animate-pulse rounded-[1.75rem] border bg-muted/60" />
+            <div key={item} className="alios-surface-muted h-72 animate-pulse bg-muted/60" />
           ))}
         </div>
       ) : filteredEntries.length === 0 ? (
