@@ -2,6 +2,14 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 187B - Figma Foundation Variable Specification
+
+- Created `docs/FIGMA_FOUNDATION_VARIABLE_SPEC_STAGE_187B.md` to define the exact Figma foundation variables for manual Figma creation
+- Documented color variables for background, surfaces, text, borders, status colors, focus, and accent-controlled action colors across light and dark modes
+- Documented accent modes for Default, Violet, Rose, Amber, Emerald, and Slate using the existing AliOS accent palette
+- Documented typography, spacing, radius, and elevation variable specifications from the existing design tokens
+- Kept the stage documentation-only with no `src` change, application behavior change, dependency change, test change, storage/schema/localStorage/backend change, AI, telemetry, analytics, or Simple View / Full View behavior change
+
 ## Stage 187A - Figma Core Component Mapping
 
 - Created `docs/FIGMA_CORE_COMPONENT_MAPPING_STAGE_187A.md` to map existing AliOS shared UI components to future Figma core components
