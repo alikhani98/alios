@@ -2,6 +2,15 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 185 - Figma Design System Foundation Preparation
+
+- Created `docs/FIGMA_DESIGN_SYSTEM_MAPPING_STAGE_185.md` to prepare AliOS for a professional Figma Design System workflow
+- Audited the current implementation sources for tokens, semantic colors, shared UI primitives, Tailwind theme mapping, accent behavior, and existing design-system documentation
+- Documented foundation mapping for light/dark color variables, semantic color roles, accent modes, typography, spacing, radius, elevation, and surface hierarchy
+- Documented code-to-Figma component mapping for buttons, inputs, selects, textareas, feedback states, cards, SoftPanel, elevated surfaces, muted surfaces, and disclosure sections
+- Defined future Figma library structure, naming conventions, variant conventions, and handoff guardrails
+- Kept the stage documentation-only with no page redesign, source behavior change, storage change, schema change, migration, backup change, route change, localStorage key change, dependency, backend/cloud/sync, AI, telemetry, analytics, or Simple View / Full View behavior change
+
 ## Stage 184 - Design System Documentation and Figma Preparation
 
 - Created a complete AliOS design-system documentation layer for future Figma work and future project architects
