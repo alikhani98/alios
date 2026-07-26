@@ -2,6 +2,13 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 187A - Figma Core Component Mapping
+
+- Created `docs/FIGMA_CORE_COMPONENT_MAPPING_STAGE_187A.md` to map existing AliOS shared UI components to future Figma core components
+- Documented Button variants, sizes, and states; Card, PremiumCard, and SoftPanel surface patterns; StatusChip tones; form field patterns; and loading, error, and success feedback states
+- Added component naming conventions and code component to Figma component mapping guidance for the next controlled Figma library step
+- Kept the stage documentation-only with no `src` change, behavior change, dependency change, test change, storage/schema/localStorage/backend change, AI, telemetry, analytics, or Simple View / Full View behavior change
+
 ## Stage 186A - Figma Component Inventory and Handoff Checklist
 
 - Created `docs/FIGMA_COMPONENT_INVENTORY_STAGE_186.md` as a controlled handoff package before creating the actual AliOS Figma library
