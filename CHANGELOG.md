@@ -2,6 +2,14 @@
 
 This changelog records completed AliOS development stages.
 
+## Stage 190 - Figma Shared Component Library Specification
+
+- Created `docs/FIGMA_COMPONENT_LIBRARY_STAGE_190.md` to define the AliOS shared Figma component library structure
+- Documented button, form, card, surface, status, feedback, and navigation component families using the existing shared UI implementation as the source of truth
+- Defined component, variant, property, and versioning rules plus the Figma organization structure across Foundations, Components, Patterns, Screens, and Documentation
+- Explicitly documented when requested Figma artifacts such as `Search`, `Tag`, and `Loading Skeleton` are composition/reference items rather than standalone runtime primitives
+- Kept the stage documentation-only with no `src` change, test change, package/dependency change, application behavior change, or storage/schema/migration/route change
+
 ## Stage 188 - Figma Screen Assembly and Handoff Workflow
 
 - Created `docs/FIGMA_SCREEN_ASSEMBLY_HANDOFF_STAGE_188.md` to define the end-to-end workflow for assembling AliOS Figma screens from approved design-system layers
