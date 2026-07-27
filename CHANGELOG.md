@@ -1,5 +1,14 @@
 # Changelog
 
+## Stage 213A - Sync Foundation Preparation
+
+- Audited the current AliOS persistence split between repository-backed Dexie records and browser-only preference state before any future account or cloud-sync work
+- Added a pure syncable-entity catalog in `src/core/sync/syncableEntities.ts` so repository-backed entity ownership, Dexie tables, and backup fields are explicit in code
+- Added minimal provider-agnostic sync metadata contracts in `src/core/sync/syncMetadata.ts` for future optional remote adapters without activating network behavior
+- Added focused tests that guard the new syncable-entity catalog against duplicate definitions
+- Documented confirmed coupling risks, including scattered direct `localStorage` reads and hardcoded preference assumptions, in `docs/SYNC_FOUNDATION_STAGE_213A.md`
+- Kept the stage architecture-preparation only: no authentication, account model, Supabase integration, network activity, UI change, route change, storage behavior change, schema change, migration, backup-format change, business-logic change, or dependency change
+
 This changelog records completed AliOS development stages.
 
 ## Stage 203 - Dashboard Visual Upgrade Implementation Phase 1
