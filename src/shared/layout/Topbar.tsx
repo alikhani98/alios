@@ -33,6 +33,7 @@ import {
 import {
   DEFAULT_APPEARANCE_PREFERENCE,
   parseAppearancePreference,
+  resolveAppearance,
 } from "@/shared/preferences/appearance";
 import {
   getDisplayNameInitials,
@@ -107,6 +108,15 @@ export function Topbar({
   const [savedMessage, setSavedMessage] = useState<string | null>(null);
   const savedMessageTimer = useRef<number | null>(null);
   const currentAppearance = parseAppearancePreference(appearancePreference);
+  const resolvedAppearance =
+    currentAppearance === "system"
+      ? resolveAppearance(
+          currentAppearance,
+          typeof window !== "undefined"
+            ? window.matchMedia("(prefers-color-scheme: dark)").matches
+            : false
+        )
+      : currentAppearance;
   const hasDisplayName = displayName.trim().length > 0;
   const initials = getDisplayNameInitials(displayName);
 
@@ -472,7 +482,7 @@ export function Topbar({
                 {hasDisplayName ? initials : <UserCircle className="h-6 w-6" />}
               </div>
               <div className="min-w-0">
-                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                <p className="text-xs font-medium text-muted-foreground">
                   {t("settings.editProfile")}
                 </p>
                 <p className="truncate text-sm font-semibold">
@@ -537,7 +547,7 @@ export function Topbar({
                 {accentColorOptions.map(({ value, labelKey }) => {
                   const palette = getAccentColorThemeVariables(
                     value,
-                    currentAppearance === "dark"
+                    resolvedAppearance === "dark"
                   );
                   const isSelected = accentColorPreference === value;
 

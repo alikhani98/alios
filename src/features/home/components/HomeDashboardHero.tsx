@@ -126,7 +126,7 @@ export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
                     <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
                     {formatDate(new Date())}
                   </p>
-                  <p className="text-sm font-semibold uppercase tracking-[0.14em] text-primary-foreground/80">
+                  <p className="text-sm font-semibold text-primary-foreground/80">
                     {t("home.mit")}
                   </p>
                 </div>
@@ -199,7 +199,7 @@ export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
                 </Link>
               </Button>
             </div>
-            <div className="mt-3 grid grid-cols-2 gap-3">
+            <div className="mt-3 grid grid-cols-1 gap-3 min-[400px]:grid-cols-2">
               {heroMetrics.map((metric) => (
                 <SoftPanel
                   key={metric.label}
