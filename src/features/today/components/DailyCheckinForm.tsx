@@ -40,8 +40,8 @@ export function DailyCheckinForm({
       className="grid gap-5"
       onSubmit={handleSubmit((values) => void onSubmit(values))}
     >
-      <div className="alios-surface-muted grid gap-5 border-border/60 p-5">
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-5 xl:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)]">
+        <div className="alios-surface-muted grid gap-4 border-border/60 p-4 sm:grid-cols-2">
           {[
             ["sleepQuality", t("today.sleepQuality")],
             ["energyLevel", t("today.energy")],
@@ -77,39 +77,42 @@ export function DailyCheckinForm({
             </Select>
           </div>
         </div>
-      </div>
 
-      <div className="alios-surface-muted grid gap-4 border-border/60 p-5 md:grid-cols-2">
-        <div className="grid gap-2">
-          <label htmlFor="checkin-smoking" className="text-sm font-medium">
-            {t("today.smokingStatus")}
-          </label>
-          <Select id="checkin-smoking" {...register("smokingStatus")}>
-            {SMOKING_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {t(option.labelKey)}
-              </option>
-            ))}
-          </Select>
+        <div className="grid gap-5">
+          <div className="alios-surface-muted grid gap-4 border-border/60 p-4">
+            <div className="grid gap-2">
+              <label htmlFor="checkin-smoking" className="text-sm font-medium">
+                {t("today.smokingStatus")}
+              </label>
+              <Select id="checkin-smoking" {...register("smokingStatus")}>
+                {SMOKING_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {t(option.labelKey)}
+                  </option>
+                ))}
+              </Select>
+            </div>
+
+            <label className="flex min-h-11 items-center gap-3 rounded-control border border-input bg-background px-4 py-3 text-sm font-medium">
+              <input
+                type="checkbox"
+                className="h-5 w-5 rounded border-input accent-primary"
+                {...register("medicationDone")}
+              />
+              {t("today.medicationDone")}
+            </label>
+          </div>
         </div>
-
-        <label className="flex min-h-11 items-center gap-3 rounded-control border border-input bg-background px-4 py-2 text-sm font-medium">
-          <input
-            type="checkbox"
-            className="h-5 w-5 rounded border-input accent-primary"
-            {...register("medicationDone")}
-          />
-          {t("today.medicationDone")}
-        </label>
       </div>
 
-      <div className="alios-surface-muted grid gap-2 border-border/60 p-5">
+      <div className="alios-surface-muted grid gap-2 border-border/60 p-4">
         <label htmlFor="checkin-notes" className="text-sm font-medium">
           {t("common.notes")}
         </label>
         <Textarea
           id="checkin-notes"
           placeholder={t("today.notesPlaceholder")}
+          className="min-h-28"
           {...register("notes")}
         />
       </div>
