@@ -1,5 +1,12 @@
 # Changelog
 
+## Stage 208 - Finance Experience Redesign
+
+- Reworked Finance into a financial-awareness workspace that strengthens current context, obligation visibility, and entry-point clarity without changing Finance behavior
+- Preserved the Stage 208 Finance redesign while repairing the branch against the current merged redesign chain on `main`
+- Kept the stage UI-only: no finance calculations, repositories, storage, schemas, migrations, routes, business logic, or dependency changes
+- Updated project history to reflect the repaired Stage 208 branch in sequence with the other experience redesign stages
+
 ## Stage 207 - Goals Experience Redesign
 
 - Reworked Goals into a clearer workspace that elevates active goal context, review-due attention, and template-driven creation without changing goal logic

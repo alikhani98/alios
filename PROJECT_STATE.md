@@ -11,6 +11,14 @@
 
 
 
+## Stage 208 Finance Experience Redesign
+
+- Stage 208 was repaired against the latest verified `origin/main` commit `a52d4d9b352e225f56bdfdc77b3961e12a9252bc`, which includes PR #190 and the Stage 207 Goals experience redesign merge.
+- Finance now uses the redesigned financial-awareness workspace that emphasizes current money context, obligation pressure, and clearer action entry points while preserving the underlying Finance behavior.
+- The repair merge kept the Stage 208 Finance UX redesign compatible with current `main` without changing finance calculations, repositories, storage, schemas, migrations, routes, business logic, or dependencies.
+- Recommended next stage: Stage 209 should continue the redesign chain by refining Personal Manual as a calmer personal knowledge workspace on top of the now-merged Dashboard, Today, Weekly Review, Goals, and Finance experience work.
+
+
 ## Stage 207 Goals Experience Redesign
 
 - Stage 207 was repaired against the latest verified `origin/main` commit `4c85d6cb8aac2f661af962d8dd24cf19743a6f47`, which includes PR #189 and the Stage 206 Weekly Review experience redesign merge.
