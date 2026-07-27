@@ -2,4 +2,8 @@ export * from "./appearance";
 export * from "./accentColor";
 export * from "./backupStatus";
 export * from "./profile";
+export * from "./registry";
 export * from "./routineNudges";
+export * from "./storage";
+export * from "./viewDensityMode";
+export * from "./weeklyTaskBudget";

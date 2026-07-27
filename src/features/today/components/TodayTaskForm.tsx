@@ -57,7 +57,7 @@ export function TodayTaskForm({
     >
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)]">
         <div className="grid gap-5">
-          <div className="alios-surface-muted grid gap-2 p-4">
+          <div className="alios-surface-muted grid gap-2 border-border/60 p-4">
             <label htmlFor="today-task-title" className="text-sm font-medium">
               {t("today.taskTitle")}
             </label>
@@ -73,7 +73,7 @@ export function TodayTaskForm({
             ) : null}
           </div>
 
-          <div className="alios-surface-muted grid gap-2 p-4">
+          <div className="alios-surface-muted grid gap-2 border-border/60 p-4">
             <label htmlFor="today-task-description" className="text-sm font-medium">
               {t("common.description")}
             </label>
@@ -85,14 +85,11 @@ export function TodayTaskForm({
             />
           </div>
 
-          <div className="alios-surface-muted grid min-w-0 gap-2 p-4">
+          <div className="alios-surface-muted grid min-w-0 gap-2 border-border/60 p-4">
             <label htmlFor="today-task-project" className="text-sm font-medium">
               {t("today.linkedProject")}
             </label>
-            <Select
-              id="today-task-project"
-              {...register("projectId")}
-            >
+            <Select id="today-task-project" {...register("projectId")}>
               <option value="">{t("today.noLinkedProject")}</option>
               {task?.projectId &&
               !projects.some((project) => project.id === task.projectId) ? (
@@ -117,16 +114,13 @@ export function TodayTaskForm({
         </div>
 
         <div className="grid gap-5">
-          <div className="alios-surface-muted grid gap-4 p-4">
+          <div className="alios-surface-muted grid gap-4 border-border/60 p-4">
             <div className="grid gap-4 md:grid-cols-2">
               <div className="grid gap-2">
                 <label htmlFor="today-task-status" className="text-sm font-medium">
                   {t("common.status")}
                 </label>
-                <Select
-                  id="today-task-status"
-                  {...register("status")}
-                >
+                <Select id="today-task-status" {...register("status")}>
                   {TASK_STATUS_OPTIONS.map((option) => (
                     <option key={option.value} value={option.value}>
                       {t(option.labelKey)}
@@ -139,10 +133,7 @@ export function TodayTaskForm({
                 <label htmlFor="today-task-priority" className="text-sm font-medium">
                   {t("common.priority")}
                 </label>
-                <Select
-                  id="today-task-priority"
-                  {...register("priority")}
-                >
+                <Select id="today-task-priority" {...register("priority")}>
                   {TASK_PRIORITY_OPTIONS.map((option) => (
                     <option key={option.value} value={option.value}>
                       {t(option.labelKey)}
@@ -158,11 +149,16 @@ export function TodayTaskForm({
                 className="h-5 w-5 rounded border-input accent-primary"
                 {...register("isMit")}
               />
-              {t("today.makeMit")}
+              <span className="space-y-1">
+                <span className="block">{t("today.makeMit")}</span>
+                <span className="block text-xs font-normal leading-5 text-muted-foreground">
+                  {t("today.makeMitShort")}
+                </span>
+              </span>
             </label>
           </div>
 
-          <div className="alios-surface-muted grid gap-4 p-4">
+          <div className="alios-surface-muted grid gap-4 border-border/60 p-4">
             <div className="grid gap-4 md:grid-cols-2">
               <div className="grid gap-2">
                 <label htmlFor="today-task-due-date" className="text-sm font-medium">
@@ -209,11 +205,7 @@ export function TodayTaskForm({
       </div>
 
       <div className="flex flex-col gap-3 border-t border-border/70 pt-4 sm:flex-row sm:flex-wrap">
-        <Button
-          type="submit"
-          className="w-full sm:w-auto"
-          disabled={isSubmitting}
-        >
+        <Button type="submit" className="w-full sm:w-auto" disabled={isSubmitting}>
           {isSubmitting
             ? t("common.saving")
             : task

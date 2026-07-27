@@ -80,10 +80,10 @@ export function TodayTaskCard({
           ? "min-w-0 overflow-hidden border-border/70 bg-muted/40"
           : task.isMit
             ? "min-w-0 overflow-hidden border-primary/25 bg-primary/5 shadow-sm"
-            : "min-w-0 overflow-hidden border-border/70"
+            : "min-w-0 overflow-hidden border-border/70 bg-card/95"
       }
     >
-      <CardContent className="grid min-w-0 gap-4 p-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
+      <CardContent className="grid min-w-0 gap-5 p-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
         <div className="min-w-0 space-y-3">
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2">
@@ -132,7 +132,7 @@ export function TodayTaskCard({
             </div>
           </div>
           {task.description ? (
-            <div className="alios-surface-muted px-4 py-3">
+            <div className="alios-surface-muted border-border/60 px-4 py-3">
               <p className="break-words whitespace-pre-wrap text-sm leading-7 text-muted-foreground">
                 {task.description}
               </p>

@@ -4,11 +4,7 @@ import { useForm } from "react-hook-form";
 import type { DailyCheckin } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
 import { Button, Select, Textarea } from "@/shared/ui";
-import {
-  LEVEL_OPTIONS,
-  SMOKING_OPTIONS,
-  STRESS_OPTIONS,
-} from "../constants";
+import { LEVEL_OPTIONS, SMOKING_OPTIONS, STRESS_OPTIONS } from "../constants";
 import {
   dailyCheckinFormSchema,
   type DailyCheckinFormValues,
@@ -45,7 +41,7 @@ export function DailyCheckinForm({
       onSubmit={handleSubmit((values) => void onSubmit(values))}
     >
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)]">
-        <div className="alios-surface-muted grid gap-4 p-4 sm:grid-cols-2">
+        <div className="alios-surface-muted grid gap-4 border-border/60 p-4 sm:grid-cols-2">
           {[
             ["sleepQuality", t("today.sleepQuality")],
             ["energyLevel", t("today.energy")],
@@ -72,10 +68,7 @@ export function DailyCheckinForm({
             <label htmlFor="checkin-stress" className="text-sm font-medium">
               {t("today.stress")}
             </label>
-            <Select
-              id="checkin-stress"
-              {...register("stressLevel")}
-            >
+            <Select id="checkin-stress" {...register("stressLevel")}>
               {STRESS_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
                   {t(option.labelKey)}
@@ -86,15 +79,12 @@ export function DailyCheckinForm({
         </div>
 
         <div className="grid gap-5">
-          <div className="alios-surface-muted grid gap-4 p-4">
+          <div className="alios-surface-muted grid gap-4 border-border/60 p-4">
             <div className="grid gap-2">
               <label htmlFor="checkin-smoking" className="text-sm font-medium">
                 {t("today.smokingStatus")}
               </label>
-              <Select
-                id="checkin-smoking"
-                {...register("smokingStatus")}
-              >
+              <Select id="checkin-smoking" {...register("smokingStatus")}>
                 {SMOKING_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>
                     {t(option.labelKey)}
@@ -115,7 +105,7 @@ export function DailyCheckinForm({
         </div>
       </div>
 
-      <div className="alios-surface-muted grid gap-2 p-4">
+      <div className="alios-surface-muted grid gap-2 border-border/60 p-4">
         <label htmlFor="checkin-notes" className="text-sm font-medium">
           {t("common.notes")}
         </label>

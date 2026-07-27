@@ -1,9 +1,14 @@
 import { AppProviders } from "@/app/providers";
+import type { AuthProvider } from "@/core/auth";
 import { AppRouter } from "@/app/router";
 
-export function App() {
+type AppProps = {
+  authProvider?: AuthProvider;
+};
+
+export function App({ authProvider }: AppProps) {
   return (
-    <AppProviders>
+    <AppProviders authProvider={authProvider}>
       <AppRouter />
     </AppProviders>
   );
