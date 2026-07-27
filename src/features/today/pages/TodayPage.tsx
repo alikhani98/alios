@@ -180,6 +180,11 @@ export function TodayPage() {
     0
   );
   const reviewDueProjects = projects.filter((project) => isProjectReviewDue(project));
+  const completedTaskCount = visibleTasks.filter(
+    (task) => task.status === "done" || task.status === "cancelled"
+  ).length;
+  const activeTaskCount = Math.max(visibleTasks.length - completedTaskCount, 0);
+  const mitTaskCount = visibleTasks.filter((task) => task.isMit).length;
 
   const showError = (caught: unknown, fallback: string) => {
     setActionError(caught instanceof Error ? caught.message : fallback);
@@ -377,16 +382,39 @@ export function TodayPage() {
 
   return (
     <section className="alios-page space-y-6">
-      <PremiumCard className="border-primary/15 bg-gradient-to-br from-primary/10 via-background to-background">
-        <CardContent className="grid gap-5 p-5 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.55fr)] sm:p-6">
-          <div>
+      <PremiumCard className="overflow-hidden border-primary/15 bg-gradient-to-br from-primary/10 via-background to-background">
+        <CardContent className="grid gap-6 p-5 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.55fr)] sm:p-6">
+          <div className="space-y-5">
             <SectionHeader
               icon={<CalendarDays className="h-5 w-5" />}
               title={t("today.title")}
               description={t("today.description")}
             />
+            <div className="grid gap-3 sm:grid-cols-3">
+              <SoftPanel className="gap-1 border-border/60 bg-background/80 px-4 py-3">
+                <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                  {t("common.active")}
+                </p>
+                <p className="text-2xl font-semibold leading-none">{activeTaskCount}</p>
+                <p className="text-sm text-muted-foreground">{t("today.tasks")}</p>
+              </SoftPanel>
+              <SoftPanel className="gap-1 border-border/60 bg-background/80 px-4 py-3">
+                <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                  {t("today.mit")}
+                </p>
+                <p className="text-2xl font-semibold leading-none">{mitTaskCount}</p>
+                <p className="text-sm text-muted-foreground">{t("today.tasksDescription")}</p>
+              </SoftPanel>
+              <SoftPanel className="gap-1 border-border/60 bg-background/80 px-4 py-3">
+                <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                  {t("common.completed")}
+                </p>
+                <p className="text-2xl font-semibold leading-none">{completedTaskCount}</p>
+                <p className="text-sm text-muted-foreground">{t("home.completion")}</p>
+              </SoftPanel>
+            </div>
           </div>
-          <SoftPanel className="space-y-4 border-primary/20 bg-primary/5">
+          <SoftPanel className="space-y-5 border-primary/20 bg-primary/5 p-5">
             <div className="flex items-start gap-3">
               <span className="alios-icon-primary">
                 <CalendarDays className="h-5 w-5" aria-hidden="true" />
@@ -398,12 +426,25 @@ export function TodayPage() {
                 <p className="break-words text-xl font-semibold leading-8">
                   {formatDate(today)}
                 </p>
+                <p className="text-sm leading-6 text-muted-foreground">
+                  {activeTaskCount > 0
+                    ? t("common.showMoreCount", { count: activeTaskCount })
+                    : t("today.noTasksDescription")}
+                </p>
               </div>
             </div>
-            <Button type="button" className="w-full" onClick={openCreateTask}>
-              <Plus className="me-2 h-4 w-4" />
-              {t("today.newTask")}
-            </Button>
+            <div className="space-y-3">
+              <Button type="button" className="w-full" onClick={openCreateTask}>
+                <Plus className="me-2 h-4 w-4" />
+                {t("today.newTask")}
+              </Button>
+              <div className="alios-surface-muted border-primary/10 bg-background/80 px-4 py-3">
+                <p className="text-sm font-medium">{t("today.checkin")}</p>
+                <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                  {t("today.notesPlaceholder")}
+                </p>
+              </div>
+            </div>
           </SoftPanel>
         </CardContent>
       </PremiumCard>
@@ -495,7 +536,7 @@ export function TodayPage() {
                 {visibleRoutineSuggestions.map((routine) => (
                   <div
                     key={routine.id}
-                    className="alios-surface-muted grid min-w-0 gap-3 p-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
+                    className="alios-surface-muted grid min-w-0 gap-3 border-border/60 p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
                   >
                     <div className="min-w-0">
                       <p className="break-words font-medium">{routine.title}</p>
@@ -540,19 +581,30 @@ export function TodayPage() {
 
       {reviewDueProjects.length > 0 ? (
         <PremiumCard className="border-border/70 bg-card/95">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Clock3 className="h-5 w-5 text-primary" />
-              {t("projects.title")}
-            </CardTitle>
+          <CardHeader className="gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div className="space-y-1">
+              <CardTitle className="flex items-center gap-2">
+                <Clock3 className="h-5 w-5 text-primary" />
+                {t("projects.title")}
+              </CardTitle>
+              <p className="text-sm leading-6 text-muted-foreground">
+                {t("goals.markReviewed")}
+              </p>
+            </div>
+            <StatusChip tone="warning">{reviewDueProjects.length}</StatusChip>
           </CardHeader>
           <CardContent className="space-y-3">
             {reviewDueProjects.map((project) => (
               <div
                 key={project.id}
-                className="alios-surface-muted flex min-w-0 flex-col gap-3 p-3 sm:flex-row sm:items-center sm:justify-between"
+                className="alios-surface-muted flex min-w-0 flex-col gap-3 border-border/60 p-4 sm:flex-row sm:items-center sm:justify-between"
               >
-                <p className="min-w-0 break-words font-medium">{project.title}</p>
+                <div className="space-y-1">
+                  <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                    {t("goals.markReviewed")}
+                  </p>
+                  <p className="min-w-0 break-words font-medium">{project.title}</p>
+                </div>
                 <Button
                   size="sm"
                   variant="outline"
@@ -604,181 +656,198 @@ export function TodayPage() {
         </div>
       ) : null}
 
-      <PremiumCard className="border-border/70 bg-card/95">
-        <CardHeader>
-          <CardTitle>{t("today.checkin")}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <div className="alios-surface-muted h-72 animate-pulse bg-muted/60" />
-          ) : (
-            <DailyCheckinForm
-              key={checkin?.updatedAt ?? "new-checkin"}
-              checkin={checkin}
-              isSubmitting={isCheckinSubmitting}
-              onSubmit={handleCheckinSubmit}
-            />
-          )}
-        </CardContent>
-      </PremiumCard>
-
-      <PremiumCard className="border-border/70 bg-card/95">
-        <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
-          <SectionHeader
-            title={t("today.tasks")}
-            description={t("today.tasksDescription")}
-          />
-          <Button type="button" variant="outline" onClick={openCreateTask}>
-            <Plus className="me-2 h-4 w-4" />
-            {t("today.newTask")}
-          </Button>
-        </CardContent>
-      </PremiumCard>
-
-      {taskFormOpen ? (
-        <PremiumCard className="border-border/70 bg-card/95">
-          <CardHeader>
-            <CardTitle>{editingTask ? t("today.editTask") : t("today.createTask")}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <TodayTaskForm
-              key={editingTask?.id ?? "new-task"}
-              task={editingTask}
-              projects={projects}
-              isProjectsLoading={isProjectsLoading}
-              areProjectsUnavailable={Boolean(projectsError)}
-              defaultDueDate={today}
-              isSubmitting={isTaskSubmitting}
-              onSubmit={handleTaskSubmit}
-              onCancel={closeTaskForm}
-            />
-          </CardContent>
-        </PremiumCard>
-      ) : null}
-
-      {projectsError ? (
-        <div
-          role="alert"
-          className="alios-surface-muted flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between"
-        >
-          <div className="flex items-start gap-2 text-sm text-muted-foreground">
-            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-            <span className="min-w-0 break-words">
-              {t("today.projectLinksUnavailable")}
-            </span>
-          </div>
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            onClick={() => void loadProjects()}
-          >
-            <RotateCcw className="me-2 h-4 w-4" />
-            {t("common.tryAgain")}
-          </Button>
-        </div>
-      ) : null}
-
-      {plannedTaskOutsideToday ? (
-        <div
-          ref={plannedTaskRef}
-          className={cn(
-            "scroll-mt-24 rounded-2xl transition-[transform,box-shadow,border-color] duration-200 ease-out motion-reduce:transition-none motion-reduce:transform-none",
-            focusedTaskId === plannedTaskOutsideToday.id
-              ? "ring-2 ring-primary/50 ring-offset-2 ring-offset-background shadow-lg shadow-primary/10"
-              : null
-          )}
-        >
-          <PremiumCard className="border-primary/25 bg-primary/5">
-            <CardContent className="space-y-4 p-5 sm:p-6">
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(20rem,0.44fr)]">
+        <div className="space-y-6">
+          <PremiumCard className="border-border/70 bg-card/95">
+            <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
               <SectionHeader
-                eyebrow={t("weeklyReview.title")}
-                title={t("weeklyReview.nextFocusLabel")}
-                description={weeklyPlanFocus.plan?.focusTitle}
-                actions={
-                  <span className="text-sm text-muted-foreground">
-                    {plannedTaskOutsideToday.dueDate
-                      ? formatDate(plannedTaskOutsideToday.dueDate)
-                      : t("common.notRecorded")}
-                  </span>
-                }
+                title={t("today.tasks")}
+                description={t("today.tasksDescription")}
               />
-              <TodayTaskCard
-                task={plannedTaskOutsideToday}
-                linkedProject={findLinkedProject(plannedTaskOutsideToday, projects)}
-                isLinkedProjectLoading={isProjectsLoading}
-                isBusy={busyTaskId === plannedTaskOutsideToday.id}
-                contextLabel={t("weeklyReview.title")}
-                allowMit={false}
-                onEdit={() => openEditTask(plannedTaskOutsideToday)}
-                onStatusChange={(status) => handleStatusChange(plannedTaskOutsideToday, status)}
-                onSelectMit={() => handleSelectMit(plannedTaskOutsideToday)}
-                onDelete={() => handleDeleteTask(plannedTaskOutsideToday)}
-              />
+              <div className="flex flex-col gap-2 sm:items-end">
+                <Button type="button" variant="outline" onClick={openCreateTask}>
+                  <Plus className="me-2 h-4 w-4" />
+                  {t("today.newTask")}
+                </Button>
+                <StatusChip tone={activeTaskCount > 0 ? "primary" : "neutral"}>
+                  {visibleTasks.length}
+                </StatusChip>
+              </div>
             </CardContent>
           </PremiumCard>
-        </div>
-      ) : null}
 
-      {isLoading ? (
-        <div className="space-y-3" aria-label={t("today.loadingTasks")}>
-          {[0, 1, 2].map((item) => (
-            <div key={item} className="alios-surface-muted h-28 animate-pulse bg-muted/60" />
-          ))}
-        </div>
-      ) : visibleTasks.length === 0 ? (
-        <EmptyState
-          icon={<CheckSquare2 className="h-6 w-6" />}
-          title={t("today.noTasks")}
-          description={t("today.noTasksDescription")}
-          actions={
-            <Button type="button" onClick={openCreateTask}>
-              <Plus className="me-2 h-4 w-4" />
-              {t("today.firstTask")}
-            </Button>
-          }
-        />
-      ) : (
-        <div className="space-y-3">
-          {displayedTasks.map((task) => (
+          {taskFormOpen ? (
+            <PremiumCard className="border-border/70 bg-card/95">
+              <CardHeader className="gap-2">
+                <CardTitle>{editingTask ? t("today.editTask") : t("today.createTask")}</CardTitle>
+                <p className="text-sm leading-6 text-muted-foreground">
+                  {t("today.tasksDescription")}
+                </p>
+              </CardHeader>
+              <CardContent>
+                <TodayTaskForm
+                  key={editingTask?.id ?? "new-task"}
+                  task={editingTask}
+                  projects={projects}
+                  isProjectsLoading={isProjectsLoading}
+                  areProjectsUnavailable={Boolean(projectsError)}
+                  defaultDueDate={today}
+                  isSubmitting={isTaskSubmitting}
+                  onSubmit={handleTaskSubmit}
+                  onCancel={closeTaskForm}
+                />
+              </CardContent>
+            </PremiumCard>
+          ) : null}
+
+          {projectsError ? (
             <div
-              key={task.id}
-              ref={(node) => {
-                taskRefs.current[task.id] = node;
-              }}
+              role="alert"
+              className="alios-surface-muted flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <div className="flex items-start gap-2 text-sm text-muted-foreground">
+                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                <span className="min-w-0 break-words">
+                  {t("today.projectLinksUnavailable")}
+                </span>
+              </div>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => void loadProjects()}
+              >
+                <RotateCcw className="me-2 h-4 w-4" />
+                {t("common.tryAgain")}
+              </Button>
+            </div>
+          ) : null}
+
+          {plannedTaskOutsideToday ? (
+            <div
+              ref={plannedTaskRef}
               className={cn(
                 "scroll-mt-24 rounded-2xl transition-[transform,box-shadow,border-color] duration-200 ease-out motion-reduce:transition-none motion-reduce:transform-none",
-                focusedTaskId === task.id
+                focusedTaskId === plannedTaskOutsideToday.id
                   ? "ring-2 ring-primary/50 ring-offset-2 ring-offset-background shadow-lg shadow-primary/10"
                   : null
               )}
             >
-              <TodayTaskCard
-                task={task}
-                linkedProject={findLinkedProject(task, projects)}
-                isLinkedProjectLoading={isProjectsLoading}
-                isBusy={busyTaskId === task.id}
-                onEdit={() => openEditTask(task)}
-                onStatusChange={(status) => handleStatusChange(task, status)}
-                onSelectMit={() => handleSelectMit(task)}
-                onDelete={() => handleDeleteTask(task)}
-              />
+              <PremiumCard className="border-primary/25 bg-primary/5">
+                <CardContent className="space-y-4 p-5 sm:p-6">
+                  <SectionHeader
+                    eyebrow={t("weeklyReview.title")}
+                    title={t("weeklyReview.nextFocusLabel")}
+                    description={weeklyPlanFocus.plan?.focusTitle}
+                    actions={
+                      <span className="text-sm text-muted-foreground">
+                        {plannedTaskOutsideToday.dueDate
+                          ? formatDate(plannedTaskOutsideToday.dueDate)
+                          : t("common.notRecorded")}
+                      </span>
+                    }
+                  />
+                  <TodayTaskCard
+                    task={plannedTaskOutsideToday}
+                    linkedProject={findLinkedProject(plannedTaskOutsideToday, projects)}
+                    isLinkedProjectLoading={isProjectsLoading}
+                    isBusy={busyTaskId === plannedTaskOutsideToday.id}
+                    contextLabel={t("weeklyReview.title")}
+                    allowMit={false}
+                    onEdit={() => openEditTask(plannedTaskOutsideToday)}
+                    onStatusChange={(status) => handleStatusChange(plannedTaskOutsideToday, status)}
+                    onSelectMit={() => handleSelectMit(plannedTaskOutsideToday)}
+                    onDelete={() => handleDeleteTask(plannedTaskOutsideToday)}
+                  />
+                </CardContent>
+              </PremiumCard>
             </div>
-          ))}
-          {visibleTasks.length > taskPreviewLimit ? (
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full sm:w-auto"
-              onClick={() => setShowAllTasks((current) => !current)}
-            >
-              {showAllTasks
-                ? t("common.showFewer")
-                : t("common.showMoreCount", { count: hiddenTaskCount })}
-            </Button>
           ) : null}
+
+          {isLoading ? (
+            <div className="space-y-3" aria-label={t("today.loadingTasks")}>
+              {[0, 1, 2].map((item) => (
+                <div key={item} className="alios-surface-muted h-28 animate-pulse bg-muted/60" />
+              ))}
+            </div>
+          ) : visibleTasks.length === 0 ? (
+            <EmptyState
+              icon={<CheckSquare2 className="h-6 w-6" />}
+              title={t("today.noTasks")}
+              description={t("today.noTasksDescription")}
+              actions={
+                <Button type="button" onClick={openCreateTask}>
+                  <Plus className="me-2 h-4 w-4" />
+                  {t("today.firstTask")}
+                </Button>
+              }
+            />
+          ) : (
+            <div className="space-y-3">
+              {displayedTasks.map((task) => (
+                <div
+                  key={task.id}
+                  ref={(node) => {
+                    taskRefs.current[task.id] = node;
+                  }}
+                  className={cn(
+                    "scroll-mt-24 rounded-2xl transition-[transform,box-shadow,border-color] duration-200 ease-out motion-reduce:transition-none motion-reduce:transform-none",
+                    focusedTaskId === task.id
+                      ? "ring-2 ring-primary/50 ring-offset-2 ring-offset-background shadow-lg shadow-primary/10"
+                      : null
+                  )}
+                >
+                  <TodayTaskCard
+                    task={task}
+                    linkedProject={findLinkedProject(task, projects)}
+                    isLinkedProjectLoading={isProjectsLoading}
+                    isBusy={busyTaskId === task.id}
+                    onEdit={() => openEditTask(task)}
+                    onStatusChange={(status) => handleStatusChange(task, status)}
+                    onSelectMit={() => handleSelectMit(task)}
+                    onDelete={() => handleDeleteTask(task)}
+                  />
+                </div>
+              ))}
+              {visibleTasks.length > taskPreviewLimit ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full sm:w-auto"
+                  onClick={() => setShowAllTasks((current) => !current)}
+                >
+                  {showAllTasks
+                    ? t("common.showFewer")
+                    : t("common.showMoreCount", { count: hiddenTaskCount })}
+                </Button>
+              ) : null}
+            </div>
+          )}
         </div>
-      )}
+
+        <div className="space-y-6">
+          <PremiumCard className="border-border/70 bg-card/95">
+            <CardHeader className="gap-2">
+              <CardTitle>{t("today.checkin")}</CardTitle>
+              <p className="text-sm leading-6 text-muted-foreground">
+                {t("today.notesPlaceholder")}
+              </p>
+            </CardHeader>
+            <CardContent>
+              {isLoading ? (
+                <div className="alios-surface-muted h-72 animate-pulse bg-muted/60" />
+              ) : (
+                <DailyCheckinForm
+                  key={checkin?.updatedAt ?? "new-checkin"}
+                  checkin={checkin}
+                  isSubmitting={isCheckinSubmitting}
+                  onSubmit={handleCheckinSubmit}
+                />
+              )}
+            </CardContent>
+          </PremiumCard>
+        </div>
+      </div>
     </section>
   );
 }

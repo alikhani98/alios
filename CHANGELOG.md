@@ -11,42 +11,21 @@
 
 This changelog records completed AliOS development stages.
 
-## Stage 203 - Dashboard Visual Upgrade Implementation Phase 1
+## Stage 201 - AliOS Master Figma File Architecture
 
-- Refined shared visual primitives for surfaces, buttons, status chips, metric cards, and empty-state composition to create a clearer hierarchy across the running application
-- Upgraded the Dashboard / Home hero with stronger MIT emphasis, calmer supporting context, clearer primary actions, and more readable quick-summary panels across mobile and desktop layouts
-- Improved Dashboard loading skeletons, error presentation, backup reminder treatment, overview card depth, and secondary-dashboard section framing to reduce visual flatness and improve scanability
-- Preserved all business logic, calculations, repositories, storage, schemas, migrations, routes, localStorage keys, backend boundaries, and dependency choices while making visible UI changes in the running app
-
-## Stage 203 - Figma Components Page Implementation Workflow
-
-- Created `docs/FIGMA_COMPONENTS_IMPLEMENTATION_STAGE_203.md` to define the implementation workflow for manually creating the AliOS `02 Components` Figma page
-- Documented the Components page structure, button checklist, form checklist, card checklist, feedback and status checklist, component naming rules, developer mapping rules, and pre-approval QA checklist
-- Explicitly recorded that this stage does not claim a real Figma components page or live Figma component set was created and that the repository remains the source of truth
-- Explicitly documented that checkbox and toggle primitives are not currently exported from `src/shared/ui` and should not be treated as implemented shared components without a future code stage
-- Kept the stage documentation-only with no `src` change, test change, package/dependency change, storage/schema/migration/backup change, localStorage/route/business-logic change, or application behavior change
-
-## Stage 202 - Figma Foundations Page Implementation Workflow
-
-- Created `docs/FIGMA_FOUNDATIONS_IMPLEMENTATION_STAGE_202.md` to define the implementation workflow for manually creating the AliOS `01 Foundations` Figma page
-- Documented the Foundations page structure, color setup checklist, typography setup checklist, layout token setup, Figma variable mapping workflow, and pre-approval QA checklist
-- Explicitly recorded that this stage does not claim a real Figma page or variable collection was created and that the repository remains the source of truth
+- Created `docs/FIGMA_MASTER_FILE_ARCHITECTURE_STAGE_201.md` to define the complete master-file structure for AliOS Figma work
+- Documented page architecture for Cover, Foundations, Components, Patterns, Screens, Prototypes, and Documentation
+- Defined foundation organization, component organization, screen organization, naming conventions, a Figma Free plan strategy, and the code-to-Figma-to-implementation workflow
 - Kept the stage documentation-only with no `src` change, test change, package/dependency change, storage/schema/migration/backup change, localStorage/route/business-logic change, or application behavior change
 
 ## Stage 200 - Dashboard Home Screen Figma Specification
 
-- Created `docs/FIGMA_DASHBOARD_SCREEN_SPECIFICATION_STAGE_200.md` to define the AliOS Dashboard / Home screen as the primary Figma reference screen based on the current implementation
-- Documented the Dashboard purpose, structure, component mapping, information hierarchy, screen states, responsive behavior, theme behavior, RTL/LTR rules, and assembly rules
-- Mapped the implemented Home hero, task and progress surfaces, weekly focus, manual summary, personal insights, secondary ecosystem sections, and quick actions to the current shared UI vocabulary
-- Explicitly documented that dedicated Home Finance snapshot and Recent Decisions sections are not currently implemented on the Dashboard and should not be invented in Figma ahead of source-backed product work
-- Kept the stage documentation-only with no `src` change, test change, package/dependency change, storage/schema/migration/backup change, localStorage/route/business-logic change, or application behavior change
+## Stage 189 - Figma Foundation Variable Implementation Preparation
 
-## Stage 199 - Decision Log Screen Figma Specification
-
-- Created `docs/FIGMA_DECISION_LOG_SCREEN_SPECIFICATION_STAGE_199.md` to define the Decision Log screen as a complete Figma-ready specification based on the current implementation
-- Documented the screen purpose, structure, component mapping, decision-card hierarchy, form grouping, review workflow, shared feedback states, responsive behavior, theme behavior, and RTL/LTR rules
-- Mapped the existing Decision Log hero, metrics, always-available form, filter controls, review-due section, and decision grid to the current shared UI vocabulary including `PremiumCard`, `SectionHeader`, `MetricCard`, `SoftPanel`, `CollapsibleSection`, `DecisionLogCard`, `DecisionLogForm`, `Badge`, `StatusChip`, `Input`, `Select`, `Textarea`, and `EmptyState`
-- Kept the stage documentation-only with no `src` change, test change, package/dependency change, storage/schema/migration/backup change, localStorage/route/business-logic change, or application behavior change
+- Created `docs/FIGMA_FOUNDATION_VARIABLE_IMPLEMENTATION_STAGE_189.md` to define the full AliOS Figma variable system and the implementation preparation rules before actual variable creation
+- Documented primitive and semantic color variables, light/dark mode aliasing, accent-mode aliasing, typography variables, spacing scale, radius variables, elevation variables, surface-system guidance, RTL/LTR rules, naming conventions, and the Figma variable creation checklist
+- Explicitly documented that Figma primitive/reference variables may exist for authoring, but publishable semantic variables must map back to the existing AliOS code tokens and approved shared behavior
+- Kept the stage documentation-only with no `src` change, logic change, test change, dependency change, package change, route/storage/schema/migration/backend/sync change, or AI/telemetry/analytics change
 
 ## Stage 188 - Figma Screen Assembly and Handoff Workflow
 
