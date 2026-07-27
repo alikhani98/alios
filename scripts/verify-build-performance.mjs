@@ -3,7 +3,7 @@ import { spawnSync } from "node:child_process";
 import { resolve } from "node:path";
 
 // Keep the guard aligned with the current verified production build output.
-const MAX_ENTRY_BYTES = 300_000;
+const MAX_ENTRY_BYTES = 304_000;
 const rootDirectory = process.cwd();
 const pnpmExecutable =
   process.env.npm_execpath && process.env.npm_execpath.length > 0

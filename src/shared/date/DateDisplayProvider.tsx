@@ -1,7 +1,10 @@
 import { createContext, useMemo, useState, type ReactNode } from "react";
 
 import { useI18n } from "@/shared/i18n";
-import { readStoredPreference, writeStoredPreference } from "@/shared/preferences";
+import {
+  readStoredPreference,
+  writeStoredPreference,
+} from "@/shared/preferences/storage";
 import {
   CALENDAR_DISPLAY_STORAGE_KEY,
   DEFAULT_CALENDAR_DISPLAY,

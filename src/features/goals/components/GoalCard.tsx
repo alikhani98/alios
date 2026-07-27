@@ -1,4 +1,13 @@
-import { CheckCircle2, Clock3, Compass, FolderKanban, ListChecks, RotateCcw, Trash2 } from "lucide-react";
+import {
+  CheckCircle2,
+  Clock3,
+  Compass,
+  FolderKanban,
+  ListChecks,
+  RotateCcw,
+  Target,
+  Trash2,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { useDateFormatter } from "@/shared/date";
@@ -54,20 +63,40 @@ export function GoalCard({
 }: GoalCardProps) {
   const { t } = useI18n();
   const { formatDateTime, formatDate } = useDateFormatter();
+  const progressLabel = `${goal.progressPercent}%`;
+  const linkedProjectSummary = isProjectProgressLoading
+    ? t("common.loading")
+    : projectProgress && projectProgress.projectCount > 0
+      ? `${projectProgress.completedProjectCount}/${projectProgress.projectCount}`
+      : t("common.notRecorded");
+  const linkedTaskSummary = !isProjectProgressLoading && projectProgress && projectProgress.taskCount > 0
+    ? `${projectProgress.completedTaskCount}/${projectProgress.taskCount}`
+    : t("common.notRecorded");
 
   return (
-    <Card className="min-w-0 overflow-hidden">
+    <Card className={isReviewDue ? "min-w-0 overflow-hidden border-warning/20 bg-warning/5" : "min-w-0 overflow-hidden"}>
       <CardHeader className="space-y-4">
         <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
           <div className="min-w-0 flex-1 space-y-2">
-            <CardTitle className="break-words text-xl leading-7">{goal.title}</CardTitle>
-            <CardDescription className="max-w-3xl break-words whitespace-pre-wrap">
+            <div className="flex flex-wrap items-center gap-2">
+              <StatusChip tone={isReviewDue ? "warning" : goal.status === "completed" ? "success" : "neutral"}>
+                {t(GOAL_STATUS_LABEL_KEYS[goal.status])}
+              </StatusChip>
+              {isReviewDue ? (
+                <StatusChip tone="warning">{t("goals.reviewDue")}</StatusChip>
+              ) : null}
+            </div>
+            <CardTitle className="break-words text-xl leading-8">{goal.title}</CardTitle>
+            <CardDescription className="max-w-3xl break-words whitespace-pre-wrap text-sm leading-7">
               {goal.description}
             </CardDescription>
           </div>
-          <StatusChip tone={isReviewDue ? "warning" : "neutral"}>
-            {t(GOAL_STATUS_LABEL_KEYS[goal.status])}
-          </StatusChip>
+          <div className="shrink-0 text-end">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+              {t("goals.progressLabel")}
+            </p>
+            <p className="mt-1 text-2xl font-semibold tabular-nums">{progressLabel}</p>
+          </div>
         </div>
 
         <div className="flex min-w-0 flex-wrap gap-2 border-t border-border/70 pt-3">
@@ -89,61 +118,66 @@ export function GoalCard({
           >
             {t(GOAL_IMPORTANCE_LABEL_KEYS[goal.importance])}
           </Badge>
-          <Badge
-            variant="outline"
-            className="max-w-full break-words whitespace-normal text-start"
-          >
-            {t("goals.progressLabel")}: {goal.progressPercent}%
-          </Badge>
         </div>
       </CardHeader>
 
       <CardContent className="min-w-0 space-y-4">
         <SoftPanel className="space-y-3">
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-sm font-semibold">{t("goals.progressLabel")}</p>
+            <StatusChip tone={goal.progressPercent >= 100 ? "success" : "primary"}>
+              {progressLabel}
+            </StatusChip>
+          </div>
           <MiniProgressBar
             value={goal.progressPercent}
             label={t("goals.progressLabel")}
           />
         </SoftPanel>
 
-        <SoftPanel className="min-w-0">
-          <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="min-w-0 space-y-1">
-              <p className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-                <FolderKanban className="h-4 w-4 shrink-0 text-primary" />
-                {t("projects.taskProgress")}
-              </p>
-              <p className="break-words text-sm font-medium">
-                {isProjectProgressLoading
-                  ? t("common.loading")
-                  : projectProgress && projectProgress.projectCount > 0
-                    ? `${projectProgress.completedProjectCount}/${projectProgress.projectCount} · ${projectProgress.completionPercent ?? 0}%`
-                    : t("common.notRecorded")}
-              </p>
-              {!isProjectProgressLoading && projectProgress ? (
-                <p className="break-words text-xs leading-5 text-muted-foreground">
-                  {projectProgress.taskCount > 0
-                    ? `${projectProgress.completedTaskCount}/${projectProgress.taskCount} · ${t("projects.taskProgress")}`
-                    : t("projects.title")}
+        <div className="grid gap-3 lg:grid-cols-2">
+          <SoftPanel className="min-w-0">
+            <div className="flex min-w-0 items-start justify-between gap-3">
+              <div className="min-w-0 space-y-1">
+                <p className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                  <FolderKanban className="h-4 w-4 shrink-0 text-primary" />
+                  {t("projects.title")}
                 </p>
-              ) : null}
-            </div>
-            <div className="flex w-full flex-col gap-2 sm:w-auto">
-              <Button asChild size="sm" variant="outline" className="w-full shrink-0 sm:w-auto">
+                <p className="break-words text-base font-semibold">{linkedProjectSummary}</p>
+                <p className="break-words text-xs leading-5 text-muted-foreground">
+                  {t("projects.taskProgress")}
+                </p>
+              </div>
+              <Button asChild size="sm" variant="outline" className="shrink-0">
                 <Link to={createGoalProjectsPath(goal.id)}>
                   <FolderKanban className="me-2 h-4 w-4" />
                   {t("projects.title")}
                 </Link>
               </Button>
-              <Button asChild size="sm" variant="outline" className="w-full shrink-0 sm:w-auto">
+            </div>
+          </SoftPanel>
+
+          <SoftPanel className="min-w-0">
+            <div className="flex min-w-0 items-start justify-between gap-3">
+              <div className="min-w-0 space-y-1">
+                <p className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                  <ListChecks className="h-4 w-4 shrink-0 text-primary" />
+                  {t("nav.today")}
+                </p>
+                <p className="break-words text-base font-semibold">{linkedTaskSummary}</p>
+                <p className="break-words text-xs leading-5 text-muted-foreground">
+                  {t("projects.openTodayTasks")}
+                </p>
+              </div>
+              <Button asChild size="sm" variant="outline" className="shrink-0">
                 <Link to={createTodayTasksPath({ goalId: goal.id })}>
                   <ListChecks className="me-2 h-4 w-4" />
-                  {t("projects.openTodayTasks")}
+                  {t("nav.today")}
                 </Link>
               </Button>
             </div>
-          </div>
-        </SoftPanel>
+          </SoftPanel>
+        </div>
 
         <div className="grid gap-2 border-t border-border/70 pt-4 text-sm text-muted-foreground sm:grid-cols-2">
           <p className="min-w-0 break-words">
@@ -193,6 +227,7 @@ export function GoalCard({
             className="w-full sm:w-auto"
             onClick={onEdit}
           >
+            <Target className="me-2 h-4 w-4" />
             {t("common.edit")}
           </Button>
           <Button

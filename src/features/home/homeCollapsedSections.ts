@@ -1,4 +1,7 @@
-import { getPreferenceStorage, writeStoredPreference } from "@/shared/preferences";
+import {
+  getPreferenceStorage,
+  writeStoredPreference,
+} from "@/shared/preferences/storage";
 
 export const HOME_COLLAPSED_SECTIONS_STORAGE_KEY =
   "alios.home.collapsedSections";

@@ -17,7 +17,11 @@ import { usePersistentBoolean, usePersistentString } from "@/shared/hooks";
 import { useI18n } from "@/shared/i18n";
 import { Badge, Button, CollapsibleSection, SoftPanel } from "@/shared/ui";
 import { aliosSurfaceMotion } from "@/shared/ui/motion";
-import { dismissMorningWarmupForToday, parseDismissedDate, shouldShowMorningWarmupNudge } from "@/shared/preferences";
+import {
+  dismissMorningWarmupForToday,
+  parseDismissedDate,
+  shouldShowMorningWarmupNudge,
+} from "@/shared/preferences/routineNudges";
 import { cn } from "@/shared/utils";
 import type { RoutineTemplateId } from "@/features/routines";
 import type { HomeCollapsibleSectionId } from "../homeCollapsedSections";

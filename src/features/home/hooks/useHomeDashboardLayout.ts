@@ -5,7 +5,7 @@ import {
   getPreferenceStorage,
   removeStoredPreference,
   writeStoredPreference,
-} from "@/shared/preferences";
+} from "@/shared/preferences/storage";
 
 import {
   HOME_DASHBOARD_LAYOUT_STORAGE_KEY,
