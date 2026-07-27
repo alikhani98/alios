@@ -14,8 +14,9 @@ describe("Stage 156 view density scope", () => {
     const helper = read("src/shared/preferences/viewDensityMode.ts");
 
     expect(helper).toContain("alios.viewDensityMode");
-    expect(helper).toContain("localStorage");
-    expect(helper).toContain("storage");
+    expect(helper).toContain("getPreferenceStorage");
+    expect(helper).toContain("writeStoredPreference");
+    expect(helper).toContain("removeStoredPreference");
     expect(helper).not.toContain("@/core/sync");
     expect(helper).not.toContain("@/features/localAi");
     expect(helper).not.toContain("@/features/settings/backup");
@@ -43,7 +44,9 @@ describe("Stage 156 view density scope", () => {
     for (const path of scopedPages) {
       const source = read(path);
       expect(
-        source.includes("alios.viewDensityMode") || source.includes("useViewDensityMode"),
+        source.includes("readStoredViewDensityMode")
+          || source.includes("useViewDensityMode")
+          || source.includes("VIEW_DENSITY_MODE_STORAGE_KEY"),
         path
       ).toBe(true);
     }

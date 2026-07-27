@@ -17,6 +17,11 @@ import {
   WEEKLY_TASK_BUDGET_STEP,
   type WeeklyTaskBudgetValidationError,
 } from "@/shared/preferences/weeklyTaskBudget";
+import {
+  getPreferenceStorage,
+  removeStoredPreference,
+  writeStoredPreference,
+} from "@/shared/preferences";
 import type { Task } from "@/shared/types";
 import {
   Badge,
@@ -47,37 +52,34 @@ import {
 } from "../weeklyTaskBudgetContent";
 
 function readStoredBudget(): number | undefined {
-  if (typeof window === "undefined") {
-    return normalizeStoredWeeklyTaskBudget(
-      globalThis.localStorage?.getItem(WEEKLY_TASK_BUDGET_STORAGE_KEY)
-    );
-  }
+  const storage = getPreferenceStorage();
 
-  try {
-    return normalizeStoredWeeklyTaskBudget(
-      window.localStorage.getItem(WEEKLY_TASK_BUDGET_STORAGE_KEY)
-    );
-  } catch {
+  if (!storage) {
     return undefined;
   }
+
+  return normalizeStoredWeeklyTaskBudget(
+    storage.getItem(WEEKLY_TASK_BUDGET_STORAGE_KEY)
+  );
 }
 
 function persistBudget(value: number | undefined): void {
-  if (typeof window === "undefined") {
+  const storage = getPreferenceStorage();
+
+  if (!storage) {
     return;
   }
 
   try {
     if (value === undefined) {
-      window.localStorage.removeItem(WEEKLY_TASK_BUDGET_STORAGE_KEY);
+      removeStoredPreference(WEEKLY_TASK_BUDGET_STORAGE_KEY, storage);
     } else {
-      window.localStorage.setItem(
+      writeStoredPreference(
         WEEKLY_TASK_BUDGET_STORAGE_KEY,
-        serializeWeeklyTaskBudget(value)
+        serializeWeeklyTaskBudget(value),
+        storage
       );
     }
-
-    window.dispatchEvent(new Event(LOCAL_PREFERENCE_CHANGE_EVENT));
   } catch {
     // Keep the visible value in memory if localStorage is unavailable.
   }

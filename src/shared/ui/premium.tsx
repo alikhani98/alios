@@ -86,7 +86,7 @@ export function SectionHeader({
     >
       <div className="min-w-0 space-y-1">
         {eyebrow ? (
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+          <p className="text-xs font-semibold text-muted-foreground">
             {eyebrow}
           </p>
         ) : null}
@@ -185,7 +185,7 @@ export function MetricCard({
           {status ? <div className="shrink-0">{status}</div> : null}
         </div>
         <div className="min-w-0 space-y-1">
-          <p className="break-words text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+          <p className="break-words text-xs font-semibold text-muted-foreground">
             {label}
           </p>
           <p className="text-[2rem] font-semibold tabular-nums leading-none tracking-tight sm:text-[2.35rem]">
@@ -236,7 +236,7 @@ export function InsightStatCard({
         </div>
 
         <div className="space-y-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+          <p className="text-xs font-semibold text-muted-foreground">
             {label}
           </p>
           <p className="text-[2rem] font-semibold tabular-nums tracking-tight sm:text-[2.25rem]">

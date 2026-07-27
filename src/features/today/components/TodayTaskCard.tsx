@@ -1,11 +1,22 @@
-import { FolderKanban, Pencil, Repeat2, Star, Trash2 } from "lucide-react";
+import {
+  CheckCircle2,
+  CircleDashed,
+  Clock3,
+  FolderKanban,
+  PauseCircle,
+  Pencil,
+  Repeat2,
+  Star,
+  Trash2,
+  XCircle,
+} from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
 import { PROJECT_STATUS_LABEL_KEYS } from "@/features/projects/constants";
 import type { Project, Task, TaskStatus } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
-import { Badge, Button, Card, CardContent, Select } from "@/shared/ui";
+import { Badge, Button, Card, CardContent, Select, StatusChip } from "@/shared/ui";
 import {
   TASK_PRIORITY_LABEL_KEYS,
   TASK_STATUS_OPTIONS,
@@ -40,28 +51,48 @@ export function TodayTaskCard({
   const { t } = useI18n();
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const completed = task.status === "done" || task.status === "cancelled";
+  const statusOption = TASK_STATUS_OPTIONS.find((option) => option.value === task.status);
+  const statusTone =
+    task.status === "done"
+      ? "success"
+      : task.status === "doing"
+        ? "primary"
+        : task.status === "deferred"
+          ? "warning"
+          : task.status === "cancelled"
+            ? "danger"
+            : "neutral";
+  const statusIcon =
+    task.status === "done"
+      ? <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />
+      : task.status === "doing"
+        ? <Clock3 className="h-3.5 w-3.5" aria-hidden="true" />
+        : task.status === "deferred"
+          ? <PauseCircle className="h-3.5 w-3.5" aria-hidden="true" />
+          : task.status === "cancelled"
+            ? <XCircle className="h-3.5 w-3.5" aria-hidden="true" />
+            : <CircleDashed className="h-3.5 w-3.5" aria-hidden="true" />;
 
   return (
     <Card
       className={
         completed
           ? "min-w-0 overflow-hidden border-border/70 bg-muted/40"
-          : "min-w-0 overflow-hidden border-border/70"
+          : task.isMit
+            ? "min-w-0 overflow-hidden border-primary/25 bg-primary/5 shadow-sm"
+            : "min-w-0 overflow-hidden border-border/70 bg-card/95"
       }
     >
-      <CardContent className="grid min-w-0 gap-4 p-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
+      <CardContent className="grid min-w-0 gap-5 p-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
         <div className="min-w-0 space-y-3">
           <div className="space-y-2">
-            <h3
-              className={
-                completed
-                  ? "min-w-0 break-words text-lg font-semibold leading-7 text-muted-foreground line-through"
-                  : "min-w-0 break-words text-lg font-semibold leading-7"
-              }
-            >
-              {task.title}
-            </h3>
             <div className="flex flex-wrap items-center gap-2">
+              <StatusChip tone={statusTone}>
+                <span className="inline-flex items-center gap-1.5">
+                  {statusIcon}
+                  {t(statusOption?.labelKey ?? "today.todo")}
+                </span>
+              </StatusChip>
               {task.isMit ? (
                 <Badge>
                   <Star className="me-1 h-3.5 w-3.5 fill-current" />
@@ -69,6 +100,19 @@ export function TodayTaskCard({
                 </Badge>
               ) : null}
               {contextLabel ? <Badge variant="secondary">{contextLabel}</Badge> : null}
+            </div>
+            <h3
+              className={
+                completed
+                  ? "min-w-0 break-words text-lg font-semibold leading-7 text-muted-foreground line-through"
+                  : task.isMit
+                    ? "min-w-0 break-words text-xl font-semibold leading-8"
+                    : "min-w-0 break-words text-lg font-semibold leading-7"
+              }
+            >
+              {task.title}
+            </h3>
+            <div className="flex flex-wrap items-center gap-2">
               {task.recurrence ? (
                 <Badge variant="secondary">
                   <Repeat2 className="me-1 h-3.5 w-3.5" />
@@ -88,7 +132,7 @@ export function TodayTaskCard({
             </div>
           </div>
           {task.description ? (
-            <div className="alios-surface-muted px-4 py-3">
+            <div className="alios-surface-muted border-border/60 px-4 py-3">
               <p className="break-words whitespace-pre-wrap text-sm leading-7 text-muted-foreground">
                 {task.description}
               </p>

@@ -1,6 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { LOCAL_PREFERENCE_CHANGE_EVENT } from "@/shared/constants/preferences";
+import {
+  getPreferenceStorage,
+  removeStoredPreference,
+  writeStoredPreference,
+} from "./storage";
 
 export type ViewDensityMode = "full" | "simple";
 
@@ -11,21 +16,6 @@ export function parseViewDensityMode(value: string | null | undefined): ViewDens
   return value === "simple" || value === "full"
     ? value
     : DEFAULT_VIEW_DENSITY_MODE;
-}
-
-function readLocalStorage(): Storage | null {
-  const storageHost =
-    typeof window === "undefined" ? globalThis : window;
-
-  if (!("localStorage" in storageHost)) {
-    return null;
-  }
-
-  try {
-    return storageHost.localStorage;
-  } catch {
-    return null;
-  }
 }
 
 function notifyLocalPreferenceChange() {
@@ -41,7 +31,7 @@ function notifyLocalPreferenceChange() {
 }
 
 export function readStoredViewDensityMode(): ViewDensityMode {
-  const storage = readLocalStorage();
+  const storage = getPreferenceStorage();
 
   if (!storage) {
     return DEFAULT_VIEW_DENSITY_MODE;
@@ -51,24 +41,26 @@ export function readStoredViewDensityMode(): ViewDensityMode {
 }
 
 export function saveViewDensityMode(value: ViewDensityMode) {
-  const storage = readLocalStorage();
+  const storage = getPreferenceStorage();
 
   if (storage) {
     if (value === DEFAULT_VIEW_DENSITY_MODE) {
-      storage.removeItem(VIEW_DENSITY_MODE_STORAGE_KEY);
+      removeStoredPreference(VIEW_DENSITY_MODE_STORAGE_KEY, storage);
     } else {
-      storage.setItem(VIEW_DENSITY_MODE_STORAGE_KEY, value);
+      writeStoredPreference(VIEW_DENSITY_MODE_STORAGE_KEY, value, storage);
     }
+    return;
   }
 
   notifyLocalPreferenceChange();
 }
 
 export function resetViewDensityModePreference() {
-  const storage = readLocalStorage();
+  const storage = getPreferenceStorage();
 
   if (storage) {
-    storage.removeItem(VIEW_DENSITY_MODE_STORAGE_KEY);
+    removeStoredPreference(VIEW_DENSITY_MODE_STORAGE_KEY, storage);
+    return;
   }
 
   notifyLocalPreferenceChange();
