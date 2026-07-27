@@ -1,5 +1,13 @@
 # Changelog
 
+## Stage 213C - Sync Profile Contract Design
+
+- Added a future sync profile contract in `src/core/sync/profileContract.ts` that defines user identity, ownership classes, preference ownership mapping, and default offline/export/sync rules
+- Added focused contract coverage in `src/core/sync/__tests__/profileContract.test.ts` to ensure every syncable entity and every registered preference category remains accounted for
+- Re-exported the new sync profile contract from `src/core/sync/index.ts`
+- Documented the future account-owned records, account preferences, device-local data, intentionally-unsynced metadata, and default conflict/offline rules in `docs/SYNC_PROFILE_CONTRACT_STAGE_213C.md`
+- Kept the stage contract-only: no authentication, Supabase, network activity, runtime behavior change, UI change, schema change, localStorage key change, or dependency change
+
 ## Stage 213B - Preference Boundary Consolidation
 
 - Added a shared preference-storage helper in `src/shared/preferences/storage.ts` to centralize safe `localStorage` reads, writes, removals, and local preference change notifications
