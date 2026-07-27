@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useStorageAdapter } from "@/core/storage";
 import { useI18n } from "@/shared/i18n";
 import type { Goal, Project, Task, WeeklyPlan } from "@/shared/types";
+import { calculateFinanceSummary } from "@/features/finance/financeCalculations";
 import { getGoalsSummary } from "@/features/goals";
 import { getLifeAreasSummary, mergeLifeAreas } from "@/features/lifeAreas";
 import { getManualEntrySummary } from "@/features/manual";
@@ -43,7 +44,7 @@ function byUpdatedAtDescending<T extends { updatedAt: string }>(a: T, b: T) {
 }
 
 export function useHomeDashboard() {
-  const { tasks, dailyCheckins, projects, journal, knowledge, goals, lifeAreas, manual, inbox, weeklyPlans } =
+  const { tasks, dailyCheckins, projects, journal, knowledge, goals, lifeAreas, manual, inbox, weeklyPlans, finance } =
     useStorageAdapter();
   const { t } = useI18n();
   const [data, setData] = useState<HomeDashboardData | null>(null);
@@ -67,6 +68,8 @@ export function useHomeDashboard() {
         manualEntries,
         inboxItems,
         weeklyPlan,
+        financeTransactions,
+        financeObligations,
       ] =
         await Promise.all([
           tasks.list(),
@@ -79,6 +82,8 @@ export function useHomeDashboard() {
           manual.list(),
           inbox.list(),
           weeklyPlans.getByWeekStart(getWeeklyPlanWeekStart()),
+          finance.listTransactions(),
+          finance.listObligations(),
         ]);
 
       const todayTasks = allTasks.filter((task) => task.dueDate === today);
@@ -91,6 +96,11 @@ export function useHomeDashboard() {
       const lifeAreaViews = mergeLifeAreas(lifeAreaEntries, t);
       const lifeAreaSummary = getLifeAreasSummary(lifeAreaViews, new Date());
       const manualSummary = getManualEntrySummary(manualEntries, new Date());
+      const financeSummary = calculateFinanceSummary(
+        financeTransactions,
+        financeObligations,
+        new Date()
+      );
 
       setData({
         tasks: allTasks,
@@ -125,6 +135,14 @@ export function useHomeDashboard() {
           averageActiveProgress: goalSummary.averageActiveProgress,
           latest: goalSummary.latestUpdatedGoal,
         },
+        finance: {
+          transactionCount: financeTransactions.length,
+          activeObligationCount: financeObligations.filter(
+            (obligation) => obligation.status === "active"
+          ).length,
+          remainingLiquidity: financeSummary.remainingLiquidity,
+          remainingObligationTotal: financeSummary.totalRemainingObligation,
+        },
         lifeAreas: {
           totalCount: lifeAreaSummary.totalCount,
           activeCount: lifeAreaSummary.activeCount,
@@ -153,6 +171,8 @@ export function useHomeDashboard() {
           knowledgeItems.length === 0 &&
           goalEntries.length === 0 &&
           lifeAreaEntries.length === 0 &&
+          financeTransactions.length === 0 &&
+          financeObligations.length === 0 &&
           manualEntries.length === 0 &&
           inboxItems.length === 0,
       });
@@ -161,7 +181,7 @@ export function useHomeDashboard() {
     } finally {
       setIsLoading(false);
     }
-  }, [dailyCheckins, goals, inbox, journal, knowledge, lifeAreas, manual, projects, tasks, t, weeklyPlans]);
+  }, [dailyCheckins, finance, goals, inbox, journal, knowledge, lifeAreas, manual, projects, tasks, t, weeklyPlans]);
 
   useEffect(() => {
     void loadDashboard();
