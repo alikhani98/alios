@@ -1,6 +1,11 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { AlertTriangle, RefreshCcw, RotateCcw } from "lucide-react";
 
+import {
+  AuthRuntimeProvider,
+  localOnlyAuthProvider,
+  type AuthProvider,
+} from "@/core/auth";
 import { StorageAdapterProvider, type StorageAdapter } from "@/core/storage";
 import { I18nProvider, useI18n } from "@/shared/i18n";
 import { DateDisplayProvider } from "@/shared/date";
@@ -18,6 +23,7 @@ import {
 type AppProvidersProps = {
   children: ReactNode;
   loadStorageAdapter?: () => Promise<StorageAdapter>;
+  authProvider?: AuthProvider;
 };
 
 type StorageAdapterModule = {
@@ -108,6 +114,7 @@ export function AppBootstrapErrorFallback({
 export function AppProviders({
   children,
   loadStorageAdapter = loadDexieStorageAdapter,
+  authProvider = localOnlyAuthProvider,
 }: AppProvidersProps) {
   const [bootstrapState, setBootstrapState] = useState<BootstrapState>({
     status: "loading",
@@ -164,9 +171,11 @@ export function AppProviders({
             }}
           />
         ) : (
-          <StorageAdapterProvider adapter={bootstrapState.adapter}>
-            {children}
-          </StorageAdapterProvider>
+          <AuthRuntimeProvider provider={authProvider}>
+            <StorageAdapterProvider adapter={bootstrapState.adapter}>
+              {children}
+            </StorageAdapterProvider>
+          </AuthRuntimeProvider>
         )}
       </DateDisplayProvider>
     </I18nProvider>

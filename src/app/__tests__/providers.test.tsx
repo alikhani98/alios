@@ -2,6 +2,7 @@ import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it } from "vitest";
 
+import { localOnlyAuthProvider } from "@/core/auth";
 import { createTestStorage, destroyTestDatabase } from "@/test/database";
 import { I18nProvider, LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
 
@@ -76,5 +77,12 @@ describe("app storage bootstrap", () => {
     expect(html).toContain("AliOS could not prepare local data");
     expect(html).toContain("Try again");
     expect(html).toContain("Reload page");
+  });
+
+  it("ships the local-only auth provider as the default runtime boundary", async () => {
+    await expect(localOnlyAuthProvider.getCurrentSession()).resolves.toMatchObject({
+      status: "unauthenticated",
+      provider: "local-only",
+    });
   });
 });

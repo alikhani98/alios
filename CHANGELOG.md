@@ -1,5 +1,13 @@
 # Changelog
 
+## Stage 214B - Auth Runtime Integration Seam
+
+- Added `AuthRuntimeProvider` and shared auth hooks so the running app has a dedicated authentication runtime boundary without enabling real authentication
+- Wired `AppProviders` and `App` to accept an injected auth provider while keeping `LocalOnlyAuthProvider` as the default shipped runtime
+- Added focused auth runtime tests covering injected-provider hydration, subscription updates, and the missing-provider guard
+- Documented the runtime seam and intentional non-changes in `docs/AUTH_RUNTIME_INTEGRATION_STAGE_214B.md`
+- Kept the stage architecture-only: no Supabase integration, no login UI, no authenticated routes, no session persistence, no dependency change, no storage change, and no visible UI change
+
 ## Stage 214A - Authentication Provider Abstraction
 
 - Added a new provider-agnostic auth boundary in `src/core/auth` with user, session, login, subscription, and provider contract types
