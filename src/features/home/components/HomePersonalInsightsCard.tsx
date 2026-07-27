@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 
 import { usePersistentString } from "@/shared/hooks";
 import { useI18n } from "@/shared/i18n";
-import { getLocalDateKey } from "@/shared/preferences";
+import { getLocalDateKey } from "@/shared/preferences/routineNudges";
 import {
   CollapsibleSection,
   EmptyState,
