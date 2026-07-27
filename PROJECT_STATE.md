@@ -11,6 +11,15 @@
 
 
 
+## Stage 207 Goals Experience Redesign
+
+- Stage 207 was repaired against the latest verified `origin/main` commit `4c85d6cb8aac2f661af962d8dd24cf19743a6f47`, which includes PR #189 and the Stage 206 Weekly Review experience redesign merge.
+- Goals now uses the redesigned workspace layout that emphasizes active goal context, review-due attention, template-led creation, and clearer separation between creation, filtering, and supporting goal workflows.
+- The branch repair preserved the Goals redesign intent while keeping current `main` compatibility, including RTL/LTR-safe filter search input positioning.
+- The stage remains UI-only: no Goal business logic, calculations, repositories, storage, routes, schemas, migrations, data contracts, or dependencies changed.
+- Recommended next stage: Stage 208 should continue the redesign chain by refining Finance as a financial-awareness workspace on top of the now-merged Dashboard, Today, Weekly Review, and Goals experience work.
+
+
 ## Stage 168 Finance Trim Type Crash Fix
 
 - Stage 168 branched from the latest verified `origin/main` commit `4f2c30b6cf973361dfd15e095f02737c785550a1`.

@@ -1,5 +1,13 @@
 # Changelog
 
+## Stage 207 - Goals Experience Redesign
+
+- Reworked Goals into a clearer workspace that elevates active goal context, review-due attention, and template-driven creation without changing goal logic
+- Added a stronger hero, progress summary surfaces, and a two-column layout that separates creation/filtering from supporting review and template workflows
+- Preserved the Stage 207 goal form, filters, review-due section, template discovery flow, focus navigation, and all existing local-first goal behavior while repairing the branch against the current `main` branch
+- Kept the stage UI-only: no business logic, calculations, repositories, storage, routes, schemas, migrations, data contracts, or dependency changes
+- Updated the Goals filter search affordance to stay compatible with current RTL/LTR direction handling from `main`
+
 ## Stage 214B - Auth Runtime Integration Seam
 
 - Added `AuthRuntimeProvider` and shared auth hooks so the running app has a dedicated authentication runtime boundary without enabling real authentication
