@@ -5,10 +5,10 @@ import {
   createBackupStatusMetadata,
   getBackupFreshness,
   readStoredBackupStatus,
+  writeStoredBackupStatus,
   type BackupStatusFreshness,
   type BackupStatusMetadata,
-  writeStoredBackupStatus,
-} from "@/shared/preferences";
+} from "@/shared/preferences/backupStatus";
 
 function readStatus(): BackupStatusMetadata | null {
   return readStoredBackupStatus();

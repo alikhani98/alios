@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 
 import { usePersistentBoolean, usePersistentString } from "@/shared/hooks";
 import { useI18n } from "@/shared/i18n";
-import { getLocalDateKey } from "@/shared/preferences";
+import { getLocalDateKey } from "@/shared/preferences/routineNudges";
 import { Badge, Button, CollapsibleSection } from "@/shared/ui";
 import { cn } from "@/shared/utils";
 
