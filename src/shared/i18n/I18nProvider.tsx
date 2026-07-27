@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 
-import { readStoredPreference, writeStoredPreference } from "@/shared/preferences";
+import {
+  readStoredPreference,
+  writeStoredPreference,
+} from "@/shared/preferences/storage";
 import {
   DEFAULT_LANGUAGE,
   getDirection,
