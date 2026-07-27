@@ -1,5 +1,13 @@
 # Changelog
 
+## Stage 214A - Authentication Provider Abstraction
+
+- Added a new provider-agnostic auth boundary in `src/core/auth` with user, session, login, subscription, and provider contract types
+- Added a shipped `LocalOnlyAuthProvider` that reports a safe unauthenticated local-only state without enabling any account flow
+- Added focused auth-boundary tests covering current-user, current-session, login rejection, refresh behavior, and auth-state subscription
+- Documented the architecture and intentional non-changes in `docs/AUTH_PROVIDER_ABSTRACTION_STAGE_214A.md`
+- Kept the stage architecture-only: no Supabase integration, no login UI, no route guards, no session persistence, no dependency change, no storage change, and no runtime behavior change
+
 ## Stage 213C - Sync Profile Contract Design
 
 - Added a future sync profile contract in `src/core/sync/profileContract.ts` that defines user identity, ownership classes, preference ownership mapping, and default offline/export/sync rules
