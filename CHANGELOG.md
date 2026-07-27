@@ -1,5 +1,13 @@
 # Changelog
 
+## Stage 214D - First Login Local Record Association Contract
+
+- Added a future local-record association contract in `src/core/auth/localRecordAssociationContract.ts` covering first-login claim behavior, duplicate prevention, non-destructive migration rules, and sync-preparation boundaries
+- Added focused contract tests to ensure local record claiming remains explicit, non-destructive, and separate from repository record shapes and backup behavior
+- Re-exported the new local-record association contract from `src/core/auth/index.ts`
+- Documented the first-login flow, migration rules, sync-candidate conditions, and sidecar metadata requirement in `docs/LOCAL_RECORD_ASSOCIATION_CONTRACT_STAGE_214D.md`
+- Kept the stage contract-only: no Supabase integration, no login UI, no sync enablement, no schema change, no dependency change, and no runtime behavior change
+
 ## Stage 214C - Session Lifecycle Contract
 
 - Added a future auth session lifecycle contract in `src/core/auth/sessionLifecycleContract.ts` covering lifecycle phases, local-first behavior, sync handoff rules, session-storage boundaries, and security rules
