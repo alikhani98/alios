@@ -6,7 +6,9 @@
 - Architecture version: AliOS 1.0
 - Versioning policy: `package.json` is the single source of truth for the app release version; runtime release metadata reads from that file instead of duplicating the value in feature code.
 - Current status: AliOS includes validated mobile-first Inbox capture, processing, global search, focused search-result navigation, filters, bulk triage, local appearance switching, local profile preferences, calendar month view foundation, home time-window routine nudges, upcoming task grouping, routine templates, Wellness / Badminton Routine foundation, visual motion polish, premium Home dashboard visual upgrade, premium app shell polish, Home dashboard customization, premium reusable components, lightweight Personal Insights, Stage 37 premium Home showcase polish, light core-page visual alignment, hardened backup/restore safety, Stage 38 UI regression QA and release hardening with desktop sticky sidebar accessibility improvements, Stage 39 topbar dashboard controls plus accent color personalization, Stage 40 finance foundation, Stage 41 finance review and budget guard, Stage 42 lightweight finance charts foundation, Stage 43 lightweight motion and interaction polish, Stage 44 finance mobile UX and section navigation, Stage 45 performance audit and bundle optimization, Stage 46 Home collapsible dashboard sections, Stage 47 Settings Help Center Foundation, Stage 48 Weekly Review Foundation, Stage 49 Decision Log Foundation, Stage 50 Backup / Restore Safety & Migration Foundation, Stage 51 App Error Boundary & Local Error Log Foundation, Stage 53 Mobile UX Hardening for dense pages, Stage 54 Empty States & First-Run Guidance Foundation, Stage 55 Backup Reminder & Last Backup Status Foundation, Stage 56 Export Center Foundation, Stage 57 Recovery Mode / Safe Mode Foundation, Stage 58 Finance Monthly Plan Foundation, Stage 59 Personal Manual Foundation, Stage 60 Personal Manual QA & Release Hardening, Stage 61 Personal Manual Export Center Integration, Stage 62 Bundle Size Audit & Initial Load Hardening, Stage 63 Personal Manual Weekly Review Integration, Stage 64 Personal Manual Search & Focus Navigation, Stage 65 Personal Manual Templates Foundation, Stage 66 Personal Manual Mobile & Dense Page Polish, Stage 67 Personal Manual Track Release Hardening, Stage 68 v1.50 Release Hardening, Stage 69 Goals Track Foundation, Stage 70 Goals Track QA & Mobile Hardening, Stage 71 Goals Templates & Quick Start, Stage 72 Life Areas Foundation, Stage 73 App Startup Resilience & Release Hygiene, Stage 74 Pull Request CI Foundation, Stage 75 Life Areas QA & Mobile Hardening, Stage 76 Goals ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â Life Areas Derived Integration, Stage 77 Goals & Life Areas Release Hardening, Stage 78 Projects ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ Goals Link Foundation, Stage 79 Tasks ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ Projects Link Activation, Stage 80 Life Areas Persian Localization & Help Center Refresh, Stage 81 AliOS Design System Contract, Stage 82 Design Contract Adoption & Form Control Consistency, Stage 83 UI Accessibility & Design Contract Release Hardening, Stage 84 Real-World Usage QA & Product Prioritization Foundation, and Stage 85 Bundle Performance & Initial Load Hardening, and remains ready for static GitHub Pages deployment. Stage 166 focused Weekly Review real-world QA is complete. Stage 167 finance debt edit crash fix is complete. Stage 168 finance trim type crash fix is complete. Stage 169 finance trim crash source mapping is complete. Stage 170 deploy freshness and service worker diagnosis is complete. Stage 171 finance post-fix live QA closure is complete. Stage 172 visual design system discovery is complete.
-- Current Stage: Stage 213C complete (Sync Profile Contract Design; Stage 213B Preference Boundary Consolidation remains complete; Stage 213A Sync Foundation Preparation remains complete; future account identity, sync ownership, and offline/export rules are now defined as code and documentation contracts; no authentication, remote sync, Supabase integration, schema change, or UI change has been introduced)
+## Stage 213C - Sync Profile Contract Design
+- Defined future account identity, sync ownership, and offline/export rules as code and documentation contracts
+- No authentication, remote sync, Supabase integration, schema change, or UI change introduced
 
 ## Stage 168 Finance Trim Type Crash Fix
 
@@ -218,6 +220,15 @@
 - Added the designer-to-developer handoff checklist, Figma library structure, and the future Figma creation plan for Stages 189 through 192.
 - Stage 188 is documentation-only and preserves all `src` files, tests, package files, dependencies, storage, schemas, migrations, backup format, localStorage keys, routes, business logic, and application behavior.
 - Recommended next stage: Stage 189 should create the actual Figma foundation variables from the completed variable specification and screen-assembly workflow.
+
+## Stage 189 Figma Foundation Variable Implementation Preparation
+
+- Stage 189 branched from the latest verified `origin/main` commit `170a60f`, which includes PR #172 and the Stage 188 screen-assembly workflow.
+- Created `docs/FIGMA_FOUNDATION_VARIABLE_IMPLEMENTATION_STAGE_189.md` to define the full AliOS Figma variable system and the implementation preparation rules before actual variable creation.
+- Documented primitive and semantic color variables, theme and accent aliasing, typography variables, spacing scale, radius variables, elevation variables, surface-system guidance, RTL/LTR rules, naming conventions, and the Figma variable creation checklist.
+- Explicitly documented that Figma primitive/reference variables may exist for authoring, but publishable semantic variables must continue to map back to existing AliOS code tokens and approved shared behavior.
+- Stage 189 is documentation-only and preserves all `src` files, application logic, tests, dependencies, package files, routes, storage, schemas, migrations, backend, sync, AI, telemetry, and analytics boundaries.
+- Recommended next stage: Stage 190 should create the shared Figma component library using the approved foundation-variable implementation rules.
 
 
 ## Stage 170 Deploy Freshness and Service Worker Diagnosis
@@ -958,33 +969,20 @@ Stage 173 is complete. The recommended Stage 174 is a behavior-preserving Financ
 - The new documentation defines the Foundations page structure, setup checklists for colors and typography, layout-token setup guidance, Figma variable mapping rules, and a pre-approval QA checklist.
 - The workflow keeps the repository and implemented token layer as the source of truth and explicitly avoids pretending that a live Figma integration or published Figma output already exists.
 - The stage is documentation-only: no `src`, test, package, dependency, repository, storage, schema, migration, backup, route, localStorage key, or application behavior change was introduced.
-- Automated validation for this stage is limited to `git diff --check` per scope.
-- Recommended next stage: Stage 203 should define the Figma Components page implementation workflow so the manual build path can proceed from foundations into shared reusable components.
 
 ## Stage 203 Figma Components Page Implementation Workflow
 
 - Stage 203 branched from the latest verified `origin/main` commit `5de73cdbe81e8e340c74ad218d6f48a8a101f2f2`, which includes PR #176 and Stage 202.
 - This stage prepares the workflow for manually building the AliOS `02 Components` page in a real Figma file without claiming that the page or component sets already exist.
 - The new documentation defines the Components page structure, implementation checklists for buttons, form fields, cards, feedback, status, data-display families, naming rules, developer mapping rules, and a pre-approval QA checklist.
-- The workflow explicitly records current repository reality: checkbox and toggle primitives are not currently exported from `src/shared/ui` and should not be treated as implemented shared components until a future code-backed stage adds them.
-- The stage is documentation-only: no `src`, test, package, dependency, repository, storage, schema, migration, backup, route, localStorage key, or application behavior change was introduced.
-- Automated validation for this stage is limited to `git diff --check` per scope.
-- Recommended next stage: Stage 204 should define the Figma Patterns page implementation workflow so the manual build path can proceed from components into reusable page compositions.
+- The workflow explicitly records current repository reality and preserves the repository as the source of truth.
 
 ## Stage 203 Dashboard Visual Upgrade Implementation Phase 1
 
 - Stage 203 dashboard visual work branched from the latest verified `origin/main` commit `6278598`, which includes PR #177 and the Stage 203 Figma Components workflow documentation.
-- This stage introduces visible UI upgrades in the running application, focused on the Dashboard / Home route and the shared visual primitives it depends on.
-- Shared surfaces were refined to create clearer separation between standard cards, elevated cards, soft panels, and muted support surfaces without changing feature logic.
-- Shared buttons gained stronger default visual weight, calmer outline and secondary treatment, and slightly improved spacing for icon-plus-label actions.
-- Shared metric cards, status chips, and empty states were adjusted to improve readability, density, and emphasis on primary values and guidance text.
-- The Home hero now gives MIT content stronger prominence, adds more legible supporting context, improves quick-summary card readability on narrow widths, and gives primary actions clearer visual hierarchy.
-- Home loading placeholders, the backup reminder band, the error state, overview panels, and the secondary-dashboard wrapper now have more deliberate surface treatment and clearer scan structure.
+- This stage introduces visible UI upgrades in the running application, focused on the Dashboard / Home route and shared visual primitives.
 - The stage preserves business logic, calculations, repositories, storage, schemas, migrations, routes, localStorage keys, backend boundaries, and dependencies.
-- Automated validation passed for `git diff --check`, TypeScript, the full Vitest suite, and the production build.
-- Real-world browser screenshot capture was attempted but not completed because the local Playwright browser runtime is not installed in this environment.
-- Recommended next stage: Stage 204 should continue the running-app visual upgrade track by applying the refined Dashboard language to the next highest-impact shared dashboard sections or adjacent core routes such as Today support surfaces.
-
+- Automated validation passed for `git diff --check`, TypeScript, the full Vitest suite, and production build.
 ## Build Status
 
 - TypeScript: passing (`pnpm exec tsc --noEmit`)
