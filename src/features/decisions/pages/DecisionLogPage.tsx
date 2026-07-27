@@ -180,6 +180,10 @@ export function DecisionLogPage() {
     () => entries.filter((entry) => isDecisionNeedsReview(entry, referenceDate)),
     [entries, referenceDate]
   );
+  const activeDecisions = filteredEntries.filter(
+    (entry) => entry.status === "open" || entry.status === "decided"
+  );
+  const primaryDecision = activeDecisions[0] ?? filteredEntries[0];
   const displayedEntries = showAllDecisions
     ? filteredEntries
     : filteredEntries.slice(0, decisionPreviewLimit);
@@ -298,25 +302,106 @@ export function DecisionLogPage() {
   return (
     <section className="alios-page space-y-6">
       <PremiumCard className="border-primary/15 bg-gradient-to-br from-primary/10 via-background to-background shadow-sm">
-        <div className="p-5 sm:p-6">
-          <SectionHeader
-            eyebrow={t("decisions.title")}
-            icon={<GitBranch className="h-5 w-5" />}
-            title={t("decisions.title")}
-            description={t("decisions.description")}
-            status={<StatusChip tone="neutral">{t("decisions.localOnlyNote")}</StatusChip>}
-          />
-          {isSimpleView ? (
-            <DecisionLogContextualHelp
-              isOpen={isContextualHelpOpen}
-              onToggle={() => setIsContextualHelpOpen((current) => !current)}
+        <div className="grid gap-5 p-5 sm:p-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)]">
+          <div className="space-y-5">
+            <SectionHeader
+              eyebrow={t("decisions.title")}
+              icon={<GitBranch className="h-5 w-5" />}
+              title={t("decisions.title")}
+              description={t("decisions.description")}
+              status={<StatusChip tone="neutral">{t("decisions.localOnlyNote")}</StatusChip>}
             />
-          ) : (
-            <div className="mt-4 max-w-3xl space-y-2 text-sm leading-7 text-muted-foreground">
-              <p>{t("decisions.nonAdvisoryNote")}</p>
-              <p>{t("decisions.localOnlyDescription")}</p>
+
+            <div className="space-y-2">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                {t("decisions.reviewDue")}
+              </p>
+              <p className="break-words text-2xl font-semibold leading-9 tracking-tight sm:text-3xl">
+                {primaryDecision ? primaryDecision.title : t("decisions.emptyTitle")}
+              </p>
+              <p className="max-w-3xl text-sm leading-7 text-muted-foreground">
+                {primaryDecision
+                  ? primaryDecision.context
+                  : t("decisions.emptyDescription")}
+              </p>
             </div>
-          )}
+
+            <div className="grid gap-3 sm:grid-cols-3">
+              <SoftPanel className="gap-2 border-primary/15 bg-background/80">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                  {t("decisions.reviewDue")}
+                </p>
+                <p className="text-lg font-semibold tabular-nums">{needsReviewEntries.length}</p>
+                <p className="text-sm text-muted-foreground">{t("decisions.needsReviewSectionDescription")}</p>
+              </SoftPanel>
+              <SoftPanel className="gap-2 border-primary/15 bg-background/80">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                  {t("decisions.openDecisions")}
+                </p>
+                <p className="text-lg font-semibold tabular-nums">{filterCounts.open}</p>
+                <p className="text-sm text-muted-foreground">{t("decisions.formDescription")}</p>
+              </SoftPanel>
+              <SoftPanel className="gap-2 border-primary/15 bg-background/80">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                  {t("decisions.reviewedDecisions")}
+                </p>
+                <p className="text-lg font-semibold tabular-nums">{filterCounts.reviewed}</p>
+                <p className="text-sm text-muted-foreground">{t("decisions.localOnlyDescription")}</p>
+              </SoftPanel>
+            </div>
+          </div>
+
+          <SoftPanel className="space-y-4 border-primary/20 bg-primary/5">
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-muted-foreground">
+                {t("decisions.createDecision")}
+              </p>
+              <p className="text-xl font-semibold leading-8">
+                {needsReviewEntries.length > 0
+                  ? t("decisions.needsReviewSection")
+                  : t("decisions.formBasics")}
+              </p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
+              <Button
+                type="button"
+                className="w-full"
+                onClick={() => {
+                  setEditingDecision(undefined);
+                  clearMessages();
+                  formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                }}
+              >
+                <Plus className="me-2 h-4 w-4" />
+                {t("decisions.createButton")}
+              </Button>
+              {needsReviewEntries.length > 0 ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => {
+                    document
+                      .getElementById("decision-log-review-due")
+                      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  }}
+                >
+                  {t("decisions.needsReviewSection")}
+                </Button>
+              ) : null}
+            </div>
+            {isSimpleView ? (
+              <DecisionLogContextualHelp
+                isOpen={isContextualHelpOpen}
+                onToggle={() => setIsContextualHelpOpen((current) => !current)}
+              />
+            ) : (
+              <div className="space-y-2 text-sm leading-7 text-muted-foreground">
+                <p>{t("decisions.nonAdvisoryNote")}</p>
+                <p>{t("decisions.localOnlyDescription")}</p>
+              </div>
+            )}
+          </SoftPanel>
         </div>
       </PremiumCard>
 
@@ -377,6 +462,13 @@ export function DecisionLogPage() {
               title={editingDecision ? t("decisions.editDecision") : t("decisions.createDecision")}
               description={t("decisions.formDescription")}
               status={<StatusChip tone="neutral">{t("decisions.formStatus")}</StatusChip>}
+              actions={
+                editingDecision ? (
+                  <Button type="button" variant="outline" onClick={closeEditor}>
+                    {t("common.cancel")}
+                  </Button>
+                ) : undefined
+              }
             />
             <div className="mt-5">
               <DecisionLogForm
@@ -400,7 +492,7 @@ export function DecisionLogPage() {
               key={filter.value}
               type="button"
               variant={isSelected ? "default" : "outline"}
-              className="flex w-full items-start justify-between gap-3 text-start"
+              className="flex w-full items-start justify-between gap-3 rounded-2xl text-start"
               onClick={() => setSelectedFilter(filter.value)}
             >
               <span className="min-w-0 flex-1 break-words">{t(filter.labelKey)}</span>

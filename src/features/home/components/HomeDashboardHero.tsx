@@ -67,21 +67,21 @@ export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
         : "success";
 
   return (
-    <PremiumCard className="overflow-hidden border-primary/15 bg-gradient-to-br from-background via-background to-primary/5 shadow-md">
-      <CardContent className="grid gap-6 p-5 sm:p-6 xl:grid-cols-[minmax(0,1.4fr)_minmax(20rem,0.8fr)]">
-        <div className="space-y-5">
-          <div className="space-y-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <StatusChip tone="primary">{formatDate(new Date())}</StatusChip>
-              <StatusChip tone="neutral">{checkinSummary}</StatusChip>
-            </div>
-            <div className="space-y-2">
-              <p className="text-sm font-medium text-muted-foreground">{t("home.todayOverview")}</p>
-              <h1 className="text-3xl font-semibold tracking-tight sm:text-[2.5rem]">
-                {primaryFocus}
-              </h1>
-              <p className="max-w-3xl text-sm leading-7 text-muted-foreground">
-                {t("home.primaryDashboardDescription")}
+<PremiumCard className="overflow-hidden border-primary/15 bg-gradient-to-br from-background via-background to-primary/5 shadow-md">
+  <CardContent className="grid gap-6 p-5 sm:p-6 xl:grid-cols-[minmax(0,1.4fr)_minmax(20rem,0.8fr)]">
+    <div className="space-y-5">
+      <div className="space-y-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <StatusChip tone="primary">{formatDate(new Date())}</StatusChip>
+          <StatusChip tone="neutral">{checkinSummary}</StatusChip>
+        </div>
+        <div className="space-y-2">
+          <p className="text-sm font-medium text-muted-foreground">{t("home.todayOverview")}</p>
+          <h1 className="text-3xl font-semibold tracking-tight sm:text-[2.5rem]">
+            {primaryFocus}
+          </h1>
+          <p className="max-w-3xl text-sm leading-7 text-muted-foreground">
+            {t("home.primaryDashboardDescription")}
               </p>
             </div>
           </div>
@@ -115,9 +115,9 @@ export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
                   {t("home.dailyPlanDescription")}
                 </p>
               </div>
-              <Badge variant="secondary">
-                {completedCount} / {todayCount}
-              </Badge>
+<Badge variant="secondary">
+  {completedCount} / {todayCount}
+</Badge>
             </div>
             <MiniProgressBar value={taskCompletionProgress} label={t("home.completion")} />
             <div className="grid gap-3 lg:grid-cols-3">

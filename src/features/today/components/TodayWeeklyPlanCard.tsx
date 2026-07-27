@@ -48,7 +48,7 @@ export function TodayWeeklyPlanCard({ focus, isLoading }: TodayWeeklyPlanCardPro
                 <CalendarDays className="h-5 w-5" aria-hidden="true" />
               </span>
               <div className="min-w-0">
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                <p className="text-xs font-semibold text-muted-foreground">
                   {t("weeklyReview.title")}
                 </p>
                 <h2 className="break-words text-lg font-semibold">{focus.plan.focusTitle}</h2>
