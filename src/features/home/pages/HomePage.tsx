@@ -90,7 +90,7 @@ const simplePrimaryDashboardSectionIds = new Set<HomeDashboardSectionId>([
   "emptyState",
   "routineNudge",
   "upcomingTasks",
-  "calendar",
+  "personalInsights",
 ]);
 
 function readSimpleViewMode() {
@@ -146,6 +146,35 @@ function OverviewPanel({
   );
 }
 
+type AttentionCardProps = {
+  title: string;
+  value: number;
+  description: string;
+  tone?: "neutral" | "warning" | "danger";
+  action?: ReactNode;
+};
+
+function AttentionCard({
+  title,
+  value,
+  description,
+  tone = "neutral",
+  action,
+}: AttentionCardProps) {
+  return (
+    <SoftPanel className="h-full space-y-4 border-border/60 bg-background/85 p-5">
+      <div className="flex items-start justify-between gap-3">
+        <div className="space-y-1">
+          <p className="text-sm font-semibold">{title}</p>
+          <p className="text-sm leading-6 text-muted-foreground">{description}</p>
+        </div>
+        <StatusChip tone={tone}>{value}</StatusChip>
+      </div>
+      {action ? <div>{action}</div> : null}
+    </SoftPanel>
+  );
+}
+
 export function HomePage() {
   const { t } = useI18n();
   const { formatDate } = useDateFormatter();
@@ -172,6 +201,22 @@ export function HomePage() {
   if (!data && !isLoading && !hasError) {
     return null;
   }
+
+  const overdueTaskCount = data
+    ? data.tasks.filter(
+        (task) =>
+          typeof task.dueDate === "string" &&
+          task.dueDate < new Date().toISOString().slice(0, 10) &&
+          task.status !== "done" &&
+          task.status !== "cancelled"
+      ).length
+    : 0;
+  const reviewDueCount = data
+    ? data.goals.reviewDueCount + data.manual.reviewDueCount + data.lifeAreas.reviewDueCount
+    : 0;
+  const immediateAttentionCount = data
+    ? overdueTaskCount + reviewDueCount + data.inbox.unprocessedCount
+    : 0;
 
   const sectionOpenProps = (sectionId: HomeCollapsibleSectionId) => ({
     open: !isSectionCollapsed(sectionId),
@@ -532,14 +577,70 @@ export function HomePage() {
       ) : data ? (
         <>
           {heroSection?.content ?? null}
-          <section className="space-y-4 sm:space-y-5" aria-label={t("home.todayOverview")}>
+          {!data.isEmpty ? (
+            <section className="space-y-4" aria-label={t("home.todayOverview")}>
+              <div className="flex flex-col gap-2 px-1 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <p className="text-lg font-semibold tracking-tight sm:text-xl">
+                    {t("home.todayOverview")}
+                  </p>
+                  <p className="text-sm leading-6 text-muted-foreground">
+                    {t("home.primaryDashboardDescription")}
+                  </p>
+                </div>
+                <StatusChip tone={immediateAttentionCount > 0 ? "warning" : "neutral"}>
+                  {immediateAttentionCount}
+                </StatusChip>
+              </div>
+              <div className="grid gap-4 xl:grid-cols-3">
+                <AttentionCard
+                  title={t("home.overdue")}
+                  value={overdueTaskCount}
+                  description={t("home.futureTasks")}
+                  tone={overdueTaskCount > 0 ? "danger" : "neutral"}
+                  action={
+                    <Button asChild variant="outline" size="sm" className="w-full sm:w-auto">
+                      <Link to="/today">{t("home.goToday")}</Link>
+                    </Button>
+                  }
+                />
+                <AttentionCard
+                  title={t("home.unprocessedInbox")}
+                  value={data.inbox.unprocessedCount}
+                  description={t("home.inboxItems")}
+                  tone={data.inbox.unprocessedCount > 0 ? "warning" : "neutral"}
+                  action={
+                    <Button asChild variant="outline" size="sm" className="w-full sm:w-auto">
+                      <Link to="/inbox">{t("nav.inbox")}</Link>
+                    </Button>
+                  }
+                />
+                <AttentionCard
+                  title={t("home.goalsReviewDue")}
+                  value={reviewDueCount}
+                  description={t("home.moreDashboardDescription")}
+                  tone={reviewDueCount > 0 ? "warning" : "neutral"}
+                  action={
+                    <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                      <Button asChild variant="outline" size="sm" className="w-full sm:w-auto">
+                        <Link to="/goals">{t("nav.goals")}</Link>
+                      </Button>
+                      <Button asChild variant="ghost" size="sm" className="w-full sm:w-auto">
+                        <Link to="/manual">{t("nav.manual")}</Link>
+                      </Button>
+                    </div>
+                  }
+                />
+              </div>
+            </section>
+          ) : null}
+
+          <section className="space-y-4 sm:space-y-5" aria-label={t("home.dailyPlan")}>
             <div className="flex flex-col gap-2 px-1 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <p className="text-lg font-semibold tracking-tight sm:text-xl">
-                  {t("home.todayOverview")}
-                </p>
+                <p className="text-lg font-semibold tracking-tight sm:text-xl">{t("home.dailyPlan")}</p>
                 <p className="text-sm leading-6 text-muted-foreground">
-                  {t("home.primaryDashboardDescription")}
+                  {t("home.dailyPlanDescription")}
                 </p>
               </div>
             </div>
@@ -555,8 +656,8 @@ export function HomePage() {
             </div>
           </section>
           {secondaryDashboardSections.length ? (
-            <Card className="overflow-hidden border-primary/15 bg-card shadow-md">
-              <CardHeader className="gap-4 border-b border-primary/10 bg-muted/20 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+            <Card className="overflow-hidden border-border/70 bg-card/95 shadow-sm">
+              <CardHeader className="gap-4 border-b border-border/60 bg-muted/10 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
                 <div className="min-w-0 space-y-1">
                   <CardTitle className="text-lg">{t("home.moreDashboard")}</CardTitle>
                   <CardDescription>{t("home.moreDashboardDescription")}</CardDescription>

@@ -3,12 +3,8 @@ import { useForm } from "react-hook-form";
 
 import type { DailyCheckin } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
-import { Button, Textarea, Select } from "@/shared/ui";
-import {
-  LEVEL_OPTIONS,
-  SMOKING_OPTIONS,
-  STRESS_OPTIONS,
-} from "../constants";
+import { Button, Select, Textarea } from "@/shared/ui";
+import { LEVEL_OPTIONS, SMOKING_OPTIONS, STRESS_OPTIONS } from "../constants";
 import {
   dailyCheckinFormSchema,
   type DailyCheckinFormValues,
@@ -44,55 +40,51 @@ export function DailyCheckinForm({
       className="grid gap-5"
       onSubmit={handleSubmit((values) => void onSubmit(values))}
     >
-      <div className="alios-surface-muted grid gap-4 p-4 sm:grid-cols-2 xl:grid-cols-4">
-        {[
-          ["sleepQuality", t("today.sleepQuality")],
-          ["energyLevel", t("today.energy")],
-          ["moodLevel", t("today.mood")],
-        ].map(([name, label]) => (
-          <div key={name} className="grid gap-2">
-            <label htmlFor={`checkin-${name}`} className="text-sm font-medium">
-              {label}
+      <div className="alios-surface-muted grid gap-5 border-border/60 p-5">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {[
+            ["sleepQuality", t("today.sleepQuality")],
+            ["energyLevel", t("today.energy")],
+            ["moodLevel", t("today.mood")],
+          ].map(([name, label]) => (
+            <div key={name} className="grid gap-2">
+              <label htmlFor={`checkin-${name}`} className="text-sm font-medium">
+                {label}
+              </label>
+              <Select
+                id={`checkin-${name}`}
+                {...register(name as "sleepQuality" | "energyLevel" | "moodLevel")}
+              >
+                {LEVEL_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {t(option.labelKey)}
+                  </option>
+                ))}
+              </Select>
+            </div>
+          ))}
+
+          <div className="grid gap-2">
+            <label htmlFor="checkin-stress" className="text-sm font-medium">
+              {t("today.stress")}
             </label>
-            <Select
-              id={`checkin-${name}`}
-              {...register(name as "sleepQuality" | "energyLevel" | "moodLevel")}
-            >
-              {LEVEL_OPTIONS.map((option) => (
+            <Select id="checkin-stress" {...register("stressLevel")}>
+              {STRESS_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
                   {t(option.labelKey)}
                 </option>
               ))}
             </Select>
           </div>
-        ))}
-
-        <div className="grid gap-2">
-          <label htmlFor="checkin-stress" className="text-sm font-medium">
-            {t("today.stress")}
-          </label>
-          <Select
-            id="checkin-stress"
-            {...register("stressLevel")}
-          >
-            {STRESS_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {t(option.labelKey)}
-              </option>
-            ))}
-          </Select>
         </div>
       </div>
 
-      <div className="alios-surface-muted grid gap-4 p-4 md:grid-cols-2">
+      <div className="alios-surface-muted grid gap-4 border-border/60 p-5 md:grid-cols-2">
         <div className="grid gap-2">
           <label htmlFor="checkin-smoking" className="text-sm font-medium">
             {t("today.smokingStatus")}
           </label>
-          <Select
-            id="checkin-smoking"
-            {...register("smokingStatus")}
-          >
+          <Select id="checkin-smoking" {...register("smokingStatus")}>
             {SMOKING_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
                 {t(option.labelKey)}
@@ -111,7 +103,7 @@ export function DailyCheckinForm({
         </label>
       </div>
 
-      <div className="alios-surface-muted grid gap-2 p-4">
+      <div className="alios-surface-muted grid gap-2 border-border/60 p-5">
         <label htmlFor="checkin-notes" className="text-sm font-medium">
           {t("common.notes")}
         </label>
