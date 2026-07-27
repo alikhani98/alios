@@ -1,5 +1,13 @@
 # Changelog
 
+## Stage 214C - Session Lifecycle Contract
+
+- Added a future auth session lifecycle contract in `src/core/auth/sessionLifecycleContract.ts` covering lifecycle phases, local-first behavior, sync handoff rules, session-storage boundaries, and security rules
+- Added focused contract tests to ensure sessions stay out of preferences and backups and that sync still requires both authentication and explicit account setup
+- Re-exported the new auth session contract from `src/core/auth/index.ts`
+- Documented the lifecycle, local-first rules, sync readiness, and security boundaries in `docs/SESSION_LIFECYCLE_CONTRACT_STAGE_214C.md`
+- Kept the stage contract-only: no Supabase integration, no login UI, no token storage implementation, no route guards, no runtime behavior change, no dependency change, and no storage change
+
 ## Stage 208 - Finance Experience Redesign
 
 - Reworked Finance into a financial-awareness workspace that strengthens current context, obligation visibility, and entry-point clarity without changing Finance behavior
