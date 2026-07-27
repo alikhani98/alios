@@ -126,7 +126,7 @@ export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
                     <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
                     {formatDate(new Date())}
                   </p>
-                  <p className="text-sm font-semibold uppercase tracking-[0.14em] text-primary-foreground/80">
+                  <p className="text-sm font-semibold text-primary-foreground/80">
                     {t("home.mit")}
                   </p>
                 </div>

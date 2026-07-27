@@ -132,7 +132,7 @@ export function ManualContextualHelp({
 }
 
 export function PersonalManualPage() {
-  const { t } = useI18n();
+  const { direction, t } = useI18n();
   const { formatDateTime } = useDateFormatter();
   const { isSimpleView } = useViewDensityMode();
   const [searchParams] = useSearchParams();
@@ -557,12 +557,17 @@ export function PersonalManualPage() {
 
           <SoftPanel className="grid min-w-0 gap-3 xl:grid-cols-[minmax(0,1fr)_12rem_12rem_auto]">
             <div className="relative min-w-0">
-              <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Search
+                className={cn(
+                  "pointer-events-none absolute top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground",
+                  direction === "rtl" ? "right-3" : "left-3"
+                )}
+              />
               <Input
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder={t("manual.searchPlaceholder")}
-                className="pl-9"
+                className={direction === "rtl" ? "pr-9" : "pl-9"}
                 aria-label={t("manual.searchLabel")}
               />
             </div>
