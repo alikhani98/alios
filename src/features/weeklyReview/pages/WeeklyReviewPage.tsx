@@ -23,6 +23,7 @@ import { Link } from "react-router-dom";
 
 import { useDateFormatter } from "@/shared/date";
 import { useI18n, type TranslationKey } from "@/shared/i18n";
+import { readStoredViewDensityMode } from "@/shared/preferences/viewDensityMode";
 import type { Goal, LifeAreaKey, ManualEntry } from "@/shared/types";
 import {
   Badge,
@@ -77,7 +78,7 @@ type ReviewQueueItem = {
 function readSimpleViewMode() {
   try {
     return typeof window !== "undefined"
-      && window.localStorage.getItem("alios.viewDensityMode") === "simple";
+      && readStoredViewDensityMode() === "simple";
   } catch {
     return false;
   }
@@ -1619,6 +1620,101 @@ export function WeeklyReviewPage() {
             </CollapsibleSection>
           </div>
 
+          <div className="grid gap-5 xl:grid-cols-2">
+            <PremiumCard className="border-primary/10 bg-card/95">
+              <div className="p-5 sm:p-6">
+                <SectionHeader
+                  icon={<Sparkles className="h-5 w-5" />}
+                  title={t("weeklyReview.focusObservationsTitle")}
+                  description={t("weeklyReview.focusObservationsDescription")}
+                  status={<StatusChip tone="neutral">{summary.focusObservations.length}</StatusChip>}
+                />
+                <div className="mt-5 space-y-3">
+                  {displayedFocusObservations.map((observation, index) => (
+                    <SoftPanel key={`${observation.kind}-${index}`} className="space-y-3 alios-surface-muted">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <StatusChip tone={getObservationTone(observation) as "neutral" | "success" | "warning"}>
+                          {t(
+                            observation.tone === "good-signal"
+                              ? "weeklyReview.goodSignal"
+                              : observation.tone === "needs-review"
+                                ? "weeklyReview.needsReview"
+                                : "weeklyReview.awareness"
+                          )}
+                        </StatusChip>
+                        {observation.count !== undefined ? (
+                          <StatusChip tone="neutral">{observation.count}</StatusChip>
+                        ) : null}
+                        {observation.amount !== undefined ? (
+                          <StatusChip tone="neutral">{formatAmount(observation.amount)}</StatusChip>
+                        ) : null}
+                      </div>
+                      <p className="text-sm leading-7 text-muted-foreground">
+                        {t(getObservationMessageKey(observation))}
+                      </p>
+                    </SoftPanel>
+                  ))}
+                  {summary.focusObservations.length > insightPreviewLimit ? (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setShowAllFocusObservations((current) => !current)}
+                    >
+                      {showAllFocusObservations
+                        ? t("common.showFewer")
+                        : t("common.showMoreCount", { count: hiddenFocusObservationCount })}
+                    </Button>
+                  ) : null}
+                </div>
+              </div>
+            </PremiumCard>
+
+            <PremiumCard className="border-primary/10 bg-card/95">
+              <div className="p-5 sm:p-6">
+                <SectionHeader
+                  icon={<ArrowUpRight className="h-5 w-5" />}
+                  title={t("weeklyReview.nextFocusTitle")}
+                  description={t("weeklyReview.nextFocusDescription")}
+                  status={<StatusChip tone="neutral">{summary.suggestedFocus.length}</StatusChip>}
+                />
+                <div className="mt-5 space-y-3">
+                  {displayedSuggestedFocus.map((suggestion, index) => (
+                    <SoftPanel key={`${suggestion.kind}-${index}`} className="space-y-3 alios-surface-muted">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <StatusChip tone="primary">{t("weeklyReview.nextFocusLabel")}</StatusChip>
+                        <StatusChip tone="neutral">{t("weeklyReview.localOnlyNote")}</StatusChip>
+                      </div>
+                      <p className="text-sm leading-7 text-muted-foreground">
+                        {t(getFocusMessageKey(suggestion))}
+                      </p>
+                    </SoftPanel>
+                  ))}
+                  {summary.suggestedFocus.length > insightPreviewLimit ? (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setShowAllSuggestedFocus((current) => !current)}
+                    >
+                      {showAllSuggestedFocus
+                        ? t("common.showFewer")
+                        : t("common.showMoreCount", { count: hiddenSuggestedFocusCount })}
+                    </Button>
+                  ) : null}
+
+                  <div className="grid gap-3 border-t border-border/70 pt-4 sm:grid-cols-2 xl:grid-cols-3">
+                    {quickLinks.map(({ to, labelKey }) => (
+                      <Button key={to} asChild variant="outline" className="w-full justify-start shadow-sm">
+                        <Link to={to}>
+                          {t(labelKey)}
+                          <ArrowUpRight className="ms-2 h-4 w-4" />
+                        </Link>
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </PremiumCard>
+          </div>
         </>
       ) : null}
     </section>
