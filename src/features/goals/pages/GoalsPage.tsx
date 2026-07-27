@@ -25,21 +25,26 @@ import {
   MetricCard,
   PremiumCard,
   SectionHeader,
+  Select,
   SoftPanel,
   StatusChip,
-  Select,
 } from "@/shared/ui";
 import { cn } from "@/shared/utils";
 
+import { GoalCard } from "../components/GoalCard";
+import { GoalForm } from "../components/GoalForm";
+import { GoalTemplateDiscoveryMarquee } from "../components/GoalTemplateDiscoveryMarquee";
 import {
+  GOAL_AREA_LABEL_KEYS,
   GOAL_AREA_OPTIONS,
   GOAL_IMPORTANCE_OPTIONS,
   GOAL_STATUS_OPTIONS,
-  GOAL_TIMEFRAME_OPTIONS,
-  GOAL_AREA_LABEL_KEYS,
   GOAL_STATUS_LABEL_KEYS,
   GOAL_TIMEFRAME_LABEL_KEYS,
+  GOAL_TIMEFRAME_OPTIONS,
 } from "../constants";
+import { parseGoalAreaSearchParam, updateGoalAreaSearchParams } from "../goalAreaNavigation";
+import { getGoalProjectProgress } from "../goalProjectProgress";
 import {
   clampGoalProgressPercent,
   filterGoals,
@@ -48,18 +53,10 @@ import {
   type GoalFilter,
 } from "../goals";
 import {
-  parseGoalAreaSearchParam,
-  updateGoalAreaSearchParams,
-} from "../goalAreaNavigation";
-import {
   createGoalDraftFromTemplate,
   GOAL_TEMPLATES,
   previewGoalTemplateBody,
 } from "../goalTemplates";
-import { GoalCard } from "../components/GoalCard";
-import { GoalForm } from "../components/GoalForm";
-import { GoalTemplateDiscoveryMarquee } from "../components/GoalTemplateDiscoveryMarquee";
-import { getGoalProjectProgress } from "../goalProjectProgress";
 import { useGoals } from "../hooks/useGoals";
 import type { GoalFormSeed, GoalFormValues } from "../types";
 
@@ -152,7 +149,7 @@ export function GoalsContextualHelp({
 }
 
 export function GoalsPage() {
-  const { t } = useI18n();
+  const { direction, t } = useI18n();
   const { isSimpleView } = useViewDensityMode();
   const { tasks: tasksRepository } = useStorageAdapter();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -181,10 +178,8 @@ export function GoalsPage() {
   const [areaFilter, setAreaFilter] = useState<GoalFilter["area"]>(() =>
     parseGoalAreaSearchParam(searchParams.get("area"))
   );
-  const [timeframeFilter, setTimeframeFilter] =
-    useState<GoalFilter["timeframe"]>("all");
-  const [importanceFilter, setImportanceFilter] =
-    useState<GoalFilter["importance"]>("all");
+  const [timeframeFilter, setTimeframeFilter] = useState<GoalFilter["timeframe"]>("all");
+  const [importanceFilter, setImportanceFilter] = useState<GoalFilter["importance"]>("all");
   const [query, setQuery] = useState("");
   const [appliedQuery, setAppliedQuery] = useState("");
   const [focusedGoalId, setFocusedGoalId] = useState<string | null>(null);
@@ -211,6 +206,7 @@ export function GoalsPage() {
       .catch(() => setTasks([]))
       .finally(() => setIsTasksLoading(false));
   }, [tasksRepository]);
+
   const templateCards = useMemo(
     () =>
       GOAL_TEMPLATES.map((template) => ({
@@ -221,6 +217,7 @@ export function GoalsPage() {
       })),
     [t]
   );
+
   const filteredEntries = useMemo(
     () =>
       filterGoals(entries, {
@@ -232,6 +229,7 @@ export function GoalsPage() {
       }),
     [appliedQuery, areaFilter, entries, importanceFilter, statusFilter, timeframeFilter]
   );
+
   const hasActiveFilters =
     statusFilter !== "all" ||
     areaFilter !== "all" ||
@@ -239,10 +237,12 @@ export function GoalsPage() {
     importanceFilter !== "all" ||
     appliedQuery.length > 0;
   const goalPreviewLimit = isSimpleView ? 4 : 6;
-  const focusRequiresAllGoals = filteredEntries.findIndex((goal) => goal.id === focusId) >= goalPreviewLimit;
-  const displayedGoals = showAllGoals || focusRequiresAllGoals
-    ? filteredEntries
-    : filteredEntries.slice(0, goalPreviewLimit);
+  const focusRequiresAllGoals =
+    filteredEntries.findIndex((goal) => goal.id === focusId) >= goalPreviewLimit;
+  const displayedGoals =
+    showAllGoals || focusRequiresAllGoals
+      ? filteredEntries
+      : filteredEntries.slice(0, goalPreviewLimit);
   const hiddenGoalCount = Math.max(filteredEntries.length - displayedGoals.length, 0);
 
   useEffect(() => {
@@ -474,8 +474,7 @@ export function GoalsPage() {
   );
   const activeGoals = filteredEntries.filter((goal) => goal.status === "active");
   const completedGoals = filteredEntries.filter((goal) => goal.status === "completed");
-  const primaryGoal = filteredEntries.find((goal) => goal.status === "active")
-    ?? filteredEntries[0];
+  const primaryGoal = filteredEntries.find((goal) => goal.status === "active") ?? filteredEntries[0];
 
   return (
     <section className="alios-page space-y-6">
@@ -541,7 +540,9 @@ export function GoalsPage() {
                 {t("goals.newGoal")}
               </p>
               <p className="text-xl font-semibold leading-8">
-                {reviewDueGoals.length > 0 ? t("goals.reviewDueSection") : t("goals.templatesTitle")}
+                {reviewDueGoals.length > 0
+                  ? t("goals.reviewDueSection")
+                  : t("goals.templatesTitle")}
               </p>
             </div>
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
@@ -669,12 +670,17 @@ export function GoalsPage() {
 
               <SoftPanel className="grid min-w-0 gap-3 md:grid-cols-[minmax(0,1fr)_11rem_11rem_11rem_11rem_auto]">
                 <div className="relative min-w-0">
-                  <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Search
+                    className={cn(
+                      "pointer-events-none absolute top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground",
+                      direction === "rtl" ? "right-3" : "left-3"
+                    )}
+                  />
                   <Input
                     value={query}
                     onChange={(event) => setQuery(event.target.value)}
                     placeholder={t("goals.searchPlaceholder")}
-                    className="pl-9"
+                    className={direction === "rtl" ? "pr-9" : "pl-9"}
                     aria-label={t("goals.searchLabel")}
                   />
                 </div>
@@ -694,9 +700,7 @@ export function GoalsPage() {
                 <Select
                   value={areaFilter}
                   onChange={(event) =>
-                    handleAreaFilterChange(
-                      event.target.value as GoalFilter["area"]
-                    )
+                    handleAreaFilterChange(event.target.value as GoalFilter["area"])
                   }
                   aria-label={t("goals.areaFilter")}
                 >
@@ -733,11 +737,7 @@ export function GoalsPage() {
                   ))}
                 </Select>
                 <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-                  <Button
-                    type="button"
-                    className="w-full sm:w-auto"
-                    onClick={handleSearch}
-                  >
+                  <Button type="button" className="w-full sm:w-auto" onClick={handleSearch}>
                     {t("goals.search")}
                   </Button>
                   {hasActiveFilters ? (
@@ -796,7 +796,10 @@ export function GoalsPage() {
           )}
 
           {reviewDueGoals.length > 0 ? (
-            <section id="goals-review-due" className="alios-surface-soft space-y-4 p-5 sm:p-6">
+            <section
+              id="goals-review-due"
+              className="alios-surface-soft space-y-4 p-5 sm:p-6"
+            >
               <SectionHeader
                 title={t("goals.reviewDueSection")}
                 description={t("goals.reviewDueSectionDescription")}
@@ -852,11 +855,7 @@ export function GoalsPage() {
                 {t("goals.clearFilters")}
               </Button>
             ) : (
-              <Button
-                type="button"
-                className="w-full sm:w-auto"
-                onClick={openCreateForm}
-              >
+              <Button type="button" className="w-full sm:w-auto" onClick={openCreateForm}>
                 <Plus className="me-2 h-4 w-4" />
                 {t("goals.emptyAction")}
               </Button>
@@ -894,14 +893,17 @@ export function GoalsPage() {
       )}
       {filteredEntries.length > goalPreviewLimit && !focusRequiresAllGoals ? (
         <div className="flex justify-start">
-          <Button type="button" variant="outline" onClick={() => setShowAllGoals((current) => !current)}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setShowAllGoals((current) => !current)}
+          >
             {showAllGoals
               ? t("common.showFewer")
               : t("common.showMoreCount", { count: hiddenGoalCount })}
           </Button>
         </div>
       ) : null}
-
     </section>
   );
 }

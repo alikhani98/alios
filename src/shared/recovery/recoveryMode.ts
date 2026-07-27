@@ -1,7 +1,9 @@
+import { RECOVERY_MODE_ENABLED_STORAGE_KEY } from "@/shared/constants/preferences";
 import {
-  LOCAL_PREFERENCE_CHANGE_EVENT,
-  RECOVERY_MODE_ENABLED_STORAGE_KEY,
-} from "@/shared/constants/preferences";
+  getPreferenceStorage,
+  removeStoredPreference,
+  writeStoredPreference,
+} from "@/shared/preferences";
 
 export { RECOVERY_MODE_ENABLED_STORAGE_KEY } from "@/shared/constants/preferences";
 
@@ -10,15 +12,7 @@ type StorageLike = Pick<Storage, "getItem" | "removeItem" | "setItem">;
 type LocationLike = Pick<Location, "hash" | "search">;
 
 function getStorage(): StorageLike | null {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
-  try {
-    return window.localStorage;
-  } catch {
-    return null;
-  }
+  return getPreferenceStorage();
 }
 
 function getHashSearch(hash: string): string {
@@ -53,18 +47,6 @@ function hasRecoveryFlag(search: string): boolean {
   }
 }
 
-function notifyPreferenceChange(): void {
-  if (typeof window === "undefined") {
-    return;
-  }
-
-  try {
-    window.dispatchEvent(new Event(LOCAL_PREFERENCE_CHANGE_EVENT));
-  } catch {
-    // Keep recovery mode local and quiet if custom events are unavailable.
-  }
-}
-
 export function readRecoveryModeEnabled(
   storage: StorageLike | null = getStorage()
 ): boolean {
@@ -89,13 +71,14 @@ export function setRecoveryModeEnabled(
 
   try {
     if (enabled) {
-      storage.setItem(RECOVERY_MODE_ENABLED_STORAGE_KEY, "true");
-    } else {
-      storage.removeItem(RECOVERY_MODE_ENABLED_STORAGE_KEY);
+      return writeStoredPreference(
+        RECOVERY_MODE_ENABLED_STORAGE_KEY,
+        "true",
+        storage
+      );
     }
 
-    notifyPreferenceChange();
-    return true;
+    return removeStoredPreference(RECOVERY_MODE_ENABLED_STORAGE_KEY, storage);
   } catch {
     return false;
   }

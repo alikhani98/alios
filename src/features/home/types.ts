@@ -41,6 +41,12 @@ export type HomeDashboardData = {
     averageActiveProgress: number | null;
     latest?: Goal;
   };
+  finance: {
+    transactionCount: number;
+    activeObligationCount: number;
+    remainingLiquidity: number;
+    remainingObligationTotal: number;
+  };
   lifeAreas: {
     totalCount: number;
     activeCount: number;

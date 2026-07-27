@@ -1,6 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { LOCAL_PREFERENCE_CHANGE_EVENT } from "@/shared/constants/preferences";
+import {
+  getPreferenceStorage,
+  removeStoredPreference,
+  writeStoredPreference,
+} from "@/shared/preferences";
 
 import {
   HOME_DASHBOARD_LAYOUT_STORAGE_KEY,
@@ -15,20 +20,12 @@ import {
   type HomeDashboardSectionId,
 } from "../dashboardLayout";
 
-function getSafeLocalStorage() {
-  try {
-    return window.localStorage;
-  } catch {
-    return null;
-  }
-}
-
 function readStoredDashboardLayout(): HomeDashboardLayout {
   if (typeof window === "undefined") {
     return getDefaultDashboardLayout();
   }
 
-  const storage = getSafeLocalStorage();
+  const storage = getPreferenceStorage();
 
   if (!storage) {
     return getDefaultDashboardLayout();
@@ -48,33 +45,32 @@ function readStoredDashboardLayout(): HomeDashboardLayout {
 }
 
 function writeStoredDashboardLayout(layout: HomeDashboardLayout) {
-  const storage = getSafeLocalStorage();
+  const storage = getPreferenceStorage();
 
   if (!storage) {
     return;
   }
 
   try {
-    storage.setItem(
+    writeStoredPreference(
       HOME_DASHBOARD_LAYOUT_STORAGE_KEY,
-      JSON.stringify(layout)
+      JSON.stringify(layout),
+      storage
     );
-    window.dispatchEvent(new Event(LOCAL_PREFERENCE_CHANGE_EVENT));
   } catch {
     // Keep the layout in memory if storage is unavailable.
   }
 }
 
 function removeStoredDashboardLayout() {
-  const storage = getSafeLocalStorage();
+  const storage = getPreferenceStorage();
 
   if (!storage) {
     return;
   }
 
   try {
-    storage.removeItem(HOME_DASHBOARD_LAYOUT_STORAGE_KEY);
-    window.dispatchEvent(new Event(LOCAL_PREFERENCE_CHANGE_EVENT));
+    removeStoredPreference(HOME_DASHBOARD_LAYOUT_STORAGE_KEY, storage);
   } catch {
     // Keep the layout in memory if storage is unavailable.
   }
