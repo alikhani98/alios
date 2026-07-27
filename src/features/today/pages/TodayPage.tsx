@@ -10,6 +10,7 @@ import { useRoutines } from "@/features/routines/hooks/useRoutines";
 import type { Project, Task, TaskStatus } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
 import { useDateFormatter } from "@/shared/date";
+import { readStoredViewDensityMode } from "@/shared/preferences/viewDensityMode";
 import {
   Button,
   Card,
@@ -45,7 +46,7 @@ import { clearDueProjectReviewDate, isProjectReviewDue } from "@/features/projec
 function readSimpleViewMode() {
   try {
     return typeof window !== "undefined"
-      && window.localStorage.getItem("alios.viewDensityMode") === "simple";
+      && readStoredViewDensityMode() === "simple";
   } catch {
     return false;
   }

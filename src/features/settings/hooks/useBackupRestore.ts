@@ -10,6 +10,7 @@ import { useStorageAdapter } from "@/core/storage";
 import { AppError } from "@/core/errors";
 import { useI18n } from "@/shared/i18n";
 import { useBackupStatus } from "@/shared/hooks";
+import { readStoredPreference, writeStoredPreference } from "@/shared/preferences";
 const LAST_RESTORED_AT_KEY = "alios.lastRestoredAt";
 
 function getErrorMessage(
@@ -55,27 +56,11 @@ function downloadJson(backup: AliosBackup): void {
 }
 
 function readStoredTimestamp(key: string): string | null {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
-  try {
-    return window.localStorage.getItem(key);
-  } catch {
-    return null;
-  }
+  return readStoredPreference(key, (value) => value ?? null, null);
 }
 
 function writeStoredTimestamp(key: string, value: string): void {
-  if (typeof window === "undefined") {
-    return;
-  }
-
-  try {
-    window.localStorage.setItem(key, value);
-  } catch {
-    // Keep the timestamp in memory if browser storage is unavailable.
-  }
+  writeStoredPreference(key, value);
 }
 
 export function useBackupRestore(onRestored?: () => Promise<void> | void) {

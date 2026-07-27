@@ -1,5 +1,14 @@
 # Changelog
 
+## Stage 213B - Preference Boundary Consolidation
+
+- Added a shared preference-storage helper in `src/shared/preferences/storage.ts` to centralize safe `localStorage` reads, writes, removals, and local preference change notifications
+- Added a canonical preference registry in `src/shared/preferences/registry.ts` that classifies current preferences as account-synced, device-local, or intentionally-unsynced
+- Migrated key preference readers and writers to the shared helper layer without changing any existing `localStorage` keys or fallback behavior
+- Replaced direct hardcoded `alios.viewDensityMode` page reads with the shared view-density preference helper in Home, Today, Weekly Review, and Finance
+- Added focused registry coverage and documented the classification and consolidation work in `docs/PREFERENCE_BOUNDARY_STAGE_213B.md`
+- Kept the stage architecture-only: no authentication, Supabase integration, cloud sync, UI redesign, route change, storage-format change, dependency change, or user-data migration
+
 ## Stage 213A - Sync Foundation Preparation
 
 - Audited the current AliOS persistence split between repository-backed Dexie records and browser-only preference state before any future account or cloud-sync work
