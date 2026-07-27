@@ -23,6 +23,7 @@ import { Link } from "react-router-dom";
 
 import { useDateFormatter } from "@/shared/date";
 import { useI18n, type TranslationKey } from "@/shared/i18n";
+import { readStoredViewDensityMode } from "@/shared/preferences/viewDensityMode";
 import type { Goal, LifeAreaKey, ManualEntry } from "@/shared/types";
 import {
   Badge,
@@ -77,7 +78,7 @@ type ReviewQueueItem = {
 function readSimpleViewMode() {
   try {
     return typeof window !== "undefined"
-      && window.localStorage.getItem("alios.viewDensityMode") === "simple";
+      && readStoredViewDensityMode() === "simple";
   } catch {
     return false;
   }

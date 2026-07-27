@@ -19,6 +19,7 @@ import { Link } from "react-router-dom";
 import { useDateFormatter } from "@/shared/date";
 import { useBackupStatus } from "@/shared/hooks";
 import { useI18n, type TranslationKey } from "@/shared/i18n";
+import { readStoredViewDensityMode } from "@/shared/preferences/viewDensityMode";
 import {
   Badge,
   Button,
@@ -96,7 +97,7 @@ const simplePrimaryDashboardSectionIds = new Set<HomeDashboardSectionId>([
 function readSimpleViewMode() {
   try {
     return typeof window !== "undefined"
-      && window.localStorage.getItem("alios.viewDensityMode") === "simple";
+      && readStoredViewDensityMode() === "simple";
   } catch {
     return false;
   }
