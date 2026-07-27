@@ -1,4 +1,4 @@
-import { CheckCircle2, Pencil, Trash2 } from "lucide-react";
+import { BookText, CheckCircle2, Pencil, Tag, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 import { useDateFormatter } from "@/shared/date";
@@ -53,26 +53,43 @@ export function ManualEntryCard({
   const reviewDue = isManualEntryReviewDue(entry);
 
   return (
-    <Card className="flex h-full min-w-0 flex-col overflow-hidden">
+    <Card
+      className={reviewDue
+        ? "flex h-full min-w-0 flex-col overflow-hidden border-warning/20 bg-warning/5"
+        : "flex h-full min-w-0 flex-col overflow-hidden"}
+    >
       <CardHeader className="min-w-0 gap-4">
         <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
-          <CardTitle className="break-words text-xl leading-7">{entry.title}</CardTitle>
-          <div className="flex min-w-0 flex-wrap justify-end gap-2">
-            <StatusChip
-              tone={
-                entry.status === "archived"
-                  ? "neutral"
-                  : entry.status === "draft"
-                    ? "warning"
-                    : "primary"
-              }
-            >
-              {t(MANUAL_STATUS_LABEL_KEYS[entry.status])}
-            </StatusChip>
-            {reviewDue ? (
-              <StatusChip tone="warning">{t("manual.reviewDue")}</StatusChip>
-            ) : null}
+          <div className="min-w-0 flex-1 space-y-3">
+            <div className="flex min-w-0 flex-wrap gap-2">
+              <StatusChip
+                tone={
+                  entry.status === "archived"
+                    ? "neutral"
+                    : entry.status === "draft"
+                      ? "warning"
+                      : "primary"
+                }
+              >
+                {t(MANUAL_STATUS_LABEL_KEYS[entry.status])}
+              </StatusChip>
+              {reviewDue ? (
+                <StatusChip tone="warning">{t("manual.reviewDue")}</StatusChip>
+              ) : null}
+            </div>
+            <div className="space-y-1">
+              <CardTitle className="break-words text-xl leading-8">{entry.title}</CardTitle>
+              <p className="text-sm text-muted-foreground">
+                {t(MANUAL_CATEGORY_LABEL_KEYS[entry.category])}
+              </p>
+            </div>
           </div>
+          <Badge
+            variant="outline"
+            className="max-w-full break-words whitespace-normal text-start leading-5"
+          >
+            {t(MANUAL_IMPORTANCE_LABEL_KEYS[entry.importance])}
+          </Badge>
         </div>
         <p className="max-w-3xl break-words text-sm leading-7 whitespace-pre-wrap text-muted-foreground">
           {previewText(entry.body, t("manual.noBodyPreview"))}
@@ -87,12 +104,6 @@ export function ManualEntryCard({
           >
             {t(MANUAL_CATEGORY_LABEL_KEYS[entry.category])}
           </Badge>
-          <Badge
-            variant="outline"
-            className="max-w-full break-words whitespace-normal text-start leading-5"
-          >
-            {t(MANUAL_IMPORTANCE_LABEL_KEYS[entry.importance])}
-          </Badge>
           {entry.reviewIntervalDays ? (
             <Badge
               variant="outline"
@@ -104,11 +115,11 @@ export function ManualEntryCard({
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">
-          <SoftPanel className="rounded-surface px-4 py-3">
+          <SoftPanel className="rounded-surface space-y-1 px-4 py-3">
             <p className="text-xs text-muted-foreground">{t("manual.updatedAt")}</p>
             <p className="mt-1 text-sm font-medium">{formatDateTime(entry.updatedAt)}</p>
           </SoftPanel>
-          <SoftPanel className="rounded-surface px-4 py-3">
+          <SoftPanel className="rounded-surface space-y-1 px-4 py-3">
             <p className="text-xs text-muted-foreground">{t("manual.lastReviewedAt")}</p>
             <p className="mt-1 text-sm font-medium">
               {entry.lastReviewedAt ? formatDateTime(entry.lastReviewedAt) : t("common.notRecorded")}
@@ -117,18 +128,32 @@ export function ManualEntryCard({
         </div>
 
         {entry.tags.length > 0 ? (
-          <div className="flex flex-wrap gap-2">
-            {entry.tags.map((tag) => (
-              <Badge
-                key={tag}
-                variant="outline"
-                className="max-w-full break-words whitespace-normal text-start leading-5"
-              >
-                {tag}
-              </Badge>
-            ))}
-          </div>
-        ) : null}
+          <SoftPanel className="space-y-3 bg-muted/60">
+            <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+              <Tag className="h-4 w-4 shrink-0" />
+              {t("manual.tags")}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {entry.tags.map((tag) => (
+                <Badge
+                  key={tag}
+                  variant="outline"
+                  className="max-w-full break-words whitespace-normal text-start leading-5"
+                >
+                  {tag}
+                </Badge>
+              ))}
+            </div>
+          </SoftPanel>
+        ) : (
+          <SoftPanel className="space-y-2 bg-muted/60">
+            <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+              <BookText className="h-4 w-4 shrink-0" />
+              {t("manual.tags")}
+            </p>
+            <p className="text-sm text-muted-foreground">{t("common.notRecorded")}</p>
+          </SoftPanel>
+        )}
       </CardContent>
 
       <CardFooter className="flex flex-col gap-2 border-t border-border/70 pt-4 sm:flex-row sm:flex-wrap sm:items-center">

@@ -183,6 +183,19 @@ export function PersonalManualPage() {
       ),
     [appliedQuery, categoryFilter, entries, statusFilter]
   );
+  const activeEntries = filteredEntries.filter((entry) => entry.status === "active");
+  const reviewDueEntries = filteredEntries.filter((entry) => {
+    const interval = entry.reviewIntervalDays;
+    if (!interval) {
+      return false;
+    }
+
+    const baseline = entry.lastReviewedAt ?? entry.updatedAt;
+    const dueAt = new Date(baseline);
+    dueAt.setDate(dueAt.getDate() + interval);
+    return dueAt.getTime() <= Date.now();
+  });
+  const primaryEntry = activeEntries[0] ?? filteredEntries[0];
 
   const hasActiveFilters =
     categoryFilter !== "all" || statusFilter !== "all" || appliedQuery.length > 0;
@@ -353,55 +366,96 @@ export function PersonalManualPage() {
   return (
     <section className="alios-page space-y-6">
       <PremiumCard className="border-primary/15 bg-gradient-to-br from-primary/10 via-background to-background shadow-sm">
-        <div className="p-5 sm:p-6">
-          <SectionHeader
-            eyebrow={t("manual.title")}
-            icon={<BookText className="h-5 w-5" />}
-            title={t("manual.title")}
-            description={t("manual.description")}
-            status={<StatusChip tone="neutral">{t("manual.localOnlyNote")}</StatusChip>}
-          />
-          {isSimpleView ? (
-            <ManualContextualHelp
-              isOpen={isContextualHelpOpen}
-              onToggle={() => setIsContextualHelpOpen((current) => !current)}
+        <div className="grid gap-5 p-5 sm:p-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)]">
+          <div className="space-y-5">
+            <SectionHeader
+              eyebrow={t("manual.title")}
+              icon={<BookText className="h-5 w-5" />}
+              title={t("manual.title")}
+              description={t("manual.description")}
+              status={<StatusChip tone="neutral">{t("manual.localOnlyNote")}</StatusChip>}
             />
-          ) : (
-            <div className="mt-4 max-w-3xl space-y-2 text-sm leading-7 text-muted-foreground">
-              <p>{t("manual.nonAdvisoryNote")}</p>
-              <p>{t("manual.localOnlyDescription")}</p>
+
+            <div className="space-y-2">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                {t("manual.latestUpdated")}
+              </p>
+              <p className="break-words text-2xl font-semibold leading-9 tracking-tight sm:text-3xl">
+                {primaryEntry ? primaryEntry.title : t("manual.emptyTitle")}
+              </p>
+              <p className="max-w-3xl text-sm leading-7 text-muted-foreground">
+                {primaryEntry
+                  ? primaryEntry.body.slice(0, 180)
+                  : t("manual.emptyDescription")}
+              </p>
             </div>
-          )}
+
+            <div className="grid gap-3 sm:grid-cols-3">
+              <SoftPanel className="gap-2 border-primary/15 bg-background/80">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                  {t("manual.activeEntries")}
+                </p>
+                <p className="text-lg font-semibold tabular-nums">{activeEntries.length}</p>
+                <p className="text-sm text-muted-foreground">{t("manual.userWrittenOnly")}</p>
+              </SoftPanel>
+              <SoftPanel className="gap-2 border-primary/15 bg-background/80">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                  {t("manual.reviewDue")}
+                </p>
+                <p className="text-lg font-semibold tabular-nums">{reviewDueEntries.length}</p>
+                <p className="text-sm text-muted-foreground">{t("manual.nonAdvisoryNote")}</p>
+              </SoftPanel>
+              <SoftPanel className="gap-2 border-primary/15 bg-background/80">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                  {t("manual.totalEntries")}
+                </p>
+                <p className="text-lg font-semibold tabular-nums">{summary.totalCount}</p>
+                <p className="text-sm text-muted-foreground">
+                  {summary.latestUpdatedEntry
+                    ? formatDateTime(summary.latestUpdatedEntry.updatedAt)
+                    : t("manual.noLatestEntry")}
+                </p>
+              </SoftPanel>
+            </div>
+          </div>
+
+          <SoftPanel className="space-y-4 border-primary/20 bg-primary/5">
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-muted-foreground">
+                {t("manual.newEntry")}
+              </p>
+              <p className="text-xl font-semibold leading-8">
+                {t("manual.templatesTitle")}
+              </p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
+              <Button type="button" className="w-full" onClick={openCreateForm}>
+                <Plus className="me-2 h-4 w-4" />
+                {t("manual.newEntry")}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={() => setShowSimpleTemplates(true)}
+              >
+                {t("manual.templatesTitle")}
+              </Button>
+            </div>
+            {isSimpleView ? (
+              <ManualContextualHelp
+                isOpen={isContextualHelpOpen}
+                onToggle={() => setIsContextualHelpOpen((current) => !current)}
+              />
+            ) : (
+              <div className="space-y-2 text-sm leading-7 text-muted-foreground">
+                <p>{t("manual.nonAdvisoryNote")}</p>
+                <p>{t("manual.localOnlyDescription")}</p>
+              </div>
+            )}
+          </SoftPanel>
         </div>
       </PremiumCard>
-
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <MetricCard
-          icon={<BookText className="h-5 w-5" />}
-          label={t("manual.totalEntries")}
-          value={summary.totalCount}
-        />
-        <MetricCard
-          icon={<Sparkles className="h-5 w-5" />}
-          label={t("manual.activeEntries")}
-          value={summary.activeCount}
-        />
-        <MetricCard
-          icon={<AlertCircle className="h-5 w-5" />}
-          label={t("manual.reviewDue")}
-          value={summary.reviewDueCount}
-        />
-        <MetricCard
-          icon={<Clock3 className="h-5 w-5" />}
-          label={t("manual.latestUpdated")}
-          value={summary.latestUpdatedEntry ? summary.latestUpdatedEntry.title : t("common.notRecorded")}
-          description={
-            summary.latestUpdatedEntry
-              ? formatDateTime(summary.latestUpdatedEntry.updatedAt)
-              : t("manual.noLatestEntry")
-          }
-        />
-      </div>
 
       {successMessage ? (
         <div role="status" className="alios-status-success rounded-surface border px-4 py-3 text-sm">
@@ -436,181 +490,230 @@ export function PersonalManualPage() {
         </div>
       ) : null}
 
-      {isSimpleView && !showSimpleTemplates ? (
-        <PremiumCard>
-          <div className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
-            <SectionHeader
-              title={t("manual.templatesTitle")}
-              description={t("manual.templatesDescription")}
-              status={<StatusChip tone="neutral">{templateCards.length}</StatusChip>}
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)]">
+        <div className="space-y-6">
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            <MetricCard
+              icon={<BookText className="h-5 w-5" />}
+              label={t("manual.totalEntries")}
+              value={summary.totalCount}
             />
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setShowSimpleTemplates(true)}
-              aria-expanded={showSimpleTemplates}
-            >
-              {t("common.expandSection")}
-            </Button>
-          </div>
-        </PremiumCard>
-      ) : (
-        <PremiumCard>
-          <div className="space-y-3 p-5 sm:space-y-4 sm:p-6">
-            <SectionHeader
-              title={t("manual.templatesTitle")}
-              description={t("manual.templatesDescription")}
-              status={<StatusChip tone="neutral">{t("manual.localOnlyNote")}</StatusChip>}
+            <MetricCard
+              icon={<Sparkles className="h-5 w-5" />}
+              label={t("manual.activeEntries")}
+              value={summary.activeCount}
             />
-            <p className="max-w-3xl text-sm leading-7 text-muted-foreground">
-              {t("manual.templatesNote")}
-            </p>
-            <div className="grid gap-2 sm:gap-3 md:grid-cols-2 xl:grid-cols-3">
-              {templateCards.map((template) => (
-                <button
-                  key={template.id}
-                  type="button"
-                  onClick={() => openTemplateForm(template.id)}
-                  className="alios-surface-muted min-w-0 p-3 text-start transition hover:-translate-y-0.5 hover:border-primary/35 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:p-4"
-                >
-                  <div className="flex min-w-0 items-start justify-between gap-3">
-                    <div className="min-w-0 flex-1 space-y-1">
-                      <p className="break-words text-[0.95rem] font-semibold leading-6 sm:text-base">
-                        {template.title}
-                      </p>
-                      <p className="break-words text-sm leading-6 text-muted-foreground">
-                        {template.description}
-                      </p>
-                    </div>
-                    <Sparkles className="mt-1 h-4 w-4 shrink-0 text-primary" />
-                  </div>
-                  <div className="mt-3 flex flex-wrap gap-2 border-t border-border/70 pt-3 sm:mt-4">
-                    <Badge
-                      variant="secondary"
-                      className="max-w-full break-words whitespace-normal text-start leading-5"
-                    >
-                      {t(MANUAL_CATEGORY_LABEL_KEYS[template.defaultCategory])}
-                    </Badge>
-                    <Badge
-                      variant="outline"
-                      className="max-w-full break-words whitespace-normal text-start leading-5"
-                    >
-                      {t(MANUAL_IMPORTANCE_LABEL_KEYS[template.defaultImportance])}
-                    </Badge>
-                    <Badge
-                      variant="outline"
-                      className="max-w-full break-words whitespace-normal text-start leading-5"
-                    >
-                      {t(MANUAL_STATUS_LABEL_KEYS[template.defaultStatus])}
-                    </Badge>
-                  </div>
-                  <p className="mt-3 hidden break-words text-sm leading-6 text-muted-foreground sm:block">
-                    {template.bodyPreview}
-                  </p>
-                </button>
-              ))}
-            </div>
+            <MetricCard
+              icon={<AlertCircle className="h-5 w-5" />}
+              label={t("manual.reviewDue")}
+              value={summary.reviewDueCount}
+            />
           </div>
-        </PremiumCard>
-      )}
 
-      <PremiumCard>
-        <div className="space-y-3 p-5 sm:space-y-4 sm:p-6">
-          <SectionHeader
-            title={
-              formOpen
-                ? editingEntry
-                  ? t("manual.editEntry")
-                  : t("manual.createEntry")
-                : t("manual.newEntry")
-            }
-            description={t("manual.formDescription")}
-            status={<StatusChip tone="neutral">{t("manual.userWrittenOnly")}</StatusChip>}
-          />
-          {!formOpen ? (
-            <Button type="button" onClick={openCreateForm}>
-              <Plus className="me-2 h-4 w-4" />
-              {t("manual.newEntry")}
-            </Button>
-          ) : null}
-          {formOpen ? (
-            <div ref={formRef}>
-              <ManualEntryForm
-                key={`${editingEntry?.id ?? draftEntry?.title ?? "manual-entry-form"}-${formRevision}`}
-                entry={editingEntry ?? draftEntry}
-                isSubmitting={isSubmitting}
-                onSubmit={handleSubmit}
-                onCancel={closeForm}
+          <PremiumCard>
+            <div className="space-y-3 p-5 sm:space-y-4 sm:p-6">
+              <SectionHeader
+                title={
+                  formOpen
+                    ? editingEntry
+                      ? t("manual.editEntry")
+                      : t("manual.createEntry")
+                    : t("manual.newEntry")
+                }
+                description={t("manual.formDescription")}
+                status={<StatusChip tone="neutral">{t("manual.userWrittenOnly")}</StatusChip>}
               />
-            </div>
-          ) : null}
-        </div>
-      </PremiumCard>
-
-      <PremiumCard>
-        <div className="space-y-4 p-5 sm:p-6">
-          <SectionHeader
-            title={t("manual.filters")}
-            description={t("manual.filtersDescription")}
-            status={<StatusChip tone="neutral">{filteredEntries.length}</StatusChip>}
-          />
-
-          <SoftPanel className="grid min-w-0 gap-3 xl:grid-cols-[minmax(0,1fr)_12rem_12rem_auto]">
-            <div className="relative min-w-0">
-              <Search
-                className={cn(
-                  "pointer-events-none absolute top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground",
-                  direction === "rtl" ? "right-3" : "left-3"
-                )}
-              />
-              <Input
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder={t("manual.searchPlaceholder")}
-                className={direction === "rtl" ? "pr-9" : "pl-9"}
-                aria-label={t("manual.searchLabel")}
-              />
-            </div>
-            <Select
-              value={categoryFilter}
-              onChange={(event) =>
-                setCategoryFilter(event.target.value as ManualEntry["category"] | "all")
-              }
-              aria-label={t("manual.categoryFilter")}
-            >
-              {MANUAL_CATEGORY_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {t(option.labelKey)}
-                </option>
-              ))}
-            </Select>
-            <Select
-              value={statusFilter}
-              onChange={(event) =>
-                setStatusFilter(event.target.value as ManualEntry["status"] | "all")
-              }
-              aria-label={t("manual.statusFilter")}
-            >
-              {MANUAL_STATUS_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {t(option.labelKey)}
-                </option>
-              ))}
-            </Select>
-            <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap xl:flex-col">
-              <Button type="button" className="w-full sm:w-auto" onClick={handleSearch}>
-                {t("manual.search")}
-              </Button>
-              {hasActiveFilters ? (
-                <Button type="button" variant="ghost" className="w-full sm:w-auto" onClick={() => void clearFilters()}>
-                  <X className="me-2 h-4 w-4" />
-                  {t("manual.clearFilters")}
+              {!formOpen ? (
+                <Button type="button" onClick={openCreateForm}>
+                  <Plus className="me-2 h-4 w-4" />
+                  {t("manual.newEntry")}
                 </Button>
               ) : null}
+              {formOpen ? (
+                <div ref={formRef}>
+                  <ManualEntryForm
+                    key={`${editingEntry?.id ?? draftEntry?.title ?? "manual-entry-form"}-${formRevision}`}
+                    entry={editingEntry ?? draftEntry}
+                    isSubmitting={isSubmitting}
+                    onSubmit={handleSubmit}
+                    onCancel={closeForm}
+                  />
+                </div>
+              ) : null}
             </div>
-          </SoftPanel>
+          </PremiumCard>
+
+          <PremiumCard>
+            <div className="space-y-4 p-5 sm:p-6">
+              <SectionHeader
+                title={t("manual.filters")}
+                description={t("manual.filtersDescription")}
+                status={<StatusChip tone="neutral">{filteredEntries.length}</StatusChip>}
+              />
+
+              <SoftPanel className="grid min-w-0 gap-3 xl:grid-cols-[minmax(0,1fr)_12rem_12rem_auto]">
+                <div className="relative min-w-0">
+                  <Search
+                    className={cn(
+                      "pointer-events-none absolute top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground",
+                      direction === "rtl" ? "right-3" : "left-3"
+                    )}
+                  />
+                  <Input
+                    value={query}
+                    onChange={(event) => setQuery(event.target.value)}
+                    placeholder={t("manual.searchPlaceholder")}
+                    className={direction === "rtl" ? "pr-9" : "pl-9"}
+                    aria-label={t("manual.searchLabel")}
+                  />
+                </div>
+                <Select
+                  value={categoryFilter}
+                  onChange={(event) =>
+                    setCategoryFilter(event.target.value as ManualEntry["category"] | "all")
+                  }
+                  aria-label={t("manual.categoryFilter")}
+                >
+                  {MANUAL_CATEGORY_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {t(option.labelKey)}
+                    </option>
+                  ))}
+                </Select>
+                <Select
+                  value={statusFilter}
+                  onChange={(event) =>
+                    setStatusFilter(event.target.value as ManualEntry["status"] | "all")
+                  }
+                  aria-label={t("manual.statusFilter")}
+                >
+                  {MANUAL_STATUS_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {t(option.labelKey)}
+                    </option>
+                  ))}
+                </Select>
+                <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap xl:flex-col">
+                  <Button type="button" className="w-full sm:w-auto" onClick={handleSearch}>
+                    {t("manual.search")}
+                  </Button>
+                  {hasActiveFilters ? (
+                    <Button type="button" variant="ghost" className="w-full sm:w-auto" onClick={() => void clearFilters()}>
+                      <X className="me-2 h-4 w-4" />
+                      {t("manual.clearFilters")}
+                    </Button>
+                  ) : null}
+                </div>
+              </SoftPanel>
+            </div>
+          </PremiumCard>
         </div>
-      </PremiumCard>
+
+        <div className="space-y-6">
+          {isSimpleView && !showSimpleTemplates ? (
+            <PremiumCard>
+              <div className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+                <SectionHeader
+                  title={t("manual.templatesTitle")}
+                  description={t("manual.templatesDescription")}
+                  status={<StatusChip tone="neutral">{templateCards.length}</StatusChip>}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowSimpleTemplates(true)}
+                  aria-expanded={showSimpleTemplates}
+                >
+                  {t("common.expandSection")}
+                </Button>
+              </div>
+            </PremiumCard>
+          ) : (
+            <PremiumCard>
+              <div className="space-y-3 p-5 sm:space-y-4 sm:p-6">
+                <SectionHeader
+                  title={t("manual.templatesTitle")}
+                  description={t("manual.templatesDescription")}
+                  status={<StatusChip tone="neutral">{t("manual.localOnlyNote")}</StatusChip>}
+                />
+                <p className="max-w-3xl text-sm leading-7 text-muted-foreground">
+                  {t("manual.templatesNote")}
+                </p>
+                <div className="grid gap-2 sm:gap-3">
+                  {templateCards.map((template) => (
+                    <button
+                      key={template.id}
+                      type="button"
+                      onClick={() => openTemplateForm(template.id)}
+                      className="alios-surface-muted min-w-0 p-3 text-start transition hover:-translate-y-0.5 hover:border-primary/35 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:p-4"
+                    >
+                      <div className="flex min-w-0 items-start justify-between gap-3">
+                        <div className="min-w-0 flex-1 space-y-1">
+                          <p className="break-words text-[0.95rem] font-semibold leading-6 sm:text-base">
+                            {template.title}
+                          </p>
+                          <p className="break-words text-sm leading-6 text-muted-foreground">
+                            {template.description}
+                          </p>
+                        </div>
+                        <Sparkles className="mt-1 h-4 w-4 shrink-0 text-primary" />
+                      </div>
+                      <div className="mt-3 flex flex-wrap gap-2 border-t border-border/70 pt-3 sm:mt-4">
+                        <Badge
+                          variant="secondary"
+                          className="max-w-full break-words whitespace-normal text-start leading-5"
+                        >
+                          {t(MANUAL_CATEGORY_LABEL_KEYS[template.defaultCategory])}
+                        </Badge>
+                        <Badge
+                          variant="outline"
+                          className="max-w-full break-words whitespace-normal text-start leading-5"
+                        >
+                          {t(MANUAL_IMPORTANCE_LABEL_KEYS[template.defaultImportance])}
+                        </Badge>
+                        <Badge
+                          variant="outline"
+                          className="max-w-full break-words whitespace-normal text-start leading-5"
+                        >
+                          {t(MANUAL_STATUS_LABEL_KEYS[template.defaultStatus])}
+                        </Badge>
+                      </div>
+                      <p className="mt-3 break-words text-sm leading-6 text-muted-foreground">
+                        {template.bodyPreview}
+                      </p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </PremiumCard>
+          )}
+
+          <PremiumCard>
+            <div className="space-y-3 p-5 sm:space-y-4 sm:p-6">
+              <SectionHeader
+                title={t("manual.latestUpdated")}
+                description={t("manual.localOnlyDescription")}
+                status={<StatusChip tone="neutral">{summary.totalCount}</StatusChip>}
+              />
+              {summary.latestUpdatedEntry ? (
+                <SoftPanel className="space-y-2 bg-background/80">
+                  <p className="text-base font-semibold">{summary.latestUpdatedEntry.title}</p>
+                  <p className="text-sm leading-7 text-muted-foreground">
+                    {summary.latestUpdatedEntry.body.slice(0, 180)}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {formatDateTime(summary.latestUpdatedEntry.updatedAt)}
+                  </p>
+                </SoftPanel>
+              ) : (
+                <SoftPanel className="space-y-2 bg-background/80">
+                  <p className="text-sm text-muted-foreground">{t("manual.noLatestEntry")}</p>
+                </SoftPanel>
+              )}
+            </div>
+          </PremiumCard>
+        </div>
+      </div>
 
       {isLoading ? (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" aria-label={t("manual.loading")}>
