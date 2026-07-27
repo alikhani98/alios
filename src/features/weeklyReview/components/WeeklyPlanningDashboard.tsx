@@ -46,7 +46,7 @@ export function WeeklyPlanningDashboard({
                 <CalendarDays className="h-5 w-5" aria-hidden="true" />
               </span>
               <div className="min-w-0 space-y-1">
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                <p className="text-xs font-semibold text-muted-foreground">
                   {t("weeklyReview.title")}
                 </p>
                 <h2 className="break-words text-xl font-semibold tracking-tight sm:text-2xl">
