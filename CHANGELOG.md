@@ -1,5 +1,13 @@
 # Changelog
 
+## Stage 215 - Account & Sync Experience Planning
+
+- Created `docs/ACCOUNT_SYNC_EXPERIENCE_STAGE_215.md` to define the future user-facing path from local-only AliOS usage toward optional account and sync features
+- Audited the existing sync, preference, auth runtime, session, and local-record association groundwork from Stages 213A through 214D and translated it into UX-facing contracts
+- Documented the future Settings account entry point, sign-in flow concept, local-only pre-login state, explicit sync opt-in flow, first-device association experience, logout expectations, sync-status visibility, and conflict explanation boundaries
+- Explicitly documented what remains device-local, what requires explicit user consent, and what must never happen silently
+- Kept the stage planning-only: no authentication implementation, no Supabase integration, no remote sync, no schema change, no repository-model change, no user-data behavior change, and no UI implementation
+
 ## Stage 214D - First Login Local Record Association Contract
 
 - Added a future local-record association contract in `src/core/auth/localRecordAssociationContract.ts` covering first-login claim behavior, duplicate prevention, non-destructive migration rules, and sync-preparation boundaries
