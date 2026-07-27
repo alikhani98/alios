@@ -2,6 +2,10 @@ import { createContext, useMemo, useState, type ReactNode } from "react";
 
 import { useI18n } from "@/shared/i18n";
 import {
+  readStoredPreference,
+  writeStoredPreference,
+} from "@/shared/preferences/storage";
+import {
   CALENDAR_DISPLAY_STORAGE_KEY,
   DEFAULT_CALENDAR_DISPLAY,
   formatDisplayDate,
@@ -17,8 +21,12 @@ export const DateDisplayContext = createContext<DateDisplayContextValue | null>(
 type DateDisplayProviderProps = { children: ReactNode };
 
 function getInitialCalendarDisplay(): CalendarDisplay {
-  const stored = localStorage.getItem(CALENDAR_DISPLAY_STORAGE_KEY);
-  return isCalendarDisplay(stored) ? stored : DEFAULT_CALENDAR_DISPLAY;
+  return readStoredPreference(
+    CALENDAR_DISPLAY_STORAGE_KEY,
+    (stored) =>
+      isCalendarDisplay(stored) ? stored : DEFAULT_CALENDAR_DISPLAY,
+    DEFAULT_CALENDAR_DISPLAY
+  );
 }
 
 export function DateDisplayProvider({ children }: DateDisplayProviderProps) {
@@ -28,7 +36,7 @@ export function DateDisplayProvider({ children }: DateDisplayProviderProps) {
   const resolvedCalendar = resolveCalendar(calendarDisplay, language);
 
   const setCalendarDisplay = (calendar: CalendarDisplay) => {
-    localStorage.setItem(CALENDAR_DISPLAY_STORAGE_KEY, calendar);
+    writeStoredPreference(CALENDAR_DISPLAY_STORAGE_KEY, calendar);
     setCalendarDisplayState(calendar);
   };
 

@@ -4,6 +4,11 @@ import {
   ACCENT_COLOR_STORAGE_KEY,
   LOCAL_PREFERENCE_CHANGE_EVENT,
 } from "@/shared/constants/preferences";
+import {
+  getPreferenceStorage,
+  removeStoredPreference,
+  writeStoredPreference,
+} from "./storage";
 
 export type AccentColorPreference =
   | "default"
@@ -132,20 +137,12 @@ export function parseAccentColorPreference(
   return normalizeAccentColorPreference(value);
 }
 
-function getSafeLocalStorage() {
-  try {
-    return window.localStorage;
-  } catch {
-    return null;
-  }
-}
-
 function readStoredAccentColorPreference(): AccentColorPreference {
   if (typeof window === "undefined") {
     return DEFAULT_ACCENT_COLOR_PREFERENCE;
   }
 
-  const storage = getSafeLocalStorage();
+  const storage = getPreferenceStorage();
 
   if (!storage) {
     return DEFAULT_ACCENT_COLOR_PREFERENCE;
@@ -184,33 +181,11 @@ export function applyAccentColorThemeVariables(
 }
 
 function writeStoredAccentColorPreference(preference: AccentColorPreference) {
-  const storage = getSafeLocalStorage();
-
-  if (!storage) {
-    return;
-  }
-
-  try {
-    storage.setItem(ACCENT_COLOR_STORAGE_KEY, preference);
-    window.dispatchEvent(new Event(LOCAL_PREFERENCE_CHANGE_EVENT));
-  } catch {
-    // Keep the value in memory if storage is unavailable.
-  }
+  writeStoredPreference(ACCENT_COLOR_STORAGE_KEY, preference);
 }
 
 function removeStoredAccentColorPreference() {
-  const storage = getSafeLocalStorage();
-
-  if (!storage) {
-    return;
-  }
-
-  try {
-    storage.removeItem(ACCENT_COLOR_STORAGE_KEY);
-    window.dispatchEvent(new Event(LOCAL_PREFERENCE_CHANGE_EVENT));
-  } catch {
-    // Keep the value in memory if storage is unavailable.
-  }
+  removeStoredPreference(ACCENT_COLOR_STORAGE_KEY);
 }
 
 export function resetAccentColorPreference() {

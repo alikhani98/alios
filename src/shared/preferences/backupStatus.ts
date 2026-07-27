@@ -1,6 +1,9 @@
-import { z } from "zod";
-
 import { BACKUP_STATUS_STORAGE_KEY } from "@/shared/constants/preferences";
+import {
+  getPreferenceStorage,
+  removeStoredPreference,
+  writeStoredPreference,
+} from "./storage";
 
 export const LEGACY_LAST_BACKUP_EXPORTED_AT_KEY =
   "alios.lastBackupExportedAt";
@@ -12,14 +15,6 @@ export type BackupStatusMetadata = {
   lastBackupVersion: number | string | null;
   updatedAt: string;
 };
-
-const backupStatusSchema = z
-  .object({
-    lastBackupAt: z.string().datetime({ offset: true }).nullable(),
-    lastBackupVersion: z.union([z.number().int(), z.string().min(1)]).nullable(),
-    updatedAt: z.string().datetime({ offset: true }),
-  })
-  .strict();
 
 const DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;
 
@@ -48,16 +43,54 @@ function parseBackupDate(value: string | null | undefined): Date | null {
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
+function isValidBackupVersion(
+  value: unknown
+): value is BackupStatusMetadata["lastBackupVersion"] {
+  return (
+    value === null ||
+    (typeof value === "number" && Number.isInteger(value)) ||
+    (typeof value === "string" && value.trim().length > 0)
+  );
+}
+
 export function normalizeBackupStatus(
   value: unknown
 ): BackupStatusMetadata | null {
-  const result = backupStatusSchema.safeParse(value);
-
-  if (!result.success) {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
     return null;
   }
 
-  return result.data;
+  const candidate = value as Record<string, unknown>;
+  const keys = Object.keys(candidate);
+
+  if (
+    keys.length !== 3 ||
+    !keys.includes("lastBackupAt") ||
+    !keys.includes("lastBackupVersion") ||
+    !keys.includes("updatedAt")
+  ) {
+    return null;
+  }
+
+  const { lastBackupAt, lastBackupVersion, updatedAt } = candidate;
+
+  if (lastBackupAt !== null && parseBackupDate(String(lastBackupAt)) === null) {
+    return null;
+  }
+
+  if (!isValidBackupVersion(lastBackupVersion)) {
+    return null;
+  }
+
+  if (typeof updatedAt !== "string" || parseBackupDate(updatedAt) === null) {
+    return null;
+  }
+
+  return {
+    lastBackupAt: lastBackupAt === null ? null : String(lastBackupAt),
+    lastBackupVersion,
+    updatedAt,
+  };
 }
 
 export function createBackupStatusMetadata(
@@ -73,20 +106,22 @@ export function createBackupStatusMetadata(
 }
 
 export function readStoredBackupStatus(): BackupStatusMetadata | null {
-  if (typeof window === "undefined") {
+  const storage = getPreferenceStorage();
+
+  if (!storage) {
     return null;
   }
 
   try {
     const storedStatus = normalizeBackupStatus(
-      parseStoredJson(window.localStorage.getItem(BACKUP_STATUS_STORAGE_KEY))
+      parseStoredJson(storage.getItem(BACKUP_STATUS_STORAGE_KEY))
     );
 
     if (storedStatus) {
       return storedStatus;
     }
 
-    const legacyTimestamp = window.localStorage.getItem(
+    const legacyTimestamp = storage.getItem(
       LEGACY_LAST_BACKUP_EXPORTED_AT_KEY
     );
     const parsedLegacyTimestamp = parseBackupDate(legacyTimestamp);
@@ -109,28 +144,31 @@ export function readStoredBackupStatus(): BackupStatusMetadata | null {
 export function writeStoredBackupStatus(
   status: BackupStatusMetadata | null
 ): boolean {
-  if (typeof window === "undefined") {
+  const storage = getPreferenceStorage();
+
+  if (!storage) {
     return false;
   }
 
   try {
     if (status) {
-      window.localStorage.setItem(
+      writeStoredPreference(
         BACKUP_STATUS_STORAGE_KEY,
-        JSON.stringify(status)
+        JSON.stringify(status),
+        storage
       );
 
       if (status.lastBackupAt) {
-        window.localStorage.setItem(
+        storage.setItem(
           LEGACY_LAST_BACKUP_EXPORTED_AT_KEY,
           status.lastBackupAt
         );
       } else {
-        window.localStorage.removeItem(LEGACY_LAST_BACKUP_EXPORTED_AT_KEY);
+        storage.removeItem(LEGACY_LAST_BACKUP_EXPORTED_AT_KEY);
       }
     } else {
-      window.localStorage.removeItem(BACKUP_STATUS_STORAGE_KEY);
-      window.localStorage.removeItem(LEGACY_LAST_BACKUP_EXPORTED_AT_KEY);
+      removeStoredPreference(BACKUP_STATUS_STORAGE_KEY, storage);
+      storage.removeItem(LEGACY_LAST_BACKUP_EXPORTED_AT_KEY);
     }
     return true;
   } catch {

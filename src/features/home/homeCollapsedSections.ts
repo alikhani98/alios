@@ -1,3 +1,8 @@
+import {
+  getPreferenceStorage,
+  writeStoredPreference,
+} from "@/shared/preferences/storage";
+
 export const HOME_COLLAPSED_SECTIONS_STORAGE_KEY =
   "alios.home.collapsedSections";
 
@@ -50,12 +55,14 @@ export function normalizeHomeCollapsedSectionIds(
 export function readStoredHomeCollapsedSectionIds():
   | HomeCollapsibleSectionId[]
   | null {
-  if (typeof window === "undefined") {
+  const storage = getPreferenceStorage();
+
+  if (!storage) {
     return null;
   }
 
   try {
-    const stored = window.localStorage.getItem(
+    const stored = storage.getItem(
       HOME_COLLAPSED_SECTIONS_STORAGE_KEY
     );
 
@@ -72,12 +79,8 @@ export function readStoredHomeCollapsedSectionIds():
 export function writeStoredHomeCollapsedSectionIds(
   value: readonly HomeCollapsibleSectionId[]
 ) {
-  if (typeof window === "undefined") {
-    return;
-  }
-
   try {
-    window.localStorage.setItem(
+    writeStoredPreference(
       HOME_COLLAPSED_SECTIONS_STORAGE_KEY,
       JSON.stringify(Array.from(new Set(value)))
     );

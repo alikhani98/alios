@@ -1,7 +1,7 @@
 import { useMemo, useState, type FormEvent } from "react";
 
 import { useI18n } from "@/shared/i18n";
-import { Button, DateValueHint, Input, SoftPanel, Textarea, Select } from "@/shared/ui";
+import { Button, DateValueHint, Input, Select, SoftPanel, Textarea } from "@/shared/ui";
 
 import {
   GOAL_AREA_OPTIONS,
@@ -52,142 +52,149 @@ export function GoalForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <SoftPanel className="space-y-4">
-        <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_14rem]">
-          <label className="space-y-2">
-            <span className="text-sm font-medium">{t("goals.titleLabel")}</span>
-            <Input
-              name="title"
-              defaultValue={goal?.title ?? ""}
-              required
-              placeholder={t("goals.titlePlaceholder")}
-            />
-          </label>
+    <form onSubmit={handleSubmit} className="space-y-5">
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)]">
+        <div className="space-y-5">
+          <SoftPanel className="space-y-4">
+            <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_14rem]">
+              <label className="space-y-2">
+                <span className="text-sm font-medium">{t("goals.titleLabel")}</span>
+                <Input
+                  name="title"
+                  defaultValue={goal?.title ?? ""}
+                  required
+                  placeholder={t("goals.titlePlaceholder")}
+                />
+              </label>
 
-          <label className="space-y-2">
-            <span className="text-sm font-medium">{t("goals.statusLabel")}</span>
-            <Select
-              name="status"
-              defaultValue={goal?.status ?? "active"}
-            >
-              {GOAL_STATUS_OPTIONS.filter((option) => option.value !== "all").map(
-                (option) => (
-                  <option key={String(option.value)} value={option.value}>
-                    {t(option.labelKey)}
-                  </option>
-                )
-              )}
-            </Select>
-          </label>
+              <label className="space-y-2">
+                <span className="text-sm font-medium">{t("goals.statusLabel")}</span>
+                <Select
+                  name="status"
+                  defaultValue={goal?.status ?? "active"}
+                >
+                  {GOAL_STATUS_OPTIONS.filter((option) => option.value !== "all").map(
+                    (option) => (
+                      <option key={String(option.value)} value={option.value}>
+                        {t(option.labelKey)}
+                      </option>
+                    )
+                  )}
+                </Select>
+              </label>
+            </div>
+
+            <label className="space-y-2">
+              <span className="text-sm font-medium">{t("goals.descriptionLabel")}</span>
+              <Textarea
+                name="description"
+                defaultValue={goal?.description ?? ""}
+                required
+                rows={5}
+                placeholder={t("goals.descriptionPlaceholder")}
+                className="min-h-32"
+              />
+            </label>
+          </SoftPanel>
         </div>
 
-        <label className="space-y-2">
-          <span className="text-sm font-medium">{t("goals.descriptionLabel")}</span>
-          <Textarea
-            name="description"
-            defaultValue={goal?.description ?? ""}
-            required
-            rows={4}
-            placeholder={t("goals.descriptionPlaceholder")}
-          />
-        </label>
-      </SoftPanel>
+        <div className="space-y-5">
+          <SoftPanel className="grid gap-4 sm:grid-cols-2">
+            <label className="space-y-2">
+              <span className="text-sm font-medium">{t("goals.areaLabel")}</span>
+              <Select
+                name="area"
+                defaultValue={goal?.area ?? "personal"}
+              >
+                {GOAL_AREA_OPTIONS.filter((option) => option.value !== "all").map(
+                  (option) => (
+                    <option key={String(option.value)} value={option.value}>
+                      {t(option.labelKey)}
+                    </option>
+                  )
+                )}
+              </Select>
+            </label>
 
-      <SoftPanel className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <label className="space-y-2">
-          <span className="text-sm font-medium">{t("goals.areaLabel")}</span>
-          <Select
-            name="area"
-            defaultValue={goal?.area ?? "personal"}
-          >
-            {GOAL_AREA_OPTIONS.filter((option) => option.value !== "all").map(
-              (option) => (
-                <option key={String(option.value)} value={option.value}>
-                  {t(option.labelKey)}
-                </option>
-              )
-            )}
-          </Select>
-        </label>
+            <label className="space-y-2">
+              <span className="text-sm font-medium">{t("goals.timeframeLabel")}</span>
+              <Select
+                name="timeframe"
+                defaultValue={goal?.timeframe ?? "open"}
+              >
+                {GOAL_TIMEFRAME_OPTIONS.filter((option) => option.value !== "all").map(
+                  (option) => (
+                    <option key={String(option.value)} value={option.value}>
+                      {t(option.labelKey)}
+                    </option>
+                  )
+                )}
+              </Select>
+            </label>
 
-        <label className="space-y-2">
-          <span className="text-sm font-medium">{t("goals.timeframeLabel")}</span>
-          <Select
-            name="timeframe"
-            defaultValue={goal?.timeframe ?? "open"}
-          >
-            {GOAL_TIMEFRAME_OPTIONS.filter((option) => option.value !== "all").map(
-              (option) => (
-                <option key={String(option.value)} value={option.value}>
-                  {t(option.labelKey)}
-                </option>
-              )
-            )}
-          </Select>
-        </label>
+            <label className="space-y-2">
+              <span className="text-sm font-medium">{t("goals.importanceLabel")}</span>
+              <Select
+                name="importance"
+                defaultValue={goal?.importance ?? "medium"}
+              >
+                {GOAL_IMPORTANCE_OPTIONS.filter((option) => option.value !== "all").map(
+                  (option) => (
+                    <option key={String(option.value)} value={option.value}>
+                      {t(option.labelKey)}
+                    </option>
+                  )
+                )}
+              </Select>
+            </label>
 
-        <label className="space-y-2">
-          <span className="text-sm font-medium">{t("goals.importanceLabel")}</span>
-          <Select
-            name="importance"
-            defaultValue={goal?.importance ?? "medium"}
-          >
-            {GOAL_IMPORTANCE_OPTIONS.filter((option) => option.value !== "all").map(
-              (option) => (
-                <option key={String(option.value)} value={option.value}>
-                  {t(option.labelKey)}
-                </option>
-              )
-            )}
-          </Select>
-        </label>
+            <label className="space-y-2">
+              <span className="text-sm font-medium">{t("goals.progressLabel")}</span>
+              <Input
+                name="progressPercent"
+                type="number"
+                min="0"
+                max="100"
+                defaultValue={goal?.progressPercent ?? 0}
+                placeholder="0"
+              />
+            </label>
+          </SoftPanel>
 
-        <label className="space-y-2">
-          <span className="text-sm font-medium">{t("goals.progressLabel")}</span>
-          <Input
-            name="progressPercent"
-            type="number"
-            min="0"
-            max="100"
-            defaultValue={goal?.progressPercent ?? 0}
-            placeholder="0"
-          />
-        </label>
-      </SoftPanel>
+          <SoftPanel className="grid gap-4">
+            <label className="space-y-2">
+              <span className="text-sm font-medium">{t("goals.targetDateLabel")}</span>
+              <Input
+                name="targetDate"
+                type="date"
+                defaultValue={goal?.targetDate ?? ""}
+                onChange={(event) => setTargetDateValue(event.target.value)}
+              />
+              <DateValueHint value={targetDateValue} />
+            </label>
 
-      <SoftPanel className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        <label className="space-y-2">
-          <span className="text-sm font-medium">{t("goals.targetDateLabel")}</span>
-          <Input
-            name="targetDate"
-            type="date"
-            defaultValue={goal?.targetDate ?? ""}
-            onChange={(event) => setTargetDateValue(event.target.value)}
-          />
-          <DateValueHint value={targetDateValue} />
-        </label>
+            <label className="space-y-2">
+              <span className="text-sm font-medium">{t("goals.reviewIntervalDaysLabel")}</span>
+              <Input
+                name="reviewIntervalDays"
+                type="number"
+                min="1"
+                defaultValue={goal?.reviewIntervalDays ?? ""}
+                placeholder={t("goals.reviewIntervalDaysPlaceholder")}
+              />
+            </label>
 
-        <label className="space-y-2">
-          <span className="text-sm font-medium">{t("goals.reviewIntervalDaysLabel")}</span>
-          <Input
-            name="reviewIntervalDays"
-            type="number"
-            min="1"
-            defaultValue={goal?.reviewIntervalDays ?? ""}
-            placeholder={t("goals.reviewIntervalDaysPlaceholder")}
-          />
-        </label>
-
-        <label className="space-y-2 xl:col-span-1">
-          <span className="text-sm font-medium">{t("goals.tagsLabel")}</span>
-          <Input
-            name="tagsText"
-            defaultValue={initialTags}
-            placeholder={t("goals.tagsPlaceholder")}
-          />
-        </label>
-      </SoftPanel>
+            <label className="space-y-2">
+              <span className="text-sm font-medium">{t("goals.tagsLabel")}</span>
+              <Input
+                name="tagsText"
+                defaultValue={initialTags}
+                placeholder={t("goals.tagsPlaceholder")}
+              />
+            </label>
+          </SoftPanel>
+        </div>
+      </div>
 
       <div className="flex flex-wrap gap-3 border-t border-border/70 pt-4">
         <Button type="submit" disabled={isSubmitting}>

@@ -25,21 +25,26 @@ import {
   MetricCard,
   PremiumCard,
   SectionHeader,
+  Select,
   SoftPanel,
   StatusChip,
-  Select,
 } from "@/shared/ui";
 import { cn } from "@/shared/utils";
 
+import { GoalCard } from "../components/GoalCard";
+import { GoalForm } from "../components/GoalForm";
+import { GoalTemplateDiscoveryMarquee } from "../components/GoalTemplateDiscoveryMarquee";
 import {
+  GOAL_AREA_LABEL_KEYS,
   GOAL_AREA_OPTIONS,
   GOAL_IMPORTANCE_OPTIONS,
   GOAL_STATUS_OPTIONS,
-  GOAL_TIMEFRAME_OPTIONS,
-  GOAL_AREA_LABEL_KEYS,
   GOAL_STATUS_LABEL_KEYS,
   GOAL_TIMEFRAME_LABEL_KEYS,
+  GOAL_TIMEFRAME_OPTIONS,
 } from "../constants";
+import { parseGoalAreaSearchParam, updateGoalAreaSearchParams } from "../goalAreaNavigation";
+import { getGoalProjectProgress } from "../goalProjectProgress";
 import {
   clampGoalProgressPercent,
   filterGoals,
@@ -48,18 +53,10 @@ import {
   type GoalFilter,
 } from "../goals";
 import {
-  parseGoalAreaSearchParam,
-  updateGoalAreaSearchParams,
-} from "../goalAreaNavigation";
-import {
   createGoalDraftFromTemplate,
   GOAL_TEMPLATES,
   previewGoalTemplateBody,
 } from "../goalTemplates";
-import { GoalCard } from "../components/GoalCard";
-import { GoalForm } from "../components/GoalForm";
-import { GoalTemplateDiscoveryMarquee } from "../components/GoalTemplateDiscoveryMarquee";
-import { getGoalProjectProgress } from "../goalProjectProgress";
 import { useGoals } from "../hooks/useGoals";
 import type { GoalFormSeed, GoalFormValues } from "../types";
 
@@ -152,7 +149,7 @@ export function GoalsContextualHelp({
 }
 
 export function GoalsPage() {
-  const { t } = useI18n();
+  const { direction, t } = useI18n();
   const { isSimpleView } = useViewDensityMode();
   const { tasks: tasksRepository } = useStorageAdapter();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -181,10 +178,8 @@ export function GoalsPage() {
   const [areaFilter, setAreaFilter] = useState<GoalFilter["area"]>(() =>
     parseGoalAreaSearchParam(searchParams.get("area"))
   );
-  const [timeframeFilter, setTimeframeFilter] =
-    useState<GoalFilter["timeframe"]>("all");
-  const [importanceFilter, setImportanceFilter] =
-    useState<GoalFilter["importance"]>("all");
+  const [timeframeFilter, setTimeframeFilter] = useState<GoalFilter["timeframe"]>("all");
+  const [importanceFilter, setImportanceFilter] = useState<GoalFilter["importance"]>("all");
   const [query, setQuery] = useState("");
   const [appliedQuery, setAppliedQuery] = useState("");
   const [focusedGoalId, setFocusedGoalId] = useState<string | null>(null);
@@ -211,6 +206,7 @@ export function GoalsPage() {
       .catch(() => setTasks([]))
       .finally(() => setIsTasksLoading(false));
   }, [tasksRepository]);
+
   const templateCards = useMemo(
     () =>
       GOAL_TEMPLATES.map((template) => ({
@@ -221,6 +217,7 @@ export function GoalsPage() {
       })),
     [t]
   );
+
   const filteredEntries = useMemo(
     () =>
       filterGoals(entries, {
@@ -232,6 +229,7 @@ export function GoalsPage() {
       }),
     [appliedQuery, areaFilter, entries, importanceFilter, statusFilter, timeframeFilter]
   );
+
   const hasActiveFilters =
     statusFilter !== "all" ||
     areaFilter !== "all" ||
@@ -239,10 +237,12 @@ export function GoalsPage() {
     importanceFilter !== "all" ||
     appliedQuery.length > 0;
   const goalPreviewLimit = isSimpleView ? 4 : 6;
-  const focusRequiresAllGoals = filteredEntries.findIndex((goal) => goal.id === focusId) >= goalPreviewLimit;
-  const displayedGoals = showAllGoals || focusRequiresAllGoals
-    ? filteredEntries
-    : filteredEntries.slice(0, goalPreviewLimit);
+  const focusRequiresAllGoals =
+    filteredEntries.findIndex((goal) => goal.id === focusId) >= goalPreviewLimit;
+  const displayedGoals =
+    showAllGoals || focusRequiresAllGoals
+      ? filteredEntries
+      : filteredEntries.slice(0, goalPreviewLimit);
   const hiddenGoalCount = Math.max(filteredEntries.length - displayedGoals.length, 0);
 
   useEffect(() => {
@@ -472,98 +472,104 @@ export function GoalsPage() {
     () => entries.filter((goal) => isGoalReviewDue(goal)),
     [entries]
   );
+  const activeGoals = filteredEntries.filter((goal) => goal.status === "active");
+  const completedGoals = filteredEntries.filter((goal) => goal.status === "completed");
+  const primaryGoal = filteredEntries.find((goal) => goal.status === "active") ?? filteredEntries[0];
 
   return (
     <section className="alios-page space-y-6">
       <PremiumCard className="border-primary/15 bg-gradient-to-br from-primary/10 via-background to-background shadow-sm">
-        <div className="p-5 sm:p-6">
-          <SectionHeader
-            eyebrow={t("goals.title")}
-            icon={<Target className="h-5 w-5" />}
-            title={t("goals.title")}
-            description={t("goals.description")}
-            status={<StatusChip tone="neutral">{t("goals.localOnlyNote")}</StatusChip>}
-          />
-          {isSimpleView ? (
-            <GoalsContextualHelp
-              isOpen={isContextualHelpOpen}
-              onToggle={() => setIsContextualHelpOpen((current) => !current)}
+        <div className="grid gap-5 p-5 sm:p-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)]">
+          <div className="space-y-5">
+            <SectionHeader
+              eyebrow={t("goals.title")}
+              icon={<Target className="h-5 w-5" />}
+              title={t("goals.title")}
+              description={t("goals.description")}
+              status={<StatusChip tone="neutral">{t("goals.localOnlyNote")}</StatusChip>}
             />
-          ) : (
-            <div className="mt-4 max-w-3xl space-y-2 text-sm leading-7 text-muted-foreground">
-              <p>{t("goals.nonAdvisoryNote")}</p>
-              <p>{t("goals.localOnlyDescription")}</p>
+
+            <div className="space-y-2">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                {t("goals.averageProgress")}
+              </p>
+              <p className="break-words text-2xl font-semibold leading-9 tracking-tight sm:text-3xl">
+                {primaryGoal ? primaryGoal.title : t("goals.emptyTitle")}
+              </p>
+              <p className="max-w-3xl text-sm leading-7 text-muted-foreground">
+                {primaryGoal ? primaryGoal.description : t("goals.emptyDescription")}
+              </p>
             </div>
-          )}
+
+            <div className="grid gap-3 sm:grid-cols-3">
+              <SoftPanel className="gap-2 border-primary/15 bg-background/80">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                  {t("goals.activeGoals")}
+                </p>
+                <p className="text-lg font-semibold tabular-nums">{activeGoals.length}</p>
+                <p className="text-sm text-muted-foreground">{t("goals.userManagedOnly")}</p>
+              </SoftPanel>
+              <SoftPanel className="gap-2 border-primary/15 bg-background/80">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                  {t("goals.reviewDue")}
+                </p>
+                <p className="text-lg font-semibold tabular-nums">{reviewDueGoals.length}</p>
+                <p className="text-sm text-muted-foreground">{t("goals.nonAdvisoryNote")}</p>
+              </SoftPanel>
+              <SoftPanel className="gap-2 border-primary/15 bg-background/80">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                  {t("goals.averageProgress")}
+                </p>
+                <p className="text-lg font-semibold tabular-nums">
+                  {summary.averageActiveProgress === null
+                    ? t("common.notRecorded")
+                    : `${Math.round(summary.averageActiveProgress)}%`}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {t("goals.highImportanceActive", {
+                    count: summary.highImportanceActiveCount,
+                  })}
+                </p>
+              </SoftPanel>
+            </div>
+          </div>
+
+          <SoftPanel className="space-y-4 border-primary/20 bg-primary/5">
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-muted-foreground">
+                {t("goals.newGoal")}
+              </p>
+              <p className="text-xl font-semibold leading-8">
+                {reviewDueGoals.length > 0
+                  ? t("goals.reviewDueSection")
+                  : t("goals.templatesTitle")}
+              </p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
+              <Button type="button" className="w-full" onClick={openCreateForm}>
+                <Plus className="me-2 h-4 w-4" />
+                {t("goals.newGoal")}
+              </Button>
+              {reviewDueGoals.length > 0 ? (
+                <Button asChild variant="outline" className="w-full">
+                  <a href="#goals-review-due">{t("goals.reviewDueSection")}</a>
+                </Button>
+              ) : null}
+            </div>
+            {isSimpleView ? (
+              <GoalsContextualHelp
+                isOpen={isContextualHelpOpen}
+                onToggle={() => setIsContextualHelpOpen((current) => !current)}
+              />
+            ) : (
+              <div className="space-y-2 text-sm leading-7 text-muted-foreground">
+                <p>{t("goals.nonAdvisoryNote")}</p>
+                <p>{t("goals.localOnlyDescription")}</p>
+              </div>
+            )}
+          </SoftPanel>
         </div>
       </PremiumCard>
-
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <MetricCard
-          icon={<Target className="h-5 w-5" />}
-          label={t("goals.totalGoals")}
-          value={summary.totalCount}
-        />
-        <MetricCard
-          icon={<CheckCircle2 className="h-5 w-5" />}
-          label={t("goals.activeGoals")}
-          value={summary.activeCount}
-        />
-        <MetricCard
-          icon={<Clock3 className="h-5 w-5" />}
-          label={t("goals.reviewDue")}
-          value={summary.reviewDueCount}
-        />
-        <MetricCard
-          icon={<CheckCircle2 className="h-5 w-5" />}
-          label={t("goals.averageProgress")}
-          value={
-            summary.averageActiveProgress === null
-              ? t("common.notRecorded")
-              : `${Math.round(summary.averageActiveProgress)}%`
-          }
-          description={t("goals.highImportanceActive", {
-            count: summary.highImportanceActiveCount,
-          })}
-        />
-      </div>
-
-      {isSimpleView && !showSimpleTemplates ? (
-        <PremiumCard>
-          <div className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
-            <SectionHeader
-              eyebrow={t("goals.templatesTitle")}
-              title={t("goals.templatesTitle")}
-              description={t("goals.templatesDescription")}
-              status={<StatusChip tone="neutral">{templateCards.length}</StatusChip>}
-            />
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setShowSimpleTemplates(true)}
-              aria-expanded={showSimpleTemplates}
-            >
-              {t("common.expandSection")}
-            </Button>
-          </div>
-        </PremiumCard>
-      ) : (
-        <GoalTemplateDiscoveryMarquee
-          templates={templateCards}
-          title={t("goals.templatesTitle")}
-          description={t("goals.templatesDescription")}
-          note={t("goals.templatesNote")}
-          localOnlyLabel={t("goals.localOnlyNote")}
-          useTemplateLabel={t("goals.useTemplate")}
-          progressLabel={t("goals.progressLabel")}
-          reviewIntervalDaysLabel={t("goals.reviewIntervalDaysLabel")}
-          emptyTitle={t("goals.emptyTitle")}
-          emptyDescription={t("goals.emptyDescription")}
-          sectionLabel={t("goals.templatesTitle")}
-          onSelectTemplate={openTemplateForm}
-          t={t}
-        />
-      )}
 
       {successMessage ? (
         <div
@@ -601,135 +607,225 @@ export function GoalsPage() {
         </div>
       ) : null}
 
-      <PremiumCard>
-        <div className="space-y-3 p-5 sm:space-y-4 sm:p-6">
-          <SectionHeader
-            title={
-              formOpen
-                ? editingGoal
-                  ? t("goals.editGoal")
-                  : t("goals.createGoal")
-                : t("goals.newGoal")
-            }
-            description={t("goals.formDescription")}
-            status={<StatusChip tone="neutral">{t("goals.userManagedOnly")}</StatusChip>}
-          />
-          {!formOpen ? (
-            <Button type="button" onClick={openCreateForm}>
-              <Plus className="me-2 h-4 w-4" />
-              {t("goals.newGoal")}
-            </Button>
-          ) : null}
-          {formOpen ? (
-            <div ref={formRef}>
-              <GoalForm
-                key={`${editingGoal?.id ?? draftGoalTemplateId ?? "new-goal"}-${formRevision}`}
-                goal={editingGoal ?? draftGoalSeed}
-                isSubmitting={isSubmitting}
-                onSubmit={handleSubmit}
-                onCancel={closeForm}
-              />
-            </div>
-          ) : null}
-        </div>
-      </PremiumCard>
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)]">
+        <div className="space-y-6">
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            <MetricCard
+              icon={<Target className="h-5 w-5" />}
+              label={t("goals.totalGoals")}
+              value={summary.totalCount}
+            />
+            <MetricCard
+              icon={<CheckCircle2 className="h-5 w-5" />}
+              label={t("goals.activeGoals")}
+              value={summary.activeCount}
+            />
+            <MetricCard
+              icon={<CheckCircle2 className="h-5 w-5" />}
+              label={t("common.completed")}
+              value={completedGoals.length}
+            />
+          </div>
 
-      <PremiumCard>
-        <div className="min-w-0 space-y-4 p-5 sm:p-6">
-          <SectionHeader
-            title={t("goals.filters")}
-            description={t("goals.filtersDescription")}
-            status={<StatusChip tone="neutral">{filteredEntries.length}</StatusChip>}
-          />
-
-          <SoftPanel className="grid min-w-0 gap-3 md:grid-cols-[minmax(0,1fr)_11rem_11rem_11rem_11rem_auto]">
-            <div className="relative min-w-0">
-              <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder={t("goals.searchPlaceholder")}
-                className="pl-9"
-                aria-label={t("goals.searchLabel")}
+          <PremiumCard>
+            <div className="space-y-3 p-5 sm:space-y-4 sm:p-6">
+              <SectionHeader
+                title={
+                  formOpen
+                    ? editingGoal
+                      ? t("goals.editGoal")
+                      : t("goals.createGoal")
+                    : t("goals.newGoal")
+                }
+                description={t("goals.formDescription")}
+                status={<StatusChip tone="neutral">{t("goals.userManagedOnly")}</StatusChip>}
               />
-            </div>
-            <Select
-              value={statusFilter}
-              onChange={(event) =>
-                setStatusFilter(event.target.value as GoalFilter["status"])
-              }
-              aria-label={t("goals.statusFilter")}
-            >
-              {GOAL_STATUS_OPTIONS.map((option) => (
-                <option key={String(option.value)} value={option.value}>
-                  {t(option.labelKey)}
-                </option>
-              ))}
-            </Select>
-            <Select
-              value={areaFilter}
-              onChange={(event) =>
-                handleAreaFilterChange(
-                  event.target.value as GoalFilter["area"]
-                )
-              }
-              aria-label={t("goals.areaFilter")}
-            >
-              {GOAL_AREA_OPTIONS.map((option) => (
-                <option key={String(option.value)} value={option.value}>
-                  {t(option.labelKey)}
-                </option>
-              ))}
-            </Select>
-            <Select
-              value={timeframeFilter}
-              onChange={(event) =>
-                setTimeframeFilter(event.target.value as GoalFilter["timeframe"])
-              }
-              aria-label={t("goals.timeframeFilter")}
-            >
-              {GOAL_TIMEFRAME_OPTIONS.map((option) => (
-                <option key={String(option.value)} value={option.value}>
-                  {t(option.labelKey)}
-                </option>
-              ))}
-            </Select>
-            <Select
-              value={importanceFilter}
-              onChange={(event) =>
-                setImportanceFilter(event.target.value as GoalFilter["importance"])
-              }
-              aria-label={t("goals.importanceFilter")}
-            >
-              {GOAL_IMPORTANCE_OPTIONS.map((option) => (
-                <option key={String(option.value)} value={option.value}>
-                  {t(option.labelKey)}
-                </option>
-              ))}
-            </Select>
-            <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-              <Button
-                type="button"
-                className="w-full sm:w-auto"
-                onClick={handleSearch}
-              >
-                {t("goals.search")}
-              </Button>
-              {hasActiveFilters ? (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="w-full sm:w-auto"
-                  onClick={clearFilters}
-                >
-                  <X className="me-2 h-4 w-4" />
-                  {t("goals.clearFilters")}
+              {!formOpen ? (
+                <Button type="button" onClick={openCreateForm}>
+                  <Plus className="me-2 h-4 w-4" />
+                  {t("goals.newGoal")}
                 </Button>
               ) : null}
+              {formOpen ? (
+                <div ref={formRef}>
+                  <GoalForm
+                    key={`${editingGoal?.id ?? draftGoalTemplateId ?? "new-goal"}-${formRevision}`}
+                    goal={editingGoal ?? draftGoalSeed}
+                    isSubmitting={isSubmitting}
+                    onSubmit={handleSubmit}
+                    onCancel={closeForm}
+                  />
+                </div>
+              ) : null}
             </div>
-          </SoftPanel>
+          </PremiumCard>
+
+          <PremiumCard>
+            <div className="min-w-0 space-y-4 p-5 sm:p-6">
+              <SectionHeader
+                title={t("goals.filters")}
+                description={t("goals.filtersDescription")}
+                status={<StatusChip tone="neutral">{filteredEntries.length}</StatusChip>}
+              />
+
+              <SoftPanel className="grid min-w-0 gap-3 md:grid-cols-[minmax(0,1fr)_11rem_11rem_11rem_11rem_auto]">
+                <div className="relative min-w-0">
+                  <Search
+                    className={cn(
+                      "pointer-events-none absolute top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground",
+                      direction === "rtl" ? "right-3" : "left-3"
+                    )}
+                  />
+                  <Input
+                    value={query}
+                    onChange={(event) => setQuery(event.target.value)}
+                    placeholder={t("goals.searchPlaceholder")}
+                    className={direction === "rtl" ? "pr-9" : "pl-9"}
+                    aria-label={t("goals.searchLabel")}
+                  />
+                </div>
+                <Select
+                  value={statusFilter}
+                  onChange={(event) =>
+                    setStatusFilter(event.target.value as GoalFilter["status"])
+                  }
+                  aria-label={t("goals.statusFilter")}
+                >
+                  {GOAL_STATUS_OPTIONS.map((option) => (
+                    <option key={String(option.value)} value={option.value}>
+                      {t(option.labelKey)}
+                    </option>
+                  ))}
+                </Select>
+                <Select
+                  value={areaFilter}
+                  onChange={(event) =>
+                    handleAreaFilterChange(event.target.value as GoalFilter["area"])
+                  }
+                  aria-label={t("goals.areaFilter")}
+                >
+                  {GOAL_AREA_OPTIONS.map((option) => (
+                    <option key={String(option.value)} value={option.value}>
+                      {t(option.labelKey)}
+                    </option>
+                  ))}
+                </Select>
+                <Select
+                  value={timeframeFilter}
+                  onChange={(event) =>
+                    setTimeframeFilter(event.target.value as GoalFilter["timeframe"])
+                  }
+                  aria-label={t("goals.timeframeFilter")}
+                >
+                  {GOAL_TIMEFRAME_OPTIONS.map((option) => (
+                    <option key={String(option.value)} value={option.value}>
+                      {t(option.labelKey)}
+                    </option>
+                  ))}
+                </Select>
+                <Select
+                  value={importanceFilter}
+                  onChange={(event) =>
+                    setImportanceFilter(event.target.value as GoalFilter["importance"])
+                  }
+                  aria-label={t("goals.importanceFilter")}
+                >
+                  {GOAL_IMPORTANCE_OPTIONS.map((option) => (
+                    <option key={String(option.value)} value={option.value}>
+                      {t(option.labelKey)}
+                    </option>
+                  ))}
+                </Select>
+                <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                  <Button type="button" className="w-full sm:w-auto" onClick={handleSearch}>
+                    {t("goals.search")}
+                  </Button>
+                  {hasActiveFilters ? (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className="w-full sm:w-auto"
+                      onClick={clearFilters}
+                    >
+                      <X className="me-2 h-4 w-4" />
+                      {t("goals.clearFilters")}
+                    </Button>
+                  ) : null}
+                </div>
+              </SoftPanel>
+            </div>
+          </PremiumCard>
         </div>
-      </PremiumCard>
+
+        <div className="space-y-6">
+          {isSimpleView && !showSimpleTemplates ? (
+            <PremiumCard>
+              <div className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+                <SectionHeader
+                  eyebrow={t("goals.templatesTitle")}
+                  title={t("goals.templatesTitle")}
+                  description={t("goals.templatesDescription")}
+                  status={<StatusChip tone="neutral">{templateCards.length}</StatusChip>}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowSimpleTemplates(true)}
+                  aria-expanded={showSimpleTemplates}
+                >
+                  {t("common.expandSection")}
+                </Button>
+              </div>
+            </PremiumCard>
+          ) : (
+            <GoalTemplateDiscoveryMarquee
+              templates={templateCards}
+              title={t("goals.templatesTitle")}
+              description={t("goals.templatesDescription")}
+              note={t("goals.templatesNote")}
+              localOnlyLabel={t("goals.localOnlyNote")}
+              useTemplateLabel={t("goals.useTemplate")}
+              progressLabel={t("goals.progressLabel")}
+              reviewIntervalDaysLabel={t("goals.reviewIntervalDaysLabel")}
+              emptyTitle={t("goals.emptyTitle")}
+              emptyDescription={t("goals.emptyDescription")}
+              sectionLabel={t("goals.templatesTitle")}
+              onSelectTemplate={openTemplateForm}
+              t={t}
+            />
+          )}
+
+          {reviewDueGoals.length > 0 ? (
+            <section
+              id="goals-review-due"
+              className="alios-surface-soft space-y-4 p-5 sm:p-6"
+            >
+              <SectionHeader
+                title={t("goals.reviewDueSection")}
+                description={t("goals.reviewDueSectionDescription")}
+                status={<StatusChip tone="warning">{reviewDueGoals.length}</StatusChip>}
+              />
+              <div className="grid min-w-0 gap-4">
+                {reviewDueGoals.slice(0, 4).map((goal) => (
+                  <GoalCard
+                    key={`review-${goal.id}`}
+                    goal={goal}
+                    isReviewDue
+                    projectProgress={getGoalProjectProgress(goal.id, projects, tasks)}
+                    isProjectProgressLoading={isProjectProgressLoading}
+                    isDeleting={deletingId === goal.id}
+                    onEdit={() => openEditForm(goal)}
+                    onDelete={() => void handleDelete(goal)}
+                    onMarkReviewed={() => void handleMarkReviewed(goal)}
+                    onMarkCompleted={() => void handleMarkCompleted(goal)}
+                    onReactivate={() => void handleReactivate(goal)}
+                  />
+                ))}
+              </div>
+            </section>
+          ) : null}
+        </div>
+      </div>
 
       {isLoading ? (
         <div
@@ -759,11 +855,7 @@ export function GoalsPage() {
                 {t("goals.clearFilters")}
               </Button>
             ) : (
-              <Button
-                type="button"
-                className="w-full sm:w-auto"
-                onClick={openCreateForm}
-              >
+              <Button type="button" className="w-full sm:w-auto" onClick={openCreateForm}>
                 <Plus className="me-2 h-4 w-4" />
                 {t("goals.emptyAction")}
               </Button>
@@ -801,39 +893,16 @@ export function GoalsPage() {
       )}
       {filteredEntries.length > goalPreviewLimit && !focusRequiresAllGoals ? (
         <div className="flex justify-start">
-          <Button type="button" variant="outline" onClick={() => setShowAllGoals((current) => !current)}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setShowAllGoals((current) => !current)}
+          >
             {showAllGoals
               ? t("common.showFewer")
               : t("common.showMoreCount", { count: hiddenGoalCount })}
           </Button>
         </div>
-      ) : null}
-
-      {reviewDueGoals.length > 0 ? (
-        <section className="alios-surface-soft space-y-4 p-5 sm:p-6">
-          <SectionHeader
-            title={t("goals.reviewDueSection")}
-            description={t("goals.reviewDueSectionDescription")}
-            status={<StatusChip tone="warning">{reviewDueGoals.length}</StatusChip>}
-          />
-          <div className="grid min-w-0 gap-4 xl:grid-cols-2">
-            {reviewDueGoals.slice(0, 4).map((goal) => (
-              <GoalCard
-                key={`review-${goal.id}`}
-                goal={goal}
-                isReviewDue
-                projectProgress={getGoalProjectProgress(goal.id, projects, tasks)}
-                isProjectProgressLoading={isProjectProgressLoading}
-                isDeleting={deletingId === goal.id}
-                onEdit={() => openEditForm(goal)}
-                onDelete={() => void handleDelete(goal)}
-                onMarkReviewed={() => void handleMarkReviewed(goal)}
-                onMarkCompleted={() => void handleMarkCompleted(goal)}
-                onReactivate={() => void handleReactivate(goal)}
-              />
-            ))}
-          </div>
-        </section>
       ) : null}
     </section>
   );

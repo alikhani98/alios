@@ -85,6 +85,12 @@ function createHomeData(overrides: Partial<HomeDashboardData> = {}): HomeDashboa
       averageActiveProgress: null,
       latest: undefined,
     },
+    finance: {
+      transactionCount: 0,
+      activeObligationCount: 0,
+      remainingLiquidity: 0,
+      remainingObligationTotal: 0,
+    },
     lifeAreas: {
       totalCount: 0,
       activeCount: 0,
