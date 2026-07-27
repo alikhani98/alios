@@ -88,7 +88,7 @@ export function DecisionLogForm({
         expandLabel={t("common.expandSection")}
         collapseLabel={t("common.collapseSection")}
       >
-        <SoftPanel className="grid gap-4 md:grid-cols-2">
+        <SoftPanel className="grid gap-4 bg-background/80 md:grid-cols-2">
           <div className="grid gap-2 md:col-span-2">
             <label htmlFor="decision-title" className="text-sm font-medium">
               {t("common.title")}
@@ -100,7 +100,6 @@ export function DecisionLogForm({
               aria-invalid={Boolean(errors.title)}
               {...register("title")}
             />
-            <DateValueHint value={decisionDateValue} />
             {errors.title ? (
               <p className="text-sm text-destructive">{t("common.validation")}</p>
             ) : null}
@@ -132,6 +131,7 @@ export function DecisionLogForm({
               aria-invalid={Boolean(errors.decisionDate)}
               {...register("decisionDate")}
             />
+            <DateValueHint value={decisionDateValue} />
             {errors.decisionDate ? (
               <p className="text-sm text-destructive">{t("common.validation")}</p>
             ) : null}
@@ -192,7 +192,7 @@ export function DecisionLogForm({
         expandLabel={t("common.expandSection")}
         collapseLabel={t("common.collapseSection")}
       >
-        <SoftPanel className="grid gap-4">
+        <SoftPanel className="grid gap-4 bg-background/80">
           <div className="grid gap-2">
             <label htmlFor="decision-context" className="text-sm font-medium">
               {t("decisions.context")}
@@ -224,15 +224,29 @@ export function DecisionLogForm({
             </p>
           </div>
 
-          <div className="grid gap-2">
-            <label htmlFor="decision-chosen-option" className="text-sm font-medium">
-              {t("decisions.chosenOption")}
-            </label>
-            <Input
-              id="decision-chosen-option"
-              placeholder={t("decisions.chosenOptionPlaceholder")}
-              {...register("chosenOption")}
-            />
+          <div className="grid gap-4 lg:grid-cols-2">
+            <div className="grid gap-2">
+              <label htmlFor="decision-chosen-option" className="text-sm font-medium">
+                {t("decisions.chosenOption")}
+              </label>
+              <Input
+                id="decision-chosen-option"
+                placeholder={t("decisions.chosenOptionPlaceholder")}
+                {...register("chosenOption")}
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <label htmlFor="decision-expected-outcome" className="text-sm font-medium">
+                {t("decisions.expectedOutcome")}
+              </label>
+              <Textarea
+                id="decision-expected-outcome"
+                rows={3}
+                placeholder={t("decisions.expectedOutcomePlaceholder")}
+                {...register("expectedOutcome")}
+              />
+            </div>
           </div>
 
           <div className="grid gap-2">
@@ -244,18 +258,6 @@ export function DecisionLogForm({
               rows={4}
               placeholder={t("decisions.reasoningPlaceholder")}
               {...register("reasoning")}
-            />
-          </div>
-
-          <div className="grid gap-2">
-            <label htmlFor="decision-expected-outcome" className="text-sm font-medium">
-              {t("decisions.expectedOutcome")}
-            </label>
-            <Textarea
-              id="decision-expected-outcome"
-              rows={3}
-              placeholder={t("decisions.expectedOutcomePlaceholder")}
-              {...register("expectedOutcome")}
             />
           </div>
 
@@ -286,7 +288,7 @@ export function DecisionLogForm({
         expandLabel={t("common.expandSection")}
         collapseLabel={t("common.collapseSection")}
       >
-        <SoftPanel className="grid gap-4 md:grid-cols-2">
+        <SoftPanel className="grid gap-4 bg-background/80 md:grid-cols-2">
           <div className="grid gap-2">
             <label htmlFor="decision-review-date" className="text-sm font-medium">
               {t("decisions.reviewDate")}

@@ -1,4 +1,4 @@
-import { Archive, CheckCircle2, Pencil, Trash2 } from "lucide-react";
+import { Archive, CheckCircle2, GitBranch, Lightbulb, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 import type { DecisionLogEntry } from "@/shared/types";
@@ -61,26 +61,45 @@ export function DecisionLogCard({
   const needsReview = isDecisionNeedsReview(decision);
 
   return (
-    <Card className="flex h-full min-w-0 flex-col overflow-hidden">
+    <Card
+      className={needsReview
+        ? "flex h-full min-w-0 flex-col overflow-hidden border-warning/20 bg-warning/5"
+        : "flex h-full min-w-0 flex-col overflow-hidden"}
+    >
       <CardHeader className="gap-4">
         <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
-          <CardTitle className="break-words text-xl leading-7">{decision.title}</CardTitle>
-          <div className="flex flex-wrap justify-end gap-2">
-            <StatusChip
-              tone={
-                decision.status === "archived"
-                  ? "neutral"
-                  : decision.status === "reviewed"
-                    ? "success"
-                    : decision.status === "decided"
-                      ? "primary"
-                      : "warning"
-              }
-            >
-              {t(statusLabelKeys[decision.status])}
-            </StatusChip>
-            {needsReview ? <StatusChip tone="warning">{t("decisions.reviewDue")}</StatusChip> : null}
+          <div className="min-w-0 flex-1 space-y-3">
+            <div className="flex flex-wrap gap-2">
+              <StatusChip
+                tone={
+                  decision.status === "archived"
+                    ? "neutral"
+                    : decision.status === "reviewed"
+                      ? "success"
+                      : decision.status === "decided"
+                        ? "primary"
+                        : "warning"
+                }
+              >
+                {t(statusLabelKeys[decision.status])}
+              </StatusChip>
+              {needsReview ? <StatusChip tone="warning">{t("decisions.reviewDue")}</StatusChip> : null}
+            </div>
+            <div className="space-y-1">
+              <CardTitle className="break-words text-xl leading-8">{decision.title}</CardTitle>
+              {decision.category ? (
+                <p className="text-sm text-muted-foreground">{decision.category}</p>
+              ) : null}
+            </div>
           </div>
+          {decision.importance ? (
+            <Badge
+              variant="outline"
+              className="max-w-full break-words whitespace-normal text-start leading-5"
+            >
+              {t("decisions.importance")}: {decision.importance}/5
+            </Badge>
+          ) : null}
         </div>
         <p className="max-w-3xl break-words text-sm leading-7 text-muted-foreground">
           {previewText(decision.context, t("decisions.noContext"))}
@@ -124,8 +143,11 @@ export function DecisionLogCard({
         ) : null}
 
         {decision.chosenOption ? (
-          <SoftPanel className="space-y-1 rounded-surface px-4 py-3 text-sm">
-            <p className="font-medium">{t("decisions.chosenOption")}</p>
+          <SoftPanel className="space-y-2 rounded-surface bg-muted/60 px-4 py-3 text-sm">
+            <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+              <GitBranch className="h-4 w-4 shrink-0" />
+              {t("decisions.chosenOption")}
+            </p>
             <p className="break-words text-muted-foreground">{decision.chosenOption}</p>
           </SoftPanel>
         ) : null}
@@ -151,20 +173,23 @@ export function DecisionLogCard({
         {decision.actualOutcome || decision.lesson ? (
           <div className="grid gap-3 sm:grid-cols-2">
             {decision.actualOutcome ? (
-              <div className="space-y-1 text-sm">
+              <SoftPanel className="space-y-2 bg-muted/60 text-sm">
                 <p className="font-medium">{t("decisions.actualOutcome")}</p>
                 <p className="break-words text-muted-foreground">
                   {previewText(decision.actualOutcome, t("common.notRecorded"))}
                 </p>
-              </div>
+              </SoftPanel>
             ) : null}
             {decision.lesson ? (
-              <div className="space-y-1 text-sm">
-                <p className="font-medium">{t("decisions.lesson")}</p>
+              <SoftPanel className="space-y-2 bg-muted/60 text-sm">
+                <p className="flex items-center gap-2 font-medium">
+                  <Lightbulb className="h-4 w-4 shrink-0 text-primary" />
+                  {t("decisions.lesson")}
+                </p>
                 <p className="break-words text-muted-foreground">
                   {previewText(decision.lesson, t("common.notRecorded"))}
                 </p>
-              </div>
+              </SoftPanel>
             ) : null}
           </div>
         ) : null}

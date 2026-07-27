@@ -1553,9 +1553,9 @@ export function WeeklyReviewPage() {
                     </Button>
                   ) : null}
 
-                  <div className="grid gap-3 border-t border-border/70 pt-4 sm:flex sm:flex-wrap">
+                  <div className="grid gap-3 border-t border-border/70 pt-4 sm:grid-cols-2 xl:grid-cols-3">
                     {quickLinks.map(({ to, labelKey }) => (
-                      <Button key={to} asChild variant="outline" className="w-full justify-start shadow-sm sm:w-auto">
+                      <Button key={to} asChild variant="outline" className="w-full justify-start shadow-sm">
                         <Link to={to}>
                           {t(labelKey)}
                           <ArrowUpRight className="ms-2 h-4 w-4" />

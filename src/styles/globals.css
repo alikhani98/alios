@@ -171,19 +171,19 @@
   }
 
   .alios-surface-card {
-    @apply rounded-surface border bg-card text-card-foreground shadow-sm;
+    @apply rounded-surface border border-border/80 bg-card/95 text-card-foreground shadow-sm backdrop-blur-sm;
   }
 
   .alios-surface-elevated {
-    @apply rounded-surface border border-primary/10 bg-gradient-to-br from-background via-background to-primary/5 text-card-foreground shadow-sm backdrop-blur-sm;
+    @apply rounded-surface border border-primary/15 bg-gradient-to-br from-background via-background to-primary/5 text-card-foreground shadow-md backdrop-blur-sm;
   }
 
   .alios-surface-soft {
-    @apply rounded-section border border-border/70 bg-background/90 shadow-sm;
+    @apply rounded-section border border-border/70 bg-background/95 shadow-sm backdrop-blur-sm;
   }
 
   .alios-surface-muted {
-    @apply rounded-surface border border-border/70 bg-background/70;
+    @apply rounded-surface border border-border/70 bg-background/75 shadow-sm;
   }
 
   .alios-control-field {
