@@ -4,7 +4,13 @@ import {
 } from "./LocalOnlyAccountProvider";
 import type { AuthProvider, AuthSession, AuthSessionStatus } from "@/core/auth";
 import { localOnlyAuthProvider } from "@/core/auth";
-import { localOnlySyncProvider, type SyncProvider } from "@/core/sync";
+import {
+  localOnlySyncProvider,
+  type SyncConflictRecord,
+  type SyncConflictResolutionInput,
+  type SyncConflictResolutionResult,
+  type SyncProvider,
+} from "@/core/sync";
 import { LOCAL_ONLY_SYNC_METADATA, type SyncMetadataSnapshot } from "@/core/sync";
 import type { SyncStatus } from "@/core/sync/types";
 import {
@@ -54,6 +60,11 @@ export type AccountRuntimeState = Readonly<{
 export interface AccountRuntimeBoundary {
   getState(): Promise<AccountRuntimeState>;
   syncNow(): Promise<SyncStatus>;
+  getSyncConflictSnapshot(): ReadonlyArray<SyncConflictRecord>;
+  getSyncConflicts(): Promise<ReadonlyArray<SyncConflictRecord>>;
+  resolveSyncConflict(
+    input: SyncConflictResolutionInput
+  ): Promise<SyncConflictResolutionResult | null>;
   subscribe(
     listener: AccountRuntimeStateListener<AccountRuntimeState>
   ): AccountStateSubscription;
@@ -282,6 +293,32 @@ export class DefaultAccountRuntimeBoundary implements AccountRuntimeBoundary {
   async syncNow(): Promise<SyncStatus> {
     const result = await this.syncProvider.syncNow();
     return result.status;
+  }
+
+  getSyncConflictSnapshot(): ReadonlyArray<SyncConflictRecord> {
+    if (typeof this.syncProvider.getConflictSnapshot !== "function") {
+      return [];
+    }
+
+    return this.syncProvider.getConflictSnapshot();
+  }
+
+  async getSyncConflicts(): Promise<ReadonlyArray<SyncConflictRecord>> {
+    if (typeof this.syncProvider.listConflicts !== "function") {
+      return [];
+    }
+
+    return this.syncProvider.listConflicts();
+  }
+
+  async resolveSyncConflict(
+    input: SyncConflictResolutionInput
+  ): Promise<SyncConflictResolutionResult | null> {
+    if (typeof this.syncProvider.resolveConflict !== "function") {
+      return null;
+    }
+
+    return this.syncProvider.resolveConflict(input);
   }
 
   subscribe(

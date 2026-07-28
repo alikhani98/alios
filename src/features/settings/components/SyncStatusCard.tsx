@@ -9,10 +9,11 @@ import {
   PauseCircle,
   RefreshCw,
   ShieldCheck,
+  Smartphone,
   UserRound,
   WifiOff,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
   useAccountRuntime,
@@ -21,7 +22,12 @@ import {
 } from "@/core/account";
 import { GoogleAuthProvider, useAuth } from "@/core/auth";
 import { OPTIONAL_SYNC_PROVIDER_ID } from "@/core/sync";
-import type { SyncScope } from "@/core/sync";
+import type {
+  SyncConflictEntity,
+  SyncConflictRecord,
+  SyncConflictResolutionChoice,
+  SyncScope,
+} from "@/core/sync";
 import { useI18n, type TranslationKey } from "@/shared/i18n";
 import {
   Badge,
@@ -87,6 +93,15 @@ type RuntimeMetadataRow = Readonly<{
   labelKey: TranslationKey;
   value: string;
   descriptionKey?: TranslationKey;
+}>;
+
+type ConflictReviewState = Readonly<{
+  expanded: boolean;
+  loading: boolean;
+  records: ReadonlyArray<SyncConflictRecord> | null;
+  feedback: string | null;
+  error: string | null;
+  pendingActionKey: string | null;
 }>;
 
 type SyncHealthTone = "neutral" | "primary" | "warning" | "danger";
@@ -269,6 +284,38 @@ function getSyncScopeLabelKey(scope: SyncScope): TranslationKey {
   }
 }
 
+function getConflictEntityLabelKey(entity: SyncConflictEntity): TranslationKey {
+  switch (entity) {
+    case "tasks":
+      return "settings.syncConflictEntityTasks";
+    case "projects":
+      return "settings.syncConflictEntityProjects";
+    case "goals":
+      return "settings.syncConflictEntityGoals";
+  }
+}
+
+function getConflictResolutionActionKey(
+  conflict: SyncConflictRecord,
+  resolution: SyncConflictResolutionChoice
+) {
+  return `${conflict.entity}:${conflict.recordId}:${resolution}`;
+}
+
+function getConflictConfirmationMessage(
+  t: (key: TranslationKey, values?: Record<string, string | number>) => string,
+  conflict: SyncConflictRecord,
+  resolution: SyncConflictResolutionChoice
+) {
+  return resolution === "keep-local"
+    ? t("settings.syncConflictConfirmKeepLocal", {
+        title: conflict.title,
+      })
+    : t("settings.syncConflictConfirmKeepRemote", {
+        title: conflict.title,
+      });
+}
+
 function getSyncHealthSummary(runtimeState: AccountRuntimeState): Readonly<{
   labelKey: TranslationKey;
   descriptionKey: TranslationKey;
@@ -393,6 +440,7 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
   const { boundary } = useAccountRuntime();
   const runtimeState = useAccountRuntimeState();
   const { provider } = useAuth();
+  const conflictSnapshot = boundary.getSyncConflictSnapshot();
   const [accountActionFeedback, setAccountActionFeedback] = useState<string | null>(
     null
   );
@@ -401,6 +449,14 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
   >(null);
   const [syncActionPending, setSyncActionPending] = useState(false);
   const [syncActionFeedback, setSyncActionFeedback] = useState<string | null>(null);
+  const [conflictReview, setConflictReview] = useState<ConflictReviewState>(() => ({
+    expanded: conflictSnapshot.length > 0,
+    loading: false,
+    records: conflictSnapshot.length > 0 ? conflictSnapshot : null,
+    feedback: null,
+    error: null,
+    pendingActionKey: null,
+  }));
   const futureActionsDescriptionId = "account-sync-future-actions-description";
   const currentState = getRuntimeSyncState(runtimeState);
   const syncHealth = getSyncHealthSummary(runtimeState);
@@ -440,6 +496,23 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
     !runtimeState.localOnly &&
     runtimeState.authStatus === "authenticated" &&
     !syncActionPending;
+  const hasConflictIssue =
+    runtimeState.syncStatus.issue === "conflict" &&
+    (runtimeState.syncStatus.conflictCount ?? 0) > 0;
+  const conflictRecords = conflictReview.records ?? [];
+  const conflictEntityCounts = useMemo(() => {
+    return conflictRecords.reduce<Record<SyncConflictEntity, number>>(
+      (counts, conflict) => {
+        counts[conflict.entity] += 1;
+        return counts;
+      },
+      {
+        tasks: 0,
+        projects: 0,
+        goals: 0,
+      }
+    );
+  }, [conflictRecords]);
 
   const handleGoogleSignIn = async () => {
     if (!interactiveGoogleProvider) {
@@ -498,6 +571,120 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
       );
     } finally {
       setSyncActionPending(false);
+    }
+  };
+
+  useEffect(() => {
+    if (hasConflictIssue) {
+      return;
+    }
+
+    setConflictReview((current) => ({
+      ...current,
+      expanded: false,
+      loading: false,
+      records: [],
+      error: null,
+      pendingActionKey: null,
+    }));
+  }, [hasConflictIssue]);
+
+  const loadConflictRecords = async () => {
+    setConflictReview((current) => ({
+      ...current,
+      loading: true,
+      error: null,
+      feedback: null,
+    }));
+
+    try {
+      const records = await boundary.getSyncConflicts();
+      setConflictReview((current) => ({
+        ...current,
+        loading: false,
+        records,
+        error: null,
+      }));
+    } catch (error) {
+      setConflictReview((current) => ({
+        ...current,
+        loading: false,
+        error:
+          error instanceof Error
+            ? error.message
+            : t("settings.syncConflictLoadError"),
+      }));
+    }
+  };
+
+  const toggleConflictReview = () => {
+    setConflictReview((current) => ({
+      ...current,
+      expanded: !current.expanded,
+      error: null,
+      feedback: null,
+    }));
+
+    if (!conflictReview.expanded && conflictReview.records === null) {
+      void loadConflictRecords();
+    }
+  };
+
+  const handleResolveConflict = async (
+    conflict: SyncConflictRecord,
+    resolution: SyncConflictResolutionChoice
+  ) => {
+    const confirmationMessage = getConflictConfirmationMessage(
+      t,
+      conflict,
+      resolution
+    );
+
+    if (
+      typeof window !== "undefined" &&
+      typeof window.confirm === "function" &&
+      !window.confirm(confirmationMessage)
+    ) {
+      return;
+    }
+
+    const pendingActionKey = getConflictResolutionActionKey(conflict, resolution);
+    setConflictReview((current) => ({
+      ...current,
+      pendingActionKey,
+      error: null,
+      feedback: null,
+    }));
+
+    try {
+      await boundary.resolveSyncConflict({
+        entity: conflict.entity,
+        recordId: conflict.recordId,
+        resolution,
+      });
+      const records = await boundary.getSyncConflicts();
+      setConflictReview((current) => ({
+        ...current,
+        pendingActionKey: null,
+        records,
+        feedback:
+          resolution === "keep-local"
+            ? t("settings.syncConflictResolvedKeepLocal", {
+                title: conflict.title,
+              })
+            : t("settings.syncConflictResolvedKeepRemote", {
+                title: conflict.title,
+              }),
+      }));
+    } catch (error) {
+      setConflictReview((current) => ({
+        ...current,
+        pendingActionKey: null,
+        error:
+          error instanceof Error
+            ? error.message
+            : t("settings.syncConflictResolveError"),
+      }));
     }
   };
 
@@ -687,6 +874,238 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
                   ? t("settings.syncRetryPending")
                   : t("settings.syncRetryAction")}
               </Button>
+            </SoftPanel>
+          ) : null}
+
+          {!runtimeState.localOnly ? (
+            <SoftPanel className="space-y-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <GitCompareArrows className="h-4 w-4 text-primary" />
+                    <p className="text-sm font-medium">
+                      {t("settings.syncConflictReviewTitle")}
+                    </p>
+                  </div>
+                  <p className="text-sm leading-6 text-muted-foreground">
+                    {hasConflictIssue
+                      ? t("settings.syncConflictReviewDetectedDescription", {
+                          count: runtimeState.syncStatus.conflictCount ?? 0,
+                        })
+                      : t("settings.syncConflictReviewEmptyDescription")}
+                  </p>
+                </div>
+                <div className="flex flex-col items-stretch gap-2 sm:items-end">
+                  <StatusChip tone={hasConflictIssue ? "danger" : "primary"}>
+                    {hasConflictIssue
+                      ? t("settings.syncConflictReviewDetectedBadge", {
+                          count: runtimeState.syncStatus.conflictCount ?? 0,
+                        })
+                      : t("settings.syncConflictReviewEmptyBadge")}
+                  </StatusChip>
+                  {hasConflictIssue ? (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="min-h-11 w-full justify-start sm:w-auto"
+                      onClick={toggleConflictReview}
+                      aria-expanded={conflictReview.expanded}
+                    >
+                      <GitCompareArrows className="me-2 h-4 w-4" />
+                      {conflictReview.expanded
+                        ? t("settings.syncConflictHideAction")
+                        : t("settings.syncConflictReviewAction")}
+                    </Button>
+                  ) : null}
+                </div>
+              </div>
+
+              {hasConflictIssue ? (
+                <div className="flex flex-wrap gap-2">
+                  {(conflictEntityCounts.tasks > 0 ||
+                    conflictEntityCounts.projects > 0 ||
+                    conflictEntityCounts.goals > 0
+                    ? (["tasks", "projects", "goals"] as const).filter(
+                        (entity) => conflictEntityCounts[entity] > 0
+                      )
+                    : (["tasks", "projects", "goals"] as const)
+                  ).map((entity) => (
+                    <Badge key={entity} variant="secondary">
+                      {t(getConflictEntityLabelKey(entity))}
+                      {conflictEntityCounts[entity] > 0
+                        ? ` (${conflictEntityCounts[entity]})`
+                        : ""}
+                    </Badge>
+                  ))}
+                </div>
+              ) : null}
+
+              {conflictReview.feedback ? (
+                <p className="text-sm leading-6 text-muted-foreground">
+                  {conflictReview.feedback}
+                </p>
+              ) : null}
+              {conflictReview.error ? (
+                <p className="text-sm leading-6 text-destructive">
+                  {conflictReview.error}
+                </p>
+              ) : null}
+
+              {conflictReview.expanded ? (
+                conflictReview.loading ? (
+                  <p className="text-sm leading-6 text-muted-foreground">
+                    {t("settings.syncConflictLoading")}
+                  </p>
+                ) : conflictRecords.length === 0 ? (
+                  <SoftPanel className="alios-surface-muted">
+                    <p className="text-sm font-medium">
+                      {t("settings.syncConflictEmptyTitle")}
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                      {t("settings.syncConflictEmptyDescription")}
+                    </p>
+                  </SoftPanel>
+                ) : (
+                  <div className="space-y-3" role="list" aria-label={t("settings.syncConflictReviewTitle")}>
+                    {conflictRecords.map((conflict) => {
+                      const keepLocalActionKey = getConflictResolutionActionKey(
+                        conflict,
+                        "keep-local"
+                      );
+                      const keepRemoteActionKey = getConflictResolutionActionKey(
+                        conflict,
+                        "keep-remote"
+                      );
+
+                      return (
+                        <SoftPanel
+                          key={`${conflict.entity}:${conflict.recordId}`}
+                          className="space-y-4"
+                          role="listitem"
+                        >
+                          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                            <div className="min-w-0 space-y-1">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <p className="text-sm font-semibold">
+                                  {conflict.title}
+                                </p>
+                                <Badge variant="secondary">
+                                  {t(getConflictEntityLabelKey(conflict.entity))}
+                                </Badge>
+                              </div>
+                              <p className="text-xs leading-5 text-muted-foreground">
+                                {t("settings.syncConflictDetectedAt", {
+                                  value: conflict.conflictAt,
+                                })}
+                              </p>
+                            </div>
+                            <StatusChip tone="danger">
+                              {t("settings.syncStatusConflict")}
+                            </StatusChip>
+                          </div>
+
+                          <div className="grid gap-3 lg:grid-cols-2">
+                            <SoftPanel className="alios-surface-muted">
+                              <div className="flex items-center gap-2">
+                                <LaptopMinimal className="h-4 w-4 text-primary" />
+                                <p className="text-sm font-medium">
+                                  {t("settings.syncConflictLocalVersionLabel")}
+                                </p>
+                              </div>
+                              <dl className="mt-3 space-y-2 text-sm leading-6 text-muted-foreground">
+                                <div>
+                                  <dt className="font-medium text-foreground">
+                                    {t("settings.syncConflictDeviceLabel")}
+                                  </dt>
+                                  <dd>{conflict.localDeviceLabel}</dd>
+                                </div>
+                                <div>
+                                  <dt className="font-medium text-foreground">
+                                    {t("settings.syncConflictModifiedAtLabel")}
+                                  </dt>
+                                  <dd>{conflict.localUpdatedAt}</dd>
+                                </div>
+                                <div>
+                                  <dt className="font-medium text-foreground">
+                                    {t("settings.syncConflictLastSyncedLabel")}
+                                  </dt>
+                                  <dd>
+                                    {conflict.localLastSyncedAt ??
+                                      t("settings.syncLastSyncedNever")}
+                                  </dd>
+                                </div>
+                              </dl>
+                            </SoftPanel>
+
+                            <SoftPanel className="alios-surface-muted">
+                              <div className="flex items-center gap-2">
+                                <Smartphone className="h-4 w-4 text-primary" />
+                                <p className="text-sm font-medium">
+                                  {t("settings.syncConflictRemoteVersionLabel")}
+                                </p>
+                              </div>
+                              <dl className="mt-3 space-y-2 text-sm leading-6 text-muted-foreground">
+                                <div>
+                                  <dt className="font-medium text-foreground">
+                                    {t("settings.syncConflictDeviceLabel")}
+                                  </dt>
+                                  <dd>{conflict.remoteDeviceLabel}</dd>
+                                </div>
+                                <div>
+                                  <dt className="font-medium text-foreground">
+                                    {t("settings.syncConflictModifiedAtLabel")}
+                                  </dt>
+                                  <dd>{conflict.remoteUpdatedAt}</dd>
+                                </div>
+                                <div>
+                                  <dt className="font-medium text-foreground">
+                                    {t("settings.syncConflictLastSyncedLabel")}
+                                  </dt>
+                                  <dd>
+                                    {conflict.remoteLastSyncedAt ??
+                                      t("settings.syncLastSyncedNever")}
+                                  </dd>
+                                </div>
+                              </dl>
+                            </SoftPanel>
+                          </div>
+
+                          <div className="flex flex-col gap-3 sm:flex-row">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              className="min-h-11 w-full justify-start sm:w-auto"
+                              disabled={conflictReview.pendingActionKey !== null}
+                              onClick={() => {
+                                void handleResolveConflict(conflict, "keep-local");
+                              }}
+                            >
+                              <LaptopMinimal className="me-2 h-4 w-4" />
+                              {conflictReview.pendingActionKey === keepLocalActionKey
+                                ? t("settings.syncConflictPendingKeepLocal")
+                                : t("settings.syncConflictKeepLocalAction")}
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              className="min-h-11 w-full justify-start sm:w-auto"
+                              disabled={conflictReview.pendingActionKey !== null}
+                              onClick={() => {
+                                void handleResolveConflict(conflict, "keep-remote");
+                              }}
+                            >
+                              <Smartphone className="me-2 h-4 w-4" />
+                              {conflictReview.pendingActionKey === keepRemoteActionKey
+                                ? t("settings.syncConflictPendingKeepRemote")
+                                : t("settings.syncConflictKeepRemoteAction")}
+                            </Button>
+                          </div>
+                        </SoftPanel>
+                      );
+                    })}
+                  </div>
+                )
+              ) : null}
             </SoftPanel>
           ) : null}
         </section>

@@ -1,4 +1,7 @@
 import type {
+  SyncConflictRecord,
+  SyncConflictResolutionInput,
+  SyncConflictResolutionResult,
   SyncProvider,
   SyncResult,
   SyncStateListener,
@@ -21,6 +24,22 @@ export class LocalOnlySyncProvider implements SyncProvider {
 
   async syncNow(): Promise<SyncResult> {
     return { status: localOnlyStatus, changedRecords: 0 };
+  }
+
+  getConflictSnapshot(): ReadonlyArray<SyncConflictRecord> {
+    return [];
+  }
+
+  async listConflicts(): Promise<ReadonlyArray<SyncConflictRecord>> {
+    return [];
+  }
+
+  async resolveConflict(
+    _input: SyncConflictResolutionInput
+  ): Promise<SyncConflictResolutionResult> {
+    throw new Error(
+      "AliOS cannot resolve sync conflicts while it is running in local-only mode."
+    );
   }
 
   subscribe(_listener: SyncStateListener): SyncStateSubscription {

@@ -47,6 +47,10 @@ import type {
   SyncLastOutcome,
 } from "./syncMetadata";
 import type {
+  SyncConflictEntity,
+  SyncConflictRecord,
+  SyncConflictResolutionInput,
+  SyncConflictResolutionResult,
   SyncIssue,
   SyncProvider,
   SyncResult,
@@ -502,12 +506,60 @@ function toRemoteRow(
   };
 }
 
+function getConflictRecordTitle(record: SyncableRecord): string {
+  return record.title;
+}
+
+function getRemoteDeviceLabel(
+  remoteRecord: SyncableRecord,
+  localDeviceId: string
+): string {
+  const remoteDeviceId = remoteRecord.sync?.lastSyncedByDeviceId;
+
+  if (!remoteDeviceId) {
+    return "Synced version";
+  }
+
+  return remoteDeviceId === localDeviceId ? "This device" : "Other device";
+}
+
+function createConflictRecord(
+  entity: SyncConflictEntity,
+  localRecord: SyncableRecord,
+  remoteRecord: SyncableRecord,
+  localDeviceLabel: string,
+  localDeviceId: string
+): SyncConflictRecord {
+  return {
+    entity,
+    recordId: localRecord.id,
+    title: getConflictRecordTitle(localRecord),
+    conflictAt: localRecord.sync?.conflictAt ?? remoteRecord.updatedAt,
+    conflictReason: localRecord.sync?.conflictReason,
+    localUpdatedAt: localRecord.updatedAt,
+    localLastSyncedAt: localRecord.sync?.lastSyncedAt,
+    localDeviceId,
+    localDeviceLabel,
+    remoteUpdatedAt: remoteRecord.updatedAt,
+    remoteLastSyncedAt: remoteRecord.sync?.lastSyncedAt,
+    remoteDeviceId: remoteRecord.sync?.lastSyncedByDeviceId,
+    remoteDeviceLabel: getRemoteDeviceLabel(remoteRecord, localDeviceId),
+  };
+}
+
 type EntitySyncOutcome = Readonly<{
   changedLocalRecords: number;
   uploadedRows: ReadonlyArray<SupabaseRecordRow>;
   conflictCount: number;
   staleLocalCount: number;
   staleRemoteCount: number;
+}>;
+
+type ConflictRecordBundle = Readonly<{
+  conflict: SyncConflictRecord;
+  localRecord: SyncableRecord;
+  remoteRecord: SyncableRecord;
+  ownerUserId: string;
 }>;
 
 function toIssueFromError(error: unknown): SyncIssue {
@@ -671,6 +723,7 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
   private readonly backupStorage: BackupStorage | null;
   private readonly listeners = new Set<SyncStateListener>();
   private syncInFlight: Promise<SyncResult> | null = null;
+  private conflictSnapshot: ReadonlyArray<SyncConflictRecord> = [];
   private lastKnownStatus: SyncStatus = createLocalOnlyStatus(
     "AliOS is currently running only on this device."
   );
@@ -795,6 +848,108 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
     return this.syncInFlight;
   }
 
+  getConflictSnapshot(): ReadonlyArray<SyncConflictRecord> {
+    return this.conflictSnapshot;
+  }
+
+  async listConflicts(): Promise<ReadonlyArray<SyncConflictRecord>> {
+    const bundles = await this.loadConflictBundles();
+    const conflicts = bundles.map((bundle) => bundle.conflict);
+    this.conflictSnapshot = conflicts;
+    return conflicts;
+  }
+
+  async resolveConflict(
+    input: SyncConflictResolutionInput
+  ): Promise<SyncConflictResolutionResult> {
+    const context = await this.loadConflictContext();
+    if (!context) {
+      throw new Error(
+        "AliOS cannot resolve sync conflicts until this device has an authenticated sync session."
+      );
+    }
+
+    const syncAt = this.now().toISOString();
+    const entityRecords = getEntityRecordMap(context.localData, input.entity);
+    const localRecord = entityRecords.get(input.recordId);
+    const remoteRow = context.remoteRows.find(
+      (row) => row.entity === input.entity && row.record_id === input.recordId
+    );
+
+    if (!localRecord || !remoteRow) {
+      throw new Error(
+        "AliOS could not load both record versions for this conflict."
+      );
+    }
+
+    const remoteRecord = parseRemoteRecord(input.entity, remoteRow.payload);
+    const resolvedRecord =
+      input.resolution === "keep-local"
+        ? withSyncedMetadata(
+            localRecord,
+            context.ownerUserId,
+            syncAt,
+            context.device.deviceId
+          )
+        : withSyncedMetadata(
+            remoteRecord,
+            context.ownerUserId,
+            syncAt,
+            remoteRecord.sync?.lastSyncedByDeviceId ?? context.device.deviceId
+          );
+
+    entityRecords.set(input.recordId, resolvedRecord);
+    applyEntityRecordMap(context.localData, input.entity, entityRecords);
+
+    const client = this.client;
+    if (!client) {
+      throw new Error("AliOS sync is unavailable on this device.");
+    }
+
+    const upsertResult = await client.records.upsert({
+      table: SUPABASE_SYNC_RECORDS_TABLE,
+      rows: [toRemoteRow(input.entity, resolvedRecord, context.ownerUserId)],
+    });
+
+    if (upsertResult.error) {
+      throw upsertResult.error;
+    }
+
+    await this.backupStorage?.replaceAll(context.localData);
+
+    const remainingConflicts = await this.loadConflictBundles();
+    this.conflictSnapshot = remainingConflicts.map((bundle) => bundle.conflict);
+    const detail =
+      remainingConflicts.length > 0
+        ? "AliOS resolved one conflict, but some records still need review."
+        : "AliOS resolved the selected conflict and kept your chosen record version.";
+
+    this.writeMetadata({
+      ...this.readMetadata(),
+      backendUserId: context.ownerUserId,
+      lastSyncedAt: syncAt,
+      lastAttemptAt: syncAt,
+      lastOutcome: remainingConflicts.length > 0 ? "error" : "success",
+      conflictCount: remainingConflicts.length,
+      detail,
+    });
+
+    const status = await this.getStatus();
+    const conflict = createConflictRecord(
+      input.entity,
+      localRecord,
+      remoteRecord,
+      context.device.label,
+      context.device.deviceId
+    );
+
+    return {
+      status,
+      conflict,
+      resolution: input.resolution,
+    };
+  }
+
   subscribe(listener: SyncStateListener): SyncStateSubscription {
     this.listeners.add(listener);
     listener(this.lastKnownStatus);
@@ -811,6 +966,89 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
     this.listeners.forEach((listener) => {
       listener(status);
     });
+  }
+
+  private async loadConflictContext(): Promise<{
+    ownerUserId: string;
+    device: SyncDeviceIdentity;
+    localData: AliosBackupData;
+    remoteRows: ReadonlyArray<SupabaseRecordRow>;
+  } | null> {
+    if (!this.client || !this.backupStorage) {
+      return null;
+    }
+
+    const connectedSession = await this.ensureRemoteSession(false);
+    if (!connectedSession?.user) {
+      return null;
+    }
+
+    const device = getOrCreateDeviceIdentity(this.getStorage());
+    const localData = await this.backupStorage.readAll();
+    const recordsResult = await this.client.records.list({
+      table: SUPABASE_SYNC_RECORDS_TABLE,
+      userId: connectedSession.user.id,
+      entities: [...USER_DATA_SCOPES],
+    });
+
+    if (recordsResult.error) {
+      throw recordsResult.error;
+    }
+
+    return {
+      ownerUserId: connectedSession.user.id,
+      device,
+      localData,
+      remoteRows: recordsResult.data,
+    };
+  }
+
+  private async loadConflictBundles(): Promise<ReadonlyArray<ConflictRecordBundle>> {
+    const context = await this.loadConflictContext();
+    if (!context) {
+      return [];
+    }
+
+    const conflicts: ConflictRecordBundle[] = [];
+
+    USER_DATA_SCOPES.forEach((entity) => {
+      const localRecords = getEntityRecordMap(context.localData, entity);
+      const remoteRows = context.remoteRows.filter((row) => row.entity === entity);
+      const remoteRecords = new Map(
+        remoteRows.map((row) => [
+          row.record_id,
+          parseRemoteRecord(entity, row.payload),
+        ])
+      );
+
+      localRecords.forEach((localRecord, recordId) => {
+        if (!localRecord.sync?.conflictAt) {
+          return;
+        }
+
+        const remoteRecord = remoteRecords.get(recordId);
+        if (!remoteRecord) {
+          return;
+        }
+
+        conflicts.push({
+          ownerUserId: context.ownerUserId,
+          localRecord,
+          remoteRecord,
+          conflict: createConflictRecord(
+            entity,
+            localRecord,
+            remoteRecord,
+            context.device.label,
+            context.device.deviceId
+          ),
+        });
+      });
+    });
+
+    return conflicts.sort((left, right) =>
+      right.conflict.conflictAt.localeCompare(left.conflict.conflictAt)
+    );
   }
 
   private readDiagnostics(): ReadonlyArray<SyncDiagnosticEntry> {
