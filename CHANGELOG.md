@@ -1,5 +1,13 @@
 # Changelog
 
+## Stage 222 - Account & Sync Security Boundary Contract
+
+- Created `docs/ACCOUNT_SYNC_SECURITY_BOUNDARY_STAGE_222.md` to define the future security boundary for optional Account & Sync features in AliOS
+- Documented the future session ownership model, device trust model, security-state meanings, logout behavior rules, sensitive data boundaries, and recovery/account-loss rules
+- Defined local-first security principles, export/backup relationship rules, and explicit implementation constraints for future account work
+- Explicitly documented that no future implementation may silently transfer data, silently delete local data, weaken local ownership, or treat sync as anything other than explicit opt-in
+- Kept the stage planning-only: no authentication implementation, no Supabase integration, no session runtime, no token handling, no remote sync, no schema or repository change, no migration, and no UI implementation
+
 ## Stage 221 - Account & Sync Data Ownership Model
 
 - Created `docs/ACCOUNT_SYNC_DATA_OWNERSHIP_STAGE_221.md` to define the complete future Account & Sync data-ownership matrix for AliOS
