@@ -1,5 +1,13 @@
 # Changelog
 
+## Stage 240 - Mobile Experience & Responsive Sync Validation
+
+- Refined the responsive `Account & Sync` Settings layout for mobile, tablet, and desktop widths without changing runtime behavior
+- Improved small-screen wrapping and hierarchy for sync status cards, account metadata, and account/state badges
+- Increased touch friendliness for retry and account action buttons with clearer full-width mobile behavior
+- Added focused rendering coverage for responsive layout assumptions and offline-style sync-state presentation
+- Documented the stage in `docs/MOBILE_SYNC_EXPERIENCE_STAGE_240.md`
+
 ## Stage 239 - Sync Conflict Resolution & Reliability
 
 - Strengthened the Supabase-backed sync foundation with safer conflict and staleness detection for tasks, projects, and goals

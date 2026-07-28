@@ -193,6 +193,9 @@ describe("SyncStatusCard", () => {
     expect(markup).toContain("Expand section");
     expect(markup).toContain('aria-expanded="false"');
     expect(markup).toContain("Data stays on this device");
+    expect(markup).toContain("sm:grid-cols-2");
+    expect(markup).toContain("xl:grid-cols-4");
+    expect(markup).toContain("min-h-11");
   });
 
   it("renders the signed-out Google representation without showing a fake active session", async () => {
@@ -355,6 +358,64 @@ describe("SyncStatusCard", () => {
     expect(markup).toContain("Projects");
     expect(markup).toContain("Goals");
     expect(markup).toContain("Sync healthy");
+  });
+
+  it("renders the offline sync presentation when connectivity-style errors are reported", async () => {
+    const authProvider = new TestAuthProvider("future-auth", {
+      status: "authenticated",
+      provider: GOOGLE_ACCOUNT_PROVIDER_ID,
+      user: {
+        userId: "user-1",
+        email: "user@example.com",
+        displayName: "AliOS User",
+        createdAt: "2026-07-28T00:00:00.000Z",
+        updatedAt: "2026-07-28T00:00:00.000Z",
+      },
+      detail: "Authenticated Google session.",
+    });
+    const boundary = createAccountRuntimeBoundary({
+      accountProvider: new TestAccountProvider(
+        GOOGLE_ACCOUNT_PROVIDER_ID,
+        "authenticated",
+        {
+          status: "authenticated",
+          providerId: GOOGLE_ACCOUNT_PROVIDER_ID,
+          lifecycle: "signed-in",
+          identity: {
+            accountId: "account-1",
+            email: "user@example.com",
+            displayName: "AliOS User",
+            providerId: GOOGLE_ACCOUNT_PROVIDER_ID,
+          },
+          detail: "Google account connected on this device.",
+        },
+        {
+          status: "authenticated",
+          available: ["account-identity", "sign-out", "explicit-sync-opt-in"],
+          detail: "Authenticated account capabilities are available.",
+        }
+      ),
+      authProvider,
+      syncProvider: new TestSyncProvider("supabase", {
+        mode: "error",
+        provider: "supabase",
+        issue: "connectivity",
+        scopes: ["preferences", "tasks", "projects", "goals"],
+        connectedUserId: "supabase-user-1",
+        deviceId: "device-1",
+        deviceLabel: "This device",
+        lastSyncedAt: "2026-07-28T11:00:00.000Z",
+        lastAttemptAt: "2026-07-28T12:00:00.000Z",
+        detail: "Connection dropped before sync could finish.",
+      }),
+    });
+
+    const markup = await renderCardToStaticMarkup(boundary, authProvider);
+
+    expect(markup).toContain("Offline");
+    expect(markup).toContain("Sync issue detected");
+    expect(markup).toContain("Retry sync");
+    expect(markup).toContain("Connection dropped before sync could finish.");
   });
 
   it("renders the Persian account and sync copy for the settings surface", async () => {
