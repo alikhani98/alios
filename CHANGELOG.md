@@ -1,5 +1,13 @@
 # Changelog
 
+## Stage 216 - Account & Sync Settings Surface Contract
+
+- Created `docs/ACCOUNT_SYNC_SETTINGS_SURFACE_STAGE_216.md` to define the future Settings information architecture for optional account and sync features
+- Documented the future Account & Sync section placement, internal structure, user states, action set, and relationship to existing preferences, backup/restore, export, recovery, and local technical settings
+- Defined the Settings-surface behavior for local-only, authenticated-without-sync, sync-enabled, and sync-paused states without implementing any runtime account UI
+- Explicitly documented safety UX rules for consent, local-vs-cloud ownership, conflict explanation, silent-upload prevention, and preservation of export/import trust
+- Kept the stage planning-only: no authentication implementation, no Supabase integration, no remote sync, no schema or repository change, no migration, and no change to current local-first behavior
+
 ## Stage 215 - Account & Sync Experience Planning
 
 - Created `docs/ACCOUNT_SYNC_EXPERIENCE_STAGE_215.md` to define the future user-facing path from local-only AliOS usage toward optional account and sync features
