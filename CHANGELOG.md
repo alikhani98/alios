@@ -1,5 +1,13 @@
 # Changelog
 
+## Stage 225 - Account & Sync Design System Mapping
+
+- Created `docs/ACCOUNT_SYNC_DESIGN_SYSTEM_MAPPING_STAGE_225.md` to define the future design-system mapping for optional Account & Sync surfaces in AliOS
+- Documented the required future component families, including account and sync status cards, consent and confirmation dialogs, warning and error banners, conflict panels, device/session items, and recovery action panels
+- Mapped future Account & Sync states onto the current AliOS token and shared-component system, including semantic colors, typography, spacing, radius, elevation, status indicators, RTL/LTR behavior, and accessibility alignment
+- Explicitly documented repository-first reuse rules and Figma-to-code handoff constraints so future design work stays tied to existing code tokens and shared UI primitives
+- Kept the stage planning-only: no authentication implementation, no Supabase integration, no remote sync, no API calls, no schema or repository change, no migration, and no runtime UI implementation
+
 ## Stage 224 - Account & Sync Accessibility Contract
 
 - Created `docs/ACCOUNT_SYNC_ACCESSIBILITY_STAGE_224.md` to define the future accessibility contract for optional Account & Sync surfaces in AliOS
