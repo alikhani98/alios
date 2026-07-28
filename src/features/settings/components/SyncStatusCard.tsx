@@ -103,7 +103,7 @@ function SyncStatePreview({ state }: SyncStatePreviewProps) {
           : "alios-surface-muted"
       }`}
     >
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex min-w-0 items-start gap-3">
           <div className="alios-icon-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl">
             <Icon className="h-5 w-5" />
@@ -120,7 +120,9 @@ function SyncStatePreview({ state }: SyncStatePreviewProps) {
             ) : null}
           </div>
         </div>
-        <StatusChip tone={state.tone}>{t(state.statusKey)}</StatusChip>
+        <div className="flex sm:justify-end">
+          <StatusChip tone={state.tone}>{t(state.statusKey)}</StatusChip>
+        </div>
       </div>
     </SoftPanel>
   );
@@ -136,7 +138,7 @@ function ConsentActionPlaceholder({
     <Button
       type="button"
       variant="outline"
-      className="justify-start"
+      className="min-h-11 w-full justify-start sm:w-auto"
       disabled={disabled}
       onClick={onClick}
       aria-describedby={descriptionId}
@@ -518,7 +520,7 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
       </CardHeader>
       <CardContent className="space-y-5">
         <div
-          className="grid gap-3 sm:grid-cols-3"
+          className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4"
           aria-label={t("settings.accountSyncSnapshotLabel")}
         >
           <SoftPanel className="alios-surface-muted">
@@ -606,7 +608,7 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
                 </p>
               </div>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 sm:max-w-[16rem] sm:justify-end">
               <StatusChip
                 tone={
                   runtimeState.localOnly
@@ -620,7 +622,7 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
               </StatusChip>
               <Badge
                 variant="secondary"
-                className="max-w-full w-fit shrink-0 break-all text-start"
+                className="max-w-full break-all text-start"
               >
                 {accountPresentation.badgeLabel}
               </Badge>
@@ -636,7 +638,7 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
                 {accountPresentation.detailsValue}
               </p>
             </SoftPanel>
-            <div className="grid gap-3 sm:grid-cols-3">
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
               {accountMetadataRows.map((row) => (
                 <SoftPanel key={row.labelKey} className="alios-surface-muted">
                   <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
@@ -672,7 +674,7 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
               <Button
                 type="button"
                 variant="outline"
-                className="justify-start"
+                className="min-h-11 w-full justify-start sm:w-auto"
                 onClick={() => {
                   void handleRetrySync();
                 }}
@@ -825,14 +827,14 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
             </StatusChip>
           </div>
           <div
-            className="grid gap-3 sm:grid-cols-3"
+            className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3"
             role="group"
             aria-label={t(accountPresentation.actionsTitleKey)}
           >
             {canSignIn ? (
               <Button
                 type="button"
-                className="justify-start"
+                className="min-h-11 w-full justify-start sm:w-auto"
                 onClick={() => {
                   void handleGoogleSignIn();
                 }}
@@ -849,7 +851,7 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
               <Button
                 type="button"
                 variant="outline"
-                className="justify-start"
+                className="min-h-11 w-full justify-start sm:w-auto"
                 onClick={() => {
                   void handleGoogleSignOut();
                 }}
@@ -863,9 +865,9 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
               </Button>
             ) : null}
             {visibleActionKeys.map((action) => (
-              <ConsentActionPlaceholder
-                key={action.labelKey}
-                label={`${t(action.labelKey)} - ${t(action.statusKey)}`}
+                  <ConsentActionPlaceholder
+                    key={action.labelKey}
+                    label={`${t(action.labelKey)} - ${t(action.statusKey)}`}
                 descriptionId={futureActionsDescriptionId}
               />
             ))}
