@@ -1,5 +1,13 @@
 # Changelog
 
+## Stage 227 - Account & Sync Prototype Flow Specification
+
+- Created `docs/ACCOUNT_SYNC_PROTOTYPE_FLOW_SPECIFICATION_STAGE_227.md` to define the future Figma prototype interaction contract for optional Account & Sync flows in AliOS
+- Documented the future prototype flows for Settings entry, local-only discovery, sign-in/account creation, sync enable/disable, pause/resume, conflict handling, and error recovery
+- Defined Figma prototype rules for frame naming, connection naming, interaction naming, overlay usage, transition rules, accessibility notes, and developer handoff expectations
+- Explicitly kept the repository and existing AliOS contracts authoritative while avoiding any implementation claim about authentication, sync runtime, or Figma artifact creation
+- Kept the stage documentation-only: no authentication implementation, no Supabase integration, no remote sync, no API calls, no schema or repository change, no migration, and no runtime UI implementation
+
 ## Stage 226 - Account & Sync Figma Screen Specification
 
 - Created `docs/ACCOUNT_SYNC_FIGMA_SCREEN_SPECIFICATION_STAGE_226.md` to define the future Figma screen specifications for optional Account & Sync surfaces in AliOS
