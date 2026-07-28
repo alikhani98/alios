@@ -1,5 +1,13 @@
 # Changelog
 
+## Stage 221 - Account & Sync Data Ownership Model
+
+- Created `docs/ACCOUNT_SYNC_DATA_OWNERSHIP_STAGE_221.md` to define the complete future Account & Sync data-ownership matrix for AliOS
+- Documented the ownership classes for local-only data, future sync-eligible account data, device-local technical state, intentionally-unsynced metadata, and sensitive session boundaries
+- Defined the local-first rules, sync consent requirements, conflict ownership rules, export/import relationship, and backup-versus-sync distinction for future account work
+- Explicitly documented that no future implementation may silently upload, merge, claim, overwrite, or delete local data
+- Kept the stage planning-only: no authentication implementation, no Supabase integration, no remote sync, no schema or repository change, no migration, no storage change, and no UI implementation
+
 ## Stage 220 - Account & Sync Interaction Flow Specification
 
 - Created `docs/ACCOUNT_SYNC_INTERACTION_FLOW_STAGE_220.md` to define the future end-to-end interaction flows for Account & Sync in AliOS
