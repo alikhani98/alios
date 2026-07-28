@@ -1,5 +1,13 @@
 # Changelog
 
+## Stage 219 - Account & Sync Settings Screen-State Specification
+
+- Created `docs/ACCOUNT_SYNC_SETTINGS_SCREEN_STATE_STAGE_219.md` to define the future `Account & Sync` Settings screen structure and state-by-state layout rules
+- Documented the future screen states for local-only, account-available, signed-in sync-off, sync-enabled, sync-paused, offline, conflict-detected, and signed-out situations
+- Defined the visible sections, primary and secondary actions, safety messaging, and loading/error/empty-state rules for each future Settings state
+- Explicitly documented how Account & Sync must stay separate from Preferences, Backup / Restore, Export, Recovery Mode, and local support surfaces while still referencing them for trust and safety
+- Kept the stage planning-only: no authentication implementation, no Supabase integration, no remote sync, no schema or repository change, no migration, no storage change, no route change, and no UI implementation
+
 ## Stage 218 - Account & Sync State Flow Mapping
 
 - Created `docs/ACCOUNT_SYNC_STATE_FLOW_STAGE_218.md` to define the future Account & Sync state model, allowed transitions, safety guards, and per-state UX expectations
