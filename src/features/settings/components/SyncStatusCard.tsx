@@ -73,6 +73,12 @@ type RuntimeAccountPresentation = Readonly<{
   hintKey: TranslationKey;
 }>;
 
+type RuntimeMetadataRow = Readonly<{
+  labelKey: TranslationKey;
+  value: string;
+  descriptionKey?: TranslationKey;
+}>;
+
 function SyncStatePreview({ state }: SyncStatePreviewProps) {
   const { t } = useI18n();
   const Icon = state.icon;
@@ -215,6 +221,24 @@ const signedInActions: readonly AccountActionDefinition[] = [
   },
 ] as const;
 
+function getProviderLabel(
+  runtimeState: AccountRuntimeState,
+  t: (key: TranslationKey, values?: Record<string, string | number>) => string
+) {
+  return runtimeState.accountProviderId === "google"
+    ? t("settings.accountProviderGoogle")
+    : t("settings.accountProviderLocalOnly");
+}
+
+function getSyncLastSeenLabel(
+  runtimeState: AccountRuntimeState,
+  t: (key: TranslationKey, values?: Record<string, string | number>) => string
+) {
+  return runtimeState.syncMetadata.lastSyncedAt
+    ? runtimeState.syncMetadata.lastSyncedAt
+    : t("settings.syncLastSyncedNever");
+}
+
 function getRuntimeSyncState(
   runtimeState: AccountRuntimeState
 ): SyncStateDefinition {
@@ -301,6 +325,23 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
   const futureActionsDescriptionId = "account-sync-future-actions-description";
   const currentState = getRuntimeSyncState(runtimeState);
   const accountPresentation = getRuntimeAccountPresentation(runtimeState, t);
+  const accountMetadataRows: readonly RuntimeMetadataRow[] = [
+    {
+      labelKey: "settings.accountProviderLabel",
+      value: getProviderLabel(runtimeState, t),
+      descriptionKey: "settings.accountProviderDescription",
+    },
+    {
+      labelKey: "settings.accountDeviceLabel",
+      value: runtimeState.syncMetadata.device.label,
+      descriptionKey: "settings.accountDeviceDescription",
+    },
+    {
+      labelKey: "settings.syncLastSyncedLabel",
+      value: getSyncLastSeenLabel(runtimeState, t),
+      descriptionKey: "settings.syncLastSyncedDescription",
+    },
+  ];
   const futureStates = syncStates.filter(
     (state) => state.titleKey !== currentState.titleKey
   );
@@ -402,14 +443,33 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
             </div>
           </div>
           <SyncStatePreview state={currentState} />
-          <SoftPanel className="alios-surface-muted">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-              {t(accountPresentation.detailsLabelKey)}
-            </p>
-            <p className="mt-2 break-words text-sm leading-6">
-              {accountPresentation.detailsValue}
-            </p>
-          </SoftPanel>
+          <div className="grid gap-3 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1.8fr)]">
+            <SoftPanel className="alios-surface-muted">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                {t(accountPresentation.detailsLabelKey)}
+              </p>
+              <p className="mt-2 break-words text-sm leading-6">
+                {accountPresentation.detailsValue}
+              </p>
+            </SoftPanel>
+            <div className="grid gap-3 sm:grid-cols-3">
+              {accountMetadataRows.map((row) => (
+                <SoftPanel key={row.labelKey} className="alios-surface-muted">
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                    {t(row.labelKey)}
+                  </p>
+                  <p className="mt-2 break-words text-sm font-medium">
+                    {row.value}
+                  </p>
+                  {row.descriptionKey ? (
+                    <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                      {t(row.descriptionKey)}
+                    </p>
+                  ) : null}
+                </SoftPanel>
+              ))}
+            </div>
+          </div>
         </section>
 
         <section aria-labelledby="account-sync-other-states" className="space-y-3">

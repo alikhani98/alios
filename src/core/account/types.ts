@@ -1,11 +1,24 @@
+export const LOCAL_ONLY_ACCOUNT_PROVIDER_ID = "local-only" as const;
+export const GOOGLE_ACCOUNT_PROVIDER_ID = "google" as const;
+
+export type AccountProviderId =
+  | typeof LOCAL_ONLY_ACCOUNT_PROVIDER_ID
+  | typeof GOOGLE_ACCOUNT_PROVIDER_ID
+  | (string & {});
+
+export type GoogleAccountIdentityMetadata = Readonly<{
+  googleSubject?: string;
+  avatarUrl?: string;
+}>;
+
 export type AccountIdentity = Readonly<{
   accountId: string;
   email?: string;
   displayName?: string;
-  providerId: string;
+  providerId: AccountProviderId;
   createdAt?: string;
   updatedAt?: string;
-  metadata?: Readonly<Record<string, unknown>>;
+  metadata?: GoogleAccountIdentityMetadata | Readonly<Record<string, unknown>>;
 }>;
 
 export type AccountStatus =
@@ -32,15 +45,24 @@ export type AccountCapabilitySet = Readonly<{
 export type AccountSessionBoundary = Readonly<{
   status: AccountStatus;
   identity: AccountIdentity | null;
-  providerId: string;
+  providerId: AccountProviderId;
+  lifecycle: SessionLifecycleState;
   expiresAt?: string;
+  lastAuthenticatedAt?: string;
   detail?: string;
 }>;
+
+export type SessionLifecycleState =
+  | "local-only"
+  | "signed-out"
+  | "signed-in"
+  | "expired";
 
 export type AccountAuthenticateInput = Readonly<{
   email?: string;
   password?: string;
   redirectTo?: string;
+  providerHint?: AccountProviderId;
   metadata?: Readonly<Record<string, unknown>>;
 }>;
 

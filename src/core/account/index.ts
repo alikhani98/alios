@@ -1,5 +1,6 @@
 export * from "./types";
 export * from "./LocalOnlyAccountProvider";
+export * from "@/core/sync/syncMetadata";
 export {
   createAccountRuntimeBoundary,
   DefaultAccountRuntimeBoundary,

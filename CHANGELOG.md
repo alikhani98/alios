@@ -1,13 +1,13 @@
 # Changelog
 
-## Stage 235 - Account Authentication Integration Preparation
+## Stage 235 - Google Account & Sync Foundation
 
-- Extended the consolidated account runtime foundation to distinguish three future-facing account presentation states: `Local only`, `Signed out`, and `Signed in` placeholder
-- Refined the Settings `Account & Sync` surface so future `Sign in`, `Sign out`, and account-information entry points can be presented without activating any fake authentication flow
-- Added bilingual copy for signed-out and signed-in placeholder messaging while preserving the shipped default as fully local-only with no active user or session
-- Expanded focused Settings coverage to prove the local-only default, signed-out preparation state, and signed-in placeholder rendering remain stable without changing runtime ownership or data behavior
+- Extended the consolidated account runtime foundation with explicit Google-ready account metadata, including provider identity, signed-out and signed-in lifecycle states, and Google-account placeholder identity details
+- Added sync-preparation metadata for device identity, last-sync timing, and last-sync outcome while preserving the shipped runtime as fully local-only and inactive
+- Refined the Settings `Account & Sync` surface so future Google sign-in, sign-out, account information, and sync-status details have a stable place without activating any fake authentication or remote behavior
+- Expanded focused runtime and Settings coverage to prove the local-only default, Google signed-out preparation state, Google signed-in placeholder state, and local sync metadata rendering remain stable without changing repository or storage behavior
 - Documented the stage in `docs/ACCOUNT_AUTHENTICATION_PREPARATION_STAGE_235.md`
-- Kept the stage preparation-only: no real authentication provider, no Supabase, no OAuth, no remote API calls, no cloud sync, no schema change, and no repository/storage behavior change
+- Kept the stage preparation-only: no Google OAuth connection, no Supabase, no Firebase, no remote API calls, no cloud database, no sync engine, no schema change, and no repository/storage behavior change
 
 ## Stage 234 - Account Runtime Foundation Consolidation
 

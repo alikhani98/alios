@@ -9,18 +9,22 @@ import type {
   AccountStateSubscription,
   AccountStatus,
 } from "./types";
-import { LOCAL_ONLY_ACCOUNT_CAPABILITY_SET } from "./types";
+import {
+  LOCAL_ONLY_ACCOUNT_CAPABILITY_SET,
+  LOCAL_ONLY_ACCOUNT_PROVIDER_ID,
+} from "./types";
 
 export const LOCAL_ONLY_ACCOUNT_SESSION_BOUNDARY: AccountSessionBoundary = {
   status: "local-only",
   identity: null,
-  providerId: "local-only",
+  providerId: LOCAL_ONLY_ACCOUNT_PROVIDER_ID,
+  lifecycle: "local-only",
   detail:
     "AliOS remains local-first. No account session is active in the current runtime.",
 };
 
 export class LocalOnlyAccountProvider implements AccountProvider {
-  readonly providerId = "local-only";
+  readonly providerId = LOCAL_ONLY_ACCOUNT_PROVIDER_ID;
 
   async getStatus(): Promise<AccountStatus> {
     return "local-only";

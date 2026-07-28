@@ -4,6 +4,7 @@ export type SyncStatus = Readonly<{
   mode: SyncMode;
   provider: string;
   lastSyncedAt?: string;
+  lastAttemptAt?: string;
   detail: string;
 }>;
 

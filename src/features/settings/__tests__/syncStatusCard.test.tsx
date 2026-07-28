@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   AccountRuntimeProvider,
+  GOOGLE_ACCOUNT_PROVIDER_ID,
   LOCAL_ONLY_SYNC_STATUS,
   createAccountRuntimeStateStore,
   createAccountRuntimeBoundary,
@@ -176,14 +177,15 @@ describe("SyncStatusCard", () => {
   it("renders the future signed-out representation without showing a fake session", async () => {
     const boundary = createAccountRuntimeBoundary({
       accountProvider: new TestAccountProvider(
-        "future-account",
+        GOOGLE_ACCOUNT_PROVIDER_ID,
         "signed-out",
         {
           status: "signed-out",
-          providerId: "future-account",
+          providerId: GOOGLE_ACCOUNT_PROVIDER_ID,
+          lifecycle: "signed-out",
           identity: null,
           detail:
-            "AliOS can prepare an account entry point here later, but no authenticated session is active.",
+            "AliOS can prepare a future Google account entry point here later, but no authenticated session is active.",
         },
         {
           status: "signed-out",
@@ -194,7 +196,7 @@ describe("SyncStatusCard", () => {
       authProvider: new TestAuthProvider("future-auth", {
         status: "unauthenticated",
         user: null,
-        provider: "future-auth",
+        provider: GOOGLE_ACCOUNT_PROVIDER_ID,
         detail: "No authenticated user session is active.",
       }),
       syncProvider: new TestSyncProvider("local-only", LOCAL_ONLY_SYNC_STATUS),
@@ -203,6 +205,9 @@ describe("SyncStatusCard", () => {
     const markup = await renderCardToStaticMarkup(boundary);
 
     expect(markup).toContain("Signed out");
+    expect(markup).toContain("Google account foundation");
+    expect(markup).toContain("This device");
+    expect(markup).toContain("Never synced");
     expect(markup).toContain("Future sign-in actions");
     expect(markup).toContain("Sign in");
     expect(markup).toContain("Enable sync · Requires sign-in");
@@ -211,18 +216,24 @@ describe("SyncStatusCard", () => {
   it("renders a future signed-in placeholder state with account details and sign-out preparation", async () => {
     const boundary = createAccountRuntimeBoundary({
       accountProvider: new TestAccountProvider(
-        "future-account",
+        GOOGLE_ACCOUNT_PROVIDER_ID,
         "authenticated",
         {
           status: "authenticated",
-          providerId: "future-account",
+          providerId: GOOGLE_ACCOUNT_PROVIDER_ID,
+          lifecycle: "signed-in",
           identity: {
             accountId: "account-1",
             email: "user@example.com",
             displayName: "AliOS User",
-            providerId: "future-account",
+            providerId: GOOGLE_ACCOUNT_PROVIDER_ID,
+            metadata: {
+              googleSubject: "google-sub-1",
+              avatarUrl: "https://example.com/avatar.png",
+            },
           },
-          detail: "A future signed-in account may appear here once authentication is approved.",
+          detail: "A future signed-in Google account may appear here once authentication is approved.",
+          lastAuthenticatedAt: "2026-07-28T00:00:00.000Z",
         },
         {
           status: "authenticated",
@@ -232,11 +243,12 @@ describe("SyncStatusCard", () => {
       ),
       authProvider: new TestAuthProvider("future-auth", {
         status: "authenticated",
-        provider: "future-auth",
+        provider: GOOGLE_ACCOUNT_PROVIDER_ID,
         user: {
           userId: "user-1",
           email: "user@example.com",
           displayName: "AliOS User",
+          avatarUrl: "https://example.com/avatar.png",
           createdAt: "2026-07-28T00:00:00.000Z",
           updatedAt: "2026-07-28T00:00:00.000Z",
         },
@@ -248,6 +260,7 @@ describe("SyncStatusCard", () => {
     const markup = await renderCardToStaticMarkup(boundary);
 
     expect(markup).toContain("Signed in");
+    expect(markup).toContain("Google account foundation");
     expect(markup).toContain("AliOS User");
     expect(markup).toContain("user@example.com");
     expect(markup).toContain("Sign out");
