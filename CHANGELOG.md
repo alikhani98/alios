@@ -1,5 +1,14 @@
 # Changelog
 
+## Stage 241 - Conflict Resolution UI
+
+- Added the first user-facing conflict review surface to the Settings `Account & Sync` area for synced Tasks, Projects, and Goals
+- Added explicit conflict summaries, entity grouping, local-versus-synced version details, and timestamp/device metadata without changing repository ownership
+- Added manual resolution actions for `Keep local version` and `Keep synced version`, both requiring explicit user confirmation before any resolution is applied
+- Extended the sync boundary additively so conflict details and resolution actions can be requested from the existing provider seam instead of bypassing storage boundaries
+- Added focused Settings rendering coverage for conflict list rendering, conflict detail visibility, resolution action states, and the empty conflict-review state
+- Documented the stage in `docs/CONFLICT_RESOLUTION_UI_STAGE_241.md`
+
 ## Stage 240 - Mobile Experience & Responsive Sync Validation
 
 - Refined the responsive `Account & Sync` Settings layout for mobile, tablet, and desktop widths without changing runtime behavior

@@ -27,6 +27,9 @@ import {
   type AuthUser,
 } from "@/core/auth";
 import type {
+  SyncConflictRecord,
+  SyncConflictResolutionInput,
+  SyncConflictResolutionResult,
   SyncProvider,
   SyncResult,
   SyncStateListener,
@@ -123,9 +126,24 @@ class TestAuthProvider implements AuthProvider {
 
 class TestSyncProvider implements SyncProvider {
   readonly name: string;
+  private readonly conflicts: SyncConflictRecord[];
+  private readonly resolveConflictHandler?: (
+    input: SyncConflictResolutionInput
+  ) => Promise<SyncConflictResolutionResult> | SyncConflictResolutionResult;
 
-  constructor(name: string, private readonly status: SyncStatus) {
+  constructor(
+    name: string,
+    private readonly status: SyncStatus,
+    options: Readonly<{
+      conflicts?: ReadonlyArray<SyncConflictRecord>;
+      resolveConflict?: (
+        input: SyncConflictResolutionInput
+      ) => Promise<SyncConflictResolutionResult> | SyncConflictResolutionResult;
+    }> = {}
+  ) {
     this.name = name;
+    this.conflicts = [...(options.conflicts ?? [])];
+    this.resolveConflictHandler = options.resolveConflict;
   }
 
   async getStatus(): Promise<SyncStatus> {
@@ -134,6 +152,38 @@ class TestSyncProvider implements SyncProvider {
 
   async syncNow(): Promise<SyncResult> {
     return { status: this.status, changedRecords: 0 };
+  }
+
+  getConflictSnapshot(): ReadonlyArray<SyncConflictRecord> {
+    return this.conflicts;
+  }
+
+  async listConflicts(): Promise<ReadonlyArray<SyncConflictRecord>> {
+    return this.conflicts;
+  }
+
+  async resolveConflict(
+    input: SyncConflictResolutionInput
+  ): Promise<SyncConflictResolutionResult> {
+    if (this.resolveConflictHandler) {
+      return this.resolveConflictHandler(input);
+    }
+
+    const conflict =
+      this.conflicts.find(
+        (entry) =>
+          entry.entity === input.entity && entry.recordId === input.recordId
+      ) ?? this.conflicts[0];
+
+    if (!conflict) {
+      throw new Error("No conflict is available for resolution.");
+    }
+
+    return {
+      status: this.status,
+      conflict,
+      resolution: input.resolution,
+    };
   }
 
   subscribe(_listener: SyncStateListener): SyncStateSubscription {
@@ -416,6 +466,150 @@ describe("SyncStatusCard", () => {
     expect(markup).toContain("Sync issue detected");
     expect(markup).toContain("Retry sync");
     expect(markup).toContain("Connection dropped before sync could finish.");
+  });
+
+  it("renders the conflict review list with local and synced version details", async () => {
+    const authProvider = new TestAuthProvider("future-auth", {
+      status: "authenticated",
+      provider: GOOGLE_ACCOUNT_PROVIDER_ID,
+      user: {
+        userId: "user-1",
+        email: "user@example.com",
+        displayName: "AliOS User",
+        createdAt: "2026-07-28T00:00:00.000Z",
+        updatedAt: "2026-07-28T00:00:00.000Z",
+      },
+      detail: "Authenticated Google session.",
+    });
+    const conflicts: readonly SyncConflictRecord[] = [
+      {
+        entity: "tasks",
+        recordId: "task-1",
+        title: "Prepare weekly review notes",
+        conflictAt: "2026-07-28T12:00:00.000Z",
+        conflictReason: "diverged-updates",
+        localUpdatedAt: "2026-07-28T11:40:00.000Z",
+        localLastSyncedAt: "2026-07-28T09:00:00.000Z",
+        localDeviceId: "device-1",
+        localDeviceLabel: "This device",
+        remoteUpdatedAt: "2026-07-28T11:45:00.000Z",
+        remoteLastSyncedAt: "2026-07-28T09:00:00.000Z",
+        remoteDeviceId: "device-2",
+        remoteDeviceLabel: "Other device",
+      },
+    ];
+    const boundary = createAccountRuntimeBoundary({
+      accountProvider: new TestAccountProvider(
+        GOOGLE_ACCOUNT_PROVIDER_ID,
+        "authenticated",
+        {
+          status: "authenticated",
+          providerId: GOOGLE_ACCOUNT_PROVIDER_ID,
+          lifecycle: "signed-in",
+          identity: {
+            accountId: "account-1",
+            email: "user@example.com",
+            displayName: "AliOS User",
+            providerId: GOOGLE_ACCOUNT_PROVIDER_ID,
+          },
+          detail: "Google account connected on this device.",
+        },
+        {
+          status: "authenticated",
+          available: ["account-identity", "sign-out", "explicit-sync-opt-in"],
+          detail: "Authenticated account capabilities are available.",
+        }
+      ),
+      authProvider,
+      syncProvider: new TestSyncProvider(
+        "supabase",
+        {
+          mode: "error",
+          provider: "supabase",
+          issue: "conflict",
+          conflictCount: 1,
+          scopes: ["preferences", "tasks", "projects", "goals"],
+          connectedUserId: "supabase-user-1",
+          deviceId: "device-1",
+          deviceLabel: "This device",
+          lastSyncedAt: "2026-07-28T09:00:00.000Z",
+          lastAttemptAt: "2026-07-28T12:00:00.000Z",
+          detail: "AliOS preserved your local data and flagged a competing task update.",
+        },
+        {
+          conflicts,
+        }
+      ),
+    });
+
+    const markup = await renderCardToStaticMarkup(boundary, authProvider);
+
+    expect(markup).toContain("Hide conflict review");
+    expect(markup).toContain("Prepare weekly review notes");
+    expect(markup).toContain("Local device version");
+    expect(markup).toContain("Synced version");
+    expect(markup).toContain("This device");
+    expect(markup).toContain("Other device");
+    expect(markup).toContain("Keep local version");
+    expect(markup).toContain("Keep synced version");
+  });
+
+  it("shows the empty conflict review state after opening a clean sync surface", async () => {
+    const authProvider = new TestAuthProvider("future-auth", {
+      status: "authenticated",
+      provider: GOOGLE_ACCOUNT_PROVIDER_ID,
+      user: {
+        userId: "user-1",
+        email: "user@example.com",
+        displayName: "AliOS User",
+        createdAt: "2026-07-28T00:00:00.000Z",
+        updatedAt: "2026-07-28T00:00:00.000Z",
+      },
+      detail: "Authenticated Google session.",
+    });
+    const boundary = createAccountRuntimeBoundary({
+      accountProvider: new TestAccountProvider(
+        GOOGLE_ACCOUNT_PROVIDER_ID,
+        "authenticated",
+        {
+          status: "authenticated",
+          providerId: GOOGLE_ACCOUNT_PROVIDER_ID,
+          lifecycle: "signed-in",
+          identity: {
+            accountId: "account-1",
+            email: "user@example.com",
+            displayName: "AliOS User",
+            providerId: GOOGLE_ACCOUNT_PROVIDER_ID,
+          },
+          detail: "Google account connected on this device.",
+        },
+        {
+          status: "authenticated",
+          available: ["account-identity", "sign-out", "explicit-sync-opt-in"],
+          detail: "Authenticated account capabilities are available.",
+        }
+      ),
+      authProvider,
+      syncProvider: new TestSyncProvider("supabase", {
+        mode: "ready",
+        provider: "supabase",
+        scopes: ["preferences", "tasks", "projects", "goals"],
+        connectedUserId: "supabase-user-1",
+        deviceId: "device-1",
+        deviceLabel: "This device",
+        lastSyncedAt: "2026-07-28T12:00:00.000Z",
+        lastAttemptAt: "2026-07-28T12:00:00.000Z",
+        detail:
+          "AliOS synced preferences, tasks, projects, and goals for this device.",
+      }),
+    });
+
+    const markup = await renderCardToStaticMarkup(boundary, authProvider);
+
+    expect(markup).toContain("No conflicts");
+    expect(markup).toContain(
+      "No sync conflicts currently need review on this device."
+    );
   });
 
   it("renders the Persian account and sync copy for the settings surface", async () => {
