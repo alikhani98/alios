@@ -430,4 +430,202 @@ describe("SupabasePreferenceSyncProvider", () => {
     expect(result.status.detail).toContain("Supabase record upsert failed.");
     expect(backupHarness.getData().tasks[0].title).toBe("Local task");
   });
+
+  it("retains the last successful sync timestamp after a later failed retry", async () => {
+    const harness = createSupabaseClientHarness();
+    const provider = new SupabasePreferenceSyncProvider({
+      client: harness.client,
+      runtime: createRuntimeStub({
+        status: "authenticated",
+        provider: "google",
+        user: {
+          userId: "google-user-1",
+          email: "user@example.com",
+          displayName: "AliOS User",
+          createdAt: "2026-07-28T00:00:00.000Z",
+          updatedAt: "2026-07-28T12:00:00.000Z",
+        },
+      }),
+      getStorage: () => localStorage,
+      now: () => new Date("2026-07-28T12:00:00.000Z"),
+    });
+
+    await provider.syncNow();
+
+    harness.client.auth.updateUser.mockResolvedValueOnce({
+      data: { user: null },
+      error: new Error("Temporary sync failure"),
+    } as never);
+
+    const failedResult = await provider.syncNow();
+
+    expect(failedResult.status).toMatchObject({
+      mode: "error",
+      issue: "provider",
+      lastSyncedAt: "2026-07-28T12:00:00.000Z",
+    });
+  });
+
+  it("records stale-local and stale-remote diagnostics without overwriting local safety", async () => {
+    const harness = createSupabaseClientHarness();
+    harness.client.records.list.mockResolvedValueOnce({
+      data: [
+        {
+          user_id: "supabase-user-1",
+          entity: "tasks",
+          record_id: "task-1",
+          payload: {
+            id: "task-1",
+            title: "Remote task title",
+            status: "todo",
+            priority: "medium",
+            isMit: false,
+            createdAt: "2026-07-27T08:00:00.000Z",
+            updatedAt: "2026-07-28T10:00:00.000Z",
+            sync: {
+              ownerUserId: "supabase-user-1",
+              lastSyncedAt: "2026-07-28T09:00:00.000Z",
+              lastSyncedByDeviceId: "remote-device",
+            },
+          },
+          updated_at: "2026-07-28T10:00:00.000Z",
+          created_at: "2026-07-27T08:00:00.000Z",
+          last_synced_at: "2026-07-28T09:00:00.000Z",
+          last_synced_by_device_id: "remote-device",
+          has_conflict: false,
+          conflict_reason: undefined,
+        },
+        {
+          user_id: "supabase-user-1",
+          entity: "projects",
+          record_id: "project-1",
+          payload: {
+            id: "project-1",
+            title: "Older remote project",
+            status: "active",
+            priority: "medium",
+            createdAt: "2026-07-27T08:00:00.000Z",
+            updatedAt: "2026-07-28T08:00:00.000Z",
+            sync: {
+              ownerUserId: "supabase-user-1",
+              lastSyncedAt: "2026-07-28T08:00:00.000Z",
+              lastSyncedByDeviceId: "remote-device",
+            },
+          },
+          updated_at: "2026-07-28T08:00:00.000Z",
+          created_at: "2026-07-27T08:00:00.000Z",
+          last_synced_at: "2026-07-28T08:00:00.000Z",
+          last_synced_by_device_id: "remote-device",
+          has_conflict: false,
+          conflict_reason: undefined,
+        },
+      ],
+      error: null,
+    });
+
+    const backupHarness = createBackupStorageStub({
+      tasks: [
+        {
+          id: "task-1",
+          title: "Local stale task",
+          status: "todo",
+          priority: "medium",
+          isMit: false,
+          createdAt: "2026-07-27T08:00:00.000Z",
+          updatedAt: "2026-07-28T08:00:00.000Z",
+          sync: {
+            ownerUserId: "supabase-user-1",
+            lastSyncedAt: "2026-07-28T09:00:00.000Z",
+            lastSyncedByDeviceId: "local-device",
+          },
+        },
+      ],
+      projects: [
+        {
+          id: "project-1",
+          title: "Local newer project",
+          status: "active",
+          priority: "medium",
+          createdAt: "2026-07-27T08:00:00.000Z",
+          updatedAt: "2026-07-28T10:30:00.000Z",
+          sync: {
+            ownerUserId: "supabase-user-1",
+            lastSyncedAt: "2026-07-28T08:00:00.000Z",
+            lastSyncedByDeviceId: "local-device",
+          },
+        },
+      ],
+    });
+
+    const provider = new SupabasePreferenceSyncProvider({
+      client: harness.client,
+      runtime: createRuntimeStub({
+        status: "authenticated",
+        provider: "google",
+        user: {
+          userId: "google-user-1",
+          email: "user@example.com",
+          displayName: "AliOS User",
+          createdAt: "2026-07-28T00:00:00.000Z",
+          updatedAt: "2026-07-28T12:00:00.000Z",
+        },
+      }),
+      getStorage: () => localStorage,
+      now: () => new Date("2026-07-28T12:00:00.000Z"),
+      backupStorage: backupHarness.backupStorage,
+    });
+
+    await provider.syncNow();
+
+    const diagnostics = JSON.parse(
+      localStorage.getItem("alios.sync.diagnostics") ?? "[]"
+    ) as ReadonlyArray<{
+      outcome: string;
+      staleLocalCount?: number;
+      staleRemoteCount?: number;
+    }>;
+
+    expect(diagnostics[0]).toMatchObject({
+      outcome: "success",
+      staleLocalCount: 1,
+      staleRemoteCount: 1,
+    });
+    expect(backupHarness.getData().tasks[0].title).toBe("Remote task title");
+  });
+
+  it("reuses the active sync attempt when retry is requested twice together", async () => {
+    const harness = createSupabaseClientHarness();
+    const provider = new SupabasePreferenceSyncProvider({
+      client: harness.client,
+      runtime: createRuntimeStub({
+        status: "authenticated",
+        provider: "google",
+        user: {
+          userId: "google-user-1",
+          email: "user@example.com",
+          displayName: "AliOS User",
+          createdAt: "2026-07-28T00:00:00.000Z",
+          updatedAt: "2026-07-28T12:00:00.000Z",
+        },
+      }),
+      getStorage: () => localStorage,
+      now: () => new Date("2026-07-28T12:00:00.000Z"),
+    });
+
+    const firstAttempt = provider.syncNow();
+    const secondAttempt = provider.syncNow();
+
+    await expect(Promise.all([firstAttempt, secondAttempt])).resolves.toMatchObject([
+      {
+        status: {
+          mode: "ready",
+        },
+      },
+      {
+        status: {
+          mode: "ready",
+        },
+      },
+    ]);
+  });
 });

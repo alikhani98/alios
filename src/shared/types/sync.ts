@@ -4,6 +4,8 @@ import { isoDateTimeSchema } from "@/shared/utils/domain";
 
 export const syncConflictReasonSchema = z.enum([
   "diverged-updates",
+  "local-record-outdated",
+  "remote-record-outdated",
   "remote-write-blocked",
 ]);
 

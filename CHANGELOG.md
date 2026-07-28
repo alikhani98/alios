@@ -1,5 +1,15 @@
 # Changelog
 
+## Stage 239 - Sync Conflict Resolution & Reliability
+
+- Strengthened the Supabase-backed sync foundation with safer conflict and staleness detection for tasks, projects, and goals
+- Preserved the last successful sync timestamp across failed retries so connected devices retain trustworthy status context
+- Added explicit sync-issue classification for conflict, connectivity-style, and provider/runtime failures without changing repository ownership
+- Added a user-triggered retry sync action and clearer sync-health summary to the Settings `Account & Sync` surface
+- Added bounded local sync diagnostics for attempt start, success, failure reason, conflict count, stale-local count, and stale-remote count
+- Expanded focused sync-provider, runtime-boundary, and Settings rendering coverage for retry behavior, stale-data detection, and failure safety
+- Documented the stage in `docs/SYNC_CONFLICT_RELIABILITY_STAGE_239.md`
+
 ## Stage 238 - User Data Sync Expansion
 
 - Expanded the Supabase-backed sync foundation from low-risk preferences into Tasks, Projects, and Goals while preserving AliOS as a local-first app

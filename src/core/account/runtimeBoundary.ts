@@ -53,6 +53,7 @@ export type AccountRuntimeState = Readonly<{
 
 export interface AccountRuntimeBoundary {
   getState(): Promise<AccountRuntimeState>;
+  syncNow(): Promise<SyncStatus>;
   subscribe(
     listener: AccountRuntimeStateListener<AccountRuntimeState>
   ): AccountStateSubscription;
@@ -116,8 +117,16 @@ function deriveSyncCapability(status: SyncStatus): SyncCapability {
   }
 
   if (status.mode === "error") {
+    if (status.issue === "connectivity") {
+      return {
+        availability: "offline",
+        enabled: false,
+        detail: status.detail,
+      };
+    }
+
     return {
-      availability: "conflict",
+      availability: status.issue === "conflict" ? "conflict" : "disabled",
       enabled: false,
       detail: status.detail,
     };
@@ -268,6 +277,11 @@ export class DefaultAccountRuntimeBoundary implements AccountRuntimeBoundary {
       this.authProvider,
       this.syncProvider
     );
+  }
+
+  async syncNow(): Promise<SyncStatus> {
+    const result = await this.syncProvider.syncNow();
+    return result.status;
   }
 
   subscribe(

@@ -82,4 +82,11 @@ describe("account runtime boundary", () => {
     expect(subscription.unsubscribe).toBeTypeOf("function");
     subscription.unsubscribe();
   });
+
+  it("exposes a local-only sync action without activating any remote behavior", async () => {
+    await expect(localOnlyAccountRuntimeBoundary.syncNow()).resolves.toMatchObject({
+      mode: "local-only",
+      provider: "local-only",
+    });
+  });
 });
