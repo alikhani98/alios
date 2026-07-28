@@ -1,5 +1,13 @@
 # Changelog
 
+## Stage 229 - Account Abstraction Layer Preparation
+
+- Created `docs/ACCOUNT_ABSTRACTION_LAYER_STAGE_229.md` to document the future-safe account boundary for AliOS while preserving current local-first behavior
+- Added a minimal contract-only `src/core/account` module defining `AccountIdentity`, `AccountStatus`, `AccountSessionBoundary`, `AccountCapabilitySet`, and `AccountProvider`
+- Added a focused test file to lock the local-only default capability behavior and the authenticated contract shape without exposing any fake runtime account session
+- Explicitly documented that account providers must not own application data, feature logic, repositories, UI state, or storage ownership
+- Kept the stage architecture-only: no authentication implementation, no Supabase integration, no remote sync, no API calls, no user-account runtime, no schema or repository migration, and no runtime UI implementation
+
 ## Stage 228 - Account & Sync Implementation Readiness Review
 
 - Created `docs/ACCOUNT_SYNC_IMPLEMENTATION_READINESS_STAGE_228.md` to review the completed Account & Sync preparation chain from Stage 213A through Stage 227
