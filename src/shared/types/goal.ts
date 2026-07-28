@@ -6,6 +6,7 @@ import {
   GOAL_STATUS_VALUES,
   GOAL_TIMEFRAME_VALUES,
 } from "@/shared/constants/domain";
+import { recordSyncMetadataSchema } from "@/shared/types/sync";
 import { dateOnlySchema, isoDateTimeSchema } from "@/shared/utils/domain";
 
 export const goalAreaSchema = z.enum(GOAL_AREA_VALUES);
@@ -28,6 +29,7 @@ export const goalSchema = z.object({
   tags: z.array(z.string().trim().min(1)).default([]),
   createdAt: isoDateTimeSchema,
   updatedAt: isoDateTimeSchema,
+  sync: recordSyncMetadataSchema.optional(),
 });
 
 export type GoalArea = z.infer<typeof goalAreaSchema>;

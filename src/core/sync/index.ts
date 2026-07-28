@@ -2,6 +2,7 @@ export * from "./LocalOnlySyncProvider";
 export * from "./SupabasePreferenceSyncProvider";
 export * from "./optionalSyncConsent";
 export * from "./profileContract";
+export * from "./recordChangeEvents";
 export * from "./supabaseSyncConfig";
 export * from "./syncableEntities";
 export * from "./syncMetadata";

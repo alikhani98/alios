@@ -4,6 +4,7 @@ import {
   PROJECT_PRIORITY_VALUES,
   PROJECT_STATUS_VALUES,
 } from "@/shared/constants/domain";
+import { recordSyncMetadataSchema } from "@/shared/types/sync";
 import { dateOnlySchema, isoDateTimeSchema } from "@/shared/utils/domain";
 
 export const projectStatusSchema = z.enum(PROJECT_STATUS_VALUES);
@@ -23,6 +24,7 @@ export const projectSchema = z.object({
   createdAt: isoDateTimeSchema,
   updatedAt: isoDateTimeSchema,
   archivedAt: isoDateTimeSchema.optional(),
+  sync: recordSyncMetadataSchema.optional(),
 });
 
 export type ProjectStatus = z.infer<typeof projectStatusSchema>;

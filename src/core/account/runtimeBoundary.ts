@@ -291,12 +291,16 @@ export class DefaultAccountRuntimeBoundary implements AccountRuntimeBoundary {
     const authSubscription = this.authProvider.subscribe(() => {
       emit();
     });
+    const syncSubscription = this.syncProvider.subscribe(() => {
+      emit();
+    });
 
     return {
       unsubscribe: () => {
         active = false;
         accountSubscription.unsubscribe();
         authSubscription.unsubscribe();
+        syncSubscription.unsubscribe();
       },
     };
   }

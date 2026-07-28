@@ -1,5 +1,16 @@
 # Changelog
 
+## Stage 238 - User Data Sync Expansion
+
+- Expanded the Supabase-backed sync foundation from low-risk preferences into Tasks, Projects, and Goals while preserving AliOS as a local-first app
+- Added optional sync metadata to Task, Project, and Goal records for ownership, last-sync tracking, device attribution, and safe conflict flagging
+- Extended the sync provider to exchange synced records through Supabase, upload local changes, hydrate remote changes, and flag diverged updates instead of silently overwriting them
+- Reused the existing backup storage boundary for local snapshot merge application so repository-owned records stay behind the current storage architecture
+- Added narrow local sync-trigger events for Task, Project, and Goal writes so sync can react to real user changes without changing feature workflows
+- Updated the Settings `Account & Sync` surface and bilingual copy to show the real synced categories, sync timing, and current connected-state scope
+- Added focused sync-provider and Settings rendering coverage for user-data sync, ownership metadata, and failed-sync safety
+- Documented the stage in `docs/USER_DATA_SYNC_EXPANSION_STAGE_238.md`
+
 ## Stage 237 - Device Sync Backend Foundation
 
 - Added the first real Supabase-backed sync foundation while preserving AliOS as a local-first app

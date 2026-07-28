@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { BackupStorage } from "@/core/backup";
 import type { AuthSession } from "@/core/auth";
 import type { GoogleAuthRuntime } from "@/core/auth/googleAuthRuntime";
 import {
@@ -7,8 +8,10 @@ import {
   APPEARANCE_STORAGE_KEY,
 } from "@/shared/constants/preferences";
 import { LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
+import type { Goal, Project, Task } from "@/shared/types";
 
 import { SupabasePreferenceSyncProvider } from "../SupabasePreferenceSyncProvider";
+import type { SupabaseRecordRow } from "../supabaseClient";
 import { SUPABASE_SYNC_METADATA_STORAGE_KEY } from "../supabaseSyncConfig";
 
 type FakeSessionUser = {
@@ -83,9 +86,94 @@ function createSupabaseClientHarness(remoteMetadata?: Record<string, unknown>) {
         return { error: null };
       }),
     },
+    records: {
+      list: vi.fn(
+        async (): Promise<{
+          data: ReadonlyArray<SupabaseRecordRow>;
+          error: Error | null;
+        }> => ({
+          data: [],
+          error: null,
+        })
+      ),
+      upsert: vi.fn(
+        async ({
+          rows,
+        }: {
+          rows: ReadonlyArray<SupabaseRecordRow>;
+        }): Promise<{
+          data: ReadonlyArray<SupabaseRecordRow>;
+          error: Error | null;
+        }> => ({
+          data: rows,
+          error: null,
+        })
+      ),
+    },
   };
 
   return { client, session };
+}
+
+function createBackupStorageStub(input?: {
+  tasks?: Task[];
+  projects?: Project[];
+  goals?: Goal[];
+}) {
+  let data = {
+    dailyCheckins: [],
+    tasks: input?.tasks ?? [],
+    goals: input?.goals ?? [],
+    lifeAreas: [],
+    decisionLogEntries: [],
+    manualEntries: [],
+    financeTransactions: [],
+    financeObligations: [],
+    projects: input?.projects ?? [],
+    journalEntries: [],
+    knowledgeItems: [],
+    settings: [],
+    inboxItems: [],
+    routines: [],
+    weeklyPlans: [],
+  };
+
+  const backupStorage: BackupStorage = {
+    readAll: vi.fn(async () => structuredClone(data)),
+    replaceAll: vi.fn(async (nextData) => {
+      data = structuredClone(nextData);
+    }),
+    getSummary: vi.fn(async () => ({
+      dailyCheckins: data.dailyCheckins.length,
+      tasks: data.tasks.length,
+      goals: data.goals.length,
+      lifeAreas: data.lifeAreas.length,
+      decisionLogEntries: data.decisionLogEntries.length,
+      manualEntries: data.manualEntries.length,
+      financeTransactions: data.financeTransactions.length,
+      financeObligations: data.financeObligations.length,
+      projects: data.projects.length,
+      journalEntries: data.journalEntries.length,
+      knowledgeItems: data.knowledgeItems.length,
+      settings: data.settings.length,
+      inboxItems: data.inboxItems.length,
+      routines: data.routines.length,
+      weeklyPlans: data.weeklyPlans.length,
+    })),
+    clearAll: vi.fn(async () => {
+      data = {
+        ...data,
+        tasks: [],
+        projects: [],
+        goals: [],
+      };
+    }),
+  };
+
+  return {
+    backupStorage,
+    getData: () => structuredClone(data),
+  };
 }
 
 describe("SupabasePreferenceSyncProvider", () => {
@@ -191,8 +279,155 @@ describe("SupabasePreferenceSyncProvider", () => {
     await expect(provider.getStatus()).resolves.toMatchObject({
       mode: "ready",
       provider: "supabase",
+      scopes: ["preferences"],
       connectedUserId: "supabase-user-1",
       lastSyncedAt: "2026-07-28T12:00:00.000Z",
     });
+  });
+
+  it("syncs tasks, projects, and goals through the backup boundary while preserving local-first ownership", async () => {
+    const harness = createSupabaseClientHarness();
+    const backupHarness = createBackupStorageStub({
+      tasks: [
+        {
+          id: "task-1",
+          title: "Local task",
+          status: "todo",
+          priority: "medium",
+          isMit: false,
+          createdAt: "2026-07-27T08:00:00.000Z",
+          updatedAt: "2026-07-28T08:00:00.000Z",
+        },
+      ],
+      projects: [
+        {
+          id: "project-1",
+          title: "Local project",
+          status: "active",
+          priority: "medium",
+          createdAt: "2026-07-27T08:00:00.000Z",
+          updatedAt: "2026-07-28T08:05:00.000Z",
+        },
+      ],
+      goals: [
+        {
+          id: "goal-1",
+          title: "Local goal",
+          description: "Keep moving",
+          area: "work",
+          timeframe: "quarter",
+          status: "active",
+          importance: "high",
+          progressPercent: 20,
+          tags: [],
+          createdAt: "2026-07-27T08:00:00.000Z",
+          updatedAt: "2026-07-28T08:10:00.000Z",
+        },
+      ],
+    });
+
+    const provider = new SupabasePreferenceSyncProvider({
+      client: harness.client,
+      runtime: createRuntimeStub({
+        status: "authenticated",
+        provider: "google",
+        user: {
+          userId: "google-user-1",
+          email: "user@example.com",
+          displayName: "AliOS User",
+          createdAt: "2026-07-28T00:00:00.000Z",
+          updatedAt: "2026-07-28T12:00:00.000Z",
+        },
+      }),
+      getStorage: () => localStorage,
+      now: () => new Date("2026-07-28T12:00:00.000Z"),
+      backupStorage: backupHarness.backupStorage,
+    });
+
+    const result = await provider.syncNow();
+
+    expect(result.status).toMatchObject({
+      mode: "ready",
+      provider: "supabase",
+      scopes: ["preferences", "tasks", "projects", "goals"],
+      connectedUserId: "supabase-user-1",
+      lastSyncedAt: "2026-07-28T12:00:00.000Z",
+    });
+    expect(harness.client.records.upsert).toHaveBeenCalledTimes(1);
+
+    const upsertRows = harness.client.records.upsert.mock.calls[0][0]
+      .rows as unknown as ReadonlyArray<{
+      entity: string;
+      record_id: string;
+      payload: { sync?: { ownerUserId?: string } };
+    }>;
+    expect(upsertRows).toHaveLength(3);
+    expect(upsertRows).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          entity: "tasks",
+          record_id: "task-1",
+          payload: expect.objectContaining({
+            sync: expect.objectContaining({
+              ownerUserId: "supabase-user-1",
+            }),
+          }),
+        }),
+        expect.objectContaining({ entity: "projects", record_id: "project-1" }),
+        expect.objectContaining({ entity: "goals", record_id: "goal-1" }),
+      ])
+    );
+
+    const syncedData = backupHarness.getData();
+    expect(syncedData.tasks[0].sync).toMatchObject({
+      ownerUserId: "supabase-user-1",
+      lastSyncedAt: "2026-07-28T12:00:00.000Z",
+      lastSyncedByDeviceId: expect.any(String),
+    });
+  });
+
+  it("keeps local data available and reports an error when record upsert fails", async () => {
+    const harness = createSupabaseClientHarness();
+    harness.client.records.upsert.mockResolvedValueOnce({
+      data: [],
+      error: new Error("Supabase record upsert failed.") as Error | null,
+    });
+    const backupHarness = createBackupStorageStub({
+      tasks: [
+        {
+          id: "task-1",
+          title: "Local task",
+          status: "todo",
+          priority: "medium",
+          isMit: false,
+          createdAt: "2026-07-27T08:00:00.000Z",
+          updatedAt: "2026-07-28T08:00:00.000Z",
+        },
+      ],
+    });
+
+    const provider = new SupabasePreferenceSyncProvider({
+      client: harness.client,
+      runtime: createRuntimeStub({
+        status: "authenticated",
+        provider: "google",
+        user: {
+          userId: "google-user-1",
+          email: "user@example.com",
+          displayName: "AliOS User",
+          createdAt: "2026-07-28T00:00:00.000Z",
+          updatedAt: "2026-07-28T12:00:00.000Z",
+        },
+      }),
+      getStorage: () => localStorage,
+      now: () => new Date("2026-07-28T12:00:00.000Z"),
+      backupStorage: backupHarness.backupStorage,
+    });
+
+    const result = await provider.syncNow();
+
+    expect(result.status.mode).toBe("error");
+    expect(result.status.detail).toContain("Supabase record upsert failed.");
+    expect(backupHarness.getData().tasks[0].title).toBe("Local task");
   });
 });

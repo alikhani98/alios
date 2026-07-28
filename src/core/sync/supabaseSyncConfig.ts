@@ -2,6 +2,7 @@ export const SUPABASE_SYNC_AUTH_STORAGE_KEY = "alios.sync.supabase.auth";
 export const SUPABASE_SYNC_METADATA_STORAGE_KEY =
   "alios.sync.supabase.metadata";
 export const SUPABASE_SYNC_DEVICE_ID_STORAGE_KEY = "alios.sync.deviceId";
+export const SUPABASE_SYNC_RECORDS_TABLE = "alios_sync_records";
 
 export type SupabaseSyncConfiguration = Readonly<{
   url: string;

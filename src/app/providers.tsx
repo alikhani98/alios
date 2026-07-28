@@ -16,7 +16,7 @@ import {
 } from "@/core/auth";
 import {
   localOnlySyncProvider,
-  supabasePreferenceSyncProvider,
+  SupabasePreferenceSyncProvider,
   type SyncProvider,
 } from "@/core/sync";
 import { StorageAdapterProvider, type StorageAdapter } from "@/core/storage";
@@ -135,22 +135,38 @@ export function AppProviders({
   authProvider = googleAuthProvider.isConfigured()
     ? googleAuthProvider
     : localOnlyAuthProvider,
-  syncProvider = googleAuthProvider.isConfigured()
-    ? supabasePreferenceSyncProvider
-    : localOnlySyncProvider,
+  syncProvider,
 }: AppProvidersProps) {
   const [bootstrapState, setBootstrapState] = useState<BootstrapState>({
     status: "loading",
   });
   const [attempt, setAttempt] = useState(0);
+  const resolvedSyncProvider = useMemo(() => {
+    if (syncProvider) {
+      return syncProvider;
+    }
+
+    if (!googleAuthProvider.isConfigured()) {
+      return localOnlySyncProvider;
+    }
+
+    if (bootstrapState.status !== "ready") {
+      return localOnlySyncProvider;
+    }
+
+    return new SupabasePreferenceSyncProvider({
+      backupStorage: bootstrapState.adapter.backup,
+    });
+  }, [bootstrapState, syncProvider]);
+
   const accountRuntimeBoundary = useMemo(
     () =>
       createAccountRuntimeBoundary({
         accountProvider,
         authProvider,
-        syncProvider,
+        syncProvider: resolvedSyncProvider,
       }),
-    [accountProvider, authProvider, syncProvider]
+    [accountProvider, authProvider, resolvedSyncProvider]
   );
 
   useEffect(() => {

@@ -10,6 +10,19 @@ export type SupabaseSession = Readonly<{
   user: SupabaseSessionUser;
 }>;
 
+export type SupabaseRecordRow = Readonly<{
+  user_id: string;
+  entity: string;
+  record_id: string;
+  payload: Record<string, unknown>;
+  updated_at: string;
+  created_at: string;
+  last_synced_at?: string;
+  last_synced_by_device_id?: string;
+  has_conflict?: boolean;
+  conflict_reason?: string;
+}>;
+
 export type SupabaseBrowserClient = Readonly<{
   auth: {
     getSession: () => Promise<{
@@ -30,6 +43,23 @@ export type SupabaseBrowserClient = Readonly<{
       error: Error | null;
     }>;
     signOut: () => Promise<{ error: Error | null }>;
+  };
+  records: {
+    list: (input: {
+      table: string;
+      userId: string;
+      entities: ReadonlyArray<string>;
+    }) => Promise<{
+      data: ReadonlyArray<SupabaseRecordRow>;
+      error: Error | null;
+    }>;
+    upsert: (input: {
+      table: string;
+      rows: ReadonlyArray<SupabaseRecordRow>;
+    }) => Promise<{
+      data: ReadonlyArray<SupabaseRecordRow>;
+      error: Error | null;
+    }>;
   };
 }>;
 
@@ -113,6 +143,10 @@ function toError(error: unknown, fallback: string) {
   return error instanceof Error
     ? error
     : new Error(typeof error === "string" ? error : fallback);
+}
+
+function encodeInFilter(values: ReadonlyArray<string>) {
+  return `(${values.map((value) => `"${value}"`).join(",")})`;
 }
 
 async function parseErrorResponse(
@@ -297,6 +331,115 @@ export function createSupabaseBrowserClient(
         } catch (error) {
           return {
             error: toError(error, "Supabase sign-out failed."),
+          };
+        }
+      },
+    },
+    records: {
+      async list({ table, userId, entities }) {
+        const currentSession = readStoredSession(authStorageKey);
+        if (!currentSession) {
+          return {
+            data: [],
+            error: new Error(
+              "Supabase sync is unavailable until this device has an authenticated session."
+            ),
+          };
+        }
+
+        if (entities.length === 0) {
+          return { data: [], error: null };
+        }
+
+        try {
+          const query = new URLSearchParams({
+            select:
+              "user_id,entity,record_id,payload,updated_at,created_at,last_synced_at,last_synced_by_device_id,has_conflict,conflict_reason",
+            user_id: `eq.${userId}`,
+            entity: `in.${encodeInFilter(entities)}`,
+          });
+          const response = await fetch(
+            `${url}/rest/v1/${table}?${query.toString()}`,
+            {
+              method: "GET",
+              headers: {
+                ...baseHeaders,
+                Authorization: `Bearer ${currentSession.access_token}`,
+              },
+            }
+          );
+
+          if (!response.ok) {
+            return {
+              data: [],
+              error: await parseErrorResponse(
+                response,
+                "Supabase record listing failed."
+              ),
+            };
+          }
+
+          const payload = (await response.json()) as ReadonlyArray<SupabaseRecordRow>;
+          return {
+            data: Array.isArray(payload) ? payload : [],
+            error: null,
+          };
+        } catch (error) {
+          return {
+            data: [],
+            error: toError(error, "Supabase record listing failed."),
+          };
+        }
+      },
+
+      async upsert({ table, rows }) {
+        const currentSession = readStoredSession(authStorageKey);
+        if (!currentSession) {
+          return {
+            data: [],
+            error: new Error(
+              "Supabase sync is unavailable until this device has an authenticated session."
+            ),
+          };
+        }
+
+        if (rows.length === 0) {
+          return { data: [], error: null };
+        }
+
+        try {
+          const response = await fetch(
+            `${url}/rest/v1/${table}?on_conflict=user_id,entity,record_id`,
+            {
+              method: "POST",
+              headers: {
+                ...baseHeaders,
+                Authorization: `Bearer ${currentSession.access_token}`,
+                Prefer: "resolution=merge-duplicates,return=representation",
+              },
+              body: JSON.stringify(rows),
+            }
+          );
+
+          if (!response.ok) {
+            return {
+              data: [],
+              error: await parseErrorResponse(
+                response,
+                "Supabase record upsert failed."
+              ),
+            };
+          }
+
+          const payload = (await response.json()) as ReadonlyArray<SupabaseRecordRow>;
+          return {
+            data: Array.isArray(payload) ? payload : [],
+            error: null,
+          };
+        } catch (error) {
+          return {
+            data: [],
+            error: toError(error, "Supabase record upsert failed."),
           };
         }
       },

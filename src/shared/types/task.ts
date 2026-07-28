@@ -5,6 +5,7 @@ import {
   TASK_RECURRENCE_FREQUENCY_VALUES,
   TASK_STATUS_VALUES,
 } from "@/shared/constants/domain";
+import { recordSyncMetadataSchema } from "@/shared/types/sync";
 import { dateOnlySchema, isoDateTimeSchema } from "@/shared/utils/domain";
 
 export const taskStatusSchema = z.enum(TASK_STATUS_VALUES);
@@ -29,6 +30,7 @@ export const taskBaseSchema = z.object({
   createdAt: isoDateTimeSchema,
   updatedAt: isoDateTimeSchema,
   completedAt: isoDateTimeSchema.optional(),
+  sync: recordSyncMetadataSchema.optional(),
 });
 
 export const taskSchema = taskBaseSchema.superRefine((task, ctx) => {

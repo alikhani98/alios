@@ -9,6 +9,7 @@ export * from "./decision-log";
 export * from "./goal";
 export * from "./project";
 export * from "./setting";
+export * from "./sync";
 export * from "./task";
 export * from "./routine";
 export * from "./weekly-plan";

@@ -5,6 +5,7 @@ import type {
   TasksRepository,
   UpdateTaskInput,
 } from "@/core/repositories";
+import { notifyUserDataSyncTrigger } from "@/core/sync";
 import { taskSchema, type Task } from "@/shared/types";
 import { getNextTaskRecurrenceDate } from "@/shared/task-recurrence";
 import type { AliosDatabase } from "../db";
@@ -41,6 +42,7 @@ export class DexieTasksRepository
         recurrenceSeriesId: input.recurrence ? metadata.id : undefined,
       });
       await this.database.tasks.add(task);
+      notifyUserDataSyncTrigger({ entity: "tasks", operation: "create" });
       return task;
     });
   }
@@ -55,6 +57,7 @@ export class DexieTasksRepository
         if (existing) return { task: taskSchema.parse(existing), created: false };
         const task = taskSchema.parse({ ...input, ...this.createMetadata() });
         await this.database.tasks.add(task);
+        notifyUserDataSyncTrigger({ entity: "tasks", operation: "create" });
         return { task, created: true };
       })
     );
@@ -102,6 +105,7 @@ export class DexieTasksRepository
             await this.database.tasks.add(nextTask);
           }
         }
+        notifyUserDataSyncTrigger({ entity: "tasks", operation: "update" });
         return task;
       })
     );
@@ -112,6 +116,7 @@ export class DexieTasksRepository
       this.database.transaction("rw", this.database.tasks, async () => {
         this.requireEntity("Task", id, await this.database.tasks.get(id));
         await this.database.tasks.delete(id);
+        notifyUserDataSyncTrigger({ entity: "tasks", operation: "delete" });
       })
     );
   }
