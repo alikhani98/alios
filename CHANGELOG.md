@@ -1,5 +1,13 @@
 # Changelog
 
+## Stage 218 - Account & Sync State Flow Mapping
+
+- Created `docs/ACCOUNT_SYNC_STATE_FLOW_STAGE_218.md` to define the future Account & Sync state model, allowed transitions, safety guards, and per-state UX expectations
+- Documented the future user-facing states for local-only, authenticated-with-sync-off, sync-enabled, sync-paused, offline, conflict-detected, signed-out, and new-device association situations
+- Defined the allowed transitions for account creation, authentication, sync enablement, sync pause/resume, conflict handling, logout, and new-device local-record association without authorizing any runtime behavior change
+- Explicitly documented that no future transition may silently upload, merge, overwrite, claim, or delete current local data
+- Kept the stage planning-only: no authentication implementation, no Supabase integration, no remote sync, no schema or repository change, no migration, no storage change, and no UI implementation
+
 ## Stage 217 - Consent & Copy Contract
 
 - Created `docs/CONSENT_COPY_CONTRACT_STAGE_217.md` to define the exact future user-facing language for optional Account and Sync features
