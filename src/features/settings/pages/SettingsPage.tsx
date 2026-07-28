@@ -419,7 +419,7 @@ export function SettingsPage() {
             </SoftPanel>
             <SoftPanel className="alios-surface-muted">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                {t("settings.syncTitle")}
+                {t("settings.accountSyncTitle")}
               </p>
               <div className="mt-2">
                 <StatusChip tone="neutral">
@@ -503,8 +503,8 @@ export function SettingsPage() {
       {isSimpleView && !showSimpleSyncDetails ? (
         <Card>
           <CardHeader>
-            <CardTitle>{t("settings.syncTitle")}</CardTitle>
-            <CardDescription>{t("settings.syncLocalOnly")}</CardDescription>
+            <CardTitle>{t("settings.accountSyncTitle")}</CardTitle>
+            <CardDescription>{t("settings.accountSyncDescription")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
             <Badge variant="secondary">{t("settings.syncStatusLocalOnly")}</Badge>
