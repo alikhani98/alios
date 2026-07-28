@@ -4,6 +4,7 @@ export type AuthUser = Readonly<{
   displayName: string;
   createdAt: string;
   updatedAt: string;
+  avatarUrl?: string;
   metadata?: Record<string, unknown>;
 }>;
 

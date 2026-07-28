@@ -11,10 +11,12 @@ import {
 describe("account runtime boundary", () => {
   it("keeps the default runtime fully local-only", async () => {
     await expect(localOnlyAccountRuntimeBoundary.getState()).resolves.toMatchObject({
+      accountProviderId: "local-only",
       localOnly: true,
       hasActiveAccount: false,
       accountStatus: "local-only",
       authStatus: "unauthenticated",
+      sessionLifecycle: "local-only",
       identity: null,
       accountCapabilities: {
         status: "local-only",
@@ -27,6 +29,14 @@ describe("account runtime boundary", () => {
       syncStatus: {
         mode: "local-only",
         provider: "local-only",
+      },
+      syncMetadata: {
+        state: "local-only",
+        lastOutcome: "never",
+        device: {
+          deviceId: "local-device",
+          label: "This device",
+        },
       },
     });
   });
@@ -46,6 +56,8 @@ describe("account runtime boundary", () => {
       provider: "local-only",
     });
     expect(LOCAL_ONLY_ACCOUNT_RUNTIME_STATE.hasActiveAccount).toBe(false);
+    expect(LOCAL_ONLY_ACCOUNT_RUNTIME_STATE.sessionLifecycle).toBe("local-only");
+    expect(LOCAL_ONLY_ACCOUNT_RUNTIME_STATE.syncMetadata.lastOutcome).toBe("never");
   });
 
   it("supports runtime subscription without implying an active account session", async () => {
@@ -60,6 +72,8 @@ describe("account runtime boundary", () => {
       expect.objectContaining({
         accountStatus: "local-only",
         authStatus: "unauthenticated",
+        accountProviderId: "local-only",
+        sessionLifecycle: "local-only",
         identity: null,
         localOnly: true,
       })

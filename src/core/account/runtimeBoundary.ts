@@ -5,14 +5,17 @@ import {
 import type { AuthProvider, AuthSession, AuthSessionStatus } from "@/core/auth";
 import { localOnlyAuthProvider } from "@/core/auth";
 import { localOnlySyncProvider, type SyncProvider } from "@/core/sync";
+import { LOCAL_ONLY_SYNC_METADATA, type SyncMetadataSnapshot } from "@/core/sync";
 import type { SyncStatus } from "@/core/sync/types";
 import {
   LOCAL_ONLY_ACCOUNT_CAPABILITY_SET,
+  LOCAL_ONLY_ACCOUNT_PROVIDER_ID,
   type AccountProvider,
   type AccountCapabilitySet,
   type AccountIdentity,
   type AccountRuntimeStateListener,
   type AccountSessionBoundary,
+  type SessionLifecycleState,
   type AccountStateSubscription,
   type AccountStatus,
 } from "./types";
@@ -32,8 +35,10 @@ export type SyncCapability = Readonly<{
 }>;
 
 export type AccountRuntimeState = Readonly<{
+  accountProviderId: string;
   accountStatus: AccountStatus;
   authStatus: AuthSessionStatus;
+  sessionLifecycle: SessionLifecycleState;
   localOnly: boolean;
   hasActiveAccount: boolean;
   identity: AccountIdentity | null;
@@ -42,6 +47,7 @@ export type AccountRuntimeState = Readonly<{
   authSession: AuthSession;
   syncCapability: SyncCapability;
   syncStatus: SyncStatus;
+  syncMetadata: SyncMetadataSnapshot;
   detail: string;
 }>;
 
@@ -62,19 +68,21 @@ export const LOCAL_ONLY_SYNC_CAPABILITY: SyncCapability = {
 export const LOCAL_ONLY_AUTH_SESSION: AuthSession = {
   status: "unauthenticated",
   user: null,
-  provider: "local-only",
+  provider: LOCAL_ONLY_ACCOUNT_PROVIDER_ID,
   detail: "AliOS is currently running without an authenticated user session.",
 };
 
 export const LOCAL_ONLY_SYNC_STATUS: SyncStatus = {
   mode: "local-only",
-  provider: "local-only",
+  provider: LOCAL_ONLY_ACCOUNT_PROVIDER_ID,
   detail: "AliOS is currently running only on this device.",
 };
 
 export const LOCAL_ONLY_ACCOUNT_RUNTIME_STATE: AccountRuntimeState = {
+  accountProviderId: LOCAL_ONLY_ACCOUNT_PROVIDER_ID,
   accountStatus: "local-only",
   authStatus: "unauthenticated",
+  sessionLifecycle: "local-only",
   localOnly: true,
   hasActiveAccount: false,
   identity: null,
@@ -83,6 +91,7 @@ export const LOCAL_ONLY_ACCOUNT_RUNTIME_STATE: AccountRuntimeState = {
   authSession: LOCAL_ONLY_AUTH_SESSION,
   syncCapability: LOCAL_ONLY_SYNC_CAPABILITY,
   syncStatus: LOCAL_ONLY_SYNC_STATUS,
+  syncMetadata: LOCAL_ONLY_SYNC_METADATA,
   detail:
     "AliOS preserves local-only behavior until a future approved account and sync implementation is explicitly enabled.",
 };
@@ -121,6 +130,78 @@ function deriveSyncCapability(status: SyncStatus): SyncCapability {
   };
 }
 
+function deriveSessionLifecycle(
+  accountStatus: AccountStatus,
+  session: AccountSessionBoundary,
+  authSession: AuthSession,
+  syncStatus: SyncStatus
+): SessionLifecycleState {
+  if (
+    accountStatus === "local-only" &&
+    authSession.status === "unauthenticated" &&
+    syncStatus.mode === "local-only"
+  ) {
+    return "local-only";
+  }
+
+  if (
+    accountStatus === "expired" ||
+    session.status === "expired" ||
+    authSession.status === "error"
+  ) {
+    return "expired";
+  }
+
+  if (
+    accountStatus === "authenticated" &&
+    session.identity &&
+    authSession.status === "authenticated"
+  ) {
+    return "signed-in";
+  }
+
+  return "signed-out";
+}
+
+function deriveSyncMetadata(status: SyncStatus): SyncMetadataSnapshot {
+  if (status.mode === "local-only") {
+    return LOCAL_ONLY_SYNC_METADATA;
+  }
+
+  return {
+    device: {
+      deviceId: "current-device",
+      label: "Current browser",
+      platform: "web",
+      trust: "known-device",
+    },
+    state:
+      status.mode === "ready"
+        ? "available"
+        : status.mode === "syncing"
+          ? "available"
+          : "error",
+    lastSyncedAt: status.lastSyncedAt,
+    lastAttemptAt: status.lastAttemptAt,
+    lastOutcome: status.mode === "error" ? "error" : status.lastSyncedAt ? "success" : "never",
+  };
+}
+
+function deriveAccountProviderId(
+  session: AccountSessionBoundary,
+  authSession: AuthSession
+): string {
+  if (session.providerId !== LOCAL_ONLY_ACCOUNT_PROVIDER_ID) {
+    return session.providerId;
+  }
+
+  if (authSession.provider !== LOCAL_ONLY_ACCOUNT_PROVIDER_ID) {
+    return authSession.provider;
+  }
+
+  return LOCAL_ONLY_ACCOUNT_PROVIDER_ID;
+}
+
 async function buildAccountRuntimeState(
   accountProvider: AccountProvider,
   authProvider: AuthProvider,
@@ -136,14 +217,21 @@ async function buildAccountRuntimeState(
     ]);
 
   const identity = session.identity;
+  const sessionLifecycle = deriveSessionLifecycle(
+    accountStatus,
+    session,
+    authSession,
+    syncStatus
+  );
   const localOnly =
-    accountStatus === "local-only" &&
-    authSession.status === "unauthenticated" &&
-    syncStatus.mode === "local-only";
+    sessionLifecycle === "local-only";
+  const accountProviderId = deriveAccountProviderId(session, authSession);
 
   return {
+    accountProviderId,
     accountStatus,
     authStatus: authSession.status,
+    sessionLifecycle,
     localOnly,
     hasActiveAccount: identity !== null && accountStatus === "authenticated",
     identity,
@@ -152,6 +240,7 @@ async function buildAccountRuntimeState(
     authSession,
     syncCapability: deriveSyncCapability(syncStatus),
     syncStatus,
+    syncMetadata: deriveSyncMetadata(syncStatus),
     detail: localOnly
       ? LOCAL_ONLY_ACCOUNT_RUNTIME_STATE.detail
       : session.detail ??
