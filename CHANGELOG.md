@@ -1,5 +1,12 @@
 # Changelog
 
+## Stage 224 - Account & Sync Accessibility Contract
+
+- Created `docs/ACCOUNT_SYNC_ACCESSIBILITY_STAGE_224.md` to define the future accessibility contract for optional Account & Sync surfaces in AliOS
+- Documented accessibility goals, keyboard navigation rules, screen reader behavior, RTL/LTR requirements, visual accessibility requirements, reduced-motion behavior, form accessibility rules, and privacy-accessibility constraints
+- Explicitly documented that all future Account & Sync states must remain understandable through assistive technology while preserving local-first behavior and explicit user consent boundaries
+- Kept the stage planning-only: no authentication implementation, no Supabase integration, no remote sync, no API calls, no schema or repository change, no migration, and no runtime UI implementation
+
 ## Stage 223 - Account & Sync Error Handling Contract
 
 - Created `docs/ACCOUNT_SYNC_ERROR_HANDLING_STAGE_223.md` to define the future error-handling model for optional Account & Sync features in AliOS
