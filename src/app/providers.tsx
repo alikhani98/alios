@@ -14,6 +14,11 @@ import {
   localOnlyAuthProvider,
   type AuthProvider,
 } from "@/core/auth";
+import {
+  localOnlySyncProvider,
+  supabasePreferenceSyncProvider,
+  type SyncProvider,
+} from "@/core/sync";
 import { StorageAdapterProvider, type StorageAdapter } from "@/core/storage";
 import { I18nProvider, useI18n } from "@/shared/i18n";
 import { DateDisplayProvider } from "@/shared/date";
@@ -33,6 +38,7 @@ type AppProvidersProps = {
   loadStorageAdapter?: () => Promise<StorageAdapter>;
   accountProvider?: AccountProvider;
   authProvider?: AuthProvider;
+  syncProvider?: SyncProvider;
 };
 
 type StorageAdapterModule = {
@@ -129,6 +135,9 @@ export function AppProviders({
   authProvider = googleAuthProvider.isConfigured()
     ? googleAuthProvider
     : localOnlyAuthProvider,
+  syncProvider = googleAuthProvider.isConfigured()
+    ? supabasePreferenceSyncProvider
+    : localOnlySyncProvider,
 }: AppProvidersProps) {
   const [bootstrapState, setBootstrapState] = useState<BootstrapState>({
     status: "loading",
@@ -139,8 +148,9 @@ export function AppProviders({
       createAccountRuntimeBoundary({
         accountProvider,
         authProvider,
+        syncProvider,
       }),
-    [accountProvider, authProvider]
+    [accountProvider, authProvider, syncProvider]
   );
 
   useEffect(() => {

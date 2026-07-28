@@ -1,0 +1,305 @@
+export type SupabaseSessionUser = Readonly<{
+  id: string;
+  user_metadata?: Record<string, unknown>;
+}>;
+
+export type SupabaseSession = Readonly<{
+  access_token: string;
+  refresh_token?: string;
+  expires_at?: number;
+  user: SupabaseSessionUser;
+}>;
+
+export type SupabaseBrowserClient = Readonly<{
+  auth: {
+    getSession: () => Promise<{
+      data: { session: SupabaseSession | null };
+      error: Error | null;
+    }>;
+    signInWithIdToken: (input: {
+      provider: "google";
+      token: string;
+    }) => Promise<{
+      data: { session: SupabaseSession | null };
+      error: Error | null;
+    }>;
+    updateUser: (attributes: {
+      data: Record<string, unknown>;
+    }) => Promise<{
+      data: { user: SupabaseSessionUser | null };
+      error: Error | null;
+    }>;
+    signOut: () => Promise<{ error: Error | null }>;
+  };
+}>;
+
+type SupabaseAuthTokenResponse = Readonly<{
+  access_token?: string;
+  refresh_token?: string;
+  expires_at?: number;
+  user?: SupabaseSessionUser;
+}>;
+
+type SupabaseUserResponse = Readonly<{
+  user?: SupabaseSessionUser;
+}>;
+
+function getStorage() {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  try {
+    return window.localStorage;
+  } catch {
+    return null;
+  }
+}
+
+function readStoredSession(storageKey: string): SupabaseSession | null {
+  const storage = getStorage();
+  if (!storage) {
+    return null;
+  }
+
+  try {
+    const raw = storage.getItem(storageKey);
+    if (!raw) {
+      return null;
+    }
+
+    const parsed = JSON.parse(raw) as Partial<SupabaseSession>;
+    if (
+      typeof parsed.access_token !== "string" ||
+      !parsed.user ||
+      typeof parsed.user.id !== "string"
+    ) {
+      return null;
+    }
+
+    return {
+      access_token: parsed.access_token,
+      refresh_token: parsed.refresh_token,
+      expires_at: parsed.expires_at,
+      user: {
+        id: parsed.user.id,
+        user_metadata: parsed.user.user_metadata,
+      },
+    };
+  } catch {
+    return null;
+  }
+}
+
+function writeStoredSession(storageKey: string, session: SupabaseSession | null) {
+  const storage = getStorage();
+  if (!storage) {
+    return;
+  }
+
+  try {
+    if (!session) {
+      storage.removeItem(storageKey);
+      return;
+    }
+
+    storage.setItem(storageKey, JSON.stringify(session));
+  } catch {
+    // Keep runtime sync best-effort if session storage is unavailable.
+  }
+}
+
+function toError(error: unknown, fallback: string) {
+  return error instanceof Error
+    ? error
+    : new Error(typeof error === "string" ? error : fallback);
+}
+
+async function parseErrorResponse(
+  response: Response,
+  fallback: string
+): Promise<Error> {
+  try {
+    const payload = (await response.json()) as
+      | { msg?: string; error_description?: string; message?: string }
+      | null;
+    return new Error(
+      payload?.msg ??
+        payload?.error_description ??
+        payload?.message ??
+        fallback
+    );
+  } catch {
+    return new Error(fallback);
+  }
+}
+
+export function createSupabaseBrowserClient(
+  url: string,
+  anonKey: string,
+  authStorageKey: string
+): SupabaseBrowserClient {
+  const baseHeaders = {
+    apikey: anonKey,
+    "Content-Type": "application/json",
+  };
+
+  return {
+    auth: {
+      async getSession() {
+        return {
+          data: { session: readStoredSession(authStorageKey) },
+          error: null,
+        };
+      },
+
+      async signInWithIdToken({ provider, token }) {
+        try {
+          const response = await fetch(
+            `${url}/auth/v1/token?grant_type=id_token`,
+            {
+              method: "POST",
+              headers: baseHeaders,
+              body: JSON.stringify({
+                provider,
+                id_token: token,
+              }),
+            }
+          );
+
+          if (!response.ok) {
+            return {
+              data: { session: null },
+              error: await parseErrorResponse(
+                response,
+                "Supabase sign-in with Google failed."
+              ),
+            };
+          }
+
+          const payload =
+            (await response.json()) as SupabaseAuthTokenResponse;
+
+          if (
+            typeof payload.access_token !== "string" ||
+            !payload.user ||
+            typeof payload.user.id !== "string"
+          ) {
+            return {
+              data: { session: null },
+              error: new Error(
+                "Supabase sign-in did not return a usable session."
+              ),
+            };
+          }
+
+          const session: SupabaseSession = {
+            access_token: payload.access_token,
+            refresh_token: payload.refresh_token,
+            expires_at: payload.expires_at,
+            user: {
+              id: payload.user.id,
+              user_metadata: payload.user.user_metadata,
+            },
+          };
+
+          writeStoredSession(authStorageKey, session);
+
+          return {
+            data: { session },
+            error: null,
+          };
+        } catch (error) {
+          return {
+            data: { session: null },
+            error: toError(error, "Supabase sign-in with Google failed."),
+          };
+        }
+      },
+
+      async updateUser({ data }) {
+        const currentSession = readStoredSession(authStorageKey);
+        if (!currentSession) {
+          return {
+            data: { user: null },
+            error: new Error(
+              "Supabase sync is unavailable until this device has an authenticated session."
+            ),
+          };
+        }
+
+        try {
+          const response = await fetch(`${url}/auth/v1/user`, {
+            method: "PUT",
+            headers: {
+              ...baseHeaders,
+              Authorization: `Bearer ${currentSession.access_token}`,
+            },
+            body: JSON.stringify({ data }),
+          });
+
+          if (!response.ok) {
+            return {
+              data: { user: null },
+              error: await parseErrorResponse(
+                response,
+                "Supabase user metadata update failed."
+              ),
+            };
+          }
+
+          const payload = (await response.json()) as SupabaseUserResponse;
+          const user =
+            payload.user && typeof payload.user.id === "string"
+              ? {
+                  id: payload.user.id,
+                  user_metadata: payload.user.user_metadata,
+                }
+              : null;
+
+          if (user) {
+            writeStoredSession(authStorageKey, {
+              ...currentSession,
+              user,
+            });
+          }
+
+          return {
+            data: { user },
+            error: null,
+          };
+        } catch (error) {
+          return {
+            data: { user: null },
+            error: toError(error, "Supabase user metadata update failed."),
+          };
+        }
+      },
+
+      async signOut() {
+        const currentSession = readStoredSession(authStorageKey);
+        writeStoredSession(authStorageKey, null);
+
+        if (!currentSession) {
+          return { error: null };
+        }
+
+        try {
+          await fetch(`${url}/auth/v1/logout`, {
+            method: "POST",
+            headers: {
+              ...baseHeaders,
+              Authorization: `Bearer ${currentSession.access_token}`,
+            },
+          });
+
+          return { error: null };
+        } catch (error) {
+          return {
+            error: toError(error, "Supabase sign-out failed."),
+          };
+        }
+      },
+    },
+  };
+}

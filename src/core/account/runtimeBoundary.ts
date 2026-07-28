@@ -170,8 +170,8 @@ function deriveSyncMetadata(status: SyncStatus): SyncMetadataSnapshot {
 
   return {
     device: {
-      deviceId: "current-device",
-      label: "Current browser",
+      deviceId: status.deviceId ?? "current-device",
+      label: status.deviceLabel ?? "Current browser",
       platform: "web",
       trust: "known-device",
     },
@@ -243,9 +243,14 @@ async function buildAccountRuntimeState(
     syncMetadata: deriveSyncMetadata(syncStatus),
     detail: localOnly
       ? LOCAL_ONLY_ACCOUNT_RUNTIME_STATE.detail
-      : session.detail ??
-        authSession.detail ??
-        syncStatus.detail ??
+      : syncStatus.mode !== "local-only"
+        ? syncStatus.detail ??
+          session.detail ??
+          authSession.detail ??
+          "AliOS prepared the account runtime state."
+        : session.detail ??
+          authSession.detail ??
+          syncStatus.detail ??
         "AliOS prepared the account runtime state.",
   };
 }

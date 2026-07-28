@@ -305,6 +305,7 @@ export class GoogleAuthRuntime {
   private pendingLogin: PendingLogin | null = null;
   private currentSession: AuthSession;
   private currentStoredSession: StoredGoogleSession | null;
+  private currentCredentialToken: string | null = null;
 
   constructor(
     private readonly configuration: GoogleAuthRuntimeConfiguration,
@@ -343,6 +344,10 @@ export class GoogleAuthRuntime {
 
   getUser(): AuthUser | null {
     return this.getSession().user;
+  }
+
+  getIdToken(): string | null {
+    return this.currentCredentialToken;
   }
 
   async login(_input: AuthLoginInput = {}): Promise<AuthLoginResult> {
@@ -528,6 +533,7 @@ export class GoogleAuthRuntime {
 
       this.writeStoredSession(storedSession);
       this.currentStoredSession = storedSession;
+      this.currentCredentialToken = response.credential;
       const session = createAuthenticatedSession(storedSession);
       this.setSession(session);
       this.pendingLogin?.resolve({ session });
@@ -590,6 +596,7 @@ export class GoogleAuthRuntime {
 
   private clearStoredSession() {
     this.currentStoredSession = null;
+    this.currentCredentialToken = null;
 
     const storage = this.getStorage();
     if (!storage) {
