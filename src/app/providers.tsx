@@ -1,6 +1,12 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { AlertTriangle, RefreshCcw, RotateCcw } from "lucide-react";
 
+import {
+  AccountRuntimeProvider,
+  createAccountRuntimeBoundary,
+  localOnlyAccountProvider,
+  type AccountProvider,
+} from "@/core/account";
 import {
   AuthRuntimeProvider,
   localOnlyAuthProvider,
@@ -23,6 +29,7 @@ import {
 type AppProvidersProps = {
   children: ReactNode;
   loadStorageAdapter?: () => Promise<StorageAdapter>;
+  accountProvider?: AccountProvider;
   authProvider?: AuthProvider;
 };
 
@@ -114,12 +121,21 @@ export function AppBootstrapErrorFallback({
 export function AppProviders({
   children,
   loadStorageAdapter = loadDexieStorageAdapter,
+  accountProvider = localOnlyAccountProvider,
   authProvider = localOnlyAuthProvider,
 }: AppProvidersProps) {
   const [bootstrapState, setBootstrapState] = useState<BootstrapState>({
     status: "loading",
   });
   const [attempt, setAttempt] = useState(0);
+  const accountRuntimeBoundary = useMemo(
+    () =>
+      createAccountRuntimeBoundary({
+        accountProvider,
+        authProvider,
+      }),
+    [accountProvider, authProvider]
+  );
 
   useEffect(() => {
     let isActive = true;
@@ -171,11 +187,13 @@ export function AppProviders({
             }}
           />
         ) : (
-          <AuthRuntimeProvider provider={authProvider}>
-            <StorageAdapterProvider adapter={bootstrapState.adapter}>
-              {children}
-            </StorageAdapterProvider>
-          </AuthRuntimeProvider>
+          <AccountRuntimeProvider boundary={accountRuntimeBoundary}>
+            <AuthRuntimeProvider provider={authProvider}>
+              <StorageAdapterProvider adapter={bootstrapState.adapter}>
+                {children}
+              </StorageAdapterProvider>
+            </AuthRuntimeProvider>
+          </AccountRuntimeProvider>
         )}
       </DateDisplayProvider>
     </I18nProvider>

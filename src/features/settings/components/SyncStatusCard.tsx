@@ -12,6 +12,7 @@ import {
   WifiOff,
 } from "lucide-react";
 
+import { useAccountRuntimeState, type AccountRuntimeState } from "@/core/account";
 import { OPTIONAL_SYNC_PROVIDER_ID } from "@/core/sync";
 import { useI18n, type TranslationKey } from "@/shared/i18n";
 import {
@@ -50,6 +51,26 @@ type SyncStatePreviewProps = Readonly<{
 type ConsentActionPlaceholderProps = Readonly<{
   label: string;
   descriptionId: string;
+}>;
+
+type AccountActionDefinition = Readonly<{
+  labelKey: TranslationKey;
+  statusKey: TranslationKey;
+}>;
+
+type RuntimeAccountPresentation = Readonly<{
+  titleKey: TranslationKey;
+  badgeLabel: string;
+  summaryStatusKey: TranslationKey;
+  description: string;
+  detailsLabelKey: TranslationKey;
+  detailsValue: string;
+  actionsTitleKey: TranslationKey;
+  actionsDescriptionKey: TranslationKey;
+  actionStatusKey: TranslationKey;
+  actionKeys: readonly AccountActionDefinition[];
+  noteKey: TranslationKey;
+  hintKey: TranslationKey;
 }>;
 
 function SyncStatePreview({ state }: SyncStatePreviewProps) {
@@ -149,11 +170,140 @@ const syncStates: readonly SyncStateDefinition[] = [
   },
 ] as const;
 
+const localOnlyActions: readonly AccountActionDefinition[] = [
+  {
+    labelKey: "settings.accountCreateAction",
+    statusKey: "settings.accountActionPlannedOnly",
+  },
+  {
+    labelKey: "settings.accountSignInAction",
+    statusKey: "settings.accountActionPlannedOnly",
+  },
+  {
+    labelKey: "settings.accountEnableSyncAction",
+    statusKey: "settings.accountActionPlannedOnly",
+  },
+] as const;
+
+const signedOutActions: readonly AccountActionDefinition[] = [
+  {
+    labelKey: "settings.accountSignInAction",
+    statusKey: "settings.accountActionFutureEntry",
+  },
+  {
+    labelKey: "settings.accountCreateAction",
+    statusKey: "settings.accountActionFutureEntry",
+  },
+  {
+    labelKey: "settings.accountEnableSyncAction",
+    statusKey: "settings.accountActionRequiresSignIn",
+  },
+] as const;
+
+const signedInActions: readonly AccountActionDefinition[] = [
+  {
+    labelKey: "settings.accountSignOutAction",
+    statusKey: "settings.accountActionFutureEntry",
+  },
+  {
+    labelKey: "settings.accountManageAction",
+    statusKey: "settings.accountActionFutureEntry",
+  },
+  {
+    labelKey: "settings.accountEnableSyncAction",
+    statusKey: "settings.accountActionFutureEntry",
+  },
+] as const;
+
+function getRuntimeSyncState(
+  runtimeState: AccountRuntimeState
+): SyncStateDefinition {
+  if (runtimeState.localOnly) {
+    return syncStates[0];
+  }
+
+  switch (runtimeState.syncCapability.availability) {
+    case "available":
+      return syncStates[1];
+    case "paused":
+      return syncStates[2];
+    case "offline":
+      return syncStates[3];
+    case "conflict":
+      return syncStates[4];
+    case "disabled":
+    case "local-only":
+    default:
+      return syncStates[0];
+  }
+}
+
+function getRuntimeAccountPresentation(
+  runtimeState: AccountRuntimeState,
+  t: (key: TranslationKey, values?: Record<string, string | number>) => string
+): RuntimeAccountPresentation {
+  if (runtimeState.localOnly) {
+    return {
+      titleKey: "settings.accountLocalOnlyTitle",
+      badgeLabel: t("settings.noOnlineAccount"),
+      summaryStatusKey: "settings.syncStatusLocalOnly",
+      description: runtimeState.detail,
+      detailsLabelKey: "settings.accountDetailsLabel",
+      detailsValue: t("settings.accountDetailsLocalOnly"),
+      actionsTitleKey: "settings.accountFutureActionsTitle",
+      actionsDescriptionKey: "settings.accountFutureActionsDescription",
+      actionStatusKey: "settings.accountFutureActionsStatus",
+      actionKeys: localOnlyActions,
+      noteKey: "settings.accountFutureActionsNote",
+      hintKey: "settings.accountFutureActionsHint",
+    };
+  }
+
+  if (runtimeState.accountStatus === "authenticated" && runtimeState.identity) {
+    return {
+      titleKey: "settings.accountSignedInTitle",
+      badgeLabel: runtimeState.identity.email ?? runtimeState.session.providerId,
+      summaryStatusKey: "settings.accountStatusSignedIn",
+      description: runtimeState.detail,
+      detailsLabelKey: "settings.accountDetailsLabel",
+      detailsValue:
+        runtimeState.identity.displayName ??
+        runtimeState.identity.email ??
+        runtimeState.identity.accountId,
+      actionsTitleKey: "settings.accountSessionActionsTitle",
+      actionsDescriptionKey: "settings.accountSessionActionsDescription",
+      actionStatusKey: "settings.accountSessionActionsStatus",
+      actionKeys: signedInActions,
+      noteKey: "settings.accountSessionActionsNote",
+      hintKey: "settings.accountSessionActionsHint",
+    };
+  }
+
+  return {
+    titleKey: "settings.accountSignedOutTitle",
+    badgeLabel: t("settings.accountStatusSignedOut"),
+    summaryStatusKey: "settings.accountStatusSignedOut",
+    description: runtimeState.detail,
+    detailsLabelKey: "settings.accountDetailsLabel",
+    detailsValue: t("settings.accountDetailsSignedOut"),
+    actionsTitleKey: "settings.accountSignInPreparationTitle",
+    actionsDescriptionKey: "settings.accountSignInPreparationDescription",
+    actionStatusKey: "settings.accountSignInPreparationStatus",
+    actionKeys: signedOutActions,
+    noteKey: "settings.accountSignInPreparationNote",
+    hintKey: "settings.accountSignInPreparationHint",
+  };
+}
+
 export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
   const { t } = useI18n();
+  const runtimeState = useAccountRuntimeState();
   const futureActionsDescriptionId = "account-sync-future-actions-description";
-  const currentState = syncStates[0];
-  const futureStates = syncStates.slice(1);
+  const currentState = getRuntimeSyncState(runtimeState);
+  const accountPresentation = getRuntimeAccountPresentation(runtimeState, t);
+  const futureStates = syncStates.filter(
+    (state) => state.titleKey !== currentState.titleKey
+  );
 
   return (
     <Card>
@@ -171,12 +321,22 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
               {t("settings.accountCurrentStateLabel")}
             </p>
             <div className="mt-2">
-              <StatusChip tone="neutral">
-                {t("settings.syncStatusLocalOnly")}
+              <StatusChip
+                tone={
+                  currentState.tone === "primary"
+                    ? "primary"
+                    : currentState.tone === "warning"
+                      ? "warning"
+                      : currentState.tone === "danger"
+                        ? "danger"
+                        : "neutral"
+                }
+              >
+                {t(accountPresentation.summaryStatusKey)}
               </StatusChip>
             </div>
             <p className="mt-3 text-sm leading-6 text-muted-foreground">
-              {t("settings.accountCurrentStateDescription")}
+              {runtimeState.detail}
             </p>
           </SoftPanel>
           <SoftPanel className="alios-surface-muted">
@@ -214,21 +374,42 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
                   id="account-sync-current-state"
                   className="text-base font-semibold leading-6"
                 >
-                  {t("settings.accountLocalOnlyTitle")}
+                  {t(accountPresentation.titleKey)}
                 </p>
                 <p className="mt-1 text-sm leading-7 text-muted-foreground">
-                  {t("settings.syncLocalOnly")}
+                  {accountPresentation.description}
                 </p>
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
-              <StatusChip tone="neutral">{t(currentState.statusKey)}</StatusChip>
-              <Badge variant="secondary" className="w-fit shrink-0">
-                {t("settings.noOnlineAccount")}
+              <StatusChip
+                tone={
+                  runtimeState.localOnly
+                    ? "neutral"
+                    : runtimeState.hasActiveAccount
+                      ? "primary"
+                      : "warning"
+                }
+              >
+                {t(accountPresentation.summaryStatusKey)}
+              </StatusChip>
+              <Badge
+                variant="secondary"
+                className="w-fit shrink-0 max-w-full break-all text-start"
+              >
+                {accountPresentation.badgeLabel}
               </Badge>
             </div>
           </div>
           <SyncStatePreview state={currentState} />
+          <SoftPanel className="alios-surface-muted">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+              {t(accountPresentation.detailsLabelKey)}
+            </p>
+            <p className="mt-2 break-words text-sm leading-6">
+              {accountPresentation.detailsValue}
+            </p>
+          </SoftPanel>
         </section>
 
         <section aria-labelledby="account-sync-other-states" className="space-y-3">
@@ -338,44 +519,39 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
               <UserRound className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
               <div>
                 <p className="text-sm font-medium">
-                  {t("settings.accountFutureActionsTitle")}
+                  {t(accountPresentation.actionsTitleKey)}
                 </p>
                 <p
                   id={futureActionsDescriptionId}
                   className="mt-1 text-sm leading-7 text-muted-foreground"
                 >
-                  {t("settings.accountFutureActionsDescription")}
+                  {t(accountPresentation.actionsDescriptionKey)}
                 </p>
               </div>
             </div>
             <StatusChip tone="warning">
-              {t("settings.accountFutureActionsStatus")}
+              {t(accountPresentation.actionStatusKey)}
             </StatusChip>
           </div>
           <div
             className="grid gap-3 sm:grid-cols-3"
             role="group"
-            aria-label={t("settings.accountFutureActionsTitle")}
+            aria-label={t(accountPresentation.actionsTitleKey)}
           >
-            <ConsentActionPlaceholder
-              label={t("settings.accountCreateAction")}
-              descriptionId={futureActionsDescriptionId}
-            />
-            <ConsentActionPlaceholder
-              label={t("settings.accountSignInAction")}
-              descriptionId={futureActionsDescriptionId}
-            />
-            <ConsentActionPlaceholder
-              label={t("settings.accountEnableSyncAction")}
-              descriptionId={futureActionsDescriptionId}
-            />
+            {accountPresentation.actionKeys.map((action) => (
+              <ConsentActionPlaceholder
+                key={action.labelKey}
+                label={`${t(action.labelKey)} · ${t(action.statusKey)}`}
+                descriptionId={futureActionsDescriptionId}
+              />
+            ))}
           </div>
           <p className="text-xs leading-5 text-muted-foreground">
-            {t("settings.accountFutureActionsNote")}
+            {t(accountPresentation.noteKey)}
           </p>
           <div className="flex items-start gap-2 rounded-xl border border-dashed border-border/70 px-3 py-3 text-xs leading-5 text-muted-foreground">
             <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-            <p>{t("settings.accountFutureActionsHint")}</p>
+            <p>{t(accountPresentation.hintKey)}</p>
           </div>
         </SoftPanel>
 

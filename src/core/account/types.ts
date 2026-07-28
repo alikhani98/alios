@@ -53,6 +53,10 @@ export type AccountStateListener = (
   session: AccountSessionBoundary
 ) => void;
 
+export type AccountRuntimeStateListener<TState> = (
+  state: TState
+) => void;
+
 export type AccountStateSubscription = Readonly<{
   unsubscribe: () => void;
 }>;

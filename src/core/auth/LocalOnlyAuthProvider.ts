@@ -12,7 +12,7 @@ const localOnlySession: AuthSession = {
   status: "unauthenticated",
   user: null,
   provider: "local-only",
-  detail: "AliOS is currently running without an account provider.",
+  detail: "AliOS is currently running without an authenticated user session.",
 };
 
 export class LocalOnlyAuthProvider implements AuthProvider {
