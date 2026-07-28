@@ -1,5 +1,13 @@
 # Changelog
 
+## Stage 232 - Account & Sync Interaction Polish
+
+- Polished the visible `Account & Sync` Settings experience so the current local-only state leads the hierarchy and the future sync states are easier to scan
+- Added keyboard-accessible expandable explanation sections for consent requirements, offline behavior, and conflict review expectations
+- Clarified disabled future account actions with stronger grouping, planned-only messaging, and improved explanatory copy
+- Expanded focused Settings sync coverage to include grouped state rendering, disabled action descriptions, and accessibility labels
+- Documented the stage in `docs/ACCOUNT_SYNC_INTERACTION_POLISH_STAGE_232.md` while preserving the current local-first runtime behavior
+
 ## Stage 231 - Sync Experience UI Foundation
 
 - Extended the visible Settings `Account & Sync` surface into a reusable sync-experience foundation without enabling authentication, remote sync, or cloud behavior
