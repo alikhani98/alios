@@ -23,11 +23,16 @@ describe("SyncStatusCard", () => {
     localStorage.clear();
   });
 
-  it("renders the local-only account and sync foundation with disabled future actions", () => {
+  it("renders the local-only account and sync foundation with disabled future actions and informational sync states", () => {
     const markup = renderCardToStaticMarkup();
 
     expect(markup).toContain("Account &amp; Sync");
     expect(markup).toContain("Local only");
+    expect(markup).toContain("Future sync states");
+    expect(markup).toContain("Sync available");
+    expect(markup).toContain("Sync paused");
+    expect(markup).toContain("Offline");
+    expect(markup).toContain("Conflict detected");
     expect(markup).toContain("Create account");
     expect(markup).toContain("Sign in");
     expect(markup).toContain("Enable sync");
@@ -42,6 +47,8 @@ describe("SyncStatusCard", () => {
 
     expect(markup).toContain("حساب و همگام‌سازی");
     expect(markup).toContain("فقط محلی");
+    expect(markup).toContain("وضعیت‌های آیندهٔ همگام‌سازی");
+    expect(markup).toContain("تعارض شناسایی شد");
     expect(markup).toContain("ایجاد حساب");
     expect(markup).toContain("فعال‌کردن همگام‌سازی");
   });

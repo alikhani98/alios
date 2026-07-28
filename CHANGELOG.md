@@ -1,5 +1,13 @@
 # Changelog
 
+## Stage 231 - Sync Experience UI Foundation
+
+- Extended the visible Settings `Account & Sync` surface into a reusable sync-experience foundation without enabling authentication, remote sync, or cloud behavior
+- Added informational future sync states for `Local only`, `Sync available`, `Sync paused`, `Offline`, and `Conflict detected`
+- Added a future-ready consent foundation that explains sync scope, explicit user control, and no-silent-overwrite safety boundaries
+- Added dedicated offline and conflict placeholder messaging so future unavailable and review-required states have an approved UI baseline
+- Expanded focused bilingual render coverage for the Settings sync foundation and documented the stage in `docs/SYNC_EXPERIENCE_UI_FOUNDATION_STAGE_231.md`
+
 ## Stage 230 - Account Settings UI Foundation
 
 - Added the first visible `Account & Sync` Settings foundation without enabling any real account, session, or sync behavior
