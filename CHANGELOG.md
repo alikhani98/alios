@@ -1,5 +1,13 @@
 # Changelog
 
+## Stage 220 - Account & Sync Interaction Flow Specification
+
+- Created `docs/ACCOUNT_SYNC_INTERACTION_FLOW_STAGE_220.md` to define the future end-to-end interaction flows for Account & Sync in AliOS
+- Documented the future flow contracts for first account entry, account creation, sync enablement, sync disablement, sign-out, conflict-resolution entry, and new-device association
+- Defined the required user-visible states, safety confirmations, and recovery behavior for each future interaction path
+- Explicitly documented that no flow may silently upload, merge, claim, overwrite, or delete local data
+- Kept the stage planning-only: no authentication implementation, no Supabase integration, no remote sync, no schema or repository change, no migration, no storage change, and no UI implementation
+
 ## Stage 219 - Account & Sync Settings Screen-State Specification
 
 - Created `docs/ACCOUNT_SYNC_SETTINGS_SCREEN_STATE_STAGE_219.md` to define the future `Account & Sync` Settings screen structure and state-by-state layout rules
