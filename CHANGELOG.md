@@ -1,5 +1,13 @@
 # Changelog
 
+## Stage 223 - Account & Sync Error Handling Contract
+
+- Created `docs/ACCOUNT_SYNC_ERROR_HANDLING_STAGE_223.md` to define the future error-handling model for optional Account & Sync features in AliOS
+- Documented the future sync error states, network-failure behavior, authentication/session failure states, permission failure handling, conflict-detected experience, retry behavior, offline continuation rules, and recovery paths
+- Defined user-facing error-copy principles, error-logging boundaries, and privacy constraints for future account and sync failures
+- Explicitly documented that no future failure path may silently delete data, silently overwrite data, block local usage, or obscure what happened to the user
+- Kept the stage planning-only: no authentication implementation, no Supabase integration, no remote sync, no API calls, no schema or repository change, no migration, and no runtime UI implementation
+
 ## Stage 222 - Account & Sync Security Boundary Contract
 
 - Created `docs/ACCOUNT_SYNC_SECURITY_BOUNDARY_STAGE_222.md` to define the future security boundary for optional Account & Sync features in AliOS
