@@ -1,14 +1,21 @@
 import {
+  LOCAL_ONLY_ACCOUNT_SESSION_BOUNDARY,
+  localOnlyAccountProvider,
+} from "./LocalOnlyAccountProvider";
+import type { AuthProvider, AuthSession, AuthSessionStatus } from "@/core/auth";
+import { localOnlyAuthProvider } from "@/core/auth";
+import { localOnlySyncProvider, type SyncProvider } from "@/core/sync";
+import type { SyncStatus } from "@/core/sync/types";
+import {
   LOCAL_ONLY_ACCOUNT_CAPABILITY_SET,
+  type AccountProvider,
   type AccountCapabilitySet,
   type AccountIdentity,
+  type AccountRuntimeStateListener,
   type AccountSessionBoundary,
-  type AccountStateListener,
   type AccountStateSubscription,
   type AccountStatus,
 } from "./types";
-import type { AuthSession, AuthSessionStatus } from "@/core/auth/types";
-import type { SyncStatus } from "@/core/sync/types";
 
 export type SyncCapabilityAvailability =
   | "local-only"
@@ -40,7 +47,9 @@ export type AccountRuntimeState = Readonly<{
 
 export interface AccountRuntimeBoundary {
   getState(): Promise<AccountRuntimeState>;
-  subscribe(listener: AccountStateListener): AccountStateSubscription;
+  subscribe(
+    listener: AccountRuntimeStateListener<AccountRuntimeState>
+  ): AccountStateSubscription;
 }
 
 export const LOCAL_ONLY_SYNC_CAPABILITY: SyncCapability = {
@@ -48,14 +57,6 @@ export const LOCAL_ONLY_SYNC_CAPABILITY: SyncCapability = {
   enabled: false,
   detail:
     "AliOS keeps sync disabled by default. No account connection or remote transfer is active.",
-};
-
-export const LOCAL_ONLY_ACCOUNT_SESSION_BOUNDARY: AccountSessionBoundary = {
-  status: "local-only",
-  identity: null,
-  providerId: "local-only",
-  detail:
-    "AliOS remains local-first. No account session is active in the current runtime.",
 };
 
 export const LOCAL_ONLY_AUTH_SESSION: AuthSession = {
@@ -86,19 +87,135 @@ export const LOCAL_ONLY_ACCOUNT_RUNTIME_STATE: AccountRuntimeState = {
     "AliOS preserves local-only behavior until a future approved account and sync implementation is explicitly enabled.",
 };
 
-export class LocalOnlyAccountRuntimeBoundary implements AccountRuntimeBoundary {
-  async getState(): Promise<AccountRuntimeState> {
-    return LOCAL_ONLY_ACCOUNT_RUNTIME_STATE;
+type AccountRuntimeBoundaryDependencies = Readonly<{
+  accountProvider?: AccountProvider;
+  authProvider?: AuthProvider;
+  syncProvider?: SyncProvider;
+}>;
+
+function deriveSyncCapability(status: SyncStatus): SyncCapability {
+  if (status.mode === "local-only") {
+    return LOCAL_ONLY_SYNC_CAPABILITY;
   }
 
-  subscribe(listener: AccountStateListener): AccountStateSubscription {
-    listener(LOCAL_ONLY_ACCOUNT_SESSION_BOUNDARY);
+  if (status.mode === "syncing") {
+    return {
+      availability: "available",
+      enabled: true,
+      detail: status.detail,
+    };
+  }
+
+  if (status.mode === "error") {
+    return {
+      availability: "conflict",
+      enabled: false,
+      detail: status.detail,
+    };
+  }
+
+  return {
+    availability: "available",
+    enabled: true,
+    detail: status.detail,
+  };
+}
+
+async function buildAccountRuntimeState(
+  accountProvider: AccountProvider,
+  authProvider: AuthProvider,
+  syncProvider: SyncProvider
+): Promise<AccountRuntimeState> {
+  const [accountStatus, accountCapabilities, session, authSession, syncStatus] =
+    await Promise.all([
+      accountProvider.getStatus(),
+      accountProvider.getCapabilities(),
+      accountProvider.getCurrentSession(),
+      authProvider.getCurrentSession(),
+      syncProvider.getStatus(),
+    ]);
+
+  const identity = session.identity;
+  const localOnly =
+    accountStatus === "local-only" &&
+    authSession.status === "unauthenticated" &&
+    syncStatus.mode === "local-only";
+
+  return {
+    accountStatus,
+    authStatus: authSession.status,
+    localOnly,
+    hasActiveAccount: identity !== null && accountStatus === "authenticated",
+    identity,
+    accountCapabilities,
+    session,
+    authSession,
+    syncCapability: deriveSyncCapability(syncStatus),
+    syncStatus,
+    detail: localOnly
+      ? LOCAL_ONLY_ACCOUNT_RUNTIME_STATE.detail
+      : session.detail ??
+        authSession.detail ??
+        syncStatus.detail ??
+        "AliOS prepared the account runtime state.",
+  };
+}
+
+export class DefaultAccountRuntimeBoundary implements AccountRuntimeBoundary {
+  constructor(
+    private readonly accountProvider: AccountProvider = localOnlyAccountProvider,
+    private readonly authProvider: AuthProvider = localOnlyAuthProvider,
+    private readonly syncProvider: SyncProvider = localOnlySyncProvider
+  ) {}
+
+  async getState(): Promise<AccountRuntimeState> {
+    return buildAccountRuntimeState(
+      this.accountProvider,
+      this.authProvider,
+      this.syncProvider
+    );
+  }
+
+  subscribe(
+    listener: AccountRuntimeStateListener<AccountRuntimeState>
+  ): AccountStateSubscription {
+    let active = true;
+
+    const emit = () => {
+      void this.getState().then((state) => {
+        if (active) {
+          listener(state);
+        }
+      });
+    };
+
+    emit();
+
+    const accountSubscription = this.accountProvider.subscribe(() => {
+      emit();
+    });
+    const authSubscription = this.authProvider.subscribe(() => {
+      emit();
+    });
 
     return {
-      unsubscribe: () => undefined,
+      unsubscribe: () => {
+        active = false;
+        accountSubscription.unsubscribe();
+        authSubscription.unsubscribe();
+      },
     };
   }
 }
 
-export const localOnlyAccountRuntimeBoundary =
-  new LocalOnlyAccountRuntimeBoundary();
+export function createAccountRuntimeBoundary(
+  dependencies: AccountRuntimeBoundaryDependencies = {}
+): AccountRuntimeBoundary {
+  return new DefaultAccountRuntimeBoundary(
+    dependencies.accountProvider ?? localOnlyAccountProvider,
+    dependencies.authProvider ?? localOnlyAuthProvider,
+    dependencies.syncProvider ?? localOnlySyncProvider
+  );
+}
+
+export const localOnlyAccountRuntimeBoundary = createAccountRuntimeBoundary();

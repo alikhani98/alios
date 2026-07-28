@@ -22,6 +22,9 @@ import {
 import { useRef, useState } from "react";
 
 import {
+  useAccountRuntimeState,
+} from "@/core/account";
+import {
   APPEARANCE_STORAGE_KEY,
   RECOVERY_MODE_ENABLED_STORAGE_KEY,
   MORNING_WARMUP_ENABLED_STORAGE_KEY,
@@ -295,6 +298,7 @@ function getBackupStatusSummaryKey(
 }
 
 export function SettingsPage() {
+  const accountRuntimeState = useAccountRuntimeState();
   const { language, setLanguage, t } = useI18n();
   const { calendarDisplay, formatDateTime, setCalendarDisplay } =
     useDateFormatter();
@@ -423,7 +427,9 @@ export function SettingsPage() {
               </p>
               <div className="mt-2">
                 <StatusChip tone="neutral">
-                  {t("settings.syncStatusLocalOnly")}
+                  {accountRuntimeState.localOnly
+                    ? t("settings.syncStatusLocalOnly")
+                    : accountRuntimeState.syncStatus.detail}
                 </StatusChip>
               </div>
             </SoftPanel>

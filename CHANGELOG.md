@@ -1,5 +1,24 @@
 # Changelog
 
+## Stage 235 - Account Authentication Integration Preparation
+
+- Extended the consolidated account runtime foundation to distinguish three future-facing account presentation states: `Local only`, `Signed out`, and `Signed in` placeholder
+- Refined the Settings `Account & Sync` surface so future `Sign in`, `Sign out`, and account-information entry points can be presented without activating any fake authentication flow
+- Added bilingual copy for signed-out and signed-in placeholder messaging while preserving the shipped default as fully local-only with no active user or session
+- Expanded focused Settings coverage to prove the local-only default, signed-out preparation state, and signed-in placeholder rendering remain stable without changing runtime ownership or data behavior
+- Documented the stage in `docs/ACCOUNT_AUTHENTICATION_PREPARATION_STAGE_235.md`
+- Kept the stage preparation-only: no real authentication provider, no Supabase, no OAuth, no remote API calls, no cloud sync, no schema change, and no repository/storage behavior change
+
+## Stage 234 - Account Runtime Foundation Consolidation
+
+- Added a concrete `LocalOnlyAccountProvider` so the existing account contract now has a real local-only runtime implementation instead of remaining type-only
+- Consolidated account, auth, and sync preparation seams behind a composed `AccountRuntimeBoundary` that exposes one local-only runtime snapshot for future approved account work
+- Added a small account runtime state store, selector helpers, and a React provider/hook access layer for future runtime and UI consumers
+- Wired the existing Settings `Account & Sync` surface to consume the consolidated runtime state while preserving the same current local-only user behavior
+- Added focused tests for the new local-only account provider, runtime store, runtime provider, and updated runtime-boundary behavior
+- Documented the consolidated preparation layer in `docs/ACCOUNT_RUNTIME_FOUNDATION_CONSOLIDATION_STAGE_234.md`
+- Kept the stage preparation-only: no authentication, no Supabase, no OAuth, no remote API calls, no cloud sync, no schema change, and no repository/storage behavior change
+
 ## Stage 233 - Account Runtime Boundary Preparation
 
 - Added a composed `AccountRuntimeBoundary` contract and a `LocalOnlyAccountRuntimeBoundary` implementation for future account-aware runtime wiring

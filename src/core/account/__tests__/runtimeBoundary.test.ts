@@ -48,16 +48,20 @@ describe("account runtime boundary", () => {
     expect(LOCAL_ONLY_ACCOUNT_RUNTIME_STATE.hasActiveAccount).toBe(false);
   });
 
-  it("supports runtime subscription without implying an active account session", () => {
+  it("supports runtime subscription without implying an active account session", async () => {
     const listener = vi.fn();
 
     const subscription = localOnlyAccountRuntimeBoundary.subscribe(listener);
+    for (let attempt = 0; attempt < 5 && listener.mock.calls.length === 0; attempt += 1) {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    }
 
     expect(listener).toHaveBeenCalledWith(
       expect.objectContaining({
-        status: "local-only",
-        providerId: "local-only",
+        accountStatus: "local-only",
+        authStatus: "unauthenticated",
         identity: null,
+        localOnly: true,
       })
     );
 
