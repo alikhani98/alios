@@ -5,8 +5,8 @@ import {
   AccountRuntimeProvider,
   GOOGLE_ACCOUNT_PROVIDER_ID,
   LOCAL_ONLY_SYNC_STATUS,
-  createAccountRuntimeStateStore,
   createAccountRuntimeBoundary,
+  createAccountRuntimeStateStore,
   type AccountCapabilitySet,
   type AccountIdentity,
   type AccountProvider,
@@ -15,17 +15,20 @@ import {
   type AccountStateSubscription,
   type AccountStatus,
 } from "@/core/account";
-import type {
-  AuthLoginInput,
-  AuthLoginResult,
-  AuthProvider,
-  AuthSession,
-  AuthStateListener,
-  AuthStateSubscription,
-  AuthUser,
+import {
+  AuthRuntimeProvider,
+  localOnlyAuthProvider,
+  type AuthLoginInput,
+  type AuthLoginResult,
+  type AuthProvider,
+  type AuthSession,
+  type AuthStateListener,
+  type AuthStateSubscription,
+  type AuthUser,
 } from "@/core/auth";
 import type { SyncProvider, SyncResult, SyncStatus } from "@/core/sync";
 import { I18nProvider, LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
+import { messagesFa } from "@/shared/i18n/messages.fa";
 
 import { SyncStatusCard } from "../components/SyncStatusCard";
 
@@ -128,14 +131,19 @@ class TestSyncProvider implements SyncProvider {
   }
 }
 
-async function renderCardToStaticMarkup(boundary = createAccountRuntimeBoundary()) {
+async function renderCardToStaticMarkup(
+  boundary = createAccountRuntimeBoundary(),
+  authProvider: AuthProvider = localOnlyAuthProvider
+) {
   const store = createAccountRuntimeStateStore(boundary);
   await store.refresh();
 
   return renderToStaticMarkup(
     <I18nProvider>
       <AccountRuntimeProvider boundary={boundary} store={store}>
-        <SyncStatusCard onGoToBackupRestore={vi.fn()} />
+        <AuthRuntimeProvider provider={authProvider}>
+          <SyncStatusCard onGoToBackupRestore={vi.fn()} />
+        </AuthRuntimeProvider>
       </AccountRuntimeProvider>
     </I18nProvider>
   );
@@ -155,7 +163,7 @@ describe("SyncStatusCard", () => {
     const markup = await renderCardToStaticMarkup();
 
     expect(markup).toContain("Account &amp; Sync");
-    expect(markup).toContain("aria-label=\"Account and sync snapshot\"");
+    expect(markup).toContain('aria-label="Account and sync snapshot"');
     expect(markup).toContain("Local only");
     expect(markup).toContain("Future sync states");
     expect(markup).toContain("Sync available");
@@ -166,15 +174,23 @@ describe("SyncStatusCard", () => {
     expect(markup).toContain("Create account");
     expect(markup).toContain("Sign in");
     expect(markup).toContain("Enable sync");
-    expect(markup).toContain("disabled=\"\"");
-    expect(markup).toContain("aria-describedby=\"account-sync-future-actions-description\"");
-    expect(markup).toContain("aria-label=\"Future account actions\"");
+    expect(markup).toContain('disabled=""');
+    expect(markup).toContain(
+      'aria-describedby="account-sync-future-actions-description"'
+    );
+    expect(markup).toContain('aria-label="Future account actions"');
     expect(markup).toContain("Expand section");
-    expect(markup).toContain("aria-expanded=\"false\"");
+    expect(markup).toContain('aria-expanded="false"');
     expect(markup).toContain("Data stays on this device");
   });
 
-  it("renders the future signed-out representation without showing a fake session", async () => {
+  it("renders the signed-out Google representation without showing a fake active session", async () => {
+    const authProvider = new TestAuthProvider("future-auth", {
+      status: "unauthenticated",
+      user: null,
+      provider: GOOGLE_ACCOUNT_PROVIDER_ID,
+      detail: "No authenticated user session is active.",
+    });
     const boundary = createAccountRuntimeBoundary({
       accountProvider: new TestAccountProvider(
         GOOGLE_ACCOUNT_PROVIDER_ID,
@@ -185,35 +201,43 @@ describe("SyncStatusCard", () => {
           lifecycle: "signed-out",
           identity: null,
           detail:
-            "AliOS can prepare a future Google account entry point here later, but no authenticated session is active.",
+            "AliOS can show a signed-out Google entry point here while your data stays local.",
         },
         {
           status: "signed-out",
           available: ["account-identity", "explicit-sync-opt-in"],
-          detail: "Future account capabilities are available after sign-in.",
+          detail: "Google account capabilities become available after sign-in.",
         }
       ),
-      authProvider: new TestAuthProvider("future-auth", {
-        status: "unauthenticated",
-        user: null,
-        provider: GOOGLE_ACCOUNT_PROVIDER_ID,
-        detail: "No authenticated user session is active.",
-      }),
+      authProvider,
       syncProvider: new TestSyncProvider("local-only", LOCAL_ONLY_SYNC_STATUS),
     });
 
-    const markup = await renderCardToStaticMarkup(boundary);
+    const markup = await renderCardToStaticMarkup(boundary, authProvider);
 
     expect(markup).toContain("Signed out");
     expect(markup).toContain("Google account foundation");
     expect(markup).toContain("This device");
     expect(markup).toContain("Never synced");
-    expect(markup).toContain("Future sign-in actions");
+    expect(markup).toContain("Google sign-in");
     expect(markup).toContain("Sign in");
-    expect(markup).toContain("Enable sync · Requires sign-in");
+    expect(markup).toContain("Enable sync - Requires sign-in");
   });
 
-  it("renders a future signed-in placeholder state with account details and sign-out preparation", async () => {
+  it("renders a signed-in Google representation with account details and sign-out messaging", async () => {
+    const authProvider = new TestAuthProvider("future-auth", {
+      status: "authenticated",
+      provider: GOOGLE_ACCOUNT_PROVIDER_ID,
+      user: {
+        userId: "user-1",
+        email: "user@example.com",
+        displayName: "AliOS User",
+        avatarUrl: "https://example.com/avatar.png",
+        createdAt: "2026-07-28T00:00:00.000Z",
+        updatedAt: "2026-07-28T00:00:00.000Z",
+      },
+      detail: "Authenticated Google session.",
+    });
     const boundary = createAccountRuntimeBoundary({
       accountProvider: new TestAccountProvider(
         GOOGLE_ACCOUNT_PROVIDER_ID,
@@ -232,7 +256,7 @@ describe("SyncStatusCard", () => {
               avatarUrl: "https://example.com/avatar.png",
             },
           },
-          detail: "A future signed-in Google account may appear here once authentication is approved.",
+          detail: "Google account connected on this device.",
           lastAuthenticatedAt: "2026-07-28T00:00:00.000Z",
         },
         {
@@ -241,28 +265,17 @@ describe("SyncStatusCard", () => {
           detail: "Authenticated account capabilities are available.",
         }
       ),
-      authProvider: new TestAuthProvider("future-auth", {
-        status: "authenticated",
-        provider: GOOGLE_ACCOUNT_PROVIDER_ID,
-        user: {
-          userId: "user-1",
-          email: "user@example.com",
-          displayName: "AliOS User",
-          avatarUrl: "https://example.com/avatar.png",
-          createdAt: "2026-07-28T00:00:00.000Z",
-          updatedAt: "2026-07-28T00:00:00.000Z",
-        },
-        detail: "Authenticated placeholder session.",
-      }),
+      authProvider,
       syncProvider: new TestSyncProvider("local-only", LOCAL_ONLY_SYNC_STATUS),
     });
 
-    const markup = await renderCardToStaticMarkup(boundary);
+    const markup = await renderCardToStaticMarkup(boundary, authProvider);
 
     expect(markup).toContain("Signed in");
     expect(markup).toContain("Google account foundation");
     expect(markup).toContain("AliOS User");
     expect(markup).toContain("user@example.com");
+    expect(markup).toContain("Account session actions");
     expect(markup).toContain("Sign out");
     expect(markup).toContain("Manage account");
   });
@@ -272,12 +285,12 @@ describe("SyncStatusCard", () => {
 
     const markup = await renderCardToStaticMarkup();
 
-    expect(markup).toContain("حساب و همگام‌سازی");
-    expect(markup).toContain("فقط محلی");
-    expect(markup).toContain("خلاصهٔ حساب و همگام‌سازی");
-    expect(markup).toContain("وضعیت‌های آیندهٔ همگام‌سازی");
-    expect(markup).toContain("تعارض شناسایی شد");
-    expect(markup).toContain("ایجاد حساب");
-    expect(markup).toContain("فعال‌کردن همگام‌سازی");
+    expect(markup).toContain(messagesFa["settings.accountSyncTitle"]);
+    expect(markup).toContain(messagesFa["settings.syncStatusLocalOnly"]);
+    expect(markup).toContain(messagesFa["settings.accountSyncSnapshotLabel"]);
+    expect(markup).toContain(messagesFa["settings.syncStatesTitle"]);
+    expect(markup).toContain(messagesFa["settings.syncStatusConflict"]);
+    expect(markup).toContain(messagesFa["settings.accountCreateAction"]);
+    expect(markup).toContain(messagesFa["settings.accountEnableSyncAction"]);
   });
 });
