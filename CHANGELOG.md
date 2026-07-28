@@ -1,5 +1,13 @@
 # Changelog
 
+## Stage 233 - Account Runtime Boundary Preparation
+
+- Added a composed `AccountRuntimeBoundary` contract and a `LocalOnlyAccountRuntimeBoundary` implementation for future account-aware runtime wiring
+- Added explicit local-only runtime defaults for account session, auth session, sync capability, and sync status without activating any real account or remote provider
+- Added focused runtime-boundary tests proving the default state remains local-only, unauthenticated, and sync-disabled
+- Documented the new abstractions, future integration points, and non-goals in `docs/ACCOUNT_RUNTIME_BOUNDARY_STAGE_233.md`
+- Kept the stage preparation-only: no authentication implementation, no Supabase, no remote API calls, no sync enablement, no schema change, and no repository/storage behavior change
+
 ## Stage 232 - Account & Sync Interaction Polish
 
 - Polished the visible `Account & Sync` Settings experience so the current local-only state leads the hierarchy and the future sync states are easier to scan
