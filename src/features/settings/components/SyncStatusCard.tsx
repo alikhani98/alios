@@ -1,6 +1,7 @@
 import {
   AlertTriangle,
   ArrowUpRight,
+  CheckCircle2,
   CloudOff,
   Cloudy,
   GitCompareArrows,
@@ -21,6 +22,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CollapsibleSection,
   SoftPanel,
   StatusChip,
 } from "@/shared/ui";
@@ -37,6 +39,8 @@ type SyncStateDefinition = Readonly<{
   statusKey: TranslationKey;
   descriptionKey: TranslationKey;
   tone: SyncStateTone;
+  detailKey?: TranslationKey;
+  featured?: boolean;
 }>;
 
 type SyncStatePreviewProps = Readonly<{
@@ -53,7 +57,13 @@ function SyncStatePreview({ state }: SyncStatePreviewProps) {
   const Icon = state.icon;
 
   return (
-    <SoftPanel className="alios-surface-muted h-full">
+    <SoftPanel
+      className={`h-full ${
+        state.featured
+          ? "border-primary/25 bg-primary/10"
+          : "alios-surface-muted"
+      }`}
+    >
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 items-start gap-3">
           <div className="alios-icon-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl">
@@ -64,6 +74,11 @@ function SyncStatePreview({ state }: SyncStatePreviewProps) {
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
               {t(state.descriptionKey)}
             </p>
+            {state.detailKey ? (
+              <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                {t(state.detailKey)}
+              </p>
+            ) : null}
           </div>
         </div>
         <StatusChip tone={state.tone}>{t(state.statusKey)}</StatusChip>
@@ -97,6 +112,8 @@ const syncStates: readonly SyncStateDefinition[] = [
     statusKey: "settings.syncStatusLocalOnly",
     descriptionKey: "settings.syncStateLocalOnlyDescription",
     tone: "neutral",
+    detailKey: "settings.syncStateLocalOnlyDetail",
+    featured: true,
   },
   {
     icon: Cloudy,
@@ -104,6 +121,7 @@ const syncStates: readonly SyncStateDefinition[] = [
     statusKey: "settings.syncStatusAvailable",
     descriptionKey: "settings.syncStateAvailableDescription",
     tone: "primary",
+    detailKey: "settings.syncStateAvailableDetail",
   },
   {
     icon: PauseCircle,
@@ -111,6 +129,7 @@ const syncStates: readonly SyncStateDefinition[] = [
     statusKey: "settings.syncStatusPaused",
     descriptionKey: "settings.syncStatePausedDescription",
     tone: "warning",
+    detailKey: "settings.syncStatePausedDetail",
   },
   {
     icon: WifiOff,
@@ -118,6 +137,7 @@ const syncStates: readonly SyncStateDefinition[] = [
     statusKey: "settings.syncStatusOffline",
     descriptionKey: "settings.syncStateOfflineDescription",
     tone: "warning",
+    detailKey: "settings.syncStateOfflineDetail",
   },
   {
     icon: GitCompareArrows,
@@ -125,12 +145,15 @@ const syncStates: readonly SyncStateDefinition[] = [
     statusKey: "settings.syncStatusConflict",
     descriptionKey: "settings.syncStateConflictDescription",
     tone: "danger",
+    detailKey: "settings.syncStateConflictDetail",
   },
 ] as const;
 
 export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
   const { t } = useI18n();
   const futureActionsDescriptionId = "account-sync-future-actions-description";
+  const currentState = syncStates[0];
+  const futureStates = syncStates.slice(1);
 
   return (
     <Card>
@@ -141,8 +164,8 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
         </CardTitle>
         <CardDescription>{t("settings.accountSyncDescription")}</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid gap-3 sm:grid-cols-3">
+      <CardContent className="space-y-5">
+        <div className="grid gap-3 sm:grid-cols-3" aria-label={t("settings.accountSyncSnapshotLabel")}>
           <SoftPanel className="alios-surface-muted">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
               {t("settings.accountCurrentStateLabel")}
@@ -180,137 +203,160 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
           </SoftPanel>
         </div>
 
-        <SoftPanel className="flex flex-col gap-3 alios-surface-muted sm:flex-row sm:items-start sm:justify-between">
-          <div className="flex items-start gap-2">
-            <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-            <div className="space-y-1">
-              <p className="text-sm font-medium">{t("settings.accountLocalOnlyTitle")}</p>
-              <p className="text-sm leading-7 text-muted-foreground">
-                {t("settings.syncLocalOnly")}
-              </p>
+        <section aria-labelledby="account-sync-current-state" className="space-y-3">
+          <div className="flex flex-col gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-4 sm:flex-row sm:items-start sm:justify-between sm:p-5">
+            <div className="flex min-w-0 items-start gap-3">
+              <div className="alios-icon-primary flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl">
+                <ShieldCheck className="h-5 w-5" />
+              </div>
+              <div className="min-w-0">
+                <p
+                  id="account-sync-current-state"
+                  className="text-base font-semibold leading-6"
+                >
+                  {t("settings.accountLocalOnlyTitle")}
+                </p>
+                <p className="mt-1 text-sm leading-7 text-muted-foreground">
+                  {t("settings.syncLocalOnly")}
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <StatusChip tone="neutral">{t(currentState.statusKey)}</StatusChip>
+              <Badge variant="secondary" className="w-fit shrink-0">
+                {t("settings.noOnlineAccount")}
+              </Badge>
             </div>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <Badge variant="secondary" className="w-fit shrink-0">
-              {t("settings.syncStatusLocalOnly")}
-            </Badge>
-            <Badge variant="secondary" className="w-fit shrink-0">
-              {t("settings.noOnlineAccount")}
-            </Badge>
-          </div>
-        </SoftPanel>
+          <SyncStatePreview state={currentState} />
+        </section>
 
-        <SoftPanel className="space-y-4">
+        <section aria-labelledby="account-sync-other-states" className="space-y-3">
           <div className="space-y-1">
-            <p className="text-sm font-medium">{t("settings.syncStatesTitle")}</p>
+            <p id="account-sync-other-states" className="text-sm font-medium">
+              {t("settings.syncStatesTitle")}
+            </p>
             <p className="text-sm leading-7 text-muted-foreground">
               {t("settings.syncStatesDescription")}
             </p>
           </div>
           <div className="grid gap-3 lg:grid-cols-2">
-            {syncStates.map((state) => (
+            {futureStates.map((state) => (
               <SyncStatePreview key={state.titleKey} state={state} />
             ))}
           </div>
-        </SoftPanel>
+        </section>
 
-        <SoftPanel className="space-y-4 border-dashed bg-background/60">
-          <div className="flex items-start gap-2">
-            <Cloudy className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-            <div>
-              <p className="text-sm font-medium">{t("settings.syncConsentTitle")}</p>
-              <p className="mt-1 text-sm leading-7 text-muted-foreground">
-                {t("settings.syncConsentDescription")}
-              </p>
+        <CollapsibleSection
+          id="account-sync-consent"
+          icon={<Cloudy className="h-5 w-5" />}
+          title={t("settings.syncConsentTitle")}
+          description={t("settings.syncConsentDescription")}
+          expandLabel={t("common.expandSection")}
+          collapseLabel={t("common.collapseSection")}
+          status={<StatusChip tone="primary">{t("settings.syncStatusAvailable")}</StatusChip>}
+          defaultOpen={false}
+        >
+          <div className="space-y-4">
+            <ul className="list-disc space-y-1 ps-5 text-sm leading-6 text-muted-foreground">
+              <li>{t("settings.syncConsentAccount")}</li>
+              <li>{t("settings.syncConsentExplicit")}</li>
+              <li>{t("settings.syncConsentScope")}</li>
+              <li>{t("settings.syncConsentLocal")}</li>
+            </ul>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <SoftPanel className="alios-surface-muted">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                  {t("settings.syncConsentScopeLabel")}
+                </p>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                  {t("settings.syncConsentScopeValue")}
+                </p>
+              </SoftPanel>
+              <SoftPanel className="alios-surface-muted">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                  {t("settings.syncConsentControlLabel")}
+                </p>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                  {t("settings.syncConsentControlValue")}
+                </p>
+              </SoftPanel>
+              <SoftPanel className="alios-surface-muted">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                  {t("settings.syncConsentSafetyLabel")}
+                </p>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                  {t("settings.syncConsentSafetyValue")}
+                </p>
+              </SoftPanel>
             </div>
+            <p className="text-xs leading-5 text-muted-foreground">
+              {t("settings.syncPlannedProvider", { provider: OPTIONAL_SYNC_PROVIDER_ID })}
+            </p>
           </div>
-          <ul className="list-disc space-y-1 ps-5 text-sm leading-6 text-muted-foreground">
-            <li>{t("settings.syncConsentAccount")}</li>
-            <li>{t("settings.syncConsentExplicit")}</li>
-            <li>{t("settings.syncConsentScope")}</li>
-            <li>{t("settings.syncConsentLocal")}</li>
-          </ul>
-          <div className="grid gap-3 sm:grid-cols-3">
-            <SoftPanel className="alios-surface-muted">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                {t("settings.syncConsentScopeLabel")}
-              </p>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                {t("settings.syncConsentScopeValue")}
-              </p>
-            </SoftPanel>
-            <SoftPanel className="alios-surface-muted">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                {t("settings.syncConsentControlLabel")}
-              </p>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                {t("settings.syncConsentControlValue")}
-              </p>
-            </SoftPanel>
-            <SoftPanel className="alios-surface-muted">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                {t("settings.syncConsentSafetyLabel")}
-              </p>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                {t("settings.syncConsentSafetyValue")}
-              </p>
-            </SoftPanel>
-          </div>
-          <p className="text-xs leading-5 text-muted-foreground">
-            {t("settings.syncPlannedProvider", { provider: OPTIONAL_SYNC_PROVIDER_ID })}
-          </p>
-        </SoftPanel>
+        </CollapsibleSection>
+
+        <div className="grid gap-4 lg:grid-cols-2">
+          <CollapsibleSection
+            id="account-sync-offline"
+            icon={<WifiOff className="h-5 w-5" />}
+            title={t("settings.syncOfflineFoundationTitle")}
+            description={t("settings.syncOfflineFoundationDescription")}
+            expandLabel={t("common.expandSection")}
+            collapseLabel={t("common.collapseSection")}
+            status={<StatusChip tone="warning">{t("settings.syncStatusOffline")}</StatusChip>}
+            defaultOpen={false}
+          >
+            <ul className="list-disc space-y-1 ps-5 text-sm leading-6 text-muted-foreground">
+              <li>{t("settings.syncOfflineFoundationLocalWork")}</li>
+              <li>{t("settings.syncOfflineFoundationUnavailable")}</li>
+              <li>{t("settings.syncOfflineFoundationReturn")}</li>
+            </ul>
+          </CollapsibleSection>
+
+          <CollapsibleSection
+            id="account-sync-conflict"
+            icon={<AlertTriangle className="h-5 w-5" />}
+            title={t("settings.syncConflictFoundationTitle")}
+            description={t("settings.syncConflictFoundationDescription")}
+            expandLabel={t("common.expandSection")}
+            collapseLabel={t("common.collapseSection")}
+            status={<StatusChip tone="danger">{t("settings.syncStatusConflict")}</StatusChip>}
+            defaultOpen={false}
+          >
+            <ul className="list-disc space-y-1 ps-5 text-sm leading-6 text-muted-foreground">
+              <li>{t("settings.syncConflictFoundationDecision")}</li>
+              <li>{t("settings.syncConflictFoundationNoOverwrite")}</li>
+              <li>{t("settings.syncConflictFoundationReview")}</li>
+            </ul>
+          </CollapsibleSection>
+        </div>
 
         <SoftPanel className="space-y-4">
-          <div className="flex items-start gap-2">
-            <WifiOff className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-            <div>
-              <p className="text-sm font-medium">{t("settings.syncOfflineFoundationTitle")}</p>
-              <p className="mt-1 text-sm leading-7 text-muted-foreground">
-                {t("settings.syncOfflineFoundationDescription")}
-              </p>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div className="flex items-start gap-2">
+              <UserRound className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+              <div>
+                <p className="text-sm font-medium">
+                  {t("settings.accountFutureActionsTitle")}
+                </p>
+                <p
+                  id={futureActionsDescriptionId}
+                  className="mt-1 text-sm leading-7 text-muted-foreground"
+                >
+                  {t("settings.accountFutureActionsDescription")}
+                </p>
+              </div>
             </div>
+            <StatusChip tone="warning">
+              {t("settings.accountFutureActionsStatus")}
+            </StatusChip>
           </div>
-          <ul className="list-disc space-y-1 ps-5 text-sm leading-6 text-muted-foreground">
-            <li>{t("settings.syncOfflineFoundationLocalWork")}</li>
-            <li>{t("settings.syncOfflineFoundationUnavailable")}</li>
-            <li>{t("settings.syncOfflineFoundationReturn")}</li>
-          </ul>
-        </SoftPanel>
-
-        <SoftPanel className="space-y-4">
-          <div className="flex items-start gap-2">
-            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-            <div>
-              <p className="text-sm font-medium">{t("settings.syncConflictFoundationTitle")}</p>
-              <p className="mt-1 text-sm leading-7 text-muted-foreground">
-                {t("settings.syncConflictFoundationDescription")}
-              </p>
-            </div>
-          </div>
-          <ul className="list-disc space-y-1 ps-5 text-sm leading-6 text-muted-foreground">
-            <li>{t("settings.syncConflictFoundationDecision")}</li>
-            <li>{t("settings.syncConflictFoundationNoOverwrite")}</li>
-            <li>{t("settings.syncConflictFoundationReview")}</li>
-          </ul>
-        </SoftPanel>
-
-        <SoftPanel className="space-y-4">
-          <div className="flex items-start gap-2">
-            <UserRound className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-            <div>
-              <p className="text-sm font-medium">
-                {t("settings.accountFutureActionsTitle")}
-              </p>
-              <p
-                id={futureActionsDescriptionId}
-                className="mt-1 text-sm leading-7 text-muted-foreground"
-              >
-                {t("settings.accountFutureActionsDescription")}
-              </p>
-            </div>
-          </div>
-          <div className="grid gap-3 sm:grid-cols-3">
+          <div
+            className="grid gap-3 sm:grid-cols-3"
+            role="group"
+            aria-label={t("settings.accountFutureActionsTitle")}
+          >
             <ConsentActionPlaceholder
               label={t("settings.accountCreateAction")}
               descriptionId={futureActionsDescriptionId}
@@ -327,6 +373,10 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
           <p className="text-xs leading-5 text-muted-foreground">
             {t("settings.accountFutureActionsNote")}
           </p>
+          <div className="flex items-start gap-2 rounded-xl border border-dashed border-border/70 px-3 py-3 text-xs leading-5 text-muted-foreground">
+            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+            <p>{t("settings.accountFutureActionsHint")}</p>
+          </div>
         </SoftPanel>
 
         <SoftPanel className="alios-surface-muted">

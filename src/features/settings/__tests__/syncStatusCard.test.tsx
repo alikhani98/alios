@@ -23,20 +23,26 @@ describe("SyncStatusCard", () => {
     localStorage.clear();
   });
 
-  it("renders the local-only account and sync foundation with disabled future actions and informational sync states", () => {
+  it("renders the polished account and sync foundation with grouped states, disabled actions, and accessibility labels", () => {
     const markup = renderCardToStaticMarkup();
 
     expect(markup).toContain("Account &amp; Sync");
+    expect(markup).toContain("aria-label=\"Account and sync snapshot\"");
     expect(markup).toContain("Local only");
     expect(markup).toContain("Future sync states");
     expect(markup).toContain("Sync available");
     expect(markup).toContain("Sync paused");
     expect(markup).toContain("Offline");
     expect(markup).toContain("Conflict detected");
+    expect(markup).toContain("Planned only");
     expect(markup).toContain("Create account");
     expect(markup).toContain("Sign in");
     expect(markup).toContain("Enable sync");
     expect(markup).toContain("disabled=\"\"");
+    expect(markup).toContain("aria-describedby=\"account-sync-future-actions-description\"");
+    expect(markup).toContain("aria-label=\"Future account actions\"");
+    expect(markup).toContain("Expand section");
+    expect(markup).toContain("aria-expanded=\"false\"");
     expect(markup).toContain("Data stays on this device");
   });
 
@@ -47,6 +53,7 @@ describe("SyncStatusCard", () => {
 
     expect(markup).toContain("حساب و همگام‌سازی");
     expect(markup).toContain("فقط محلی");
+    expect(markup).toContain("خلاصهٔ حساب و همگام‌سازی");
     expect(markup).toContain("وضعیت‌های آیندهٔ همگام‌سازی");
     expect(markup).toContain("تعارض شناسایی شد");
     expect(markup).toContain("ایجاد حساب");
