@@ -1,5 +1,15 @@
 # Changelog
 
+## Stage 236 - Google Account Authentication
+
+- Added a real Google sign-in runtime using Google Identity Services without adding a backend, sync engine, repository change, schema change, or cloud data upload path
+- Added shipped `GoogleAuthProvider` and `GoogleAccountProvider` adapters so the existing account runtime foundation can represent real `Signed out` and `Signed in` device states when `VITE_GOOGLE_CLIENT_ID` is configured
+- Persisted only a minimal local session snapshot for the connected Google identity on this device and kept that metadata outside backups, repository storage, and feature persistence
+- Updated the Settings `Account & Sync` surface so it now exposes a live Google sign-in action, a real sign-out action, current account identity details, and honest local-only fallback messaging
+- Expanded focused coverage for the Google auth runtime, account-provider mapping, bilingual Settings rendering, and session cleanup behavior
+- Documented the stage in `docs/GOOGLE_ACCOUNT_AUTHENTICATION_STAGE_236.md`
+- Kept the stage intentionally narrow: no remote sync, no data upload, no cloud database, no schema change, no repository change, no migration, and no automatic ownership transfer
+
 ## Stage 235 - Google Account & Sync Foundation
 
 - Extended the consolidated account runtime foundation with explicit Google-ready account metadata, including provider identity, signed-out and signed-in lifecycle states, and Google-account placeholder identity details

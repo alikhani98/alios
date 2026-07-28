@@ -429,7 +429,9 @@ export function SettingsPage() {
                 <StatusChip tone="neutral">
                   {accountRuntimeState.localOnly
                     ? t("settings.syncStatusLocalOnly")
-                    : accountRuntimeState.syncStatus.detail}
+                    : accountRuntimeState.hasActiveAccount
+                      ? t("settings.accountStatusSignedIn")
+                      : t("settings.accountStatusSignedOut")}
                 </StatusChip>
               </div>
             </SoftPanel>
@@ -513,7 +515,13 @@ export function SettingsPage() {
             <CardDescription>{t("settings.accountSyncDescription")}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
-            <Badge variant="secondary">{t("settings.syncStatusLocalOnly")}</Badge>
+            <Badge variant="secondary">
+              {accountRuntimeState.localOnly
+                ? t("settings.syncStatusLocalOnly")
+                : accountRuntimeState.hasActiveAccount
+                  ? t("settings.accountStatusSignedIn")
+                  : t("settings.accountStatusSignedOut")}
+            </Badge>
             <Button
               type="button"
               variant="outline"

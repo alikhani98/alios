@@ -11,8 +11,10 @@ import {
   UserRound,
   WifiOff,
 } from "lucide-react";
+import { useState } from "react";
 
 import { useAccountRuntimeState, type AccountRuntimeState } from "@/core/account";
+import { GoogleAuthProvider, useAuth } from "@/core/auth";
 import { OPTIONAL_SYNC_PROVIDER_ID } from "@/core/sync";
 import { useI18n, type TranslationKey } from "@/shared/i18n";
 import {
@@ -51,6 +53,8 @@ type SyncStatePreviewProps = Readonly<{
 type ConsentActionPlaceholderProps = Readonly<{
   label: string;
   descriptionId: string;
+  disabled?: boolean;
+  onClick?: () => void;
 }>;
 
 type AccountActionDefinition = Readonly<{
@@ -117,13 +121,16 @@ function SyncStatePreview({ state }: SyncStatePreviewProps) {
 function ConsentActionPlaceholder({
   label,
   descriptionId,
+  disabled = true,
+  onClick,
 }: ConsentActionPlaceholderProps) {
   return (
     <Button
       type="button"
       variant="outline"
       className="justify-start"
-      disabled
+      disabled={disabled}
+      onClick={onClick}
       aria-describedby={descriptionId}
     >
       <ArrowUpRight className="me-2 h-4 w-4 shrink-0" />
@@ -322,9 +329,24 @@ function getRuntimeAccountPresentation(
 export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
   const { t } = useI18n();
   const runtimeState = useAccountRuntimeState();
+  const { provider } = useAuth();
+  const [accountActionFeedback, setAccountActionFeedback] = useState<string | null>(
+    null
+  );
+  const [accountActionPending, setAccountActionPending] = useState<
+    "sign-in" | "sign-out" | null
+  >(null);
   const futureActionsDescriptionId = "account-sync-future-actions-description";
   const currentState = getRuntimeSyncState(runtimeState);
   const accountPresentation = getRuntimeAccountPresentation(runtimeState, t);
+  const interactiveGoogleProvider =
+    provider instanceof GoogleAuthProvider && provider.isConfigured()
+      ? provider
+      : null;
+  const canSignIn =
+    interactiveGoogleProvider !== null && !runtimeState.hasActiveAccount;
+  const canSignOut =
+    interactiveGoogleProvider !== null && runtimeState.hasActiveAccount;
   const accountMetadataRows: readonly RuntimeMetadataRow[] = [
     {
       labelKey: "settings.accountProviderLabel",
@@ -346,6 +368,58 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
     (state) => state.titleKey !== currentState.titleKey
   );
 
+  const handleGoogleSignIn = async () => {
+    if (!interactiveGoogleProvider) {
+      return;
+    }
+
+    setAccountActionPending("sign-in");
+    setAccountActionFeedback(null);
+
+    try {
+      await interactiveGoogleProvider.login({});
+      setAccountActionFeedback(t("settings.accountGoogleSignInSuccess"));
+    } catch (error) {
+      setAccountActionFeedback(
+        error instanceof Error
+          ? error.message
+          : t("settings.accountGoogleSignInError")
+      );
+    } finally {
+      setAccountActionPending(null);
+    }
+  };
+
+  const handleGoogleSignOut = async () => {
+    if (!interactiveGoogleProvider) {
+      return;
+    }
+
+    setAccountActionPending("sign-out");
+    setAccountActionFeedback(null);
+
+    try {
+      await interactiveGoogleProvider.logout();
+      setAccountActionFeedback(t("settings.accountGoogleSignOutSuccess"));
+    } catch (error) {
+      setAccountActionFeedback(
+        error instanceof Error
+          ? error.message
+          : t("settings.accountGoogleSignOutError")
+      );
+    } finally {
+      setAccountActionPending(null);
+    }
+  };
+
+  const visibleActionKeys = accountPresentation.actionKeys.filter((action) =>
+    canSignIn
+      ? action.labelKey !== "settings.accountSignInAction"
+      : canSignOut
+        ? action.labelKey !== "settings.accountSignOutAction"
+        : true
+  );
+
   return (
     <Card>
       <CardHeader>
@@ -356,7 +430,10 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
         <CardDescription>{t("settings.accountSyncDescription")}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-5">
-        <div className="grid gap-3 sm:grid-cols-3" aria-label={t("settings.accountSyncSnapshotLabel")}>
+        <div
+          className="grid gap-3 sm:grid-cols-3"
+          aria-label={t("settings.accountSyncSnapshotLabel")}
+        >
           <SoftPanel className="alios-surface-muted">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
               {t("settings.accountCurrentStateLabel")}
@@ -404,7 +481,10 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
           </SoftPanel>
         </div>
 
-        <section aria-labelledby="account-sync-current-state" className="space-y-3">
+        <section
+          aria-labelledby="account-sync-current-state"
+          className="space-y-3"
+        >
           <div className="flex flex-col gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-4 sm:flex-row sm:items-start sm:justify-between sm:p-5">
             <div className="flex min-w-0 items-start gap-3">
               <div className="alios-icon-primary flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl">
@@ -436,7 +516,7 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
               </StatusChip>
               <Badge
                 variant="secondary"
-                className="w-fit shrink-0 max-w-full break-all text-start"
+                className="max-w-full w-fit shrink-0 break-all text-start"
               >
                 {accountPresentation.badgeLabel}
               </Badge>
@@ -495,7 +575,11 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
           description={t("settings.syncConsentDescription")}
           expandLabel={t("common.expandSection")}
           collapseLabel={t("common.collapseSection")}
-          status={<StatusChip tone="primary">{t("settings.syncStatusAvailable")}</StatusChip>}
+          status={
+            <StatusChip tone="primary">
+              {t("settings.syncStatusAvailable")}
+            </StatusChip>
+          }
           defaultOpen={false}
         >
           <div className="space-y-4">
@@ -532,7 +616,9 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
               </SoftPanel>
             </div>
             <p className="text-xs leading-5 text-muted-foreground">
-              {t("settings.syncPlannedProvider", { provider: OPTIONAL_SYNC_PROVIDER_ID })}
+              {t("settings.syncPlannedProvider", {
+                provider: OPTIONAL_SYNC_PROVIDER_ID,
+              })}
             </p>
           </div>
         </CollapsibleSection>
@@ -545,7 +631,11 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
             description={t("settings.syncOfflineFoundationDescription")}
             expandLabel={t("common.expandSection")}
             collapseLabel={t("common.collapseSection")}
-            status={<StatusChip tone="warning">{t("settings.syncStatusOffline")}</StatusChip>}
+            status={
+              <StatusChip tone="warning">
+                {t("settings.syncStatusOffline")}
+              </StatusChip>
+            }
             defaultOpen={false}
           >
             <ul className="list-disc space-y-1 ps-5 text-sm leading-6 text-muted-foreground">
@@ -562,7 +652,11 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
             description={t("settings.syncConflictFoundationDescription")}
             expandLabel={t("common.expandSection")}
             collapseLabel={t("common.collapseSection")}
-            status={<StatusChip tone="danger">{t("settings.syncStatusConflict")}</StatusChip>}
+            status={
+              <StatusChip tone="danger">
+                {t("settings.syncStatusConflict")}
+              </StatusChip>
+            }
             defaultOpen={false}
           >
             <ul className="list-disc space-y-1 ps-5 text-sm leading-6 text-muted-foreground">
@@ -598,14 +692,55 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
             role="group"
             aria-label={t(accountPresentation.actionsTitleKey)}
           >
-            {accountPresentation.actionKeys.map((action) => (
+            {canSignIn ? (
+              <Button
+                type="button"
+                className="justify-start"
+                onClick={() => {
+                  void handleGoogleSignIn();
+                }}
+                disabled={accountActionPending !== null}
+                aria-describedby={futureActionsDescriptionId}
+              >
+                <ArrowUpRight className="me-2 h-4 w-4 shrink-0" />
+                {accountActionPending === "sign-in"
+                  ? t("settings.accountGoogleSigningIn")
+                  : t("settings.accountGoogleSignInAction")}
+              </Button>
+            ) : null}
+            {canSignOut ? (
+              <Button
+                type="button"
+                variant="outline"
+                className="justify-start"
+                onClick={() => {
+                  void handleGoogleSignOut();
+                }}
+                disabled={accountActionPending !== null}
+                aria-describedby={futureActionsDescriptionId}
+              >
+                <ArrowUpRight className="me-2 h-4 w-4 shrink-0" />
+                {accountActionPending === "sign-out"
+                  ? t("settings.accountGoogleSigningOut")
+                  : t("settings.accountSignOutAction")}
+              </Button>
+            ) : null}
+            {visibleActionKeys.map((action) => (
               <ConsentActionPlaceholder
                 key={action.labelKey}
-                label={`${t(action.labelKey)} · ${t(action.statusKey)}`}
+                label={`${t(action.labelKey)} - ${t(action.statusKey)}`}
                 descriptionId={futureActionsDescriptionId}
               />
             ))}
           </div>
+          {accountActionFeedback ? (
+            <div
+              role="status"
+              className="rounded-xl border border-border/70 bg-muted/40 px-3 py-3 text-sm leading-6 text-muted-foreground"
+            >
+              {accountActionFeedback}
+            </div>
+          ) : null}
           <p className="text-xs leading-5 text-muted-foreground">
             {t(accountPresentation.noteKey)}
           </p>
@@ -619,7 +754,9 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
           <div className="flex items-start gap-2">
             <LaptopMinimal className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
             <div>
-              <p className="text-sm font-medium">{t("settings.deviceTransferTitle")}</p>
+              <p className="text-sm font-medium">
+                {t("settings.deviceTransferTitle")}
+              </p>
               <p className="mt-1 text-sm leading-7 text-muted-foreground">
                 {t("settings.deviceTransferDescription")}
               </p>
@@ -640,10 +777,6 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
             {t("settings.deviceTransferAction")}
           </Button>
         </SoftPanel>
-
-        <p className="text-xs leading-5 text-muted-foreground">
-          {t("settings.syncFutureNote")}
-        </p>
       </CardContent>
     </Card>
   );

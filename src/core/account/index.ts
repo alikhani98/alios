@@ -1,4 +1,5 @@
 export * from "./types";
+export * from "./GoogleAccountProvider";
 export * from "./LocalOnlyAccountProvider";
 export * from "@/core/sync/syncMetadata";
 export {

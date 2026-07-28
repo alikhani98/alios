@@ -4,11 +4,13 @@ import { AlertTriangle, RefreshCcw, RotateCcw } from "lucide-react";
 import {
   AccountRuntimeProvider,
   createAccountRuntimeBoundary,
+  googleAccountProvider,
   localOnlyAccountProvider,
   type AccountProvider,
 } from "@/core/account";
 import {
   AuthRuntimeProvider,
+  googleAuthProvider,
   localOnlyAuthProvider,
   type AuthProvider,
 } from "@/core/auth";
@@ -121,8 +123,12 @@ export function AppBootstrapErrorFallback({
 export function AppProviders({
   children,
   loadStorageAdapter = loadDexieStorageAdapter,
-  accountProvider = localOnlyAccountProvider,
-  authProvider = localOnlyAuthProvider,
+  accountProvider = googleAuthProvider.isConfigured()
+    ? googleAccountProvider
+    : localOnlyAccountProvider,
+  authProvider = googleAuthProvider.isConfigured()
+    ? googleAuthProvider
+    : localOnlyAuthProvider,
 }: AppProvidersProps) {
   const [bootstrapState, setBootstrapState] = useState<BootstrapState>({
     status: "loading",
