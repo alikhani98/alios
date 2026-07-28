@@ -175,6 +175,7 @@ describe("SyncStatusCard", () => {
     expect(markup).toContain("Account &amp; Sync");
     expect(markup).toContain('aria-label="Account and sync snapshot"');
     expect(markup).toContain("Local only");
+    expect(markup).toContain("Sync health");
     expect(markup).toContain("Future sync states");
     expect(markup).toContain("Sync available");
     expect(markup).toContain("Sync paused");
@@ -229,6 +230,7 @@ describe("SyncStatusCard", () => {
     expect(markup).toContain("Google account foundation");
     expect(markup).toContain("This device");
     expect(markup).toContain("Never synced");
+    expect(markup).toContain("Retry sync");
     expect(markup).toContain("Google sign-in");
     expect(markup).toContain("Sign in");
     expect(markup).toContain("Enable sync - Requires sign-in");
@@ -286,6 +288,7 @@ describe("SyncStatusCard", () => {
     expect(markup).toContain("AliOS User");
     expect(markup).toContain("user@example.com");
     expect(markup).toContain("Account session actions");
+    expect(markup).toContain("Retry sync");
     expect(markup).toContain("Sign out");
     expect(markup).toContain("Manage account");
   });
@@ -351,6 +354,7 @@ describe("SyncStatusCard", () => {
     expect(markup).toContain("Tasks");
     expect(markup).toContain("Projects");
     expect(markup).toContain("Goals");
+    expect(markup).toContain("Sync healthy");
   });
 
   it("renders the Persian account and sync copy for the settings surface", async () => {

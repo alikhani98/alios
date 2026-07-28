@@ -1,4 +1,5 @@
 export type SyncMode = "local-only" | "ready" | "syncing" | "error";
+export type SyncIssue = "conflict" | "connectivity" | "provider";
 
 export type SyncScope = "preferences" | "tasks" | "projects" | "goals";
 
@@ -12,6 +13,7 @@ export type SyncStatus = Readonly<{
   lastAttemptAt?: string;
   scopes?: ReadonlyArray<SyncScope>;
   conflictCount?: number;
+  issue?: SyncIssue;
   detail: string;
 }>;
 

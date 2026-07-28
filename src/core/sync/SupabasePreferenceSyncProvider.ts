@@ -41,8 +41,13 @@ import {
   type SupabaseRecordRow,
   type SupabaseSession,
 } from "./supabaseClient";
-import type { SyncDeviceIdentity, SyncLastOutcome } from "./syncMetadata";
 import type {
+  SyncDiagnosticEntry,
+  SyncDeviceIdentity,
+  SyncLastOutcome,
+} from "./syncMetadata";
+import type {
+  SyncIssue,
   SyncProvider,
   SyncResult,
   SyncScope,
@@ -63,6 +68,8 @@ const SYNCED_PREFERENCE_KEYS = [
 ] as const;
 
 const USER_DATA_SCOPES = ["tasks", "projects", "goals"] as const;
+const SUPABASE_SYNC_DIAGNOSTICS_STORAGE_KEY = "alios.sync.diagnostics";
+const MAX_SYNC_DIAGNOSTIC_ENTRIES = 20;
 const PREFERENCE_ONLY_SCOPES = ["preferences"] as const satisfies ReadonlyArray<SyncScope>;
 const FULL_SYNC_SCOPES = [
   "preferences",
@@ -499,7 +506,29 @@ type EntitySyncOutcome = Readonly<{
   changedLocalRecords: number;
   uploadedRows: ReadonlyArray<SupabaseRecordRow>;
   conflictCount: number;
+  staleLocalCount: number;
+  staleRemoteCount: number;
 }>;
+
+function toIssueFromError(error: unknown): SyncIssue {
+  if (typeof navigator !== "undefined" && navigator.onLine === false) {
+    return "connectivity";
+  }
+
+  const message =
+    error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
+
+  if (
+    message.includes("network") ||
+    message.includes("offline") ||
+    message.includes("fetch") ||
+    message.includes("timeout")
+  ) {
+    return "connectivity";
+  }
+
+  return "provider";
+}
 
 function mergeEntityRecords(
   entity: SyncEntity,
@@ -520,6 +549,8 @@ function mergeEntityRecords(
   const uploadedRows: SupabaseRecordRow[] = [];
   let changedLocalRecords = 0;
   let conflictCount = 0;
+  let staleLocalCount = 0;
+  let staleRemoteCount = 0;
   const allRecordIds = new Set([
     ...localRecords.keys(),
     ...remoteRecords.keys(),
@@ -604,6 +635,7 @@ function mergeEntityRecords(
       if (!recordsMatch(localRecord, syncedLocalRecord)) {
         changedLocalRecords += 1;
       }
+      staleRemoteCount += 1;
       return;
     }
 
@@ -615,6 +647,7 @@ function mergeEntityRecords(
     );
     nextRecords.set(recordId, syncedRemoteRecord);
     changedLocalRecords += 1;
+    staleLocalCount += 1;
   });
 
   applyEntityRecordMap(localData, entity, nextRecords);
@@ -623,6 +656,8 @@ function mergeEntityRecords(
     changedLocalRecords,
     uploadedRows,
     conflictCount,
+    staleLocalCount,
+    staleRemoteCount,
   };
 }
 
@@ -732,6 +767,12 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
       lastSyncedAt: metadata.lastSyncedAt,
       lastAttemptAt: metadata.lastAttemptAt,
       conflictCount: metadata.conflictCount,
+      issue:
+        metadata.lastOutcome === "error"
+          ? metadata.conflictCount && metadata.conflictCount > 0
+            ? "conflict"
+            : "provider"
+          : undefined,
       detail:
         metadata.detail ??
         (this.backupStorage
@@ -770,6 +811,27 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
     this.listeners.forEach((listener) => {
       listener(status);
     });
+  }
+
+  private readDiagnostics(): ReadonlyArray<SyncDiagnosticEntry> {
+    return (
+      readStoredJson<ReadonlyArray<SyncDiagnosticEntry>>(
+        this.getStorage(),
+        SUPABASE_SYNC_DIAGNOSTICS_STORAGE_KEY
+      ) ?? []
+    );
+  }
+
+  private appendDiagnostic(entry: SyncDiagnosticEntry) {
+    const nextEntries = [entry, ...this.readDiagnostics()].slice(
+      0,
+      MAX_SYNC_DIAGNOSTIC_ENTRIES
+    );
+    writeStoredJson(
+      this.getStorage(),
+      SUPABASE_SYNC_DIAGNOSTICS_STORAGE_KEY,
+      nextEntries
+    );
   }
 
   private async runSync(): Promise<SyncResult> {
@@ -811,6 +873,11 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
       ...this.readMetadata(),
       lastAttemptAt: attemptAt,
       detail: syncingStatus.detail,
+    });
+    this.appendDiagnostic({
+      startedAt: attemptAt,
+      outcome: "started",
+      provider: "supabase",
     });
     this.emitStatus(syncingStatus);
 
@@ -878,6 +945,8 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
       let localUserDataChanges = 0;
       let remoteUserDataChanges = 0;
       let conflictCount = 0;
+      let staleLocalCount = 0;
+      let staleRemoteCount = 0;
 
       if (this.backupStorage) {
         const localData = await this.backupStorage.readAll();
@@ -908,6 +977,8 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
           localUserDataChanges += outcome.changedLocalRecords;
           remoteUserDataChanges += outcome.uploadedRows.length;
           conflictCount += outcome.conflictCount;
+          staleLocalCount += outcome.staleLocalCount;
+          staleRemoteCount += outcome.staleRemoteCount;
           uploadedRows.push(...outcome.uploadedRows);
         });
 
@@ -942,8 +1013,15 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
         lastSyncedAt: syncAt,
         lastAttemptAt: attemptAt,
         conflictCount,
+        issue: conflictCount > 0 ? "conflict" : undefined,
         detail,
       };
+
+      const changedRecords =
+        localPreferenceChanges +
+        remotePreferenceChanges +
+        localUserDataChanges +
+        remoteUserDataChanges;
 
       this.writeMetadata({
         backendUserId: connectedSession.user.id,
@@ -954,13 +1032,20 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
         conflictCount,
       });
       this.emitStatus(status);
+      this.appendDiagnostic({
+        startedAt: attemptAt,
+        finishedAt: syncAt,
+        outcome: conflictCount > 0 ? "error" : "success",
+        provider: "supabase",
+        changedRecords,
+        conflictCount,
+        staleLocalCount,
+        staleRemoteCount,
+        failureReason: conflictCount > 0 ? detail : undefined,
+      });
 
       return {
-        changedRecords:
-          localPreferenceChanges +
-          remotePreferenceChanges +
-          localUserDataChanges +
-          remoteUserDataChanges,
+        changedRecords,
         status,
       };
     } catch (error) {
@@ -968,21 +1053,33 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
         error instanceof Error
           ? error.message
           : "AliOS could not complete sync.";
+      const previousMetadata = this.readMetadata();
       const status: SyncStatus = {
         mode: "error",
         provider: "supabase",
         scopes,
+        connectedUserId: previousMetadata.backendUserId,
+        lastSyncedAt: previousMetadata.lastSyncedAt,
         lastAttemptAt: attemptAt,
-        conflictCount: this.readMetadata().conflictCount,
+        conflictCount: previousMetadata.conflictCount,
+        issue: toIssueFromError(error),
         detail,
       };
       this.writeMetadata({
-        ...this.readMetadata(),
+        ...previousMetadata,
         lastAttemptAt: attemptAt,
         lastOutcome: "error",
         detail,
       });
       this.emitStatus(status);
+      this.appendDiagnostic({
+        startedAt: attemptAt,
+        finishedAt: this.now().toISOString(),
+        outcome: "error",
+        provider: "supabase",
+        conflictCount: previousMetadata.conflictCount,
+        failureReason: detail,
+      });
 
       return {
         changedRecords: 0,

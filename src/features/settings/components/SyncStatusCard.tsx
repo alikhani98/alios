@@ -7,13 +7,18 @@ import {
   GitCompareArrows,
   LaptopMinimal,
   PauseCircle,
+  RefreshCw,
   ShieldCheck,
   UserRound,
   WifiOff,
 } from "lucide-react";
 import { useState } from "react";
 
-import { useAccountRuntimeState, type AccountRuntimeState } from "@/core/account";
+import {
+  useAccountRuntime,
+  useAccountRuntimeState,
+  type AccountRuntimeState,
+} from "@/core/account";
 import { GoogleAuthProvider, useAuth } from "@/core/auth";
 import { OPTIONAL_SYNC_PROVIDER_ID } from "@/core/sync";
 import type { SyncScope } from "@/core/sync";
@@ -83,6 +88,8 @@ type RuntimeMetadataRow = Readonly<{
   value: string;
   descriptionKey?: TranslationKey;
 }>;
+
+type SyncHealthTone = "neutral" | "primary" | "warning" | "danger";
 
 function SyncStatePreview({ state }: SyncStatePreviewProps) {
   const { t } = useI18n();
@@ -260,6 +267,45 @@ function getSyncScopeLabelKey(scope: SyncScope): TranslationKey {
   }
 }
 
+function getSyncHealthSummary(runtimeState: AccountRuntimeState): Readonly<{
+  labelKey: TranslationKey;
+  descriptionKey: TranslationKey;
+  tone: SyncHealthTone;
+}> {
+  if (runtimeState.localOnly) {
+    return {
+      labelKey: "settings.syncHealthLocalOnly",
+      descriptionKey: "settings.syncHealthLocalOnlyDescription",
+      tone: "neutral",
+    };
+  }
+
+  if (runtimeState.syncStatus.mode === "syncing") {
+    return {
+      labelKey: "settings.syncHealthSyncing",
+      descriptionKey: "settings.syncHealthSyncingDescription",
+      tone: "primary",
+    };
+  }
+
+  if (runtimeState.syncStatus.mode === "error") {
+    return {
+      labelKey: "settings.syncHealthIssue",
+      descriptionKey:
+        runtimeState.syncStatus.issue === "conflict"
+          ? "settings.syncHealthConflictDescription"
+          : "settings.syncHealthIssueDescription",
+      tone: runtimeState.syncStatus.issue === "conflict" ? "danger" : "warning",
+    };
+  }
+
+  return {
+    labelKey: "settings.syncHealthHealthy",
+    descriptionKey: "settings.syncHealthHealthyDescription",
+    tone: "primary",
+  };
+}
+
 function getRuntimeSyncState(
   runtimeState: AccountRuntimeState
 ): SyncStateDefinition {
@@ -342,6 +388,7 @@ function getRuntimeAccountPresentation(
 
 export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
   const { t } = useI18n();
+  const { boundary } = useAccountRuntime();
   const runtimeState = useAccountRuntimeState();
   const { provider } = useAuth();
   const [accountActionFeedback, setAccountActionFeedback] = useState<string | null>(
@@ -350,8 +397,11 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
   const [accountActionPending, setAccountActionPending] = useState<
     "sign-in" | "sign-out" | null
   >(null);
+  const [syncActionPending, setSyncActionPending] = useState(false);
+  const [syncActionFeedback, setSyncActionFeedback] = useState<string | null>(null);
   const futureActionsDescriptionId = "account-sync-future-actions-description";
   const currentState = getRuntimeSyncState(runtimeState);
+  const syncHealth = getSyncHealthSummary(runtimeState);
   const accountPresentation = getRuntimeAccountPresentation(runtimeState, t);
   const interactiveGoogleProvider =
     provider instanceof GoogleAuthProvider && provider.isConfigured()
@@ -384,6 +434,10 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
   const syncedScopeKeys =
     runtimeState.syncStatus.scopes?.map((scope) => getSyncScopeLabelKey(scope)) ??
     [];
+  const canRetrySync =
+    !runtimeState.localOnly &&
+    runtimeState.authStatus === "authenticated" &&
+    !syncActionPending;
 
   const handleGoogleSignIn = async () => {
     if (!interactiveGoogleProvider) {
@@ -426,6 +480,22 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
       );
     } finally {
       setAccountActionPending(null);
+    }
+  };
+
+  const handleRetrySync = async () => {
+    setSyncActionPending(true);
+    setSyncActionFeedback(null);
+
+    try {
+      const status = await boundary.syncNow();
+      setSyncActionFeedback(status.detail);
+    } catch (error) {
+      setSyncActionFeedback(
+        error instanceof Error ? error.message : t("settings.syncRetryError")
+      );
+    } finally {
+      setSyncActionPending(false);
     }
   };
 
@@ -502,6 +572,17 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
                 : t("settings.syncCategoriesConnectedDescription")}
             </p>
           </SoftPanel>
+          <SoftPanel className="alios-surface-muted">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+              {t("settings.syncHealthLabel")}
+            </p>
+            <div className="mt-2">
+              <StatusChip tone={syncHealth.tone}>{t(syncHealth.labelKey)}</StatusChip>
+            </div>
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">
+              {t(syncHealth.descriptionKey)}
+            </p>
+          </SoftPanel>
         </div>
 
         <section
@@ -573,6 +654,39 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
               ))}
             </div>
           </div>
+          {!runtimeState.localOnly ? (
+            <SoftPanel className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="space-y-1">
+                <p className="text-sm font-medium">
+                  {t("settings.syncRetryTitle")}
+                </p>
+                <p className="text-sm leading-6 text-muted-foreground">
+                  {t("settings.syncRetryDescription")}
+                </p>
+                {syncActionFeedback ? (
+                  <p className="text-xs leading-5 text-muted-foreground">
+                    {syncActionFeedback}
+                  </p>
+                ) : null}
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                className="justify-start"
+                onClick={() => {
+                  void handleRetrySync();
+                }}
+                disabled={!canRetrySync}
+              >
+                <RefreshCw
+                  className={`me-2 h-4 w-4 ${syncActionPending ? "animate-spin" : ""}`}
+                />
+                {syncActionPending
+                  ? t("settings.syncRetryPending")
+                  : t("settings.syncRetryAction")}
+              </Button>
+            </SoftPanel>
+          ) : null}
         </section>
 
         <section aria-labelledby="account-sync-other-states" className="space-y-3">

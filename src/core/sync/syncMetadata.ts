@@ -19,6 +19,20 @@ export type SyncLifecycleState =
 
 export type SyncLastOutcome = "never" | "success" | "error";
 
+export type SyncAttemptOutcome = "started" | "success" | "error";
+
+export type SyncDiagnosticEntry = Readonly<{
+  startedAt: string;
+  finishedAt?: string;
+  outcome: SyncAttemptOutcome;
+  provider: string;
+  changedRecords?: number;
+  failureReason?: string;
+  conflictCount?: number;
+  staleLocalCount?: number;
+  staleRemoteCount?: number;
+}>;
+
 export type SyncMetadataSnapshot = Readonly<{
   device: SyncDeviceIdentity;
   state: SyncLifecycleState;
