@@ -1,5 +1,13 @@
 # Changelog
 
+## Stage 230 - Account Settings UI Foundation
+
+- Added the first visible `Account & Sync` Settings foundation without enabling any real account, session, or sync behavior
+- Expanded the existing Settings sync surface into a clearer local-only account status card that explains current device-only ownership, privacy, and future sync availability
+- Added intentionally disabled placeholder actions for `Create account`, `Sign in`, and `Enable sync` so future entry points are visible without creating fake runtime flows
+- Added focused bilingual render coverage for the new Account & Sync foundation card
+- Documented the stage in `docs/ACCOUNT_SETTINGS_UI_FOUNDATION_STAGE_230.md` and kept the implementation minimal, local-first, and non-destructive
+
 ## Stage 229 - Account Abstraction Layer Preparation
 
 - Created `docs/ACCOUNT_ABSTRACTION_LAYER_STAGE_229.md` to document the future-safe account boundary for AliOS while preserving current local-first behavior
