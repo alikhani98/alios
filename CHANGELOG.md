@@ -1,5 +1,16 @@
 # Changelog
 
+## Stage 237 - Device Sync Backend Foundation
+
+- Added the first real Supabase-backed sync foundation while preserving AliOS as a local-first app
+- Added a Supabase sync configuration boundary, local device sync metadata, and a runtime preference-sync provider
+- Connected the existing Google sign-in foundation to backend identity exchange without persisting the raw Google credential token
+- Synced only low-risk preferences in this stage: appearance, language, and interface preferences
+- Kept tasks, goals, finance, personal manual entries, decisions, repositories, schemas, backups, and migrations unchanged
+- Updated the Settings `Account & Sync` surface and bilingual copy to reflect the new preference-sync foundation honestly
+- Added focused sync-provider and Settings rendering coverage
+- Documented the stage in `docs/DEVICE_SYNC_BACKEND_FOUNDATION_STAGE_237.md`
+
 ## Stage 236 - Google Account Authentication
 
 - Added a real Google sign-in runtime using Google Identity Services without adding a backend, sync engine, repository change, schema change, or cloud data upload path

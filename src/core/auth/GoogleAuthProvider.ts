@@ -24,6 +24,10 @@ export class GoogleAuthProvider implements AuthProvider {
     return this.runtime.renderButton(parent);
   }
 
+  getIdToken(): string | null {
+    return this.runtime.getIdToken();
+  }
+
   async getCurrentUser(): Promise<AuthUser | null> {
     return this.runtime.getUser();
   }

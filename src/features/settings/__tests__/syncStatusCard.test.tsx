@@ -280,6 +280,65 @@ describe("SyncStatusCard", () => {
     expect(markup).toContain("Manage account");
   });
 
+  it("renders the connected preference-sync state with sync timing metadata", async () => {
+    const authProvider = new TestAuthProvider("future-auth", {
+      status: "authenticated",
+      provider: GOOGLE_ACCOUNT_PROVIDER_ID,
+      user: {
+        userId: "user-1",
+        email: "user@example.com",
+        displayName: "AliOS User",
+        createdAt: "2026-07-28T00:00:00.000Z",
+        updatedAt: "2026-07-28T00:00:00.000Z",
+      },
+      detail: "Authenticated Google session.",
+    });
+    const boundary = createAccountRuntimeBoundary({
+      accountProvider: new TestAccountProvider(
+        GOOGLE_ACCOUNT_PROVIDER_ID,
+        "authenticated",
+        {
+          status: "authenticated",
+          providerId: GOOGLE_ACCOUNT_PROVIDER_ID,
+          lifecycle: "signed-in",
+          identity: {
+            accountId: "account-1",
+            email: "user@example.com",
+            displayName: "AliOS User",
+            providerId: GOOGLE_ACCOUNT_PROVIDER_ID,
+          },
+          detail: "Google account connected on this device.",
+        },
+        {
+          status: "authenticated",
+          available: ["account-identity", "sign-out", "explicit-sync-opt-in"],
+          detail: "Authenticated account capabilities are available.",
+        }
+      ),
+      authProvider,
+      syncProvider: new TestSyncProvider("supabase", {
+        mode: "ready",
+        provider: "supabase",
+        connectedUserId: "supabase-user-1",
+        deviceId: "device-1",
+        deviceLabel: "This device",
+        lastSyncedAt: "2026-07-28T12:00:00.000Z",
+        lastAttemptAt: "2026-07-28T12:00:00.000Z",
+        detail:
+          "AliOS synced appearance, language, and interface preferences for this device.",
+      }),
+    });
+
+    const markup = await renderCardToStaticMarkup(boundary, authProvider);
+
+    expect(markup).toContain("Sync available");
+    expect(markup).toContain("2026-07-28T12:00:00.000Z");
+    expect(markup).toContain(
+      "AliOS synced appearance, language, and interface preferences for this device."
+    );
+    expect(markup).toContain("Low-risk preferences only");
+  });
+
   it("renders the Persian account and sync copy for the settings surface", async () => {
     localStorage.setItem(LANGUAGE_STORAGE_KEY, "fa");
 

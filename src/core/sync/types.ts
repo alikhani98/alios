@@ -3,6 +3,9 @@ export type SyncMode = "local-only" | "ready" | "syncing" | "error";
 export type SyncStatus = Readonly<{
   mode: SyncMode;
   provider: string;
+  connectedUserId?: string;
+  deviceId?: string;
+  deviceLabel?: string;
   lastSyncedAt?: string;
   lastAttemptAt?: string;
   detail: string;
