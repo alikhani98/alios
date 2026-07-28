@@ -1,5 +1,13 @@
 # Changelog
 
+## Stage 226 - Account & Sync Figma Screen Specification
+
+- Created `docs/ACCOUNT_SYNC_FIGMA_SCREEN_SPECIFICATION_STAGE_226.md` to define the future Figma screen specifications for optional Account & Sync surfaces in AliOS
+- Documented the future screen specifications for the Settings entry surface, local-only state, sign-in/account creation, sync consent, sync enabled, sync paused, conflict resolution, and error/recovery screens
+- Defined Figma-specific implementation rules for page placement, frame naming, component references, token usage, Auto Layout expectations, developer handoff notes, and RTL/LTR behavior
+- Explicitly kept the repository and current AliOS design system authoritative while avoiding any implementation claim about Figma file creation or runtime UI behavior
+- Kept the stage documentation-only: no authentication implementation, no Supabase integration, no remote sync, no API calls, no schema or repository change, no migration, and no runtime UI implementation
+
 ## Stage 225 - Account & Sync Design System Mapping
 
 - Created `docs/ACCOUNT_SYNC_DESIGN_SYSTEM_MAPPING_STAGE_225.md` to define the future design-system mapping for optional Account & Sync surfaces in AliOS
