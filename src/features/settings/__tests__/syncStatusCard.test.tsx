@@ -26,7 +26,13 @@ import {
   type AuthStateSubscription,
   type AuthUser,
 } from "@/core/auth";
-import type { SyncProvider, SyncResult, SyncStatus } from "@/core/sync";
+import type {
+  SyncProvider,
+  SyncResult,
+  SyncStateListener,
+  SyncStateSubscription,
+  SyncStatus,
+} from "@/core/sync";
 import { I18nProvider, LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
 import { messagesFa } from "@/shared/i18n/messages.fa";
 
@@ -128,6 +134,10 @@ class TestSyncProvider implements SyncProvider {
 
   async syncNow(): Promise<SyncResult> {
     return { status: this.status, changedRecords: 0 };
+  }
+
+  subscribe(_listener: SyncStateListener): SyncStateSubscription {
+    return { unsubscribe: () => undefined };
   }
 }
 
@@ -319,13 +329,14 @@ describe("SyncStatusCard", () => {
       syncProvider: new TestSyncProvider("supabase", {
         mode: "ready",
         provider: "supabase",
+        scopes: ["preferences", "tasks", "projects", "goals"],
         connectedUserId: "supabase-user-1",
         deviceId: "device-1",
         deviceLabel: "This device",
         lastSyncedAt: "2026-07-28T12:00:00.000Z",
         lastAttemptAt: "2026-07-28T12:00:00.000Z",
         detail:
-          "AliOS synced appearance, language, and interface preferences for this device.",
+          "AliOS synced preferences, tasks, projects, and goals for this device.",
       }),
     });
 
@@ -334,9 +345,12 @@ describe("SyncStatusCard", () => {
     expect(markup).toContain("Sync available");
     expect(markup).toContain("2026-07-28T12:00:00.000Z");
     expect(markup).toContain(
-      "AliOS synced appearance, language, and interface preferences for this device."
+      "AliOS synced preferences, tasks, projects, and goals for this device."
     );
-    expect(markup).toContain("Low-risk preferences only");
+    expect(markup).toContain("Preferences");
+    expect(markup).toContain("Tasks");
+    expect(markup).toContain("Projects");
+    expect(markup).toContain("Goals");
   });
 
   it("renders the Persian account and sync copy for the settings surface", async () => {

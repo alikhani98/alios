@@ -16,6 +16,7 @@ import { useState } from "react";
 import { useAccountRuntimeState, type AccountRuntimeState } from "@/core/account";
 import { GoogleAuthProvider, useAuth } from "@/core/auth";
 import { OPTIONAL_SYNC_PROVIDER_ID } from "@/core/sync";
+import type { SyncScope } from "@/core/sync";
 import { useI18n, type TranslationKey } from "@/shared/i18n";
 import {
   Badge,
@@ -246,6 +247,19 @@ function getSyncLastSeenLabel(
     : t("settings.syncLastSyncedNever");
 }
 
+function getSyncScopeLabelKey(scope: SyncScope): TranslationKey {
+  switch (scope) {
+    case "preferences":
+      return "settings.syncScopePreferences";
+    case "tasks":
+      return "settings.syncScopeTasks";
+    case "projects":
+      return "settings.syncScopeProjects";
+    case "goals":
+      return "settings.syncScopeGoals";
+  }
+}
+
 function getRuntimeSyncState(
   runtimeState: AccountRuntimeState
 ): SyncStateDefinition {
@@ -367,6 +381,9 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
   const futureStates = syncStates.filter(
     (state) => state.titleKey !== currentState.titleKey
   );
+  const syncedScopeKeys =
+    runtimeState.syncStatus.scopes?.map((scope) => getSyncScopeLabelKey(scope)) ??
+    [];
 
   const handleGoogleSignIn = async () => {
     if (!interactiveGoogleProvider) {
@@ -470,13 +487,19 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
           </SoftPanel>
           <SoftPanel className="alios-surface-muted">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-              {t("settings.accountFutureSyncLabel")}
+              {t("settings.syncCategoriesLabel")}
             </p>
-            <p className="mt-2 text-sm font-medium">
-              {t("settings.accountFutureSyncValue")}
-            </p>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              {t("settings.accountFutureSyncDescription")}
+            <div className="mt-3 flex flex-wrap gap-2">
+              {syncedScopeKeys.map((scopeKey) => (
+                <Badge key={scopeKey} variant="secondary">
+                  {t(scopeKey)}
+                </Badge>
+              ))}
+            </div>
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">
+              {runtimeState.localOnly
+                ? t("settings.syncCategoriesLocalOnlyDescription")
+                : t("settings.syncCategoriesConnectedDescription")}
             </p>
           </SoftPanel>
         </div>

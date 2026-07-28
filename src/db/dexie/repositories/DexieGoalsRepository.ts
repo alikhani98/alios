@@ -3,6 +3,7 @@ import {
   type GoalsRepository,
   type UpdateGoalInput,
 } from "@/core/repositories";
+import { notifyUserDataSyncTrigger } from "@/core/sync";
 import { goalSchema, type Goal } from "@/shared/types";
 
 import type { AliosDatabase } from "../db";
@@ -46,6 +47,7 @@ export class DexieGoalsRepository
         ...this.createMetadata(),
       });
       await this.database.goals.add(goal);
+      notifyUserDataSyncTrigger({ entity: "goals", operation: "create" });
       return goal;
     });
   }
@@ -66,6 +68,7 @@ export class DexieGoalsRepository
               : clampProgressPercent(input.progressPercent),
         });
         await this.database.goals.put(goal);
+        notifyUserDataSyncTrigger({ entity: "goals", operation: "update" });
         return goal;
       })
     );
@@ -76,6 +79,7 @@ export class DexieGoalsRepository
       this.database.transaction("rw", this.database.goals, async () => {
         this.requireEntity("Goal", id, await this.database.goals.get(id));
         await this.database.goals.delete(id);
+        notifyUserDataSyncTrigger({ entity: "goals", operation: "delete" });
       })
     );
   }

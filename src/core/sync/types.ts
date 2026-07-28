@@ -1,5 +1,7 @@
 export type SyncMode = "local-only" | "ready" | "syncing" | "error";
 
+export type SyncScope = "preferences" | "tasks" | "projects" | "goals";
+
 export type SyncStatus = Readonly<{
   mode: SyncMode;
   provider: string;
@@ -8,12 +10,20 @@ export type SyncStatus = Readonly<{
   deviceLabel?: string;
   lastSyncedAt?: string;
   lastAttemptAt?: string;
+  scopes?: ReadonlyArray<SyncScope>;
+  conflictCount?: number;
   detail: string;
 }>;
 
 export type SyncResult = Readonly<{
   status: SyncStatus;
   changedRecords: number;
+}>;
+
+export type SyncStateListener = (status: SyncStatus) => void;
+
+export type SyncStateSubscription = Readonly<{
+  unsubscribe: () => void;
 }>;
 
 /**
@@ -24,4 +34,5 @@ export interface SyncProvider {
   readonly name: string;
   getStatus(): Promise<SyncStatus>;
   syncNow(): Promise<SyncResult>;
+  subscribe(listener: SyncStateListener): SyncStateSubscription;
 }

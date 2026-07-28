@@ -1,4 +1,10 @@
-import type { SyncProvider, SyncResult, SyncStatus } from "./types";
+import type {
+  SyncProvider,
+  SyncResult,
+  SyncStateListener,
+  SyncStateSubscription,
+  SyncStatus,
+} from "./types";
 
 const localOnlyStatus: SyncStatus = {
   mode: "local-only",
@@ -15,6 +21,10 @@ export class LocalOnlySyncProvider implements SyncProvider {
 
   async syncNow(): Promise<SyncResult> {
     return { status: localOnlyStatus, changedRecords: 0 };
+  }
+
+  subscribe(_listener: SyncStateListener): SyncStateSubscription {
+    return { unsubscribe: () => undefined };
   }
 }
 

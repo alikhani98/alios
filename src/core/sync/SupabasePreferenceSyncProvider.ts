@@ -1,11 +1,22 @@
-import { googleAuthRuntime, type GoogleAuthRuntime } from "@/core/auth/googleAuthRuntime";
+import type { AliosBackupData, BackupStorage } from "@/core/backup";
+import type { GoogleAuthRuntime } from "@/core/auth/googleAuthRuntime";
+import { googleAuthRuntime } from "@/core/auth/googleAuthRuntime";
 import { CALENDAR_DISPLAY_STORAGE_KEY } from "@/shared/date";
-import { LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
 import {
   ACCENT_COLOR_STORAGE_KEY,
   APPEARANCE_STORAGE_KEY,
   LOCAL_PREFERENCE_CHANGE_EVENT,
 } from "@/shared/constants/preferences";
+import {
+  goalSchema,
+  projectSchema,
+  taskSchema,
+  type Goal,
+  type Project,
+  type RecordSyncMetadata,
+  type Task,
+} from "@/shared/types";
+import { LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
 import {
   getPreferenceStorage,
   notifyPreferenceChanged,
@@ -13,22 +24,32 @@ import {
   type PreferenceStorage,
 } from "@/shared/preferences/storage";
 import { VIEW_DENSITY_MODE_STORAGE_KEY } from "@/shared/preferences/viewDensityMode";
-import { HOME_DASHBOARD_LAYOUT_STORAGE_KEY } from "@/features/home/dashboardLayout";
-import { HOME_COLLAPSED_SECTIONS_STORAGE_KEY } from "@/features/home/homeCollapsedSections";
 import { FINANCE_COLLAPSED_SECTIONS_STORAGE_KEY } from "@/features/finance/financeSections";
+import { HOME_COLLAPSED_SECTIONS_STORAGE_KEY } from "@/features/home/homeCollapsedSections";
+import { HOME_DASHBOARD_LAYOUT_STORAGE_KEY } from "@/features/home/dashboardLayout";
 
-import type { SyncDeviceIdentity, SyncLastOutcome } from "./syncMetadata";
-import type { SyncProvider, SyncResult, SyncStatus } from "./types";
+import { USER_DATA_SYNC_TRIGGER_EVENT } from "./recordChangeEvents";
 import {
   SUPABASE_SYNC_DEVICE_ID_STORAGE_KEY,
   SUPABASE_SYNC_METADATA_STORAGE_KEY,
+  SUPABASE_SYNC_RECORDS_TABLE,
   getSupabaseSyncConfiguration,
 } from "./supabaseSyncConfig";
 import {
   createSupabaseBrowserClient,
   type SupabaseBrowserClient,
+  type SupabaseRecordRow,
   type SupabaseSession,
 } from "./supabaseClient";
+import type { SyncDeviceIdentity, SyncLastOutcome } from "./syncMetadata";
+import type {
+  SyncProvider,
+  SyncResult,
+  SyncScope,
+  SyncStateListener,
+  SyncStateSubscription,
+  SyncStatus,
+} from "./types";
 
 const SYNCED_PREFERENCE_KEYS = [
   LANGUAGE_STORAGE_KEY,
@@ -41,8 +62,19 @@ const SYNCED_PREFERENCE_KEYS = [
   FINANCE_COLLAPSED_SECTIONS_STORAGE_KEY,
 ] as const;
 
+const USER_DATA_SCOPES = ["tasks", "projects", "goals"] as const;
+const PREFERENCE_ONLY_SCOPES = ["preferences"] as const satisfies ReadonlyArray<SyncScope>;
+const FULL_SYNC_SCOPES = [
+  "preferences",
+  "tasks",
+  "projects",
+  "goals",
+] as const satisfies ReadonlyArray<SyncScope>;
+
 type SyncedPreferenceKey = (typeof SYNCED_PREFERENCE_KEYS)[number];
 type SyncedPreferencePayload = Partial<Record<SyncedPreferenceKey, string>>;
+type SyncEntity = (typeof USER_DATA_SCOPES)[number];
+type SyncableRecord = Task | Project | Goal;
 
 type SyncMetadataRecord = Readonly<{
   backendUserId?: string;
@@ -50,12 +82,13 @@ type SyncMetadataRecord = Readonly<{
   lastAttemptAt?: string;
   lastOutcome: SyncLastOutcome;
   detail?: string;
+  conflictCount?: number;
 }>;
 
 type SupabaseSyncUserMetadata = Readonly<{
   alios_preferences?: SyncedPreferencePayload;
   alios_sync?: Readonly<{
-    scope: "preferences";
+    scope: "preferences" | "preferences-and-user-data";
     deviceId: string;
     deviceLabel: string;
     lastSyncedAt: string;
@@ -83,8 +116,27 @@ type SupabaseAuthFacade = Readonly<{
   signOut: () => Promise<{ error: Error | null }>;
 }>;
 
+type SupabaseRecordsFacade = Readonly<{
+  list: (input: {
+    table: string;
+    userId: string;
+    entities: ReadonlyArray<string>;
+  }) => Promise<{
+    data: ReadonlyArray<SupabaseRecordRow>;
+    error: Error | null;
+  }>;
+  upsert: (input: {
+    table: string;
+    rows: ReadonlyArray<SupabaseRecordRow>;
+  }) => Promise<{
+    data: ReadonlyArray<SupabaseRecordRow>;
+    error: Error | null;
+  }>;
+}>;
+
 type SupabaseClientFacade = Readonly<{
   auth: SupabaseAuthFacade;
+  records: SupabaseRecordsFacade;
 }>;
 
 type SyncProviderDependencies = Readonly<{
@@ -93,7 +145,10 @@ type SyncProviderDependencies = Readonly<{
   getStorage?: () => PreferenceStorage | null;
   now?: () => Date;
   runtime?: GoogleAuthRuntime;
+  backupStorage?: BackupStorage;
 }>;
+
+type RecordMap<TRecord extends SyncableRecord> = Map<string, TRecord>;
 
 function createFallbackDeviceId() {
   return `device-${Date.now().toString(36)}-${Math.random()
@@ -267,7 +322,307 @@ function createLocalOnlyStatus(detail: string): SyncStatus {
   return {
     mode: "local-only",
     provider: "local-only",
+    scopes: PREFERENCE_ONLY_SCOPES,
     detail,
+  };
+}
+
+function getScopes(hasUserDataSync: boolean): ReadonlyArray<SyncScope> {
+  return hasUserDataSync ? FULL_SYNC_SCOPES : PREFERENCE_ONLY_SCOPES;
+}
+
+function cloneRecord<TRecord extends SyncableRecord>(record: TRecord): TRecord {
+  return {
+    ...record,
+    sync: record.sync ? { ...record.sync } : undefined,
+  } as TRecord;
+}
+
+function normalizeSyncMetadata(
+  sync: RecordSyncMetadata | undefined,
+  ownerUserId: string
+): RecordSyncMetadata {
+  return {
+    ownerUserId,
+    lastSyncedAt: sync?.lastSyncedAt,
+    lastSyncedByDeviceId: sync?.lastSyncedByDeviceId,
+    conflictAt: sync?.conflictAt,
+    conflictReason: sync?.conflictReason,
+  };
+}
+
+function withSyncedMetadata<TRecord extends SyncableRecord>(
+  record: TRecord,
+  ownerUserId: string,
+  syncAt: string,
+  deviceId: string
+): TRecord {
+  return {
+    ...cloneRecord(record),
+    sync: {
+      ...normalizeSyncMetadata(record.sync, ownerUserId),
+      ownerUserId,
+      lastSyncedAt: syncAt,
+      lastSyncedByDeviceId: deviceId,
+      conflictAt: undefined,
+      conflictReason: undefined,
+    },
+  } as TRecord;
+}
+
+function withConflictMetadata<TRecord extends SyncableRecord>(
+  record: TRecord,
+  ownerUserId: string,
+  conflictAt: string
+): TRecord {
+  return {
+    ...cloneRecord(record),
+    sync: {
+      ...normalizeSyncMetadata(record.sync, ownerUserId),
+      ownerUserId,
+      conflictAt,
+      conflictReason: "diverged-updates",
+    },
+  } as TRecord;
+}
+
+function isRecordDirty(record: SyncableRecord) {
+  return (
+    !record.sync?.lastSyncedAt || record.updatedAt > record.sync.lastSyncedAt
+  );
+}
+
+function stripEphemeralSyncFields(record: SyncableRecord) {
+  const next = cloneRecord(record);
+
+  if (!next.sync) {
+    return next;
+  }
+
+  next.sync = {
+    ownerUserId: next.sync.ownerUserId,
+    lastSyncedAt: next.sync.lastSyncedAt,
+    lastSyncedByDeviceId: next.sync.lastSyncedByDeviceId,
+  };
+
+  return next;
+}
+
+function recordsMatch(left: SyncableRecord, right: SyncableRecord) {
+  return (
+    JSON.stringify(stripEphemeralSyncFields(left)) ===
+    JSON.stringify(stripEphemeralSyncFields(right))
+  );
+}
+
+function getTaskMap(data: AliosBackupData): RecordMap<Task> {
+  return new Map(data.tasks.map((record) => [record.id, cloneRecord(record)]));
+}
+
+function getProjectMap(data: AliosBackupData): RecordMap<Project> {
+  return new Map(data.projects.map((record) => [record.id, cloneRecord(record)]));
+}
+
+function getGoalMap(data: AliosBackupData): RecordMap<Goal> {
+  return new Map(data.goals.map((record) => [record.id, cloneRecord(record)]));
+}
+
+function toSortedValues<TRecord extends SyncableRecord>(records: RecordMap<TRecord>) {
+  return [...records.values()].sort((left, right) =>
+    left.createdAt.localeCompare(right.createdAt)
+  );
+}
+
+function getEntityRecordMap(
+  data: AliosBackupData,
+  entity: SyncEntity
+): RecordMap<SyncableRecord> {
+  switch (entity) {
+    case "tasks":
+      return getTaskMap(data);
+    case "projects":
+      return getProjectMap(data);
+    case "goals":
+      return getGoalMap(data);
+  }
+}
+
+function applyEntityRecordMap(
+  data: AliosBackupData,
+  entity: SyncEntity,
+  records: RecordMap<SyncableRecord>
+) {
+  switch (entity) {
+    case "tasks":
+      data.tasks = toSortedValues(records as RecordMap<Task>);
+      break;
+    case "projects":
+      data.projects = toSortedValues(records as RecordMap<Project>);
+      break;
+    case "goals":
+      data.goals = toSortedValues(records as RecordMap<Goal>);
+      break;
+  }
+}
+
+function parseRemoteRecord(entity: SyncEntity, payload: Record<string, unknown>) {
+  switch (entity) {
+    case "tasks":
+      return taskSchema.parse(payload);
+    case "projects":
+      return projectSchema.parse(payload);
+    case "goals":
+      return goalSchema.parse(payload);
+  }
+}
+
+function toRemoteRow(
+  entity: SyncEntity,
+  record: SyncableRecord,
+  ownerUserId: string
+): SupabaseRecordRow {
+  return {
+    user_id: ownerUserId,
+    entity,
+    record_id: record.id,
+    payload: record as unknown as Record<string, unknown>,
+    updated_at: record.updatedAt,
+    created_at: record.createdAt,
+    last_synced_at: record.sync?.lastSyncedAt,
+    last_synced_by_device_id: record.sync?.lastSyncedByDeviceId,
+    has_conflict: Boolean(record.sync?.conflictAt),
+    conflict_reason: record.sync?.conflictReason,
+  };
+}
+
+type EntitySyncOutcome = Readonly<{
+  changedLocalRecords: number;
+  uploadedRows: ReadonlyArray<SupabaseRecordRow>;
+  conflictCount: number;
+}>;
+
+function mergeEntityRecords(
+  entity: SyncEntity,
+  localData: AliosBackupData,
+  remoteRows: ReadonlyArray<SupabaseRecordRow>,
+  ownerUserId: string,
+  syncAt: string,
+  deviceId: string
+): EntitySyncOutcome {
+  const localRecords = getEntityRecordMap(localData, entity);
+  const nextRecords = new Map(localRecords);
+  const remoteRecords = new Map(
+    remoteRows.map((row) => [
+      row.record_id,
+      parseRemoteRecord(entity, row.payload),
+    ])
+  );
+  const uploadedRows: SupabaseRecordRow[] = [];
+  let changedLocalRecords = 0;
+  let conflictCount = 0;
+  const allRecordIds = new Set([
+    ...localRecords.keys(),
+    ...remoteRecords.keys(),
+  ]);
+
+  allRecordIds.forEach((recordId) => {
+    const localRecord = localRecords.get(recordId);
+    const remoteRecord = remoteRecords.get(recordId);
+
+    if (localRecord && !remoteRecord) {
+      const syncedLocalRecord = withSyncedMetadata(
+        localRecord,
+        ownerUserId,
+        syncAt,
+        deviceId
+      );
+      nextRecords.set(recordId, syncedLocalRecord);
+      uploadedRows.push(toRemoteRow(entity, syncedLocalRecord, ownerUserId));
+      if (!recordsMatch(localRecord, syncedLocalRecord)) {
+        changedLocalRecords += 1;
+      }
+      return;
+    }
+
+    if (!localRecord || !remoteRecord) {
+      if (!remoteRecord) {
+        return;
+      }
+
+      const syncedRemoteRecord = withSyncedMetadata(
+        remoteRecord,
+        ownerUserId,
+        syncAt,
+        remoteRecord.sync?.lastSyncedByDeviceId ?? deviceId
+      );
+      nextRecords.set(recordId, syncedRemoteRecord);
+      changedLocalRecords += 1;
+      return;
+    }
+
+    if (recordsMatch(localRecord, remoteRecord)) {
+      const alignedRecord = withSyncedMetadata(
+        localRecord,
+        ownerUserId,
+        syncAt,
+        deviceId
+      );
+      nextRecords.set(recordId, alignedRecord);
+      uploadedRows.push(toRemoteRow(entity, alignedRecord, ownerUserId));
+      if (!recordsMatch(localRecord, alignedRecord)) {
+        changedLocalRecords += 1;
+      }
+      return;
+    }
+
+    const localDirty = isRecordDirty(localRecord);
+    const remoteDirty = isRecordDirty(remoteRecord);
+
+    if (localDirty && remoteDirty) {
+      const conflictedRecord = withConflictMetadata(
+        localRecord,
+        ownerUserId,
+        syncAt
+      );
+      nextRecords.set(recordId, conflictedRecord);
+      if (!recordsMatch(localRecord, conflictedRecord)) {
+        changedLocalRecords += 1;
+      }
+      conflictCount += 1;
+      return;
+    }
+
+    if (localDirty || localRecord.updatedAt >= remoteRecord.updatedAt) {
+      const syncedLocalRecord = withSyncedMetadata(
+        localRecord,
+        ownerUserId,
+        syncAt,
+        deviceId
+      );
+      nextRecords.set(recordId, syncedLocalRecord);
+      uploadedRows.push(toRemoteRow(entity, syncedLocalRecord, ownerUserId));
+      if (!recordsMatch(localRecord, syncedLocalRecord)) {
+        changedLocalRecords += 1;
+      }
+      return;
+    }
+
+    const syncedRemoteRecord = withSyncedMetadata(
+      remoteRecord,
+      ownerUserId,
+      syncAt,
+      remoteRecord.sync?.lastSyncedByDeviceId ?? deviceId
+    );
+    nextRecords.set(recordId, syncedRemoteRecord);
+    changedLocalRecords += 1;
+  });
+
+  applyEntityRecordMap(localData, entity, nextRecords);
+
+  return {
+    changedLocalRecords,
+    uploadedRows,
+    conflictCount,
   };
 }
 
@@ -278,7 +633,12 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
   private readonly getStorage: () => PreferenceStorage | null;
   private readonly runtime: GoogleAuthRuntime;
   private readonly client: SupabaseClientFacade | null;
+  private readonly backupStorage: BackupStorage | null;
+  private readonly listeners = new Set<SyncStateListener>();
   private syncInFlight: Promise<SyncResult> | null = null;
+  private lastKnownStatus: SyncStatus = createLocalOnlyStatus(
+    "AliOS is currently running only on this device."
+  );
 
   constructor(dependencies: SyncProviderDependencies = {}) {
     this.now = dependencies.now ?? (() => new Date());
@@ -288,6 +648,7 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
       dependencies.client ??
       dependencies.createClient?.() ??
       createSupabaseClientFromConfiguration();
+    this.backupStorage = dependencies.backupStorage ?? null;
 
     this.runtime.subscribe((session) => {
       if (session.status === "authenticated") {
@@ -296,7 +657,13 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
       }
 
       if (session.status === "unauthenticated" || session.status === "error") {
-        void this.disconnectRemoteSession();
+        void this.disconnectRemoteSession().finally(() => {
+          this.emitStatus(
+            createLocalOnlyStatus(
+              "Sign in with Google on this device to connect sync."
+            )
+          );
+        });
       }
     });
 
@@ -312,52 +679,67 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
         LOCAL_PREFERENCE_CHANGE_EVENT,
         handlePreferenceChange
       );
+      window.addEventListener(USER_DATA_SYNC_TRIGGER_EVENT, handlePreferenceChange);
     }
   }
 
   async getStatus(): Promise<SyncStatus> {
     if (!this.client) {
-      return createLocalOnlyStatus(
-        "Preference sync stays disabled until Supabase environment variables are configured."
+      const status = createLocalOnlyStatus(
+        "Sync stays disabled until Supabase environment variables are configured."
       );
+      this.emitStatus(status);
+      return status;
     }
 
     const authSession = this.runtime.getSession();
     if (authSession.status !== "authenticated" || !authSession.user) {
-      return createLocalOnlyStatus(
-        "Sign in with Google on this device to connect low-risk preference sync."
+      const status = createLocalOnlyStatus(
+        "Sign in with Google on this device to connect sync."
       );
+      this.emitStatus(status);
+      return status;
     }
 
     const connectedSession = await this.ensureRemoteSession(false);
+    const metadata = this.readMetadata();
+    const scopes = getScopes(this.backupStorage !== null);
+
     if (!connectedSession?.user) {
-      const metadata = this.readMetadata();
-      return {
+      const status: SyncStatus = {
         mode: "local-only",
         provider: "supabase",
+        scopes,
         lastSyncedAt: metadata.lastSyncedAt,
         lastAttemptAt: metadata.lastAttemptAt,
+        conflictCount: metadata.conflictCount,
         detail:
           metadata.detail ??
-          "AliOS has not connected this device to preference sync yet.",
+          "AliOS has not connected this device to sync yet.",
       };
+      this.emitStatus(status);
+      return status;
     }
 
-    const metadata = this.readMetadata();
     const device = getOrCreateDeviceIdentity(this.getStorage());
-
-    return {
-      mode: "ready",
+    const status: SyncStatus = {
+      mode: metadata.lastOutcome === "error" ? "error" : "ready",
       provider: "supabase",
+      scopes,
       connectedUserId: connectedSession.user.id,
       deviceId: device.deviceId,
       deviceLabel: device.label,
       lastSyncedAt: metadata.lastSyncedAt,
       lastAttemptAt: metadata.lastAttemptAt,
-      detail: metadata.lastSyncedAt
-        ? "Low-risk preferences are connected through Supabase for this device."
-        : "Supabase preference sync is connected and ready for this device.",
+      conflictCount: metadata.conflictCount,
+      detail:
+        metadata.detail ??
+        (this.backupStorage
+          ? "AliOS sync is connected for preferences, tasks, projects, and goals on this device."
+          : "AliOS sync is connected for low-risk preferences on this device."),
     };
+    this.emitStatus(status);
+    return status;
   }
 
   async syncNow(): Promise<SyncResult> {
@@ -372,39 +754,72 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
     return this.syncInFlight;
   }
 
+  subscribe(listener: SyncStateListener): SyncStateSubscription {
+    this.listeners.add(listener);
+    listener(this.lastKnownStatus);
+
+    return {
+      unsubscribe: () => {
+        this.listeners.delete(listener);
+      },
+    };
+  }
+
+  private emitStatus(status: SyncStatus) {
+    this.lastKnownStatus = status;
+    this.listeners.forEach((listener) => {
+      listener(status);
+    });
+  }
+
   private async runSync(): Promise<SyncResult> {
     if (!this.client) {
+      const status = createLocalOnlyStatus(
+        "Sync stays disabled until Supabase environment variables are configured."
+      );
+      this.emitStatus(status);
       return {
         changedRecords: 0,
-        status: createLocalOnlyStatus(
-          "Preference sync stays disabled until Supabase environment variables are configured."
-        ),
+        status,
       };
     }
 
     const authSession = this.runtime.getSession();
     if (authSession.status !== "authenticated" || !authSession.user) {
+      const status = createLocalOnlyStatus(
+        "Sign in with Google on this device to connect sync."
+      );
+      this.emitStatus(status);
       return {
         changedRecords: 0,
-        status: createLocalOnlyStatus(
-          "Sign in with Google on this device to connect low-risk preference sync."
-        ),
+        status,
       };
     }
 
     const attemptAt = this.now().toISOString();
+    const scopes = getScopes(this.backupStorage !== null);
+    const syncingStatus: SyncStatus = {
+      mode: "syncing",
+      provider: "supabase",
+      scopes,
+      lastAttemptAt: attemptAt,
+      detail: this.backupStorage
+        ? "AliOS is syncing preferences, tasks, projects, and goals for this device."
+        : "AliOS is syncing low-risk preferences for this device.",
+    };
     this.writeMetadata({
       ...this.readMetadata(),
       lastAttemptAt: attemptAt,
-      detail: "AliOS is syncing low-risk preferences for this device.",
+      detail: syncingStatus.detail,
     });
+    this.emitStatus(syncingStatus);
 
     try {
       const connectedSession = await this.ensureRemoteSession(true);
 
       if (!connectedSession?.user) {
         const status = createLocalOnlyStatus(
-          "AliOS could not connect this Google session to Supabase preference sync."
+          "AliOS could not connect this Google session to Supabase sync."
         );
         this.writeMetadata({
           ...this.readMetadata(),
@@ -412,6 +827,7 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
           lastOutcome: "error",
           detail: status.detail,
         });
+        this.emitStatus(status);
         return {
           changedRecords: 0,
           status,
@@ -425,109 +841,152 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
         connectedSession.user.user_metadata as Record<string, unknown> | undefined
       );
       const mergedSnapshot = mergePreferenceSnapshots(localSnapshot, remoteSnapshot);
-      const localChanges = applyRemotePreferencesToLocal(
+      const localPreferenceChanges = applyRemotePreferencesToLocal(
         storage,
         localSnapshot,
         mergedSnapshot
       );
-      const remoteChanges = countChangedPreferences(
+      const remotePreferenceChanges = countChangedPreferences(
         mergedSnapshot,
         remoteSnapshot
       );
       const syncAt = this.now().toISOString();
 
-      if (remoteChanges > 0) {
-        const existingMetadata =
-          (connectedSession.user.user_metadata as Record<string, unknown> | undefined) ??
-          {};
-        const remoteMetadata: SupabaseSyncUserMetadata = {
-          ...existingMetadata,
-          alios_preferences: mergedSnapshot,
-          alios_sync: {
-            scope: "preferences",
-            deviceId: device.deviceId,
-            deviceLabel: device.label,
-            lastSyncedAt: syncAt,
-          },
-        };
-        const { data, error } = await this.client.auth.updateUser({
-          data: remoteMetadata as Record<string, unknown>,
-        });
-
-        if (error) {
-          throw error;
-        }
-
-        const syncedUser = data.user ?? connectedSession.user;
-        this.writeMetadata({
-          backendUserId: syncedUser.id,
-          lastAttemptAt: attemptAt,
+      const existingMetadata =
+        (connectedSession.user.user_metadata as Record<string, unknown> | undefined) ??
+        {};
+      const remoteMetadata: SupabaseSyncUserMetadata = {
+        ...existingMetadata,
+        alios_preferences: mergedSnapshot,
+        alios_sync: {
+          scope: this.backupStorage
+            ? "preferences-and-user-data"
+            : "preferences",
+          deviceId: device.deviceId,
+          deviceLabel: device.label,
           lastSyncedAt: syncAt,
-          lastOutcome: "success",
-          detail:
-            "AliOS synced appearance, language, and interface preferences for this device.",
-        });
+        },
+      };
+      const updateUserResult = await this.client.auth.updateUser({
+        data: remoteMetadata as Record<string, unknown>,
+      });
 
-        return {
-          changedRecords: localChanges + remoteChanges,
-          status: {
-            mode: "ready",
-            provider: "supabase",
-            connectedUserId: syncedUser.id,
-            deviceId: device.deviceId,
-            deviceLabel: device.label,
-            lastSyncedAt: syncAt,
-            lastAttemptAt: attemptAt,
-            detail:
-              "AliOS synced appearance, language, and interface preferences for this device.",
-          },
-        };
+      if (updateUserResult.error) {
+        throw updateUserResult.error;
       }
 
+      let localUserDataChanges = 0;
+      let remoteUserDataChanges = 0;
+      let conflictCount = 0;
+
+      if (this.backupStorage) {
+        const localData = await this.backupStorage.readAll();
+        const remoteRecordsResult = await this.client.records.list({
+          table: SUPABASE_SYNC_RECORDS_TABLE,
+          userId: connectedSession.user.id,
+          entities: USER_DATA_SCOPES,
+        });
+
+        if (remoteRecordsResult.error) {
+          throw remoteRecordsResult.error;
+        }
+
+        const uploadedRows: SupabaseRecordRow[] = [];
+
+        USER_DATA_SCOPES.forEach((entity) => {
+          const entityRows = remoteRecordsResult.data.filter(
+            (row) => row.entity === entity
+          );
+          const outcome = mergeEntityRecords(
+            entity,
+            localData,
+            entityRows,
+            connectedSession.user.id,
+            syncAt,
+            device.deviceId
+          );
+          localUserDataChanges += outcome.changedLocalRecords;
+          remoteUserDataChanges += outcome.uploadedRows.length;
+          conflictCount += outcome.conflictCount;
+          uploadedRows.push(...outcome.uploadedRows);
+        });
+
+        if (localUserDataChanges > 0 || conflictCount > 0) {
+          await this.backupStorage.replaceAll(localData);
+        }
+
+        const upsertResult = await this.client.records.upsert({
+          table: SUPABASE_SYNC_RECORDS_TABLE,
+          rows: uploadedRows,
+        });
+
+        if (upsertResult.error) {
+          throw upsertResult.error;
+        }
+      }
+
+      const detail =
+        conflictCount > 0
+          ? "AliOS synced preferences and safe records, but some task, project, or goal changes now need conflict review."
+          : this.backupStorage
+            ? "AliOS synced preferences, tasks, projects, and goals for this device."
+            : "AliOS synced appearance, language, and interface preferences for this device.";
+
       const status: SyncStatus = {
-        mode: "ready",
+        mode: conflictCount > 0 ? "error" : "ready",
         provider: "supabase",
+        scopes,
         connectedUserId: connectedSession.user.id,
         deviceId: device.deviceId,
         deviceLabel: device.label,
         lastSyncedAt: syncAt,
         lastAttemptAt: attemptAt,
-        detail:
-          "AliOS synced appearance, language, and interface preferences for this device.",
+        conflictCount,
+        detail,
       };
 
       this.writeMetadata({
         backendUserId: connectedSession.user.id,
         lastAttemptAt: attemptAt,
         lastSyncedAt: syncAt,
-        lastOutcome: "success",
-        detail: status.detail,
+        lastOutcome: conflictCount > 0 ? "error" : "success",
+        detail,
+        conflictCount,
       });
+      this.emitStatus(status);
 
       return {
-        changedRecords: localChanges + remoteChanges,
+        changedRecords:
+          localPreferenceChanges +
+          remotePreferenceChanges +
+          localUserDataChanges +
+          remoteUserDataChanges,
         status,
       };
     } catch (error) {
       const detail =
         error instanceof Error
           ? error.message
-          : "AliOS could not complete preference sync.";
+          : "AliOS could not complete sync.";
+      const status: SyncStatus = {
+        mode: "error",
+        provider: "supabase",
+        scopes,
+        lastAttemptAt: attemptAt,
+        conflictCount: this.readMetadata().conflictCount,
+        detail,
+      };
       this.writeMetadata({
         ...this.readMetadata(),
         lastAttemptAt: attemptAt,
         lastOutcome: "error",
         detail,
       });
+      this.emitStatus(status);
 
       return {
         changedRecords: 0,
-        status: {
-          mode: "error",
-          provider: "supabase",
-          lastAttemptAt: attemptAt,
-          detail,
-        },
+        status,
       };
     }
   }

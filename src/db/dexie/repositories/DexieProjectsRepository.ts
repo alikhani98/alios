@@ -3,6 +3,7 @@ import type {
   ProjectsRepository,
   UpdateProjectInput,
 } from "@/core/repositories";
+import { notifyUserDataSyncTrigger } from "@/core/sync";
 import { projectSchema, type Project } from "@/shared/types";
 import type { AliosDatabase } from "../db";
 import { DexieRepositoryBase } from "./DexieRepositoryBase";
@@ -33,6 +34,7 @@ export class DexieProjectsRepository
     return this.execute("creating a project", async () => {
       const project = projectSchema.parse({ ...input, ...this.createMetadata() });
       await this.database.projects.add(project);
+      notifyUserDataSyncTrigger({ entity: "projects", operation: "create" });
       return project;
     });
   }
@@ -53,6 +55,7 @@ export class DexieProjectsRepository
           updatedAt: new Date().toISOString(),
         });
         await this.database.projects.put(project);
+        notifyUserDataSyncTrigger({ entity: "projects", operation: "update" });
         return project;
       })
     );
@@ -63,6 +66,7 @@ export class DexieProjectsRepository
       this.database.transaction("rw", this.database.projects, async () => {
         this.requireEntity("Project", id, await this.database.projects.get(id));
         await this.database.projects.delete(id);
+        notifyUserDataSyncTrigger({ entity: "projects", operation: "delete" });
       })
     );
   }
