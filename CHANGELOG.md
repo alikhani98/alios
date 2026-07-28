@@ -1,5 +1,13 @@
 # Changelog
 
+## Stage 217 - Consent & Copy Contract
+
+- Created `docs/CONSENT_COPY_CONTRACT_STAGE_217.md` to define the exact future user-facing language for optional Account and Sync features
+- Documented approved copy for account introduction, local-only reassurance, sync consent, device-local exceptions, ownership boundaries, backup/export reassurance, and explicit permission before upload
+- Defined future state messages for local-only, signed-in-with-sync-off, sync-enabled, sync-paused, offline, and conflict-review states
+- Documented the approved warning and recovery wording for first sync, new-device association, logout, failed sync, expired session, and interrupted setup
+- Kept the stage planning-only: no authentication implementation, no Supabase integration, no remote sync, no schema or repository change, no migration, no Settings UI implementation, and no change to current local-first behavior
+
 ## Stage 216 - Account & Sync Settings Surface Contract
 
 - Created `docs/ACCOUNT_SYNC_SETTINGS_SURFACE_STAGE_216.md` to define the future Settings information architecture for optional account and sync features
