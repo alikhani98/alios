@@ -1,5 +1,14 @@
 # Changelog
 
+## Stage 249 - Real Google Authentication & Device Sync Verification
+
+- Audited the live Account & Sync implementation after Stage 248 and confirmed the real Google sign-in, explicit sync opt-in, sign-out, cross-device hydration, and conflict-review flow remain intact
+- Removed outdated future-only wording from the live Settings account surface so real sign-in and sync controls no longer read like inactive planning placeholders
+- Updated bilingual Account & Sync copy to describe sync scope, consent boundaries, and provider status as current product behavior instead of deferred stage language
+- Preserved repository ownership, storage behavior, schema rules, backup compatibility, local-first safety, and the existing synced data scope while tightening owner-facing clarity
+- Expanded focused Settings rendering coverage for the updated live account-action wording and the active sync-scope consent language
+- Documented the verification stage in `docs/REAL_GOOGLE_AUTH_DEVICE_SYNC_VERIFICATION_STAGE_249.md`
+
 ## Stage 248 - Account & Sync Actually Usable
 
 - Added an explicit sync opt-in gate so Google sign-in no longer starts remote record exchange by itself

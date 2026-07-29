@@ -231,7 +231,7 @@ describe("SyncStatusCard", () => {
     expect(markup).toContain("Sync paused");
     expect(markup).toContain("Offline");
     expect(markup).toContain("Conflict detected");
-    expect(markup).toContain("Coming later");
+    expect(markup).toContain("Limited now");
     expect(markup).toContain("Create account");
     expect(markup).toContain("Sign in");
     expect(markup).toContain("Enable sync");
@@ -239,7 +239,7 @@ describe("SyncStatusCard", () => {
     expect(markup).toContain(
       'aria-describedby="account-sync-future-actions-description"'
     );
-    expect(markup).toContain('aria-label="Account actions coming later"');
+    expect(markup).toContain('aria-label="Account actions"');
     expect(markup).toContain("Expand section");
     expect(markup).toContain('aria-expanded="false"');
     expect(markup).toContain("Data stays on this device");
@@ -290,7 +290,7 @@ describe("SyncStatusCard", () => {
       "Sign in with Google on this device to attach a real account identity to AliOS without uploading your records or enabling sync."
     );
     expect(markup).toContain(
-      "Only clearly listed future sync-eligible records could ever leave this device, and only after the user reviews that scope."
+      "Only clearly listed sync categories may leave this device, and only after the user reviews that scope."
     );
     expect(markup).toContain(
       "Decisions, backups, recovery data, and every unsynced category remain available on this device even when sync is connected."
