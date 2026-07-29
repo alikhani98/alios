@@ -398,6 +398,9 @@ describe("SyncStatusCard", () => {
             detail:
               "Finance transactions and obligations are sync-eligible in this stage; budgets remain derived from those records.",
             lastSyncedAt: "2026-07-28T12:00:00.000Z",
+            enabled: true,
+            privacyLevel: "sensitive",
+            visibility: "synced",
           },
           {
             key: "manual",
@@ -406,6 +409,9 @@ describe("SyncStatusCard", () => {
               "Personal Manual remains local-only for content, but this device is now prepared to sync readiness metadata.",
             lastSyncedAt: "2026-07-28T11:00:00.000Z",
             itemCount: 3,
+            enabled: false,
+            privacyLevel: "private",
+            visibility: "metadata-only",
           },
         ],
         manualPreparation: {
@@ -414,6 +420,11 @@ describe("SyncStatusCard", () => {
           lastModifiedAt: "2026-07-28T11:00:00.000Z",
           detail:
             "Personal Manual remains local-only for content, but this device is now prepared to sync readiness metadata.",
+        },
+        lastTrustedDevice: {
+          deviceId: "device-1",
+          label: "This device",
+          lastSyncedAt: "2026-07-28T12:00:00.000Z",
         },
         detail:
           "AliOS synced preferences, tasks, projects, goals, and finance records for this device.",
@@ -434,6 +445,10 @@ describe("SyncStatusCard", () => {
     expect(markup).toContain("Finance");
     expect(markup).toContain("Personal Manual readiness");
     expect(markup).toContain("3 items");
+    expect(markup).toContain("Sync privacy");
+    expect(markup).toContain("Last trusted device");
+    expect(markup).toContain("Privacy: Sensitive");
+    expect(markup).toContain("Visibility: Synced");
     expect(markup).toContain("Sync healthy");
   });
 
@@ -648,6 +663,7 @@ describe("SyncStatusCard", () => {
     expect(markup).toContain(messagesFa["settings.syncStatusLocalOnly"]);
     expect(markup).toContain(messagesFa["settings.accountSyncSnapshotLabel"]);
     expect(markup).toContain(messagesFa["settings.syncStatesTitle"]);
+    expect(markup).toContain(messagesFa["settings.syncPrivacySectionTitle"]);
     expect(markup).toContain(messagesFa["settings.syncStatusConflict"]);
     expect(markup).toContain(messagesFa["settings.accountCreateAction"]);
     expect(markup).toContain(messagesFa["settings.accountEnableSyncAction"]);

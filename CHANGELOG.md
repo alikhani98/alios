@@ -1,5 +1,14 @@
 # Changelog
 
+## Stage 243 - Sync Data Security & Privacy Layer
+
+- Added a practical sync privacy layer to the existing Account & Sync foundation so users can see which categories sync, which remain local, and how each category is exposed
+- Extended sync category status metadata with explicit enabled status, privacy level, and visibility mode for Preferences, Tasks, Projects, Goals, Finance, and Personal Manual readiness
+- Added minimal trusted-device metadata support so the Settings surface can show the last trusted sync device without introducing a new security system or changing repository ownership
+- Expanded the Settings `Account & Sync` surface with a dedicated `Sync privacy` section plus category-level privacy and visibility badges
+- Added focused Settings rendering coverage for privacy presentation, disabled/local-only categories, and bilingual privacy copy
+- Documented the stage in `docs/SYNC_DATA_SECURITY_PRIVACY_STAGE_243.md`
+
 ## Stage 242 - Finance & Personal Data Sync Expansion
 
 - Expanded the Supabase-backed sync foundation to include Finance transactions and Finance obligations while preserving AliOS as a local-first app
