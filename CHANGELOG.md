@@ -1,5 +1,14 @@
 # Changelog
 
+## Stage 245 - Account & Sync Real Usage Polish
+
+- Refined the visible `Account & Sync` Settings experience so account state, sync state, connected-device information, and conflict/recovery cues are easier to scan
+- Added first-sync guidance for connected account states that have not completed a successful sync yet, including clearer explanations of what syncs now and what stays local
+- Reworked several account and sync labels so the surface reads like product UI instead of implementation or planning scaffolding
+- Updated connected-device presentation so the current device still appears clearly before a wider device handoff history exists
+- Expanded focused Settings rendering coverage for first-sync guidance, connected-device presentation, and the polished account/sync wording
+- Documented the stage in `docs/ACCOUNT_SYNC_REAL_USAGE_POLISH_STAGE_245.md`
+
 ## Stage 244 - Multi-Device Sync Final Validation & User Experience
 
 - Refined the visible `Account & Sync` experience so first-sync, active-sync, completed, offline, failed, and conflict-required states are easier to understand

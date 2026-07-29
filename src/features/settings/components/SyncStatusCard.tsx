@@ -651,6 +651,45 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
   const categoryStatuses = runtimeState.syncStatus.categoryStatuses ?? [];
   const manualPreparation = runtimeState.syncStatus.manualPreparation;
   const connectedDevices = runtimeState.syncStatus.connectedDevices ?? [];
+  const deviceRows = useMemo(() => {
+    if (runtimeState.localOnly) {
+      return [];
+    }
+
+    const devices = new Map<
+      string,
+      Readonly<{ deviceId: string; label: string; lastSyncedAt?: string }>
+    >();
+
+    if (runtimeState.syncMetadata.device.deviceId) {
+      devices.set(runtimeState.syncMetadata.device.deviceId, {
+        deviceId: runtimeState.syncMetadata.device.deviceId,
+        label: runtimeState.syncMetadata.device.label,
+        lastSyncedAt: runtimeState.syncStatus.lastSyncedAt,
+      });
+    }
+
+    connectedDevices.forEach((device) => {
+      const existing = devices.get(device.deviceId);
+      devices.set(device.deviceId, {
+        deviceId: device.deviceId,
+        label: device.label,
+        lastSyncedAt: existing?.lastSyncedAt ?? device.lastSyncedAt,
+      });
+    });
+
+    return [...devices.values()].sort((left, right) =>
+      (right.lastSyncedAt ?? "").localeCompare(left.lastSyncedAt ?? "")
+    );
+  }, [
+    connectedDevices,
+    runtimeState.localOnly,
+    runtimeState.syncMetadata.device.deviceId,
+    runtimeState.syncMetadata.device.label,
+    runtimeState.syncStatus.lastSyncedAt,
+  ]);
+  const needsFirstSyncGuidance =
+    !runtimeState.localOnly && !runtimeState.syncStatus.lastSyncedAt;
   const canRetrySync =
     !runtimeState.localOnly &&
     runtimeState.authStatus === "authenticated" &&
@@ -1071,7 +1110,7 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
                     </p>
                     <p className="mt-2 text-sm font-medium">
                       {t("settings.syncConnectedDeviceCountValue", {
-                        count: connectedDevices.length,
+                        count: deviceRows.length,
                       })}
                     </p>
                     <p className="mt-2 text-xs leading-5 text-muted-foreground">
@@ -1079,9 +1118,9 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
                     </p>
                   </SoftPanel>
                 </div>
-                {connectedDevices.length > 0 ? (
+                {deviceRows.length > 0 ? (
                   <div className="space-y-2" role="list" aria-label={t("settings.syncConnectedDevicesTitle")}>
-                    {connectedDevices.map((device) => (
+                    {deviceRows.map((device) => (
                       <div
                         key={device.deviceId}
                         className="flex flex-col gap-2 rounded-xl border border-border/70 bg-muted/20 px-3 py-3 sm:flex-row sm:items-start sm:justify-between"
@@ -1105,13 +1144,54 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
                       </div>
                     ))}
                   </div>
-                ) : (
-                  <div className="rounded-xl border border-dashed border-border/70 px-3 py-3 text-sm leading-6 text-muted-foreground">
-                    {t("settings.syncConnectedDevicesEmpty")}
-                  </div>
-                )}
+                ) : null}
               </SoftPanel>
             </div>
+          ) : null}
+          {needsFirstSyncGuidance ? (
+            <SoftPanel className="space-y-4 border-primary/20 bg-primary/5">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div className="space-y-1">
+                  <p className="text-sm font-semibold">
+                    {t("settings.syncExperiencePreparingTitle")}
+                  </p>
+                  <p className="text-sm leading-6 text-muted-foreground">
+                    {t("settings.syncExperiencePreparingDescription")}
+                  </p>
+                </div>
+                <StatusChip tone="warning">
+                  {t("settings.syncExperiencePreparingBadge")}
+                </StatusChip>
+              </div>
+              <div className="grid gap-3 lg:grid-cols-3">
+                <SoftPanel className="alios-surface-muted">
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                    {t("settings.syncConsentScopeLabel")}
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                    {t("settings.syncConsentScopeValue")}
+                  </p>
+                </SoftPanel>
+                <SoftPanel className="alios-surface-muted">
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                    {t("settings.syncPrivacyLocalTitle")}
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                    {t("settings.syncPrivacyLocalDescription")}
+                  </p>
+                </SoftPanel>
+                <SoftPanel className="alios-surface-muted">
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                    {t("common.status")}
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                    {canSignIn
+                      ? t("settings.accountSignInPreparationDescription")
+                      : t("settings.syncRetryDescription")}
+                  </p>
+                </SoftPanel>
+              </div>
+            </SoftPanel>
           ) : null}
           {categoryStatuses.length > 0 ? (
             <div className="grid gap-3 lg:grid-cols-2">
