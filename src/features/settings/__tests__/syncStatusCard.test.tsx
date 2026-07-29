@@ -226,12 +226,12 @@ describe("SyncStatusCard", () => {
     expect(markup).toContain('aria-label="Account and sync snapshot"');
     expect(markup).toContain("Local only");
     expect(markup).toContain("Sync health");
-    expect(markup).toContain("Future sync states");
+    expect(markup).toContain("Other sync states");
     expect(markup).toContain("Sync available");
     expect(markup).toContain("Sync paused");
     expect(markup).toContain("Offline");
     expect(markup).toContain("Conflict detected");
-    expect(markup).toContain("Planned only");
+    expect(markup).toContain("Coming later");
     expect(markup).toContain("Create account");
     expect(markup).toContain("Sign in");
     expect(markup).toContain("Enable sync");
@@ -239,7 +239,7 @@ describe("SyncStatusCard", () => {
     expect(markup).toContain(
       'aria-describedby="account-sync-future-actions-description"'
     );
-    expect(markup).toContain('aria-label="Future account actions"');
+    expect(markup).toContain('aria-label="Account actions coming later"');
     expect(markup).toContain("Expand section");
     expect(markup).toContain('aria-expanded="false"');
     expect(markup).toContain("Data stays on this device");
@@ -280,17 +280,25 @@ describe("SyncStatusCard", () => {
     const markup = await renderCardToStaticMarkup(boundary, authProvider);
 
     expect(markup).toContain("Signed out");
-    expect(markup).toContain("Google account foundation");
+    expect(markup).toContain("Google sign-in");
     expect(markup).toContain("This device");
     expect(markup).toContain("Never synced");
     expect(markup).toContain("Preparing sync");
+    expect(markup).toContain("Connected devices");
+    expect(markup).toContain("1 device(s)");
     expect(markup).toContain(
-      "No connected-device metadata is available yet."
+      "Sign in with Google on this device to attach a real account identity to AliOS without uploading your records or enabling sync."
+    );
+    expect(markup).toContain(
+      "Only clearly listed future sync-eligible records could ever leave this device, and only after the user reviews that scope."
+    );
+    expect(markup).toContain(
+      "Personal Manual content, conflict-free local work, backups, recovery data, and every unsynced category remain available on this device even when sync is connected."
     );
     expect(markup).toContain("Retry sync");
     expect(markup).toContain("Google sign-in");
     expect(markup).toContain("Sign in");
-    expect(markup).toContain("Enable sync - Requires sign-in");
+    expect(markup).toContain("Enable sync - Sign in first");
   });
 
   it("renders a signed-in Google representation with account details and sign-out messaging", async () => {
@@ -341,7 +349,7 @@ describe("SyncStatusCard", () => {
     const markup = await renderCardToStaticMarkup(boundary, authProvider);
 
     expect(markup).toContain("Signed in");
-    expect(markup).toContain("Google account foundation");
+    expect(markup).toContain("Google sign-in");
     expect(markup).toContain("AliOS User");
     expect(markup).toContain("user@example.com");
     expect(markup).toContain("Account session actions");
