@@ -11,11 +11,13 @@ import {
   financeObligationSchema,
   financeTransactionSchema,
   goalSchema,
+  manualEntrySchema,
   projectSchema,
   taskSchema,
   type FinanceObligation,
   type FinanceTransaction,
   type Goal,
+  type ManualEntry,
   type Project,
   type RecordSyncMetadata,
   type Task,
@@ -83,8 +85,10 @@ const USER_DATA_SCOPES = [
   "goals",
   "financeTransactions",
   "financeObligations",
+  "manualEntries",
 ] as const;
 const SUPABASE_SYNC_DIAGNOSTICS_STORAGE_KEY = "alios.sync.diagnostics";
+const SUPABASE_SYNC_ENABLED_STORAGE_KEY = "alios.sync.enabled";
 const MAX_SYNC_DIAGNOSTIC_ENTRIES = 20;
 const PREFERENCE_ONLY_SCOPES = ["preferences"] as const satisfies ReadonlyArray<SyncScope>;
 const FULL_SYNC_SCOPES = [
@@ -93,6 +97,7 @@ const FULL_SYNC_SCOPES = [
   "projects",
   "goals",
   "finance",
+  "manual",
 ] as const satisfies ReadonlyArray<SyncScope>;
 
 type SyncedPreferenceKey = (typeof SYNCED_PREFERENCE_KEYS)[number];
@@ -102,6 +107,7 @@ type SyncableRecord =
   | Task
   | Project
   | Goal
+  | ManualEntry
   | FinanceTransaction
   | FinanceObligation;
 
@@ -358,6 +364,7 @@ function createLocalOnlyStatus(detail: string): SyncStatus {
   return {
     mode: "local-only",
     provider: "local-only",
+    enabled: false,
     scopes: PREFERENCE_ONLY_SCOPES,
     detail,
   };
@@ -432,13 +439,18 @@ function createCategoryStatuses(
 
   statuses.push({
     key: "manual",
-    state: manualPreparation.readiness === "ready" ? "planned" : "local-only",
+    state: hasUserDataSync && syncAt ? "ready" : "local-only",
     detail: manualPreparation.detail,
-    lastSyncedAt: manualPreparation.lastModifiedAt,
+    lastSyncedAt: hasUserDataSync ? syncAt : undefined,
     itemCount: manualPreparation.entryCount,
-    enabled: false,
+    enabled: hasUserDataSync && Boolean(syncAt),
     privacyLevel: "private",
-    visibility: manualPreparation.entryCount > 0 ? "metadata-only" : "local-only",
+    visibility:
+      hasUserDataSync && syncAt
+        ? "synced"
+        : manualPreparation.entryCount > 0
+          ? "metadata-only"
+          : "local-only",
   });
 
   return statuses;
@@ -594,6 +606,12 @@ function getGoalMap(data: AliosBackupData): RecordMap<Goal> {
   return new Map(data.goals.map((record) => [record.id, cloneRecord(record)]));
 }
 
+function getManualEntryMap(data: AliosBackupData): RecordMap<ManualEntry> {
+  return new Map(
+    data.manualEntries.map((record) => [record.id, cloneRecord(record)])
+  );
+}
+
 function getFinanceTransactionMap(
   data: AliosBackupData
 ): RecordMap<FinanceTransaction> {
@@ -627,6 +645,8 @@ function getEntityRecordMap(
       return getProjectMap(data);
     case "goals":
       return getGoalMap(data);
+    case "manualEntries":
+      return getManualEntryMap(data);
     case "financeTransactions":
       return getFinanceTransactionMap(data);
     case "financeObligations":
@@ -649,6 +669,9 @@ function applyEntityRecordMap(
     case "goals":
       data.goals = toSortedValues(records as RecordMap<Goal>);
       break;
+    case "manualEntries":
+      data.manualEntries = toSortedValues(records as RecordMap<ManualEntry>);
+      break;
     case "financeTransactions":
       data.financeTransactions = toSortedValues(
         records as RecordMap<FinanceTransaction>
@@ -670,6 +693,8 @@ function parseRemoteRecord(entity: SyncEntity, payload: Record<string, unknown>)
       return projectSchema.parse(payload);
     case "goals":
       return goalSchema.parse(payload);
+    case "manualEntries":
+      return manualEntrySchema.parse(payload);
     case "financeTransactions":
       return financeTransactionSchema.parse(payload);
     case "financeObligations":
@@ -753,7 +778,7 @@ function buildManualPreparationStatus(
     readiness: entryCount > 0 ? "ready" : "empty",
     detail:
       entryCount > 0
-        ? "Personal Manual remains local-only for content, but this device is now prepared to sync readiness metadata."
+        ? "Personal Manual entries can sync on approved devices while keeping local-first editing and explicit conflict review."
         : "Personal Manual has no entries yet, so sync preparation metadata stays empty on this device.",
   };
 }
@@ -959,12 +984,13 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
     this.backupStorage = dependencies.backupStorage ?? null;
 
     this.runtime.subscribe((session) => {
-      if (session.status === "authenticated") {
+      if (session.status === "authenticated" && this.isSyncEnabled()) {
         void this.syncNow();
         return;
       }
 
       if (session.status === "unauthenticated" || session.status === "error") {
+        this.setSyncEnabled(false);
         void this.disconnectRemoteSession().finally(() => {
           this.emitStatus(
             createLocalOnlyStatus(
@@ -977,7 +1003,10 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
 
     if (typeof window !== "undefined") {
       const handlePreferenceChange = () => {
-        if (this.runtime.getSession().status === "authenticated") {
+        if (
+          this.runtime.getSession().status === "authenticated" &&
+          this.isSyncEnabled()
+        ) {
           void this.syncNow();
         }
       };
@@ -1005,6 +1034,27 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
       const status = createLocalOnlyStatus(
         "Sign in with Google on this device to connect sync."
       );
+      this.emitStatus(status);
+      return status;
+    }
+
+    if (!this.isSyncEnabled()) {
+      const manualPreparation =
+        this.backupStorage
+          ? buildManualPreparationStatus(await this.backupStorage.readAll())
+          : createEmptyManualPreparationStatus();
+      const status: SyncStatus = {
+        mode: "local-only",
+        provider: "supabase",
+        enabled: false,
+        connectedUserId: authSession.user.userId,
+        scopes: [],
+        categoryStatuses: createCategoryStatuses(undefined, false, manualPreparation),
+        manualPreparation,
+        connectedDevices: [],
+        detail:
+          "Google account is connected on this device, but sync stays off until you explicitly enable it.",
+      };
       this.emitStatus(status);
       return status;
     }
@@ -1037,6 +1087,7 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
       const status: SyncStatus = {
         mode: "local-only",
         provider: "supabase",
+        enabled: true,
         scopes,
         lastSyncedAt: metadata.lastSyncedAt,
         lastAttemptAt: metadata.lastAttemptAt,
@@ -1057,6 +1108,7 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
     const status: SyncStatus = {
       mode: metadata.lastOutcome === "error" ? "error" : "ready",
       provider: "supabase",
+      enabled: true,
       scopes,
       connectedUserId: connectedSession.user.id,
       deviceId: device.deviceId,
@@ -1084,7 +1136,7 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
       detail:
         metadata.detail ??
         (this.backupStorage
-          ? "AliOS sync is connected for preferences, tasks, projects, goals, and finance records on this device."
+          ? "AliOS sync is connected for preferences, tasks, projects, goals, finance, and Personal Manual records on this device."
           : "AliOS sync is connected for low-risk preferences on this device."),
     };
     this.emitStatus(status);
@@ -1095,6 +1147,8 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
     if (this.syncInFlight) {
       return this.syncInFlight;
     }
+
+    this.setSyncEnabled(true);
 
     this.syncInFlight = this.runSync().finally(() => {
       this.syncInFlight = null;
@@ -1371,7 +1425,7 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
         },
       ],
       detail: this.backupStorage
-        ? "AliOS is syncing preferences, tasks, projects, goals, and finance records for this device."
+        ? "AliOS is syncing preferences, tasks, projects, goals, finance, and Personal Manual records for this device."
         : "AliOS is syncing low-risk preferences for this device.",
     };
     this.writeMetadata({
@@ -1516,14 +1570,15 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
       );
       const detail =
         conflictCount > 0
-          ? "AliOS synced preferences and safe records, but some task, project, goal, or finance changes now need conflict review."
+          ? "AliOS synced preferences and safe records, but some task, project, goal, finance, or Personal Manual changes now need conflict review."
           : this.backupStorage
-            ? "AliOS synced preferences, tasks, projects, goals, and finance records for this device."
+            ? "AliOS synced preferences, tasks, projects, goals, finance, and Personal Manual records for this device."
             : "AliOS synced appearance, language, and interface preferences for this device.";
 
       const status: SyncStatus = {
         mode: conflictCount > 0 ? "error" : "ready",
         provider: "supabase",
+        enabled: true,
         scopes,
         connectedUserId: connectedSession.user.id,
         deviceId: device.deviceId,
@@ -1592,6 +1647,7 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
       const status: SyncStatus = {
         mode: "error",
         provider: "supabase",
+        enabled: this.isSyncEnabled(),
         scopes,
         connectedUserId: previousMetadata.backendUserId,
         lastSyncedAt: previousMetadata.lastSyncedAt,
@@ -1708,6 +1764,27 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
       SUPABASE_SYNC_METADATA_STORAGE_KEY,
       metadata
     );
+  }
+
+  private isSyncEnabled() {
+    return this.getStorage()?.getItem(SUPABASE_SYNC_ENABLED_STORAGE_KEY) === "true";
+  }
+
+  private setSyncEnabled(enabled: boolean) {
+    const storage = this.getStorage();
+    if (!storage) {
+      return;
+    }
+
+    try {
+      if (enabled) {
+        storage.setItem(SUPABASE_SYNC_ENABLED_STORAGE_KEY, "true");
+      } else {
+        storage.removeItem(SUPABASE_SYNC_ENABLED_STORAGE_KEY);
+      }
+    } catch {
+      // Keep sync opt-in local and best-effort only.
+    }
   }
 }
 

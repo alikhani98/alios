@@ -293,7 +293,7 @@ describe("SyncStatusCard", () => {
       "Only clearly listed future sync-eligible records could ever leave this device, and only after the user reviews that scope."
     );
     expect(markup).toContain(
-      "Personal Manual content, conflict-free local work, backups, recovery data, and every unsynced category remain available on this device even when sync is connected."
+      "Decisions, backups, recovery data, and every unsynced category remain available on this device even when sync is connected."
     );
     expect(markup).toContain("Google sign-in");
     expect(markup).toContain("Sign in");
@@ -353,7 +353,7 @@ describe("SyncStatusCard", () => {
     expect(markup).toContain("AliOS User");
     expect(markup).toContain("user@example.com");
     expect(markup).toContain("Account session actions");
-    expect(markup).toContain("Retry sync");
+    expect(markup).toContain("Enable sync");
     expect(markup).toContain("Available now");
     expect(markup).toContain("Sign out");
     expect(markup).toContain("Manage account");
@@ -398,7 +398,8 @@ describe("SyncStatusCard", () => {
       syncProvider: new TestSyncProvider("supabase", {
         mode: "ready",
         provider: "supabase",
-        scopes: ["preferences", "tasks", "projects", "goals", "finance"],
+        enabled: true,
+        scopes: ["preferences", "tasks", "projects", "goals", "finance", "manual"],
         connectedUserId: "supabase-user-1",
         deviceId: "device-1",
         deviceLabel: "This device",
@@ -417,14 +418,14 @@ describe("SyncStatusCard", () => {
           },
           {
             key: "manual",
-            state: "planned",
+            state: "ready",
             detail:
-              "Personal Manual remains local-only for content, but this device is now prepared to sync readiness metadata.",
-            lastSyncedAt: "2026-07-28T11:00:00.000Z",
+              "Personal Manual entries can sync on approved devices while keeping local-first editing and explicit conflict review.",
+            lastSyncedAt: "2026-07-28T12:00:00.000Z",
             itemCount: 3,
-            enabled: false,
+            enabled: true,
             privacyLevel: "private",
-            visibility: "metadata-only",
+            visibility: "synced",
           },
         ],
         manualPreparation: {
@@ -432,7 +433,7 @@ describe("SyncStatusCard", () => {
           readiness: "ready",
           lastModifiedAt: "2026-07-28T11:00:00.000Z",
           detail:
-            "Personal Manual remains local-only for content, but this device is now prepared to sync readiness metadata.",
+            "Personal Manual entries can sync on approved devices while keeping local-first editing and explicit conflict review.",
         },
         lastTrustedDevice: {
           deviceId: "device-2",
@@ -452,7 +453,7 @@ describe("SyncStatusCard", () => {
           },
         ],
         detail:
-          "AliOS synced preferences, tasks, projects, goals, and finance records for this device.",
+          "AliOS synced preferences, tasks, projects, goals, finance, and Personal Manual records for this device.",
       }),
     });
 
@@ -462,14 +463,14 @@ describe("SyncStatusCard", () => {
     expect(markup).toContain("Current sync provider: supabase.");
     expect(markup).toContain("2026-07-28T12:00:00.000Z");
     expect(markup).toContain(
-      "AliOS synced preferences, tasks, projects, goals, and finance records for this device."
+      "AliOS synced preferences, tasks, projects, goals, finance, and Personal Manual records for this device."
     );
     expect(markup).toContain("Preferences");
     expect(markup).toContain("Tasks");
     expect(markup).toContain("Projects");
     expect(markup).toContain("Goals");
     expect(markup).toContain("Finance");
-    expect(markup).toContain("Personal Manual readiness");
+    expect(markup).toContain("Personal Manual");
     expect(markup).toContain("3 items");
     expect(markup).toContain("Sync privacy");
     expect(markup).toContain("Last trusted device");
@@ -526,7 +527,8 @@ describe("SyncStatusCard", () => {
           mode: "error",
           provider: "supabase",
           issue: "connectivity",
-          scopes: ["preferences", "tasks", "projects", "goals", "finance"],
+          enabled: true,
+          scopes: ["preferences", "tasks", "projects", "goals", "finance", "manual"],
           connectedUserId: "supabase-user-1",
         deviceId: "device-1",
         deviceLabel: "This device",
@@ -605,7 +607,8 @@ describe("SyncStatusCard", () => {
           provider: "supabase",
           issue: "conflict",
           conflictCount: 1,
-          scopes: ["preferences", "tasks", "projects", "goals", "finance"],
+          enabled: true,
+          scopes: ["preferences", "tasks", "projects", "goals", "finance", "manual"],
           connectedUserId: "supabase-user-1",
           deviceId: "device-1",
           deviceLabel: "This device",
@@ -671,14 +674,15 @@ describe("SyncStatusCard", () => {
       syncProvider: new TestSyncProvider("supabase", {
         mode: "ready",
         provider: "supabase",
-        scopes: ["preferences", "tasks", "projects", "goals", "finance"],
+        enabled: true,
+        scopes: ["preferences", "tasks", "projects", "goals", "finance", "manual"],
         connectedUserId: "supabase-user-1",
         deviceId: "device-1",
         deviceLabel: "This device",
         lastSyncedAt: "2026-07-28T12:00:00.000Z",
         lastAttemptAt: "2026-07-28T12:00:00.000Z",
         detail:
-          "AliOS synced preferences, tasks, projects, goals, and finance records for this device.",
+          "AliOS synced preferences, tasks, projects, goals, finance, and Personal Manual records for this device.",
       }),
     });
 

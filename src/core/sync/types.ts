@@ -6,13 +6,15 @@ export type SyncScope =
   | "tasks"
   | "projects"
   | "goals"
-  | "finance";
+  | "finance"
+  | "manual";
 export type SyncConflictEntity =
   | "tasks"
   | "projects"
   | "goals"
   | "financeTransactions"
-  | "financeObligations";
+  | "financeObligations"
+  | "manualEntries";
 export type SyncConflictResolutionChoice = "keep-local" | "keep-remote";
 export type SyncPrivacyLevel = "standard" | "sensitive" | "private";
 export type SyncUserVisibility = "synced" | "local-only" | "metadata-only";
@@ -50,6 +52,7 @@ export type ManualPreparationStatus = Readonly<{
 export type SyncStatus = Readonly<{
   mode: SyncMode;
   provider: string;
+  enabled?: boolean;
   connectedUserId?: string;
   deviceId?: string;
   deviceLabel?: string;
