@@ -254,6 +254,7 @@ export const messagesEn = {
   "settings.accountGoogleSignOutError": "Google sign-out could not be completed.",
   "settings.accountSignOutAction": "Sign out",
   "settings.accountManageAction": "Manage account",
+  "settings.accountOpenDetailsAction": "Open account & sync details",
   "settings.accountActionPlannedOnly": "Coming later",
   "settings.accountActionFutureEntry": "Not available yet",
   "settings.accountActionRequiresSignIn": "Sign in first",

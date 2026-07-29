@@ -163,6 +163,7 @@ export const messagesFa: Record<TranslationKey, string> = {
   "settings.accountSessionActionsHint": "حتی در یک وضعیتِ واردشدهٔ آینده هم مالکیت local-first، رضایت صریح برای همگام‌سازی، و ایمنیِ پشتیبان/خروجی همچنان الزامی است.",
   "settings.accountSignOutAction": "خروج",
   "settings.accountManageAction": "مدیریت حساب",
+  "settings.accountOpenDetailsAction": "باز کردن جزئیات حساب و همگام‌سازی",
   "settings.accountActionPlannedOnly": "فقط برنامه‌ریزی‌شده",
   "settings.accountActionFutureEntry": "ورود آینده",
   "settings.accountActionRequiresSignIn": "نیازمند ورود",

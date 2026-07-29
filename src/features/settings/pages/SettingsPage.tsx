@@ -62,6 +62,7 @@ import { SettingsHelpCenter } from "../components/SettingsHelpCenter";
 import { RecoveryModeSection } from "../components/RecoveryModeSection";
 import { ExportCenterSection } from "../components/ExportCenterSection";
 import { LocalErrorLogSection } from "../components/LocalErrorLogSection";
+import { SettingsAccountEntryCard } from "../components/SettingsAccountEntryCard";
 import { SyncStatusCard } from "../components/SyncStatusCard";
 import { WeeklyTaskBudgetSection } from "../components/WeeklyTaskBudgetSection";
 import { LocalAiSetupCard } from "@/features/localAi";
@@ -509,29 +510,10 @@ export function SettingsPage() {
       <LocalErrorLogSection id="settings-local-error-log" />
 
       {isSimpleView && !showSimpleSyncDetails ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>{t("settings.accountSyncTitle")}</CardTitle>
-            <CardDescription>{t("settings.accountSyncDescription")}</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <Badge variant="secondary">
-              {accountRuntimeState.localOnly
-                ? t("settings.syncStatusLocalOnly")
-                : accountRuntimeState.hasActiveAccount
-                  ? t("settings.accountStatusSignedIn")
-                  : t("settings.accountStatusSignedOut")}
-            </Badge>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setShowSimpleSyncDetails(true)}
-              aria-expanded={showSimpleSyncDetails}
-            >
-              {t("common.expandSection")}
-            </Button>
-          </CardContent>
-        </Card>
+        <SettingsAccountEntryCard
+          expanded={showSimpleSyncDetails}
+          onOpenDetails={() => setShowSimpleSyncDetails(true)}
+        />
       ) : (
         <SyncStatusCard onGoToBackupRestore={() => scrollToSection("settings-backup-restore")} />
       )}
