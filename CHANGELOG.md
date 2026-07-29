@@ -1,5 +1,13 @@
 # Changelog
 
+## Stage 250 - Enable User Login Entry Point
+
+- Added a compact Account & Sync entry card for Settings Simple View so users can see a real Google sign-in action without first expanding the full sync details surface
+- Reused the existing authentication and sync foundations to show signed-out, signed-in, sign-out, and enable-sync actions directly from the Settings entry point
+- Kept the existing detailed `SyncStatusCard` flow in place while making the first account action easier to discover for normal users
+- Added focused rendering coverage for logged-out visibility, visible sign-in entry, and logged-in account actions
+- Preserved repositories, schemas, storage ownership, sync architecture, and business logic while improving Settings usability only
+
 ## Stage 249 - Real Google Authentication & Device Sync Verification
 
 - Audited the live Account & Sync implementation after Stage 248 and confirmed the real Google sign-in, explicit sync opt-in, sign-out, cross-device hydration, and conflict-review flow remain intact
