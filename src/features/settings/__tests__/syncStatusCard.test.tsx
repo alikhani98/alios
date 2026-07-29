@@ -295,10 +295,10 @@ describe("SyncStatusCard", () => {
     expect(markup).toContain(
       "Personal Manual content, conflict-free local work, backups, recovery data, and every unsynced category remain available on this device even when sync is connected."
     );
-    expect(markup).toContain("Retry sync");
     expect(markup).toContain("Google sign-in");
     expect(markup).toContain("Sign in");
     expect(markup).toContain("Enable sync - Sign in first");
+    expect(markup).not.toContain("Retry sync");
   });
 
   it("renders a signed-in Google representation with account details and sign-out messaging", async () => {
@@ -354,6 +354,7 @@ describe("SyncStatusCard", () => {
     expect(markup).toContain("user@example.com");
     expect(markup).toContain("Account session actions");
     expect(markup).toContain("Retry sync");
+    expect(markup).toContain("Available now");
     expect(markup).toContain("Sign out");
     expect(markup).toContain("Manage account");
   });
@@ -458,6 +459,7 @@ describe("SyncStatusCard", () => {
     const markup = await renderCardToStaticMarkup(boundary, authProvider);
 
     expect(markup).toContain("Sync available");
+    expect(markup).toContain("Current sync provider: supabase.");
     expect(markup).toContain("2026-07-28T12:00:00.000Z");
     expect(markup).toContain(
       "AliOS synced preferences, tasks, projects, goals, and finance records for this device."
@@ -480,6 +482,8 @@ describe("SyncStatusCard", () => {
     expect(markup).toContain("2 device(s)");
     expect(markup).toContain("Last successful sync: 2026-07-28T12:00:00.000Z");
     expect(markup).toContain("Phone");
+    expect(markup).toContain("Offline safety");
+    expect(markup).toContain("Conflict safety");
   });
 
   it("renders the offline sync presentation when connectivity-style errors are reported", async () => {

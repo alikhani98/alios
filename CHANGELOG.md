@@ -1,5 +1,15 @@
 # Changelog
 
+## Stage 246 - Final Sync Readiness Audit & Real Usage Verification
+
+- Audited the current Account & Sync surface for first-device, second-device, retry, conflict, privacy, and connected-device usability without changing auth or sync architecture
+- Removed the misleading signed-out retry presentation so the real next step stays focused on Google sign-in
+- Added clearer first-sync next-step guidance for already signed-in users preparing their first successful sync
+- Reworked several account and sync messages to remove placeholder-style or future-only wording from active shipped states
+- Updated the Account & Sync action-state presentation so available account actions no longer read like warning-only placeholders
+- Expanded focused Settings rendering coverage for the signed-out retry cleanup, first-sync guidance, and active-state wording
+- Documented the stage in `docs/FINAL_SYNC_READINESS_AUDIT_STAGE_246.md`
+
 ## Stage 245 - Account & Sync Real Usage Polish
 
 - Refined the visible `Account & Sync` Settings experience so account state, sync state, connected-device information, and conflict/recovery cues are easier to scan
