@@ -61,6 +61,7 @@ export type SyncStatus = Readonly<{
   categoryStatuses?: ReadonlyArray<SyncCategoryStatus>;
   manualPreparation?: ManualPreparationStatus;
   lastTrustedDevice?: SyncTrustedDevice;
+  connectedDevices?: ReadonlyArray<SyncTrustedDevice>;
   detail: string;
 }>;
 

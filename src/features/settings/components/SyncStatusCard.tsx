@@ -96,6 +96,20 @@ type RuntimeMetadataRow = Readonly<{
   descriptionKey?: TranslationKey;
 }>;
 
+type SyncExperienceState = Readonly<{
+  key:
+    | "preparing"
+    | "syncing"
+    | "completed"
+    | "offline"
+    | "failed"
+    | "conflict";
+  titleKey: TranslationKey;
+  descriptionKey: TranslationKey;
+  badgeKey: TranslationKey;
+  tone: SyncStateTone;
+}>;
+
 type SyncCategoryTone = "neutral" | "primary" | "warning" | "danger";
 
 type ConflictReviewState = Readonly<{
@@ -425,6 +439,68 @@ function getSyncHealthSummary(runtimeState: AccountRuntimeState): Readonly<{
   };
 }
 
+function getSyncExperienceState(
+  runtimeState: AccountRuntimeState
+): SyncExperienceState {
+  if (runtimeState.syncStatus.issue === "conflict") {
+    return {
+      key: "conflict",
+      titleKey: "settings.syncExperienceConflictTitle",
+      descriptionKey: "settings.syncExperienceConflictDescription",
+      badgeKey: "settings.syncExperienceConflictBadge",
+      tone: "danger",
+    };
+  }
+
+  if (runtimeState.syncStatus.mode === "syncing") {
+    return {
+      key: "syncing",
+      titleKey: "settings.syncExperienceSyncingTitle",
+      descriptionKey: "settings.syncExperienceSyncingDescription",
+      badgeKey: "settings.syncExperienceSyncingBadge",
+      tone: "primary",
+    };
+  }
+
+  if (runtimeState.syncStatus.mode === "error") {
+    if (runtimeState.syncStatus.issue === "connectivity") {
+      return {
+        key: "offline",
+        titleKey: "settings.syncExperienceOfflineTitle",
+        descriptionKey: "settings.syncExperienceOfflineDescription",
+        badgeKey: "settings.syncExperienceOfflineBadge",
+        tone: "warning",
+      };
+    }
+
+    return {
+      key: "failed",
+      titleKey: "settings.syncExperienceFailedTitle",
+      descriptionKey: "settings.syncExperienceFailedDescription",
+      badgeKey: "settings.syncExperienceFailedBadge",
+      tone: "warning",
+    };
+  }
+
+  if (!runtimeState.syncStatus.lastSyncedAt) {
+    return {
+      key: "preparing",
+      titleKey: "settings.syncExperiencePreparingTitle",
+      descriptionKey: "settings.syncExperiencePreparingDescription",
+      badgeKey: "settings.syncExperiencePreparingBadge",
+      tone: "neutral",
+    };
+  }
+
+  return {
+    key: "completed",
+    titleKey: "settings.syncExperienceCompletedTitle",
+    descriptionKey: "settings.syncExperienceCompletedDescription",
+    badgeKey: "settings.syncExperienceCompletedBadge",
+    tone: "primary",
+  };
+}
+
 function getRuntimeSyncState(
   runtimeState: AccountRuntimeState
 ): SyncStateDefinition {
@@ -530,6 +606,7 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
   const futureActionsDescriptionId = "account-sync-future-actions-description";
   const currentState = getRuntimeSyncState(runtimeState);
   const syncHealth = getSyncHealthSummary(runtimeState);
+  const syncExperienceState = getSyncExperienceState(runtimeState);
   const accountPresentation = getRuntimeAccountPresentation(runtimeState, t);
   const interactiveGoogleProvider =
     provider instanceof GoogleAuthProvider && provider.isConfigured()
@@ -573,6 +650,7 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
     [];
   const categoryStatuses = runtimeState.syncStatus.categoryStatuses ?? [];
   const manualPreparation = runtimeState.syncStatus.manualPreparation;
+  const connectedDevices = runtimeState.syncStatus.connectedDevices ?? [];
   const canRetrySync =
     !runtimeState.localOnly &&
     runtimeState.authStatus === "authenticated" &&
@@ -933,6 +1011,108 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
               ))}
             </div>
           </div>
+          {!runtimeState.localOnly ? (
+            <div className="grid gap-3 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1.85fr)]">
+              <SoftPanel className="space-y-3">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-medium">
+                      {t("settings.syncExperienceTitle")}
+                    </p>
+                    <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                      {t(syncExperienceState.descriptionKey)}
+                    </p>
+                  </div>
+                  <StatusChip tone={syncExperienceState.tone}>
+                    {t(syncExperienceState.badgeKey)}
+                  </StatusChip>
+                </div>
+                <div className="rounded-xl border border-border/70 bg-muted/30 px-3 py-3">
+                  <p className="text-sm font-medium">
+                    {t(syncExperienceState.titleKey)}
+                  </p>
+                  <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                    {runtimeState.syncStatus.detail}
+                  </p>
+                </div>
+                <ul className="list-disc space-y-1 ps-5 text-sm leading-6 text-muted-foreground">
+                  <li>{t("settings.syncExperienceFirstDeviceRule")}</li>
+                  <li>{t("settings.syncExperienceSecondDeviceRule")}</li>
+                  <li>{t("settings.syncExperienceRecoveryRule")}</li>
+                </ul>
+              </SoftPanel>
+              <SoftPanel className="space-y-3">
+                <div className="flex items-start gap-2">
+                  <LaptopMinimal className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                  <div>
+                    <p className="text-sm font-medium">
+                      {t("settings.syncConnectedDevicesTitle")}
+                    </p>
+                    <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                      {t("settings.syncConnectedDevicesDescription")}
+                    </p>
+                  </div>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <SoftPanel className="alios-surface-muted">
+                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                      {t("settings.syncCurrentDeviceTitle")}
+                    </p>
+                    <p className="mt-2 text-sm font-medium">
+                      {runtimeState.syncMetadata.device.label}
+                    </p>
+                    <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                      {t("settings.syncCurrentDeviceDescription")}
+                    </p>
+                  </SoftPanel>
+                  <SoftPanel className="alios-surface-muted">
+                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                      {t("settings.syncConnectedDeviceCountTitle")}
+                    </p>
+                    <p className="mt-2 text-sm font-medium">
+                      {t("settings.syncConnectedDeviceCountValue", {
+                        count: connectedDevices.length,
+                      })}
+                    </p>
+                    <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                      {t("settings.syncConnectedDeviceCountDescription")}
+                    </p>
+                  </SoftPanel>
+                </div>
+                {connectedDevices.length > 0 ? (
+                  <div className="space-y-2" role="list" aria-label={t("settings.syncConnectedDevicesTitle")}>
+                    {connectedDevices.map((device) => (
+                      <div
+                        key={device.deviceId}
+                        className="flex flex-col gap-2 rounded-xl border border-border/70 bg-muted/20 px-3 py-3 sm:flex-row sm:items-start sm:justify-between"
+                        role="listitem"
+                      >
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium">{device.label}</p>
+                          <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                            {device.deviceId === runtimeState.syncMetadata.device.deviceId
+                              ? t("settings.syncCurrentDeviceBadge")
+                              : t("settings.syncConnectedDeviceBadge")}
+                          </p>
+                        </div>
+                        <p className="text-xs leading-5 text-muted-foreground sm:text-end">
+                          {device.lastSyncedAt
+                            ? t("settings.syncConnectedDeviceLastSynced", {
+                                value: device.lastSyncedAt,
+                              })
+                            : t("settings.syncConnectedDevicePending")}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="rounded-xl border border-dashed border-border/70 px-3 py-3 text-sm leading-6 text-muted-foreground">
+                    {t("settings.syncConnectedDevicesEmpty")}
+                  </div>
+                )}
+              </SoftPanel>
+            </div>
+          ) : null}
           {categoryStatuses.length > 0 ? (
             <div className="grid gap-3 lg:grid-cols-2">
               {categoryStatuses.map((category) => (

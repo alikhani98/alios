@@ -467,6 +467,37 @@ function readLastTrustedDevice(
   };
 }
 
+function buildConnectedDevices(
+  currentDevice: SyncTrustedDevice | undefined,
+  lastTrustedDevice: SyncTrustedDevice | undefined
+): ReadonlyArray<SyncTrustedDevice> | undefined {
+  const devices = [currentDevice, lastTrustedDevice].filter(
+    (device): device is SyncTrustedDevice => Boolean(device)
+  );
+
+  if (devices.length === 0) {
+    return undefined;
+  }
+
+  const uniqueDevices = new Map<string, SyncTrustedDevice>();
+  devices.forEach((device) => {
+    const existing = uniqueDevices.get(device.deviceId);
+    if (!existing) {
+      uniqueDevices.set(device.deviceId, device);
+      return;
+    }
+
+    uniqueDevices.set(device.deviceId, {
+      ...existing,
+      lastSyncedAt: device.lastSyncedAt ?? existing.lastSyncedAt,
+    });
+  });
+
+  return [...uniqueDevices.values()].sort((left, right) =>
+    (right.lastSyncedAt ?? "").localeCompare(left.lastSyncedAt ?? "")
+  );
+}
+
 function cloneRecord<TRecord extends SyncableRecord>(record: TRecord): TRecord {
   return {
     ...record,
@@ -1013,6 +1044,7 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
         categoryStatuses,
         manualPreparation,
         lastTrustedDevice,
+        connectedDevices: buildConnectedDevices(undefined, lastTrustedDevice),
         detail:
           metadata.detail ??
           "AliOS has not connected this device to sync yet.",
@@ -1035,6 +1067,14 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
       categoryStatuses,
       manualPreparation,
       lastTrustedDevice,
+      connectedDevices: buildConnectedDevices(
+        {
+          deviceId: device.deviceId,
+          label: device.label,
+          lastSyncedAt: metadata.lastSyncedAt,
+        },
+        lastTrustedDevice
+      ),
       issue:
         metadata.lastOutcome === "error"
           ? metadata.conflictCount && metadata.conflictCount > 0
@@ -1324,6 +1364,12 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
         createEmptyManualPreparationStatus()
       ),
       lastTrustedDevice: undefined,
+      connectedDevices: [
+        {
+          deviceId: getOrCreateDeviceIdentity(this.getStorage()).deviceId,
+          label: getOrCreateDeviceIdentity(this.getStorage()).label,
+        },
+      ],
       detail: this.backupStorage
         ? "AliOS is syncing preferences, tasks, projects, goals, and finance records for this device."
         : "AliOS is syncing low-risk preferences for this device.",
@@ -1493,6 +1539,14 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
           label: device.label,
           lastSyncedAt: syncAt,
         },
+        connectedDevices: buildConnectedDevices(
+          {
+            deviceId: device.deviceId,
+            label: device.label,
+            lastSyncedAt: syncAt,
+          },
+          readLastTrustedDevice(updateUserResult.data.user?.user_metadata)
+        ),
         detail,
       };
 
@@ -1547,6 +1601,24 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
         categoryStatuses: previousMetadata.categoryStatuses,
         manualPreparation: previousMetadata.manualPreparation,
         lastTrustedDevice: undefined,
+        connectedDevices: previousMetadata.backendUserId
+          ? buildConnectedDevices(
+              undefined,
+              previousMetadata.lastSyncedAt
+                ? {
+                    deviceId:
+                      this.lastKnownStatus.deviceId ??
+                      this.lastKnownStatus.lastTrustedDevice?.deviceId ??
+                      "current-device",
+                    label:
+                      this.lastKnownStatus.deviceLabel ??
+                      this.lastKnownStatus.lastTrustedDevice?.label ??
+                      "This device",
+                    lastSyncedAt: previousMetadata.lastSyncedAt,
+                  }
+                : undefined
+            )
+          : undefined,
         detail,
       };
       this.writeMetadata({
