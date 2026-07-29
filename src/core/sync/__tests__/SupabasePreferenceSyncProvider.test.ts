@@ -292,13 +292,43 @@ describe("SupabasePreferenceSyncProvider", () => {
     await expect(provider.getStatus()).resolves.toMatchObject({
       mode: "ready",
       provider: "supabase",
+      enabled: true,
       scopes: ["preferences"],
       connectedUserId: "supabase-user-1",
       lastSyncedAt: "2026-07-28T12:00:00.000Z",
     });
   });
 
-  it("syncs tasks, projects, goals, and finance records through the backup boundary while preserving local-first ownership", async () => {
+  it("keeps a signed-in device local-only until the owner explicitly enables sync", async () => {
+    const harness = createSupabaseClientHarness();
+    const provider = new SupabasePreferenceSyncProvider({
+      client: harness.client,
+      runtime: createRuntimeStub({
+        status: "authenticated",
+        provider: "google",
+        user: {
+          userId: "google-user-1",
+          email: "user@example.com",
+          displayName: "AliOS User",
+          createdAt: "2026-07-28T00:00:00.000Z",
+          updatedAt: "2026-07-28T12:00:00.000Z",
+        },
+      }),
+      getStorage: () => localStorage,
+      now: () => new Date("2026-07-28T12:00:00.000Z"),
+    });
+
+    await expect(provider.getStatus()).resolves.toMatchObject({
+      mode: "local-only",
+      provider: "supabase",
+      enabled: false,
+      connectedUserId: "google-user-1",
+      scopes: [],
+    });
+    expect(harness.client.auth.signInWithIdToken).not.toHaveBeenCalled();
+  });
+
+  it("syncs tasks, projects, goals, finance records, and Personal Manual entries through the backup boundary while preserving local-first ownership", async () => {
     const harness = createSupabaseClientHarness();
     const backupHarness = createBackupStorageStub({
       tasks: [
@@ -400,7 +430,8 @@ describe("SupabasePreferenceSyncProvider", () => {
     expect(result.status).toMatchObject({
       mode: "ready",
       provider: "supabase",
-      scopes: ["preferences", "tasks", "projects", "goals", "finance"],
+      enabled: true,
+      scopes: ["preferences", "tasks", "projects", "goals", "finance", "manual"],
       connectedUserId: "supabase-user-1",
       lastSyncedAt: "2026-07-28T12:00:00.000Z",
       manualPreparation: {
@@ -417,7 +448,7 @@ describe("SupabasePreferenceSyncProvider", () => {
       record_id: string;
       payload: { sync?: { ownerUserId?: string } };
     }>;
-    expect(upsertRows).toHaveLength(5);
+    expect(upsertRows).toHaveLength(6);
     expect(upsertRows).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -439,6 +470,10 @@ describe("SupabasePreferenceSyncProvider", () => {
           entity: "financeObligations",
           record_id: "obl-1",
         }),
+        expect.objectContaining({
+          entity: "manualEntries",
+          record_id: "manual-1",
+        }),
       ])
     );
 
@@ -454,6 +489,9 @@ describe("SupabasePreferenceSyncProvider", () => {
     expect(syncedData.financeObligations[0].sync).toMatchObject({
       ownerUserId: "supabase-user-1",
     });
+    expect(syncedData.manualEntries[0].sync).toMatchObject({
+      ownerUserId: "supabase-user-1",
+    });
     expect(harness.client.auth.updateUser).toHaveBeenCalledWith({
       data: expect.objectContaining({
         alios_manual: {
@@ -462,6 +500,104 @@ describe("SupabasePreferenceSyncProvider", () => {
           readiness: "ready",
         },
       }),
+    });
+  });
+
+  it("downloads synced Finance and Personal Manual data for a second device after sync is enabled", async () => {
+    const harness = createSupabaseClientHarness();
+    harness.client.records.list.mockResolvedValueOnce({
+      data: [
+        {
+          user_id: "supabase-user-1",
+          entity: "financeTransactions",
+          record_id: "txn-remote-1",
+          payload: {
+            id: "txn-remote-1",
+            type: "expense",
+            title: "Remote taxi",
+            amount: 42,
+            category: "transport",
+            occurredAt: "2026-07-28",
+            createdAt: "2026-07-27T08:00:00.000Z",
+            updatedAt: "2026-07-28T09:15:00.000Z",
+            sync: {
+              ownerUserId: "supabase-user-1",
+              lastSyncedAt: "2026-07-28T09:15:00.000Z",
+              lastSyncedByDeviceId: "phone-device",
+            },
+          },
+          updated_at: "2026-07-28T09:15:00.000Z",
+          created_at: "2026-07-27T08:00:00.000Z",
+          last_synced_at: "2026-07-28T09:15:00.000Z",
+          last_synced_by_device_id: "phone-device",
+          has_conflict: false,
+          conflict_reason: undefined,
+        },
+        {
+          user_id: "supabase-user-1",
+          entity: "manualEntries",
+          record_id: "manual-remote-1",
+          payload: {
+            id: "manual-remote-1",
+            title: "Remote rule",
+            body: "Protect focus before meetings.",
+            category: "principles",
+            importance: "medium",
+            status: "active",
+            tags: ["focus"],
+            createdAt: "2026-07-27T08:00:00.000Z",
+            updatedAt: "2026-07-28T09:20:00.000Z",
+            sync: {
+              ownerUserId: "supabase-user-1",
+              lastSyncedAt: "2026-07-28T09:20:00.000Z",
+              lastSyncedByDeviceId: "phone-device",
+            },
+          },
+          updated_at: "2026-07-28T09:20:00.000Z",
+          created_at: "2026-07-27T08:00:00.000Z",
+          last_synced_at: "2026-07-28T09:20:00.000Z",
+          last_synced_by_device_id: "phone-device",
+          has_conflict: false,
+          conflict_reason: undefined,
+        },
+      ],
+      error: null,
+    });
+
+    const backupHarness = createBackupStorageStub();
+    const provider = new SupabasePreferenceSyncProvider({
+      client: harness.client,
+      runtime: createRuntimeStub({
+        status: "authenticated",
+        provider: "google",
+        user: {
+          userId: "google-user-1",
+          email: "user@example.com",
+          displayName: "AliOS User",
+          createdAt: "2026-07-28T00:00:00.000Z",
+          updatedAt: "2026-07-28T12:00:00.000Z",
+        },
+      }),
+      getStorage: () => localStorage,
+      now: () => new Date("2026-07-28T12:00:00.000Z"),
+      backupStorage: backupHarness.backupStorage,
+    });
+
+    const result = await provider.syncNow();
+    const syncedData = backupHarness.getData();
+
+    expect(result.status).toMatchObject({
+      mode: "ready",
+      enabled: true,
+      scopes: ["preferences", "tasks", "projects", "goals", "finance", "manual"],
+    });
+    expect(syncedData.financeTransactions[0]).toMatchObject({
+      id: "txn-remote-1",
+      title: "Remote taxi",
+    });
+    expect(syncedData.manualEntries[0]).toMatchObject({
+      id: "manual-remote-1",
+      title: "Remote rule",
     });
   });
 

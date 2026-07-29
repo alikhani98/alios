@@ -300,6 +300,8 @@ function getSyncScopeLabelKey(scope: SyncScope): TranslationKey {
       return "settings.syncScopeGoals";
     case "finance":
       return "settings.syncScopeFinance";
+    case "manual":
+      return "settings.syncScopeManual";
   }
 }
 
@@ -318,7 +320,7 @@ function getSyncCategoryLabelKey(
     case "finance":
       return "settings.syncScopeFinance";
     case "manual":
-      return "settings.syncScopeManualPreparation";
+      return "settings.syncScopeManual";
   }
 }
 
@@ -376,6 +378,8 @@ function getConflictEntityLabelKey(entity: SyncConflictEntity): TranslationKey {
       return "settings.syncConflictEntityFinanceTransactions";
     case "financeObligations":
       return "settings.syncConflictEntityFinanceObligations";
+    case "manualEntries":
+      return "settings.syncConflictEntityManualEntries";
   }
 }
 
@@ -616,6 +620,10 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
     interactiveGoogleProvider !== null && !runtimeState.hasActiveAccount;
   const canSignOut =
     interactiveGoogleProvider !== null && runtimeState.hasActiveAccount;
+  const canEnableSync =
+    runtimeState.hasActiveAccount &&
+    runtimeState.syncStatus.enabled !== true &&
+    !syncActionPending;
   const accountMetadataRows: readonly RuntimeMetadataRow[] = [
     {
       labelKey: "settings.accountProviderLabel",
@@ -690,7 +698,10 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
   ]);
   const needsFirstSyncGuidance =
     !runtimeState.localOnly && !runtimeState.syncStatus.lastSyncedAt;
-  const showRetryPanel = !runtimeState.localOnly && runtimeState.hasActiveAccount;
+  const showRetryPanel =
+    !runtimeState.localOnly &&
+    runtimeState.hasActiveAccount &&
+    runtimeState.syncStatus.enabled === true;
   const canRetrySync =
     showRetryPanel && runtimeState.authStatus === "authenticated" && !syncActionPending;
   const hasConflictIssue =
@@ -709,6 +720,7 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
         goals: 0,
         financeTransactions: 0,
         financeObligations: 0,
+        manualEntries: 0,
       }
     );
   }, [conflictRecords]);
@@ -767,6 +779,22 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
     } catch (error) {
       setSyncActionFeedback(
         error instanceof Error ? error.message : t("settings.syncRetryError")
+      );
+    } finally {
+      setSyncActionPending(false);
+    }
+  };
+
+  const handleEnableSync = async () => {
+    setSyncActionPending(true);
+    setSyncActionFeedback(null);
+
+    try {
+      const status = await boundary.syncNow();
+      setSyncActionFeedback(status.detail);
+    } catch (error) {
+      setSyncActionFeedback(
+        error instanceof Error ? error.message : t("settings.accountEnableSyncError")
       );
     } finally {
       setSyncActionPending(false);
@@ -892,6 +920,8 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
       ? action.labelKey !== "settings.accountSignInAction"
       : canSignOut
         ? action.labelKey !== "settings.accountSignOutAction"
+        : canEnableSync
+          ? action.labelKey !== "settings.accountEnableSyncAction"
         : true
   );
   const accountActionStatusTone: SyncStateTone = runtimeState.localOnly
@@ -1219,14 +1249,15 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
                       tone={getCategoryTone(category)}
                     >
                       {t(
-                        category.key === "manual"
-                          ? "settings.syncStatusPrepared"
-                          : category.state === "ready"
-                            ? "settings.syncStatusAvailable"
-                            : category.state === "syncing"
-                              ? "settings.syncHealthSyncing"
-                              : category.state === "planned"
-                                ? "settings.accountActionPlannedOnly"
+                        category.state === "ready"
+                          ? "settings.syncStatusAvailable"
+                          : category.state === "syncing"
+                            ? "settings.syncHealthSyncing"
+                            : category.state === "planned"
+                              ? "settings.accountActionPlannedOnly"
+                              : category.key === "manual" &&
+                                  category.visibility === "metadata-only"
+                                ? "settings.syncStatusPrepared"
                                 : "settings.syncStatusLocalOnly"
                       )}
                     </StatusChip>
@@ -1385,7 +1416,8 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
                     conflictEntityCounts.projects > 0 ||
                     conflictEntityCounts.goals > 0 ||
                     conflictEntityCounts.financeTransactions > 0 ||
-                    conflictEntityCounts.financeObligations > 0
+                    conflictEntityCounts.financeObligations > 0 ||
+                    conflictEntityCounts.manualEntries > 0
                     ? (
                         [
                           "tasks",
@@ -1393,6 +1425,7 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
                           "goals",
                           "financeTransactions",
                           "financeObligations",
+                          "manualEntries",
                         ] as const
                       ).filter(
                         (entity) => conflictEntityCounts[entity] > 0
@@ -1404,6 +1437,7 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
                           "goals",
                           "financeTransactions",
                           "financeObligations",
+                          "manualEntries",
                         ] as const
                       )
                   ).map((entity) => (
@@ -1760,10 +1794,29 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
                   : t("settings.accountSignOutAction")}
               </Button>
             ) : null}
+            {canEnableSync ? (
+              <Button
+                type="button"
+                variant="secondary"
+                className="min-h-11 w-full justify-start sm:w-auto"
+                onClick={() => {
+                  void handleEnableSync();
+                }}
+                disabled={syncActionPending}
+                aria-describedby={futureActionsDescriptionId}
+              >
+                <RefreshCw
+                  className={`me-2 h-4 w-4 ${syncActionPending ? "animate-spin" : ""}`}
+                />
+                {syncActionPending
+                  ? t("settings.accountEnableSyncPending")
+                  : t("settings.accountEnableSyncAction")}
+              </Button>
+            ) : null}
             {visibleActionKeys.map((action) => (
-                  <ConsentActionPlaceholder
-                    key={action.labelKey}
-                    label={`${t(action.labelKey)} - ${t(action.statusKey)}`}
+              <ConsentActionPlaceholder
+                key={action.labelKey}
+                label={`${t(action.labelKey)} - ${t(action.statusKey)}`}
                 descriptionId={futureActionsDescriptionId}
               />
             ))}

@@ -1,5 +1,14 @@
 # Changelog
 
+## Stage 248 - Account & Sync Actually Usable
+
+- Added an explicit sync opt-in gate so Google sign-in no longer starts remote record exchange by itself
+- Made the existing Settings `Account & Sync` surface expose a real `Enable sync` action for signed-in users while preserving local-first safety
+- Expanded the active synced record scope to include Personal Manual entries alongside the existing Preferences, Tasks, Projects, Goals, and Finance records
+- Preserved local copies, conflict review, repository ownership, schema behavior, and offline safety while making first-device and second-device flows genuinely usable
+- Expanded sync-provider and Settings rendering coverage for signed-in-but-not-synced state, first-device opt-in, second-device hydration, and Personal Manual sync participation
+- Documented the stage in `docs/ACCOUNT_SYNC_USABLE_STAGE_248.md`
+
 ## Stage 247 - Finance Experience Improvement
 
 - Improved the Finance hero area with a compact sync-awareness surface and a lighter spending overview so key money context is easier to scan at a glance
