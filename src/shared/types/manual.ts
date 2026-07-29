@@ -5,6 +5,7 @@ import {
   MANUAL_IMPORTANCE_VALUES,
   MANUAL_STATUS_VALUES,
 } from "@/shared/constants/domain";
+import { recordSyncMetadataSchema } from "@/shared/types/sync";
 import { isoDateTimeSchema } from "@/shared/utils/domain";
 
 export const manualEntryCategorySchema = z.enum(MANUAL_CATEGORY_VALUES);
@@ -23,6 +24,7 @@ export const manualEntrySchema = z.object({
   lastReviewedAt: isoDateTimeSchema.optional(),
   createdAt: isoDateTimeSchema,
   updatedAt: isoDateTimeSchema,
+  sync: recordSyncMetadataSchema.optional(),
 });
 
 export type ManualEntryCategory = z.infer<typeof manualEntryCategorySchema>;

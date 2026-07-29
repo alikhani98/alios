@@ -1,5 +1,14 @@
 # Changelog
 
+## Stage 242 - Finance & Personal Data Sync Expansion
+
+- Expanded the Supabase-backed sync foundation to include Finance transactions and Finance obligations while preserving AliOS as a local-first app
+- Added additive sync metadata support for Finance and Personal Manual records without changing repository ownership, schema behavior, or local storage expectations
+- Added Finance and Personal Manual repository sync-trigger events so the existing sync provider can react to real user edits through the current storage boundary
+- Extended the Settings `Account & Sync` surface and bilingual copy to show Finance sync coverage, Personal Manual readiness metadata, richer category-level sync summaries, and Finance conflict grouping support
+- Added focused sync-provider and Settings rendering coverage for Finance sync success, Finance sync failure safety, and Personal Manual readiness metadata
+- Documented the stage in `docs/FINANCE_PERSONAL_DATA_SYNC_EXPANSION_STAGE_242.md`
+
 ## Stage 241 - Conflict Resolution UI
 
 - Added the first user-facing conflict review surface to the Settings `Account & Sync` area for synced Tasks, Projects, and Goals

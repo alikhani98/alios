@@ -385,14 +385,38 @@ describe("SyncStatusCard", () => {
       syncProvider: new TestSyncProvider("supabase", {
         mode: "ready",
         provider: "supabase",
-        scopes: ["preferences", "tasks", "projects", "goals"],
+        scopes: ["preferences", "tasks", "projects", "goals", "finance"],
         connectedUserId: "supabase-user-1",
         deviceId: "device-1",
         deviceLabel: "This device",
         lastSyncedAt: "2026-07-28T12:00:00.000Z",
         lastAttemptAt: "2026-07-28T12:00:00.000Z",
+        categoryStatuses: [
+          {
+            key: "finance",
+            state: "ready",
+            detail:
+              "Finance transactions and obligations are sync-eligible in this stage; budgets remain derived from those records.",
+            lastSyncedAt: "2026-07-28T12:00:00.000Z",
+          },
+          {
+            key: "manual",
+            state: "planned",
+            detail:
+              "Personal Manual remains local-only for content, but this device is now prepared to sync readiness metadata.",
+            lastSyncedAt: "2026-07-28T11:00:00.000Z",
+            itemCount: 3,
+          },
+        ],
+        manualPreparation: {
+          entryCount: 3,
+          readiness: "ready",
+          lastModifiedAt: "2026-07-28T11:00:00.000Z",
+          detail:
+            "Personal Manual remains local-only for content, but this device is now prepared to sync readiness metadata.",
+        },
         detail:
-          "AliOS synced preferences, tasks, projects, and goals for this device.",
+          "AliOS synced preferences, tasks, projects, goals, and finance records for this device.",
       }),
     });
 
@@ -401,12 +425,15 @@ describe("SyncStatusCard", () => {
     expect(markup).toContain("Sync available");
     expect(markup).toContain("2026-07-28T12:00:00.000Z");
     expect(markup).toContain(
-      "AliOS synced preferences, tasks, projects, and goals for this device."
+      "AliOS synced preferences, tasks, projects, goals, and finance records for this device."
     );
     expect(markup).toContain("Preferences");
     expect(markup).toContain("Tasks");
     expect(markup).toContain("Projects");
     expect(markup).toContain("Goals");
+    expect(markup).toContain("Finance");
+    expect(markup).toContain("Personal Manual readiness");
+    expect(markup).toContain("3 items");
     expect(markup).toContain("Sync healthy");
   });
 
@@ -447,11 +474,11 @@ describe("SyncStatusCard", () => {
       ),
       authProvider,
       syncProvider: new TestSyncProvider("supabase", {
-        mode: "error",
-        provider: "supabase",
-        issue: "connectivity",
-        scopes: ["preferences", "tasks", "projects", "goals"],
-        connectedUserId: "supabase-user-1",
+          mode: "error",
+          provider: "supabase",
+          issue: "connectivity",
+          scopes: ["preferences", "tasks", "projects", "goals", "finance"],
+          connectedUserId: "supabase-user-1",
         deviceId: "device-1",
         deviceLabel: "This device",
         lastSyncedAt: "2026-07-28T11:00:00.000Z",
@@ -528,7 +555,7 @@ describe("SyncStatusCard", () => {
           provider: "supabase",
           issue: "conflict",
           conflictCount: 1,
-          scopes: ["preferences", "tasks", "projects", "goals"],
+          scopes: ["preferences", "tasks", "projects", "goals", "finance"],
           connectedUserId: "supabase-user-1",
           deviceId: "device-1",
           deviceLabel: "This device",
@@ -593,14 +620,14 @@ describe("SyncStatusCard", () => {
       syncProvider: new TestSyncProvider("supabase", {
         mode: "ready",
         provider: "supabase",
-        scopes: ["preferences", "tasks", "projects", "goals"],
+        scopes: ["preferences", "tasks", "projects", "goals", "finance"],
         connectedUserId: "supabase-user-1",
         deviceId: "device-1",
         deviceLabel: "This device",
         lastSyncedAt: "2026-07-28T12:00:00.000Z",
         lastAttemptAt: "2026-07-28T12:00:00.000Z",
         detail:
-          "AliOS synced preferences, tasks, projects, and goals for this device.",
+          "AliOS synced preferences, tasks, projects, goals, and finance records for this device.",
       }),
     });
 

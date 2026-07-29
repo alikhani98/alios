@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { recordSyncMetadataSchema } from "@/shared/types/sync";
 import { dateOnlySchema, isoDateTimeSchema } from "@/shared/utils/domain";
 
 export const FINANCE_TRANSACTION_TYPE_VALUES = ["income", "expense"] as const;
@@ -33,6 +34,7 @@ export const financeTransactionSchema = z.object({
   notes: z.string().trim().min(1).optional(),
   createdAt: isoDateTimeSchema,
   updatedAt: isoDateTimeSchema,
+  sync: recordSyncMetadataSchema.optional(),
 });
 
 export const financeObligationSchema = z.object({
@@ -50,6 +52,7 @@ export const financeObligationSchema = z.object({
   notes: z.string().trim().min(1).optional(),
   createdAt: isoDateTimeSchema,
   updatedAt: isoDateTimeSchema,
+  sync: recordSyncMetadataSchema.optional(),
 });
 
 export type FinanceTransactionType = z.infer<typeof financeTransactionTypeSchema>;

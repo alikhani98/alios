@@ -1,9 +1,40 @@
 export type SyncMode = "local-only" | "ready" | "syncing" | "error";
 export type SyncIssue = "conflict" | "connectivity" | "provider";
 
-export type SyncScope = "preferences" | "tasks" | "projects" | "goals";
-export type SyncConflictEntity = Exclude<SyncScope, "preferences">;
+export type SyncScope =
+  | "preferences"
+  | "tasks"
+  | "projects"
+  | "goals"
+  | "finance";
+export type SyncConflictEntity =
+  | "tasks"
+  | "projects"
+  | "goals"
+  | "financeTransactions"
+  | "financeObligations";
 export type SyncConflictResolutionChoice = "keep-local" | "keep-remote";
+
+export type SyncCategoryStatus = Readonly<{
+  key:
+    | "preferences"
+    | "tasks"
+    | "projects"
+    | "goals"
+    | "finance"
+    | "manual";
+  state: "local-only" | "ready" | "syncing" | "error" | "planned";
+  detail: string;
+  lastSyncedAt?: string;
+  itemCount?: number;
+}>;
+
+export type ManualPreparationStatus = Readonly<{
+  entryCount: number;
+  lastModifiedAt?: string;
+  readiness: "empty" | "ready";
+  detail: string;
+}>;
 
 export type SyncStatus = Readonly<{
   mode: SyncMode;
@@ -16,6 +47,8 @@ export type SyncStatus = Readonly<{
   scopes?: ReadonlyArray<SyncScope>;
   conflictCount?: number;
   issue?: SyncIssue;
+  categoryStatuses?: ReadonlyArray<SyncCategoryStatus>;
+  manualPreparation?: ManualPreparationStatus;
   detail: string;
 }>;
 

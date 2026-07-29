@@ -8,9 +8,13 @@ import {
   LOCAL_PREFERENCE_CHANGE_EVENT,
 } from "@/shared/constants/preferences";
 import {
+  financeObligationSchema,
+  financeTransactionSchema,
   goalSchema,
   projectSchema,
   taskSchema,
+  type FinanceObligation,
+  type FinanceTransaction,
   type Goal,
   type Project,
   type RecordSyncMetadata,
@@ -37,7 +41,6 @@ import {
 } from "./supabaseSyncConfig";
 import {
   createSupabaseBrowserClient,
-  type SupabaseBrowserClient,
   type SupabaseRecordRow,
   type SupabaseSession,
 } from "./supabaseClient";
@@ -51,7 +54,9 @@ import type {
   SyncConflictRecord,
   SyncConflictResolutionInput,
   SyncConflictResolutionResult,
+  SyncCategoryStatus,
   SyncIssue,
+  ManualPreparationStatus,
   SyncProvider,
   SyncResult,
   SyncScope,
@@ -71,7 +76,13 @@ const SYNCED_PREFERENCE_KEYS = [
   FINANCE_COLLAPSED_SECTIONS_STORAGE_KEY,
 ] as const;
 
-const USER_DATA_SCOPES = ["tasks", "projects", "goals"] as const;
+const USER_DATA_SCOPES = [
+  "tasks",
+  "projects",
+  "goals",
+  "financeTransactions",
+  "financeObligations",
+] as const;
 const SUPABASE_SYNC_DIAGNOSTICS_STORAGE_KEY = "alios.sync.diagnostics";
 const MAX_SYNC_DIAGNOSTIC_ENTRIES = 20;
 const PREFERENCE_ONLY_SCOPES = ["preferences"] as const satisfies ReadonlyArray<SyncScope>;
@@ -80,12 +91,18 @@ const FULL_SYNC_SCOPES = [
   "tasks",
   "projects",
   "goals",
+  "finance",
 ] as const satisfies ReadonlyArray<SyncScope>;
 
 type SyncedPreferenceKey = (typeof SYNCED_PREFERENCE_KEYS)[number];
 type SyncedPreferencePayload = Partial<Record<SyncedPreferenceKey, string>>;
 type SyncEntity = (typeof USER_DATA_SCOPES)[number];
-type SyncableRecord = Task | Project | Goal;
+type SyncableRecord =
+  | Task
+  | Project
+  | Goal
+  | FinanceTransaction
+  | FinanceObligation;
 
 type SyncMetadataRecord = Readonly<{
   backendUserId?: string;
@@ -94,6 +111,8 @@ type SyncMetadataRecord = Readonly<{
   lastOutcome: SyncLastOutcome;
   detail?: string;
   conflictCount?: number;
+  categoryStatuses?: ReadonlyArray<SyncCategoryStatus>;
+  manualPreparation?: ManualPreparationStatus;
 }>;
 
 type SupabaseSyncUserMetadata = Readonly<{
@@ -103,6 +122,11 @@ type SupabaseSyncUserMetadata = Readonly<{
     deviceId: string;
     deviceLabel: string;
     lastSyncedAt: string;
+  }>;
+  alios_manual?: Readonly<{
+    entryCount: number;
+    lastModifiedAt?: string;
+    readiness: "empty" | "ready";
   }>;
 }>;
 
@@ -342,6 +366,72 @@ function getScopes(hasUserDataSync: boolean): ReadonlyArray<SyncScope> {
   return hasUserDataSync ? FULL_SYNC_SCOPES : PREFERENCE_ONLY_SCOPES;
 }
 
+function createCategoryStatuses(
+  syncAt: string | undefined,
+  hasUserDataSync: boolean,
+  manualPreparation: ManualPreparationStatus
+): ReadonlyArray<SyncCategoryStatus> {
+  const statuses: SyncCategoryStatus[] = [
+    {
+      key: "preferences",
+      state: syncAt ? "ready" : "local-only",
+      detail: syncAt
+        ? "Appearance, language, and interface preferences can sync on this device."
+        : "Preferences stay local until optional sync is connected.",
+      lastSyncedAt: syncAt,
+    },
+  ];
+
+  if (hasUserDataSync) {
+    statuses.push(
+      {
+        key: "tasks",
+        state: syncAt ? "ready" : "local-only",
+        detail: "Tasks remain local-first and sync only after authenticated opt-in.",
+        lastSyncedAt: syncAt,
+      },
+      {
+        key: "projects",
+        state: syncAt ? "ready" : "local-only",
+        detail:
+          "Projects remain editable offline and sync without bypassing local repositories.",
+        lastSyncedAt: syncAt,
+      },
+      {
+        key: "goals",
+        state: syncAt ? "ready" : "local-only",
+        detail:
+          "Goals keep local ownership while this device exchanges approved sync records.",
+        lastSyncedAt: syncAt,
+      },
+      {
+        key: "finance",
+        state: syncAt ? "ready" : "local-only",
+        detail:
+          "Finance transactions and obligations are sync-eligible in this stage; budgets remain derived from those records.",
+        lastSyncedAt: syncAt,
+      }
+    );
+  } else {
+    statuses.push({
+      key: "finance",
+      state: "planned",
+      detail:
+        "Finance sync needs the approved user-data sync boundary before records can leave this device.",
+    });
+  }
+
+  statuses.push({
+    key: "manual",
+    state: manualPreparation.readiness === "ready" ? "planned" : "local-only",
+    detail: manualPreparation.detail,
+    lastSyncedAt: manualPreparation.lastModifiedAt,
+    itemCount: manualPreparation.entryCount,
+  });
+
+  return statuses;
+}
+
 function cloneRecord<TRecord extends SyncableRecord>(record: TRecord): TRecord {
   return {
     ...record,
@@ -438,6 +528,22 @@ function getGoalMap(data: AliosBackupData): RecordMap<Goal> {
   return new Map(data.goals.map((record) => [record.id, cloneRecord(record)]));
 }
 
+function getFinanceTransactionMap(
+  data: AliosBackupData
+): RecordMap<FinanceTransaction> {
+  return new Map(
+    data.financeTransactions.map((record) => [record.id, cloneRecord(record)])
+  );
+}
+
+function getFinanceObligationMap(
+  data: AliosBackupData
+): RecordMap<FinanceObligation> {
+  return new Map(
+    data.financeObligations.map((record) => [record.id, cloneRecord(record)])
+  );
+}
+
 function toSortedValues<TRecord extends SyncableRecord>(records: RecordMap<TRecord>) {
   return [...records.values()].sort((left, right) =>
     left.createdAt.localeCompare(right.createdAt)
@@ -455,6 +561,10 @@ function getEntityRecordMap(
       return getProjectMap(data);
     case "goals":
       return getGoalMap(data);
+    case "financeTransactions":
+      return getFinanceTransactionMap(data);
+    case "financeObligations":
+      return getFinanceObligationMap(data);
   }
 }
 
@@ -473,6 +583,16 @@ function applyEntityRecordMap(
     case "goals":
       data.goals = toSortedValues(records as RecordMap<Goal>);
       break;
+    case "financeTransactions":
+      data.financeTransactions = toSortedValues(
+        records as RecordMap<FinanceTransaction>
+      );
+      break;
+    case "financeObligations":
+      data.financeObligations = toSortedValues(
+        records as RecordMap<FinanceObligation>
+      );
+      break;
   }
 }
 
@@ -484,6 +604,10 @@ function parseRemoteRecord(entity: SyncEntity, payload: Record<string, unknown>)
       return projectSchema.parse(payload);
     case "goals":
       return goalSchema.parse(payload);
+    case "financeTransactions":
+      return financeTransactionSchema.parse(payload);
+    case "financeObligations":
+      return financeObligationSchema.parse(payload);
   }
 }
 
@@ -544,6 +668,36 @@ function createConflictRecord(
     remoteLastSyncedAt: remoteRecord.sync?.lastSyncedAt,
     remoteDeviceId: remoteRecord.sync?.lastSyncedByDeviceId,
     remoteDeviceLabel: getRemoteDeviceLabel(remoteRecord, localDeviceId),
+  };
+}
+
+function buildManualPreparationStatus(
+  data: AliosBackupData
+): ManualPreparationStatus {
+  const entryCount = data.manualEntries.length;
+  const lastModifiedAt = data.manualEntries.reduce<string | undefined>(
+    (latest, entry) =>
+      !latest || entry.updatedAt > latest ? entry.updatedAt : latest,
+    undefined
+  );
+
+  return {
+    entryCount,
+    lastModifiedAt,
+    readiness: entryCount > 0 ? "ready" : "empty",
+    detail:
+      entryCount > 0
+        ? "Personal Manual remains local-only for content, but this device is now prepared to sync readiness metadata."
+        : "Personal Manual has no entries yet, so sync preparation metadata stays empty on this device.",
+  };
+}
+
+function createEmptyManualPreparationStatus(): ManualPreparationStatus {
+  return {
+    entryCount: 0,
+    readiness: "empty",
+    detail:
+      "Personal Manual content still stays local while sync preparation metadata is being checked.",
   };
 }
 
@@ -792,6 +946,18 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
     const connectedSession = await this.ensureRemoteSession(false);
     const metadata = this.readMetadata();
     const scopes = getScopes(this.backupStorage !== null);
+    const manualPreparation =
+      metadata.manualPreparation ??
+      (this.backupStorage
+        ? buildManualPreparationStatus(await this.backupStorage.readAll())
+        : createEmptyManualPreparationStatus());
+    const categoryStatuses =
+      metadata.categoryStatuses ??
+      createCategoryStatuses(
+        metadata.lastSyncedAt,
+        this.backupStorage !== null,
+        manualPreparation
+      );
 
     if (!connectedSession?.user) {
       const status: SyncStatus = {
@@ -801,6 +967,8 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
         lastSyncedAt: metadata.lastSyncedAt,
         lastAttemptAt: metadata.lastAttemptAt,
         conflictCount: metadata.conflictCount,
+        categoryStatuses,
+        manualPreparation,
         detail:
           metadata.detail ??
           "AliOS has not connected this device to sync yet.",
@@ -820,6 +988,8 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
       lastSyncedAt: metadata.lastSyncedAt,
       lastAttemptAt: metadata.lastAttemptAt,
       conflictCount: metadata.conflictCount,
+      categoryStatuses,
+      manualPreparation,
       issue:
         metadata.lastOutcome === "error"
           ? metadata.conflictCount && metadata.conflictCount > 0
@@ -829,7 +999,7 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
       detail:
         metadata.detail ??
         (this.backupStorage
-          ? "AliOS sync is connected for preferences, tasks, projects, and goals on this device."
+          ? "AliOS sync is connected for preferences, tasks, projects, goals, and finance records on this device."
           : "AliOS sync is connected for low-risk preferences on this device."),
     };
     this.emitStatus(status);
@@ -1103,8 +1273,13 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
       provider: "supabase",
       scopes,
       lastAttemptAt: attemptAt,
+      categoryStatuses: createCategoryStatuses(
+        undefined,
+        this.backupStorage !== null,
+        createEmptyManualPreparationStatus()
+      ),
       detail: this.backupStorage
-        ? "AliOS is syncing preferences, tasks, projects, and goals for this device."
+        ? "AliOS is syncing preferences, tasks, projects, goals, and finance records for this device."
         : "AliOS is syncing low-risk preferences for this device.",
     };
     this.writeMetadata({
@@ -1157,37 +1332,16 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
       );
       const syncAt = this.now().toISOString();
 
-      const existingMetadata =
-        (connectedSession.user.user_metadata as Record<string, unknown> | undefined) ??
-        {};
-      const remoteMetadata: SupabaseSyncUserMetadata = {
-        ...existingMetadata,
-        alios_preferences: mergedSnapshot,
-        alios_sync: {
-          scope: this.backupStorage
-            ? "preferences-and-user-data"
-            : "preferences",
-          deviceId: device.deviceId,
-          deviceLabel: device.label,
-          lastSyncedAt: syncAt,
-        },
-      };
-      const updateUserResult = await this.client.auth.updateUser({
-        data: remoteMetadata as Record<string, unknown>,
-      });
-
-      if (updateUserResult.error) {
-        throw updateUserResult.error;
-      }
-
       let localUserDataChanges = 0;
       let remoteUserDataChanges = 0;
       let conflictCount = 0;
       let staleLocalCount = 0;
       let staleRemoteCount = 0;
+      let manualPreparation = createEmptyManualPreparationStatus();
 
       if (this.backupStorage) {
         const localData = await this.backupStorage.readAll();
+        manualPreparation = buildManualPreparationStatus(localData);
         const remoteRecordsResult = await this.client.records.list({
           table: SUPABASE_SYNC_RECORDS_TABLE,
           userId: connectedSession.user.id,
@@ -1232,13 +1386,47 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
         if (upsertResult.error) {
           throw upsertResult.error;
         }
+
       }
 
+      const existingMetadata =
+        (connectedSession.user.user_metadata as Record<string, unknown> | undefined) ??
+        {};
+      const remoteMetadata: SupabaseSyncUserMetadata = {
+        ...existingMetadata,
+        alios_preferences: mergedSnapshot,
+        alios_sync: {
+          scope: this.backupStorage
+            ? "preferences-and-user-data"
+            : "preferences",
+          deviceId: device.deviceId,
+          deviceLabel: device.label,
+          lastSyncedAt: syncAt,
+        },
+        alios_manual: {
+          entryCount: manualPreparation.entryCount,
+          lastModifiedAt: manualPreparation.lastModifiedAt,
+          readiness: manualPreparation.readiness,
+        },
+      };
+      const updateUserResult = await this.client.auth.updateUser({
+        data: remoteMetadata as Record<string, unknown>,
+      });
+
+      if (updateUserResult.error) {
+        throw updateUserResult.error;
+      }
+
+      const categoryStatuses = createCategoryStatuses(
+        syncAt,
+        this.backupStorage !== null,
+        manualPreparation
+      );
       const detail =
         conflictCount > 0
-          ? "AliOS synced preferences and safe records, but some task, project, or goal changes now need conflict review."
+          ? "AliOS synced preferences and safe records, but some task, project, goal, or finance changes now need conflict review."
           : this.backupStorage
-            ? "AliOS synced preferences, tasks, projects, and goals for this device."
+            ? "AliOS synced preferences, tasks, projects, goals, and finance records for this device."
             : "AliOS synced appearance, language, and interface preferences for this device.";
 
       const status: SyncStatus = {
@@ -1252,6 +1440,8 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
         lastAttemptAt: attemptAt,
         conflictCount,
         issue: conflictCount > 0 ? "conflict" : undefined,
+        categoryStatuses,
+        manualPreparation,
         detail,
       };
 
@@ -1268,6 +1458,8 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
         lastOutcome: conflictCount > 0 ? "error" : "success",
         detail,
         conflictCount,
+        categoryStatuses,
+        manualPreparation,
       });
       this.emitStatus(status);
       this.appendDiagnostic({
@@ -1301,6 +1493,8 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
         lastAttemptAt: attemptAt,
         conflictCount: previousMetadata.conflictCount,
         issue: toIssueFromError(error),
+        categoryStatuses: previousMetadata.categoryStatuses,
+        manualPreparation: previousMetadata.manualPreparation,
         detail,
       };
       this.writeMetadata({
