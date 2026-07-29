@@ -283,6 +283,10 @@ describe("SyncStatusCard", () => {
     expect(markup).toContain("Google account foundation");
     expect(markup).toContain("This device");
     expect(markup).toContain("Never synced");
+    expect(markup).toContain("Preparing sync");
+    expect(markup).toContain(
+      "No connected-device metadata is available yet."
+    );
     expect(markup).toContain("Retry sync");
     expect(markup).toContain("Google sign-in");
     expect(markup).toContain("Sign in");
@@ -422,10 +426,22 @@ describe("SyncStatusCard", () => {
             "Personal Manual remains local-only for content, but this device is now prepared to sync readiness metadata.",
         },
         lastTrustedDevice: {
-          deviceId: "device-1",
-          label: "This device",
-          lastSyncedAt: "2026-07-28T12:00:00.000Z",
+          deviceId: "device-2",
+          label: "Phone",
+          lastSyncedAt: "2026-07-28T11:45:00.000Z",
         },
+        connectedDevices: [
+          {
+            deviceId: "device-1",
+            label: "This device",
+            lastSyncedAt: "2026-07-28T12:00:00.000Z",
+          },
+          {
+            deviceId: "device-2",
+            label: "Phone",
+            lastSyncedAt: "2026-07-28T11:45:00.000Z",
+          },
+        ],
         detail:
           "AliOS synced preferences, tasks, projects, goals, and finance records for this device.",
       }),
@@ -450,6 +466,12 @@ describe("SyncStatusCard", () => {
     expect(markup).toContain("Privacy: Sensitive");
     expect(markup).toContain("Visibility: Synced");
     expect(markup).toContain("Sync healthy");
+    expect(markup).toContain("Multi-device sync experience");
+    expect(markup).toContain("Sync completed");
+    expect(markup).toContain("Connected devices");
+    expect(markup).toContain("2 device(s)");
+    expect(markup).toContain("Last successful sync: 2026-07-28T12:00:00.000Z");
+    expect(markup).toContain("Phone");
   });
 
   it("renders the offline sync presentation when connectivity-style errors are reported", async () => {
@@ -506,6 +528,7 @@ describe("SyncStatusCard", () => {
 
     expect(markup).toContain("Offline");
     expect(markup).toContain("Sync issue detected");
+    expect(markup).toContain("Offline recovery");
     expect(markup).toContain("Retry sync");
     expect(markup).toContain("Connection dropped before sync could finish.");
   });
@@ -587,6 +610,7 @@ describe("SyncStatusCard", () => {
     const markup = await renderCardToStaticMarkup(boundary, authProvider);
 
     expect(markup).toContain("Hide conflict review");
+    expect(markup).toContain("Conflict review required");
     expect(markup).toContain("Prepare weekly review notes");
     expect(markup).toContain("Local device version");
     expect(markup).toContain("Synced version");

@@ -1,5 +1,13 @@
 # Changelog
 
+## Stage 244 - Multi-Device Sync Final Validation & User Experience
+
+- Refined the visible `Account & Sync` experience so first-sync, active-sync, completed, offline, failed, and conflict-required states are easier to understand
+- Added a simple connected-devices section that shows the current device, connected device count, and last successful sync metadata already available from the current sync foundation
+- Extended the sync status model additively with connected-device presentation metadata without changing repositories, schemas, storage ownership, or sync backend architecture
+- Added focused Settings rendering coverage for first-sync state, multi-device presentation, offline recovery messaging, and conflict-required messaging
+- Documented the stage in `docs/MULTI_DEVICE_SYNC_VALIDATION_STAGE_244.md`
+
 ## Stage 243 - Sync Data Security & Privacy Layer
 
 - Added a practical sync privacy layer to the existing Account & Sync foundation so users can see which categories sync, which remain local, and how each category is exposed
