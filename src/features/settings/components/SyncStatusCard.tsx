@@ -690,10 +690,9 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
   ]);
   const needsFirstSyncGuidance =
     !runtimeState.localOnly && !runtimeState.syncStatus.lastSyncedAt;
+  const showRetryPanel = !runtimeState.localOnly && runtimeState.hasActiveAccount;
   const canRetrySync =
-    !runtimeState.localOnly &&
-    runtimeState.authStatus === "authenticated" &&
-    !syncActionPending;
+    showRetryPanel && runtimeState.authStatus === "authenticated" && !syncActionPending;
   const hasConflictIssue =
     runtimeState.syncStatus.issue === "conflict" &&
     (runtimeState.syncStatus.conflictCount ?? 0) > 0;
@@ -895,6 +894,11 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
         ? action.labelKey !== "settings.accountSignOutAction"
         : true
   );
+  const accountActionStatusTone: SyncStateTone = runtimeState.localOnly
+    ? "neutral"
+    : runtimeState.hasActiveAccount || canSignIn
+      ? "primary"
+      : "warning";
 
   return (
     <Card>
@@ -1182,10 +1186,12 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
                 </SoftPanel>
                 <SoftPanel className="alios-surface-muted">
                   <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                    {t("common.status")}
+                    {t("settings.syncFirstSyncNextStepLabel")}
                   </p>
                   <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                    {canSignIn
+                    {runtimeState.hasActiveAccount
+                      ? t("settings.syncFirstSyncNextStepSignedIn")
+                      : canSignIn
                       ? t("settings.accountSignInPreparationDescription")
                       : t("settings.syncRetryDescription")}
                   </p>
@@ -1296,7 +1302,7 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
               </ul>
             </div>
           </CollapsibleSection>
-          {!runtimeState.localOnly ? (
+          {showRetryPanel ? (
             <SoftPanel className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="space-y-1">
                 <p className="text-sm font-medium">
@@ -1712,7 +1718,7 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
                 </p>
               </div>
             </div>
-            <StatusChip tone="warning">
+            <StatusChip tone={accountActionStatusTone}>
               {t(accountPresentation.actionStatusKey)}
             </StatusChip>
           </div>
