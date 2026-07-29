@@ -63,6 +63,7 @@ import type {
   SyncStateListener,
   SyncStateSubscription,
   SyncStatus,
+  SyncTrustedDevice,
 } from "./types";
 
 const SYNCED_PREFERENCE_KEYS = [
@@ -379,47 +380,55 @@ function createCategoryStatuses(
         ? "Appearance, language, and interface preferences can sync on this device."
         : "Preferences stay local until optional sync is connected.",
       lastSyncedAt: syncAt,
+      enabled: Boolean(syncAt),
+      privacyLevel: "standard",
+      visibility: syncAt ? "synced" : "local-only",
+    },
+    {
+      key: "tasks",
+      state: hasUserDataSync && syncAt ? "ready" : "local-only",
+      detail: hasUserDataSync
+        ? "Tasks remain local-first and sync only after authenticated opt-in."
+        : "Tasks stay local until the broader sync boundary is enabled.",
+      lastSyncedAt: hasUserDataSync ? syncAt : undefined,
+      enabled: hasUserDataSync && Boolean(syncAt),
+      privacyLevel: "standard",
+      visibility: hasUserDataSync && syncAt ? "synced" : "local-only",
+    },
+    {
+      key: "projects",
+      state: hasUserDataSync && syncAt ? "ready" : "local-only",
+      detail: hasUserDataSync
+        ? "Projects remain editable offline and sync without bypassing local repositories."
+        : "Projects stay local until the broader sync boundary is enabled.",
+      lastSyncedAt: hasUserDataSync ? syncAt : undefined,
+      enabled: hasUserDataSync && Boolean(syncAt),
+      privacyLevel: "standard",
+      visibility: hasUserDataSync && syncAt ? "synced" : "local-only",
+    },
+    {
+      key: "goals",
+      state: hasUserDataSync && syncAt ? "ready" : "local-only",
+      detail: hasUserDataSync
+        ? "Goals keep local ownership while this device exchanges approved sync records."
+        : "Goals stay local until the broader sync boundary is enabled.",
+      lastSyncedAt: hasUserDataSync ? syncAt : undefined,
+      enabled: hasUserDataSync && Boolean(syncAt),
+      privacyLevel: "standard",
+      visibility: hasUserDataSync && syncAt ? "synced" : "local-only",
+    },
+    {
+      key: "finance",
+      state: hasUserDataSync && syncAt ? "ready" : "local-only",
+      detail: hasUserDataSync
+        ? "Finance transactions and obligations are sync-eligible in this stage; budgets remain derived from those records."
+        : "Finance records stay local until the broader sync boundary is enabled.",
+      lastSyncedAt: hasUserDataSync ? syncAt : undefined,
+      enabled: hasUserDataSync && Boolean(syncAt),
+      privacyLevel: "sensitive",
+      visibility: hasUserDataSync && syncAt ? "synced" : "local-only",
     },
   ];
-
-  if (hasUserDataSync) {
-    statuses.push(
-      {
-        key: "tasks",
-        state: syncAt ? "ready" : "local-only",
-        detail: "Tasks remain local-first and sync only after authenticated opt-in.",
-        lastSyncedAt: syncAt,
-      },
-      {
-        key: "projects",
-        state: syncAt ? "ready" : "local-only",
-        detail:
-          "Projects remain editable offline and sync without bypassing local repositories.",
-        lastSyncedAt: syncAt,
-      },
-      {
-        key: "goals",
-        state: syncAt ? "ready" : "local-only",
-        detail:
-          "Goals keep local ownership while this device exchanges approved sync records.",
-        lastSyncedAt: syncAt,
-      },
-      {
-        key: "finance",
-        state: syncAt ? "ready" : "local-only",
-        detail:
-          "Finance transactions and obligations are sync-eligible in this stage; budgets remain derived from those records.",
-        lastSyncedAt: syncAt,
-      }
-    );
-  } else {
-    statuses.push({
-      key: "finance",
-      state: "planned",
-      detail:
-        "Finance sync needs the approved user-data sync boundary before records can leave this device.",
-    });
-  }
 
   statuses.push({
     key: "manual",
@@ -427,9 +436,35 @@ function createCategoryStatuses(
     detail: manualPreparation.detail,
     lastSyncedAt: manualPreparation.lastModifiedAt,
     itemCount: manualPreparation.entryCount,
+    enabled: false,
+    privacyLevel: "private",
+    visibility: manualPreparation.entryCount > 0 ? "metadata-only" : "local-only",
   });
 
   return statuses;
+}
+
+function readLastTrustedDevice(
+  metadata: Record<string, unknown> | null | undefined
+): SyncTrustedDevice | undefined {
+  const payload = metadata?.alios_sync;
+  if (!payload || typeof payload !== "object") {
+    return undefined;
+  }
+
+  const deviceId = (payload as Record<string, unknown>).deviceId;
+  const label = (payload as Record<string, unknown>).deviceLabel;
+  const lastSyncedAt = (payload as Record<string, unknown>).lastSyncedAt;
+
+  if (typeof deviceId !== "string" || typeof label !== "string") {
+    return undefined;
+  }
+
+  return {
+    deviceId,
+    label,
+    lastSyncedAt: typeof lastSyncedAt === "string" ? lastSyncedAt : undefined,
+  };
 }
 
 function cloneRecord<TRecord extends SyncableRecord>(record: TRecord): TRecord {
@@ -946,6 +981,14 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
     const connectedSession = await this.ensureRemoteSession(false);
     const metadata = this.readMetadata();
     const scopes = getScopes(this.backupStorage !== null);
+    const lastTrustedDevice =
+      connectedSession?.user
+        ? readLastTrustedDevice(
+            connectedSession.user.user_metadata as
+              | Record<string, unknown>
+              | undefined
+          )
+        : undefined;
     const manualPreparation =
       metadata.manualPreparation ??
       (this.backupStorage
@@ -969,6 +1012,7 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
         conflictCount: metadata.conflictCount,
         categoryStatuses,
         manualPreparation,
+        lastTrustedDevice,
         detail:
           metadata.detail ??
           "AliOS has not connected this device to sync yet.",
@@ -990,6 +1034,7 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
       conflictCount: metadata.conflictCount,
       categoryStatuses,
       manualPreparation,
+      lastTrustedDevice,
       issue:
         metadata.lastOutcome === "error"
           ? metadata.conflictCount && metadata.conflictCount > 0
@@ -1278,6 +1323,7 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
         this.backupStorage !== null,
         createEmptyManualPreparationStatus()
       ),
+      lastTrustedDevice: undefined,
       detail: this.backupStorage
         ? "AliOS is syncing preferences, tasks, projects, goals, and finance records for this device."
         : "AliOS is syncing low-risk preferences for this device.",
@@ -1442,6 +1488,11 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
         issue: conflictCount > 0 ? "conflict" : undefined,
         categoryStatuses,
         manualPreparation,
+        lastTrustedDevice: {
+          deviceId: device.deviceId,
+          label: device.label,
+          lastSyncedAt: syncAt,
+        },
         detail,
       };
 
@@ -1495,6 +1546,7 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
         issue: toIssueFromError(error),
         categoryStatuses: previousMetadata.categoryStatuses,
         manualPreparation: previousMetadata.manualPreparation,
+        lastTrustedDevice: undefined,
         detail,
       };
       this.writeMetadata({

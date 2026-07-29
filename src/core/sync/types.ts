@@ -14,6 +14,14 @@ export type SyncConflictEntity =
   | "financeTransactions"
   | "financeObligations";
 export type SyncConflictResolutionChoice = "keep-local" | "keep-remote";
+export type SyncPrivacyLevel = "standard" | "sensitive" | "private";
+export type SyncUserVisibility = "synced" | "local-only" | "metadata-only";
+
+export type SyncTrustedDevice = Readonly<{
+  deviceId: string;
+  label: string;
+  lastSyncedAt?: string;
+}>;
 
 export type SyncCategoryStatus = Readonly<{
   key:
@@ -27,6 +35,9 @@ export type SyncCategoryStatus = Readonly<{
   detail: string;
   lastSyncedAt?: string;
   itemCount?: number;
+  enabled: boolean;
+  privacyLevel: SyncPrivacyLevel;
+  visibility: SyncUserVisibility;
 }>;
 
 export type ManualPreparationStatus = Readonly<{
@@ -49,6 +60,7 @@ export type SyncStatus = Readonly<{
   issue?: SyncIssue;
   categoryStatuses?: ReadonlyArray<SyncCategoryStatus>;
   manualPreparation?: ManualPreparationStatus;
+  lastTrustedDevice?: SyncTrustedDevice;
   detail: string;
 }>;
 

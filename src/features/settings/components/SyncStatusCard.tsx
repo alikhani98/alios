@@ -96,6 +96,8 @@ type RuntimeMetadataRow = Readonly<{
   descriptionKey?: TranslationKey;
 }>;
 
+type SyncCategoryTone = "neutral" | "primary" | "warning" | "danger";
+
 type ConflictReviewState = Readonly<{
   expanded: boolean;
   loading: boolean;
@@ -306,6 +308,48 @@ function getSyncCategoryLabelKey(
   }
 }
 
+function getPrivacyLevelLabelKey(
+  level: SyncCategoryStatus["privacyLevel"]
+): TranslationKey {
+  switch (level) {
+    case "standard":
+      return "settings.syncPrivacyLevelStandard";
+    case "sensitive":
+      return "settings.syncPrivacyLevelSensitive";
+    case "private":
+      return "settings.syncPrivacyLevelPrivate";
+  }
+}
+
+function getVisibilityLabelKey(
+  visibility: SyncCategoryStatus["visibility"]
+): TranslationKey {
+  switch (visibility) {
+    case "synced":
+      return "settings.syncVisibilitySynced";
+    case "local-only":
+      return "settings.syncVisibilityLocalOnly";
+    case "metadata-only":
+      return "settings.syncVisibilityMetadataOnly";
+  }
+}
+
+function getCategoryTone(category: SyncCategoryStatus): SyncCategoryTone {
+  if (category.state === "error") {
+    return "danger";
+  }
+
+  if (!category.enabled && category.visibility !== "metadata-only") {
+    return "neutral";
+  }
+
+  if (category.visibility === "metadata-only" || category.state === "planned") {
+    return "warning";
+  }
+
+  return "primary";
+}
+
 function getConflictEntityLabelKey(entity: SyncConflictEntity): TranslationKey {
   switch (entity) {
     case "tasks":
@@ -511,6 +555,15 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
       value: getSyncLastSeenLabel(runtimeState, t),
       descriptionKey: "settings.syncLastSyncedDescription",
     },
+    ...(runtimeState.syncStatus.lastTrustedDevice
+      ? [
+          {
+            labelKey: "settings.syncTrustedDeviceLabel" as const,
+            value: runtimeState.syncStatus.lastTrustedDevice.label,
+            descriptionKey: "settings.syncTrustedDeviceDescription" as const,
+          },
+        ]
+      : []),
   ];
   const futureStates = syncStates.filter(
     (state) => state.titleKey !== currentState.titleKey
@@ -897,15 +950,7 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
                       </p>
                     </div>
                     <StatusChip
-                      tone={
-                        category.state === "error"
-                          ? "danger"
-                          : category.state === "syncing"
-                            ? "primary"
-                            : category.state === "planned"
-                              ? "warning"
-                              : "neutral"
-                      }
+                      tone={getCategoryTone(category)}
                     >
                       {t(
                         category.key === "manual"
@@ -921,6 +966,16 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
                     </StatusChip>
                   </div>
                   <div className="flex flex-wrap gap-3 text-xs leading-5 text-muted-foreground">
+                    <span>
+                      {t("settings.syncPrivacyBadge", {
+                        level: t(getPrivacyLevelLabelKey(category.privacyLevel)),
+                      })}
+                    </span>
+                    <span>
+                      {t("settings.syncVisibilityBadge", {
+                        visibility: t(getVisibilityLabelKey(category.visibility)),
+                      })}
+                    </span>
                     {typeof category.itemCount === "number" ? (
                       <span>
                         {t("settings.syncCategoryItemCount", {
@@ -940,6 +995,47 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
               ))}
             </div>
           ) : null}
+
+          <CollapsibleSection
+            id="account-sync-privacy"
+            icon={<ShieldCheck className="h-5 w-5" />}
+            title={t("settings.syncPrivacySectionTitle")}
+            description={t("settings.syncPrivacySectionDescription")}
+            expandLabel={t("common.expandSection")}
+            collapseLabel={t("common.collapseSection")}
+            status={
+              <StatusChip tone="primary">
+                {t("settings.syncPrivacySectionStatus")}
+              </StatusChip>
+            }
+            defaultOpen={false}
+          >
+            <div className="space-y-4">
+              <div className="grid gap-3 lg:grid-cols-2">
+                <SoftPanel className="alios-surface-muted">
+                  <p className="text-sm font-medium">
+                    {t("settings.syncPrivacySyncedTitle")}
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                    {t("settings.syncPrivacySyncedDescription")}
+                  </p>
+                </SoftPanel>
+                <SoftPanel className="alios-surface-muted">
+                  <p className="text-sm font-medium">
+                    {t("settings.syncPrivacyLocalTitle")}
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                    {t("settings.syncPrivacyLocalDescription")}
+                  </p>
+                </SoftPanel>
+              </div>
+              <ul className="list-disc space-y-1 ps-5 text-sm leading-6 text-muted-foreground">
+                <li>{t("settings.syncPrivacyRuleNoSilentUpload")}</li>
+                <li>{t("settings.syncPrivacyRuleNoCategoryActivation")}</li>
+                <li>{t("settings.syncPrivacyRuleLocalAvailability")}</li>
+              </ul>
+            </div>
+          </CollapsibleSection>
           {!runtimeState.localOnly ? (
             <SoftPanel className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="space-y-1">
