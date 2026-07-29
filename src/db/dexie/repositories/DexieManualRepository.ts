@@ -3,6 +3,7 @@ import type {
   ManualRepository,
   UpdateManualEntryInput,
 } from "@/core/repositories";
+import { notifyUserDataSyncTrigger } from "@/core/sync";
 import { manualEntrySchema, type ManualEntry } from "@/shared/types";
 
 import type { AliosDatabase } from "../db";
@@ -37,6 +38,10 @@ export class DexieManualRepository
         ...this.createMetadata(),
       });
       await this.database.manualEntries.add(entry);
+      notifyUserDataSyncTrigger({
+        entity: "manualEntries",
+        operation: "create",
+      });
       return entry;
     });
   }
@@ -60,6 +65,10 @@ export class DexieManualRepository
           updatedAt: new Date().toISOString(),
         });
         await this.database.manualEntries.put(entry);
+        notifyUserDataSyncTrigger({
+          entity: "manualEntries",
+          operation: "update",
+        });
         return entry;
       })
     );
@@ -74,6 +83,10 @@ export class DexieManualRepository
           await this.database.manualEntries.get(id)
         );
         await this.database.manualEntries.delete(id);
+        notifyUserDataSyncTrigger({
+          entity: "manualEntries",
+          operation: "delete",
+        });
       })
     );
   }

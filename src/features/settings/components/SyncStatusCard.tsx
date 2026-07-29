@@ -23,6 +23,7 @@ import {
 import { GoogleAuthProvider, useAuth } from "@/core/auth";
 import { OPTIONAL_SYNC_PROVIDER_ID } from "@/core/sync";
 import type {
+  SyncCategoryStatus,
   SyncConflictEntity,
   SyncConflictRecord,
   SyncConflictResolutionChoice,
@@ -281,6 +282,27 @@ function getSyncScopeLabelKey(scope: SyncScope): TranslationKey {
       return "settings.syncScopeProjects";
     case "goals":
       return "settings.syncScopeGoals";
+    case "finance":
+      return "settings.syncScopeFinance";
+  }
+}
+
+function getSyncCategoryLabelKey(
+  key: SyncCategoryStatus["key"]
+): TranslationKey {
+  switch (key) {
+    case "preferences":
+      return "settings.syncScopePreferences";
+    case "tasks":
+      return "settings.syncScopeTasks";
+    case "projects":
+      return "settings.syncScopeProjects";
+    case "goals":
+      return "settings.syncScopeGoals";
+    case "finance":
+      return "settings.syncScopeFinance";
+    case "manual":
+      return "settings.syncScopeManualPreparation";
   }
 }
 
@@ -292,6 +314,10 @@ function getConflictEntityLabelKey(entity: SyncConflictEntity): TranslationKey {
       return "settings.syncConflictEntityProjects";
     case "goals":
       return "settings.syncConflictEntityGoals";
+    case "financeTransactions":
+      return "settings.syncConflictEntityFinanceTransactions";
+    case "financeObligations":
+      return "settings.syncConflictEntityFinanceObligations";
   }
 }
 
@@ -492,6 +518,8 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
   const syncedScopeKeys =
     runtimeState.syncStatus.scopes?.map((scope) => getSyncScopeLabelKey(scope)) ??
     [];
+  const categoryStatuses = runtimeState.syncStatus.categoryStatuses ?? [];
+  const manualPreparation = runtimeState.syncStatus.manualPreparation;
   const canRetrySync =
     !runtimeState.localOnly &&
     runtimeState.authStatus === "authenticated" &&
@@ -510,6 +538,8 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
         tasks: 0,
         projects: 0,
         goals: 0,
+        financeTransactions: 0,
+        financeObligations: 0,
       }
     );
   }, [conflictRecords]);
@@ -760,6 +790,13 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
                 ? t("settings.syncCategoriesLocalOnlyDescription")
                 : t("settings.syncCategoriesConnectedDescription")}
             </p>
+            {manualPreparation ? (
+              <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                {t("settings.syncManualPreparationSummary", {
+                  count: manualPreparation.entryCount,
+                })}
+              </p>
+            ) : null}
           </SoftPanel>
           <SoftPanel className="alios-surface-muted">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
@@ -843,6 +880,66 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
               ))}
             </div>
           </div>
+          {categoryStatuses.length > 0 ? (
+            <div className="grid gap-3 lg:grid-cols-2">
+              {categoryStatuses.map((category) => (
+                <SoftPanel
+                  key={category.key}
+                  className="alios-surface-muted space-y-3"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium">
+                        {t(getSyncCategoryLabelKey(category.key))}
+                      </p>
+                      <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                        {category.detail}
+                      </p>
+                    </div>
+                    <StatusChip
+                      tone={
+                        category.state === "error"
+                          ? "danger"
+                          : category.state === "syncing"
+                            ? "primary"
+                            : category.state === "planned"
+                              ? "warning"
+                              : "neutral"
+                      }
+                    >
+                      {t(
+                        category.key === "manual"
+                          ? "settings.syncStatusPrepared"
+                          : category.state === "ready"
+                            ? "settings.syncStatusAvailable"
+                            : category.state === "syncing"
+                              ? "settings.syncHealthSyncing"
+                              : category.state === "planned"
+                                ? "settings.accountActionPlannedOnly"
+                                : "settings.syncStatusLocalOnly"
+                      )}
+                    </StatusChip>
+                  </div>
+                  <div className="flex flex-wrap gap-3 text-xs leading-5 text-muted-foreground">
+                    {typeof category.itemCount === "number" ? (
+                      <span>
+                        {t("settings.syncCategoryItemCount", {
+                          count: category.itemCount,
+                        })}
+                      </span>
+                    ) : null}
+                    {category.lastSyncedAt ? (
+                      <span>
+                        {t("settings.syncCategoryLastUpdated", {
+                          value: category.lastSyncedAt,
+                        })}
+                      </span>
+                    ) : null}
+                  </div>
+                </SoftPanel>
+              ))}
+            </div>
+          ) : null}
           {!runtimeState.localOnly ? (
             <SoftPanel className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="space-y-1">
@@ -924,11 +1021,29 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
                 <div className="flex flex-wrap gap-2">
                   {(conflictEntityCounts.tasks > 0 ||
                     conflictEntityCounts.projects > 0 ||
-                    conflictEntityCounts.goals > 0
-                    ? (["tasks", "projects", "goals"] as const).filter(
+                    conflictEntityCounts.goals > 0 ||
+                    conflictEntityCounts.financeTransactions > 0 ||
+                    conflictEntityCounts.financeObligations > 0
+                    ? (
+                        [
+                          "tasks",
+                          "projects",
+                          "goals",
+                          "financeTransactions",
+                          "financeObligations",
+                        ] as const
+                      ).filter(
                         (entity) => conflictEntityCounts[entity] > 0
                       )
-                    : (["tasks", "projects", "goals"] as const)
+                    : (
+                        [
+                          "tasks",
+                          "projects",
+                          "goals",
+                          "financeTransactions",
+                          "financeObligations",
+                        ] as const
+                      )
                   ).map((entity) => (
                     <Badge key={entity} variant="secondary">
                       {t(getConflictEntityLabelKey(entity))}

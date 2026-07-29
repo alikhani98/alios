@@ -11,6 +11,7 @@ import {
   type FinanceObligation,
   type FinanceTransaction,
 } from "@/shared/types";
+import { notifyUserDataSyncTrigger } from "@/core/sync";
 import type { AliosDatabase } from "../db";
 import { DexieRepositoryBase } from "./DexieRepositoryBase";
 
@@ -47,6 +48,10 @@ export class DexieFinanceRepository
         ...this.createMetadata(),
       });
       await this.database.financeTransactions.add(transaction);
+      notifyUserDataSyncTrigger({
+        entity: "financeTransactions",
+        operation: "create",
+      });
       return transaction;
     });
   }
@@ -70,6 +75,10 @@ export class DexieFinanceRepository
           updatedAt: new Date().toISOString(),
         });
         await this.database.financeTransactions.put(transaction);
+        notifyUserDataSyncTrigger({
+          entity: "financeTransactions",
+          operation: "update",
+        });
         return transaction;
       })
     );
@@ -84,6 +93,10 @@ export class DexieFinanceRepository
           await this.database.financeTransactions.get(id)
         );
         await this.database.financeTransactions.delete(id);
+        notifyUserDataSyncTrigger({
+          entity: "financeTransactions",
+          operation: "delete",
+        });
       })
     );
   }
@@ -113,6 +126,10 @@ export class DexieFinanceRepository
         ...this.createMetadata(),
       });
       await this.database.financeObligations.add(obligation);
+      notifyUserDataSyncTrigger({
+        entity: "financeObligations",
+        operation: "create",
+      });
       return obligation;
     });
   }
@@ -136,6 +153,10 @@ export class DexieFinanceRepository
           updatedAt: new Date().toISOString(),
         });
         await this.database.financeObligations.put(obligation);
+        notifyUserDataSyncTrigger({
+          entity: "financeObligations",
+          operation: "update",
+        });
         return obligation;
       })
     );
@@ -150,6 +171,10 @@ export class DexieFinanceRepository
           await this.database.financeObligations.get(id)
         );
         await this.database.financeObligations.delete(id);
+        notifyUserDataSyncTrigger({
+          entity: "financeObligations",
+          operation: "delete",
+        });
       })
     );
   }

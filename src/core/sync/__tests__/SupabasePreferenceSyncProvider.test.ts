@@ -8,7 +8,14 @@ import {
   APPEARANCE_STORAGE_KEY,
 } from "@/shared/constants/preferences";
 import { LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
-import type { Goal, Project, Task } from "@/shared/types";
+import type {
+  FinanceObligation,
+  FinanceTransaction,
+  Goal,
+  ManualEntry,
+  Project,
+  Task,
+} from "@/shared/types";
 
 import { SupabasePreferenceSyncProvider } from "../SupabasePreferenceSyncProvider";
 import type { SupabaseRecordRow } from "../supabaseClient";
@@ -119,6 +126,9 @@ function createBackupStorageStub(input?: {
   tasks?: Task[];
   projects?: Project[];
   goals?: Goal[];
+  manualEntries?: ManualEntry[];
+  financeTransactions?: FinanceTransaction[];
+  financeObligations?: FinanceObligation[];
 }) {
   let data = {
     dailyCheckins: [],
@@ -126,9 +136,9 @@ function createBackupStorageStub(input?: {
     goals: input?.goals ?? [],
     lifeAreas: [],
     decisionLogEntries: [],
-    manualEntries: [],
-    financeTransactions: [],
-    financeObligations: [],
+    manualEntries: input?.manualEntries ?? [],
+    financeTransactions: input?.financeTransactions ?? [],
+    financeObligations: input?.financeObligations ?? [],
     projects: input?.projects ?? [],
     journalEntries: [],
     knowledgeItems: [],
@@ -166,6 +176,9 @@ function createBackupStorageStub(input?: {
         tasks: [],
         projects: [],
         goals: [],
+        manualEntries: [],
+        financeTransactions: [],
+        financeObligations: [],
       };
     }),
   };
@@ -285,7 +298,7 @@ describe("SupabasePreferenceSyncProvider", () => {
     });
   });
 
-  it("syncs tasks, projects, and goals through the backup boundary while preserving local-first ownership", async () => {
+  it("syncs tasks, projects, goals, and finance records through the backup boundary while preserving local-first ownership", async () => {
     const harness = createSupabaseClientHarness();
     const backupHarness = createBackupStorageStub({
       tasks: [
@@ -324,6 +337,44 @@ describe("SupabasePreferenceSyncProvider", () => {
           updatedAt: "2026-07-28T08:10:00.000Z",
         },
       ],
+      financeTransactions: [
+        {
+          id: "txn-1",
+          type: "expense",
+          title: "Local grocery run",
+          amount: 85,
+          category: "groceries",
+          occurredAt: "2026-07-28",
+          createdAt: "2026-07-27T08:00:00.000Z",
+          updatedAt: "2026-07-28T08:20:00.000Z",
+        },
+      ],
+      financeObligations: [
+        {
+          id: "obl-1",
+          type: "debt",
+          title: "Family loan",
+          totalAmount: 1000,
+          paidAmount: 250,
+          dueAmount: 750,
+          status: "active",
+          createdAt: "2026-07-27T08:00:00.000Z",
+          updatedAt: "2026-07-28T08:25:00.000Z",
+        },
+      ],
+      manualEntries: [
+        {
+          id: "manual-1",
+          title: "Morning reset notes",
+          body: "Keep the desk clean and review today before noon.",
+          category: "principles",
+          importance: "medium",
+          status: "active",
+          tags: ["habit"],
+          createdAt: "2026-07-27T08:00:00.000Z",
+          updatedAt: "2026-07-28T08:30:00.000Z",
+        },
+      ],
     });
 
     const provider = new SupabasePreferenceSyncProvider({
@@ -349,9 +400,14 @@ describe("SupabasePreferenceSyncProvider", () => {
     expect(result.status).toMatchObject({
       mode: "ready",
       provider: "supabase",
-      scopes: ["preferences", "tasks", "projects", "goals"],
+      scopes: ["preferences", "tasks", "projects", "goals", "finance"],
       connectedUserId: "supabase-user-1",
       lastSyncedAt: "2026-07-28T12:00:00.000Z",
+      manualPreparation: {
+        entryCount: 1,
+        readiness: "ready",
+        lastModifiedAt: "2026-07-28T08:30:00.000Z",
+      },
     });
     expect(harness.client.records.upsert).toHaveBeenCalledTimes(1);
 
@@ -361,7 +417,7 @@ describe("SupabasePreferenceSyncProvider", () => {
       record_id: string;
       payload: { sync?: { ownerUserId?: string } };
     }>;
-    expect(upsertRows).toHaveLength(3);
+    expect(upsertRows).toHaveLength(5);
     expect(upsertRows).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -375,6 +431,14 @@ describe("SupabasePreferenceSyncProvider", () => {
         }),
         expect.objectContaining({ entity: "projects", record_id: "project-1" }),
         expect.objectContaining({ entity: "goals", record_id: "goal-1" }),
+        expect.objectContaining({
+          entity: "financeTransactions",
+          record_id: "txn-1",
+        }),
+        expect.objectContaining({
+          entity: "financeObligations",
+          record_id: "obl-1",
+        }),
       ])
     );
 
@@ -383,6 +447,21 @@ describe("SupabasePreferenceSyncProvider", () => {
       ownerUserId: "supabase-user-1",
       lastSyncedAt: "2026-07-28T12:00:00.000Z",
       lastSyncedByDeviceId: expect.any(String),
+    });
+    expect(syncedData.financeTransactions[0].sync).toMatchObject({
+      ownerUserId: "supabase-user-1",
+    });
+    expect(syncedData.financeObligations[0].sync).toMatchObject({
+      ownerUserId: "supabase-user-1",
+    });
+    expect(harness.client.auth.updateUser).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        alios_manual: {
+          entryCount: 1,
+          lastModifiedAt: "2026-07-28T08:30:00.000Z",
+          readiness: "ready",
+        },
+      }),
     });
   });
 
@@ -429,6 +508,54 @@ describe("SupabasePreferenceSyncProvider", () => {
     expect(result.status.mode).toBe("error");
     expect(result.status.detail).toContain("Supabase record upsert failed.");
     expect(backupHarness.getData().tasks[0].title).toBe("Local task");
+  });
+
+  it("keeps finance data local when a finance sync attempt fails", async () => {
+    const harness = createSupabaseClientHarness();
+    harness.client.records.upsert.mockResolvedValueOnce({
+      data: [],
+      error: new Error("Finance sync failed.") as Error | null,
+    });
+    const backupHarness = createBackupStorageStub({
+      financeTransactions: [
+        {
+          id: "txn-1",
+          type: "expense",
+          title: "Rent transfer",
+          amount: 400,
+          category: "housing",
+          occurredAt: "2026-07-28",
+          createdAt: "2026-07-27T08:00:00.000Z",
+          updatedAt: "2026-07-28T08:00:00.000Z",
+        },
+      ],
+    });
+
+    const provider = new SupabasePreferenceSyncProvider({
+      client: harness.client,
+      runtime: createRuntimeStub({
+        status: "authenticated",
+        provider: "google",
+        user: {
+          userId: "google-user-1",
+          email: "user@example.com",
+          displayName: "AliOS User",
+          createdAt: "2026-07-28T00:00:00.000Z",
+          updatedAt: "2026-07-28T12:00:00.000Z",
+        },
+      }),
+      getStorage: () => localStorage,
+      now: () => new Date("2026-07-28T12:00:00.000Z"),
+      backupStorage: backupHarness.backupStorage,
+    });
+
+    const result = await provider.syncNow();
+
+    expect(result.status.mode).toBe("error");
+    expect(result.status.detail).toContain("Finance sync failed.");
+    expect(backupHarness.getData().financeTransactions[0].title).toBe(
+      "Rent transfer"
+    );
   });
 
   it("retains the last successful sync timestamp after a later failed retry", async () => {
