@@ -1,5 +1,14 @@
 # Changelog
 
+## Stage 247 - Finance Experience Improvement
+
+- Improved the Finance hero area with a compact sync-awareness surface and a lighter spending overview so key money context is easier to scan at a glance
+- Added local Finance search across transactions and obligations, plus clearer empty-search recovery and result-count feedback
+- Refined the transaction form so income and expense entries only show matching category options and give clearer category helper copy
+- Preserved all Finance calculations, repository behavior, storage ownership, schemas, routes, and sync architecture while making the visible workflow calmer on desktop and mobile
+- Expanded focused Finance rendering coverage for the new sync/status surface and transaction category behavior
+- Documented the stage in `docs/FINANCE_EXPERIENCE_IMPROVEMENT_STAGE_247.md`
+
 ## Stage 246 - Final Sync Readiness Audit & Real Usage Verification
 
 - Audited the current Account & Sync surface for first-device, second-device, retry, conflict, privacy, and connected-device usability without changing auth or sync architecture

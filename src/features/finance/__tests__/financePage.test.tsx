@@ -1,6 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { AccountRuntimeProvider } from "@/core/account";
 import { DateDisplayProvider } from "@/shared/date";
 import { I18nProvider, LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
 import type { FinanceObligation, FinanceTransaction } from "@/shared/types";
@@ -68,18 +69,22 @@ describe("FinancePage", () => {
     localStorage.setItem(LANGUAGE_STORAGE_KEY, "fa");
   });
 
-  it("renders the Finance route, active debt edit affordance, and Persian labels without crashing", () => {
+  it("renders finance search, sync awareness, and Persian finance labels without crashing", () => {
     const markup = renderToStaticMarkup(
-      <I18nProvider>
-        <DateDisplayProvider>
-          <FinancePage />
-        </DateDisplayProvider>
-      </I18nProvider>
+      <AccountRuntimeProvider>
+        <I18nProvider>
+          <DateDisplayProvider>
+            <FinancePage />
+          </DateDisplayProvider>
+        </I18nProvider>
+      </AccountRuntimeProvider>
     );
 
     expect(markup).toContain("بانک مهر شماره 1");
     expect(markup).toContain("ویرایش");
     expect(markup).toContain("افزودن قسط / بدهی");
+    expect(markup).toContain("جستجوی رکوردهای مالی");
+    expect(markup).toContain("آگاهی از همگام‌سازی مالی");
     expect(markup).not.toContain("AliOS could not prepare local data");
   });
 });

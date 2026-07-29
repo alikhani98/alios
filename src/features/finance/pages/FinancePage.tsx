@@ -2,12 +2,14 @@ import {
   BadgeDollarSign,
   CircleDollarSign,
   Landmark,
+  Search,
   ReceiptText,
   RotateCcw,
   Wallet,
 } from "lucide-react";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 
+import { useAccountRuntimeState } from "@/core/account";
 import { useDateFormatter } from "@/shared/date";
 import { useI18n, type TranslationKey } from "@/shared/i18n";
 import { readStoredViewDensityMode } from "@/shared/preferences/viewDensityMode";
@@ -23,6 +25,7 @@ import {
   StatusChip,
   ProgressBarList,
   Button,
+  Input,
 } from "@/shared/ui";
 import {
   calculateFinanceReview,
@@ -150,6 +153,51 @@ function getFinanceSectionDescriptionKey(filter: FinanceViewFilter) {
   }
 }
 
+function matchesFinanceTransactionSearch(
+  transaction: FinanceTransaction,
+  searchTerm: string,
+  t: (key: TranslationKey, values?: Record<string, string | number>) => string
+) {
+  const haystack = [
+    transaction.title,
+    transaction.notes ?? "",
+    t(transaction.type === "income" ? "finance.transactionTypeIncome" : "finance.transactionTypeExpense"),
+    t(getFinanceTransactionCategoryLabelKey(transaction.category)),
+  ]
+    .join(" ")
+    .toLocaleLowerCase();
+
+  return haystack.includes(searchTerm);
+}
+
+function matchesFinanceObligationSearch(
+  obligation: FinanceObligation,
+  searchTerm: string,
+  t: (key: TranslationKey, values?: Record<string, string | number>) => string
+) {
+  const haystack = [
+    obligation.title,
+    obligation.counterparty ?? "",
+    obligation.notes ?? "",
+    t(
+      obligation.type === "installment"
+        ? "finance.obligationTypeInstallment"
+        : "finance.obligationTypeDebt"
+    ),
+    t(
+      obligation.status === "paid"
+        ? "finance.statusPaid"
+        : obligation.status === "paused"
+          ? "finance.statusPaused"
+          : "finance.statusActive"
+    ),
+  ]
+    .join(" ")
+    .toLocaleLowerCase();
+
+  return haystack.includes(searchTerm);
+}
+
 function readSimpleViewMode() {
   try {
     return typeof window !== "undefined"
@@ -184,6 +232,7 @@ function useSimpleViewMode() {
 export function FinancePage() {
   const { language, t } = useI18n();
   const { formatDate, resolvedCalendar } = useDateFormatter();
+  const accountRuntimeState = useAccountRuntimeState();
   const isSimpleView = useSimpleViewMode();
   const referenceDate = useMemo(() => new Date(), []);
   const {
@@ -208,6 +257,7 @@ export function FinancePage() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [selectedFilter, setSelectedFilter] =
     useState<FinanceViewFilter>("all");
+  const [searchQuery, setSearchQuery] = useState("");
   const [showAllTransactions, setShowAllTransactions] = useState(false);
   const [showAllObligations, setShowAllObligations] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<
@@ -238,7 +288,7 @@ export function FinancePage() {
   useEffect(() => {
     setShowAllTransactions(false);
     setShowAllObligations(false);
-  }, [selectedFilter]);
+  }, [searchQuery, selectedFilter]);
 
   const currencyLocale = language === "fa" ? "fa-IR" : "en-US";
   const calendarLocale = resolvedCalendar === "jalali" ? "persian" : "gregory";
@@ -316,6 +366,8 @@ export function FinancePage() {
     () => getRecentFinanceTransactions(transactions, transactions.length),
     [transactions]
   );
+  const normalizedSearchQuery = searchQuery.trim().toLocaleLowerCase();
+  const hasSearchQuery = normalizedSearchQuery.length > 0;
   const incomeTransactions = useMemo(
     () => sortedTransactions.filter((transaction) => transaction.type === "income"),
     [sortedTransactions]
@@ -334,6 +386,13 @@ export function FinancePage() {
         .filter(({ obligation }) => obligation.status === "paid")
         .map(({ obligation }) => obligation),
     [review.obligationProgress]
+  );
+  const financeSyncCategory = useMemo(
+    () =>
+      accountRuntimeState.syncStatus.categoryStatuses?.find(
+        (categoryStatus) => categoryStatus.key === "finance"
+      ),
+    [accountRuntimeState.syncStatus.categoryStatuses]
   );
   const budgetGuard = review.budgetGuard;
   const dueSoonCount = review.upcomingObligations.filter(
@@ -496,21 +555,54 @@ export function FinancePage() {
         : sortedTransactions;
   const filteredObligations =
     selectedFilter === "paidObligations" ? paidObligations : activeObligations;
+  const searchedTransactions = hasSearchQuery
+    ? filteredTransactions.filter((transaction) =>
+        matchesFinanceTransactionSearch(transaction, normalizedSearchQuery, t)
+      )
+    : filteredTransactions;
+  const searchedObligations = hasSearchQuery
+    ? filteredObligations.filter((obligation) =>
+        matchesFinanceObligationSearch(obligation, normalizedSearchQuery, t)
+      )
+    : filteredObligations;
   const financePreviewLimit = isSimpleView ? 6 : 12;
   const displayedTransactions = showAllTransactions
-    ? filteredTransactions
-    : filteredTransactions.slice(0, financePreviewLimit);
+    ? searchedTransactions
+    : searchedTransactions.slice(0, financePreviewLimit);
   const displayedObligations = showAllObligations
-    ? filteredObligations
-    : filteredObligations.slice(0, financePreviewLimit);
+    ? searchedObligations
+    : searchedObligations.slice(0, financePreviewLimit);
   const hiddenTransactionCount = Math.max(
-    filteredTransactions.length - displayedTransactions.length,
+    searchedTransactions.length - displayedTransactions.length,
     0
   );
   const hiddenObligationCount = Math.max(
-    filteredObligations.length - displayedObligations.length,
+    searchedObligations.length - displayedObligations.length,
     0
   );
+  const topExpenseCategory = review.expenseCategoryBreakdown[0];
+  const financeSyncTone =
+    accountRuntimeState.syncStatus.issue === "conflict"
+      ? "danger"
+      : accountRuntimeState.syncStatus.mode === "error"
+        ? "warning"
+        : accountRuntimeState.syncStatus.mode === "syncing"
+          ? "primary"
+          : accountRuntimeState.localOnly
+            ? "neutral"
+            : "success";
+  const financeSyncLabel = accountRuntimeState.localOnly
+    ? t("settings.syncStatusLocalOnly")
+    : accountRuntimeState.syncStatus.issue === "conflict"
+      ? t("settings.syncStatusConflict")
+      : accountRuntimeState.syncStatus.mode === "syncing"
+        ? t("settings.syncHealthSyncing")
+        : accountRuntimeState.syncStatus.mode === "error"
+          ? t("settings.syncHealthIssue")
+          : t("settings.syncHealthHealthy");
+  const financeSyncDescription = financeSyncCategory?.detail ??
+    accountRuntimeState.syncStatus.detail ??
+    t("finance.localSummaryNote");
   const hasRecords = transactions.length > 0 || obligations.length > 0;
   const transactionSectionTitleKey = getFinanceSectionTitleKey(selectedFilter);
   const transactionSectionDescriptionKey =
@@ -668,6 +760,53 @@ export function FinancePage() {
                 >
                   {t("finance.addObligation")}
                 </Button>
+              </div>
+              <div className="grid gap-3">
+                <SoftPanel className="gap-3 border-border/70 bg-background/85">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <p className="text-sm font-medium">{t("finance.syncStatusTitle")}</p>
+                    <StatusChip tone={financeSyncTone}>{financeSyncLabel}</StatusChip>
+                  </div>
+                  <p className="text-sm leading-7 text-muted-foreground">
+                    {financeSyncDescription}
+                  </p>
+                  <div className="grid gap-2 text-xs text-muted-foreground sm:grid-cols-2">
+                    <p>
+                      {t("settings.syncLastSyncedLabel")}:{" "}
+                      {accountRuntimeState.syncStatus.lastSyncedAt
+                        ? formatDate(accountRuntimeState.syncStatus.lastSyncedAt)
+                        : t("settings.syncLastSyncedNever")}
+                    </p>
+                    <p>
+                      {t("settings.syncConflictReviewDetectedBadge", {
+                        count: accountRuntimeState.syncStatus.conflictCount ?? 0,
+                      })}
+                    </p>
+                  </div>
+                </SoftPanel>
+
+                <SoftPanel className="gap-3 border-border/70 bg-background/85">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <p className="text-sm font-medium">{t("finance.spendingOverviewTitle")}</p>
+                    <StatusChip tone="neutral">
+                      {t("finance.recentTransactionsCount", {
+                        count: sortedTransactions.length,
+                      })}
+                    </StatusChip>
+                  </div>
+                  <p className="text-sm leading-7 text-muted-foreground">
+                    {topExpenseCategory
+                      ? t("finance.topExpenseCategory", {
+                          category: t(
+                            getFinanceTransactionCategoryLabelKey(
+                              topExpenseCategory.category
+                            )
+                          ),
+                          amount: formatAmount(topExpenseCategory.amount),
+                        })
+                      : t("finance.spendingOverviewEmpty")}
+                  </p>
+                </SoftPanel>
               </div>
               <div className="space-y-2 text-sm leading-7 text-muted-foreground">
                 <p>{t("finance.localSummaryNote")}</p>
@@ -1165,6 +1304,46 @@ export function FinancePage() {
           })}
         </div>
 
+        <PremiumCard className="border-border/70 bg-card/95">
+          <div className="grid gap-4 p-4 sm:p-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+            <div className="grid gap-2">
+              <label
+                htmlFor="finance-search"
+                className="text-sm font-medium text-foreground"
+              >
+                {t("finance.searchLabel")}
+              </label>
+              <div className="relative">
+                <Search className="pointer-events-none absolute top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground ltr:left-3 rtl:right-3" />
+                <Input
+                  id="finance-search"
+                  value={searchQuery}
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  placeholder={t("finance.searchPlaceholder")}
+                  className="bg-background/80 ltr:pl-9 rtl:pr-9"
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              {hasSearchQuery ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setSearchQuery("")}
+                >
+                  {t("finance.clearSearch")}
+                </Button>
+              ) : null}
+              <StatusChip tone="neutral">
+                {t("finance.searchResultsSummary", {
+                  count: searchedTransactions.length + searchedObligations.length,
+                })}
+              </StatusChip>
+            </div>
+          </div>
+        </PremiumCard>
+
         <div className="space-y-4">
           {isLoading ? (
             <div className="grid gap-4 xl:grid-cols-2" aria-label={t("finance.loading")}>
@@ -1217,29 +1396,39 @@ export function FinancePage() {
                         </Button>
                       }
                       status={
-                        <StatusChip tone="neutral">{filteredTransactions.length}</StatusChip>
+                        <StatusChip tone="neutral">{searchedTransactions.length}</StatusChip>
                       }
                     />
                     <div className="mt-5 space-y-4">
-                      {filteredTransactions.length === 0 ? (
+                      {searchedTransactions.length === 0 ? (
                         <SoftPanel className="space-y-3">
                           <p className="text-sm leading-7 text-muted-foreground">
-                            {selectedFilter === "income"
-                              ? t("finance.noIncomeTransactionsYet")
-                              : selectedFilter === "expenses"
-                                ? t("finance.noExpenseTransactionsYet")
-                                : t("finance.noTransactionsYet")}
+                            {hasSearchQuery
+                              ? t("finance.noSearchMatches")
+                              : selectedFilter === "income"
+                                ? t("finance.noIncomeTransactionsYet")
+                                : selectedFilter === "expenses"
+                                  ? t("finance.noExpenseTransactionsYet")
+                                  : t("finance.noTransactionsYet")}
                           </p>
                           <p className="text-xs leading-6 text-muted-foreground">
-                            {t("finance.transactionsEmptyNote")}
+                            {hasSearchQuery
+                              ? t("finance.searchEmptyNote")
+                              : t("finance.transactionsEmptyNote")}
                           </p>
                           <Button
                             type="button"
                             variant="outline"
                             className="w-full sm:w-auto"
-                            onClick={() => handleQuickNav(FINANCE_SECTION_ANCHORS.addTransaction)}
+                            onClick={() =>
+                              hasSearchQuery
+                                ? setSearchQuery("")
+                                : handleQuickNav(FINANCE_SECTION_ANCHORS.addTransaction)
+                            }
                           >
-                            {t("finance.addTransaction")}
+                            {hasSearchQuery
+                              ? t("finance.clearSearch")
+                              : t("finance.addTransaction")}
                           </Button>
                         </SoftPanel>
                       ) : (
@@ -1260,7 +1449,7 @@ export function FinancePage() {
                           />
                         ))
                       )}
-                      {filteredTransactions.length > financePreviewLimit ? (
+                      {searchedTransactions.length > financePreviewLimit ? (
                         <Button
                           type="button"
                           variant="outline"
@@ -1295,7 +1484,7 @@ export function FinancePage() {
                       }
                       status={
                         selectedFilter === "paidObligations" ? (
-                          <StatusChip tone="neutral">{filteredObligations.length}</StatusChip>
+                          <StatusChip tone="neutral">{searchedObligations.length}</StatusChip>
                         ) : (
                           <StatusChip tone="neutral">
                             {t("finance.remainingObligationTotal")}:{" "}
@@ -1305,23 +1494,33 @@ export function FinancePage() {
                       }
                     />
                     <div className="mt-5 space-y-4">
-                      {filteredObligations.length === 0 ? (
+                      {searchedObligations.length === 0 ? (
                         <SoftPanel className="space-y-3">
                           <p className="text-sm leading-7 text-muted-foreground">
-                            {selectedFilter === "paidObligations"
-                              ? t("finance.noPaidObligationsYet")
-                              : t("finance.noObligationsYet")}
+                            {hasSearchQuery
+                              ? t("finance.noSearchMatches")
+                              : selectedFilter === "paidObligations"
+                                ? t("finance.noPaidObligationsYet")
+                                : t("finance.noObligationsYet")}
                           </p>
                           <p className="text-xs leading-6 text-muted-foreground">
-                            {t("finance.obligationsEmptyNote")}
+                            {hasSearchQuery
+                              ? t("finance.searchEmptyNote")
+                              : t("finance.obligationsEmptyNote")}
                           </p>
                           <Button
                             type="button"
                             variant="outline"
                             className="w-full sm:w-auto"
-                            onClick={() => handleQuickNav(FINANCE_SECTION_ANCHORS.addObligation)}
+                            onClick={() =>
+                              hasSearchQuery
+                                ? setSearchQuery("")
+                                : handleQuickNav(FINANCE_SECTION_ANCHORS.addObligation)
+                            }
                           >
-                            {t("finance.addObligation")}
+                            {hasSearchQuery
+                              ? t("finance.clearSearch")
+                              : t("finance.addObligation")}
                           </Button>
                         </SoftPanel>
                       ) : (
@@ -1342,7 +1541,7 @@ export function FinancePage() {
                           />
                         ))
                       )}
-                      {filteredObligations.length > financePreviewLimit ? (
+                      {searchedObligations.length > financePreviewLimit ? (
                         <Button
                           type="button"
                           variant="outline"

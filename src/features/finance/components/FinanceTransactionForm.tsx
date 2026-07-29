@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
+import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 
 import type { FinanceTransaction } from "@/shared/types";
@@ -40,6 +41,7 @@ export function FinanceTransactionForm({
   const { t } = useI18n();
   const {
     register,
+    setValue,
     watch,
     handleSubmit,
     formState: { errors },
@@ -56,7 +58,38 @@ export function FinanceTransactionForm({
       notes: transaction?.notes ?? "",
     },
   });
+  const transactionTypeValue = watch("type");
+  const categoryValue = watch("category");
   const occurredAtValue = watch("occurredAt");
+  const categoryOptions = useMemo(
+    () =>
+      FINANCE_CATEGORY_OPTIONS.filter((option) =>
+        transactionTypeValue === "income"
+          ? ["salary", "freelance", "bonus", "other"].includes(option.value)
+          : [
+              "rent",
+              "groceries",
+              "transport",
+              "utilities",
+              "health",
+              "debt-payment",
+              "other",
+            ].includes(option.value)
+      ),
+    [transactionTypeValue]
+  );
+
+  useEffect(() => {
+    if (categoryOptions.some((option) => option.value === categoryValue)) {
+      return;
+    }
+
+    setValue(
+      "category",
+      DEFAULT_FINANCE_TRANSACTION_CATEGORY[transactionTypeValue],
+      { shouldDirty: true }
+    );
+  }, [categoryOptions, categoryValue, setValue, transactionTypeValue]);
 
   return (
     <form
@@ -127,12 +160,17 @@ export function FinanceTransactionForm({
                   id="finance-transaction-category"
                   {...register("category")}
                 >
-                  {FINANCE_CATEGORY_OPTIONS.map((option) => (
+                  {categoryOptions.map((option) => (
                     <option key={option.value} value={option.value}>
                       {t(option.labelKey)}
                     </option>
                   ))}
                 </Select>
+                <p className="text-xs text-muted-foreground">
+                  {transactionTypeValue === "income"
+                    ? t("finance.categoryHelperIncome")
+                    : t("finance.categoryHelperExpense")}
+                </p>
               </div>
 
               <div className="grid gap-2">
