@@ -1,5 +1,12 @@
 # Changelog
 
+## Stage 251A - Account & Backend Direction Update
+
+- Updated the repository operating contract to permit optional account authentication, sync backend support, and multi-device access while preserving AliOS as a local-first product
+- Clarified that local storage remains the first usable copy of user data, account creation stays optional, and cloud usage must never become mandatory by accident
+- Recorded Supabase Auth, email authentication, and sync backend support as approved future directions instead of leaving them in conflict with older no-auth/no-backend/no-Supabase contract language
+- Kept the stage documentation-only with no runtime behavior, repository, schema, migration, or backend implementation change
+
 ## Stage 250 - Enable User Login Entry Point
 
 - Added a compact Account & Sync entry card for Settings Simple View so users can see a real Google sign-in action without first expanding the full sync details surface

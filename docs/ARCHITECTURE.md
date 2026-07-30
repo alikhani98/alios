@@ -1,6 +1,27 @@
 # AliOS Architecture
 
-AliOS 1.0 is a local-first static web app.
+AliOS 1.0 is a local-first web app. Static-only deployment remains valid for stages that do not enable optional account or sync infrastructure.
+
+## Product Direction Boundary
+
+- Local-first remains the primary operating model for AliOS.
+- Local data remains the first owned, readable, and writable copy of user information.
+- AliOS must remain usable without creating or signing into an account unless a future approved stage explicitly changes that rule.
+- Account creation, sign-in, and sync activation are optional user actions rather than prerequisites for product access.
+- Export, import, backup, and restore remain valid user-controlled safety mechanisms even when optional account or sync features exist.
+- Remote services must not silently replace, hide, delete, or take ownership away from the local copy of user data.
+- Feature repositories remain the source of truth for feature data access even when optional account, session, or sync layers are active.
+
+## Optional Account & Sync Boundary
+
+- Authentication is an additive capability, not a replacement for local-first usage.
+- Backend services are additive infrastructure for optional account and sync flows, not a replacement for local persistence or repository ownership.
+- Multi-device access must build on explicit user consent, visible sync state, and clear data-scope disclosure.
+- Existing local data must not be auto-migrated, silently claimed, or destructively merged when a user first signs in.
+- Local-only usage must remain possible, and signed-out or offline states must not block access to existing local records.
+- Account identity, authentication sessions, and sync metadata remain separate from feature repository logic, domain rules, and storage-adapter contracts.
+- Approved future implementation directions may include Supabase Auth, email authentication, sync backend support, and multi-device data access.
+- Non-goals for this direction remain mandatory cloud usage, replacing IndexedDB as the first local store, forced account creation, silent upload, silent merge, and silent deletion.
 
 ## Core Stack
 
