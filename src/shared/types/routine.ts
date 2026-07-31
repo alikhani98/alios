@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { TASK_PRIORITY_VALUES } from "@/shared/constants/domain";
+import { recordSyncMetadataSchema } from "@/shared/types/sync";
 import { isoDateTimeSchema } from "@/shared/utils/domain";
 
 export const routineWeekdaySchema = z.number().int().min(0).max(6);
@@ -14,6 +15,7 @@ export const routineSchema = z.object({
   isActive: z.boolean(),
   createdAt: isoDateTimeSchema,
   updatedAt: isoDateTimeSchema,
+  sync: recordSyncMetadataSchema.optional(),
 });
 
 export type Routine = z.infer<typeof routineSchema>;

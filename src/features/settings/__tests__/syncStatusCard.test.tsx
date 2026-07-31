@@ -399,13 +399,31 @@ describe("SyncStatusCard", () => {
         mode: "ready",
         provider: "supabase",
         enabled: true,
-        scopes: ["preferences", "tasks", "projects", "goals", "finance", "manual"],
+        scopes: [
+          "preferences",
+          "tasks",
+          "routines",
+          "projects",
+          "goals",
+          "finance",
+          "manual",
+        ],
         connectedUserId: "supabase-user-1",
         deviceId: "device-1",
         deviceLabel: "This device",
         lastSyncedAt: "2026-07-28T12:00:00.000Z",
         lastAttemptAt: "2026-07-28T12:00:00.000Z",
         categoryStatuses: [
+          {
+            key: "routines",
+            state: "ready",
+            detail:
+              "Routines stay editable offline and sync through the same local-first repository boundary.",
+            lastSyncedAt: "2026-07-28T12:00:00.000Z",
+            enabled: true,
+            privacyLevel: "standard",
+            visibility: "synced",
+          },
           {
             key: "finance",
             state: "ready",
@@ -453,7 +471,7 @@ describe("SyncStatusCard", () => {
           },
         ],
         detail:
-          "AliOS synced preferences, tasks, projects, goals, finance, and Personal Manual records for this device.",
+          "AliOS synced preferences, tasks, routines, projects, goals, finance, and Personal Manual records for this device.",
       }),
     });
 
@@ -463,10 +481,11 @@ describe("SyncStatusCard", () => {
     expect(markup).toContain("Current sync provider: supabase.");
     expect(markup).toContain("2026-07-28T12:00:00.000Z");
     expect(markup).toContain(
-      "AliOS synced preferences, tasks, projects, goals, finance, and Personal Manual records for this device."
+      "AliOS synced preferences, tasks, routines, projects, goals, finance, and Personal Manual records for this device."
     );
     expect(markup).toContain("Preferences");
     expect(markup).toContain("Tasks");
+    expect(markup).toContain("Routines");
     expect(markup).toContain("Projects");
     expect(markup).toContain("Goals");
     expect(markup).toContain("Finance");
@@ -528,7 +547,15 @@ describe("SyncStatusCard", () => {
           provider: "supabase",
           issue: "connectivity",
           enabled: true,
-          scopes: ["preferences", "tasks", "projects", "goals", "finance", "manual"],
+          scopes: [
+            "preferences",
+            "tasks",
+            "routines",
+            "projects",
+            "goals",
+            "finance",
+            "manual",
+          ],
           connectedUserId: "supabase-user-1",
         deviceId: "device-1",
         deviceLabel: "This device",
@@ -608,7 +635,15 @@ describe("SyncStatusCard", () => {
           issue: "conflict",
           conflictCount: 1,
           enabled: true,
-          scopes: ["preferences", "tasks", "projects", "goals", "finance", "manual"],
+          scopes: [
+            "preferences",
+            "tasks",
+            "routines",
+            "projects",
+            "goals",
+            "finance",
+            "manual",
+          ],
           connectedUserId: "supabase-user-1",
           deviceId: "device-1",
           deviceLabel: "This device",
@@ -675,14 +710,22 @@ describe("SyncStatusCard", () => {
         mode: "ready",
         provider: "supabase",
         enabled: true,
-        scopes: ["preferences", "tasks", "projects", "goals", "finance", "manual"],
+        scopes: [
+          "preferences",
+          "tasks",
+          "routines",
+          "projects",
+          "goals",
+          "finance",
+          "manual",
+        ],
         connectedUserId: "supabase-user-1",
         deviceId: "device-1",
         deviceLabel: "This device",
         lastSyncedAt: "2026-07-28T12:00:00.000Z",
         lastAttemptAt: "2026-07-28T12:00:00.000Z",
         detail:
-          "AliOS synced preferences, tasks, projects, goals, finance, and Personal Manual records for this device.",
+          "AliOS synced preferences, tasks, routines, projects, goals, finance, and Personal Manual records for this device.",
       }),
     });
 

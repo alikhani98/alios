@@ -1,5 +1,19 @@
 # Changelog
 
+## Stage 254 - Essential User Data Sync Completion
+
+- Audited the live sync surface and confirmed Preferences, Finance, Personal Manual, Goals, and Projects were already synchronized through the existing Supabase-backed sync provider
+- Expanded the active synced data scope to include Routines so a second device can now receive the user's recurring routine records through the same repository-backed sync boundary
+- Added routine sync metadata support plus provider-level routine upload, download, conflict-label, and status-category handling without changing repository ownership, schema migration behavior, or local-first safety
+- Updated English and Persian Account & Sync copy so the visible synced-category descriptions, conflict scope, and provider status accurately match the current runtime behavior
+- Expanded focused sync-provider and Settings rendering coverage for routine sync upload/download, synced-scope presentation, and updated category labeling
+
+## Stage 253 - First Device Sync Verification
+
+- Fixed stale sync opt-in state after sign-out so AliOS no longer pretends sync is still enabled when the authenticated Supabase session has already ended
+- Preserved existing local-first behavior by clearing only the invalid remote-sync state while leaving local data, repositories, and storage ownership unchanged
+- Added focused regression coverage for signed-out sync fallback and stale enabled-state cleanup inside the existing Supabase sync provider
+
 ## Stage 252 - Connected Account & Sync Activation
 
 - Updated the existing Supabase sync provider to reuse the active authenticated account session directly, so signed-in email users can enable sync without falling back through the Google-only runtime path
