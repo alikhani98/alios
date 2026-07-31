@@ -42,7 +42,12 @@ function createRuntimeStub(
   } as unknown as GoogleAuthRuntime;
 }
 
-function createSupabaseClientHarness(remoteMetadata?: Record<string, unknown>) {
+function createSupabaseClientHarness(
+  remoteMetadata?: Record<string, unknown>,
+  options: Readonly<{
+    initialSession?: boolean;
+  }> = {}
+) {
   const session: FakeSession = {
     access_token: "supabase-access-token",
     user: {
@@ -51,7 +56,15 @@ function createSupabaseClientHarness(remoteMetadata?: Record<string, unknown>) {
     },
   };
 
-  let currentSession: FakeSession | null = null;
+  let currentSession: FakeSession | null = options.initialSession
+    ? {
+        access_token: session.access_token,
+        user: {
+          ...session.user,
+          user_metadata: remoteMetadata,
+        },
+      }
+    : null;
 
   const client = {
     auth: {
@@ -195,18 +208,21 @@ describe("SupabasePreferenceSyncProvider", () => {
   });
 
   it("stays local-only when no authenticated runtime session is available", async () => {
+    const harness = createSupabaseClientHarness();
     const provider = new SupabasePreferenceSyncProvider({
+      client: harness.client,
       runtime: createRuntimeStub({
         status: "unauthenticated",
         provider: "google",
         user: null,
-      }),
+      }, ""),
       getStorage: () => localStorage,
     });
 
     await expect(provider.getStatus()).resolves.toMatchObject({
       mode: "local-only",
-      provider: "local-only",
+      provider: "supabase",
+      enabled: false,
     });
     await expect(provider.syncNow()).resolves.toMatchObject({
       changedRecords: 0,
@@ -319,6 +335,49 @@ describe("SupabasePreferenceSyncProvider", () => {
       scopes: [],
     });
     expect(harness.client.auth.signInWithIdToken).not.toHaveBeenCalled();
+  });
+
+  it("enables sync for an email-authenticated device by reusing the existing Supabase session", async () => {
+    localStorage.setItem(APPEARANCE_STORAGE_KEY, "dark");
+
+    const harness = createSupabaseClientHarness(
+      {
+        alios_preferences: {
+          [LANGUAGE_STORAGE_KEY]: "en",
+        },
+      },
+      { initialSession: true }
+    );
+    const provider = new SupabasePreferenceSyncProvider({
+      client: harness.client,
+      runtime: createRuntimeStub({
+        status: "unauthenticated",
+        provider: "google",
+        user: null,
+      }),
+      getStorage: () => localStorage,
+      now: () => new Date("2026-07-29T10:00:00.000Z"),
+    });
+
+    await expect(provider.getStatus()).resolves.toMatchObject({
+      mode: "local-only",
+      provider: "supabase",
+      enabled: false,
+      connectedUserId: "supabase-user-1",
+      detail:
+        "An account is connected on this device, but sync stays off until you explicitly enable it.",
+    });
+
+    const result = await provider.syncNow();
+
+    expect(harness.client.auth.signInWithIdToken).not.toHaveBeenCalled();
+    expect(result.status).toMatchObject({
+      mode: "ready",
+      provider: "supabase",
+      enabled: true,
+      connectedUserId: "supabase-user-1",
+      lastSyncedAt: "2026-07-29T10:00:00.000Z",
+    });
   });
 
   it("does not notify sync subscribers when getStatus is called", async () => {
@@ -715,6 +774,30 @@ describe("SupabasePreferenceSyncProvider", () => {
     expect(backupHarness.getData().financeTransactions[0].title).toBe(
       "Rent transfer"
     );
+  });
+
+  it("returns to local-only status after the authenticated Supabase session signs out", async () => {
+    const harness = createSupabaseClientHarness(undefined, { initialSession: true });
+    const provider = new SupabasePreferenceSyncProvider({
+      client: harness.client,
+      runtime: createRuntimeStub({
+        status: "unauthenticated",
+        provider: "google",
+        user: null,
+      }),
+      getStorage: () => localStorage,
+      now: () => new Date("2026-07-29T10:00:00.000Z"),
+    });
+
+    await provider.syncNow();
+    await harness.client.auth.signOut();
+
+    await expect(provider.getStatus()).resolves.toMatchObject({
+      mode: "local-only",
+      provider: "local-only",
+      enabled: false,
+      detail: "Sign in on this device to connect sync.",
+    });
   });
 
   it("retains the last successful sync timestamp after a later failed retry", async () => {

@@ -112,6 +112,10 @@ export function SettingsAccountEntryCard({
     runtimeState.identity?.displayName ??
     runtimeState.identity?.email ??
     t("settings.accountDetailsSignedOut");
+  const connectedEmail =
+    runtimeState.hasActiveAccount && runtimeState.identity?.email
+      ? runtimeState.identity.email
+      : null;
 
   const handleGoogleSignIn = async () => {
     if (!interactiveGoogleProvider) {
@@ -274,6 +278,11 @@ export function SettingsAccountEntryCard({
                     ? t("settings.accountEmailTitle")
                     : t("settings.accountSignInPreparationTitle")}
               </p>
+              {connectedEmail ? (
+                <p className="text-xs text-muted-foreground" dir="ltr">
+                  {connectedEmail}
+                </p>
+              ) : null}
               <p className="text-sm leading-6 text-muted-foreground">
                 {runtimeState.hasActiveAccount
                   ? t("settings.accountSessionActionsDescription")

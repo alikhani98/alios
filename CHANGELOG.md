@@ -1,5 +1,13 @@
 # Changelog
 
+## Stage 252 - Connected Account & Sync Activation
+
+- Updated the existing Supabase sync provider to reuse the active authenticated account session directly, so signed-in email users can enable sync without falling back through the Google-only runtime path
+- Kept the Google token-exchange path available only as a fallback, preserving the current provider architecture while making the real email account flow usable
+- Updated the Settings `Account & Sync` entry card to show the connected email address in authenticated states and keep sign-out plus enable-sync actions easier to verify
+- Added focused regression coverage for email-account sync activation, signed-out sync fallback, and authenticated account email visibility
+- Preserved local-first behavior, repository ownership, schema behavior, storage ownership, and explicit sync opt-in without adding new providers or refactoring unrelated runtime code
+
 ## Stage 251 - Email Account Authentication & Sync Access
 
 - Added real email-based AliOS account creation, sign-in, sign-out, and session-restore support on top of the existing Supabase-backed auth boundary
