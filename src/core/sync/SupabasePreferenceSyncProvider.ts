@@ -994,7 +994,7 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
         void this.disconnectRemoteSession().finally(() => {
           this.emitStatus(
             createLocalOnlyStatus(
-              "Sign in with Google on this device to connect sync."
+              "Sign in on this device to connect sync."
             )
           );
         });
@@ -1003,12 +1003,24 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
 
     if (typeof window !== "undefined") {
       const handlePreferenceChange = () => {
-        if (
-          this.runtime.getSession().status === "authenticated" &&
-          this.isSyncEnabled()
-        ) {
-          void this.syncNow();
+        if (!this.isSyncEnabled()) {
+          return;
         }
+
+        void this.ensureRemoteSession(false)
+          .then((connectedSession) => {
+            if (connectedSession?.user) {
+              void this.syncNow();
+              return;
+            }
+
+            if (this.runtime.getSession().status === "authenticated") {
+              void this.syncNow();
+            }
+          })
+          .catch(() => {
+            // Leave the current local data in place when a background sync check fails.
+          });
       };
 
       window.addEventListener("storage", handlePreferenceChange);
@@ -1027,34 +1039,33 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
       );
     }
 
-    const authSession = this.runtime.getSession();
-    if (authSession.status !== "authenticated" || !authSession.user) {
-      return createLocalOnlyStatus(
-        "Sign in with Google on this device to connect sync."
-      );
-    }
+    const runtimeSession = this.runtime.getSession();
+    const connectedSession = await this.ensureRemoteSession(false);
 
     if (!this.isSyncEnabled()) {
       const manualPreparation =
         this.backupStorage
           ? buildManualPreparationStatus(await this.backupStorage.readAll())
           : createEmptyManualPreparationStatus();
+      const connectedUserId =
+        connectedSession?.user?.id ??
+        (runtimeSession.status === "authenticated" ? runtimeSession.user?.userId : undefined);
       const status: SyncStatus = {
         mode: "local-only",
         provider: "supabase",
         enabled: false,
-        connectedUserId: authSession.user.userId,
+        connectedUserId,
         scopes: [],
         categoryStatuses: createCategoryStatuses(undefined, false, manualPreparation),
         manualPreparation,
         connectedDevices: [],
         detail:
-          "Google account is connected on this device, but sync stays off until you explicitly enable it.",
+          connectedUserId
+            ? "An account is connected on this device, but sync stays off until you explicitly enable it."
+            : "Sign in on this device before you enable sync.",
       };
       return status;
     }
-
-    const connectedSession = await this.ensureRemoteSession(false);
     const metadata = this.readMetadata();
     const scopes = getScopes(this.backupStorage !== null);
     const lastTrustedDevice =
@@ -1079,23 +1090,9 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
       );
 
     if (!connectedSession?.user) {
-      const status: SyncStatus = {
-        mode: "local-only",
-        provider: "supabase",
-        enabled: true,
-        scopes,
-        lastSyncedAt: metadata.lastSyncedAt,
-        lastAttemptAt: metadata.lastAttemptAt,
-        conflictCount: metadata.conflictCount,
-        categoryStatuses,
-        manualPreparation,
-        lastTrustedDevice,
-        connectedDevices: buildConnectedDevices(undefined, lastTrustedDevice),
-        detail:
-          metadata.detail ??
-          "AliOS has not connected this device to sync yet.",
-      };
-      return status;
+      return createLocalOnlyStatus(
+        "Sign in on this device to connect sync."
+      );
     }
 
     const device = getOrCreateDeviceIdentity(this.getStorage());
@@ -1386,10 +1383,10 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
       };
     }
 
-    const authSession = this.runtime.getSession();
-    if (authSession.status !== "authenticated" || !authSession.user) {
+    const connectedSession = await this.ensureRemoteSession(true);
+    if (!connectedSession?.user) {
       const status = createLocalOnlyStatus(
-        "Sign in with Google on this device to connect sync."
+        "Sign in on this device to connect sync."
       );
       this.emitStatus(status);
       return {
@@ -1434,25 +1431,6 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
     this.emitStatus(syncingStatus);
 
     try {
-      const connectedSession = await this.ensureRemoteSession(true);
-
-      if (!connectedSession?.user) {
-        const status = createLocalOnlyStatus(
-          "AliOS could not connect this Google session to Supabase sync."
-        );
-        this.writeMetadata({
-          ...this.readMetadata(),
-          lastAttemptAt: attemptAt,
-          lastOutcome: "error",
-          detail: status.detail,
-        });
-        this.emitStatus(status);
-        return {
-          changedRecords: 0,
-          status,
-        };
-      }
-
       const storage = this.getStorage();
       const device = getOrCreateDeviceIdentity(storage);
       const localSnapshot = readLocalPreferenceSnapshot(storage);

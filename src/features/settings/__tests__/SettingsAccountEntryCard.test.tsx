@@ -318,10 +318,59 @@ describe("SettingsAccountEntryCard", () => {
     const markup = await renderEntryCard(boundary, authProvider);
 
     expect(markup).toContain("AliOS User");
+    expect(markup).toContain("user@example.com");
     expect(markup).toContain("Signed in");
     expect(markup).toContain("Enable sync");
     expect(markup).toContain("Sign out");
     expect(markup).toContain("Open account &amp; sync details");
+  });
+
+  it("shows the connected email in the signed-in email account state", async () => {
+    const authProvider = new TestAuthProvider(EMAIL_ACCOUNT_PROVIDER_ID, {
+      status: "authenticated",
+      provider: EMAIL_ACCOUNT_PROVIDER_ID,
+      user: {
+        userId: "user-1",
+        email: "owner@example.com",
+        displayName: "AliOS Owner",
+        createdAt: "2026-07-29T00:00:00.000Z",
+        updatedAt: "2026-07-29T00:00:00.000Z",
+      },
+      detail: "Authenticated email session.",
+    });
+    const boundary = createAccountRuntimeBoundary({
+      accountProvider: new TestAccountProvider(
+        EMAIL_ACCOUNT_PROVIDER_ID,
+        "authenticated",
+        {
+          status: "authenticated",
+          providerId: EMAIL_ACCOUNT_PROVIDER_ID,
+          lifecycle: "signed-in",
+          identity: {
+            accountId: "account-1",
+            email: "owner@example.com",
+            displayName: "AliOS Owner",
+            providerId: EMAIL_ACCOUNT_PROVIDER_ID,
+            metadata: {},
+          },
+          detail: "Email account connected on this device.",
+          lastAuthenticatedAt: "2026-07-29T00:00:00.000Z",
+        },
+        {
+          status: "authenticated",
+          available: ["account-identity", "sign-out", "explicit-sync-opt-in"],
+          detail: "Authenticated account capabilities are available.",
+        }
+      ),
+      authProvider,
+      syncProvider: new TestSyncProvider("local-only", LOCAL_ONLY_SYNC_STATUS),
+    });
+
+    const markup = await renderEntryCard(boundary, authProvider);
+
+    expect(markup).toContain("AliOS Owner");
+    expect(markup).toContain("owner@example.com");
+    expect(markup).toContain("Sign out");
   });
 
   it("shows real email account actions when the configured provider is email", async () => {
