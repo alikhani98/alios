@@ -20,7 +20,11 @@ import {
   useAccountRuntimeState,
   type AccountRuntimeState,
 } from "@/core/account";
-import { GoogleAuthProvider, useAuth } from "@/core/auth";
+import {
+  EMAIL_ACCOUNT_PROVIDER_ID,
+  GOOGLE_ACCOUNT_PROVIDER_ID,
+} from "@/core/account/types";
+import { useAuth, type AuthProvider } from "@/core/auth";
 import { OPTIONAL_SYNC_PROVIDER_ID } from "@/core/sync";
 import type {
   SyncCategoryStatus,
@@ -42,6 +46,7 @@ import {
   SoftPanel,
   StatusChip,
 } from "@/shared/ui";
+import { EmailAccountAuthForm } from "./EmailAccountAuthForm";
 
 type SyncStatusCardProps = Readonly<{
   onGoToBackupRestore: () => void;
@@ -69,6 +74,17 @@ type ConsentActionPlaceholderProps = Readonly<{
   disabled?: boolean;
   onClick?: () => void;
 }>;
+
+type InteractiveGoogleAuthProvider = AuthProvider &
+  Readonly<{
+    isConfigured: () => boolean;
+  }>;
+
+type InteractiveEmailAuthProvider = AuthProvider &
+  Readonly<{
+    isConfigured: () => boolean;
+    createAccount: NonNullable<AuthProvider["createAccount"]>;
+  }>;
 
 type AccountActionDefinition = Readonly<{
   labelKey: TranslationKey;
@@ -181,6 +197,37 @@ function ConsentActionPlaceholder({
   );
 }
 
+function getInteractiveGoogleProvider(
+  provider: AuthProvider
+): InteractiveGoogleAuthProvider | null {
+  if (
+    provider.name !== GOOGLE_ACCOUNT_PROVIDER_ID ||
+    !("isConfigured" in provider) ||
+    typeof provider.isConfigured !== "function" ||
+    !provider.isConfigured()
+  ) {
+    return null;
+  }
+
+  return provider as InteractiveGoogleAuthProvider;
+}
+
+function getInteractiveEmailProvider(
+  provider: AuthProvider
+): InteractiveEmailAuthProvider | null {
+  if (
+    provider.name !== EMAIL_ACCOUNT_PROVIDER_ID ||
+    !("isConfigured" in provider) ||
+    typeof provider.isConfigured !== "function" ||
+    !provider.isConfigured() ||
+    typeof provider.createAccount !== "function"
+  ) {
+    return null;
+  }
+
+  return provider as InteractiveEmailAuthProvider;
+}
+
 const syncStates: readonly SyncStateDefinition[] = [
   {
     icon: CloudOff,
@@ -274,9 +321,11 @@ function getProviderLabel(
   runtimeState: AccountRuntimeState,
   t: (key: TranslationKey, values?: Record<string, string | number>) => string
 ) {
-  return runtimeState.accountProviderId === "google"
-    ? t("settings.accountProviderGoogle")
-    : t("settings.accountProviderLocalOnly");
+  return runtimeState.accountProviderId === EMAIL_ACCOUNT_PROVIDER_ID
+    ? t("settings.accountProviderEmail")
+    : runtimeState.accountProviderId === GOOGLE_ACCOUNT_PROVIDER_ID
+      ? t("settings.accountProviderGoogle")
+      : t("settings.accountProviderLocalOnly");
 }
 
 function getSyncLastSeenLabel(
@@ -532,6 +581,9 @@ function getRuntimeAccountPresentation(
   runtimeState: AccountRuntimeState,
   t: (key: TranslationKey, values?: Record<string, string | number>) => string
 ): RuntimeAccountPresentation {
+  const emailProviderActive =
+    runtimeState.accountProviderId === EMAIL_ACCOUNT_PROVIDER_ID;
+
   if (runtimeState.localOnly) {
     return {
       titleKey: "settings.accountLocalOnlyTitle",
@@ -561,27 +613,45 @@ function getRuntimeAccountPresentation(
         runtimeState.identity.email ??
         runtimeState.identity.accountId,
       actionsTitleKey: "settings.accountSessionActionsTitle",
-      actionsDescriptionKey: "settings.accountSessionActionsDescription",
+      actionsDescriptionKey: emailProviderActive
+        ? "settings.accountEmailSessionActionsDescription"
+        : "settings.accountSessionActionsDescription",
       actionStatusKey: "settings.accountSessionActionsStatus",
       actionKeys: signedInActions,
-      noteKey: "settings.accountSessionActionsNote",
-      hintKey: "settings.accountSessionActionsHint",
+      noteKey: emailProviderActive
+        ? "settings.accountEmailSessionActionsNote"
+        : "settings.accountSessionActionsNote",
+      hintKey: emailProviderActive
+        ? "settings.accountEmailSessionActionsHint"
+        : "settings.accountSessionActionsHint",
     };
   }
 
   return {
-    titleKey: "settings.accountSignedOutTitle",
+    titleKey: emailProviderActive
+      ? "settings.accountEmailTitle"
+      : "settings.accountSignedOutTitle",
     badgeLabel: t("settings.accountStatusSignedOut"),
     summaryStatusKey: "settings.accountStatusSignedOut",
     description: runtimeState.detail,
     detailsLabelKey: "settings.accountDetailsLabel",
     detailsValue: t("settings.accountDetailsSignedOut"),
-    actionsTitleKey: "settings.accountSignInPreparationTitle",
-    actionsDescriptionKey: "settings.accountSignInPreparationDescription",
-    actionStatusKey: "settings.accountSignInPreparationStatus",
+    actionsTitleKey: emailProviderActive
+      ? "settings.accountEmailActionsTitle"
+      : "settings.accountSignInPreparationTitle",
+    actionsDescriptionKey: emailProviderActive
+      ? "settings.accountEmailActionsDescription"
+      : "settings.accountSignInPreparationDescription",
+    actionStatusKey: emailProviderActive
+      ? "settings.accountEmailActionsStatus"
+      : "settings.accountSignInPreparationStatus",
     actionKeys: signedOutActions,
-    noteKey: "settings.accountSignInPreparationNote",
-    hintKey: "settings.accountSignInPreparationHint",
+    noteKey: emailProviderActive
+      ? "settings.accountEmailActionsNote"
+      : "settings.accountSignInPreparationNote",
+    hintKey: emailProviderActive
+      ? "settings.accountEmailActionsHint"
+      : "settings.accountSignInPreparationHint",
   };
 }
 
@@ -595,7 +665,7 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
     null
   );
   const [accountActionPending, setAccountActionPending] = useState<
-    "sign-in" | "sign-out" | null
+    "create-account" | "sign-in" | "sign-out" | null
   >(null);
   const [syncActionPending, setSyncActionPending] = useState(false);
   const [syncActionFeedback, setSyncActionFeedback] = useState<string | null>(null);
@@ -612,14 +682,16 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
   const syncHealth = getSyncHealthSummary(runtimeState);
   const syncExperienceState = getSyncExperienceState(runtimeState);
   const accountPresentation = getRuntimeAccountPresentation(runtimeState, t);
-  const interactiveGoogleProvider =
-    provider instanceof GoogleAuthProvider && provider.isConfigured()
-      ? provider
-      : null;
+  const interactiveGoogleProvider = getInteractiveGoogleProvider(provider);
+  const interactiveEmailProvider = getInteractiveEmailProvider(provider);
+  const canCreateAccount =
+    interactiveEmailProvider !== null && !runtimeState.hasActiveAccount;
   const canSignIn =
-    interactiveGoogleProvider !== null && !runtimeState.hasActiveAccount;
+    (interactiveEmailProvider !== null || interactiveGoogleProvider !== null) &&
+    !runtimeState.hasActiveAccount;
   const canSignOut =
-    interactiveGoogleProvider !== null && runtimeState.hasActiveAccount;
+    (interactiveEmailProvider !== null || interactiveGoogleProvider !== null) &&
+    runtimeState.hasActiveAccount;
   const canEnableSync =
     runtimeState.hasActiveAccount &&
     runtimeState.syncStatus.enabled !== true &&
@@ -747,8 +819,64 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
     }
   };
 
-  const handleGoogleSignOut = async () => {
-    if (!interactiveGoogleProvider) {
+  const handleEmailCreateAccount = async (input: {
+    email: string;
+    password: string;
+  }) => {
+    if (!interactiveEmailProvider) {
+      return;
+    }
+
+    setAccountActionPending("create-account");
+    setAccountActionFeedback(null);
+
+    try {
+      const result = await interactiveEmailProvider.createAccount(input);
+      setAccountActionFeedback(
+        result.requiresVerification
+          ? t("settings.accountEmailVerificationRequired")
+          : t("settings.accountEmailCreateSuccess")
+      );
+    } catch (error) {
+      setAccountActionFeedback(
+        error instanceof Error
+          ? error.message
+          : t("settings.accountEmailCreateError")
+      );
+    } finally {
+      setAccountActionPending(null);
+    }
+  };
+
+  const handleEmailSignIn = async (input: {
+    email: string;
+    password: string;
+  }) => {
+    if (!interactiveEmailProvider) {
+      return;
+    }
+
+    setAccountActionPending("sign-in");
+    setAccountActionFeedback(null);
+
+    try {
+      await interactiveEmailProvider.login(input);
+      setAccountActionFeedback(t("settings.accountEmailSignInSuccess"));
+    } catch (error) {
+      setAccountActionFeedback(
+        error instanceof Error
+          ? error.message
+          : t("settings.accountEmailSignInError")
+      );
+    } finally {
+      setAccountActionPending(null);
+    }
+  };
+
+  const handleSignOut = async () => {
+    const interactiveProvider =
+      interactiveEmailProvider ?? interactiveGoogleProvider;
+    if (!interactiveProvider) {
       return;
     }
 
@@ -756,13 +884,19 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
     setAccountActionFeedback(null);
 
     try {
-      await interactiveGoogleProvider.logout();
-      setAccountActionFeedback(t("settings.accountGoogleSignOutSuccess"));
+      await interactiveProvider.logout();
+      setAccountActionFeedback(
+        interactiveEmailProvider
+          ? t("settings.accountEmailSignOutSuccess")
+          : t("settings.accountGoogleSignOutSuccess")
+      );
     } catch (error) {
       setAccountActionFeedback(
         error instanceof Error
           ? error.message
-          : t("settings.accountGoogleSignOutError")
+          : interactiveEmailProvider
+            ? t("settings.accountEmailSignOutError")
+            : t("settings.accountGoogleSignOutError")
       );
     } finally {
       setAccountActionPending(null);
@@ -916,8 +1050,10 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
   };
 
   const visibleActionKeys = accountPresentation.actionKeys.filter((action) =>
-    canSignIn
-      ? action.labelKey !== "settings.accountSignInAction"
+    canCreateAccount
+      ? action.labelKey !== "settings.accountCreateAction"
+      : canSignIn
+        ? action.labelKey !== "settings.accountSignInAction"
       : canSignOut
         ? action.labelKey !== "settings.accountSignOutAction"
         : canEnableSync
@@ -926,7 +1062,7 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
   );
   const accountActionStatusTone: SyncStateTone = runtimeState.localOnly
     ? "neutral"
-    : runtimeState.hasActiveAccount || canSignIn
+    : runtimeState.hasActiveAccount || canSignIn || canCreateAccount
       ? "primary"
       : "warning";
 
@@ -1761,7 +1897,17 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
             role="group"
             aria-label={t(accountPresentation.actionsTitleKey)}
           >
-            {canSignIn ? (
+            {!runtimeState.hasActiveAccount && interactiveEmailProvider ? (
+              <div className="sm:col-span-2 xl:col-span-3">
+                <EmailAccountAuthForm
+                  busyAction={accountActionPending}
+                  feedback={accountActionFeedback}
+                  onCreateAccount={handleEmailCreateAccount}
+                  onSignIn={handleEmailSignIn}
+                />
+              </div>
+            ) : null}
+            {!runtimeState.hasActiveAccount && interactiveGoogleProvider ? (
               <Button
                 type="button"
                 className="min-h-11 w-full justify-start sm:w-auto"
@@ -1783,14 +1929,16 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
                 variant="outline"
                 className="min-h-11 w-full justify-start sm:w-auto"
                 onClick={() => {
-                  void handleGoogleSignOut();
+                  void handleSignOut();
                 }}
                 disabled={accountActionPending !== null}
                 aria-describedby={futureActionsDescriptionId}
               >
                 <ArrowUpRight className="me-2 h-4 w-4 shrink-0" />
                 {accountActionPending === "sign-out"
-                  ? t("settings.accountGoogleSigningOut")
+                  ? interactiveEmailProvider
+                    ? t("settings.accountEmailSigningOut")
+                    : t("settings.accountGoogleSigningOut")
                   : t("settings.accountSignOutAction")}
               </Button>
             ) : null}
@@ -1821,7 +1969,7 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
               />
             ))}
           </div>
-          {accountActionFeedback ? (
+          {accountActionFeedback && !interactiveEmailProvider ? (
             <div
               role="status"
               className="rounded-xl border border-border/70 bg-muted/40 px-3 py-3 text-sm leading-6 text-muted-foreground"

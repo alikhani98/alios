@@ -1,8 +1,10 @@
 export const LOCAL_ONLY_ACCOUNT_PROVIDER_ID = "local-only" as const;
 export const GOOGLE_ACCOUNT_PROVIDER_ID = "google" as const;
+export const EMAIL_ACCOUNT_PROVIDER_ID = "email" as const;
 
 export type AccountProviderId =
   | typeof LOCAL_ONLY_ACCOUNT_PROVIDER_ID
+  | typeof EMAIL_ACCOUNT_PROVIDER_ID
   | typeof GOOGLE_ACCOUNT_PROVIDER_ID
   | (string & {});
 

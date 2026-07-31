@@ -1,5 +1,13 @@
 # Changelog
 
+## Stage 251 - Email Account Authentication & Sync Access
+
+- Added real email-based AliOS account creation, sign-in, sign-out, and session-restore support on top of the existing Supabase-backed auth boundary
+- Reused the existing account runtime, auth runtime, and sync runtime so signed-in email users can keep local-first behavior and explicitly enable sync without silent upload
+- Updated the Settings `Account & Sync` surface to show real email account actions, connected account state, sync availability, and sign-out behavior instead of placeholder-only account actions
+- Preserved repository ownership, schema behavior, storage ownership, sync opt-in safety, and continued local-only usage for existing users without an account
+- Added focused auth-provider and Settings account-entry coverage for email account creation, login, logout, session restore, and signed-out entry rendering
+
 ## Stage 251A - Account & Backend Direction Update
 
 - Updated the repository operating contract to permit optional account authentication, sync backend support, and multi-device access while preserving AliOS as a local-first product

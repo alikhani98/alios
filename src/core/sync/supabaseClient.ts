@@ -29,10 +29,32 @@ export type SupabaseBrowserClient = Readonly<{
       data: { session: SupabaseSession | null };
       error: Error | null;
     }>;
+    signUpWithPassword: (input: {
+      email: string;
+      password: string;
+      data?: Record<string, unknown>;
+    }) => Promise<{
+      data: {
+        session: SupabaseSession | null;
+        user: SupabaseSessionUser | null;
+      };
+      error: Error | null;
+    }>;
+    signInWithPassword: (input: {
+      email: string;
+      password: string;
+    }) => Promise<{
+      data: { session: SupabaseSession | null };
+      error: Error | null;
+    }>;
     signInWithIdToken: (input: {
       provider: "google";
       token: string;
     }) => Promise<{
+      data: { session: SupabaseSession | null };
+      error: Error | null;
+    }>;
+    refreshSession: () => Promise<{
       data: { session: SupabaseSession | null };
       error: Error | null;
     }>;
@@ -71,6 +93,13 @@ type SupabaseAuthTokenResponse = Readonly<{
 }>;
 
 type SupabaseUserResponse = Readonly<{
+  user?: SupabaseSessionUser;
+}>;
+
+type SupabaseSignUpResponse = Readonly<{
+  access_token?: string;
+  refresh_token?: string;
+  expires_at?: number;
   user?: SupabaseSessionUser;
 }>;
 
@@ -145,6 +174,41 @@ function toError(error: unknown, fallback: string) {
     : new Error(typeof error === "string" ? error : fallback);
 }
 
+function toSupabaseSession(
+  payload:
+    | SupabaseAuthTokenResponse
+    | SupabaseSignUpResponse
+    | null
+    | undefined
+): SupabaseSession | null {
+  if (
+    !payload ||
+    typeof payload.access_token !== "string" ||
+    !payload.user ||
+    typeof payload.user.id !== "string"
+  ) {
+    return null;
+  }
+
+  return {
+    access_token: payload.access_token,
+    refresh_token: payload.refresh_token,
+    expires_at: payload.expires_at,
+    user: {
+      id: payload.user.id,
+      user_metadata: payload.user.user_metadata,
+    },
+  };
+}
+
+function isSessionExpired(session: SupabaseSession | null): boolean {
+  if (!session?.expires_at) {
+    return false;
+  }
+
+  return session.expires_at * 1000 <= Date.now();
+}
+
 function encodeInFilter(values: ReadonlyArray<string>) {
   return `(${values.map((value) => `"${value}"`).join(",")})`;
 }
@@ -181,10 +245,227 @@ export function createSupabaseBrowserClient(
   return {
     auth: {
       async getSession() {
-        return {
-          data: { session: readStoredSession(authStorageKey) },
-          error: null,
-        };
+        const currentSession = readStoredSession(authStorageKey);
+        if (!currentSession) {
+          return {
+            data: { session: null },
+            error: null,
+          };
+        }
+
+        if (!isSessionExpired(currentSession) || !currentSession.refresh_token) {
+          return {
+            data: { session: currentSession },
+            error: null,
+          };
+        }
+
+        try {
+          const response = await fetch(
+            `${url}/auth/v1/token?grant_type=refresh_token`,
+            {
+              method: "POST",
+              headers: baseHeaders,
+              body: JSON.stringify({
+                refresh_token: currentSession.refresh_token,
+              }),
+            }
+          );
+
+          if (!response.ok) {
+            writeStoredSession(authStorageKey, null);
+            return {
+              data: { session: null },
+              error: await parseErrorResponse(
+                response,
+                "Supabase session refresh failed."
+              ),
+            };
+          }
+
+          const payload =
+            (await response.json()) as SupabaseAuthTokenResponse;
+          const nextSession = toSupabaseSession(payload);
+
+          if (!nextSession) {
+            writeStoredSession(authStorageKey, null);
+            return {
+              data: { session: null },
+              error: new Error(
+                "Supabase session refresh did not return a usable session."
+              ),
+            };
+          }
+
+          writeStoredSession(authStorageKey, nextSession);
+          return {
+            data: { session: nextSession },
+            error: null,
+          };
+        } catch (error) {
+          writeStoredSession(authStorageKey, null);
+          return {
+            data: { session: null },
+            error: toError(error, "Supabase session refresh failed."),
+          };
+        }
+      },
+
+      async signUpWithPassword({ email, password, data }) {
+        try {
+          const response = await fetch(`${url}/auth/v1/signup`, {
+            method: "POST",
+            headers: baseHeaders,
+            body: JSON.stringify({
+              email,
+              password,
+              data,
+            }),
+          });
+
+          if (!response.ok) {
+            return {
+              data: { session: null, user: null },
+              error: await parseErrorResponse(
+                response,
+                "Supabase email account creation failed."
+              ),
+            };
+          }
+
+          const payload = (await response.json()) as SupabaseSignUpResponse;
+          const session = toSupabaseSession(payload);
+          const user =
+            payload.user && typeof payload.user.id === "string"
+              ? {
+                  id: payload.user.id,
+                  user_metadata: payload.user.user_metadata,
+                }
+              : null;
+
+          writeStoredSession(authStorageKey, session);
+          return {
+            data: { session, user },
+            error: null,
+          };
+        } catch (error) {
+          return {
+            data: { session: null, user: null },
+            error: toError(error, "Supabase email account creation failed."),
+          };
+        }
+      },
+
+      async signInWithPassword({ email, password }) {
+        try {
+          const response = await fetch(
+            `${url}/auth/v1/token?grant_type=password`,
+            {
+              method: "POST",
+              headers: baseHeaders,
+              body: JSON.stringify({
+                email,
+                password,
+              }),
+            }
+          );
+
+          if (!response.ok) {
+            return {
+              data: { session: null },
+              error: await parseErrorResponse(
+                response,
+                "Supabase email sign-in failed."
+              ),
+            };
+          }
+
+          const payload =
+            (await response.json()) as SupabaseAuthTokenResponse;
+          const session = toSupabaseSession(payload);
+
+          if (!session) {
+            return {
+              data: { session: null },
+              error: new Error(
+                "Supabase email sign-in did not return a usable session."
+              ),
+            };
+          }
+
+          writeStoredSession(authStorageKey, session);
+          return {
+            data: { session },
+            error: null,
+          };
+        } catch (error) {
+          return {
+            data: { session: null },
+            error: toError(error, "Supabase email sign-in failed."),
+          };
+        }
+      },
+
+      async refreshSession() {
+        const currentSession = readStoredSession(authStorageKey);
+        if (!currentSession?.refresh_token) {
+          return {
+            data: { session: null },
+            error: new Error(
+              "Supabase session refresh is unavailable without a stored refresh token."
+            ),
+          };
+        }
+
+        try {
+          const response = await fetch(
+            `${url}/auth/v1/token?grant_type=refresh_token`,
+            {
+              method: "POST",
+              headers: baseHeaders,
+              body: JSON.stringify({
+                refresh_token: currentSession.refresh_token,
+              }),
+            }
+          );
+
+          if (!response.ok) {
+            writeStoredSession(authStorageKey, null);
+            return {
+              data: { session: null },
+              error: await parseErrorResponse(
+                response,
+                "Supabase session refresh failed."
+              ),
+            };
+          }
+
+          const payload =
+            (await response.json()) as SupabaseAuthTokenResponse;
+          const nextSession = toSupabaseSession(payload);
+
+          if (!nextSession) {
+            writeStoredSession(authStorageKey, null);
+            return {
+              data: { session: null },
+              error: new Error(
+                "Supabase session refresh did not return a usable session."
+              ),
+            };
+          }
+
+          writeStoredSession(authStorageKey, nextSession);
+          return {
+            data: { session: nextSession },
+            error: null,
+          };
+        } catch (error) {
+          writeStoredSession(authStorageKey, null);
+          return {
+            data: { session: null },
+            error: toError(error, "Supabase session refresh failed."),
+          };
+        }
       },
 
       async signInWithIdToken({ provider, token }) {
@@ -213,12 +494,9 @@ export function createSupabaseBrowserClient(
 
           const payload =
             (await response.json()) as SupabaseAuthTokenResponse;
+          const session = toSupabaseSession(payload);
 
-          if (
-            typeof payload.access_token !== "string" ||
-            !payload.user ||
-            typeof payload.user.id !== "string"
-          ) {
+          if (!session) {
             return {
               data: { session: null },
               error: new Error(
@@ -226,16 +504,6 @@ export function createSupabaseBrowserClient(
               ),
             };
           }
-
-          const session: SupabaseSession = {
-            access_token: payload.access_token,
-            refresh_token: payload.refresh_token,
-            expires_at: payload.expires_at,
-            user: {
-              id: payload.user.id,
-              user_metadata: payload.user.user_metadata,
-            },
-          };
 
           writeStoredSession(authStorageKey, session);
 

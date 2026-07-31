@@ -2,7 +2,10 @@ import { ArrowUpRight, RefreshCw, ShieldCheck, UserRound } from "lucide-react";
 import { useState } from "react";
 
 import { useAccountRuntime, useAccountRuntimeState } from "@/core/account";
-import { GOOGLE_ACCOUNT_PROVIDER_ID } from "@/core/account/types";
+import {
+  EMAIL_ACCOUNT_PROVIDER_ID,
+  GOOGLE_ACCOUNT_PROVIDER_ID,
+} from "@/core/account/types";
 import { useAuth, type AuthProvider } from "@/core/auth";
 import { useI18n } from "@/shared/i18n";
 import {
@@ -16,6 +19,8 @@ import {
   StatusChip,
 } from "@/shared/ui";
 
+import { EmailAccountAuthForm } from "./EmailAccountAuthForm";
+
 type SettingsAccountEntryCardProps = Readonly<{
   expanded: boolean;
   onOpenDetails: () => void;
@@ -24,6 +29,12 @@ type SettingsAccountEntryCardProps = Readonly<{
 type InteractiveGoogleAuthProvider = AuthProvider &
   Readonly<{
     isConfigured: () => boolean;
+  }>;
+
+type InteractiveEmailAuthProvider = AuthProvider &
+  Readonly<{
+    isConfigured: () => boolean;
+    createAccount: NonNullable<AuthProvider["createAccount"]>;
   }>;
 
 function getInteractiveGoogleProvider(
@@ -41,6 +52,34 @@ function getInteractiveGoogleProvider(
   return provider as InteractiveGoogleAuthProvider;
 }
 
+function getInteractiveEmailProvider(
+  provider: AuthProvider
+): InteractiveEmailAuthProvider | null {
+  if (
+    provider.name !== EMAIL_ACCOUNT_PROVIDER_ID ||
+    !("isConfigured" in provider) ||
+    typeof provider.isConfigured !== "function" ||
+    !provider.isConfigured() ||
+    typeof provider.createAccount !== "function"
+  ) {
+    return null;
+  }
+
+  return provider as InteractiveEmailAuthProvider;
+}
+
+function getProviderLabelKey(providerId: string) {
+  if (providerId === EMAIL_ACCOUNT_PROVIDER_ID) {
+    return "settings.accountProviderEmail" as const;
+  }
+
+  if (providerId === GOOGLE_ACCOUNT_PROVIDER_ID) {
+    return "settings.accountProviderGoogle" as const;
+  }
+
+  return "settings.accountProviderLocalOnly" as const;
+}
+
 export function SettingsAccountEntryCard({
   expanded,
   onOpenDetails,
@@ -50,16 +89,21 @@ export function SettingsAccountEntryCard({
   const runtimeState = useAccountRuntimeState();
   const { provider } = useAuth();
   const [accountActionPending, setAccountActionPending] = useState<
-    "sign-in" | "sign-out" | null
+    "create-account" | "sign-in" | "sign-out" | null
   >(null);
   const [syncActionPending, setSyncActionPending] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
 
   const interactiveGoogleProvider = getInteractiveGoogleProvider(provider);
+  const interactiveEmailProvider = getInteractiveEmailProvider(provider);
+  const canCreateAccount =
+    interactiveEmailProvider !== null && !runtimeState.hasActiveAccount;
   const canSignIn =
-    interactiveGoogleProvider !== null && !runtimeState.hasActiveAccount;
+    (interactiveEmailProvider !== null || interactiveGoogleProvider !== null) &&
+    !runtimeState.hasActiveAccount;
   const canSignOut =
-    interactiveGoogleProvider !== null && runtimeState.hasActiveAccount;
+    (interactiveEmailProvider !== null || interactiveGoogleProvider !== null) &&
+    runtimeState.hasActiveAccount;
   const canEnableSync =
     runtimeState.hasActiveAccount &&
     runtimeState.syncStatus.enabled !== true &&
@@ -91,8 +135,61 @@ export function SettingsAccountEntryCard({
     }
   };
 
-  const handleGoogleSignOut = async () => {
-    if (!interactiveGoogleProvider) {
+  const handleEmailCreateAccount = async (input: {
+    email: string;
+    password: string;
+  }) => {
+    if (!interactiveEmailProvider) {
+      return;
+    }
+
+    setAccountActionPending("create-account");
+    setFeedback(null);
+
+    try {
+      const result = await interactiveEmailProvider.createAccount(input);
+      setFeedback(
+        result.requiresVerification
+          ? t("settings.accountEmailVerificationRequired")
+          : t("settings.accountEmailCreateSuccess")
+      );
+    } catch (error) {
+      setFeedback(
+        error instanceof Error
+          ? error.message
+          : t("settings.accountEmailCreateError")
+      );
+    } finally {
+      setAccountActionPending(null);
+    }
+  };
+
+  const handleEmailSignIn = async (input: { email: string; password: string }) => {
+    if (!interactiveEmailProvider) {
+      return;
+    }
+
+    setAccountActionPending("sign-in");
+    setFeedback(null);
+
+    try {
+      await interactiveEmailProvider.login(input);
+      setFeedback(t("settings.accountEmailSignInSuccess"));
+    } catch (error) {
+      setFeedback(
+        error instanceof Error
+          ? error.message
+          : t("settings.accountEmailSignInError")
+      );
+    } finally {
+      setAccountActionPending(null);
+    }
+  };
+
+  const handleSignOut = async () => {
+    const interactiveProvider =
+      interactiveEmailProvider ?? interactiveGoogleProvider;
+    if (!interactiveProvider) {
       return;
     }
 
@@ -100,13 +197,19 @@ export function SettingsAccountEntryCard({
     setFeedback(null);
 
     try {
-      await interactiveGoogleProvider.logout();
-      setFeedback(t("settings.accountGoogleSignOutSuccess"));
+      await interactiveProvider.logout();
+      setFeedback(
+        interactiveEmailProvider
+          ? t("settings.accountEmailSignOutSuccess")
+          : t("settings.accountGoogleSignOutSuccess")
+      );
     } catch (error) {
       setFeedback(
         error instanceof Error
           ? error.message
-          : t("settings.accountGoogleSignOutError")
+          : interactiveEmailProvider
+            ? t("settings.accountEmailSignOutError")
+            : t("settings.accountGoogleSignOutError")
       );
     } finally {
       setAccountActionPending(null);
@@ -167,17 +270,23 @@ export function SettingsAccountEntryCard({
               <p className="text-sm font-medium">
                 {runtimeState.hasActiveAccount
                   ? accountIdentityLabel
-                  : t("settings.accountSignInPreparationTitle")}
+                  : interactiveEmailProvider
+                    ? t("settings.accountEmailTitle")
+                    : t("settings.accountSignInPreparationTitle")}
               </p>
               <p className="text-sm leading-6 text-muted-foreground">
                 {runtimeState.hasActiveAccount
                   ? t("settings.accountSessionActionsDescription")
-                  : t("settings.accountSignInPreparationDescription")}
+                  : interactiveEmailProvider
+                    ? t("settings.accountEmailDescription")
+                    : t("settings.accountSignInPreparationDescription")}
               </p>
             </div>
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
-            <Badge variant="secondary">{t("settings.accountProviderGoogle")}</Badge>
+            <Badge variant="secondary">
+              {t(getProviderLabelKey(runtimeState.accountProviderId))}
+            </Badge>
             <Badge variant="secondary">
               {runtimeState.hasActiveAccount
                 ? runtimeState.syncStatus.enabled
@@ -188,8 +297,18 @@ export function SettingsAccountEntryCard({
           </div>
         </div>
 
+        {!runtimeState.hasActiveAccount && interactiveEmailProvider ? (
+          <EmailAccountAuthForm
+            compact
+            busyAction={accountActionPending}
+            feedback={feedback}
+            onCreateAccount={handleEmailCreateAccount}
+            onSignIn={handleEmailSignIn}
+          />
+        ) : null}
+
         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-          {canSignIn ? (
+          {!runtimeState.hasActiveAccount && interactiveGoogleProvider ? (
             <Button
               type="button"
               className="min-h-11 w-full justify-start sm:w-auto"
@@ -228,13 +347,15 @@ export function SettingsAccountEntryCard({
               variant="outline"
               className="min-h-11 w-full justify-start sm:w-auto"
               onClick={() => {
-                void handleGoogleSignOut();
+                void handleSignOut();
               }}
               disabled={accountActionPending !== null}
             >
               <ArrowUpRight className="me-2 h-4 w-4 shrink-0" />
               {accountActionPending === "sign-out"
-                ? t("settings.accountGoogleSigningOut")
+                ? interactiveEmailProvider
+                  ? t("settings.accountEmailSigningOut")
+                  : t("settings.accountGoogleSigningOut")
                 : t("settings.accountSignOutAction")}
             </Button>
           ) : null}
@@ -250,7 +371,7 @@ export function SettingsAccountEntryCard({
           </Button>
         </div>
 
-        {feedback ? (
+        {feedback && !interactiveEmailProvider ? (
           <div
             role="status"
             className="rounded-xl border border-border/70 bg-muted/40 px-3 py-3 text-sm leading-6 text-muted-foreground"

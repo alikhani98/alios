@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import {
   AccountRuntimeProvider,
+  EMAIL_ACCOUNT_PROVIDER_ID,
   GOOGLE_ACCOUNT_PROVIDER_ID,
   LOCAL_ONLY_SYNC_STATUS,
   createAccountRuntimeBoundary,
@@ -111,6 +112,10 @@ class TestAuthProvider implements AuthProvider {
 
   async getCurrentSession(): Promise<AuthSession> {
     return this.session;
+  }
+
+  async createAccount(_input: AuthLoginInput): Promise<AuthLoginResult> {
+    return { session: this.session };
   }
 
   async login(_input: AuthLoginInput): Promise<AuthLoginResult> {
@@ -317,5 +322,42 @@ describe("SettingsAccountEntryCard", () => {
     expect(markup).toContain("Enable sync");
     expect(markup).toContain("Sign out");
     expect(markup).toContain("Open account &amp; sync details");
+  });
+
+  it("shows real email account actions when the configured provider is email", async () => {
+    const authProvider = new TestAuthProvider(EMAIL_ACCOUNT_PROVIDER_ID, {
+      status: "unauthenticated",
+      user: null,
+      provider: EMAIL_ACCOUNT_PROVIDER_ID,
+      detail: "No authenticated email session is active.",
+    });
+    const boundary = createAccountRuntimeBoundary({
+      accountProvider: new TestAccountProvider(
+        EMAIL_ACCOUNT_PROVIDER_ID,
+        "signed-out",
+        {
+          status: "signed-out",
+          providerId: EMAIL_ACCOUNT_PROVIDER_ID,
+          lifecycle: "signed-out",
+          identity: null,
+          detail:
+            "AliOS can show the signed-out email account entry here while your data stays local.",
+        },
+        {
+          status: "signed-out",
+          available: ["account-identity", "explicit-sync-opt-in"],
+          detail: "Email account capabilities become available after sign-in.",
+        }
+      ),
+      authProvider,
+      syncProvider: new TestSyncProvider("local-only", LOCAL_ONLY_SYNC_STATUS),
+    });
+
+    const markup = await renderEntryCard(boundary, authProvider);
+
+    expect(markup).toContain("Email sign-in");
+    expect(markup).toContain("Create account");
+    expect(markup).toContain("Sign in with email");
+    expect(markup).not.toContain("Sign in with Google");
   });
 });

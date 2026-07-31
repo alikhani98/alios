@@ -49,6 +49,7 @@ export interface AuthProvider {
   readonly name: string;
   getCurrentUser(): Promise<AuthUser | null>;
   getCurrentSession(): Promise<AuthSession>;
+  createAccount?(input: AuthLoginInput): Promise<AuthLoginResult>;
   login(input: AuthLoginInput): Promise<AuthLoginResult>;
   logout(): Promise<void>;
   refreshSession(): Promise<AuthSession>;
