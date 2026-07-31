@@ -1090,9 +1090,11 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
       );
 
     if (!connectedSession?.user) {
-      return createLocalOnlyStatus(
-        "Sign in on this device to connect sync."
-      );
+      if (runtimeSession.status !== "authenticated") {
+        this.setSyncEnabled(false);
+      }
+
+      return createLocalOnlyStatus("Sign in on this device to connect sync.");
     }
 
     const device = getOrCreateDeviceIdentity(this.getStorage());
