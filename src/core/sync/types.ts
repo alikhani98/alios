@@ -4,12 +4,14 @@ export type SyncIssue = "conflict" | "connectivity" | "provider";
 export type SyncScope =
   | "preferences"
   | "tasks"
+  | "routines"
   | "projects"
   | "goals"
   | "finance"
   | "manual";
 export type SyncConflictEntity =
   | "tasks"
+  | "routines"
   | "projects"
   | "goals"
   | "financeTransactions"
@@ -29,6 +31,7 @@ export type SyncCategoryStatus = Readonly<{
   key:
     | "preferences"
     | "tasks"
+    | "routines"
     | "projects"
     | "goals"
     | "finance"

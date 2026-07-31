@@ -14,6 +14,7 @@ import type {
   Goal,
   ManualEntry,
   Project,
+  Routine,
   Task,
 } from "@/shared/types";
 
@@ -137,6 +138,7 @@ function createSupabaseClientHarness(
 
 function createBackupStorageStub(input?: {
   tasks?: Task[];
+  routines?: Routine[];
   projects?: Project[];
   goals?: Goal[];
   manualEntries?: ManualEntry[];
@@ -157,7 +159,7 @@ function createBackupStorageStub(input?: {
     knowledgeItems: [],
     settings: [],
     inboxItems: [],
-    routines: [],
+    routines: input?.routines ?? [],
     weeklyPlans: [],
   };
 
@@ -187,6 +189,7 @@ function createBackupStorageStub(input?: {
       data = {
         ...data,
         tasks: [],
+        routines: [],
         projects: [],
         goals: [],
         manualEntries: [],
@@ -424,6 +427,18 @@ describe("SupabasePreferenceSyncProvider", () => {
           updatedAt: "2026-07-28T08:00:00.000Z",
         },
       ],
+      routines: [
+        {
+          id: "routine-1",
+          title: "Morning planning",
+          description: "Review priorities before opening chat apps.",
+          weekdays: [1, 2, 3, 4, 5],
+          priority: "medium",
+          isActive: true,
+          createdAt: "2026-07-27T08:00:00.000Z",
+          updatedAt: "2026-07-28T08:03:00.000Z",
+        },
+      ],
       projects: [
         {
           id: "project-1",
@@ -513,7 +528,15 @@ describe("SupabasePreferenceSyncProvider", () => {
       mode: "ready",
       provider: "supabase",
       enabled: true,
-      scopes: ["preferences", "tasks", "projects", "goals", "finance", "manual"],
+      scopes: [
+        "preferences",
+        "tasks",
+        "routines",
+        "projects",
+        "goals",
+        "finance",
+        "manual",
+      ],
       connectedUserId: "supabase-user-1",
       lastSyncedAt: "2026-07-28T12:00:00.000Z",
       manualPreparation: {
@@ -530,7 +553,7 @@ describe("SupabasePreferenceSyncProvider", () => {
       record_id: string;
       payload: { sync?: { ownerUserId?: string } };
     }>;
-    expect(upsertRows).toHaveLength(6);
+    expect(upsertRows).toHaveLength(7);
     expect(upsertRows).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
@@ -541,6 +564,10 @@ describe("SupabasePreferenceSyncProvider", () => {
               ownerUserId: "supabase-user-1",
             }),
           }),
+        }),
+        expect.objectContaining({
+          entity: "routines",
+          record_id: "routine-1",
         }),
         expect.objectContaining({ entity: "projects", record_id: "project-1" }),
         expect.objectContaining({ entity: "goals", record_id: "goal-1" }),
@@ -565,6 +592,11 @@ describe("SupabasePreferenceSyncProvider", () => {
       lastSyncedAt: "2026-07-28T12:00:00.000Z",
       lastSyncedByDeviceId: expect.any(String),
     });
+    expect(syncedData.routines[0].sync).toMatchObject({
+      ownerUserId: "supabase-user-1",
+      lastSyncedAt: "2026-07-28T12:00:00.000Z",
+      lastSyncedByDeviceId: expect.any(String),
+    });
     expect(syncedData.financeTransactions[0].sync).toMatchObject({
       ownerUserId: "supabase-user-1",
     });
@@ -585,7 +617,7 @@ describe("SupabasePreferenceSyncProvider", () => {
     });
   });
 
-  it("downloads synced Finance and Personal Manual data for a second device after sync is enabled", async () => {
+  it("downloads synced Finance, routines, and Personal Manual data for a second device after sync is enabled", async () => {
     const harness = createSupabaseClientHarness();
     harness.client.records.list.mockResolvedValueOnce({
       data: [
@@ -611,6 +643,32 @@ describe("SupabasePreferenceSyncProvider", () => {
           updated_at: "2026-07-28T09:15:00.000Z",
           created_at: "2026-07-27T08:00:00.000Z",
           last_synced_at: "2026-07-28T09:15:00.000Z",
+          last_synced_by_device_id: "phone-device",
+          has_conflict: false,
+          conflict_reason: undefined,
+        },
+        {
+          user_id: "supabase-user-1",
+          entity: "routines",
+          record_id: "routine-remote-1",
+          payload: {
+            id: "routine-remote-1",
+            title: "Remote evening review",
+            description: "Close the day with a five-minute review.",
+            weekdays: [0, 1, 2, 3, 4],
+            priority: "medium",
+            isActive: true,
+            createdAt: "2026-07-27T08:00:00.000Z",
+            updatedAt: "2026-07-28T09:18:00.000Z",
+            sync: {
+              ownerUserId: "supabase-user-1",
+              lastSyncedAt: "2026-07-28T09:18:00.000Z",
+              lastSyncedByDeviceId: "phone-device",
+            },
+          },
+          updated_at: "2026-07-28T09:18:00.000Z",
+          created_at: "2026-07-27T08:00:00.000Z",
+          last_synced_at: "2026-07-28T09:18:00.000Z",
           last_synced_by_device_id: "phone-device",
           has_conflict: false,
           conflict_reason: undefined,
@@ -671,11 +729,23 @@ describe("SupabasePreferenceSyncProvider", () => {
     expect(result.status).toMatchObject({
       mode: "ready",
       enabled: true,
-      scopes: ["preferences", "tasks", "projects", "goals", "finance", "manual"],
+      scopes: [
+        "preferences",
+        "tasks",
+        "routines",
+        "projects",
+        "goals",
+        "finance",
+        "manual",
+      ],
     });
     expect(syncedData.financeTransactions[0]).toMatchObject({
       id: "txn-remote-1",
       title: "Remote taxi",
+    });
+    expect(syncedData.routines[0]).toMatchObject({
+      id: "routine-remote-1",
+      title: "Remote evening review",
     });
     expect(syncedData.manualEntries[0]).toMatchObject({
       id: "manual-remote-1",

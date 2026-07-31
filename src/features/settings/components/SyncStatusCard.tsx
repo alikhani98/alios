@@ -343,6 +343,8 @@ function getSyncScopeLabelKey(scope: SyncScope): TranslationKey {
       return "settings.syncScopePreferences";
     case "tasks":
       return "settings.syncScopeTasks";
+    case "routines":
+      return "settings.syncScopeRoutines";
     case "projects":
       return "settings.syncScopeProjects";
     case "goals":
@@ -362,6 +364,8 @@ function getSyncCategoryLabelKey(
       return "settings.syncScopePreferences";
     case "tasks":
       return "settings.syncScopeTasks";
+    case "routines":
+      return "settings.syncScopeRoutines";
     case "projects":
       return "settings.syncScopeProjects";
     case "goals":
@@ -419,6 +423,8 @@ function getConflictEntityLabelKey(entity: SyncConflictEntity): TranslationKey {
   switch (entity) {
     case "tasks":
       return "settings.syncConflictEntityTasks";
+    case "routines":
+      return "settings.syncConflictEntityRoutines";
     case "projects":
       return "settings.syncConflictEntityProjects";
     case "goals":
@@ -788,6 +794,7 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
       },
       {
         tasks: 0,
+        routines: 0,
         projects: 0,
         goals: 0,
         financeTransactions: 0,

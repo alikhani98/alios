@@ -13,6 +13,7 @@ import {
   goalSchema,
   manualEntrySchema,
   projectSchema,
+  routineSchema,
   taskSchema,
   type FinanceObligation,
   type FinanceTransaction,
@@ -20,6 +21,7 @@ import {
   type ManualEntry,
   type Project,
   type RecordSyncMetadata,
+  type Routine,
   type Task,
 } from "@/shared/types";
 import { LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
@@ -81,6 +83,7 @@ const SYNCED_PREFERENCE_KEYS = [
 
 const USER_DATA_SCOPES = [
   "tasks",
+  "routines",
   "projects",
   "goals",
   "financeTransactions",
@@ -94,6 +97,7 @@ const PREFERENCE_ONLY_SCOPES = ["preferences"] as const satisfies ReadonlyArray<
 const FULL_SYNC_SCOPES = [
   "preferences",
   "tasks",
+  "routines",
   "projects",
   "goals",
   "finance",
@@ -105,6 +109,7 @@ type SyncedPreferencePayload = Partial<Record<SyncedPreferenceKey, string>>;
 type SyncEntity = (typeof USER_DATA_SCOPES)[number];
 type SyncableRecord =
   | Task
+  | Routine
   | Project
   | Goal
   | ManualEntry
@@ -403,6 +408,17 @@ function createCategoryStatuses(
       visibility: hasUserDataSync && syncAt ? "synced" : "local-only",
     },
     {
+      key: "routines",
+      state: hasUserDataSync && syncAt ? "ready" : "local-only",
+      detail: hasUserDataSync
+        ? "Routines stay editable offline and sync through the same local-first repository boundary."
+        : "Routines stay local until the broader sync boundary is enabled.",
+      lastSyncedAt: hasUserDataSync ? syncAt : undefined,
+      enabled: hasUserDataSync && Boolean(syncAt),
+      privacyLevel: "standard",
+      visibility: hasUserDataSync && syncAt ? "synced" : "local-only",
+    },
+    {
       key: "projects",
       state: hasUserDataSync && syncAt ? "ready" : "local-only",
       detail: hasUserDataSync
@@ -598,6 +614,12 @@ function getTaskMap(data: AliosBackupData): RecordMap<Task> {
   return new Map(data.tasks.map((record) => [record.id, cloneRecord(record)]));
 }
 
+function getRoutineMap(data: AliosBackupData): RecordMap<Routine> {
+  return new Map(
+    data.routines.map((record) => [record.id, cloneRecord(record)])
+  );
+}
+
 function getProjectMap(data: AliosBackupData): RecordMap<Project> {
   return new Map(data.projects.map((record) => [record.id, cloneRecord(record)]));
 }
@@ -641,6 +663,8 @@ function getEntityRecordMap(
   switch (entity) {
     case "tasks":
       return getTaskMap(data);
+    case "routines":
+      return getRoutineMap(data);
     case "projects":
       return getProjectMap(data);
     case "goals":
@@ -662,6 +686,9 @@ function applyEntityRecordMap(
   switch (entity) {
     case "tasks":
       data.tasks = toSortedValues(records as RecordMap<Task>);
+      break;
+    case "routines":
+      data.routines = toSortedValues(records as RecordMap<Routine>);
       break;
     case "projects":
       data.projects = toSortedValues(records as RecordMap<Project>);
@@ -689,6 +716,8 @@ function parseRemoteRecord(entity: SyncEntity, payload: Record<string, unknown>)
   switch (entity) {
     case "tasks":
       return taskSchema.parse(payload);
+    case "routines":
+      return routineSchema.parse(payload);
     case "projects":
       return projectSchema.parse(payload);
     case "goals":
@@ -1129,7 +1158,7 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
       detail:
         metadata.detail ??
         (this.backupStorage
-          ? "AliOS sync is connected for preferences, tasks, projects, goals, finance, and Personal Manual records on this device."
+          ? "AliOS sync is connected for preferences, tasks, routines, projects, goals, finance, and Personal Manual records on this device."
           : "AliOS sync is connected for low-risk preferences on this device."),
     };
     return status;
@@ -1417,7 +1446,7 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
         },
       ],
       detail: this.backupStorage
-        ? "AliOS is syncing preferences, tasks, projects, goals, finance, and Personal Manual records for this device."
+        ? "AliOS is syncing preferences, tasks, routines, projects, goals, finance, and Personal Manual records for this device."
         : "AliOS is syncing low-risk preferences for this device.",
     };
     this.writeMetadata({
@@ -1543,9 +1572,9 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
       );
       const detail =
         conflictCount > 0
-          ? "AliOS synced preferences and safe records, but some task, project, goal, finance, or Personal Manual changes now need conflict review."
+          ? "AliOS synced preferences and safe records, but some task, routine, project, goal, finance, or Personal Manual changes now need conflict review."
           : this.backupStorage
-            ? "AliOS synced preferences, tasks, projects, goals, finance, and Personal Manual records for this device."
+            ? "AliOS synced preferences, tasks, routines, projects, goals, finance, and Personal Manual records for this device."
             : "AliOS synced appearance, language, and interface preferences for this device.";
 
       const status: SyncStatus = {
