@@ -4,12 +4,14 @@ import { AlertTriangle, RefreshCcw, RotateCcw } from "lucide-react";
 import {
   AccountRuntimeProvider,
   createAccountRuntimeBoundary,
+  emailAccountProvider,
   googleAccountProvider,
   localOnlyAccountProvider,
   type AccountProvider,
 } from "@/core/account";
 import {
   AuthRuntimeProvider,
+  emailAuthProvider,
   googleAuthProvider,
   localOnlyAuthProvider,
   type AuthProvider,
@@ -49,6 +51,27 @@ type BootstrapState =
   | { status: "loading" }
   | { status: "ready"; adapter: StorageAdapter }
   | { status: "error"; error: Error };
+
+function resolveDefaultAccountProvider() {
+  if (emailAuthProvider.isConfigured()) {
+    return {
+      accountProvider: emailAccountProvider,
+      authProvider: emailAuthProvider,
+    };
+  }
+
+  if (googleAuthProvider.isConfigured()) {
+    return {
+      accountProvider: googleAccountProvider,
+      authProvider: googleAuthProvider,
+    };
+  }
+
+  return {
+    accountProvider: localOnlyAccountProvider,
+    authProvider: localOnlyAuthProvider,
+  };
+}
 
 export function normalizeBootstrapError(error: unknown): Error {
   if (error instanceof Error) {
@@ -129,12 +152,8 @@ export function AppBootstrapErrorFallback({
 export function AppProviders({
   children,
   loadStorageAdapter = loadDexieStorageAdapter,
-  accountProvider = googleAuthProvider.isConfigured()
-    ? googleAccountProvider
-    : localOnlyAccountProvider,
-  authProvider = googleAuthProvider.isConfigured()
-    ? googleAuthProvider
-    : localOnlyAuthProvider,
+  accountProvider = resolveDefaultAccountProvider().accountProvider,
+  authProvider = resolveDefaultAccountProvider().authProvider,
   syncProvider,
 }: AppProvidersProps) {
   const [bootstrapState, setBootstrapState] = useState<BootstrapState>({
@@ -146,7 +165,7 @@ export function AppProviders({
       return syncProvider;
     }
 
-    if (!googleAuthProvider.isConfigured()) {
+    if (!emailAuthProvider.isConfigured() && !googleAuthProvider.isConfigured()) {
       return localOnlySyncProvider;
     }
 
