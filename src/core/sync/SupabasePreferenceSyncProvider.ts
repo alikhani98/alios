@@ -1022,20 +1022,16 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
 
   async getStatus(): Promise<SyncStatus> {
     if (!this.client) {
-      const status = createLocalOnlyStatus(
+      return createLocalOnlyStatus(
         "Sync stays disabled until Supabase environment variables are configured."
       );
-      this.emitStatus(status);
-      return status;
     }
 
     const authSession = this.runtime.getSession();
     if (authSession.status !== "authenticated" || !authSession.user) {
-      const status = createLocalOnlyStatus(
+      return createLocalOnlyStatus(
         "Sign in with Google on this device to connect sync."
       );
-      this.emitStatus(status);
-      return status;
     }
 
     if (!this.isSyncEnabled()) {
@@ -1055,7 +1051,6 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
         detail:
           "Google account is connected on this device, but sync stays off until you explicitly enable it.",
       };
-      this.emitStatus(status);
       return status;
     }
 
@@ -1100,7 +1095,6 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
           metadata.detail ??
           "AliOS has not connected this device to sync yet.",
       };
-      this.emitStatus(status);
       return status;
     }
 
@@ -1139,7 +1133,6 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
           ? "AliOS sync is connected for preferences, tasks, projects, goals, finance, and Personal Manual records on this device."
           : "AliOS sync is connected for low-risk preferences on this device."),
     };
-    this.emitStatus(status);
     return status;
   }
 

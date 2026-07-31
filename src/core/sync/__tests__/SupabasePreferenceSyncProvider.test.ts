@@ -194,19 +194,12 @@ describe("SupabasePreferenceSyncProvider", () => {
     localStorage.clear();
   });
 
-  it("stays local-only when no Supabase client is configured", async () => {
+  it("stays local-only when no authenticated runtime session is available", async () => {
     const provider = new SupabasePreferenceSyncProvider({
-      createClient: () => null,
       runtime: createRuntimeStub({
-        status: "authenticated",
+        status: "unauthenticated",
         provider: "google",
-        user: {
-          userId: "google-user-1",
-          email: "user@example.com",
-          displayName: "AliOS User",
-          createdAt: "2026-07-28T00:00:00.000Z",
-          updatedAt: "2026-07-28T00:00:00.000Z",
-        },
+        user: null,
       }),
       getStorage: () => localStorage,
     });
@@ -326,6 +319,36 @@ describe("SupabasePreferenceSyncProvider", () => {
       scopes: [],
     });
     expect(harness.client.auth.signInWithIdToken).not.toHaveBeenCalled();
+  });
+
+  it("does not notify sync subscribers when getStatus is called", async () => {
+    const harness = createSupabaseClientHarness();
+    const provider = new SupabasePreferenceSyncProvider({
+      client: harness.client,
+      runtime: createRuntimeStub({
+        status: "authenticated",
+        provider: "google",
+        user: {
+          userId: "google-user-1",
+          email: "user@example.com",
+          displayName: "AliOS User",
+          createdAt: "2026-07-28T00:00:00.000Z",
+          updatedAt: "2026-07-28T12:00:00.000Z",
+        },
+      }),
+      getStorage: () => localStorage,
+      now: () => new Date("2026-07-28T12:00:00.000Z"),
+    });
+
+    const listener = vi.fn();
+    const subscription = provider.subscribe(listener);
+
+    listener.mockClear();
+    await provider.getStatus();
+
+    expect(listener).not.toHaveBeenCalled();
+
+    subscription.unsubscribe();
   });
 
   it("syncs tasks, projects, goals, finance records, and Personal Manual entries through the backup boundary while preserving local-first ownership", async () => {
