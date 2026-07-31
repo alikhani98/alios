@@ -798,6 +798,7 @@ describe("SupabasePreferenceSyncProvider", () => {
       enabled: false,
       detail: "Sign in on this device to connect sync.",
     });
+    expect(localStorage.getItem("alios.sync.enabled")).toBeNull();
   });
 
   it("retains the last successful sync timestamp after a later failed retry", async () => {
