@@ -34,6 +34,10 @@ function createClientHarness() {
         data: { session },
         error: null,
       }),
+      restoreSessionFromUrlHash: async () => ({
+        data: { session: null, consumed: false },
+        error: null,
+      }),
       signUpWithPassword: async ({ email }) => ({
         data: {
           session: null,

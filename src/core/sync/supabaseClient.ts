@@ -29,6 +29,12 @@ export type SupabaseBrowserClient = Readonly<{
       data: { session: SupabaseSession | null };
       error: Error | null;
     }>;
+    restoreSessionFromUrlHash: (
+      hash?: string
+    ) => Promise<{
+      data: { session: SupabaseSession | null; consumed: boolean };
+      error: Error | null;
+    }>;
     signUpWithPassword: (input: {
       email: string;
       password: string;
@@ -101,6 +107,13 @@ type SupabaseSignUpResponse = Readonly<{
   refresh_token?: string;
   expires_at?: number;
   user?: SupabaseSessionUser;
+}>;
+
+type SupabaseAccessTokenPayload = Readonly<{
+  sub?: string;
+  email?: string;
+  user_metadata?: Record<string, unknown>;
+  exp?: number;
 }>;
 
 function getStorage() {
@@ -199,6 +212,97 @@ function toSupabaseSession(
       user_metadata: payload.user.user_metadata,
     },
   };
+}
+
+function decodeBase64UrlSegment(segment: string): string {
+  const normalized = segment.replace(/-/g, "+").replace(/_/g, "/");
+  const padding = normalized.length % 4 === 0 ? "" : "=".repeat(4 - (normalized.length % 4));
+  const encoded = `${normalized}${padding}`;
+
+  if (typeof atob === "function") {
+    return atob(encoded);
+  }
+
+  return Buffer.from(encoded, "base64").toString("binary");
+}
+
+function parseAccessTokenPayload(accessToken: string): SupabaseAccessTokenPayload {
+  const segments = accessToken.split(".");
+
+  if (segments.length < 2) {
+    throw new Error("Supabase access token was malformed.");
+  }
+
+  try {
+    const payload = JSON.parse(
+      decodeBase64UrlSegment(segments[1])
+    ) as SupabaseAccessTokenPayload;
+
+    if (typeof payload.sub !== "string" || payload.sub.trim().length === 0) {
+      throw new Error("Supabase access token did not include a subject.");
+    }
+
+    return payload;
+  } catch (error) {
+    throw new Error(
+      error instanceof Error
+        ? error.message
+        : "Supabase access token payload could not be decoded."
+    );
+  }
+}
+
+function parseSessionFromUrlHash(hash: string): {
+  session: SupabaseSession | null;
+  consumed: boolean;
+} {
+  const normalizedHash = hash.startsWith("#") ? hash.slice(1) : hash;
+  const params = new URLSearchParams(normalizedHash);
+  const accessToken = params.get("access_token");
+  const refreshToken = params.get("refresh_token");
+
+  if (!accessToken && !refreshToken) {
+    return {
+      session: null,
+      consumed: false,
+    };
+  }
+
+  if (!accessToken) {
+    throw new Error("Supabase auth callback did not include an access token.");
+  }
+
+  const payload = parseAccessTokenPayload(accessToken);
+  return {
+    session: {
+      access_token: accessToken,
+      refresh_token: refreshToken ?? undefined,
+      expires_at:
+        typeof payload.exp === "number" && Number.isFinite(payload.exp)
+          ? payload.exp
+          : undefined,
+      user: {
+        id: payload.sub!.trim(),
+        user_metadata:
+          payload.user_metadata ??
+          (payload.email
+            ? {
+                email: payload.email,
+              }
+            : undefined),
+      },
+    },
+    consumed: true,
+  };
+}
+
+function clearAuthHashFromUrl() {
+  if (typeof window === "undefined" || typeof window.history === "undefined") {
+    return;
+  }
+
+  const nextUrl = `${window.location.pathname}${window.location.search}`;
+  window.history.replaceState(window.history.state, document.title, nextUrl);
 }
 
 function isSessionExpired(session: SupabaseSession | null): boolean {
@@ -307,6 +411,33 @@ export function createSupabaseBrowserClient(
           return {
             data: { session: null },
             error: toError(error, "Supabase session refresh failed."),
+          };
+        }
+      },
+
+      async restoreSessionFromUrlHash(hash = typeof window !== "undefined" ? window.location.hash : "") {
+        try {
+          const { session, consumed } = parseSessionFromUrlHash(hash);
+
+          if (!consumed) {
+            return {
+              data: { session: null, consumed: false },
+              error: null,
+            };
+          }
+
+          writeStoredSession(authStorageKey, session);
+          clearAuthHashFromUrl();
+          return {
+            data: { session, consumed: true },
+            error: null,
+          };
+        } catch (error) {
+          clearAuthHashFromUrl();
+          writeStoredSession(authStorageKey, null);
+          return {
+            data: { session: null, consumed: true },
+            error: toError(error, "Supabase auth callback could not be restored."),
           };
         }
       },

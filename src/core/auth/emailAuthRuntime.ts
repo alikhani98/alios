@@ -118,6 +118,25 @@ export class EmailAuthRuntime {
       return this.currentSession;
     }
 
+    const callbackRestoreResult = await this.client.auth.restoreSessionFromUrlHash();
+    if (callbackRestoreResult.error) {
+      this.currentSession = {
+        status: "error",
+        user: null,
+        provider: EMAIL_ACCOUNT_PROVIDER_ID,
+        detail: callbackRestoreResult.error.message,
+      };
+      return this.currentSession;
+    }
+
+    if (callbackRestoreResult.data.session) {
+      this.currentSession = createAuthenticatedSession(
+        callbackRestoreResult.data.session,
+        this.now()
+      );
+      return this.currentSession;
+    }
+
     const result = await this.client.auth.getSession();
     if (result.error) {
       this.currentSession = {
