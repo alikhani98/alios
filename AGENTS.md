@@ -102,6 +102,18 @@ During a stage:
 - Keep domain, application, repository, storage, and UI responsibilities separate.
 - Do not silently expand scope.
 - Keep the project in a buildable state.
+- Follow this approval chain unless the user explicitly approves a narrower exception:
+
+```text
+Local implementation
+-> Local automated validation
+-> Local/real-world QA
+-> User approval
+-> Commit
+-> User approval
+-> Push / PR
+-> Separate approval for Merge
+```
 
 After a stage:
 
@@ -151,6 +163,15 @@ Every completed work response must include:
 - Automated Validation Status: tests, TypeScript, build, and CI status
 - Real-World Validation Status: manual testing, device or browser validation, user acceptance, or external verification
 - Passing automated tests does not equal real-world validation
+- Always separate these three lines explicitly:
+
+```text
+Implementation status:
+Automated validation status:
+Real-world validation status:
+```
+
+- Never report automated validation as a substitute for real-world validation. `Automated validation passed != Real-world validation passed`.
 - Files Added
 - Files Modified
 - Files Removed

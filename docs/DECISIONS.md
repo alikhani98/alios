@@ -11,12 +11,56 @@ Reason:
 
 ## ADR-002: Use IndexedDB/Dexie instead of Supabase
 
+**Status:** Superseded in part (Stage 251A, 2026-07-31)
+
 Reason:
 
 - Zero monthly cost
 - No external service dependency
 - Offline-first
 - Good fit for a single-user local app
+
+Historical note:
+
+- This decision remains valid for AliOS' primary local persistence model.
+- It is superseded in part because the repository now allows additive optional Supabase-backed account and sync capabilities without replacing IndexedDB/Dexie as the first local store.
+
+## ADR-002A: Keep IndexedDB primary while allowing optional Supabase-backed auth and sync
+
+**Status:** Accepted (Stage 251A, 2026-07-31)
+
+Context:
+
+- AliOS began as a strictly local-only product and documented Dexie/IndexedDB as the sole persistence direction.
+- By Stage 251A onward, the repository already contained approved optional account, authentication, and sync work that no longer matched the older absolute "no Supabase / no auth / no backend" wording.
+- The project still needed to preserve its local-first safety model, repository ownership, and account-free usage.
+
+Decision:
+
+- IndexedDB/Dexie remains AliOS' primary local persistence layer and the first readable/writable copy of user data.
+- Supabase-backed authentication and synchronization are allowed only as additive optional capabilities.
+- Repository boundaries remain the source of truth for feature data access; auth and sync adapters must not take ownership of feature repositories or domain rules.
+- Account creation, sign-in, and sync activation must remain explicit user actions.
+- Local-only usage remains valid, and backup/export/import remain trusted user-controlled safety paths.
+
+Reason:
+
+- This preserves the original local-first architecture while allowing real multi-device workflows without rewriting the core data model.
+- It keeps remote capability bounded to adapters instead of spreading backend assumptions into feature code.
+- It corrects the repository's architecture contract without erasing historical decisions.
+
+Consequences:
+
+- Documentation must distinguish between "local-first" and "local-only".
+- Supabase/Auth language must be additive and optional rather than absolute or mandatory.
+- Automated validation and real-world sync verification must be reported separately.
+
+Related files:
+
+- `AGENTS.md`
+- `README.md`
+- `PROJECT_STATE.md`
+- `docs/ARCHITECTURE.md`
 
 ## ADR-003: Use Repository Pattern from day one
 

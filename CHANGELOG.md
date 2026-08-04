@@ -1,5 +1,14 @@
 # Changelog
 
+## Stage 255 - Project Memory & Documentation Alignment
+
+- Added `AI_CONTEXT.md` as a compact repository-native recovery guide for new Codex sessions so project reality no longer depends on prior chat history
+- Aligned `AGENTS.md`, `README.md`, `PROJECT_STATE.md`, `docs/ROADMAP.md`, `docs/ARCHITECTURE.md`, and `docs/DECISIONS.md` with the current local-first plus optional account/sync product model proved through Stage 254
+- Preserved historical decisions while marking the older absolute Dexie-vs-Supabase direction as superseded in part instead of deleting it
+- Recorded the required approval chain and the rule that automated validation must always be reported separately from real-world validation
+- This stage changed no product behavior, source files under `src/`, schemas, migrations, dependencies, Supabase configuration, authentication implementation, sync implementation, tests, or user data
+- This stage does not claim real-world multi-device verification
+
 ## Stage 254 - Essential User Data Sync Completion
 
 - Audited the live sync surface and confirmed Preferences, Finance, Personal Manual, Goals, and Projects were already synchronized through the existing Supabase-backed sync provider
