@@ -47,7 +47,7 @@ Stage 84 adds a manual, local-only real-world usage QA guide so future work is p
 Stage 85 splits stable third-party build output into cacheable chunks and keeps form validation code out of the initial module-preload path; see [`docs/PERFORMANCE.md`](docs/PERFORMANCE.md).
 Stage 86 turns that measured boundary into a repeatable local and pull-request CI guard through `pnpm performance:check`.
 
-AliOS is designed for one person and stores its data in the browser through IndexedDB. It requires no backend, account, authentication, subscription, paid API, or hosted AI service.
+AliOS is still designed for one person first and keeps its local browser data in IndexedDB through Dexie. The application remains usable without an account, but the repository now also contains optional account and sync capabilities that can be enabled explicitly by the user. Those additive capabilities do not replace local ownership, do not make cloud usage mandatory, and do not turn AliOS into a subscription or hosted-AI product.
 
 ## Core features
 
@@ -107,7 +107,7 @@ AliOS is designed for one person and stores its data in the browser through Inde
 
 AliOS is a static React application built with Vite and TypeScript. It uses Tailwind CSS and shadcn/ui-compatible components for the interface, React Router with hash routing, Zod and React Hook Form for validation and forms, and Dexie over IndexedDB for local persistence.
 
-Application features access persistence through Repository and Storage Adapter boundaries. UI code does not access Dexie directly. AliOS 1.0 has no backend, authentication, remote database, cloud sync, paid API, or AI integration.
+Application features access persistence through Repository and Storage Adapter boundaries. UI code does not access Dexie directly. IndexedDB remains the primary local persistence layer and the first readable/writable copy of user data. Optional Supabase-backed authentication and sync may be enabled as additive capabilities, but they must preserve local-first safety, explicit sync opt-in, backup compatibility, and repository ownership.
 
 Architecture references:
 
@@ -182,10 +182,9 @@ To enable deployment:
 3. Push the approved changes to `main` or manually run the **Deploy GitHub Pages** workflow.
 4. Wait for both workflow jobs to pass, then open the Pages URL above.
 
-AliOS uses hash routing (`#/today`, `#/projects`, and similar routes), so direct navigation does not require server rewrite rules. A production build can also be uploaded to static hosting at a matching `/alios/` path. No production Node.js server or backend is required.
+AliOS uses hash routing (`#/today`, `#/projects`, and similar routes), so direct navigation does not require server rewrite rules. A production build can also be uploaded to static hosting at a matching `/alios/` path. No production Node.js server is required.
 
-Deployment creates a public application URL, not data synchronization. Records remain local to each browser/device. Use Backup Export and Backup Import to transfer data manually.
-Local appearance and profile preferences also stay on the current browser or device and do not sync between installations.
+Deployment creates a public application URL. By default, records still stay local to each browser/device. When the optional account and sync capability is not configured or not enabled by the user, Backup Export and Backup Import remain the manual cross-device transfer path. When the optional account and sync capability is configured and explicitly enabled, the current repository supports additive Supabase-backed synchronization for the implemented data scope only. Local appearance and profile preferences continue to be local-first preferences, and only the explicitly synchronized preference subset participates in the opt-in sync flow.
 
 ## Backup and restore
 
@@ -198,7 +197,7 @@ Restore validates the selected file before showing confirmation. The restore pre
 
 Backups now include `inboxItems`. Valid older backups without this field remain compatible and restore with an empty Inbox. Stage 50 also keeps additive `financeTransactions`, `financeObligations`, and `decisionLogEntries` compatibility by restoring missing arrays as empty lists while still rejecting malformed records before any write.
 
-Clearing browser storage, using a different browser profile, changing the deployment origin, or losing the device can make local data unavailable. Export backups regularly; v1.0 does not provide automatic or cloud backup.
+Clearing browser storage, using a different browser profile, changing the deployment origin, or losing the device can make local data unavailable. Export backups regularly. Backup, export, import, and restore remain valid user-controlled safety paths even when optional account and sync features are enabled.
 
 ## Browser support
 
@@ -208,7 +207,7 @@ AliOS targets current mobile and desktop releases of Chromium-based browsers, Fi
 
 Open the deployed AliOS URL in a mobile browser. Where the browser and platform support it, use **Add to Home Screen** or **Install app** to launch AliOS in a standalone window. The app uses a native Service Worker to cache its static shell and loaded same-origin assets after a normal online visit. User records remain only in IndexedDB; the first offline launch is not supported and updates are not forced mid-session.
 
-Data belongs to the exact browser, device, and deployed origin where it was created. Mobile and laptop data do not synchronize automatically. To move data between devices:
+Data belongs first to the local browser, device, and deployed origin where it was created. Mobile and laptop data do not synchronize automatically unless the optional account and sync capability is configured and explicitly enabled by the user. Manual backup transfer remains a supported and trustworthy path. To move data between devices manually:
 
 1. Export a backup from Settings on the source device.
 2. Transfer the JSON file using a method you trust.
@@ -225,16 +224,16 @@ Open Inbox to save a thought, task, idea, link, reminder, or note with minimal t
 
 ## v1.0 scope and limitations
 
-Version 1.0 is intentionally single-user and local-only. It does not include:
+Version 1.0 remains intentionally single-user by default and local-first. It does not include:
 
-- Accounts, authentication, backend services, or automatic multi-device sync
+- Mandatory accounts, forced authentication, or mandatory cloud usage
 - Cloud or scheduled backup, encryption, compression, or attachments
 - Full routines and wellness engines
 - Routine templates are preview-only foundations and do not create recurring routines
 - Decision Log is a local-first foundation and does not decide for the user
 - Personal Manual templates are static starter structures only and do not create separate saved template records
 - AI features or hosted AI providers
-- Google Calendar, ICS export, notifications, and analytics
+- Gmail or Outlook inbox synchronization, Google Calendar, ICS export, notifications, and analytics
 - UI automation or end-to-end browser tests
 - Advanced routines and wellness engines beyond the simple local checklist foundation
 - Local-only Home dashboard layout preferences with no drag-and-drop builder yet
@@ -243,6 +242,17 @@ Version 1.0 is intentionally single-user and local-only. It does not include:
 
 Dates remain stored as ISO/Gregorian strings; Jalali support is display-only. User-generated content is never automatically translated.
 The Home dashboard also includes a small local-only morning reminder that can be dismissed for the day or disabled in Settings, a routine templates section with built-in previews, a local Wellness / Badminton routine card with daily checklist state, and an upcoming tasks summary that helps separate overdue, today, tomorrow, this week, and later work.
+
+## Optional account and sync
+
+The current repository includes additive account and sync foundations beyond the original local-only release line.
+
+- AliOS remains local-first and usable without an account.
+- Account creation and sign-in are optional.
+- Sync activates only after explicit user action.
+- Supabase-backed auth and sync are additive adapters, not replacements for local repositories or local ownership.
+- The implemented sync scope is limited to the categories already evidenced in the repository and project state.
+- Email authentication means account sign-in with email credentials. It does not mean synchronizing a Gmail or Outlook inbox.
 
 ## After v1.0
 

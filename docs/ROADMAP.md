@@ -18,7 +18,15 @@
 
 ## Real-world usage period
 
-AliOS v1.0 should be used with real personal data before more product scope is approved. Full routines and wellness engines, AI, Google Calendar, ICS export, cloud sync, and notifications remain deferred until observed usage justifies them. Weekly Review and Decision Log are now available as local-first foundations, and Personal Manual is now available as a local-first foundation.
+AliOS v1.0 should be used with real personal data before more product scope is approved. Full routines and wellness engines, AI, Google Calendar, ICS export, and notifications remain deferred until observed usage justifies them. Weekly Review and Decision Log are now available as local-first foundations, and Personal Manual is now available as a local-first foundation.
+
+## Current implementation reality
+
+- AliOS remains local-first.
+- Using AliOS without an account remains a supported product mode.
+- Optional account authentication and optional Supabase-backed synchronization now exist in the repository as additive capabilities.
+- Sync is not treated as always-on infrastructure; it must still be activated explicitly by the user.
+- Real multi-device verification of the current optional account/sync behavior remains an evidence gap even though the implementation path exists.
 
 The later version ideas below are directional only. They are not approved stages and may change after real-world use.
 

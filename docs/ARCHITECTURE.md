@@ -346,9 +346,9 @@ Dexie / IndexedDB in v1
 ## Non-goals in v1
 
 - No OpenAI API
-- No Supabase
-- No backend
-- No auth
+- No mandatory Supabase dependency for basic product access
+- No mandatory backend usage for local-only product access
+- No forced authentication for using AliOS
 - No vector database
 - No semantic search
 - No plugins
@@ -365,14 +365,15 @@ Dexie / IndexedDB in v1
 ## Local-first sync boundary
 
 - `SyncProvider` is an application boundary, not a database replacement. Features continue to use repositories and the injected Storage Adapter.
-- The only shipped provider is `LocalOnlySyncProvider`; both its status and `syncNow` result are non-mutating and have no network activity.
+- The repository now ships both a local-only provider path and an additive optional Supabase-backed sync provider path.
+- The local-only provider remains the safe default whenever optional account and sync configuration is unavailable or not explicitly enabled by the user.
 - A remote provider must be opt-in, retain a local-first source of truth, preserve backup/restore compatibility, publish conflict behavior, and never make authentication or remote transfer a prerequisite for using AliOS.
 
 ## Optional sync consent boundary
 
-- The future remote-provider direction is Supabase, but no SDK, endpoint, credential, account state, or network request is shipped in this stage.
-- `assessOptionalSyncConsent` is a pure pre-activation guard. A future provider must prove a user-controlled account, explicit consent, visible data-scope disclosure, retained local copy, and backup compatibility before it can activate.
-- The guard never persists consent or claims that a provider is configured; that action belongs to a separate approved account-and-sync implementation.
+- Supabase is the approved additive remote-provider direction currently implemented in the repository for optional account and sync behavior.
+- Sync activation still requires explicit user consent, visible scope disclosure, a retained local copy, and backup compatibility.
+- The consent boundary remains product-critical even though optional auth and sync foundations are now implemented: no silent upload, no silent merge, and no forced account path are allowed.
 
 ## Local device transfer guide
 
