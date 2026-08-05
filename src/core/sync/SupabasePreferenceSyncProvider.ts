@@ -1,4 +1,6 @@
 import type { AliosBackupData, BackupStorage } from "@/core/backup";
+import type { AuthProvider, AuthSession } from "@/core/auth";
+import { googleAuthProvider } from "@/core/auth";
 import type { GoogleAuthRuntime } from "@/core/auth/googleAuthRuntime";
 import { googleAuthRuntime } from "@/core/auth/googleAuthRuntime";
 import { CALENDAR_DISPLAY_STORAGE_KEY } from "@/shared/date";
@@ -191,9 +193,18 @@ type SyncProviderDependencies = Readonly<{
   createClient?: () => SupabaseClientFacade | null;
   getStorage?: () => PreferenceStorage | null;
   now?: () => Date;
+  authProvider?: Pick<AuthProvider, "getCurrentSession" | "subscribe">;
   runtime?: GoogleAuthRuntime;
+  idTokenProvider?: Pick<GoogleAuthRuntime, "getIdToken">;
   backupStorage?: BackupStorage;
 }>;
+
+type SyncAuthSessionSource = Readonly<{
+  getCurrentSession: () => Promise<AuthSession>;
+  subscribe: (listener: (session: AuthSession) => void) => { unsubscribe: () => void };
+}>;
+
+type AuthSessionSubscription = ReturnType<SyncAuthSessionSource["subscribe"]>;
 
 type RecordMap<TRecord extends SyncableRecord> = Map<string, TRecord>;
 
@@ -992,10 +1003,14 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
 
   private readonly now: () => Date;
   private readonly getStorage: () => PreferenceStorage | null;
-  private readonly runtime: GoogleAuthRuntime;
+  private readonly authSessionSource: SyncAuthSessionSource;
+  private readonly idTokenProvider: Pick<GoogleAuthRuntime, "getIdToken"> | null;
   private readonly client: SupabaseClientFacade | null;
   private readonly backupStorage: BackupStorage | null;
   private readonly listeners = new Set<SyncStateListener>();
+  private authSessionSubscription: AuthSessionSubscription | null = null;
+  private preferenceChangeListener: (() => void) | null = null;
+  private isActivated = false;
   private syncInFlight: Promise<SyncResult> | null = null;
   private conflictSnapshot: ReadonlyArray<SyncConflictRecord> = [];
   private lastKnownStatus: SyncStatus = createLocalOnlyStatus(
@@ -1005,60 +1020,66 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
   constructor(dependencies: SyncProviderDependencies = {}) {
     this.now = dependencies.now ?? (() => new Date());
     this.getStorage = dependencies.getStorage ?? getPreferenceStorage;
-    this.runtime = dependencies.runtime ?? googleAuthRuntime;
+    const runtime = dependencies.runtime ?? googleAuthRuntime;
+    this.authSessionSource = dependencies.authProvider ?? {
+      getCurrentSession: async () => runtime.getSession(),
+      subscribe: (listener) => runtime.subscribe(listener),
+    };
+    this.idTokenProvider = dependencies.idTokenProvider ?? runtime ?? null;
     this.client =
       dependencies.client ??
       dependencies.createClient?.() ??
       createSupabaseClientFromConfiguration();
     this.backupStorage = dependencies.backupStorage ?? null;
+  }
 
-    this.runtime.subscribe((session) => {
-      if (session.status === "authenticated" && this.isSyncEnabled()) {
-        void this.syncNow();
-        return;
-      }
+  activate() {
+    if (this.isActivated) {
+      return;
+    }
 
-      if (session.status === "unauthenticated" || session.status === "error") {
-        this.setSyncEnabled(false);
-        void this.disconnectRemoteSession().finally(() => {
-          this.emitStatus(
-            createLocalOnlyStatus(
-              "Sign in on this device to connect sync."
-            )
-          );
-        });
-      }
+    this.isActivated = true;
+    this.authSessionSubscription = this.authSessionSource.subscribe(() => {
+      void this.handleAuthSessionChange();
     });
 
     if (typeof window !== "undefined") {
-      const handlePreferenceChange = () => {
-        if (!this.isSyncEnabled()) {
-          return;
-        }
-
-        void this.ensureRemoteSession(false)
-          .then((connectedSession) => {
-            if (connectedSession?.user) {
-              void this.syncNow();
-              return;
-            }
-
-            if (this.runtime.getSession().status === "authenticated") {
-              void this.syncNow();
-            }
-          })
-          .catch(() => {
-            // Leave the current local data in place when a background sync check fails.
-          });
+      this.preferenceChangeListener = () => {
+        void this.handlePreferenceChange();
       };
-
-      window.addEventListener("storage", handlePreferenceChange);
+      window.addEventListener("storage", this.preferenceChangeListener);
       window.addEventListener(
         LOCAL_PREFERENCE_CHANGE_EVENT,
-        handlePreferenceChange
+        this.preferenceChangeListener
       );
-      window.addEventListener(USER_DATA_SYNC_TRIGGER_EVENT, handlePreferenceChange);
+      window.addEventListener(
+        USER_DATA_SYNC_TRIGGER_EVENT,
+        this.preferenceChangeListener
+      );
     }
+  }
+
+  deactivate() {
+    if (!this.isActivated) {
+      return;
+    }
+
+    this.isActivated = false;
+    this.authSessionSubscription?.unsubscribe();
+    this.authSessionSubscription = null;
+
+    if (typeof window !== "undefined" && this.preferenceChangeListener) {
+      window.removeEventListener("storage", this.preferenceChangeListener);
+      window.removeEventListener(
+        LOCAL_PREFERENCE_CHANGE_EVENT,
+        this.preferenceChangeListener
+      );
+      window.removeEventListener(
+        USER_DATA_SYNC_TRIGGER_EVENT,
+        this.preferenceChangeListener
+      );
+    }
+    this.preferenceChangeListener = null;
   }
 
   async getStatus(): Promise<SyncStatus> {
@@ -1068,7 +1089,7 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
       );
     }
 
-    const runtimeSession = this.runtime.getSession();
+    const runtimeSession = await this.authSessionSource.getCurrentSession();
     const connectedSession = await this.ensureRemoteSession(false);
 
     if (!this.isSyncEnabled()) {
@@ -1296,6 +1317,44 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
     this.listeners.forEach((listener) => {
       listener(status);
     });
+  }
+
+  private async handleAuthSessionChange() {
+    const session = await this.authSessionSource.getCurrentSession();
+    if (session.status === "authenticated" && this.isSyncEnabled()) {
+      void this.syncNow();
+      return;
+    }
+
+    if (session.status === "unauthenticated" || session.status === "error") {
+      this.setSyncEnabled(false);
+      void this.disconnectRemoteSession().finally(() => {
+        this.emitStatus(
+          createLocalOnlyStatus("Sign in on this device to connect sync.")
+        );
+      });
+    }
+  }
+
+  private async handlePreferenceChange() {
+    if (!this.isSyncEnabled()) {
+      return;
+    }
+
+    try {
+      const connectedSession = await this.ensureRemoteSession(false);
+      if (connectedSession?.user) {
+        void this.syncNow();
+        return;
+      }
+
+      const session = await this.authSessionSource.getCurrentSession();
+      if (session.status === "authenticated") {
+        void this.syncNow();
+      }
+    } catch {
+      // Leave the current local data in place when a background sync check fails.
+    }
   }
 
   private async loadConflictContext(): Promise<{
@@ -1722,7 +1781,11 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
       return null;
     }
 
-    const idToken = this.runtime.getIdToken();
+    if (!this.idTokenProvider) {
+      return null;
+    }
+
+    const idToken = this.idTokenProvider.getIdToken();
     if (!idToken) {
       return null;
     }

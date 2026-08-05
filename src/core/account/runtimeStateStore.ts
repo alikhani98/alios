@@ -25,11 +25,11 @@ class DefaultAccountRuntimeStateStore implements AccountRuntimeStateStore {
   private readonly listeners = new Set<
     AccountRuntimeStateListener<AccountRuntimeState>
   >();
+  private boundarySubscription: AccountStateSubscription | null = null;
 
   constructor(private readonly boundary: AccountRuntimeBoundary) {
-    this.boundary.subscribe((nextState) => {
-      this.setState(nextState);
-    });
+    // Intentionally side-effect free. Upstream boundary observation starts only
+    // when the first downstream subscriber attaches.
   }
 
   getState(): AccountRuntimeState {
@@ -49,14 +49,29 @@ class DefaultAccountRuntimeStateStore implements AccountRuntimeStateStore {
   subscribe(
     listener: AccountRuntimeStateListener<AccountRuntimeState>
   ): AccountStateSubscription {
+    this.ensureBoundarySubscription();
     this.listeners.add(listener);
     listener(this.state);
 
     return {
       unsubscribe: () => {
         this.listeners.delete(listener);
+        if (this.listeners.size === 0) {
+          this.boundarySubscription?.unsubscribe();
+          this.boundarySubscription = null;
+        }
       },
     };
+  }
+
+  private ensureBoundarySubscription() {
+    if (this.boundarySubscription) {
+      return;
+    }
+
+    this.boundarySubscription = this.boundary.subscribe((nextState) => {
+      this.setState(nextState);
+    });
   }
 
   private setState(nextState: AccountRuntimeState) {

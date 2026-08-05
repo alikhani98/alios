@@ -12,6 +12,7 @@ import {
 import {
   AuthRuntimeProvider,
   emailAuthProvider,
+  googleAuthRuntime,
   googleAuthProvider,
   localOnlyAuthProvider,
   type AuthProvider,
@@ -174,9 +175,12 @@ export function AppProviders({
     }
 
     return new SupabasePreferenceSyncProvider({
+      authProvider,
+      idTokenProvider:
+        authProvider === googleAuthProvider ? googleAuthRuntime : undefined,
       backupStorage: bootstrapState.adapter.backup,
     });
-  }, [bootstrapState, syncProvider]);
+  }, [authProvider, bootstrapState, syncProvider]);
 
   const accountRuntimeBoundary = useMemo(
     () =>
@@ -187,6 +191,21 @@ export function AppProviders({
       }),
     [accountProvider, authProvider, resolvedSyncProvider]
   );
+
+  useEffect(() => {
+    if (
+      bootstrapState.status !== "ready" ||
+      !(resolvedSyncProvider instanceof SupabasePreferenceSyncProvider)
+    ) {
+      return;
+    }
+
+    resolvedSyncProvider.activate();
+
+    return () => {
+      resolvedSyncProvider.deactivate();
+    };
+  }, [bootstrapState.status, resolvedSyncProvider]);
 
   useEffect(() => {
     let isActive = true;

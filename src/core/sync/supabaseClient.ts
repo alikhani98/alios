@@ -116,7 +116,9 @@ type SupabaseAccessTokenPayload = Readonly<{
   exp?: number;
 }>;
 
-function getStorage() {
+type BrowserStorage = Pick<Storage, "getItem" | "setItem" | "removeItem">;
+
+function getStorage(): BrowserStorage | null {
   if (typeof window === "undefined") {
     return null;
   }
@@ -128,8 +130,10 @@ function getStorage() {
   }
 }
 
-function readStoredSession(storageKey: string): SupabaseSession | null {
-  const storage = getStorage();
+function readStoredSession(
+  storageKey: string,
+  storage: BrowserStorage | null = getStorage()
+): SupabaseSession | null {
   if (!storage) {
     return null;
   }
@@ -163,21 +167,56 @@ function readStoredSession(storageKey: string): SupabaseSession | null {
   }
 }
 
-function writeStoredSession(storageKey: string, session: SupabaseSession | null) {
-  const storage = getStorage();
+function sessionsMatch(
+  expected: SupabaseSession | null,
+  actual: SupabaseSession | null
+) {
+  if (expected === null || actual === null) {
+    return expected === actual;
+  }
+
+  return (
+    expected.access_token === actual.access_token &&
+    expected.refresh_token === actual.refresh_token &&
+    expected.expires_at === actual.expires_at &&
+    expected.user.id === actual.user.id
+  );
+}
+
+function persistStoredSession(
+  storageKey: string,
+  session: SupabaseSession | null,
+  storage: BrowserStorage | null = getStorage()
+): Error | null {
   if (!storage) {
-    return;
+    return new Error(
+      "AliOS could not persist the email session on this device."
+    );
   }
 
   try {
     if (!session) {
       storage.removeItem(storageKey);
-      return;
+    } else {
+      storage.setItem(storageKey, JSON.stringify(session));
     }
 
-    storage.setItem(storageKey, JSON.stringify(session));
+    const restoredSession = readStoredSession(storageKey, storage);
+    if (sessionsMatch(session, restoredSession)) {
+      return null;
+    }
+
+    return new Error(
+      session
+        ? "AliOS could not persist the email session on this device."
+        : "AliOS could not clear the persisted email session on this device."
+    );
   } catch {
-    // Keep runtime sync best-effort if session storage is unavailable.
+    return new Error(
+      session
+        ? "AliOS could not persist the email session on this device."
+        : "AliOS could not clear the persisted email session on this device."
+    );
   }
 }
 
@@ -339,8 +378,12 @@ async function parseErrorResponse(
 export function createSupabaseBrowserClient(
   url: string,
   anonKey: string,
-  authStorageKey: string
+  authStorageKey: string,
+  options: Readonly<{
+    storage?: BrowserStorage | null;
+  }> = {}
 ): SupabaseBrowserClient {
+  const resolveStorage = () => options.storage ?? getStorage();
   const baseHeaders = {
     apikey: anonKey,
     "Content-Type": "application/json",
@@ -349,7 +392,8 @@ export function createSupabaseBrowserClient(
   return {
     auth: {
       async getSession() {
-        const currentSession = readStoredSession(authStorageKey);
+        const storage = resolveStorage();
+        const currentSession = readStoredSession(authStorageKey, storage);
         if (!currentSession) {
           return {
             data: { session: null },
@@ -377,7 +421,7 @@ export function createSupabaseBrowserClient(
           );
 
           if (!response.ok) {
-            writeStoredSession(authStorageKey, null);
+            persistStoredSession(authStorageKey, null, storage);
             return {
               data: { session: null },
               error: await parseErrorResponse(
@@ -392,7 +436,7 @@ export function createSupabaseBrowserClient(
           const nextSession = toSupabaseSession(payload);
 
           if (!nextSession) {
-            writeStoredSession(authStorageKey, null);
+            persistStoredSession(authStorageKey, null, storage);
             return {
               data: { session: null },
               error: new Error(
@@ -401,13 +445,24 @@ export function createSupabaseBrowserClient(
             };
           }
 
-          writeStoredSession(authStorageKey, nextSession);
+          const persistenceError = persistStoredSession(
+            authStorageKey,
+            nextSession,
+            storage
+          );
+          if (persistenceError) {
+            return {
+              data: { session: null },
+              error: persistenceError,
+            };
+          }
+
           return {
             data: { session: nextSession },
             error: null,
           };
         } catch (error) {
-          writeStoredSession(authStorageKey, null);
+          persistStoredSession(authStorageKey, null, storage);
           return {
             data: { session: null },
             error: toError(error, "Supabase session refresh failed."),
@@ -416,6 +471,7 @@ export function createSupabaseBrowserClient(
       },
 
       async restoreSessionFromUrlHash(hash = typeof window !== "undefined" ? window.location.hash : "") {
+        const storage = resolveStorage();
         try {
           const { session, consumed } = parseSessionFromUrlHash(hash);
 
@@ -426,7 +482,19 @@ export function createSupabaseBrowserClient(
             };
           }
 
-          writeStoredSession(authStorageKey, session);
+          const persistenceError = persistStoredSession(
+            authStorageKey,
+            session,
+            storage
+          );
+          if (persistenceError) {
+            clearAuthHashFromUrl();
+            return {
+              data: { session: null, consumed: true },
+              error: persistenceError,
+            };
+          }
+
           clearAuthHashFromUrl();
           return {
             data: { session, consumed: true },
@@ -434,7 +502,7 @@ export function createSupabaseBrowserClient(
           };
         } catch (error) {
           clearAuthHashFromUrl();
-          writeStoredSession(authStorageKey, null);
+          persistStoredSession(authStorageKey, null, storage);
           return {
             data: { session: null, consumed: true },
             error: toError(error, "Supabase auth callback could not be restored."),
@@ -443,6 +511,7 @@ export function createSupabaseBrowserClient(
       },
 
       async signUpWithPassword({ email, password, data }) {
+        const storage = resolveStorage();
         try {
           const response = await fetch(`${url}/auth/v1/signup`, {
             method: "POST",
@@ -474,7 +543,18 @@ export function createSupabaseBrowserClient(
                 }
               : null;
 
-          writeStoredSession(authStorageKey, session);
+          const persistenceError = persistStoredSession(
+            authStorageKey,
+            session,
+            storage
+          );
+          if (persistenceError) {
+            return {
+              data: { session: null, user: null },
+              error: persistenceError,
+            };
+          }
+
           return {
             data: { session, user },
             error: null,
@@ -488,6 +568,7 @@ export function createSupabaseBrowserClient(
       },
 
       async signInWithPassword({ email, password }) {
+        const storage = resolveStorage();
         try {
           const response = await fetch(
             `${url}/auth/v1/token?grant_type=password`,
@@ -524,7 +605,18 @@ export function createSupabaseBrowserClient(
             };
           }
 
-          writeStoredSession(authStorageKey, session);
+          const persistenceError = persistStoredSession(
+            authStorageKey,
+            session,
+            storage
+          );
+          if (persistenceError) {
+            return {
+              data: { session: null },
+              error: persistenceError,
+            };
+          }
+
           return {
             data: { session },
             error: null,
@@ -538,7 +630,8 @@ export function createSupabaseBrowserClient(
       },
 
       async refreshSession() {
-        const currentSession = readStoredSession(authStorageKey);
+        const storage = resolveStorage();
+        const currentSession = readStoredSession(authStorageKey, storage);
         if (!currentSession?.refresh_token) {
           return {
             data: { session: null },
@@ -561,7 +654,7 @@ export function createSupabaseBrowserClient(
           );
 
           if (!response.ok) {
-            writeStoredSession(authStorageKey, null);
+            persistStoredSession(authStorageKey, null, storage);
             return {
               data: { session: null },
               error: await parseErrorResponse(
@@ -576,7 +669,7 @@ export function createSupabaseBrowserClient(
           const nextSession = toSupabaseSession(payload);
 
           if (!nextSession) {
-            writeStoredSession(authStorageKey, null);
+            persistStoredSession(authStorageKey, null, storage);
             return {
               data: { session: null },
               error: new Error(
@@ -585,13 +678,24 @@ export function createSupabaseBrowserClient(
             };
           }
 
-          writeStoredSession(authStorageKey, nextSession);
+          const persistenceError = persistStoredSession(
+            authStorageKey,
+            nextSession,
+            storage
+          );
+          if (persistenceError) {
+            return {
+              data: { session: null },
+              error: persistenceError,
+            };
+          }
+
           return {
             data: { session: nextSession },
             error: null,
           };
         } catch (error) {
-          writeStoredSession(authStorageKey, null);
+          persistStoredSession(authStorageKey, null, storage);
           return {
             data: { session: null },
             error: toError(error, "Supabase session refresh failed."),
@@ -600,6 +704,7 @@ export function createSupabaseBrowserClient(
       },
 
       async signInWithIdToken({ provider, token }) {
+        const storage = resolveStorage();
         try {
           const response = await fetch(
             `${url}/auth/v1/token?grant_type=id_token`,
@@ -636,7 +741,17 @@ export function createSupabaseBrowserClient(
             };
           }
 
-          writeStoredSession(authStorageKey, session);
+          const persistenceError = persistStoredSession(
+            authStorageKey,
+            session,
+            storage
+          );
+          if (persistenceError) {
+            return {
+              data: { session: null },
+              error: persistenceError,
+            };
+          }
 
           return {
             data: { session },
@@ -651,7 +766,8 @@ export function createSupabaseBrowserClient(
       },
 
       async updateUser({ data }) {
-        const currentSession = readStoredSession(authStorageKey);
+        const storage = resolveStorage();
+        const currentSession = readStoredSession(authStorageKey, storage);
         if (!currentSession) {
           return {
             data: { user: null },
@@ -691,10 +807,20 @@ export function createSupabaseBrowserClient(
               : null;
 
           if (user) {
-            writeStoredSession(authStorageKey, {
-              ...currentSession,
-              user,
-            });
+            const persistenceError = persistStoredSession(
+              authStorageKey,
+              {
+                ...currentSession,
+                user,
+              },
+              storage
+            );
+            if (persistenceError) {
+              return {
+                data: { user: null },
+                error: persistenceError,
+              };
+            }
           }
 
           return {
@@ -710,8 +836,12 @@ export function createSupabaseBrowserClient(
       },
 
       async signOut() {
-        const currentSession = readStoredSession(authStorageKey);
-        writeStoredSession(authStorageKey, null);
+        const storage = resolveStorage();
+        const currentSession = readStoredSession(authStorageKey, storage);
+        const persistenceError = persistStoredSession(authStorageKey, null, storage);
+        if (persistenceError) {
+          return { error: persistenceError };
+        }
 
         if (!currentSession) {
           return { error: null };

@@ -81,6 +81,7 @@ export class EmailAuthRuntime {
   private readonly createClient: () => SupabaseBrowserClient | null;
   private client: SupabaseBrowserClient | null;
   private currentSession: AuthSession;
+  private hydrationInFlight: Promise<AuthSession> | null = null;
 
   constructor(dependencies: EmailAuthRuntimeDependencies = {}) {
     this.now = dependencies.now ?? (() => new Date());
@@ -100,7 +101,12 @@ export class EmailAuthRuntime {
       });
     this.client = dependencies.client ?? this.createClient();
     this.currentSession = this.client
-      ? createSignedOutSession("No email account is signed in on this device.")
+      ? {
+          status: "authenticating",
+          user: null,
+          provider: EMAIL_ACCOUNT_PROVIDER_ID,
+          detail: "AliOS is restoring the email session on this device.",
+        }
       : createSignedOutSession(
           "Email sign-in is unavailable until Supabase environment variables are configured."
         );
@@ -112,46 +118,21 @@ export class EmailAuthRuntime {
 
   async getSession(): Promise<AuthSession> {
     if (!this.client) {
-      this.currentSession = createSignedOutSession(
-        "Email sign-in is unavailable until Supabase environment variables are configured."
+      this.setSession(
+        createSignedOutSession(
+          "Email sign-in is unavailable until Supabase environment variables are configured."
+        )
       );
       return this.currentSession;
     }
 
-    const callbackRestoreResult = await this.client.auth.restoreSessionFromUrlHash();
-    if (callbackRestoreResult.error) {
-      this.currentSession = {
-        status: "error",
-        user: null,
-        provider: EMAIL_ACCOUNT_PROVIDER_ID,
-        detail: callbackRestoreResult.error.message,
-      };
-      return this.currentSession;
+    if (!this.hydrationInFlight) {
+      this.hydrationInFlight = this.resolveCurrentSession().finally(() => {
+        this.hydrationInFlight = null;
+      });
     }
 
-    if (callbackRestoreResult.data.session) {
-      this.currentSession = createAuthenticatedSession(
-        callbackRestoreResult.data.session,
-        this.now()
-      );
-      return this.currentSession;
-    }
-
-    const result = await this.client.auth.getSession();
-    if (result.error) {
-      this.currentSession = {
-        status: "error",
-        user: null,
-        provider: EMAIL_ACCOUNT_PROVIDER_ID,
-        detail: result.error.message,
-      };
-      return this.currentSession;
-    }
-
-    this.currentSession = result.data.session
-      ? createAuthenticatedSession(result.data.session, this.now())
-      : createSignedOutSession("No email account is signed in on this device.");
-    return this.currentSession;
+    return this.hydrationInFlight;
   }
 
   async getUser(): Promise<AuthUser | null> {
@@ -278,26 +259,30 @@ export class EmailAuthRuntime {
 
   async refreshSession(): Promise<AuthSession> {
     if (!this.client) {
-      return createSignedOutSession(
+      const signedOutSession = createSignedOutSession(
         "Email sign-in is unavailable until Supabase environment variables are configured."
       );
+      this.setSession(signedOutSession);
+      return signedOutSession;
     }
 
     const result = await this.client.auth.refreshSession();
     if (result.error) {
-      this.currentSession = {
+      const errorSession: AuthSession = {
         status: "error",
         user: null,
         provider: EMAIL_ACCOUNT_PROVIDER_ID,
         detail: result.error.message,
       };
-      return this.currentSession;
+      this.setSession(errorSession);
+      return errorSession;
     }
 
-    this.currentSession = result.data.session
+    const nextSession = result.data.session
       ? createAuthenticatedSession(result.data.session, this.now())
       : createSignedOutSession("No email account is signed in on this device.");
-    return this.currentSession;
+    this.setSession(nextSession);
+    return nextSession;
   }
 
   subscribe(listener: AuthStateListener): AuthStateSubscription {
@@ -316,6 +301,55 @@ export class EmailAuthRuntime {
     this.listeners.forEach((listener) => {
       listener(nextSession);
     });
+  }
+
+  private async resolveCurrentSession(): Promise<AuthSession> {
+    if (!this.client) {
+      const signedOutSession = createSignedOutSession(
+        "Email sign-in is unavailable until Supabase environment variables are configured."
+      );
+      this.setSession(signedOutSession);
+      return signedOutSession;
+    }
+
+    const callbackRestoreResult = await this.client.auth.restoreSessionFromUrlHash();
+    if (callbackRestoreResult.error) {
+      const errorSession: AuthSession = {
+        status: "error",
+        user: null,
+        provider: EMAIL_ACCOUNT_PROVIDER_ID,
+        detail: callbackRestoreResult.error.message,
+      };
+      this.setSession(errorSession);
+      return errorSession;
+    }
+
+    if (callbackRestoreResult.data.session) {
+      const restoredSession = createAuthenticatedSession(
+        callbackRestoreResult.data.session,
+        this.now()
+      );
+      this.setSession(restoredSession);
+      return restoredSession;
+    }
+
+    const result = await this.client.auth.getSession();
+    if (result.error) {
+      const errorSession: AuthSession = {
+        status: "error",
+        user: null,
+        provider: EMAIL_ACCOUNT_PROVIDER_ID,
+        detail: result.error.message,
+      };
+      this.setSession(errorSession);
+      return errorSession;
+    }
+
+    const nextSession = result.data.session
+      ? createAuthenticatedSession(result.data.session, this.now())
+      : createSignedOutSession("No email account is signed in on this device.");
+    this.setSession(nextSession);
+    return nextSession;
   }
 }
 

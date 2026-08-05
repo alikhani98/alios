@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { LOCAL_ONLY_ACCOUNT_RUNTIME_STATE } from "../runtimeBoundary";
 import {
@@ -8,6 +8,56 @@ import {
   selectSyncCapabilityStatus,
   selectSyncStatus,
 } from "../runtimeStateStore";
+import type { AccountRuntimeBoundary, AccountRuntimeState } from "../runtimeBoundary";
+
+function createBoundaryHarness(state: AccountRuntimeState = LOCAL_ONLY_ACCOUNT_RUNTIME_STATE) {
+  let currentState = state;
+  let activeSubscriptions = 0;
+  let maxActiveSubscriptions = 0;
+  let subscribeCalls = 0;
+  let unsubscribeCalls = 0;
+  const listeners = new Set<(nextState: AccountRuntimeState) => void>();
+
+  const boundary: AccountRuntimeBoundary = {
+    getState: async () => currentState,
+    syncNow: async () => currentState.syncStatus,
+    getSyncConflictSnapshot: () => [],
+    getSyncConflicts: async () => [],
+    resolveSyncConflict: async () => null,
+    subscribe(listener) {
+      subscribeCalls += 1;
+      activeSubscriptions += 1;
+      maxActiveSubscriptions = Math.max(
+        maxActiveSubscriptions,
+        activeSubscriptions
+      );
+      listeners.add(listener);
+      listener(currentState);
+
+      return {
+        unsubscribe: () => {
+          if (!listeners.delete(listener)) {
+            return;
+          }
+          activeSubscriptions -= 1;
+          unsubscribeCalls += 1;
+        },
+      };
+    },
+  };
+
+  return {
+    boundary,
+    emit(nextState: AccountRuntimeState) {
+      currentState = nextState;
+      listeners.forEach((listener) => listener(nextState));
+    },
+    getActiveSubscriptions: () => activeSubscriptions,
+    getMaxActiveSubscriptions: () => maxActiveSubscriptions,
+    getSubscribeCalls: () => subscribeCalls,
+    getUnsubscribeCalls: () => unsubscribeCalls,
+  };
+}
 
 describe("account runtime state store", () => {
   it("starts in the same local-only state exposed by the runtime boundary", () => {
@@ -47,5 +97,65 @@ describe("account runtime state store", () => {
       mode: "local-only",
       provider: "local-only",
     });
+  });
+
+  it("keeps construction side-effect free until the first downstream subscriber attaches", () => {
+    const harness = createBoundaryHarness();
+
+    createAccountRuntimeStateStore(harness.boundary);
+
+    expect(harness.getSubscribeCalls()).toBe(0);
+    expect(harness.getActiveSubscriptions()).toBe(0);
+  });
+
+  it("reuses one upstream boundary subscription across multiple downstream subscribers", () => {
+    const harness = createBoundaryHarness();
+    const store = createAccountRuntimeStateStore(harness.boundary);
+    const firstListener = vi.fn();
+    const secondListener = vi.fn();
+
+    const firstSubscription = store.subscribe(firstListener);
+
+    expect(harness.getSubscribeCalls()).toBe(1);
+    expect(harness.getActiveSubscriptions()).toBe(1);
+    expect(harness.getMaxActiveSubscriptions()).toBe(1);
+
+    const secondSubscription = store.subscribe(secondListener);
+
+    expect(harness.getSubscribeCalls()).toBe(1);
+    expect(harness.getActiveSubscriptions()).toBe(1);
+    expect(harness.getMaxActiveSubscriptions()).toBe(1);
+
+    firstSubscription.unsubscribe();
+
+    expect(harness.getActiveSubscriptions()).toBe(1);
+    expect(harness.getUnsubscribeCalls()).toBe(0);
+
+    secondSubscription.unsubscribe();
+
+    expect(harness.getActiveSubscriptions()).toBe(0);
+    expect(harness.getUnsubscribeCalls()).toBe(1);
+  });
+
+  it("leaks nothing across StrictMode-style subscribe and cleanup replay", () => {
+    const harness = createBoundaryHarness();
+    const store = createAccountRuntimeStateStore(harness.boundary);
+    const firstListener = vi.fn();
+    const secondListener = vi.fn();
+
+    const firstSubscription = store.subscribe(firstListener);
+    firstSubscription.unsubscribe();
+
+    expect(harness.getSubscribeCalls()).toBe(1);
+    expect(harness.getUnsubscribeCalls()).toBe(1);
+    expect(harness.getActiveSubscriptions()).toBe(0);
+
+    const secondSubscription = store.subscribe(secondListener);
+    secondSubscription.unsubscribe();
+
+    expect(harness.getSubscribeCalls()).toBe(2);
+    expect(harness.getUnsubscribeCalls()).toBe(2);
+    expect(harness.getActiveSubscriptions()).toBe(0);
+    expect(harness.getMaxActiveSubscriptions()).toBe(1);
   });
 });

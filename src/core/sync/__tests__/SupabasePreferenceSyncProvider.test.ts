@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { BackupStorage } from "@/core/backup";
-import type { AuthSession } from "@/core/auth";
+import type { AuthProvider, AuthSession } from "@/core/auth";
 import type { GoogleAuthRuntime } from "@/core/auth/googleAuthRuntime";
 import {
   ACCENT_COLOR_STORAGE_KEY,
@@ -41,6 +41,82 @@ function createRuntimeStub(
     getIdToken: () => idToken,
     subscribe: () => ({ unsubscribe: () => undefined }),
   } as unknown as GoogleAuthRuntime;
+}
+
+function createAuthProviderHarness(initialSession: AuthSession) {
+  let currentSession = initialSession;
+  const listeners = new Set<(session: AuthSession) => void>();
+
+  const provider: AuthProvider = {
+    name: initialSession.provider,
+    getCurrentUser: async () => currentSession.user,
+    getCurrentSession: async () => currentSession,
+    login: async () => ({ session: currentSession }),
+    logout: async () => undefined,
+    refreshSession: async () => currentSession,
+    subscribe: (listener) => {
+      listeners.add(listener);
+      void Promise.resolve().then(() => listener(currentSession));
+      return {
+        unsubscribe: () => {
+          listeners.delete(listener);
+        },
+      };
+    },
+  };
+
+  return {
+    provider,
+    setSession(nextSession: AuthSession) {
+      currentSession = nextSession;
+      listeners.forEach((listener) => listener(currentSession));
+    },
+  };
+}
+
+function createSubscriptionTrackingAuthProvider(initialSession: AuthSession) {
+  let currentSession = initialSession;
+  let activeSubscriptions = 0;
+  let maxActiveSubscriptions = 0;
+  const listeners = new Set<(session: AuthSession) => void>();
+  const unsubscribe = vi.fn(() => {
+    activeSubscriptions -= 1;
+  });
+  const subscribe = vi.fn((listener: (session: AuthSession) => void) => {
+    listeners.add(listener);
+    activeSubscriptions += 1;
+    maxActiveSubscriptions = Math.max(
+      maxActiveSubscriptions,
+      activeSubscriptions
+    );
+
+    return {
+      unsubscribe: () => {
+        if (!listeners.delete(listener)) {
+          return;
+        }
+        unsubscribe();
+      },
+    };
+  });
+
+  const provider: AuthProvider = {
+    name: initialSession.provider,
+    getCurrentUser: async () => currentSession.user,
+    getCurrentSession: async () => currentSession,
+    login: async () => ({ session: currentSession }),
+    logout: async () => undefined,
+    refreshSession: async () => currentSession,
+    subscribe,
+  };
+
+  return {
+    provider,
+    subscribe,
+    unsubscribe,
+    getActiveSubscriptions: () => activeSubscriptions,
+    getMaxActiveSubscriptions: () => maxActiveSubscriptions,
+  };
 }
 
 function createSupabaseClientHarness(
@@ -208,6 +284,92 @@ function createBackupStorageStub(input?: {
 describe("SupabasePreferenceSyncProvider", () => {
   beforeEach(() => {
     localStorage.clear();
+  });
+
+  it("keeps construction inert until explicit activation", () => {
+    const authHarness = createSubscriptionTrackingAuthProvider({
+      status: "authenticated",
+      provider: "email",
+      user: {
+        userId: "supabase-user-1",
+        email: "user@example.com",
+        displayName: "AliOS User",
+        createdAt: "2026-07-29T10:00:00.000Z",
+        updatedAt: "2026-07-29T10:00:00.000Z",
+      },
+      detail: "Email account connected on this device.",
+    });
+
+    new SupabasePreferenceSyncProvider({
+      authProvider: authHarness.provider,
+      getStorage: () => localStorage,
+    });
+
+    expect(authHarness.subscribe).not.toHaveBeenCalled();
+    expect(authHarness.getActiveSubscriptions()).toBe(0);
+  });
+
+  it("keeps the module-scope singleton inert during import", async () => {
+    vi.resetModules();
+    const runtimeSubscribe = vi.fn(() => ({
+      unsubscribe: () => undefined,
+    }));
+
+    vi.doMock("@/core/auth/googleAuthRuntime", async () => {
+      const actual =
+        await vi.importActual<typeof import("@/core/auth/googleAuthRuntime")>(
+          "@/core/auth/googleAuthRuntime"
+        );
+
+      return {
+        ...actual,
+        googleAuthRuntime: {
+          ...actual.googleAuthRuntime,
+          subscribe: runtimeSubscribe,
+        },
+      };
+    });
+
+    const module = await import("../SupabasePreferenceSyncProvider");
+
+    expect(module.supabasePreferenceSyncProvider).toBeDefined();
+    expect(runtimeSubscribe).not.toHaveBeenCalled();
+
+    vi.doUnmock("@/core/auth/googleAuthRuntime");
+    vi.resetModules();
+  });
+
+  it("subscribes only after explicit activation and cleans up idempotently", () => {
+    const authHarness = createSubscriptionTrackingAuthProvider({
+      status: "authenticated",
+      provider: "email",
+      user: {
+        userId: "supabase-user-1",
+        email: "user@example.com",
+        displayName: "AliOS User",
+        createdAt: "2026-07-29T10:00:00.000Z",
+        updatedAt: "2026-07-29T10:00:00.000Z",
+      },
+      detail: "Email account connected on this device.",
+    });
+
+    const provider = new SupabasePreferenceSyncProvider({
+      authProvider: authHarness.provider,
+      getStorage: () => localStorage,
+    });
+
+    provider.activate();
+    provider.activate();
+
+    expect(authHarness.subscribe).toHaveBeenCalledTimes(1);
+    expect(authHarness.getActiveSubscriptions()).toBe(1);
+    expect(authHarness.getMaxActiveSubscriptions()).toBe(1);
+
+    provider.deactivate();
+    provider.deactivate();
+
+    expect(authHarness.unsubscribe).toHaveBeenCalledTimes(1);
+    expect(authHarness.getActiveSubscriptions()).toBe(0);
   });
 
   it("stays local-only when no authenticated runtime session is available", async () => {
@@ -380,6 +542,140 @@ describe("SupabasePreferenceSyncProvider", () => {
       enabled: true,
       connectedUserId: "supabase-user-1",
       lastSyncedAt: "2026-07-29T10:00:00.000Z",
+    });
+  });
+
+  it("does not sign out an email-backed Supabase session after activation when an unrelated Google runtime is unauthenticated", async () => {
+    localStorage.setItem("alios.sync.enabled", "true");
+
+    const harness = createSupabaseClientHarness(undefined, {
+      initialSession: true,
+    });
+    const authHarness = createAuthProviderHarness({
+      status: "authenticated",
+      provider: "email",
+      user: {
+        userId: "supabase-user-1",
+        email: "user@example.com",
+        displayName: "AliOS User",
+        createdAt: "2026-07-29T10:00:00.000Z",
+        updatedAt: "2026-07-29T10:00:00.000Z",
+      },
+      detail: "Email account connected on this device.",
+    });
+
+    const provider = new SupabasePreferenceSyncProvider({
+      client: harness.client,
+      authProvider: authHarness.provider,
+      runtime: createRuntimeStub({
+        status: "unauthenticated",
+        provider: "google",
+        user: null,
+      }),
+      getStorage: () => localStorage,
+      now: () => new Date("2026-07-29T10:00:00.000Z"),
+    });
+
+    provider.activate();
+    await Promise.resolve();
+
+    expect(harness.client.auth.signOut).not.toHaveBeenCalled();
+    await expect(provider.getStatus()).resolves.toMatchObject({
+      mode: "ready",
+      provider: "supabase",
+      enabled: true,
+      connectedUserId: "supabase-user-1",
+    });
+    expect(localStorage.getItem("alios.sync.enabled")).toBe("true");
+  });
+
+  it("preserves the sync opt-in across provider reconstruction for an authenticated email session", async () => {
+    localStorage.setItem("alios.sync.enabled", "true");
+
+    const harness = createSupabaseClientHarness(undefined, {
+      initialSession: true,
+    });
+    const authHarness = createAuthProviderHarness({
+      status: "authenticated",
+      provider: "email",
+      user: {
+        userId: "supabase-user-1",
+        email: "user@example.com",
+        displayName: "AliOS User",
+        createdAt: "2026-07-29T10:00:00.000Z",
+        updatedAt: "2026-07-29T10:00:00.000Z",
+      },
+      detail: "Email account connected on this device.",
+    });
+
+    const firstProvider = new SupabasePreferenceSyncProvider({
+      client: harness.client,
+      authProvider: authHarness.provider,
+      getStorage: () => localStorage,
+      now: () => new Date("2026-07-29T10:00:00.000Z"),
+    });
+
+    await expect(firstProvider.getStatus()).resolves.toMatchObject({
+      mode: "ready",
+      enabled: true,
+    });
+
+    const secondProvider = new SupabasePreferenceSyncProvider({
+      client: harness.client,
+      authProvider: authHarness.provider,
+      getStorage: () => localStorage,
+      now: () => new Date("2026-07-29T10:05:00.000Z"),
+    });
+
+    await expect(secondProvider.getStatus()).resolves.toMatchObject({
+      mode: "ready",
+      enabled: true,
+      connectedUserId: "supabase-user-1",
+    });
+    expect(localStorage.getItem("alios.sync.enabled")).toBe("true");
+  });
+
+  it("clears the stored Supabase session only after an explicit sign-out reaches the active auth provider", async () => {
+    localStorage.setItem("alios.sync.enabled", "true");
+
+    const harness = createSupabaseClientHarness(undefined, {
+      initialSession: true,
+    });
+    const authHarness = createAuthProviderHarness({
+      status: "authenticated",
+      provider: "email",
+      user: {
+        userId: "supabase-user-1",
+        email: "user@example.com",
+        displayName: "AliOS User",
+        createdAt: "2026-07-29T10:00:00.000Z",
+        updatedAt: "2026-07-29T10:00:00.000Z",
+      },
+      detail: "Email account connected on this device.",
+    });
+
+    const provider = new SupabasePreferenceSyncProvider({
+      client: harness.client,
+      authProvider: authHarness.provider,
+      getStorage: () => localStorage,
+      now: () => new Date("2026-07-29T10:00:00.000Z"),
+    });
+
+    provider.activate();
+    authHarness.setSession({
+      status: "unauthenticated",
+      provider: "email",
+      user: null,
+      detail: "Email account signed out on this device.",
+    });
+    await Promise.resolve();
+
+    expect(harness.client.auth.signOut).toHaveBeenCalledTimes(1);
+    expect(localStorage.getItem("alios.sync.enabled")).toBeNull();
+    await expect(provider.getStatus()).resolves.toMatchObject({
+      mode: "local-only",
+      provider: "supabase",
+      enabled: false,
     });
   });
 
