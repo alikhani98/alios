@@ -9,6 +9,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CollapsibleSection,
   SoftPanel,
 } from "@/shared/ui";
 
@@ -18,6 +19,7 @@ type RecoveryModeSectionProps = {
   onGoToBackupRestore: () => void;
   onGoToExportCenter: () => void;
   onGoToLocalErrorLog: () => void;
+  detailsDefaultOpen?: boolean;
 };
 
 export function RecoveryModeSection({
@@ -26,6 +28,7 @@ export function RecoveryModeSection({
   onGoToBackupRestore,
   onGoToExportCenter,
   onGoToLocalErrorLog,
+  detailsDefaultOpen = true,
 }: RecoveryModeSectionProps) {
   const { t } = useI18n();
 
@@ -68,51 +71,61 @@ export function RecoveryModeSection({
           {enabled ? t("recovery.disable") : t("recovery.enable")}
         </Button>
 
-        {enabled ? (
-          <SoftPanel className="space-y-3 alios-surface-card">
-            <p className="text-sm leading-7 text-muted-foreground">
-              {t("recovery.actions")}
-            </p>
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full justify-start"
-                onClick={onGoToBackupRestore}
-              >
-                <FileJson className="me-2 h-4 w-4 shrink-0" />
-                <span className="min-w-0 truncate">{t("recovery.backupRestore")}</span>
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full justify-start"
-                onClick={onGoToExportCenter}
-              >
-                <Download className="me-2 h-4 w-4 shrink-0" />
-                <span className="min-w-0 truncate">{t("recovery.exportCenter")}</span>
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full justify-start"
-                onClick={onGoToLocalErrorLog}
-              >
-                <ClipboardList className="me-2 h-4 w-4 shrink-0" />
-                <span className="min-w-0 truncate">{t("recovery.localErrorLog")}</span>
-              </Button>
-            </div>
-          </SoftPanel>
-        ) : (
-          <SoftPanel className="alios-surface-card">
-            <p className="text-sm leading-7 text-muted-foreground">
-              {t("recovery.sectionHint")}
-            </p>
-            <p className="mt-2 text-xs leading-5 text-muted-foreground">
-              {t("recovery.actions")}
-            </p>
-          </SoftPanel>
-        )}
+        <CollapsibleSection
+          id="settings-recovery-mode-details"
+          title={t("recovery.actions")}
+          description={t("recovery.sectionHint")}
+          icon={<ShieldCheck className="h-4 w-4" />}
+          expandLabel={t("common.expandSection")}
+          collapseLabel={t("common.collapseSection")}
+          defaultOpen={detailsDefaultOpen}
+        >
+          {enabled ? (
+            <SoftPanel className="space-y-3 alios-surface-card">
+              <p className="text-sm leading-7 text-muted-foreground">
+                {t("recovery.actions")}
+              </p>
+              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full justify-start"
+                  onClick={onGoToBackupRestore}
+                >
+                  <FileJson className="me-2 h-4 w-4 shrink-0" />
+                  <span className="min-w-0 truncate">{t("recovery.backupRestore")}</span>
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full justify-start"
+                  onClick={onGoToExportCenter}
+                >
+                  <Download className="me-2 h-4 w-4 shrink-0" />
+                  <span className="min-w-0 truncate">{t("recovery.exportCenter")}</span>
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full justify-start"
+                  onClick={onGoToLocalErrorLog}
+                >
+                  <ClipboardList className="me-2 h-4 w-4 shrink-0" />
+                  <span className="min-w-0 truncate">{t("recovery.localErrorLog")}</span>
+                </Button>
+              </div>
+            </SoftPanel>
+          ) : (
+            <SoftPanel className="alios-surface-card">
+              <p className="text-sm leading-7 text-muted-foreground">
+                {t("recovery.sectionHint")}
+              </p>
+              <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                {t("recovery.actions")}
+              </p>
+            </SoftPanel>
+          )}
+        </CollapsibleSection>
       </CardContent>
     </Card>
   );

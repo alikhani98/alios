@@ -1,7 +1,6 @@
 import {
   AlertTriangle,
   ArrowUpRight,
-  CheckCircle2,
   CloudOff,
   Cloudy,
   GitCompareArrows,
@@ -498,6 +497,15 @@ function getSyncHealthSummary(runtimeState: AccountRuntimeState): Readonly<{
   };
 }
 
+function getUserFacingSyncDetail(
+  detail: string,
+  t: (key: TranslationKey, values?: Record<string, string | number>) => string
+) {
+  return /alios_sync_records|schema cache|public\./i.test(detail)
+    ? t("settings.syncServiceUnavailable")
+    : detail;
+}
+
 function getSyncExperienceState(
   runtimeState: AccountRuntimeState
 ): SyncExperienceState {
@@ -688,6 +696,14 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
   const syncHealth = getSyncHealthSummary(runtimeState);
   const syncExperienceState = getSyncExperienceState(runtimeState);
   const accountPresentation = getRuntimeAccountPresentation(runtimeState, t);
+  const accountDescription = getUserFacingSyncDetail(
+    accountPresentation.description,
+    t
+  );
+  const syncDetail = getUserFacingSyncDetail(runtimeState.syncStatus.detail, t);
+  const syncActionFeedbackMessage = syncActionFeedback
+    ? getUserFacingSyncDetail(syncActionFeedback, t)
+    : null;
   const interactiveGoogleProvider = getInteractiveGoogleProvider(provider);
   const interactiveEmailProvider = getInteractiveEmailProvider(provider);
   const canCreateAccount =
@@ -1084,7 +1100,7 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
       </CardHeader>
       <CardContent className="space-y-5">
         <div
-          className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4"
+          className="grid gap-3 md:grid-cols-3"
           aria-label={t("settings.accountSyncSnapshotLabel")}
         >
           <SoftPanel className="alios-surface-muted">
@@ -1094,56 +1110,22 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
             <div className="mt-2">
               <StatusChip
                 tone={
-                  currentState.tone === "primary"
-                    ? "primary"
-                    : currentState.tone === "warning"
-                      ? "warning"
-                      : currentState.tone === "danger"
-                        ? "danger"
-                        : "neutral"
+                  runtimeState.localOnly
+                    ? "neutral"
+                    : runtimeState.hasActiveAccount
+                      ? "primary"
+                      : "warning"
                 }
               >
                 {t(accountPresentation.summaryStatusKey)}
               </StatusChip>
             </div>
-            <p className="mt-3 text-sm leading-6 text-muted-foreground">
-              {runtimeState.detail}
-            </p>
-          </SoftPanel>
-          <SoftPanel className="alios-surface-muted">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-              {t("settings.accountPrivacyLabel")}
+            <p className="mt-3 break-words text-sm leading-6 text-muted-foreground">
+              {accountPresentation.badgeLabel}
             </p>
             <p className="mt-2 text-sm font-medium">
               {t("settings.accountPrivacyValue")}
             </p>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              {t("settings.accountPrivacyDescription")}
-            </p>
-          </SoftPanel>
-          <SoftPanel className="alios-surface-muted">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-              {t("settings.syncCategoriesLabel")}
-            </p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {syncedScopeKeys.map((scopeKey) => (
-                <Badge key={scopeKey} variant="secondary">
-                  {t(scopeKey)}
-                </Badge>
-              ))}
-            </div>
-            <p className="mt-3 text-sm leading-6 text-muted-foreground">
-              {runtimeState.localOnly
-                ? t("settings.syncCategoriesLocalOnlyDescription")
-                : t("settings.syncCategoriesConnectedDescription")}
-            </p>
-            {manualPreparation ? (
-              <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                {t("settings.syncManualPreparationSummary", {
-                  count: manualPreparation.entryCount,
-                })}
-              </p>
-            ) : null}
           </SoftPanel>
           <SoftPanel className="alios-surface-muted">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
@@ -1156,7 +1138,165 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
               {t(syncHealth.descriptionKey)}
             </p>
           </SoftPanel>
+          <SoftPanel className="alios-surface-muted">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+              {t("settings.syncLastSyncedLabel")}
+            </p>
+            <p className="mt-2 break-words text-sm font-medium">
+              {getSyncLastSeenLabel(runtimeState, t)}
+            </p>
+            <p className="mt-2 text-xs leading-5 text-muted-foreground">
+              {t("settings.syncLastSyncedDescription")}
+            </p>
+          </SoftPanel>
         </div>
+
+        <SoftPanel className="space-y-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div className="flex items-start gap-2">
+              <UserRound className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+              <div>
+                <p className="text-sm font-medium">
+                  {t(accountPresentation.actionsTitleKey)}
+                </p>
+                <p
+                  id={futureActionsDescriptionId}
+                  className="mt-1 text-sm leading-7 text-muted-foreground"
+                >
+                  {t(accountPresentation.actionsDescriptionKey)}
+                </p>
+              </div>
+            </div>
+            <StatusChip tone={accountActionStatusTone}>
+              {t(accountPresentation.actionStatusKey)}
+            </StatusChip>
+          </div>
+          <div
+            className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3"
+            role="group"
+            aria-label={t(accountPresentation.actionsTitleKey)}
+          >
+            {!runtimeState.hasActiveAccount && interactiveEmailProvider ? (
+              <div className="sm:col-span-2 xl:col-span-3">
+                <EmailAccountAuthForm
+                  busyAction={accountActionPending}
+                  feedback={accountActionFeedback}
+                  onCreateAccount={handleEmailCreateAccount}
+                  onSignIn={handleEmailSignIn}
+                />
+              </div>
+            ) : null}
+            {!runtimeState.hasActiveAccount && interactiveGoogleProvider ? (
+              <Button
+                type="button"
+                className="min-h-11 w-full justify-start sm:w-auto"
+                onClick={() => {
+                  void handleGoogleSignIn();
+                }}
+                disabled={accountActionPending !== null}
+                aria-describedby={futureActionsDescriptionId}
+              >
+                <ArrowUpRight className="me-2 h-4 w-4 shrink-0" />
+                {accountActionPending === "sign-in"
+                  ? t("settings.accountGoogleSigningIn")
+                  : t("settings.accountGoogleSignInAction")}
+              </Button>
+            ) : null}
+            {canSignOut ? (
+              <Button
+                type="button"
+                variant="outline"
+                className="min-h-11 w-full justify-start sm:w-auto"
+                onClick={() => {
+                  void handleSignOut();
+                }}
+                disabled={accountActionPending !== null}
+                aria-describedby={futureActionsDescriptionId}
+              >
+                <ArrowUpRight className="me-2 h-4 w-4 shrink-0" />
+                {accountActionPending === "sign-out"
+                  ? interactiveEmailProvider
+                    ? t("settings.accountEmailSigningOut")
+                    : t("settings.accountGoogleSigningOut")
+                  : t("settings.accountSignOutAction")}
+              </Button>
+            ) : null}
+            {canEnableSync ? (
+              <Button
+                type="button"
+                variant="secondary"
+                className="min-h-11 w-full justify-start sm:w-auto"
+                onClick={() => {
+                  void handleEnableSync();
+                }}
+                disabled={syncActionPending}
+                aria-describedby={futureActionsDescriptionId}
+              >
+                <RefreshCw
+                  className={`me-2 h-4 w-4 ${syncActionPending ? "animate-spin" : ""}`}
+                />
+                {syncActionPending
+                  ? t("settings.accountEnableSyncPending")
+                  : t("settings.accountEnableSyncAction")}
+              </Button>
+            ) : null}
+            {visibleActionKeys.map((action) => (
+              <ConsentActionPlaceholder
+                key={action.labelKey}
+                label={`${t(action.labelKey)} - ${t(action.statusKey)}`}
+                descriptionId={futureActionsDescriptionId}
+              />
+            ))}
+          </div>
+          {accountActionFeedback &&
+          (interactiveEmailProvider === null || runtimeState.hasActiveAccount) ? (
+            <div
+              role="status"
+              className="rounded-xl border border-border/70 bg-muted/40 px-3 py-3 text-sm leading-6 text-muted-foreground"
+            >
+              {getUserFacingSyncDetail(accountActionFeedback ?? "", t)}
+            </div>
+          ) : null}
+          <p className="text-xs leading-5 text-muted-foreground">
+            {t(accountPresentation.noteKey)}
+          </p>
+        </SoftPanel>
+
+        <CollapsibleSection
+          id="account-sync-advanced-details"
+          icon={<ShieldCheck className="h-5 w-5" />}
+          title={t("settings.syncAdvancedDetailsTitle")}
+          description={t("settings.syncAdvancedDetailsDescription")}
+          expandLabel={t("common.expandSection")}
+          collapseLabel={t("common.collapseSection")}
+          status={<StatusChip tone="neutral">{t("settings.localFirst")}</StatusChip>}
+          defaultOpen={false}
+        >
+          <div className="space-y-5">
+            <SoftPanel className="alios-surface-muted">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                {t("settings.syncCategoriesLabel")}
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {syncedScopeKeys.map((scopeKey) => (
+                  <Badge key={scopeKey} variant="secondary">
+                    {t(scopeKey)}
+                  </Badge>
+                ))}
+              </div>
+              <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                {runtimeState.localOnly
+                  ? t("settings.syncCategoriesLocalOnlyDescription")
+                  : t("settings.syncCategoriesConnectedDescription")}
+              </p>
+              {manualPreparation ? (
+                <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                  {t("settings.syncManualPreparationSummary", {
+                    count: manualPreparation.entryCount,
+                  })}
+                </p>
+              ) : null}
+            </SoftPanel>
 
         <section
           aria-labelledby="account-sync-current-state"
@@ -1175,7 +1315,7 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
                   {t(accountPresentation.titleKey)}
                 </p>
                 <p className="mt-1 text-sm leading-7 text-muted-foreground">
-                  {accountPresentation.description}
+                  {accountDescription}
                 </p>
               </div>
             </div>
@@ -1228,118 +1368,133 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
             </div>
           </div>
           {!runtimeState.localOnly ? (
-            <div className="grid gap-3 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1.85fr)]">
-              <SoftPanel className="space-y-3">
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
+            <CollapsibleSection
+              id="account-sync-device-details"
+              icon={<LaptopMinimal className="h-5 w-5" />}
+              title={t("settings.syncConnectedDevicesTitle")}
+              description={t("settings.syncConnectedDevicesDescription")}
+              expandLabel={t("common.expandSection")}
+              collapseLabel={t("common.collapseSection")}
+              status={
+                <StatusChip tone={syncExperienceState.tone}>
+                  {t(syncExperienceState.badgeKey)}
+                </StatusChip>
+              }
+              defaultOpen={false}
+            >
+              <div className="grid gap-3 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1.85fr)]">
+                <SoftPanel className="space-y-3">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-medium">
+                        {t("settings.syncExperienceTitle")}
+                      </p>
+                      <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                        {t(syncExperienceState.descriptionKey)}
+                      </p>
+                    </div>
+                    <StatusChip tone={syncExperienceState.tone}>
+                      {t(syncExperienceState.badgeKey)}
+                    </StatusChip>
+                  </div>
+                  <div className="rounded-xl border border-border/70 bg-muted/30 px-3 py-3">
                     <p className="text-sm font-medium">
-                      {t("settings.syncExperienceTitle")}
+                      {t(syncExperienceState.titleKey)}
                     </p>
-                    <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                      {t(syncExperienceState.descriptionKey)}
+                    <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                      {syncDetail}
                     </p>
                   </div>
-                  <StatusChip tone={syncExperienceState.tone}>
-                    {t(syncExperienceState.badgeKey)}
-                  </StatusChip>
-                </div>
-                <div className="rounded-xl border border-border/70 bg-muted/30 px-3 py-3">
-                  <p className="text-sm font-medium">
-                    {t(syncExperienceState.titleKey)}
-                  </p>
-                  <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                    {runtimeState.syncStatus.detail}
-                  </p>
-                </div>
-                <ul className="list-disc space-y-1 ps-5 text-sm leading-6 text-muted-foreground">
-                  <li>{t("settings.syncExperienceFirstDeviceRule")}</li>
-                  <li>{t("settings.syncExperienceSecondDeviceRule")}</li>
-                  <li>{t("settings.syncExperienceRecoveryRule")}</li>
-                </ul>
-              </SoftPanel>
-              <SoftPanel className="space-y-3">
-                <div className="flex items-start gap-2">
-                  <LaptopMinimal className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                  <div>
-                    <p className="text-sm font-medium">
-                      {t("settings.syncConnectedDevicesTitle")}
-                    </p>
-                    <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                      {t("settings.syncConnectedDevicesDescription")}
-                    </p>
+                  <ul className="list-disc space-y-1 ps-5 text-sm leading-6 text-muted-foreground">
+                    <li>{t("settings.syncExperienceFirstDeviceRule")}</li>
+                    <li>{t("settings.syncExperienceSecondDeviceRule")}</li>
+                    <li>{t("settings.syncExperienceRecoveryRule")}</li>
+                  </ul>
+                </SoftPanel>
+                <SoftPanel className="space-y-3">
+                  <div className="flex items-start gap-2">
+                    <LaptopMinimal className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                    <div>
+                      <p className="text-sm font-medium">
+                        {t("settings.syncConnectedDevicesTitle")}
+                      </p>
+                      <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                        {t("settings.syncConnectedDevicesDescription")}
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <SoftPanel className="alios-surface-muted">
-                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                      {t("settings.syncCurrentDeviceTitle")}
-                    </p>
-                    <p className="mt-2 text-sm font-medium">
-                      {runtimeState.syncMetadata.device.label}
-                    </p>
-                    <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                      {t("settings.syncCurrentDeviceDescription")}
-                    </p>
-                  </SoftPanel>
-                  <SoftPanel className="alios-surface-muted">
-                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                      {t("settings.syncConnectedDeviceCountTitle")}
-                    </p>
-                    <p className="mt-2 text-sm font-medium">
-                      {t("settings.syncConnectedDeviceCountValue", {
-                        count: deviceRows.length,
-                      })}
-                    </p>
-                    <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                      {t("settings.syncConnectedDeviceCountDescription")}
-                    </p>
-                  </SoftPanel>
-                </div>
-                {deviceRows.length > 0 ? (
-                  <div className="space-y-2" role="list" aria-label={t("settings.syncConnectedDevicesTitle")}>
-                    {deviceRows.map((device) => (
-                      <div
-                        key={device.deviceId}
-                        className="flex flex-col gap-2 rounded-xl border border-border/70 bg-muted/20 px-3 py-3 sm:flex-row sm:items-start sm:justify-between"
-                        role="listitem"
-                      >
-                        <div className="min-w-0">
-                          <p className="text-sm font-medium">{device.label}</p>
-                          <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                            {device.deviceId === runtimeState.syncMetadata.device.deviceId
-                              ? t("settings.syncCurrentDeviceBadge")
-                              : t("settings.syncConnectedDeviceBadge")}
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <SoftPanel className="alios-surface-muted">
+                      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                        {t("settings.syncCurrentDeviceTitle")}
+                      </p>
+                      <p className="mt-2 text-sm font-medium">
+                        {runtimeState.syncMetadata.device.label}
+                      </p>
+                      <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                        {t("settings.syncCurrentDeviceDescription")}
+                      </p>
+                    </SoftPanel>
+                    <SoftPanel className="alios-surface-muted">
+                      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                        {t("settings.syncConnectedDeviceCountTitle")}
+                      </p>
+                      <p className="mt-2 text-sm font-medium">
+                        {t("settings.syncConnectedDeviceCountValue", {
+                          count: deviceRows.length,
+                        })}
+                      </p>
+                      <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                        {t("settings.syncConnectedDeviceCountDescription")}
+                      </p>
+                    </SoftPanel>
+                  </div>
+                  {deviceRows.length > 0 ? (
+                    <div className="space-y-2" role="list" aria-label={t("settings.syncConnectedDevicesTitle")}>
+                      {deviceRows.map((device) => (
+                        <div
+                          key={device.deviceId}
+                          className="flex flex-col gap-2 rounded-xl border border-border/70 bg-muted/20 px-3 py-3 sm:flex-row sm:items-start sm:justify-between"
+                          role="listitem"
+                        >
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium">{device.label}</p>
+                            <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                              {device.deviceId === runtimeState.syncMetadata.device.deviceId
+                                ? t("settings.syncCurrentDeviceBadge")
+                                : t("settings.syncConnectedDeviceBadge")}
+                            </p>
+                          </div>
+                          <p className="text-xs leading-5 text-muted-foreground sm:text-end">
+                            {device.lastSyncedAt
+                              ? t("settings.syncConnectedDeviceLastSynced", {
+                                  value: device.lastSyncedAt,
+                                })
+                              : t("settings.syncConnectedDevicePending")}
                           </p>
                         </div>
-                        <p className="text-xs leading-5 text-muted-foreground sm:text-end">
-                          {device.lastSyncedAt
-                            ? t("settings.syncConnectedDeviceLastSynced", {
-                                value: device.lastSyncedAt,
-                              })
-                            : t("settings.syncConnectedDevicePending")}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                ) : null}
-              </SoftPanel>
-            </div>
+                      ))}
+                    </div>
+                  ) : null}
+                </SoftPanel>
+              </div>
+            </CollapsibleSection>
           ) : null}
           {needsFirstSyncGuidance ? (
-            <SoftPanel className="space-y-4 border-primary/20 bg-primary/5">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                <div className="space-y-1">
-                  <p className="text-sm font-semibold">
-                    {t("settings.syncExperiencePreparingTitle")}
-                  </p>
-                  <p className="text-sm leading-6 text-muted-foreground">
-                    {t("settings.syncExperiencePreparingDescription")}
-                  </p>
-                </div>
+            <CollapsibleSection
+              id="account-sync-first-sync-guidance"
+              icon={<RefreshCw className="h-5 w-5" />}
+              title={t("settings.syncExperiencePreparingTitle")}
+              description={t("settings.syncExperiencePreparingDescription")}
+              expandLabel={t("common.expandSection")}
+              collapseLabel={t("common.collapseSection")}
+              status={
                 <StatusChip tone="warning">
                   {t("settings.syncExperiencePreparingBadge")}
                 </StatusChip>
-              </div>
+              }
+              defaultOpen={false}
+            >
               <div className="grid gap-3 lg:grid-cols-3">
                 <SoftPanel className="alios-surface-muted">
                   <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
@@ -1370,7 +1525,7 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
                   </p>
                 </SoftPanel>
               </div>
-            </SoftPanel>
+            </CollapsibleSection>
           ) : null}
           {categoryStatuses.length > 0 ? (
             <div className="grid gap-3 lg:grid-cols-2">
@@ -1487,7 +1642,7 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
                 </p>
                 {syncActionFeedback ? (
                   <p className="text-xs leading-5 text-muted-foreground">
-                    {syncActionFeedback}
+                    {syncActionFeedbackMessage}
                   </p>
                 ) : null}
               </div>
@@ -1764,21 +1919,26 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
           ) : null}
         </section>
 
-        <section aria-labelledby="account-sync-other-states" className="space-y-3">
-          <div className="space-y-1">
-            <p id="account-sync-other-states" className="text-sm font-medium">
-              {t("settings.syncStatesTitle")}
-            </p>
-            <p className="text-sm leading-7 text-muted-foreground">
-              {t("settings.syncStatesDescription")}
-            </p>
-          </div>
+        <CollapsibleSection
+          id="account-sync-other-states"
+          icon={<Cloudy className="h-5 w-5" />}
+          title={t("settings.syncStatesTitle")}
+          description={t("settings.syncStatesDescription")}
+          expandLabel={t("common.expandSection")}
+          collapseLabel={t("common.collapseSection")}
+          status={
+            <StatusChip tone="neutral">
+              {t("settings.syncStatusAvailable")}
+            </StatusChip>
+          }
+          defaultOpen={false}
+        >
           <div className="grid gap-3 lg:grid-cols-2">
             {futureStates.map((state) => (
               <SyncStatePreview key={state.titleKey} state={state} />
             ))}
           </div>
-        </section>
+        </CollapsibleSection>
 
         <CollapsibleSection
           id="account-sync-consent"
@@ -1879,132 +2039,15 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
           </CollapsibleSection>
         </div>
 
-        <SoftPanel className="space-y-4">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-            <div className="flex items-start gap-2">
-              <UserRound className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-              <div>
-                <p className="text-sm font-medium">
-                  {t(accountPresentation.actionsTitleKey)}
-                </p>
-                <p
-                  id={futureActionsDescriptionId}
-                  className="mt-1 text-sm leading-7 text-muted-foreground"
-                >
-                  {t(accountPresentation.actionsDescriptionKey)}
-                </p>
-              </div>
-            </div>
-            <StatusChip tone={accountActionStatusTone}>
-              {t(accountPresentation.actionStatusKey)}
-            </StatusChip>
-          </div>
-          <div
-            className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3"
-            role="group"
-            aria-label={t(accountPresentation.actionsTitleKey)}
-          >
-            {!runtimeState.hasActiveAccount && interactiveEmailProvider ? (
-              <div className="sm:col-span-2 xl:col-span-3">
-                <EmailAccountAuthForm
-                  busyAction={accountActionPending}
-                  feedback={accountActionFeedback}
-                  onCreateAccount={handleEmailCreateAccount}
-                  onSignIn={handleEmailSignIn}
-                />
-              </div>
-            ) : null}
-            {!runtimeState.hasActiveAccount && interactiveGoogleProvider ? (
-              <Button
-                type="button"
-                className="min-h-11 w-full justify-start sm:w-auto"
-                onClick={() => {
-                  void handleGoogleSignIn();
-                }}
-                disabled={accountActionPending !== null}
-                aria-describedby={futureActionsDescriptionId}
-              >
-                <ArrowUpRight className="me-2 h-4 w-4 shrink-0" />
-                {accountActionPending === "sign-in"
-                  ? t("settings.accountGoogleSigningIn")
-                  : t("settings.accountGoogleSignInAction")}
-              </Button>
-            ) : null}
-            {canSignOut ? (
-              <Button
-                type="button"
-                variant="outline"
-                className="min-h-11 w-full justify-start sm:w-auto"
-                onClick={() => {
-                  void handleSignOut();
-                }}
-                disabled={accountActionPending !== null}
-                aria-describedby={futureActionsDescriptionId}
-              >
-                <ArrowUpRight className="me-2 h-4 w-4 shrink-0" />
-                {accountActionPending === "sign-out"
-                  ? interactiveEmailProvider
-                    ? t("settings.accountEmailSigningOut")
-                    : t("settings.accountGoogleSigningOut")
-                  : t("settings.accountSignOutAction")}
-              </Button>
-            ) : null}
-            {canEnableSync ? (
-              <Button
-                type="button"
-                variant="secondary"
-                className="min-h-11 w-full justify-start sm:w-auto"
-                onClick={() => {
-                  void handleEnableSync();
-                }}
-                disabled={syncActionPending}
-                aria-describedby={futureActionsDescriptionId}
-              >
-                <RefreshCw
-                  className={`me-2 h-4 w-4 ${syncActionPending ? "animate-spin" : ""}`}
-                />
-                {syncActionPending
-                  ? t("settings.accountEnableSyncPending")
-                  : t("settings.accountEnableSyncAction")}
-              </Button>
-            ) : null}
-            {visibleActionKeys.map((action) => (
-              <ConsentActionPlaceholder
-                key={action.labelKey}
-                label={`${t(action.labelKey)} - ${t(action.statusKey)}`}
-                descriptionId={futureActionsDescriptionId}
-              />
-            ))}
-          </div>
-          {accountActionFeedback && !interactiveEmailProvider ? (
-            <div
-              role="status"
-              className="rounded-xl border border-border/70 bg-muted/40 px-3 py-3 text-sm leading-6 text-muted-foreground"
-            >
-              {accountActionFeedback}
-            </div>
-          ) : null}
-          <p className="text-xs leading-5 text-muted-foreground">
-            {t(accountPresentation.noteKey)}
-          </p>
-          <div className="flex items-start gap-2 rounded-xl border border-dashed border-border/70 px-3 py-3 text-xs leading-5 text-muted-foreground">
-            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-            <p>{t(accountPresentation.hintKey)}</p>
-          </div>
-        </SoftPanel>
-
-        <SoftPanel className="alios-surface-muted">
-          <div className="flex items-start gap-2">
-            <LaptopMinimal className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-            <div>
-              <p className="text-sm font-medium">
-                {t("settings.deviceTransferTitle")}
-              </p>
-              <p className="mt-1 text-sm leading-7 text-muted-foreground">
-                {t("settings.deviceTransferDescription")}
-              </p>
-            </div>
-          </div>
+        <CollapsibleSection
+          id="account-sync-device-transfer"
+          icon={<LaptopMinimal className="h-5 w-5" />}
+          title={t("settings.deviceTransferTitle")}
+          description={t("settings.deviceTransferDescription")}
+          expandLabel={t("common.expandSection")}
+          collapseLabel={t("common.collapseSection")}
+          defaultOpen={false}
+        >
           <ol className="mt-3 list-decimal space-y-1 ps-5 text-sm leading-6 text-muted-foreground">
             <li>{t("settings.deviceTransferExport")}</li>
             <li>{t("settings.deviceTransferMove")}</li>
@@ -2019,7 +2062,9 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
           >
             {t("settings.deviceTransferAction")}
           </Button>
-        </SoftPanel>
+        </CollapsibleSection>
+          </div>
+        </CollapsibleSection>
       </CardContent>
     </Card>
   );

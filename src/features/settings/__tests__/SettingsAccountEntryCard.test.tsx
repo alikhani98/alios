@@ -257,6 +257,7 @@ describe("SettingsAccountEntryCard", () => {
     expect(markup).toContain("Google sign-in");
     expect(markup).toContain("Sign in with Google");
     expect(markup).toContain("Open account &amp; sync details");
+    expect(markup).toContain('aria-expanded="false"');
     expect(markup).toContain("Signed out");
   });
 

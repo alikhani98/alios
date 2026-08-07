@@ -242,9 +242,14 @@ describe("SyncStatusCard", () => {
     expect(markup).toContain('aria-label="Account actions"');
     expect(markup).toContain("Expand section");
     expect(markup).toContain('aria-expanded="false"');
+    expect(markup).toContain('aria-controls="account-sync-other-states-content"');
+    expect(markup).toContain('aria-controls="account-sync-consent-content"');
+    expect(markup).toContain('aria-controls="account-sync-offline-content"');
+    expect(markup).toContain('aria-controls="account-sync-conflict-content"');
+    expect(markup).toContain('aria-controls="account-sync-device-transfer-content"');
     expect(markup).toContain("Data stays on this device");
     expect(markup).toContain("sm:grid-cols-2");
-    expect(markup).toContain("xl:grid-cols-4");
+    expect(markup).toContain("xl:grid-cols-3");
     expect(markup).toContain("min-h-11");
   });
 
@@ -499,6 +504,7 @@ describe("SyncStatusCard", () => {
     expect(markup).toContain("Multi-device sync experience");
     expect(markup).toContain("Sync completed");
     expect(markup).toContain("Connected devices");
+    expect(markup).toContain('aria-controls="account-sync-device-details-content"');
     expect(markup).toContain("2 device(s)");
     expect(markup).toContain("Last successful sync: 2026-07-28T12:00:00.000Z");
     expect(markup).toContain("Phone");
