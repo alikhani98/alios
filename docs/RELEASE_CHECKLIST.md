@@ -2,6 +2,8 @@
 
 Automated gates last verified on 2026-07-17. The original v1.0 production-preview QA baseline remains recorded below; Stage 77 through Stage 80 mobile checks still require their documented manual browser smoke passes.
 
+> Historical checklist note: checklist items from earlier stages record what was true when those stages shipped. Entries such as "No Supabase package" are not current prohibitions after the approved optional account and sync implementation. Current release validation must preserve local-first behavior while allowing optional Email authentication and Supabase-backed sync.
+
 ## Pull request validation
 
 Stage 74 adds the least-privilege **Validate Pull Request** workflow for every pull request targeting `main`. Before merging, confirm that its single **TypeScript, tests, and build** job passes. The job uses the frozen lockfile and runs:

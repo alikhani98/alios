@@ -14,6 +14,14 @@
   - Automated validation complete: automated checks must stay separate from live QA evidence and do not prove real-world behavior by themselves.
   - Real-world validation complete: only explicitly documented browser/device evidence counts as real-world validation.
 
+## Current Account & Sync Rule
+
+AliOS is local-first by default. The app remains usable without an account, without sync, and without a backend connection.
+
+As of the merged Stage 256 implementation, optional Email authentication and Supabase-backed synchronization exist as additive capabilities. They require explicit user action: account creation/sign-in does not by itself upload user data, and synchronization starts only after the user enables sync.
+
+The older absolute "No Supabase / No Authentication / No Backend" language remains valid as historical context for earlier stages, but it is superseded as a current hard prohibition by the approved optional account and sync direction.
+
 ## Stage 255 Project Memory & Documentation Alignment
 
 - Stage 255 aligns the repository's long-lived documentation with the actual post-Stage-254 architecture and implementation evidence.

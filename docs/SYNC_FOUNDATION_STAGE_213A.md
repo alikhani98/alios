@@ -8,6 +8,8 @@ Status: `STAGE_213A_SYNC_FOUNDATION_PREPARATION_COMPLETE`
 
 Stage 213A prepares the data architecture for a future optional account and cloud-sync track without changing current AliOS behavior. AliOS remains local-first, single-user, static-hosting compatible, and fully usable with no account, no backend, and no remote data copy.
 
+> Historical context: Stage 213A intentionally did not implement authentication or Supabase. Later approved stages added optional Email authentication and Supabase-backed sync. The preserved current rule is that AliOS remains local-first and fully usable without account or sync, while account/sync are optional explicit opt-in capabilities.
+
 This stage is intentionally preparation-only. It documents the current persistence architecture, identifies the main coupling risks, and adds a minimal sync-ready contract around repository-backed entities.
 
 ## 2. Base and Branch

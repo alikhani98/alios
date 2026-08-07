@@ -28,6 +28,14 @@ AliOS v1.0 should be used with real personal data before more product scope is a
 - Sync is not treated as always-on infrastructure; it must still be activated explicitly by the user.
 - Real multi-device verification of the current optional account/sync behavior remains an evidence gap even though the implementation path exists.
 
+## Current Account & Sync Direction
+
+Current AliOS remains local-first by default. Supabase-backed account authentication and synchronization are optional, additive capabilities.
+
+The app must continue to work fully in local-only mode. Account creation, sign-in, and synchronization are never mandatory. Sync requires explicit opt-in and must not silently upload, overwrite, or delete local data.
+
+Older roadmap entries that say backend/auth/sync are unimplemented describe the repository state at that historical stage, not the current main branch after Stages 251-256.
+
 The later version ideas below are directional only. They are not approved stages and may change after real-world use.
 
 Stage 50 hardens manual backup and restore with validation and additive migration normalization, but it remains a local-only maintenance improvement rather than a new product surface.

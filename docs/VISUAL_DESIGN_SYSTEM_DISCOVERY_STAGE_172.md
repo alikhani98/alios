@@ -14,6 +14,8 @@ The finance blocker that motivated the recent stage sequence is now closed by us
 
 ## 2. Preconditions and Current Release Status
 
+> Historical context: this document describes the Stage 172 design-system baseline. The "no-backend architecture" phrase reflects the repository state at that time. Current AliOS remains local-first by default, but approved optional account authentication and Supabase-backed sync now exist as additive capabilities.
+
 - Base commit: `4aab7742655121cd05a5ac37183f614d04eee557`
 - Branch: `codex/stage-172-visual-design-system-discovery`
 - Latest verified upstream main includes PR #154 merge commit `4aab7742655121cd05a5ac37183f614d04eee557`

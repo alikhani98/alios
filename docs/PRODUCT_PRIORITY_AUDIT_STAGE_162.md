@@ -2,6 +2,8 @@
 
 Status: documentation-only audit complete. No product feature, source code, UI, CSS, route, test, schema, migration, backup-format, storage, localStorage key, dependency, Sync, Cloud, AI, analytics, telemetry, backend, or runtime behavior is implemented by this document.
 
+> Historical context: this audit describes the Stage 162 architecture boundary. Its "no backend / no authentication / no cloud sync" wording is preserved as historical product-priority context, but it is superseded in part by later approved optional account and sync stages. The current rule is local-first by default with optional Email authentication and Supabase-backed sync requiring explicit user opt-in.
+
 ## Executive Summary
 
 Stage 162 recommends that the next AliOS stage should be a small QA / Release Hardening stage, not a new product feature.
