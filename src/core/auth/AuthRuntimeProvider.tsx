@@ -8,6 +8,7 @@ import {
 } from "react";
 
 import { localOnlyAuthProvider } from "./LocalOnlyAuthProvider";
+import type { AuthSessionSource } from "./authSessionStore";
 import type { AuthProvider, AuthSession } from "./types";
 
 type AuthContextValue = Readonly<{
@@ -19,6 +20,7 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 type AuthRuntimeProviderProps = {
   provider?: AuthProvider;
+  sessionSource?: AuthSessionSource;
   children: ReactNode;
 };
 
@@ -33,6 +35,7 @@ function createBootstrapSession(provider: AuthProvider): AuthSession {
 
 export function AuthRuntimeProvider({
   provider = localOnlyAuthProvider,
+  sessionSource = provider,
   children,
 }: AuthRuntimeProviderProps) {
   const [session, setSession] = useState<AuthSession>(() =>
@@ -44,7 +47,7 @@ export function AuthRuntimeProvider({
 
     setSession(createBootstrapSession(provider));
 
-    void provider
+    void sessionSource
       .getCurrentSession()
       .then((currentSession) => {
         if (isActive) {
@@ -67,7 +70,7 @@ export function AuthRuntimeProvider({
         });
       });
 
-    const subscription = provider.subscribe((nextSession) => {
+    const subscription = sessionSource.subscribe((nextSession) => {
       if (isActive) {
         setSession(nextSession);
       }
@@ -77,7 +80,7 @@ export function AuthRuntimeProvider({
       isActive = false;
       subscription.unsubscribe();
     };
-  }, [provider]);
+  }, [provider, sessionSource]);
 
   const value = useMemo<AuthContextValue>(
     () => ({

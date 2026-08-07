@@ -37,6 +37,17 @@ type InteractiveEmailAuthProvider = AuthProvider &
     createAccount: NonNullable<AuthProvider["createAccount"]>;
   }>;
 
+export function shouldRenderStandaloneAccountFeedback(input: {
+  feedback: string | null;
+  hasInteractiveEmailProvider: boolean;
+  hasActiveAccount: boolean;
+}) {
+  return Boolean(
+    input.feedback &&
+      (!input.hasInteractiveEmailProvider || input.hasActiveAccount)
+  );
+}
+
 function getInteractiveGoogleProvider(
   provider: AuthProvider
 ): InteractiveGoogleAuthProvider | null {
@@ -380,7 +391,11 @@ export function SettingsAccountEntryCard({
           </Button>
         </div>
 
-        {feedback && !interactiveEmailProvider ? (
+        {shouldRenderStandaloneAccountFeedback({
+          feedback,
+          hasInteractiveEmailProvider: interactiveEmailProvider !== null,
+          hasActiveAccount: runtimeState.hasActiveAccount,
+        }) ? (
           <div
             role="status"
             className="rounded-xl border border-border/70 bg-muted/40 px-3 py-3 text-sm leading-6 text-muted-foreground"

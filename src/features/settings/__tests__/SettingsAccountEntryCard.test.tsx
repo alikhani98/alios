@@ -39,6 +39,7 @@ import type {
 import { I18nProvider, LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
 
 import { SettingsAccountEntryCard } from "../components/SettingsAccountEntryCard";
+import { shouldRenderStandaloneAccountFeedback } from "../components/SettingsAccountEntryCard";
 
 class TestAccountProvider implements AccountProvider {
   readonly providerId: string;
@@ -198,6 +199,27 @@ describe("SettingsAccountEntryCard", () => {
 
   afterEach(() => {
     localStorage.clear();
+  });
+
+  it("shows standalone sync feedback for the signed-in email path", () => {
+    expect(
+      shouldRenderStandaloneAccountFeedback({
+        feedback:
+          "AliOS synced preferences, tasks, routines, projects, goals, finance, and Personal Manual records for this device.",
+        hasInteractiveEmailProvider: true,
+        hasActiveAccount: true,
+      })
+    ).toBe(true);
+  });
+
+  it("keeps email-form feedback inline while the email user is still signed out", () => {
+    expect(
+      shouldRenderStandaloneAccountFeedback({
+        feedback: "Email sign-in did not complete.",
+        hasInteractiveEmailProvider: true,
+        hasActiveAccount: false,
+      })
+    ).toBe(false);
   });
 
   it("shows the Google sign-in entry point for a logged-out account state", async () => {

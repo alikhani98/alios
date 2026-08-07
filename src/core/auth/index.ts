@@ -1,4 +1,5 @@
 export * from "./AuthRuntimeProvider";
+export * from "./authSessionStore";
 export * from "./EmailAuthProvider";
 export * from "./GoogleAuthProvider";
 export * from "./LocalOnlyAuthProvider";
