@@ -6,6 +6,7 @@ import type { GoogleAuthRuntime } from "@/core/auth/googleAuthRuntime";
 import {
   ACCENT_COLOR_STORAGE_KEY,
   APPEARANCE_STORAGE_KEY,
+  LOCAL_PREFERENCE_CHANGE_EVENT,
 } from "@/shared/constants/preferences";
 import { LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
 import type {
@@ -44,8 +45,19 @@ function createRuntimeStub(
 }
 
 function createAuthProviderHarness(initialSession: AuthSession) {
+  return createAuthProviderHarnessWithOptions(initialSession);
+}
+
+function createAuthProviderHarnessWithOptions(
+  initialSession: AuthSession,
+  options: Readonly<{
+    emitCurrentSessionOnSubscribe?: boolean;
+  }> = {}
+) {
   let currentSession = initialSession;
   const listeners = new Set<(session: AuthSession) => void>();
+  const emitCurrentSessionOnSubscribe =
+    options.emitCurrentSessionOnSubscribe ?? true;
 
   const provider: AuthProvider = {
     name: initialSession.provider,
@@ -56,7 +68,9 @@ function createAuthProviderHarness(initialSession: AuthSession) {
     refreshSession: async () => currentSession,
     subscribe: (listener) => {
       listeners.add(listener);
-      void Promise.resolve().then(() => listener(currentSession));
+      if (emitCurrentSessionOnSubscribe) {
+        void Promise.resolve().then(() => listener(currentSession));
+      }
       return {
         unsubscribe: () => {
           listeners.delete(listener);
@@ -70,6 +84,45 @@ function createAuthProviderHarness(initialSession: AuthSession) {
     setSession(nextSession: AuthSession) {
       currentSession = nextSession;
       listeners.forEach((listener) => listener(currentSession));
+    },
+  };
+}
+
+async function flushMicrotasks(count = 4) {
+  for (let index = 0; index < count; index += 1) {
+    await Promise.resolve();
+  }
+}
+
+function installWindowEventHarness() {
+  const eventTarget = new EventTarget();
+  const previousWindow = (globalThis as { window?: unknown }).window;
+  const windowStub = {
+    localStorage,
+    addEventListener: eventTarget.addEventListener.bind(eventTarget),
+    removeEventListener: eventTarget.removeEventListener.bind(eventTarget),
+    dispatchEvent: eventTarget.dispatchEvent.bind(eventTarget),
+  };
+
+  Object.defineProperty(globalThis, "window", {
+    configurable: true,
+    writable: true,
+    value: windowStub,
+  });
+
+  return {
+    window: windowStub,
+    restore() {
+      if (typeof previousWindow === "undefined") {
+        delete (globalThis as { window?: unknown }).window;
+        return;
+      }
+
+      Object.defineProperty(globalThis, "window", {
+        configurable: true,
+        writable: true,
+        value: previousWindow,
+      });
     },
   };
 }
@@ -707,6 +760,194 @@ describe("SupabasePreferenceSyncProvider", () => {
     expect(listener).not.toHaveBeenCalled();
 
     subscription.unsubscribe();
+  });
+
+  it("does not let internally applied preference events recursively trigger another sync", async () => {
+    localStorage.setItem("alios.sync.enabled", "true");
+    const windowHarness = installWindowEventHarness();
+
+    try {
+      const harness = createSupabaseClientHarness(
+        {
+          alios_preferences: {
+            [LANGUAGE_STORAGE_KEY]: "en",
+          },
+        },
+        {
+          initialSession: true,
+        }
+      );
+      const authHarness = createAuthProviderHarnessWithOptions(
+        {
+          status: "authenticated",
+          provider: "email",
+          user: {
+            userId: "supabase-user-1",
+            email: "user@example.com",
+            displayName: "AliOS User",
+            createdAt: "2026-07-29T10:00:00.000Z",
+            updatedAt: "2026-07-29T10:00:00.000Z",
+          },
+          detail: "Email account connected on this device.",
+        },
+        {
+          emitCurrentSessionOnSubscribe: false,
+        }
+      );
+      const provider = new SupabasePreferenceSyncProvider({
+        client: harness.client,
+        authProvider: authHarness.provider,
+        getStorage: () => localStorage,
+        now: () => new Date("2026-07-29T10:00:00.000Z"),
+      });
+      const syncSpy = vi.spyOn(provider, "syncNow");
+
+      provider.activate();
+      windowHarness.window.dispatchEvent(
+        new CustomEvent(LOCAL_PREFERENCE_CHANGE_EVENT, {
+          detail: { key: APPEARANCE_STORAGE_KEY },
+        })
+      );
+      await flushMicrotasks();
+
+      expect(syncSpy).toHaveBeenCalledTimes(1);
+      expect(harness.client.auth.updateUser).toHaveBeenCalledTimes(1);
+    } finally {
+      windowHarness.restore();
+    }
+  });
+
+  it("emits only one effective local preference notification for each internally applied write", async () => {
+    const windowHarness = installWindowEventHarness();
+    const harness = createSupabaseClientHarness(
+      {
+        alios_preferences: {
+          [LANGUAGE_STORAGE_KEY]: "en",
+        },
+      },
+      {
+        initialSession: true,
+      }
+    );
+    const notificationListener = vi.fn();
+    windowHarness.window.addEventListener(
+      LOCAL_PREFERENCE_CHANGE_EVENT,
+      notificationListener
+    );
+
+    try {
+      const provider = new SupabasePreferenceSyncProvider({
+        client: harness.client,
+        authProvider: createAuthProviderHarnessWithOptions(
+          {
+            status: "authenticated",
+            provider: "email",
+            user: {
+              userId: "supabase-user-1",
+              email: "user@example.com",
+              displayName: "AliOS User",
+              createdAt: "2026-07-29T10:00:00.000Z",
+              updatedAt: "2026-07-29T10:00:00.000Z",
+            },
+            detail: "Email account connected on this device.",
+          },
+          {
+            emitCurrentSessionOnSubscribe: false,
+          }
+        ).provider,
+        getStorage: () => localStorage,
+        now: () => new Date("2026-07-29T10:00:00.000Z"),
+      });
+
+      await provider.syncNow();
+
+      expect(notificationListener).toHaveBeenCalledTimes(1);
+    } finally {
+      windowHarness.window.removeEventListener(
+        LOCAL_PREFERENCE_CHANGE_EVENT,
+        notificationListener
+      );
+      windowHarness.restore();
+    }
+  });
+
+  it("coalesces burst preference events into one in-flight sync attempt", async () => {
+    localStorage.setItem("alios.sync.enabled", "true");
+    const windowHarness = installWindowEventHarness();
+
+    try {
+      const harness = createSupabaseClientHarness(
+        {
+          alios_preferences: {
+            [LANGUAGE_STORAGE_KEY]: "en",
+          },
+        },
+        {
+          initialSession: true,
+        }
+      );
+      let resolveUpdateUser:
+        | ((value: { data: { user: FakeSessionUser | null }; error: Error | null }) => void)
+        | undefined;
+      harness.client.auth.updateUser.mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            resolveUpdateUser = resolve as (
+              value: { data: { user: FakeSessionUser | null }; error: Error | null }
+            ) => void;
+          })
+      );
+      const authHarness = createAuthProviderHarnessWithOptions(
+        {
+          status: "authenticated",
+          provider: "email",
+          user: {
+            userId: "supabase-user-1",
+            email: "user@example.com",
+            displayName: "AliOS User",
+            createdAt: "2026-07-29T10:00:00.000Z",
+            updatedAt: "2026-07-29T10:00:00.000Z",
+          },
+          detail: "Email account connected on this device.",
+        },
+        {
+          emitCurrentSessionOnSubscribe: false,
+        }
+      );
+      const provider = new SupabasePreferenceSyncProvider({
+        client: harness.client,
+        authProvider: authHarness.provider,
+        getStorage: () => localStorage,
+        now: () => new Date("2026-07-29T10:00:00.000Z"),
+      });
+
+      provider.activate();
+      windowHarness.window.dispatchEvent(new Event(LOCAL_PREFERENCE_CHANGE_EVENT));
+      windowHarness.window.dispatchEvent(new Event(LOCAL_PREFERENCE_CHANGE_EVENT));
+      windowHarness.window.dispatchEvent(new Event(LOCAL_PREFERENCE_CHANGE_EVENT));
+      await flushMicrotasks();
+
+      expect(harness.client.auth.updateUser).toHaveBeenCalledTimes(1);
+
+      if (resolveUpdateUser) {
+        resolveUpdateUser({
+          data: {
+            user: {
+              id: "supabase-user-1",
+              user_metadata: {
+                alios_preferences: {
+                  [LANGUAGE_STORAGE_KEY]: "en",
+                },
+              },
+            },
+          },
+          error: null,
+        });
+      }
+      await flushMicrotasks();
+    } finally {
+      windowHarness.restore();
+    }
   });
 
   it("syncs tasks, projects, goals, finance records, and Personal Manual entries through the backup boundary while preserving local-first ownership", async () => {

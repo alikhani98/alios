@@ -1,3 +1,6 @@
+// @vitest-environment jsdom
+import { StrictMode, act, useState } from "react";
+import { createRoot } from "react-dom/client";
 import { describe, expect, it, vi } from "vitest";
 
 import { LOCAL_ONLY_ACCOUNT_RUNTIME_STATE } from "../runtimeBoundary";
@@ -7,6 +10,7 @@ import {
   selectAuthSessionStatus,
   selectSyncCapabilityStatus,
   selectSyncStatus,
+  useAccountRuntimeState,
 } from "../runtimeStateStore";
 import type { AccountRuntimeBoundary, AccountRuntimeState } from "../runtimeBoundary";
 
@@ -71,9 +75,11 @@ describe("account runtime state store", () => {
     const store = createAccountRuntimeStateStore();
 
     const beforeRefresh = store.getSnapshot();
+    const repeatedSnapshot = store.getSnapshot();
     const refreshed = await store.refresh();
     const afterRefresh = store.getSnapshot();
 
+    expect(Object.is(beforeRefresh, repeatedSnapshot)).toBe(true);
     expect(beforeRefresh).toEqual(LOCAL_ONLY_ACCOUNT_RUNTIME_STATE);
     expect(refreshed).toEqual(LOCAL_ONLY_ACCOUNT_RUNTIME_STATE);
     expect(afterRefresh).toEqual(LOCAL_ONLY_ACCOUNT_RUNTIME_STATE);
@@ -157,5 +163,84 @@ describe("account runtime state store", () => {
     expect(harness.getUnsubscribeCalls()).toBe(2);
     expect(harness.getActiveSubscriptions()).toBe(0);
     expect(harness.getMaxActiveSubscriptions()).toBe(1);
+  });
+
+  it("keeps the Settings-style two-consumer subscription bounded across StrictMode and rerenders", async () => {
+    const harness = createBoundaryHarness();
+    const store = createAccountRuntimeStateStore(harness.boundary);
+    const renderCounts = { page: 0, card: 0 };
+    let rerenderParent: (() => void) | null = null;
+
+    function Consumer({ name }: { name: keyof typeof renderCounts }) {
+      useAccountRuntimeState(store);
+      renderCounts[name] += 1;
+      return null;
+    }
+
+    function SettingsRuntimeHarness() {
+      const [, setRenderVersion] = useState(0);
+      rerenderParent = () => setRenderVersion((version) => version + 1);
+
+      return (
+        <>
+          <Consumer name="page" />
+          <Consumer name="card" />
+        </>
+      );
+    }
+
+    const container = document.createElement("div");
+    const root = createRoot(container);
+
+    await act(async () => {
+      root.render(
+        <StrictMode>
+          <SettingsRuntimeHarness />
+        </StrictMode>
+      );
+    });
+
+    expect(harness.getActiveSubscriptions()).toBe(1);
+    expect(harness.getMaxActiveSubscriptions()).toBe(1);
+    expect(harness.getSubscribeCalls()).toBe(2);
+
+    const subscribeCallsAfterStrictModeReplay = harness.getSubscribeCalls();
+    const rendersAfterMount = { ...renderCounts };
+
+    await act(async () => {
+      rerenderParent?.();
+      rerenderParent?.();
+    });
+
+    expect(harness.getSubscribeCalls()).toBe(subscribeCallsAfterStrictModeReplay);
+    expect(harness.getActiveSubscriptions()).toBe(1);
+    expect(renderCounts.page).toBeLessThanOrEqual(rendersAfterMount.page + 2);
+    expect(renderCounts.card).toBeLessThanOrEqual(rendersAfterMount.card + 2);
+
+    const equivalentState = {
+      ...LOCAL_ONLY_ACCOUNT_RUNTIME_STATE,
+      syncCapability: { ...LOCAL_ONLY_ACCOUNT_RUNTIME_STATE.syncCapability },
+      syncStatus: { ...LOCAL_ONLY_ACCOUNT_RUNTIME_STATE.syncStatus },
+      syncMetadata: { ...LOCAL_ONLY_ACCOUNT_RUNTIME_STATE.syncMetadata },
+    };
+
+    await act(async () => {
+      harness.emit(equivalentState);
+      harness.emit({ ...equivalentState });
+      harness.emit({ ...equivalentState });
+    });
+
+    expect(harness.getSubscribeCalls()).toBe(subscribeCallsAfterStrictModeReplay);
+    expect(harness.getActiveSubscriptions()).toBe(1);
+    expect(harness.getMaxActiveSubscriptions()).toBe(1);
+    expect(renderCounts.page).toBeLessThanOrEqual(rendersAfterMount.page + 4);
+    expect(renderCounts.card).toBeLessThanOrEqual(rendersAfterMount.card + 4);
+
+    await act(async () => {
+      root.unmount();
+    });
+
+    expect(harness.getActiveSubscriptions()).toBe(0);
+    expect(harness.getUnsubscribeCalls()).toBe(2);
   });
 });

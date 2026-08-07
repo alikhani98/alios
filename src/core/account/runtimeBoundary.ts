@@ -2,7 +2,12 @@ import {
   LOCAL_ONLY_ACCOUNT_SESSION_BOUNDARY,
   localOnlyAccountProvider,
 } from "./LocalOnlyAccountProvider";
-import type { AuthProvider, AuthSession, AuthSessionStatus } from "@/core/auth";
+import type {
+  AuthProvider,
+  AuthSession,
+  AuthSessionSource,
+  AuthSessionStatus,
+} from "@/core/auth";
 import { localOnlyAuthProvider } from "@/core/auth";
 import {
   localOnlySyncProvider,
@@ -111,6 +116,7 @@ export const LOCAL_ONLY_ACCOUNT_RUNTIME_STATE: AccountRuntimeState = {
 type AccountRuntimeBoundaryDependencies = Readonly<{
   accountProvider?: AccountProvider;
   authProvider?: AuthProvider;
+  authSessionSource?: AuthSessionSource;
   syncProvider?: SyncProvider;
 }>;
 
@@ -224,7 +230,7 @@ function deriveAccountProviderId(
 
 async function buildAccountRuntimeState(
   accountProvider: AccountProvider,
-  authProvider: AuthProvider,
+  authSessionSource: AuthSessionSource,
   syncProvider: SyncProvider
 ): Promise<AccountRuntimeState> {
   const [accountStatus, accountCapabilities, session, authSession, syncStatus] =
@@ -232,7 +238,7 @@ async function buildAccountRuntimeState(
       accountProvider.getStatus(),
       accountProvider.getCapabilities(),
       accountProvider.getCurrentSession(),
-      authProvider.getCurrentSession(),
+      authSessionSource.getCurrentSession(),
       syncProvider.getStatus(),
     ]);
 
@@ -278,14 +284,15 @@ async function buildAccountRuntimeState(
 export class DefaultAccountRuntimeBoundary implements AccountRuntimeBoundary {
   constructor(
     private readonly accountProvider: AccountProvider = localOnlyAccountProvider,
-    private readonly authProvider: AuthProvider = localOnlyAuthProvider,
+    authProvider: AuthProvider = localOnlyAuthProvider,
+    private readonly authSessionSource: AuthSessionSource = authProvider,
     private readonly syncProvider: SyncProvider = localOnlySyncProvider
   ) {}
 
   async getState(): Promise<AccountRuntimeState> {
     return buildAccountRuntimeState(
       this.accountProvider,
-      this.authProvider,
+      this.authSessionSource,
       this.syncProvider
     );
   }
@@ -325,21 +332,34 @@ export class DefaultAccountRuntimeBoundary implements AccountRuntimeBoundary {
     listener: AccountRuntimeStateListener<AccountRuntimeState>
   ): AccountStateSubscription {
     let active = true;
+    let emitInFlight = false;
+    let emitPending = false;
 
     const emit = () => {
-      void this.getState().then((state) => {
-        if (active) {
-          listener(state);
-        }
-      });
+      if (emitInFlight) {
+        emitPending = true;
+        return;
+      }
+
+      emitInFlight = true;
+      void this.getState()
+        .then((state) => {
+          if (active) {
+            listener(state);
+          }
+        })
+        .finally(() => {
+          emitInFlight = false;
+          if (active && emitPending) {
+            emitPending = false;
+            emit();
+          }
+        });
     };
 
     emit();
 
-    const accountSubscription = this.accountProvider.subscribe(() => {
-      emit();
-    });
-    const authSubscription = this.authProvider.subscribe(() => {
+    const authSubscription = this.authSessionSource.subscribe(() => {
       emit();
     });
     const syncSubscription = this.syncProvider.subscribe(() => {
@@ -349,7 +369,6 @@ export class DefaultAccountRuntimeBoundary implements AccountRuntimeBoundary {
     return {
       unsubscribe: () => {
         active = false;
-        accountSubscription.unsubscribe();
         authSubscription.unsubscribe();
         syncSubscription.unsubscribe();
       },
@@ -363,6 +382,7 @@ export function createAccountRuntimeBoundary(
   return new DefaultAccountRuntimeBoundary(
     dependencies.accountProvider ?? localOnlyAccountProvider,
     dependencies.authProvider ?? localOnlyAuthProvider,
+    dependencies.authSessionSource ?? dependencies.authProvider ?? localOnlyAuthProvider,
     dependencies.syncProvider ?? localOnlySyncProvider
   );
 }

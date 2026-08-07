@@ -11,6 +11,7 @@ import {
 } from "@/core/account";
 import {
   AuthRuntimeProvider,
+  createAuthSessionStore,
   emailAuthProvider,
   googleAuthRuntime,
   googleAuthProvider,
@@ -41,6 +42,7 @@ type AppProvidersProps = {
   loadStorageAdapter?: () => Promise<StorageAdapter>;
   accountProvider?: AccountProvider;
   authProvider?: AuthProvider;
+  authSessionSource?: ReturnType<typeof createAuthSessionStore>;
   syncProvider?: SyncProvider;
 };
 
@@ -155,12 +157,17 @@ export function AppProviders({
   loadStorageAdapter = loadDexieStorageAdapter,
   accountProvider = resolveDefaultAccountProvider().accountProvider,
   authProvider = resolveDefaultAccountProvider().authProvider,
+  authSessionSource: injectedAuthSessionSource,
   syncProvider,
 }: AppProvidersProps) {
   const [bootstrapState, setBootstrapState] = useState<BootstrapState>({
     status: "loading",
   });
   const [attempt, setAttempt] = useState(0);
+  const authSessionSource = useMemo(
+    () => injectedAuthSessionSource ?? createAuthSessionStore(authProvider),
+    [authProvider, injectedAuthSessionSource]
+  );
   const resolvedSyncProvider = useMemo(() => {
     if (syncProvider) {
       return syncProvider;
@@ -175,21 +182,22 @@ export function AppProviders({
     }
 
     return new SupabasePreferenceSyncProvider({
-      authProvider,
+      authProvider: authSessionSource,
       idTokenProvider:
         authProvider === googleAuthProvider ? googleAuthRuntime : undefined,
       backupStorage: bootstrapState.adapter.backup,
     });
-  }, [authProvider, bootstrapState, syncProvider]);
+  }, [authProvider, authSessionSource, bootstrapState, syncProvider]);
 
   const accountRuntimeBoundary = useMemo(
     () =>
       createAccountRuntimeBoundary({
         accountProvider,
         authProvider,
+        authSessionSource,
         syncProvider: resolvedSyncProvider,
       }),
-    [accountProvider, authProvider, resolvedSyncProvider]
+    [accountProvider, authProvider, authSessionSource, resolvedSyncProvider]
   );
 
   useEffect(() => {
@@ -258,7 +266,10 @@ export function AppProviders({
           />
         ) : (
           <AccountRuntimeProvider boundary={accountRuntimeBoundary}>
-            <AuthRuntimeProvider provider={authProvider}>
+            <AuthRuntimeProvider
+              provider={authProvider}
+              sessionSource={authSessionSource}
+            >
               <StorageAdapterProvider adapter={bootstrapState.adapter}>
                 {children}
               </StorageAdapterProvider>

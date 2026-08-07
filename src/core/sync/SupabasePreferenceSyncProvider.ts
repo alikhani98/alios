@@ -29,7 +29,6 @@ import {
 import { LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
 import {
   getPreferenceStorage,
-  notifyPreferenceChanged,
   writeStoredPreference,
   type PreferenceStorage,
 } from "@/shared/preferences/storage";
@@ -355,7 +354,6 @@ function applyRemotePreferencesToLocal(
     }
 
     if (writeStoredPreference(key, mergedValue, storage)) {
-      notifyPreferenceChanged(key);
       changed += 1;
     }
   });
@@ -1011,6 +1009,7 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
   private authSessionSubscription: AuthSessionSubscription | null = null;
   private preferenceChangeListener: (() => void) | null = null;
   private isActivated = false;
+  private internalPreferenceEventSuppressionDepth = 0;
   private syncInFlight: Promise<SyncResult> | null = null;
   private conflictSnapshot: ReadonlyArray<SyncConflictRecord> = [];
   private lastKnownStatus: SyncStatus = createLocalOnlyStatus(
@@ -1341,6 +1340,10 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
       return;
     }
 
+    if (this.internalPreferenceEventSuppressionDepth > 0) {
+      return;
+    }
+
     try {
       const connectedSession = await this.ensureRemoteSession(false);
       if (connectedSession?.user) {
@@ -1528,11 +1531,20 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
         connectedSession.user.user_metadata as Record<string, unknown> | undefined
       );
       const mergedSnapshot = mergePreferenceSnapshots(localSnapshot, remoteSnapshot);
-      const localPreferenceChanges = applyRemotePreferencesToLocal(
-        storage,
-        localSnapshot,
-        mergedSnapshot
-      );
+      this.internalPreferenceEventSuppressionDepth += 1;
+      let localPreferenceChanges = 0;
+      try {
+        localPreferenceChanges = applyRemotePreferencesToLocal(
+          storage,
+          localSnapshot,
+          mergedSnapshot
+        );
+      } finally {
+        this.internalPreferenceEventSuppressionDepth = Math.max(
+          0,
+          this.internalPreferenceEventSuppressionDepth - 1
+        );
+      }
       const remotePreferenceChanges = countChangedPreferences(
         mergedSnapshot,
         remoteSnapshot

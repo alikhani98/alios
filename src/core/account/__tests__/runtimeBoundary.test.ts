@@ -1,8 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
 import { SupabasePreferenceSyncProvider } from "@/core/sync";
-import type { AuthProvider, AuthSession } from "@/core/auth";
-import type { GoogleAuthRuntime } from "@/core/auth/googleAuthRuntime";
+import { createAuthSessionStore, type AuthProvider, type AuthSession } from "@/core/auth";
 import type { AccountProvider, AccountSessionBoundary } from "../types";
 
 import {
@@ -13,14 +12,6 @@ import {
   createAccountRuntimeBoundary,
   localOnlyAccountRuntimeBoundary,
 } from "../runtimeBoundary";
-
-function createRuntimeStub(session: AuthSession, idToken = "google-id-token") {
-  return {
-    getSession: () => session,
-    getIdToken: () => idToken,
-    subscribe: () => ({ unsubscribe: () => undefined }),
-  } as unknown as GoogleAuthRuntime;
-}
 
 function createAuthenticatedAccountProvider(): AccountProvider {
   const session: AccountSessionBoundary = {
@@ -56,28 +47,40 @@ function createAuthenticatedAccountProvider(): AccountProvider {
   };
 }
 
-function createAuthenticatedAuthProvider(): AuthProvider {
-  const session: AuthSession = {
-    status: "authenticated",
-    provider: "email",
-    user: {
-      userId: "user-1",
-      email: "user@example.com",
-      displayName: "AliOS User",
-      createdAt: "2026-07-28T00:00:00.000Z",
-      updatedAt: "2026-07-28T12:00:00.000Z",
-    },
-    detail: "Email account connected on this device.",
-  };
-
-  return {
-    name: "email",
+function createSubscriptionTrackingAuthProvider(session: AuthSession) {
+  let activeSubscriptions = 0;
+  let maxActiveSubscriptions = 0;
+  const listeners = new Set<(nextSession: AuthSession) => void>();
+  const provider: AuthProvider = {
+    name: session.provider,
     getCurrentUser: async () => session.user,
     getCurrentSession: async () => session,
     login: async () => ({ session }),
     logout: async () => undefined,
     refreshSession: async () => session,
-    subscribe: () => ({ unsubscribe: () => undefined }),
+    subscribe: vi.fn((listener) => {
+      listeners.add(listener);
+      activeSubscriptions += 1;
+      maxActiveSubscriptions = Math.max(
+        maxActiveSubscriptions,
+        activeSubscriptions
+      );
+      listener(session);
+
+      return {
+        unsubscribe: () => {
+          if (listeners.delete(listener)) {
+            activeSubscriptions -= 1;
+          }
+        },
+      };
+    }),
+  };
+
+  return {
+    provider,
+    getActiveSubscriptions: () => activeSubscriptions,
+    getMaxActiveSubscriptions: () => maxActiveSubscriptions,
   };
 }
 
@@ -164,6 +167,19 @@ describe("account runtime boundary", () => {
   });
 
   it("initializes account runtime state once with a configured Supabase sync provider", async () => {
+    const authHarness = createSubscriptionTrackingAuthProvider({
+      status: "authenticated",
+      provider: "email",
+      user: {
+        userId: "user-1",
+        email: "user@example.com",
+        displayName: "AliOS User",
+        createdAt: "2026-07-28T00:00:00.000Z",
+        updatedAt: "2026-07-28T12:00:00.000Z",
+      },
+      detail: "Email account connected on this device.",
+    });
+    const authSessionSource = createAuthSessionStore(authHarness.provider);
     const syncProvider = new SupabasePreferenceSyncProvider({
       client: {
         auth: {
@@ -192,24 +208,15 @@ describe("account runtime boundary", () => {
           }),
         },
       },
-      runtime: createRuntimeStub({
-        status: "authenticated",
-        provider: "google",
-        user: {
-          userId: "google-user-1",
-          email: "user@example.com",
-          displayName: "AliOS User",
-          createdAt: "2026-07-28T00:00:00.000Z",
-          updatedAt: "2026-07-28T12:00:00.000Z",
-        },
-      }),
+      authProvider: authSessionSource,
       getStorage: () => localStorage,
       now: () => new Date("2026-07-28T12:00:00.000Z"),
     });
 
     const boundary = createAccountRuntimeBoundary({
       accountProvider: createAuthenticatedAccountProvider(),
-      authProvider: createAuthenticatedAuthProvider(),
+      authProvider: authHarness.provider,
+      authSessionSource,
       syncProvider,
     });
     const listener = vi.fn();
@@ -239,5 +246,9 @@ describe("account runtime boundary", () => {
     );
 
     subscription.unsubscribe();
+
+    expect(authHarness.provider.subscribe).toHaveBeenCalledTimes(1);
+    expect(authHarness.getActiveSubscriptions()).toBe(0);
+    expect(authHarness.getMaxActiveSubscriptions()).toBe(1);
   });
 });

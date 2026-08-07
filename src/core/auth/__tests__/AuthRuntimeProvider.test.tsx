@@ -1,7 +1,10 @@
-import React from "react";
+// @vitest-environment jsdom
+import React, { act } from "react";
+import { createRoot } from "react-dom/client";
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
+import { createAuthSessionStore } from "../authSessionStore";
 import {
   AuthRuntimeProvider,
   useAuth,
@@ -106,5 +109,44 @@ describe("AuthRuntimeProvider", () => {
     expect(() => renderToStaticMarkup(<AuthProbe />)).toThrow(
       "AuthRuntimeProvider is missing from the application tree."
     );
+  });
+
+  it("derives live session updates from a shared session source without subscribing directly", async () => {
+    const provider = new TestAuthProvider(authenticatedSession);
+    const providerSubscribeSpy = vi.spyOn(provider, "subscribe");
+    const sessionSource = createAuthSessionStore(provider);
+    const container = document.createElement("div");
+    const root = createRoot(container);
+
+    document.body.appendChild(container);
+
+    try {
+      await act(async () => {
+        root.render(
+          <AuthRuntimeProvider
+            provider={provider}
+            sessionSource={sessionSource}
+          >
+            <AuthProbe />
+          </AuthRuntimeProvider>
+        );
+      });
+
+      await act(async () => {
+        await Promise.resolve();
+      });
+
+      expect(providerSubscribeSpy).toHaveBeenCalledTimes(1);
+      expect(container.innerHTML).toContain('data-provider="test-auth"');
+      expect(container.innerHTML).toContain(
+        'data-session-status="authenticated"'
+      );
+
+      await act(async () => {
+        root.unmount();
+      });
+    } finally {
+      container.remove();
+    }
   });
 });

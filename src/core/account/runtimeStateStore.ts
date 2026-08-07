@@ -1,4 +1,4 @@
-import { useSyncExternalStore } from "react";
+import { useCallback, useSyncExternalStore } from "react";
 
 import {
   LOCAL_ONLY_ACCOUNT_RUNTIME_STATE,
@@ -51,7 +51,6 @@ class DefaultAccountRuntimeStateStore implements AccountRuntimeStateStore {
   ): AccountStateSubscription {
     this.ensureBoundarySubscription();
     this.listeners.add(listener);
-    listener(this.state);
 
     return {
       unsubscribe: () => {
@@ -97,11 +96,18 @@ export const accountRuntimeStateStore = createAccountRuntimeStateStore();
 export function useAccountRuntimeState(
   store: AccountRuntimeStateStore = accountRuntimeStateStore
 ): AccountRuntimeState {
-  return useSyncExternalStore(
-    (listener) => store.subscribe(listener).unsubscribe,
-    () => store.getSnapshot(),
-    () => store.getSnapshot()
+  const subscribe = useCallback(
+    (listener: () => void) => {
+      const subscription = store.subscribe(listener);
+      return () => {
+        subscription.unsubscribe();
+      };
+    },
+    [store]
   );
+  const getSnapshot = useCallback(() => store.getSnapshot(), [store]);
+
+  return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 }
 
 export const selectAccountRuntimeStatus = (state: AccountRuntimeState) =>
