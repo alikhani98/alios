@@ -301,6 +301,7 @@ function getBackupStatusSummaryKey(
 export function SettingsPage() {
   const accountRuntimeState = useAccountRuntimeState();
   const { language, setLanguage, t } = useI18n();
+  const { value: viewDensityMode } = useViewDensityMode();
   const { calendarDisplay, formatDateTime, setCalendarDisplay } =
     useDateFormatter();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -340,6 +341,20 @@ export function SettingsPage() {
     ? createBackupRestoreImpactPreview(backup.pendingBackup, dataManagement.summary)
     : null;
   const currentAppearance = parseAppearancePreference(appearancePreference);
+  const appearanceLabelKey =
+    appearanceOptions.find((option) => option.value === currentAppearance)?.labelKey ??
+    "settings.system";
+  const viewDensityLabel =
+    viewDensityOptions.find((option) => option.value === viewDensityMode)?.label[
+      language
+    ] ?? viewDensityOptions[0].label[language];
+  const languageLabel =
+    language === "fa" ? t("settings.persian") : t("settings.english");
+  const appearanceBehaviorSummary = t("settings.appearanceBehaviorSummary", {
+    theme: t(appearanceLabelKey),
+    density: viewDensityLabel,
+    language: languageLabel,
+  });
   const totalLocalRecords = dataManagement.summary
     ? getTotalRecords(dataManagement.summary)
     : 0;
@@ -456,17 +471,50 @@ export function SettingsPage() {
         </div>
       ) : null}
 
-      <section className="space-y-4">
-        <SectionHeader
-          icon={<ShieldCheck className="h-5 w-5" />}
-          title={t("settings.localDataSafety")}
-          description={t("settings.localDataSafetyDescription")}
-          status={
-            <StatusChip tone={backup.backupFreshness === "overdue" ? "warning" : "neutral"}>
-              {t(getBackupStatusLabelKey(backup.backupFreshness))}
-            </StatusChip>
-          }
-        />
+      <CollapsibleSection
+        id="settings-account-sync-group"
+        icon={<ShieldCheck className="h-4 w-4" />}
+        title={t("settings.accountSyncTitle")}
+        description={t("settings.accountSyncDescription")}
+        status={
+          <StatusChip
+            tone={
+              accountRuntimeState.localOnly
+                ? "neutral"
+                : accountRuntimeState.hasActiveAccount
+                  ? "primary"
+                  : "warning"
+            }
+          >
+            {accountRuntimeState.localOnly
+              ? t("settings.syncStatusLocalOnly")
+              : accountRuntimeState.hasActiveAccount
+                ? t("settings.accountStatusSignedIn")
+                : t("settings.accountStatusSignedOut")}
+          </StatusChip>
+        }
+        expandLabel={t("common.expandSection")}
+        collapseLabel={t("common.collapseSection")}
+        defaultOpen
+      >
+        <SyncStatusCard onGoToBackupRestore={() => scrollToSection("settings-backup-restore")} />
+      </CollapsibleSection>
+
+      <CollapsibleSection
+        id="settings-local-data-recovery-group"
+        icon={<ShieldCheck className="h-4 w-4" />}
+        title={t("settings.localDataRecoveryTitle")}
+        description={t("settings.localDataRecoveryDescription")}
+        status={
+          <StatusChip tone={backup.backupFreshness === "overdue" ? "warning" : "neutral"}>
+            {t(getBackupStatusLabelKey(backup.backupFreshness))}
+          </StatusChip>
+        }
+        expandLabel={t("common.expandSection")}
+        collapseLabel={t("common.collapseSection")}
+        defaultOpen={false}
+      >
+        <div className="space-y-4">
 
         <Card>
           <CardContent className="grid gap-3 p-5 sm:p-6 md:grid-cols-3">
@@ -578,6 +626,17 @@ export function SettingsPage() {
           </div>
         </CollapsibleSection>
 
+        <RecoveryModeSection
+          enabled={recoveryModeEnabled}
+          onToggle={() => setRecoveryModeEnabled(!recoveryModeEnabled)}
+          onGoToBackupRestore={() => scrollToSection("settings-backup-restore")}
+          onGoToExportCenter={() => scrollToSection("settings-export-center")}
+          onGoToLocalErrorLog={() => scrollToSection("settings-local-error-log")}
+          detailsDefaultOpen={false}
+        />
+        </div>
+      </CollapsibleSection>
+
       <CollapsibleSection
         id="settings-help-center"
         title={language === "fa" ? "راهنمای AliOS" : "AliOS Help Center"}
@@ -594,15 +653,17 @@ export function SettingsPage() {
         <SettingsHelpCenter />
       </CollapsibleSection>
 
-      </section>
-
-      <section className="space-y-4">
-        <SectionHeader
-          icon={<SlidersHorizontal className="h-5 w-5" />}
-          title={t("settings.appearance")}
-          description={t("settings.appearanceDescription")}
-          status={<StatusChip tone="neutral">{t("settings.localFirst")}</StatusChip>}
-        />
+      <CollapsibleSection
+        id="settings-appearance-behavior-group"
+        icon={<SlidersHorizontal className="h-4 w-4" />}
+        title={t("settings.appearanceBehaviorTitle")}
+        description={t("settings.appearanceBehaviorDescription")}
+        status={<StatusChip tone="neutral">{appearanceBehaviorSummary}</StatusChip>}
+        expandLabel={t("common.expandSection")}
+        collapseLabel={t("common.collapseSection")}
+        defaultOpen={false}
+      >
+        <div className="space-y-4">
 
         <div className="grid gap-4 xl:grid-cols-2">
       <Card>
@@ -849,25 +910,20 @@ export function SettingsPage() {
           </div>
         </CollapsibleSection>
 
-      </section>
+        </div>
+      </CollapsibleSection>
 
-      <section className="space-y-4">
-        <SectionHeader
-          icon={<SlidersHorizontal className="h-5 w-5" />}
-          title={t("settings.accountSyncTitle")}
-          description={t("settings.accountSyncDescription")}
-          status={<StatusChip tone="neutral">{t("settings.localFirst")}</StatusChip>}
-        />
-        <SyncStatusCard onGoToBackupRestore={() => scrollToSection("settings-backup-restore")} />
-      </section>
-
-      <section className="space-y-4">
-        <SectionHeader
-          icon={<FileJson className="h-5 w-5" />}
-          title={t("settings.backupExport")}
-          description={t("settings.backupExportDescription")}
-          status={<StatusChip tone="neutral">{t("settings.localFirst")}</StatusChip>}
-        />
+      <CollapsibleSection
+        id="settings-backup-export-group"
+        icon={<FileJson className="h-4 w-4" />}
+        title={t("settings.backupExportGroupTitle")}
+        description={t("settings.backupExportGroupDescription")}
+        status={<StatusChip tone="neutral">{t("settings.localFirst")}</StatusChip>}
+        expandLabel={t("common.expandSection")}
+        collapseLabel={t("common.collapseSection")}
+        defaultOpen
+      >
+        <div className="space-y-4">
 
       <div id="settings-backup-restore" className="grid gap-6 lg:grid-cols-2">
         <Card>
@@ -1034,24 +1090,31 @@ export function SettingsPage() {
         </Card>
       ) : null}
 
-      </section>
+        <CollapsibleSection
+          id="settings-export-center-group"
+          title={t("settings.exportCenterTitle")}
+          description={t("settings.exportCenterDescription")}
+          icon={<Download className="h-4 w-4" />}
+          expandLabel={t("common.expandSection")}
+          collapseLabel={t("common.collapseSection")}
+          defaultOpen={false}
+        >
+          <ExportCenterSection id="settings-export-center" />
+        </CollapsibleSection>
+        </div>
+      </CollapsibleSection>
 
-      <section className="space-y-4">
-        <SectionHeader
-          icon={<FileJson className="h-5 w-5" />}
-          title={t("settings.advancedLocalOperations")}
-          description={t("settings.advancedLocalOperationsDescription")}
-          status={<StatusChip tone="neutral">{t("settings.localFirst")}</StatusChip>}
-        />
-
-        <RecoveryModeSection
-          enabled={recoveryModeEnabled}
-          onToggle={() => setRecoveryModeEnabled(!recoveryModeEnabled)}
-          onGoToBackupRestore={() => scrollToSection("settings-backup-restore")}
-          onGoToExportCenter={() => scrollToSection("settings-export-center")}
-          onGoToLocalErrorLog={() => scrollToSection("settings-local-error-log")}
-          detailsDefaultOpen={false}
-        />
+      <CollapsibleSection
+        id="settings-advanced-developer-group"
+        icon={<FileJson className="h-4 w-4" />}
+        title={t("settings.advancedDeveloperTitle")}
+        description={t("settings.advancedDeveloperDescription")}
+        status={<StatusChip tone="neutral">{t("settings.advancedDeveloperStatus")}</StatusChip>}
+        expandLabel={t("common.expandSection")}
+        collapseLabel={t("common.collapseSection")}
+        defaultOpen={false}
+      >
+        <div className="space-y-4">
 
         <CollapsibleSection
           id="settings-advanced-local-tools"
@@ -1063,14 +1126,11 @@ export function SettingsPage() {
           defaultOpen={false}
         >
           <div className="space-y-4">
-            <ExportCenterSection id="settings-export-center" />
             <LocalErrorLogSection id="settings-local-error-log" />
             <LocalAiSetupCard />
           </div>
         </CollapsibleSection>
-      </section>
 
-      <section className="space-y-4">
         <CollapsibleSection
           id="settings-app-info"
           icon={<Info className="h-4 w-4" />}
@@ -1143,7 +1203,8 @@ export function SettingsPage() {
       </Card>
           </div>
         </CollapsibleSection>
-      </section>
+        </div>
+      </CollapsibleSection>
 
       <section className="space-y-4">
         <SectionHeader

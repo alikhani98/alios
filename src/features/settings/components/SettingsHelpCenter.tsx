@@ -142,7 +142,20 @@ export function SettingsHelpCenter() {
         />
 
         <div className="space-y-4">
-          <PlanningLoopStickyGuide />
+          <CollapsibleSection
+            id="settings-help-planning-loop-guide"
+            title={isPersian ? "راهنمای چرخه AliOS" : "AliOS planning loop guide"}
+            description={
+              isPersian
+                ? "نمای کامل چرخه برنامه‌ریزی را فقط هنگام نیاز باز کنید."
+                : "Open the full planning-loop walkthrough only when you need it."
+            }
+            icon={<Sparkles className="h-4 w-4" />}
+            defaultOpen={false}
+            className="border-border/60 bg-background/70"
+          >
+            <PlanningLoopStickyGuide />
+          </CollapsibleSection>
 
           {settingsHelpCenterSections.map((section) => (
             <CollapsibleSection

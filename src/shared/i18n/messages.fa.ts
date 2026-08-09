@@ -3,6 +3,16 @@ import { messagesEn } from "./messages.en";
 
 export const messagesFa: Record<TranslationKey, string> = {
   ...messagesEn,
+  "settings.appearanceBehaviorTitle": "ظاهر و رفتار",
+  "settings.appearanceBehaviorDescription": "ظاهر، تراکم نمایش، زبان، تقویم و ترجیحات محلی کم‌استفاده در این بخش هستند.",
+  "settings.appearanceBehaviorSummary": "ظاهر: {theme} · تراکم: {density} · زبان: {language}",
+  "settings.backupExportGroupTitle": "پشتیبان‌گیری و خروجی",
+  "settings.backupExportGroupDescription": "پشتیبان کامل بسازید، فایل معتبر را بازیابی کنید یا خروجی‌های خوانا را باز کنید.",
+  "settings.localDataRecoveryTitle": "داده‌های محلی و بازیابی",
+  "settings.localDataRecoveryDescription": "شمارش داده‌های محلی و مسیرهای بازیابی را فقط هنگام نیاز بررسی کنید.",
+  "settings.advancedDeveloperTitle": "پیشرفته / توسعه‌دهنده",
+  "settings.advancedDeveloperDescription": "گزارش‌ها، بررسی‌های محلی، اطلاعات برنامه و ابزارهای به‌روزرسانی از مسیر اصلی تنظیمات جدا می‌مانند.",
+  "settings.advancedDeveloperStatus": "تشخیص",
   "nav.weeklyReview": "مرور هفته",
   "nav.routines": "روتین‌ها",
   "nav.goals": "هدف‌ها",
