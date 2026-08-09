@@ -322,11 +322,14 @@ export function WeeklyReviewPage() {
     [summary]
   );
   const reviewQueuePreviewLimit = isSimpleView ? 3 : 6;
+  const firstReviewQueueItem = reviewQueue[0];
+  const remainingReviewQueueItems = reviewQueue.slice(1);
+  const remainingReviewQueuePreviewLimit = Math.max(reviewQueuePreviewLimit - 1, 0);
   const displayedReviewQueue = showAllReviewQueueItems
-    ? reviewQueue
-    : reviewQueue.slice(0, reviewQueuePreviewLimit);
+    ? remainingReviewQueueItems
+    : remainingReviewQueueItems.slice(0, remainingReviewQueuePreviewLimit);
   const hiddenReviewQueueCount = Math.max(
-    reviewQueue.length - displayedReviewQueue.length,
+    remainingReviewQueueItems.length - displayedReviewQueue.length,
     0
   );
   const reviewDetailPreviewLimit = isSimpleView ? 3 : 6;
@@ -404,6 +407,34 @@ export function WeeklyReviewPage() {
     setIsSavingWeeklyPlan(true);
     try { await saveWeeklyPlan(values); } finally { setIsSavingWeeklyPlan(false); }
   };
+
+  const renderReviewQueueItem = (item: ReviewQueueItem) => (
+    <SoftPanel key={`${item.kind}-${item.id}`} className="space-y-4 border-warning/20 bg-background/90">
+      <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0 space-y-1">
+          <p className="min-w-0 break-words text-base font-semibold leading-7">{item.title}</p>
+          <p className="text-sm text-muted-foreground">{t("weeklyReview.localOnlyNote")}</p>
+        </div>
+        <div className="flex shrink-0 flex-wrap gap-2">
+          <Badge variant="secondary">{t(getReviewQueueLabelKey(item))}</Badge>
+          <StatusChip tone="warning">{t(getReviewQueueReasonKey(item))}</StatusChip>
+        </div>
+      </div>
+      <div className="flex flex-col gap-2 border-t border-border/70 pt-3 sm:flex-row sm:flex-wrap">
+        <Button
+          type="button"
+          size="sm"
+          className="w-full sm:w-auto"
+          onClick={() => void handleReviewQueueItem(item)}
+        >
+          {t("goals.markReviewed")}
+        </Button>
+        <Button asChild size="sm" variant="outline" className="w-full sm:w-auto">
+          <Link to={item.to}>{t(getReviewQueueLabelKey(item))}</Link>
+        </Button>
+      </div>
+    </SoftPanel>
+  );
 
   const currencyLocale = language === "fa" ? "fa-IR" : "en-US";
   const formatAmount = useMemo(
@@ -661,61 +692,52 @@ export function WeeklyReviewPage() {
                 reviewQueueCount={reviewQueue.length}
               />
 
-              {reviewQueue.length > 0 ? (
-                <CollapsibleSection
-                  id="weekly-review-queue"
-                  title={t("weeklyReview.needsReview")}
-                  description={t("weeklyReview.localOnlyNote")}
-                  icon={<Clock3 className="h-5 w-5" />}
-                  status={<StatusChip tone="warning">{reviewQueue.length}</StatusChip>}
-                  contentClassName="space-y-4"
-                >
-                  <div className="grid gap-3">
-                    {displayedReviewQueue.map((item) => (
-                      <SoftPanel key={`${item.kind}-${item.id}`} className="space-y-4 border-warning/20 bg-background/90">
-                        <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
-                          <div className="min-w-0 space-y-1">
-                            <p className="min-w-0 break-words text-base font-semibold leading-7">{item.title}</p>
-                            <p className="text-sm text-muted-foreground">{t("weeklyReview.localOnlyNote")}</p>
-                          </div>
-                          <div className="flex shrink-0 flex-wrap gap-2">
-                            <Badge variant="secondary">{t(getReviewQueueLabelKey(item))}</Badge>
-                            <StatusChip tone="warning">{t(getReviewQueueReasonKey(item))}</StatusChip>
-                          </div>
-                        </div>
-                        <div className="flex flex-col gap-2 border-t border-border/70 pt-3 sm:flex-row sm:flex-wrap">
-                          <Button
-                            type="button"
-                            size="sm"
-                            className="w-full sm:w-auto"
-                            onClick={() => void handleReviewQueueItem(item)}
-                          >
-                            {t("goals.markReviewed")}
-                          </Button>
-                          <Button asChild size="sm" variant="outline" className="w-full sm:w-auto">
-                            <Link to={item.to}>{t(getReviewQueueLabelKey(item))}</Link>
-                          </Button>
-                        </div>
-                      </SoftPanel>
-                    ))}
+              {firstReviewQueueItem ? (
+                <>
+                <PremiumCard id="weekly-review-queue" className="border-warning/20 bg-card/95">
+                  <div className="space-y-4 p-5 sm:p-6">
+                    <SectionHeader
+                      icon={<Clock3 className="h-5 w-5" />}
+                      title={t("weeklyReview.needsReview")}
+                      description={t("weeklyReview.localOnlyNote")}
+                      status={<StatusChip tone="warning">{reviewQueue.length}</StatusChip>}
+                    />
+                    {renderReviewQueueItem(firstReviewQueueItem)}
                   </div>
-                  {reviewQueue.length > reviewQueuePreviewLimit ? (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="w-full sm:w-auto"
-                      onClick={() => setShowAllReviewQueueItems((current) => !current)}
-                    >
-                      {showAllReviewQueueItems
-                        ? t("common.showFewer")
-                        : t("common.showMoreCount", {
-                            count: hiddenReviewQueueCount,
-                          })}
-                    </Button>
-                  ) : null}
-                </CollapsibleSection>
+                </PremiumCard>
+
+                {remainingReviewQueueItems.length > 0 ? (
+                  <CollapsibleSection
+                    id="weekly-review-queue-details"
+                    title={t("weeklyReview.needsReview")}
+                    description={t("weeklyReview.localOnlyNote")}
+                    icon={<Clock3 className="h-5 w-5" />}
+                    status={<StatusChip tone="neutral">{remainingReviewQueueItems.length}</StatusChip>}
+                    defaultOpen={false}
+                    contentClassName="space-y-4"
+                  >
+                    <div className="grid gap-3">
+                      {displayedReviewQueue.map((item) => renderReviewQueueItem(item))}
+                    </div>
+                    {remainingReviewQueueItems.length > remainingReviewQueuePreviewLimit ? (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full sm:w-auto"
+                        onClick={() => setShowAllReviewQueueItems((current) => !current)}
+                      >
+                        {showAllReviewQueueItems
+                          ? t("common.showFewer")
+                          : t("common.showMoreCount", {
+                              count: hiddenReviewQueueCount,
+                            })}
+                      </Button>
+                    ) : null}
+                  </CollapsibleSection>
+                ) : null}
+                </>
               ) : (
-                <PremiumCard className="border-border/70 bg-card/95">
+                <PremiumCard id="weekly-review-queue" className="border-border/70 bg-card/95">
                   <div className="p-5 sm:p-6">
                     <SectionHeader
                       icon={<Clock3 className="h-5 w-5" />}
@@ -750,106 +772,120 @@ export function WeeklyReviewPage() {
             </div>
 
             <div className="space-y-6">
-              <WeeklyPlanRetrospective
-                plan={previousWeeklyPlan}
-                links={previousWeeklyPlanLinks}
-                execution={previousWeeklyPlanExecution}
-                weekLabel={previousWeeklyPlan ? formatDate(previousWeeklyPlan.weekStart) : undefined}
-              />
+              {previousWeeklyPlan ? (
+                <CollapsibleSection
+                  id="weekly-review-retrospective"
+                  title={t("weeklyReview.last7Days")}
+                  description={formatDate(previousWeeklyPlan.weekStart)}
+                  icon={<Clock3 className="h-5 w-5" />}
+                  status={<StatusChip tone="neutral">{t("projects.taskProgress")}</StatusChip>}
+                  defaultOpen={false}
+                  contentClassName="p-0"
+                >
+                  <WeeklyPlanRetrospective
+                    plan={previousWeeklyPlan}
+                    links={previousWeeklyPlanLinks}
+                    execution={previousWeeklyPlanExecution}
+                    weekLabel={formatDate(previousWeeklyPlan.weekStart)}
+                  />
+                </CollapsibleSection>
+              ) : null}
 
-              <PremiumCard className="border-primary/10 bg-card/95">
-                <div className="p-5 sm:p-6">
+              <CollapsibleSection
+                id="weekly-review-signals"
+                title={t("weeklyReview.weeklySignalsTitle")}
+                description={t("weeklyReview.focusObservationsDescription")}
+                icon={<Sparkles className="h-5 w-5" />}
+                status={<StatusChip tone="neutral">{summary.focusObservations.length + summary.suggestedFocus.length}</StatusChip>}
+                defaultOpen={false}
+                contentClassName="space-y-5"
+              >
+                <div className="space-y-3">
                   <SectionHeader
                     icon={<Sparkles className="h-5 w-5" />}
                     title={t("weeklyReview.focusObservationsTitle")}
                     description={t("weeklyReview.focusObservationsDescription")}
                     status={<StatusChip tone="neutral">{summary.focusObservations.length}</StatusChip>}
                   />
-                  <div className="mt-5 space-y-3">
-                    {displayedFocusObservations.map((observation, index) => (
-                      <SoftPanel key={`${observation.kind}-${index}`} className="space-y-3 alios-surface-muted">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <StatusChip tone={getObservationTone(observation) as "neutral" | "success" | "warning"}>
-                            {t(
-                              observation.tone === "good-signal"
-                                ? "weeklyReview.goodSignal"
-                                : observation.tone === "needs-review"
-                                  ? "weeklyReview.needsReview"
-                                  : "weeklyReview.awareness"
-                            )}
-                          </StatusChip>
-                          {observation.count !== undefined ? (
-                            <StatusChip tone="neutral">{observation.count}</StatusChip>
-                          ) : null}
-                          {observation.amount !== undefined ? (
-                            <StatusChip tone="neutral">{formatAmount(observation.amount)}</StatusChip>
-                          ) : null}
-                        </div>
-                        <p className="text-sm leading-7 text-muted-foreground">
-                          {t(getObservationMessageKey(observation))}
-                        </p>
-                      </SoftPanel>
-                    ))}
-                    {summary.focusObservations.length > insightPreviewLimit ? (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => setShowAllFocusObservations((current) => !current)}
-                      >
-                        {showAllFocusObservations
-                          ? t("common.showFewer")
-                          : t("common.showMoreCount", { count: hiddenFocusObservationCount })}
-                      </Button>
-                    ) : null}
-                  </div>
+                  {displayedFocusObservations.map((observation, index) => (
+                    <SoftPanel key={`${observation.kind}-${index}`} className="space-y-3 alios-surface-muted">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <StatusChip tone={getObservationTone(observation) as "neutral" | "success" | "warning"}>
+                          {t(
+                            observation.tone === "good-signal"
+                              ? "weeklyReview.goodSignal"
+                              : observation.tone === "needs-review"
+                                ? "weeklyReview.needsReview"
+                                : "weeklyReview.awareness"
+                          )}
+                        </StatusChip>
+                        {observation.count !== undefined ? (
+                          <StatusChip tone="neutral">{observation.count}</StatusChip>
+                        ) : null}
+                        {observation.amount !== undefined ? (
+                          <StatusChip tone="neutral">{formatAmount(observation.amount)}</StatusChip>
+                        ) : null}
+                      </div>
+                      <p className="text-sm leading-7 text-muted-foreground">
+                        {t(getObservationMessageKey(observation))}
+                      </p>
+                    </SoftPanel>
+                  ))}
+                  {summary.focusObservations.length > insightPreviewLimit ? (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setShowAllFocusObservations((current) => !current)}
+                    >
+                      {showAllFocusObservations
+                        ? t("common.showFewer")
+                        : t("common.showMoreCount", { count: hiddenFocusObservationCount })}
+                    </Button>
+                  ) : null}
                 </div>
-              </PremiumCard>
 
-              <PremiumCard className="border-primary/10 bg-card/95">
-                <div className="p-5 sm:p-6">
+                <div className="space-y-3 border-t border-border/70 pt-5">
                   <SectionHeader
                     icon={<ArrowUpRight className="h-5 w-5" />}
                     title={t("weeklyReview.nextFocusTitle")}
                     description={t("weeklyReview.nextFocusDescription")}
                     status={<StatusChip tone="neutral">{summary.suggestedFocus.length}</StatusChip>}
                   />
-                  <div className="mt-5 space-y-3">
-                    {displayedSuggestedFocus.map((suggestion, index) => (
-                      <SoftPanel key={`${suggestion.kind}-${index}`} className="space-y-3 alios-surface-muted">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <StatusChip tone="primary">{t("weeklyReview.nextFocusLabel")}</StatusChip>
-                          <StatusChip tone="neutral">{t("weeklyReview.localOnlyNote")}</StatusChip>
-                        </div>
-                        <p className="text-sm leading-7 text-muted-foreground">
-                          {t(getFocusMessageKey(suggestion))}
-                        </p>
-                      </SoftPanel>
-                    ))}
-                    {summary.suggestedFocus.length > insightPreviewLimit ? (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => setShowAllSuggestedFocus((current) => !current)}
-                      >
-                        {showAllSuggestedFocus
-                          ? t("common.showFewer")
-                          : t("common.showMoreCount", { count: hiddenSuggestedFocusCount })}
-                      </Button>
-                    ) : null}
+                  {displayedSuggestedFocus.map((suggestion, index) => (
+                    <SoftPanel key={`${suggestion.kind}-${index}`} className="space-y-3 alios-surface-muted">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <StatusChip tone="primary">{t("weeklyReview.nextFocusLabel")}</StatusChip>
+                        <StatusChip tone="neutral">{t("weeklyReview.localOnlyNote")}</StatusChip>
+                      </div>
+                      <p className="text-sm leading-7 text-muted-foreground">
+                        {t(getFocusMessageKey(suggestion))}
+                      </p>
+                    </SoftPanel>
+                  ))}
+                  {summary.suggestedFocus.length > insightPreviewLimit ? (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setShowAllSuggestedFocus((current) => !current)}
+                    >
+                      {showAllSuggestedFocus
+                        ? t("common.showFewer")
+                        : t("common.showMoreCount", { count: hiddenSuggestedFocusCount })}
+                    </Button>
+                  ) : null}
 
-                    <div className="grid gap-3 border-t border-border/70 pt-4 sm:flex sm:flex-wrap">
-                      {quickLinks.map(({ to, labelKey }) => (
-                        <Button key={to} asChild variant="outline" className="w-full justify-start shadow-sm sm:w-auto">
-                          <Link to={to}>
-                            {t(labelKey)}
-                            <ArrowUpRight className="ms-2 h-4 w-4" />
-                          </Link>
-                        </Button>
-                      ))}
-                    </div>
+                  <div className="grid gap-3 border-t border-border/70 pt-4 sm:grid-cols-2 xl:grid-cols-3">
+                    {quickLinks.map(({ to, labelKey }) => (
+                      <Button key={to} asChild variant="outline" className="w-full justify-start shadow-sm">
+                        <Link to={to}>
+                          {t(labelKey)}
+                          <ArrowUpRight className="ms-2 h-4 w-4" />
+                        </Link>
+                      </Button>
+                    ))}
                   </div>
                 </div>
-              </PremiumCard>
+              </CollapsibleSection>
             </div>
           </div>
 
@@ -881,6 +917,7 @@ export function WeeklyReviewPage() {
               description={t("weeklyReview.tasksSectionDescription")}
               icon={<ClipboardList className="h-5 w-5" />}
               status={<StatusChip tone="neutral">{summary.taskSummary.totalCount}</StatusChip>}
+              defaultOpen={false}
               contentClassName="space-y-4"
             >
               <div className="grid gap-3 sm:grid-cols-2">
@@ -917,6 +954,7 @@ export function WeeklyReviewPage() {
               description={t("weeklyReview.projectsSectionDescription")}
               icon={<FolderKanban className="h-5 w-5" />}
               status={<StatusChip tone="neutral">{summary.projectSummary.activeCount}</StatusChip>}
+              defaultOpen={false}
               contentClassName="space-y-4"
             >
               <div className="grid gap-3 sm:grid-cols-2">
@@ -953,6 +991,7 @@ export function WeeklyReviewPage() {
               description={t("weeklyReview.projectsSectionDescription")}
               icon={<Target className="h-5 w-5" />}
               status={<StatusChip tone="neutral">{summary.planningSummary.linkedProjectCount}</StatusChip>}
+              defaultOpen={false}
               contentClassName="space-y-4"
             >
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -1040,6 +1079,7 @@ export function WeeklyReviewPage() {
               description={t("weeklyReview.routinesSectionDescription")}
               icon={<Repeat2 className="h-5 w-5" />}
               status={<StatusChip tone="neutral">{summary.routineSummary.plannedInWindowCount}</StatusChip>}
+              defaultOpen={false}
               contentClassName="space-y-4"
             >
               <div className="grid gap-3 sm:grid-cols-2">
@@ -1088,6 +1128,7 @@ export function WeeklyReviewPage() {
               description={t("weeklyReview.inboxSectionDescription")}
               icon={<Inbox className="h-5 w-5" />}
               status={<StatusChip tone="neutral">{summary.inboxSummary.pendingCount}</StatusChip>}
+              defaultOpen={false}
               contentClassName="space-y-4"
             >
               <div className="grid gap-3 sm:grid-cols-2">
@@ -1124,6 +1165,7 @@ export function WeeklyReviewPage() {
               description={t("weeklyReview.journalKnowledgeSectionDescription")}
               icon={<Brain className="h-5 w-5" />}
               status={<StatusChip tone="neutral">{summary.journalSummary.entriesInWindowCount + summary.knowledgeSummary.createdInWindowCount}</StatusChip>}
+              defaultOpen={false}
               contentClassName="space-y-4"
             >
               <div className="grid gap-4 lg:grid-cols-2">
@@ -1195,6 +1237,7 @@ export function WeeklyReviewPage() {
                   {summary.decisionSummary.needsReviewCount}
                 </StatusChip>
               }
+              defaultOpen={false}
               contentClassName="space-y-4"
             >
               <div className="grid gap-3 sm:grid-cols-2">
@@ -1239,6 +1282,7 @@ export function WeeklyReviewPage() {
               description={t("weeklyReview.goalsSectionDescription")}
               icon={<Target className="h-5 w-5" />}
               status={<StatusChip tone={summary.goalSummary.dueCount > 0 ? "warning" : "neutral"}>{summary.goalSummary.dueCount}</StatusChip>}
+              defaultOpen={false}
               contentClassName="space-y-4"
             >
               <SoftPanel className="space-y-3 alios-surface-muted">
@@ -1357,6 +1401,7 @@ export function WeeklyReviewPage() {
                   {summary.lifeAreaSummary.dueCount}
                 </StatusChip>
               }
+              defaultOpen={false}
               contentClassName="space-y-4"
             >
               <SoftPanel className="space-y-3 alios-surface-muted">
@@ -1447,6 +1492,7 @@ export function WeeklyReviewPage() {
                   {summary.manualSummary.dueCount}
                 </StatusChip>
               }
+              defaultOpen={false}
               contentClassName="space-y-4"
             >
               <SoftPanel className="space-y-3 alios-surface-muted">
@@ -1537,6 +1583,7 @@ export function WeeklyReviewPage() {
               description={t("weeklyReview.financeSectionDescription")}
               icon={<Wallet className="h-5 w-5" />}
               status={<StatusChip tone={summary.financeSummary.netCashflowInWindow >= 0 ? "success" : "warning"}>{formatAmount(summary.financeSummary.netCashflowInWindow)}</StatusChip>}
+              defaultOpen={false}
               contentClassName="space-y-4"
             >
               <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -1581,6 +1628,7 @@ export function WeeklyReviewPage() {
               description={t("weeklyReview.wellnessSectionDescription")}
               icon={<CalendarDays className="h-5 w-5" />}
               status={<StatusChip tone="neutral">{summary.wellnessSummary.checkinCountInWindow}</StatusChip>}
+              defaultOpen={false}
               contentClassName="space-y-4"
             >
               <div className="grid gap-3 sm:grid-cols-2">
@@ -1620,101 +1668,6 @@ export function WeeklyReviewPage() {
             </CollapsibleSection>
           </div>
 
-          <div className="grid gap-5 xl:grid-cols-2">
-            <PremiumCard className="border-primary/10 bg-card/95">
-              <div className="p-5 sm:p-6">
-                <SectionHeader
-                  icon={<Sparkles className="h-5 w-5" />}
-                  title={t("weeklyReview.focusObservationsTitle")}
-                  description={t("weeklyReview.focusObservationsDescription")}
-                  status={<StatusChip tone="neutral">{summary.focusObservations.length}</StatusChip>}
-                />
-                <div className="mt-5 space-y-3">
-                  {displayedFocusObservations.map((observation, index) => (
-                    <SoftPanel key={`${observation.kind}-${index}`} className="space-y-3 alios-surface-muted">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <StatusChip tone={getObservationTone(observation) as "neutral" | "success" | "warning"}>
-                          {t(
-                            observation.tone === "good-signal"
-                              ? "weeklyReview.goodSignal"
-                              : observation.tone === "needs-review"
-                                ? "weeklyReview.needsReview"
-                                : "weeklyReview.awareness"
-                          )}
-                        </StatusChip>
-                        {observation.count !== undefined ? (
-                          <StatusChip tone="neutral">{observation.count}</StatusChip>
-                        ) : null}
-                        {observation.amount !== undefined ? (
-                          <StatusChip tone="neutral">{formatAmount(observation.amount)}</StatusChip>
-                        ) : null}
-                      </div>
-                      <p className="text-sm leading-7 text-muted-foreground">
-                        {t(getObservationMessageKey(observation))}
-                      </p>
-                    </SoftPanel>
-                  ))}
-                  {summary.focusObservations.length > insightPreviewLimit ? (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setShowAllFocusObservations((current) => !current)}
-                    >
-                      {showAllFocusObservations
-                        ? t("common.showFewer")
-                        : t("common.showMoreCount", { count: hiddenFocusObservationCount })}
-                    </Button>
-                  ) : null}
-                </div>
-              </div>
-            </PremiumCard>
-
-            <PremiumCard className="border-primary/10 bg-card/95">
-              <div className="p-5 sm:p-6">
-                <SectionHeader
-                  icon={<ArrowUpRight className="h-5 w-5" />}
-                  title={t("weeklyReview.nextFocusTitle")}
-                  description={t("weeklyReview.nextFocusDescription")}
-                  status={<StatusChip tone="neutral">{summary.suggestedFocus.length}</StatusChip>}
-                />
-                <div className="mt-5 space-y-3">
-                  {displayedSuggestedFocus.map((suggestion, index) => (
-                    <SoftPanel key={`${suggestion.kind}-${index}`} className="space-y-3 alios-surface-muted">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <StatusChip tone="primary">{t("weeklyReview.nextFocusLabel")}</StatusChip>
-                        <StatusChip tone="neutral">{t("weeklyReview.localOnlyNote")}</StatusChip>
-                      </div>
-                      <p className="text-sm leading-7 text-muted-foreground">
-                        {t(getFocusMessageKey(suggestion))}
-                      </p>
-                    </SoftPanel>
-                  ))}
-                  {summary.suggestedFocus.length > insightPreviewLimit ? (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setShowAllSuggestedFocus((current) => !current)}
-                    >
-                      {showAllSuggestedFocus
-                        ? t("common.showFewer")
-                        : t("common.showMoreCount", { count: hiddenSuggestedFocusCount })}
-                    </Button>
-                  ) : null}
-
-                  <div className="grid gap-3 border-t border-border/70 pt-4 sm:grid-cols-2 xl:grid-cols-3">
-                    {quickLinks.map(({ to, labelKey }) => (
-                      <Button key={to} asChild variant="outline" className="w-full justify-start shadow-sm">
-                        <Link to={to}>
-                          {t(labelKey)}
-                          <ArrowUpRight className="ms-2 h-4 w-4" />
-                        </Link>
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </PremiumCard>
-          </div>
         </>
       ) : null}
     </section>

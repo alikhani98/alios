@@ -1047,6 +1047,7 @@ export const messagesEn = {
   "weeklyReview.routinesEmptyTitle": "No routine tasks this week",
   "weeklyReview.routinesEmptyDescription": "Add a routine to Today.",
   "weeklyReview.openRoutines": "Open routines",
+  "weeklyReview.weeklySignalsTitle": "Weekly signals",
   "weeklyReview.focusObservationsTitle": "What this week says",
   "weeklyReview.focusObservationsDescription": "Deterministic, rule-based observations from your local data only.",
   "weeklyReview.goodSignal": "Good signal",

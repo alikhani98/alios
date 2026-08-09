@@ -713,6 +713,7 @@ export const messagesFa: Record<TranslationKey, string> = {
   "weeklyReview.routinesEmptyTitle": "این هفته کار روتینی ندارید",
   "weeklyReview.routinesEmptyDescription": "روتین را به امروز اضافه کنید.",
   "weeklyReview.openRoutines": "باز کردن روتین‌ها",
+  "weeklyReview.weeklySignalsTitle": "نشانه‌های هفته",
   "weeklyReview.focusObservationsTitle": "این هفته چه می‌گوید",
   "weeklyReview.focusObservationsDescription": "بیان‌های اطلاعاتی و قاعده‌محور فقط بر اساس داده‌های محلی شما.",
   "weeklyReview.goodSignal": "نشانه خوب",
