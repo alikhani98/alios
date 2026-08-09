@@ -6,6 +6,7 @@ import {
   Plus,
   RotateCcw,
   Search,
+  Sparkles,
   Target,
   X,
 } from "lucide-react";
@@ -20,6 +21,7 @@ import { useViewDensityMode } from "@/shared/preferences/viewDensityMode";
 import type { Goal, Task } from "@/shared/types";
 import {
   Button,
+  CollapsibleSection,
   EmptyState,
   Input,
   MetricCard,
@@ -139,8 +141,6 @@ export function GoalsContextualHelp({
           <div className="mt-2 space-y-2">
             <p>{copy.details}</p>
             <p>{copy.progress}</p>
-            <p>{t("goals.localOnlyDescription")}</p>
-            <p>{t("goals.nonAdvisoryNote")}</p>
           </div>
         </div>
       ) : null}
@@ -627,25 +627,30 @@ export function GoalsPage() {
             />
           </div>
 
-          <PremiumCard>
-            <div className="space-y-3 p-5 sm:space-y-4 sm:p-6">
-              <SectionHeader
-                title={
-                  formOpen
-                    ? editingGoal
-                      ? t("goals.editGoal")
-                      : t("goals.createGoal")
-                    : t("goals.newGoal")
-                }
-                description={t("goals.formDescription")}
-                status={<StatusChip tone="neutral">{t("goals.userManagedOnly")}</StatusChip>}
-              />
-              {!formOpen ? (
-                <Button type="button" onClick={openCreateForm}>
-                  <Plus className="me-2 h-4 w-4" />
-                  {t("goals.newGoal")}
-                </Button>
-              ) : null}
+          <CollapsibleSection
+            id="goals-form"
+            title={
+              formOpen
+                ? editingGoal
+                  ? t("goals.editGoal")
+                  : t("goals.createGoal")
+                : t("goals.newGoal")
+            }
+            description={t("goals.formDescription")}
+            status={<StatusChip tone="neutral">{t("goals.userManagedOnly")}</StatusChip>}
+            icon={<Plus className="h-5 w-5" />}
+            open={formOpen}
+            onOpenChange={(open) => {
+              if (open) {
+                openCreateForm();
+              } else {
+                closeForm();
+              }
+            }}
+            expandLabel={t("common.expandSection")}
+            collapseLabel={t("common.collapseSection")}
+            contentClassName="space-y-5 bg-background/30"
+          >
               {formOpen ? (
                 <div ref={formRef}>
                   <GoalForm
@@ -657,8 +662,7 @@ export function GoalsPage() {
                   />
                 </div>
               ) : null}
-            </div>
-          </PremiumCard>
+          </CollapsibleSection>
 
           <PremiumCard>
             <div className="min-w-0 space-y-4 p-5 sm:p-6">
@@ -758,42 +762,36 @@ export function GoalsPage() {
         </div>
 
         <div className="space-y-6">
-          {isSimpleView && !showSimpleTemplates ? (
-            <PremiumCard>
-              <div className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
-                <SectionHeader
-                  eyebrow={t("goals.templatesTitle")}
-                  title={t("goals.templatesTitle")}
-                  description={t("goals.templatesDescription")}
-                  status={<StatusChip tone="neutral">{templateCards.length}</StatusChip>}
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setShowSimpleTemplates(true)}
-                  aria-expanded={showSimpleTemplates}
-                >
-                  {t("common.expandSection")}
-                </Button>
-              </div>
-            </PremiumCard>
-          ) : (
-            <GoalTemplateDiscoveryMarquee
-              templates={templateCards}
-              title={t("goals.templatesTitle")}
-              description={t("goals.templatesDescription")}
-              note={t("goals.templatesNote")}
-              localOnlyLabel={t("goals.localOnlyNote")}
-              useTemplateLabel={t("goals.useTemplate")}
-              progressLabel={t("goals.progressLabel")}
-              reviewIntervalDaysLabel={t("goals.reviewIntervalDaysLabel")}
-              emptyTitle={t("goals.emptyTitle")}
-              emptyDescription={t("goals.emptyDescription")}
-              sectionLabel={t("goals.templatesTitle")}
-              onSelectTemplate={openTemplateForm}
-              t={t}
-            />
-          )}
+          <CollapsibleSection
+            id="goals-templates"
+            title={t("goals.templatesTitle")}
+            description={t("goals.templatesDescription")}
+            status={<StatusChip tone="neutral">{templateCards.length}</StatusChip>}
+            icon={<Sparkles className="h-5 w-5" />}
+            open={showSimpleTemplates}
+            onOpenChange={setShowSimpleTemplates}
+            expandLabel={t("common.expandSection")}
+            collapseLabel={t("common.collapseSection")}
+            contentClassName="p-0"
+          >
+            {showSimpleTemplates ? (
+              <GoalTemplateDiscoveryMarquee
+                templates={templateCards}
+                title={t("goals.templatesTitle")}
+                description={t("goals.templatesDescription")}
+                note={t("goals.templatesNote")}
+                localOnlyLabel={t("goals.localOnlyNote")}
+                useTemplateLabel={t("goals.useTemplate")}
+                progressLabel={t("goals.progressLabel")}
+                reviewIntervalDaysLabel={t("goals.reviewIntervalDaysLabel")}
+                emptyTitle={t("goals.emptyTitle")}
+                emptyDescription={t("goals.emptyDescription")}
+                sectionLabel={t("goals.templatesTitle")}
+                onSelectTemplate={openTemplateForm}
+                t={t}
+              />
+            ) : null}
+          </CollapsibleSection>
 
           {reviewDueGoals.length > 0 ? (
             <section

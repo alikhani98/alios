@@ -50,7 +50,8 @@ describe("GoalsContextualHelp", () => {
     expect(markup).toContain("clear, reviewable goals");
     expect(markup).toContain("does not fake progress");
     expect(markup).toContain("does not fake progress or decide priorities automatically");
-    expect(markup).toContain("stay on this device");
+    expect(markup).not.toContain("stay on this device");
+    expect(markup).not.toContain("AliOS helps you track goals");
   });
 
   it("uses Persian help labels when the app language is Persian", () => {
@@ -70,5 +71,18 @@ describe("GoalsContextualHelp", () => {
 
     expect(source).toContain('t("goals.newGoal")');
     expect(source).toContain("openCreateForm");
+  });
+
+  it("keeps secondary goal creation and templates behind collapsed disclosures", () => {
+    const source = readFileSync(
+      join(process.cwd(), "src/features/goals/pages/GoalsPage.tsx"),
+      "utf8"
+    );
+
+    expect(source).toContain('id="goals-form"');
+    expect(source).toContain('id="goals-templates"');
+    expect(source).toContain("open={formOpen}");
+    expect(source).toContain("open={showSimpleTemplates}");
+    expect(source).not.toContain("isSimpleView && !showSimpleTemplates");
   });
 });
