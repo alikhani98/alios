@@ -240,7 +240,7 @@ export function HomeDashboardHero({ data, actions }: HomeDashboardHeroProps) {
           <SoftPanel className="space-y-4 border-border/60 bg-background/85 p-5">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <p className="text-sm font-semibold">{t("home.quickActions")}</p>
+                <p className="text-sm font-semibold">{t("home.localSnapshot")}</p>
                 <p className="text-sm leading-6 text-muted-foreground">
                   {t("home.description")}
                 </p>

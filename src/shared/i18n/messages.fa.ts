@@ -1013,6 +1013,7 @@ export const messagesFa: Record<TranslationKey, string> = {
   "home.manualLatestUpdatedEntry": "آخرین یادداشت دفترچه‌ای به‌روزشده",
   "home.updated": "به‌روزرسانی {date}",
   "home.quickActions": "پیوندهای سریع",
+  "home.localSnapshot": "نمای محلی",
   "home.dailyPlan": "برنامه امروز",
   "home.dailyPlanDescription": "هدف، تمرکز هفته و اقدام بعدی را در یک نگاه نگه دارید.",
   "home.captureNextActionDescription": "فکر، کار یا یادآوری بعدی را همین حالا ثبت کنید و بعداً سامان دهید.",

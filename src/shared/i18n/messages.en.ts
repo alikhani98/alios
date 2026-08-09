@@ -942,6 +942,7 @@ export const messagesEn = {
   "home.manualLatestUpdatedEntry": "Latest updated manual entry",
   "home.updated": "Updated {date}",
   "home.quickActions": "Quick links",
+  "home.localSnapshot": "Local snapshot",
   "home.dailyPlan": "Today's plan",
   "home.dailyPlanDescription": "Keep your goal, weekly focus, and next action in one view.",
   "home.captureNextActionDescription": "Capture the next thought, task, or reminder now and organize it later.",

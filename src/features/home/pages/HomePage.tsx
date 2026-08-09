@@ -507,7 +507,7 @@ export function HomePage() {
     primarySectionIds.has(section.sectionId)
   );
   const secondaryDashboardSections = dashboardSections.filter(
-    (section) => !primaryDashboardSectionIds.has(section.sectionId)
+    (section) => !primarySectionIds.has(section.sectionId)
   );
 
   return (
