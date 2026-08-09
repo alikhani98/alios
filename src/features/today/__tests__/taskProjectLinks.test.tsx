@@ -1,4 +1,6 @@
 import type { ReactElement } from "react";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { renderToStaticMarkup } from "react-dom/server";
 import { StaticRouter } from "react-router-dom/server";
 import { beforeEach, describe, expect, it } from "vitest";
@@ -150,5 +152,18 @@ describe("Task project links", () => {
 
     expect(html).toContain("پروژه مرتبط");
     expect(html).toContain("مشاهده پروژه");
+  });
+  it("keeps secondary Today side panels collapsed while preserving the primary task action", () => {
+    const source = readFileSync(
+      join(process.cwd(), "src/features/today/pages/TodayPage.tsx"),
+      "utf8"
+    );
+
+    expect(source).toContain('id="today-routine-suggestions"');
+    expect(source).toContain('id="today-daily-checkin"');
+    expect(source).toContain('id="today-daily-insights"');
+    expect(source.match(/defaultOpen={false}/g)?.length).toBeGreaterThanOrEqual(3);
+    expect(source).toContain("openCreateTask");
+    expect(source).toContain('t("today.newTask")');
   });
 });

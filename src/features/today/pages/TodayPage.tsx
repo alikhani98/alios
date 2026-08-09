@@ -17,6 +17,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  CollapsibleSection,
   EmptyState,
   PremiumCard,
   SectionHeader,
@@ -702,22 +703,22 @@ export function TodayPage() {
         <div className="space-y-6">
           <TodayWeeklyPlanCard focus={weeklyPlanFocus} isLoading={isWeeklyPlanLoading} />
 
-          <PremiumCard className="border-border/70 bg-card/95">
-            <CardHeader className="gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div className="space-y-1">
-                <CardTitle className="flex items-center gap-2">
-                  <Repeat2 className="h-5 w-5 text-primary" />
-                  {t("routines.todayTitle")}
-                </CardTitle>
-                <p className="text-sm leading-6 text-muted-foreground">
-                  {t("routines.todayDescription")}
-                </p>
-              </div>
-              {routineSuggestions.length > 0 ? (
+          <CollapsibleSection
+            id="today-routine-suggestions"
+            title={t("routines.todayTitle")}
+            description={t("routines.todayDescription")}
+            icon={<Repeat2 className="h-5 w-5" />}
+            status={
+              routineSuggestions.length > 0 ? (
                 <StatusChip tone="neutral">{routineSuggestions.length}</StatusChip>
-              ) : null}
-            </CardHeader>
-            <CardContent className="space-y-3">
+              ) : null
+            }
+            defaultOpen={false}
+            expandLabel={t("common.expandSection")}
+            collapseLabel={t("common.collapseSection")}
+            contentClassName="space-y-3"
+            className="border-border/70 bg-card/95"
+          >
               {routinesError ? (
                 <div className="alios-surface-muted flex flex-col gap-3 p-3 sm:flex-row sm:items-center sm:justify-between">
                   <p className="text-sm text-muted-foreground">{t("routines.todayUnavailable")}</p>
@@ -771,14 +772,17 @@ export function TodayPage() {
                   ) : null}
                 </>
               ) : null}
-            </CardContent>
-          </PremiumCard>
+          </CollapsibleSection>
 
-          <PremiumCard className="border-border/70 bg-card/95">
-            <CardHeader>
-              <CardTitle>{t("today.checkin")}</CardTitle>
-            </CardHeader>
-            <CardContent>
+          <CollapsibleSection
+            id="today-daily-checkin"
+            title={t("today.checkin")}
+            icon={<Sparkles className="h-5 w-5" />}
+            defaultOpen={false}
+            expandLabel={t("common.expandSection")}
+            collapseLabel={t("common.collapseSection")}
+            className="border-border/70 bg-card/95"
+          >
               {isLoading ? (
                 <div className="alios-surface-muted h-72 animate-pulse bg-muted/60" />
               ) : (
@@ -789,18 +793,20 @@ export function TodayPage() {
                   onSubmit={handleCheckinSubmit}
                 />
               )}
-            </CardContent>
-          </PremiumCard>
+          </CollapsibleSection>
 
           {(reviewDueProjects.length > 0 || plannedTaskOutsideToday || deferredTaskCount > 0) ? (
-            <PremiumCard className="border-border/70 bg-card/95">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Clock3 className="h-5 w-5 text-primary" />
-                  {t("home.dailyInsights")}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
+            <CollapsibleSection
+              id="today-daily-insights"
+              title={t("home.dailyInsights")}
+              icon={<Clock3 className="h-5 w-5" />}
+              status={<StatusChip tone="neutral">{reviewDueProjects.length + deferredTaskCount + (plannedTaskOutsideToday ? 1 : 0)}</StatusChip>}
+              defaultOpen={false}
+              expandLabel={t("common.expandSection")}
+              collapseLabel={t("common.collapseSection")}
+              contentClassName="space-y-4"
+              className="border-border/70 bg-card/95"
+            >
                 {plannedTaskOutsideToday ? (
                   <div
                     ref={plannedTaskRef}
@@ -878,13 +884,12 @@ export function TodayPage() {
                       <p className="text-sm font-medium">{t("common.completed")}</p>
                       <span className="inline-flex items-center gap-2 text-sm text-muted-foreground">
                         <CheckCircle2 className="h-4 w-4 text-primary" aria-hidden="true" />
-                        {completedTaskCount}
-                      </span>
-                    </div>
-                  </SoftPanel>
-                ) : null}
-              </CardContent>
-            </PremiumCard>
+                    {completedTaskCount}
+                  </span>
+                </div>
+              </SoftPanel>
+            ) : null}
+            </CollapsibleSection>
           ) : null}
         </div>
       </div>
