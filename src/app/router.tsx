@@ -10,6 +10,11 @@ const HomePage = lazyWithRetry(() =>
     default: module.HomePage,
   }))
 );
+const UnifiedHomePage = lazyWithRetry(() =>
+  import("@/features/home/pages/UnifiedHomePage").then((module) => ({
+    default: module.UnifiedHomePage,
+  }))
+);
 const TodayPage = lazyWithRetry(() =>
   import("@/features/today/pages/TodayPage").then((module) => ({
     default: module.TodayPage,
@@ -102,6 +107,14 @@ const router = createHashRouter([
         element: (
           <Suspense fallback={<RouteLoadingFallback />}>
             <TodayPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "preview-unified-home",
+        element: (
+          <Suspense fallback={<RouteLoadingFallback />}>
+            <UnifiedHomePage />
           </Suspense>
         ),
       },
