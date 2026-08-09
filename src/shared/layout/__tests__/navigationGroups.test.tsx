@@ -63,6 +63,16 @@ describe("navigation groups", () => {
   });
 
   it("keeps direct destinations visible and only opens the default planning group", () => {
+    const directGroup = navigationGroups.find((group) => group.id === "direct");
+    const planReviewGroup = navigationGroups.find((group) => group.id === "planReview");
+
+    expect(directGroup?.items.map((item) => item.href)).toEqual([
+      "/",
+      "/inbox",
+      "/search",
+    ]);
+    expect(planReviewGroup?.items.map((item) => item.href)).toContain("/today");
+
     act(() => {
       root.render(
         <MemoryRouter>

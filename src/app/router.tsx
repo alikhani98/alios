@@ -5,11 +5,6 @@ import { AppShell } from "@/shared/layout";
 import { RouteLoadingFallback } from "@/shared/ui";
 import { lazyWithRetry } from "@/shared/runtime/lazyWithRetry";
 
-const HomePage = lazyWithRetry(() =>
-  import("@/features/home/pages/HomePage").then((module) => ({
-    default: module.HomePage,
-  }))
-);
 const UnifiedHomePage = lazyWithRetry(() =>
   import("@/features/home/pages/UnifiedHomePage").then((module) => ({
     default: module.UnifiedHomePage,
@@ -98,7 +93,7 @@ const router = createHashRouter([
         index: true,
         element: (
           <Suspense fallback={<RouteLoadingFallback />}>
-            <HomePage />
+            <UnifiedHomePage />
           </Suspense>
         ),
       },
@@ -107,14 +102,6 @@ const router = createHashRouter([
         element: (
           <Suspense fallback={<RouteLoadingFallback />}>
             <TodayPage />
-          </Suspense>
-        ),
-      },
-      {
-        path: "preview-unified-home",
-        element: (
-          <Suspense fallback={<RouteLoadingFallback />}>
-            <UnifiedHomePage />
           </Suspense>
         ),
       },

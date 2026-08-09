@@ -53,11 +53,6 @@ export const navigationGroups: NavigationGroup[] = [
         icon: "home",
       },
       {
-        titleKey: "nav.today",
-        href: "/today",
-        icon: "calendar-check",
-      },
-      {
         titleKey: "nav.inbox",
         href: "/inbox",
         icon: "inbox",
@@ -77,6 +72,11 @@ export const navigationGroups: NavigationGroup[] = [
         titleKey: "nav.calendar",
         href: "/calendar",
         icon: "calendar-range",
+      },
+      {
+        titleKey: "nav.today",
+        href: "/today",
+        icon: "calendar-check",
       },
       {
         titleKey: "nav.routines",
