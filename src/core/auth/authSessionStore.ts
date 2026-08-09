@@ -27,8 +27,6 @@ function authUsersMatch(
     left.userId === right.userId &&
     left.email === right.email &&
     left.displayName === right.displayName &&
-    left.createdAt === right.createdAt &&
-    left.updatedAt === right.updatedAt &&
     left.avatarUrl === right.avatarUrl
   );
 }

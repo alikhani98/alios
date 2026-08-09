@@ -25,7 +25,7 @@ function createAccessToken(overrides: Record<string, unknown> = {}) {
         email: "user@example.com",
         display_name: "AliOS User",
       },
-      exp: Math.floor(new Date("2026-08-01T12:00:00.000Z").getTime() / 1000),
+      exp: futureExpirySeconds(),
       ...overrides,
     })
   );
@@ -38,13 +38,25 @@ function readStoredSession(storageKey: string): SupabaseSession | null {
   return raw ? (JSON.parse(raw) as SupabaseSession) : null;
 }
 
+function toUnixSeconds(date: Date) {
+  return Math.floor(date.getTime() / 1000);
+}
+
+function futureExpirySeconds() {
+  return toUnixSeconds(new Date(Date.now() + 60 * 60 * 1000));
+}
+
+function pastExpirySeconds() {
+  return toUnixSeconds(new Date(Date.now() - 60 * 60 * 1000));
+}
+
 function createSessionPayload(
   overrides: Partial<SupabaseSession> = {}
 ): SupabaseSession {
   return {
     access_token: createAccessToken(),
     refresh_token: "refresh-token",
-    expires_at: Math.floor(new Date("2026-08-01T12:00:00.000Z").getTime() / 1000),
+    expires_at: futureExpirySeconds(),
     user: {
       id: "user-1",
       user_metadata: {
@@ -199,6 +211,30 @@ describe("EmailAuthRuntime auth callback handling", () => {
     expect(restoredStatuses.at(-1)).toBe("authenticated");
   });
 
+  it("keeps authenticated timestamps stable when the same stored session is restored repeatedly", async () => {
+    installBrowserStubs("");
+    localStorage.setItem(storageKey, JSON.stringify(createSessionPayload()));
+    let currentTime = new Date("2026-07-31T10:00:00.000Z");
+
+    const runtime = new EmailAuthRuntime({
+      client: createSupabaseBrowserClient(
+        "https://example.supabase.co",
+        "anon-key",
+        storageKey
+      ),
+      now: () => currentTime,
+    });
+
+    const firstSession = await runtime.getSession();
+    currentTime = new Date("2026-07-31T10:05:00.000Z");
+    const secondSession = await runtime.getSession();
+
+    expect(firstSession.status).toBe("authenticated");
+    expect(secondSession.status).toBe("authenticated");
+    expect(firstSession.user?.createdAt).toBe(secondSession.user?.createdAt);
+    expect(firstSession.user?.updatedAt).toBe(secondSession.user?.updatedAt);
+  });
+
   it("does not finalize authenticated state when session persistence fails", async () => {
     const failingStorage = {
       getItem: vi.fn(() => null),
@@ -287,18 +323,18 @@ describe("EmailAuthRuntime auth callback handling", () => {
     installBrowserStubs("");
     const expiredSession = createSessionPayload({
       access_token: createAccessToken({
-        exp: Math.floor(new Date("2026-07-31T08:00:00.000Z").getTime() / 1000),
+        exp: pastExpirySeconds(),
       }),
-      expires_at: Math.floor(new Date("2026-07-31T08:00:00.000Z").getTime() / 1000),
+      expires_at: pastExpirySeconds(),
       refresh_token: "refresh-token-expired",
     });
     localStorage.setItem(storageKey, JSON.stringify(expiredSession));
 
     const refreshedSession = createSessionPayload({
       access_token: createAccessToken({
-        exp: Math.floor(new Date("2026-08-02T08:00:00.000Z").getTime() / 1000),
+        exp: futureExpirySeconds(),
       }),
-      expires_at: Math.floor(new Date("2026-08-02T08:00:00.000Z").getTime() / 1000),
+      expires_at: futureExpirySeconds(),
       refresh_token: "refresh-token-fresh",
     });
     const fetchMock = vi.fn(async () => createJsonResponse(refreshedSession));

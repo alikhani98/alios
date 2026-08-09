@@ -1,3 +1,6 @@
+// @vitest-environment jsdom
+import { act } from "react";
+import { createRoot } from "react-dom/client";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -188,6 +191,26 @@ class TestSyncProvider implements SyncProvider {
 
   subscribe(_listener: SyncStateListener): SyncStateSubscription {
     return { unsubscribe: () => undefined };
+  }
+}
+
+class TrackingSyncProvider extends TestSyncProvider {
+  activeSubscriptions = 0;
+  maxActiveSubscriptions = 0;
+
+  subscribe(listener: SyncStateListener): SyncStateSubscription {
+    this.activeSubscriptions += 1;
+    this.maxActiveSubscriptions = Math.max(
+      this.maxActiveSubscriptions,
+      this.activeSubscriptions
+    );
+    void this.getStatus().then(listener);
+
+    return {
+      unsubscribe: () => {
+        this.activeSubscriptions -= 1;
+      },
+    };
   }
 }
 
@@ -741,6 +764,101 @@ describe("SyncStatusCard", () => {
     expect(markup).toContain(
       "No sync conflicts currently need review on this device."
     );
+  });
+
+  it("keeps the signed-in sync settings surface bounded during a client mount", async () => {
+    const authProvider = new TestAuthProvider("email", {
+      status: "authenticated",
+      provider: "email",
+      user: {
+        userId: "user-1",
+        email: "user@example.com",
+        displayName: "AliOS User",
+        createdAt: "2026-07-28T00:00:00.000Z",
+        updatedAt: "2026-07-28T12:00:00.000Z",
+      },
+      detail: "Email account connected on this device.",
+    });
+    const syncProvider = new TrackingSyncProvider("supabase", {
+      mode: "ready",
+      provider: "supabase",
+      enabled: true,
+      scopes: ["preferences", "tasks", "projects"],
+      connectedUserId: "supabase-user-1",
+      deviceId: "device-1",
+      deviceLabel: "This device",
+      lastSyncedAt: "2026-07-28T12:00:00.000Z",
+      lastAttemptAt: "2026-07-28T12:00:00.000Z",
+      detail:
+        "AliOS synced preferences, tasks, and projects for this device.",
+    });
+    const boundary = createAccountRuntimeBoundary({
+      accountProvider: new TestAccountProvider(
+        "email",
+        "authenticated",
+        {
+          status: "authenticated",
+          providerId: "email",
+          lifecycle: "signed-in",
+          identity: {
+            accountId: "account-1",
+            email: "user@example.com",
+            displayName: "AliOS User",
+            providerId: "email",
+          },
+          detail: "Email account connected on this device.",
+        },
+        {
+          status: "authenticated",
+          available: ["account-identity", "sign-out", "explicit-sync-opt-in"],
+          detail: "Authenticated account capabilities are available.",
+        }
+      ),
+      authProvider,
+      syncProvider,
+    });
+    const container = document.createElement("div");
+    const root = createRoot(container);
+    let renderCount = 0;
+
+    function RenderProbe() {
+      renderCount += 1;
+      return <SyncStatusCard onGoToBackupRestore={vi.fn()} />;
+    }
+
+    document.body.appendChild(container);
+
+    try {
+      await act(async () => {
+        root.render(
+          <I18nProvider>
+            <AccountRuntimeProvider boundary={boundary}>
+              <AuthRuntimeProvider provider={authProvider}>
+                <RenderProbe />
+              </AuthRuntimeProvider>
+            </AccountRuntimeProvider>
+          </I18nProvider>
+        );
+      });
+
+      await act(async () => {
+        await Promise.resolve();
+        await Promise.resolve();
+      });
+
+      expect(container.textContent).toContain("Account & Sync");
+      expect(container.textContent).toContain("Sync available");
+      expect(renderCount).toBeLessThan(10);
+      expect(syncProvider.maxActiveSubscriptions).toBe(1);
+
+      await act(async () => {
+        root.unmount();
+      });
+
+      expect(syncProvider.activeSubscriptions).toBe(0);
+    } finally {
+      container.remove();
+    }
   });
 
   it("renders the Persian account and sync copy for the settings surface", async () => {

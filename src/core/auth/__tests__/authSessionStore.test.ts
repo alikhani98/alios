@@ -138,4 +138,29 @@ describe("auth session store", () => {
     expect(harness.getActiveSubscriptions()).toBe(0);
     expect(harness.getUnsubscribeCalls()).toBe(2);
   });
+
+  it("does not notify consumers when only derived user timestamps change", () => {
+    const harness = createTrackingAuthProvider(signedInSession);
+    const store = createAuthSessionStore(harness.provider);
+    const listener = vi.fn();
+
+    const subscription = store.subscribe(listener);
+
+    expect(listener).toHaveBeenCalledTimes(1);
+
+    harness.emit({
+      ...signedInSession,
+      user: signedInSession.user
+        ? {
+            ...signedInSession.user,
+            createdAt: "2026-07-29T10:05:00.000Z",
+            updatedAt: "2026-07-29T10:05:00.000Z",
+          }
+        : null,
+    });
+
+    expect(listener).toHaveBeenCalledTimes(1);
+
+    subscription.unsubscribe();
+  });
 });

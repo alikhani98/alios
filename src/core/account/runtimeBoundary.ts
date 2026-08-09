@@ -348,6 +348,9 @@ export class DefaultAccountRuntimeBoundary implements AccountRuntimeBoundary {
             listener(state);
           }
         })
+        .catch(() => {
+          // Keep subscription delivery bounded when a provider snapshot fails.
+        })
         .finally(() => {
           emitInFlight = false;
           if (active && emitPending) {

@@ -251,4 +251,64 @@ describe("account runtime boundary", () => {
     expect(authHarness.getActiveSubscriptions()).toBe(0);
     expect(authHarness.getMaxActiveSubscriptions()).toBe(1);
   });
+
+  it("keeps auth restore notifications bounded when only derived timestamps change", async () => {
+    let sessionReadCount = 0;
+    const listeners = new Set<(nextSession: AuthSession) => void>();
+    const createSession = (): AuthSession => {
+      sessionReadCount += 1;
+      return {
+        status: "authenticated",
+        provider: "email",
+        user: {
+          userId: "user-1",
+          email: "user@example.com",
+          displayName: "AliOS User",
+          createdAt: `2026-07-28T12:00:0${sessionReadCount}.000Z`,
+          updatedAt: `2026-07-28T12:00:0${sessionReadCount}.000Z`,
+        },
+        detail: "Email account connected on this device.",
+      };
+    };
+    let currentSession = createSession();
+    const authProvider: AuthProvider = {
+      name: "email",
+      getCurrentUser: async () => currentSession.user,
+      getCurrentSession: async () => {
+        currentSession = createSession();
+        return currentSession;
+      },
+      login: async () => ({ session: currentSession }),
+      logout: async () => undefined,
+      refreshSession: async () => currentSession,
+      subscribe: vi.fn((listener) => {
+        listeners.add(listener);
+        listener(currentSession);
+
+        return {
+          unsubscribe: () => {
+            listeners.delete(listener);
+          },
+        };
+      }),
+    };
+    const authSessionSource = createAuthSessionStore(authProvider);
+    const boundary = createAccountRuntimeBoundary({
+      accountProvider: createAuthenticatedAccountProvider(),
+      authProvider,
+      authSessionSource,
+    });
+    const listener = vi.fn();
+
+    const subscription = boundary.subscribe(listener);
+
+    for (let attempt = 0; attempt < 10; attempt += 1) {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    }
+
+    expect(listener.mock.calls.length).toBeLessThanOrEqual(2);
+    expect(authProvider.subscribe).toHaveBeenCalledTimes(1);
+
+    subscription.unsubscribe();
+  });
 });

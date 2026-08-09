@@ -25,6 +25,29 @@ function toIsoString(date: Date) {
   return date.toISOString();
 }
 
+function readMetadataTimestamp(
+  metadata: Record<string, unknown>,
+  keys: ReadonlyArray<string>
+): string | null {
+  for (const key of keys) {
+    const value = metadata[key];
+    if (typeof value === "string" && value.trim().length > 0) {
+      return value.trim();
+    }
+  }
+
+  return null;
+}
+
+function createSessionCacheKey(session: SupabaseSession) {
+  return [
+    session.user.id,
+    session.access_token,
+    session.refresh_token ?? "",
+    session.expires_at ?? "",
+  ].join("|");
+}
+
 function createSignedOutSession(detail: string): AuthSession {
   return {
     status: "unauthenticated",
@@ -36,7 +59,7 @@ function createSignedOutSession(detail: string): AuthSession {
 
 function createAuthenticatedSession(
   session: SupabaseSession,
-  now: Date
+  authenticatedAt: string
 ): AuthSession {
   const metadata = session.user.user_metadata ?? {};
   const displayName =
@@ -54,7 +77,12 @@ function createAuthenticatedSession(
     typeof metadata.email === "string" && metadata.email.trim().length > 0
       ? metadata.email.trim()
       : "";
-  const updatedAt = toIsoString(now);
+  const createdAt =
+    readMetadataTimestamp(metadata, ["created_at", "createdAt"]) ??
+    authenticatedAt;
+  const updatedAt =
+    readMetadataTimestamp(metadata, ["updated_at", "updatedAt"]) ??
+    authenticatedAt;
 
   return {
     status: "authenticated",
@@ -79,6 +107,7 @@ export class EmailAuthRuntime {
   private readonly listeners = new Set<AuthStateListener>();
   private readonly now: () => Date;
   private readonly createClient: () => SupabaseBrowserClient | null;
+  private readonly sessionTimestampCache = new Map<string, string>();
   private client: SupabaseBrowserClient | null;
   private currentSession: AuthSession;
   private hydrationInFlight: Promise<AuthSession> | null = null;
@@ -180,7 +209,10 @@ export class EmailAuthRuntime {
     }
 
     if (result.data.session) {
-      const session = createAuthenticatedSession(result.data.session, this.now());
+      const session = createAuthenticatedSession(
+        result.data.session,
+        this.resolveAuthenticatedAt(result.data.session)
+      );
       this.setSession(session);
       return { session };
     }
@@ -234,7 +266,10 @@ export class EmailAuthRuntime {
       throw error;
     }
 
-    const session = createAuthenticatedSession(result.data.session, this.now());
+    const session = createAuthenticatedSession(
+      result.data.session,
+      this.resolveAuthenticatedAt(result.data.session)
+    );
     this.setSession(session);
     return { session };
   }
@@ -279,7 +314,10 @@ export class EmailAuthRuntime {
     }
 
     const nextSession = result.data.session
-      ? createAuthenticatedSession(result.data.session, this.now())
+      ? createAuthenticatedSession(
+          result.data.session,
+          this.resolveAuthenticatedAt(result.data.session)
+        )
       : createSignedOutSession("No email account is signed in on this device.");
     this.setSession(nextSession);
     return nextSession;
@@ -301,6 +339,18 @@ export class EmailAuthRuntime {
     this.listeners.forEach((listener) => {
       listener(nextSession);
     });
+  }
+
+  private resolveAuthenticatedAt(session: SupabaseSession) {
+    const cacheKey = createSessionCacheKey(session);
+    const cachedTimestamp = this.sessionTimestampCache.get(cacheKey);
+    if (cachedTimestamp) {
+      return cachedTimestamp;
+    }
+
+    const authenticatedAt = toIsoString(this.now());
+    this.sessionTimestampCache.set(cacheKey, authenticatedAt);
+    return authenticatedAt;
   }
 
   private async resolveCurrentSession(): Promise<AuthSession> {
@@ -327,7 +377,7 @@ export class EmailAuthRuntime {
     if (callbackRestoreResult.data.session) {
       const restoredSession = createAuthenticatedSession(
         callbackRestoreResult.data.session,
-        this.now()
+        this.resolveAuthenticatedAt(callbackRestoreResult.data.session)
       );
       this.setSession(restoredSession);
       return restoredSession;
@@ -346,7 +396,10 @@ export class EmailAuthRuntime {
     }
 
     const nextSession = result.data.session
-      ? createAuthenticatedSession(result.data.session, this.now())
+      ? createAuthenticatedSession(
+          result.data.session,
+          this.resolveAuthenticatedAt(result.data.session)
+        )
       : createSignedOutSession("No email account is signed in on this device.");
     this.setSession(nextSession);
     return nextSession;
