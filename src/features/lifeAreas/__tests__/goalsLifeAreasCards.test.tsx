@@ -81,9 +81,11 @@ describe("Goals and Life Areas cards", () => {
     );
 
     expect(html).toContain("Linked goals");
+    expect(html).toContain("Area details");
     expect(html).toContain("Active: 2");
     expect(html).toContain("Completed: 1");
     expect(html).toContain("Active progress: 45%");
+    expect(html).toContain('id="life-area-health-details-content" hidden="" aria-hidden="true"');
     expect(html).toContain('href="/goals?area=health"');
     expect(html).toContain("View area goals");
   });

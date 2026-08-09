@@ -15,6 +15,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
+  CollapsibleSection,
   StatusChip,
 } from "@/shared/ui";
 
@@ -112,34 +113,13 @@ export function LifeAreaCard({
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4 px-4 pb-4 sm:px-6 sm:pb-6">
-        <div className="grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
-          <p className="min-w-0 break-words">
-            {t("lifeAreas.reviewIntervalDaysLabel")}:{" "}
-            {area.reviewIntervalDays ?? t("common.notRecorded")}
-          </p>
-          <p className="min-w-0 break-words">
-            {t("lifeAreas.lastReviewedLabel")}:{" "}
-            {area.lastReviewedAt
-              ? formatDateTime(area.lastReviewedAt)
-              : t("common.notRecorded")}
-          </p>
-          <p className="min-w-0 break-words">
-            {t("lifeAreas.updatedAtLabel")}:{" "}
-            {area.updatedAt ? formatDateTime(area.updatedAt) : t("common.notRecorded")}
-          </p>
-          <p className="min-w-0 break-words">
-            {t("lifeAreas.createdAtLabel")}:{" "}
-            {area.createdAt ? formatDateTime(area.createdAt) : t("common.notRecorded")}
-          </p>
-        </div>
-
-        <div className="min-w-0 rounded-2xl border border-primary/15 bg-primary/5 px-3 py-3 sm:px-4">
-          <div className="flex min-w-0 flex-wrap items-center justify-between gap-2">
-            <p className="flex min-w-0 items-center gap-2 text-sm font-medium text-foreground">
-              <Target className="h-4 w-4 shrink-0 text-primary" />
-              <span className="break-words">{t("lifeAreas.linkedGoals")}</span>
-            </p>
+      <CardContent className="px-4 pb-4 sm:px-6 sm:pb-6">
+        <CollapsibleSection
+          id={`life-area-${area.areaKey}-details`}
+          title={t("lifeAreas.areaDetails")}
+          description={t("lifeAreas.areaDetailsDescription")}
+          icon={<Target className="h-5 w-5" />}
+          status={
             <StatusChip tone="neutral">
               {isGoalSummaryLoading
                 ? t("common.loading")
@@ -147,54 +127,96 @@ export function LifeAreaCard({
                   ? t("lifeAreas.linkedGoalsUnavailable")
                   : goalSummary.totalCount}
             </StatusChip>
+          }
+          expandLabel={t("common.expandSection")}
+          collapseLabel={t("common.collapseSection")}
+          defaultOpen={false}
+          className="rounded-2xl border border-border/70 bg-muted/20 shadow-none"
+          contentClassName="space-y-4"
+        >
+          <div className="grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
+            <p className="min-w-0 break-words">
+              {t("lifeAreas.reviewIntervalDaysLabel")}:{" "}
+              {area.reviewIntervalDays ?? t("common.notRecorded")}
+            </p>
+            <p className="min-w-0 break-words">
+              {t("lifeAreas.lastReviewedLabel")}:{" "}
+              {area.lastReviewedAt
+                ? formatDateTime(area.lastReviewedAt)
+                : t("common.notRecorded")}
+            </p>
+            <p className="min-w-0 break-words">
+              {t("lifeAreas.updatedAtLabel")}:{" "}
+              {area.updatedAt ? formatDateTime(area.updatedAt) : t("common.notRecorded")}
+            </p>
+            <p className="min-w-0 break-words">
+              {t("lifeAreas.createdAtLabel")}:{" "}
+              {area.createdAt ? formatDateTime(area.createdAt) : t("common.notRecorded")}
+            </p>
           </div>
-          {!isGoalSummaryLoading && !isGoalSummaryUnavailable ? (
-            <div className="mt-3 grid min-w-0 gap-2 text-sm text-muted-foreground sm:grid-cols-3">
-              <p className="min-w-0 break-words">
-                {t("lifeAreas.linkedActiveGoals")}: {goalSummary.activeCount}
+
+          <div className="min-w-0 rounded-2xl border border-primary/15 bg-primary/5 px-3 py-3 sm:px-4">
+            <div className="flex min-w-0 flex-wrap items-center justify-between gap-2">
+              <p className="flex min-w-0 items-center gap-2 text-sm font-medium text-foreground">
+                <Target className="h-4 w-4 shrink-0 text-primary" />
+                <span className="break-words">{t("lifeAreas.linkedGoals")}</span>
               </p>
-              <p className="min-w-0 break-words">
-                {t("lifeAreas.linkedCompletedGoals")}: {goalSummary.completedCount}
-              </p>
-              <p className="min-w-0 break-words">
-                {`${t("lifeAreas.linkedAverageProgress")}: ${
-                  goalSummary.averageActiveProgress === null
-                    ? t("common.notRecorded")
-                    : `${Math.round(goalSummary.averageActiveProgress)}%`
-                }`}
+              <StatusChip tone="neutral">
+                {isGoalSummaryLoading
+                  ? t("common.loading")
+                  : isGoalSummaryUnavailable
+                    ? t("lifeAreas.linkedGoalsUnavailable")
+                    : goalSummary.totalCount}
+              </StatusChip>
+            </div>
+            {!isGoalSummaryLoading && !isGoalSummaryUnavailable ? (
+              <div className="mt-3 grid min-w-0 gap-2 text-sm text-muted-foreground sm:grid-cols-3">
+                <p className="min-w-0 break-words">
+                  {t("lifeAreas.linkedActiveGoals")}: {goalSummary.activeCount}
+                </p>
+                <p className="min-w-0 break-words">
+                  {t("lifeAreas.linkedCompletedGoals")}: {goalSummary.completedCount}
+                </p>
+                <p className="min-w-0 break-words">
+                  {`${t("lifeAreas.linkedAverageProgress")}: ${
+                    goalSummary.averageActiveProgress === null
+                      ? t("common.notRecorded")
+                      : `${Math.round(goalSummary.averageActiveProgress)}%`
+                  }`}
+                </p>
+              </div>
+            ) : null}
+          </div>
+
+          {area.focusNote.trim().length > 0 ? (
+            <div className="rounded-2xl border bg-background/70 px-3 py-3 sm:px-4">
+              <p className="text-xs text-muted-foreground">{t("lifeAreas.focusNoteLabel")}</p>
+              <p className="mt-1 break-words whitespace-pre-wrap text-sm leading-7">
+                {area.focusNote}
               </p>
             </div>
+          ) : (
+            <div className="rounded-2xl border bg-muted/30 px-3 py-3 sm:px-4">
+              <p className="text-sm leading-7 text-muted-foreground">
+                {t("lifeAreas.noFocusNote")}
+              </p>
+            </div>
+          )}
+
+          {area.tags.length > 0 ? (
+            <div className="flex flex-wrap gap-2">
+              {area.tags.map((tag) => (
+                <Badge
+                  key={tag}
+                  variant="outline"
+                  className="max-w-full break-words whitespace-normal text-start leading-5"
+                >
+                  {tag}
+                </Badge>
+              ))}
+            </div>
           ) : null}
-        </div>
-
-        {area.focusNote.trim().length > 0 ? (
-          <div className="rounded-2xl border bg-background/70 px-3 py-3 sm:px-4">
-            <p className="text-xs text-muted-foreground">{t("lifeAreas.focusNoteLabel")}</p>
-            <p className="mt-1 break-words whitespace-pre-wrap text-sm leading-7">
-              {area.focusNote}
-            </p>
-          </div>
-        ) : (
-          <div className="rounded-2xl border bg-muted/30 px-3 py-3 sm:px-4">
-            <p className="text-sm leading-7 text-muted-foreground">
-              {t("lifeAreas.noFocusNote")}
-            </p>
-          </div>
-        )}
-
-        {area.tags.length > 0 ? (
-          <div className="flex flex-wrap gap-2">
-            {area.tags.map((tag) => (
-              <Badge
-                key={tag}
-                variant="outline"
-                className="max-w-full break-words whitespace-normal text-start leading-5"
-              >
-                {tag}
-              </Badge>
-            ))}
-          </div>
-        ) : null}
+        </CollapsibleSection>
       </CardContent>
 
       <CardFooter className="flex flex-col gap-2 border-t px-4 pb-4 pt-4 sm:flex-row sm:flex-wrap sm:items-center sm:px-6 sm:pb-6">

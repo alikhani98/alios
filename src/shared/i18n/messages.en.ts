@@ -653,6 +653,8 @@ export const messagesEn = {
   "lifeAreas.reviewDue": "Needs review",
   "lifeAreas.averageSatisfaction": "Average satisfaction",
   "lifeAreas.highAttentionActive": "High-attention active areas: {count}",
+  "lifeAreas.areaDetails": "Area details",
+  "lifeAreas.areaDetailsDescription": "Open review timing, linked-goal progress, focus notes, and tags when you need the deeper view.",
   "lifeAreas.linkedGoals": "Linked goals",
   "lifeAreas.linkedActiveGoals": "Active",
   "lifeAreas.linkedCompletedGoals": "Completed",

@@ -515,6 +515,8 @@ export const messagesFa: Record<TranslationKey, string> = {
   "lifeAreas.reviewDue": "نیازمند مرور",
   "lifeAreas.averageSatisfaction": "میانگین رضایت",
   "lifeAreas.highAttentionActive": "حوزه‌های فعال با توجه زیاد: {count}",
+  "lifeAreas.areaDetails": "جزئیات حوزه",
+  "lifeAreas.areaDetailsDescription": "زمان‌بندی مرور، پیشرفت هدف‌های مرتبط، یادداشت تمرکز و برچسب‌ها را فقط وقتی به نمای عمیق‌تر نیاز دارید باز کنید.",
   "lifeAreas.linkedGoals": "هدف‌های مرتبط",
   "lifeAreas.linkedActiveGoals": "فعال",
   "lifeAreas.linkedCompletedGoals": "تکمیل‌شده",

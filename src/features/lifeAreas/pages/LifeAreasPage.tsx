@@ -16,7 +16,7 @@ import { parseLifeAreaFocusSearchParam } from "@/features/goals/goalAreaNavigati
 import { useGoals } from "@/features/goals/hooks/useGoals";
 import { useI18n } from "@/shared/i18n";
 import type { LifeAreaKey } from "@/shared/types";
-import { Badge, Button, EmptyState, Input, MetricCard, PremiumCard, SectionHeader, StatusChip, Select } from "@/shared/ui";
+import { Badge, Button, CollapsibleSection, EmptyState, Input, MetricCard, PremiumCard, SectionHeader, StatusChip, Select } from "@/shared/ui";
 import { cn } from "@/shared/utils";
 
 import { LifeAreaCard } from "../components/LifeAreaCard";
@@ -90,6 +90,7 @@ export function LifeAreasPage() {
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "paused" | "archived">("all");
   const [attentionFilter, setAttentionFilter] = useState<"all" | "low" | "medium" | "high">("all");
   const [formRevision, setFormRevision] = useState(0);
+  const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [focusedAreaKey, setFocusedAreaKey] = useState<LifeAreaKey | null>(null);
   const [focusMessage, setFocusMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -123,12 +124,14 @@ export function LifeAreasPage() {
 
   const openEditor = (areaKey: LifeAreaKey) => {
     setEditingAreaKey(areaKey);
+    setIsEditorOpen(true);
     setFormRevision((current) => current + 1);
     clearMessages();
   };
 
   const closeEditor = () => {
     setEditingAreaKey(null);
+    setIsEditorOpen(false);
   };
 
   const handleSearch = () => {
@@ -374,17 +377,21 @@ export function LifeAreasPage() {
         </div>
       ) : null}
 
-      <PremiumCard>
-        <div className="min-w-0 space-y-3 p-4 sm:space-y-4 sm:p-6">
-          <SectionHeader
-            title={
-              editingArea
-                ? `${t("lifeAreas.editArea")}: ${editingArea.title}`
-                : t("lifeAreas.editorTitle")
-            }
-            description={t("lifeAreas.editorDescription")}
-            status={<StatusChip tone="neutral">{t("lifeAreas.localOnlyNote")}</StatusChip>}
-          />
+      <CollapsibleSection
+        id="life-areas-editor"
+        title={
+          editingArea
+            ? `${t("lifeAreas.editArea")}: ${editingArea.title}`
+            : t("lifeAreas.editorTitle")
+        }
+        description={t("lifeAreas.editorDescription")}
+        status={<StatusChip tone="neutral">{t("lifeAreas.localOnlyNote")}</StatusChip>}
+        expandLabel={t("common.expandSection")}
+        collapseLabel={t("common.collapseSection")}
+        open={isEditorOpen}
+        onOpenChange={setIsEditorOpen}
+      >
+        <div className="min-w-0 space-y-3 sm:space-y-4">
           {!editingArea ? (
             <p className="max-w-3xl text-sm leading-7 text-muted-foreground">
               {t("lifeAreas.editorHint")}
@@ -401,7 +408,7 @@ export function LifeAreasPage() {
             </div>
           )}
         </div>
-      </PremiumCard>
+      </CollapsibleSection>
 
       <PremiumCard>
         <div className="min-w-0 space-y-4 p-4 sm:p-6">
@@ -533,13 +540,16 @@ export function LifeAreasPage() {
         </div>
       )}
 
-      <PremiumCard>
-        <div className="min-w-0 space-y-3 p-4 sm:p-6">
-          <SectionHeader
-            title={t("lifeAreas.canonicalTitle")}
-            description={t("lifeAreas.canonicalDescription")}
-            status={<StatusChip tone="neutral">{LIFE_AREA_DEFINITIONS.length}</StatusChip>}
-          />
+      <CollapsibleSection
+        id="life-areas-canonical"
+        title={t("lifeAreas.canonicalTitle")}
+        description={t("lifeAreas.canonicalDescription")}
+        status={<StatusChip tone="neutral">{LIFE_AREA_DEFINITIONS.length}</StatusChip>}
+        expandLabel={t("common.expandSection")}
+        collapseLabel={t("common.collapseSection")}
+        defaultOpen={false}
+      >
+        <div className="min-w-0 space-y-3">
           <p className="max-w-3xl text-sm leading-7 text-muted-foreground">
             {t("lifeAreas.canonicalNote")}
           </p>
@@ -555,7 +565,7 @@ export function LifeAreasPage() {
             ))}
           </div>
         </div>
-      </PremiumCard>
+      </CollapsibleSection>
     </section>
   );
 }
