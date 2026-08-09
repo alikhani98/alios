@@ -38,9 +38,6 @@ async function renderRoute(hashPath: string) {
   vi.doMock("@/shared/ui", () => ({
     RouteLoadingFallback: () => <div data-testid="route-loading">Loading</div>,
   }));
-  vi.doMock("@/features/home/pages/HomePage", () => ({
-    HomePage: () => <section data-testid="legacy-home-page">Legacy Home</section>,
-  }));
   vi.doMock("@/features/home/pages/UnifiedHomePage", () => ({
     UnifiedHomePage: () => (
       <section data-testid="unified-home-page">Unified Home</section>
@@ -104,7 +101,6 @@ describe("AppRouter IA consolidation", () => {
     }
     vi.doUnmock("@/shared/layout");
     vi.doUnmock("@/shared/ui");
-    vi.doUnmock("@/features/home/pages/HomePage");
     vi.doUnmock("@/features/home/pages/UnifiedHomePage");
     vi.doUnmock("@/features/today/pages/TodayPage");
   });
@@ -115,7 +111,6 @@ describe("AppRouter IA consolidation", () => {
     containers.push(rendered.container);
 
     expect(await waitForElement(rendered.container, '[data-testid="unified-home-page"]')).not.toBeNull();
-    expect(rendered.container.querySelector('[data-testid="legacy-home-page"]')).toBeNull();
   });
 
   it("keeps the standalone Today route and its query parameters alive", async () => {
