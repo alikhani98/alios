@@ -10,6 +10,7 @@ import { useViewDensityMode } from "@/shared/preferences/viewDensityMode";
 import {
   Badge,
   Button,
+  CollapsibleSection,
   EmptyState,
   Input,
   MetricCard,
@@ -610,32 +611,18 @@ export function PersonalManualPage() {
         </div>
 
         <div className="space-y-6">
-          {isSimpleView && !showSimpleTemplates ? (
-            <PremiumCard>
-              <div className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
-                <SectionHeader
-                  title={t("manual.templatesTitle")}
-                  description={t("manual.templatesDescription")}
-                  status={<StatusChip tone="neutral">{templateCards.length}</StatusChip>}
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setShowSimpleTemplates(true)}
-                  aria-expanded={showSimpleTemplates}
-                >
-                  {t("common.expandSection")}
-                </Button>
-              </div>
-            </PremiumCard>
-          ) : (
-            <PremiumCard>
-              <div className="space-y-3 p-5 sm:space-y-4 sm:p-6">
-                <SectionHeader
-                  title={t("manual.templatesTitle")}
-                  description={t("manual.templatesDescription")}
-                  status={<StatusChip tone="neutral">{t("manual.localOnlyNote")}</StatusChip>}
-                />
+          <CollapsibleSection
+            id="manual-templates"
+            title={t("manual.templatesTitle")}
+            description={t("manual.templatesDescription")}
+            status={<StatusChip tone="neutral">{templateCards.length}</StatusChip>}
+            icon={<Sparkles className="h-5 w-5" />}
+            open={showSimpleTemplates}
+            onOpenChange={setShowSimpleTemplates}
+            expandLabel={t("common.expandSection")}
+            collapseLabel={t("common.collapseSection")}
+            contentClassName="space-y-3 sm:space-y-4"
+          >
                 <p className="max-w-3xl text-sm leading-7 text-muted-foreground">
                   {t("manual.templatesNote")}
                 </p>
@@ -684,17 +671,18 @@ export function PersonalManualPage() {
                     </button>
                   ))}
                 </div>
-              </div>
-            </PremiumCard>
-          )}
+          </CollapsibleSection>
 
-          <PremiumCard>
-            <div className="space-y-3 p-5 sm:space-y-4 sm:p-6">
-              <SectionHeader
-                title={t("manual.latestUpdated")}
-                description={t("manual.localOnlyDescription")}
-                status={<StatusChip tone="neutral">{summary.totalCount}</StatusChip>}
-              />
+          <CollapsibleSection
+            id="manual-latest-updated"
+            title={t("manual.latestUpdated")}
+            status={<StatusChip tone="neutral">{summary.totalCount}</StatusChip>}
+            icon={<Clock3 className="h-5 w-5" />}
+            defaultOpen={false}
+            expandLabel={t("common.expandSection")}
+            collapseLabel={t("common.collapseSection")}
+            contentClassName="space-y-3 sm:space-y-4"
+          >
               {summary.latestUpdatedEntry ? (
                 <SoftPanel className="space-y-2 bg-background/80">
                   <p className="text-base font-semibold">{summary.latestUpdatedEntry.title}</p>
@@ -710,8 +698,7 @@ export function PersonalManualPage() {
                   <p className="text-sm text-muted-foreground">{t("manual.noLatestEntry")}</p>
                 </SoftPanel>
               )}
-            </div>
-          </PremiumCard>
+          </CollapsibleSection>
         </div>
       </div>
 

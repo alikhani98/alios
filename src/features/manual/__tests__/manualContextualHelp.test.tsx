@@ -70,4 +70,17 @@ describe("ManualContextualHelp", () => {
     expect(source).toContain('t("manual.newEntry")');
     expect(source).toContain("openCreateForm");
   });
+
+  it("keeps secondary manual templates and latest updated details collapsed by default", () => {
+    const source = readFileSync(
+      join(process.cwd(), "src/features/manual/pages/PersonalManualPage.tsx"),
+      "utf8"
+    );
+
+    expect(source).toContain('id="manual-templates"');
+    expect(source).toContain('open={showSimpleTemplates}');
+    expect(source).toContain('id="manual-latest-updated"');
+    expect(source).toContain("defaultOpen={false}");
+    expect(source).not.toContain('description={t("manual.localOnlyDescription")}');
+  });
 });
