@@ -155,7 +155,7 @@ describe("Task project links", () => {
   });
   it("keeps secondary Today side panels collapsed while preserving the primary task action", () => {
     const source = readFileSync(
-      join(process.cwd(), "src/features/today/pages/TodayPage.tsx"),
+      join(process.cwd(), "src/features/today/components/TodayWorkspace.tsx"),
       "utf8"
     );
 
