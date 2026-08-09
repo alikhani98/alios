@@ -67,10 +67,25 @@ const dashboardData: HomeDashboardData = {
 };
 
 vi.mock("@/features/today/components/TodayWorkspace", () => ({
-  TodayWorkspace: ({ today, focusId }: { today: string; focusId: string | null }) => (
+  TodayWorkspace: ({
+    focusId,
+    hideEmptyTaskState,
+    hideHero,
+    hideTaskSummaryHeader,
+    today,
+  }: {
+    focusId: string | null;
+    hideEmptyTaskState?: boolean;
+    hideHero?: boolean;
+    hideTaskSummaryHeader?: boolean;
+    today: string;
+  }) => (
     <section data-testid="today-workspace">
       Today workspace for {today}
       {focusId ? ` focused on ${focusId}` : ""}
+      {hideHero ? " without hero" : ""}
+      {hideTaskSummaryHeader ? " without task summary" : ""}
+      {hideEmptyTaskState ? " without empty task state" : ""}
     </section>
   ),
 }));
@@ -126,6 +141,9 @@ describe("UnifiedHomePage", () => {
     expect(markup).toContain("Capture item");
     expect(markup).toContain("Weekly Review");
     expect(markup).toContain("Today workspace for 2026-08-09 focused on home-task-1");
+    expect(markup).toContain("without hero");
+    expect(markup).toContain("without task summary");
+    expect(markup).toContain("without empty task state");
   });
 
   it("keeps context direct while More Context starts collapsed", () => {

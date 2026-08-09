@@ -76,6 +76,9 @@ function useSimpleViewMode() {
 export interface TodayWorkspaceProps {
   focusId: string | null;
   goalId: string | null;
+  hideEmptyTaskState?: boolean;
+  hideHero?: boolean;
+  hideTaskSummaryHeader?: boolean;
   projectId: string | null;
   routineId: string | null;
   today: string;
@@ -84,6 +87,9 @@ export interface TodayWorkspaceProps {
 export function TodayWorkspace({
   focusId,
   goalId,
+  hideEmptyTaskState = false,
+  hideHero = false,
+  hideTaskSummaryHeader = false,
   projectId,
   routineId,
   today,
@@ -423,66 +429,68 @@ export function TodayWorkspace({
 
   return (
     <section className="alios-page space-y-6">
-      <PremiumCard className="border-primary/15 bg-gradient-to-br from-primary/10 via-background to-background">
-        <CardContent className="grid gap-5 p-5 sm:p-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)]">
-          <div className="space-y-5">
-            <SectionHeader
-              eyebrow={t("home.dailyPlan")}
-              icon={<CalendarDays className="h-5 w-5" />}
-              title={t("today.title")}
-              description={t("today.description")}
-            />
-            <div className="grid gap-3 sm:grid-cols-3">
-              <SoftPanel className="gap-2 border-primary/15 bg-background/80">
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                  {t("home.taskDate")}
-                </p>
-                <p className="text-lg font-semibold leading-8">{formatDate(today)}</p>
-              </SoftPanel>
-              <SoftPanel className="gap-2 border-primary/15 bg-background/80">
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                  {t("today.tasks")}
-                </p>
-                <p className="text-lg font-semibold tabular-nums">{activeTaskCount}</p>
-                <p className="text-sm text-muted-foreground">{t("common.active")}</p>
-              </SoftPanel>
-              <SoftPanel className="gap-2 border-primary/15 bg-background/80">
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                  {t("common.completed")}
-                </p>
-                <p className="text-lg font-semibold tabular-nums">{completionRate}%</p>
-                <p className="text-sm text-muted-foreground">
-                  {completedTaskCount} / {visibleTasks.length || 0}
-                </p>
-              </SoftPanel>
-            </div>
-          </div>
-          <SoftPanel className="space-y-4 border-primary/20 bg-primary/5">
-            <div className="flex items-start gap-3">
-              <span className="alios-icon-primary">
-                {mitTask ? <Target className="h-5 w-5" aria-hidden="true" /> : <Sparkles className="h-5 w-5" aria-hidden="true" />}
-              </span>
-              <div className="min-w-0 space-y-1">
-                <p className="text-sm font-medium text-muted-foreground">
-                  {mitTask ? t("today.mit") : t("today.tasks")}
-                </p>
-                <p className="break-words text-xl font-semibold leading-8">
-                  {mitTask ? mitTask.title : t("today.noTasks")}
-                </p>
-                {mitTask ? (
-                  <p className="text-sm leading-6 text-muted-foreground">
-                    {t("today.tasksDescription")}
+      {hideHero ? null : (
+        <PremiumCard className="border-primary/15 bg-gradient-to-br from-primary/10 via-background to-background">
+          <CardContent className="grid gap-5 p-5 sm:p-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)]">
+            <div className="space-y-5">
+              <SectionHeader
+                eyebrow={t("home.dailyPlan")}
+                icon={<CalendarDays className="h-5 w-5" />}
+                title={t("today.title")}
+                description={t("today.description")}
+              />
+              <div className="grid gap-3 sm:grid-cols-3">
+                <SoftPanel className="gap-2 border-primary/15 bg-background/80">
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                    {t("home.taskDate")}
                   </p>
-                ) : null}
+                  <p className="text-lg font-semibold leading-8">{formatDate(today)}</p>
+                </SoftPanel>
+                <SoftPanel className="gap-2 border-primary/15 bg-background/80">
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                    {t("today.tasks")}
+                  </p>
+                  <p className="text-lg font-semibold tabular-nums">{activeTaskCount}</p>
+                  <p className="text-sm text-muted-foreground">{t("common.active")}</p>
+                </SoftPanel>
+                <SoftPanel className="gap-2 border-primary/15 bg-background/80">
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                    {t("common.completed")}
+                  </p>
+                  <p className="text-lg font-semibold tabular-nums">{completionRate}%</p>
+                  <p className="text-sm text-muted-foreground">
+                    {completedTaskCount} / {visibleTasks.length || 0}
+                  </p>
+                </SoftPanel>
               </div>
             </div>
-            <Button type="button" className="w-full" onClick={openCreateTask}>
-              <Plus className="me-2 h-4 w-4" />
-              {t("today.newTask")}
-            </Button>
-          </SoftPanel>
-        </CardContent>
-      </PremiumCard>
+            <SoftPanel className="space-y-4 border-primary/20 bg-primary/5">
+              <div className="flex items-start gap-3">
+                <span className="alios-icon-primary">
+                  {mitTask ? <Target className="h-5 w-5" aria-hidden="true" /> : <Sparkles className="h-5 w-5" aria-hidden="true" />}
+                </span>
+                <div className="min-w-0 space-y-1">
+                  <p className="text-sm font-medium text-muted-foreground">
+                    {mitTask ? t("today.mit") : t("today.tasks")}
+                  </p>
+                  <p className="break-words text-xl font-semibold leading-8">
+                    {mitTask ? mitTask.title : t("today.noTasks")}
+                  </p>
+                  {mitTask ? (
+                    <p className="text-sm leading-6 text-muted-foreground">
+                      {t("today.tasksDescription")}
+                    </p>
+                  ) : null}
+                </div>
+              </div>
+              <Button type="button" className="w-full" onClick={openCreateTask}>
+                <Plus className="me-2 h-4 w-4" />
+                {t("today.newTask")}
+              </Button>
+            </SoftPanel>
+          </CardContent>
+        </PremiumCard>
+      )}
 
       {projectId ? (
         <div
@@ -575,24 +583,26 @@ export function TodayWorkspace({
         </div>
       ) : null}
 
-      <PremiumCard className="border-border/70 bg-card/95">
-        <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
-          <SectionHeader
-            eyebrow={mitTask ? t("today.mit") : undefined}
-            title={t("today.tasks")}
-            description={t("today.tasksDescription")}
-            status={
-              <StatusChip tone={activeTaskCount > 0 ? "primary" : "neutral"}>
-                {activeTaskCount} {t("common.active")}
-              </StatusChip>
-            }
-          />
-          <Button type="button" variant="outline" onClick={openCreateTask}>
-            <Plus className="me-2 h-4 w-4" />
-            {t("today.newTask")}
-          </Button>
-        </CardContent>
-      </PremiumCard>
+      {hideTaskSummaryHeader ? null : (
+        <PremiumCard className="border-border/70 bg-card/95">
+          <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+            <SectionHeader
+              eyebrow={mitTask ? t("today.mit") : undefined}
+              title={t("today.tasks")}
+              description={t("today.tasksDescription")}
+              status={
+                <StatusChip tone={activeTaskCount > 0 ? "primary" : "neutral"}>
+                  {activeTaskCount} {t("common.active")}
+                </StatusChip>
+              }
+            />
+            <Button type="button" variant="outline" onClick={openCreateTask}>
+              <Plus className="me-2 h-4 w-4" />
+              {t("today.newTask")}
+            </Button>
+          </CardContent>
+        </PremiumCard>
+      )}
 
       {taskFormOpen ? (
         <PremiumCard className="border-border/70 bg-card/95">
@@ -646,7 +656,7 @@ export function TodayWorkspace({
                 <div key={item} className="alios-surface-muted h-28 animate-pulse bg-muted/60" />
               ))}
             </div>
-          ) : visibleTasks.length === 0 ? (
+          ) : visibleTasks.length === 0 && !hideEmptyTaskState ? (
             <EmptyState
               icon={<CheckSquare2 className="h-6 w-6" />}
               title={t("today.noTasks")}
@@ -658,7 +668,7 @@ export function TodayWorkspace({
                 </Button>
               }
             />
-          ) : (
+          ) : visibleTasks.length > 0 ? (
             <div className="space-y-3">
               {displayedTasks.map((task) => (
                 <div
@@ -698,7 +708,7 @@ export function TodayWorkspace({
                 </Button>
               ) : null}
             </div>
-          )}
+          ) : null}
         </div>
 
         <div className="space-y-6">

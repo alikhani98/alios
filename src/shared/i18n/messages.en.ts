@@ -744,7 +744,7 @@ export const messagesEn = {
   "home.clearStartEmptyLabel": "Next action",
   "home.clearStartAddTask": "Add task",
   "home.todayContextTitle": "Today context",
-  "home.todayContextDescription": "The selected day, inbox pressure, and direct planning links stay close to the task workspace.",
+  "home.todayContextDescription": "Jump to Calendar or Inbox without leaving the daily workspace.",
   "home.moreDashboard": "More sections",
   "home.moreDashboardDescription": "Open supporting reviews, routines, and reference information only when needed.",
   "home.showInsightDetails": "Show insight details",

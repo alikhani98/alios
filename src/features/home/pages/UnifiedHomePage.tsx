@@ -27,7 +27,6 @@ import {
   Card,
   CardContent,
   CollapsibleSection,
-  EmptyState,
   MetricCard,
   SectionHeader,
   SoftPanel,
@@ -84,15 +83,8 @@ function OverviewPanel({ children }: { children: ReactNode }) {
   );
 }
 
-function TodayContextStrip({
-  data,
-  today,
-}: {
-  data: HomeDashboardData;
-  today: string;
-}) {
+function TodayContextStrip() {
   const { t } = useI18n();
-  const { formatDate } = useDateFormatter();
 
   return (
     <PremiumContextCard>
@@ -100,37 +92,20 @@ function TodayContextStrip({
         icon={<CalendarDays className="h-5 w-5" aria-hidden="true" />}
         title={t("home.todayContextTitle")}
         description={t("home.todayContextDescription")}
-        status={<StatusChip tone="neutral">{formatDate(today)}</StatusChip>}
       />
-      <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] md:items-center">
-        <SoftPanel className="gap-1 border-primary/10 bg-background/85">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-            {t("home.taskDate")}
-          </p>
-          <p className="text-lg font-semibold">{formatDate(today)}</p>
-        </SoftPanel>
-        <SoftPanel className="gap-1 border-primary/10 bg-background/85">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-            {t("home.unprocessedInbox")}
-          </p>
-          <p className="text-lg font-semibold tabular-nums">
-            {data.inbox.unprocessedCount}
-          </p>
-        </SoftPanel>
-        <div className="grid gap-2 sm:grid-cols-2 md:flex md:justify-end">
-          <Button asChild variant="outline" className="w-full md:w-auto">
-            <Link to="/calendar">
-              {t("nav.calendar")}
-              <ArrowUpLeft className="ms-2 h-4 w-4" aria-hidden="true" />
-            </Link>
-          </Button>
-          <Button asChild variant="outline" className="w-full md:w-auto">
-            <Link to="/inbox">
-              {t("nav.inbox")}
-              <ArrowUpLeft className="ms-2 h-4 w-4" aria-hidden="true" />
-            </Link>
-          </Button>
-        </div>
+      <div className="grid gap-2 sm:grid-cols-2 md:flex md:justify-end">
+        <Button asChild variant="outline" className="w-full md:w-auto">
+          <Link to="/calendar">
+            {t("nav.calendar")}
+            <ArrowUpLeft className="ms-2 h-4 w-4" aria-hidden="true" />
+          </Link>
+        </Button>
+        <Button asChild variant="outline" className="w-full md:w-auto">
+          <Link to="/inbox">
+            {t("nav.inbox")}
+            <ArrowUpLeft className="ms-2 h-4 w-4" aria-hidden="true" />
+          </Link>
+        </Button>
       </div>
     </PremiumContextCard>
   );
@@ -539,32 +514,17 @@ export function UnifiedHomePage() {
       ) : data ? (
         <>
           <ClearStartCard data={data} />
-          {data.isEmpty ? (
-            <EmptyState
-              icon={<Target className="h-6 w-6" aria-hidden="true" />}
-              title={t("home.emptyTitle")}
-              description={t("home.emptyDescription")}
-              note={t("home.emptyNote")}
-              actions={
-                <>
-                  <Button asChild>
-                    <Link to="/inbox">{t("nav.inbox")}</Link>
-                  </Button>
-                  <Button asChild variant="outline">
-                    <Link to="/today">{t("home.clearStartAddTask")}</Link>
-                  </Button>
-                </>
-              }
-            />
-          ) : null}
           <TodayWorkspace
             today={today}
             focusId={searchParams.get("focusId")}
             goalId={searchParams.get("goalId")}
+            hideEmptyTaskState
+            hideHero
+            hideTaskSummaryHeader
             projectId={searchParams.get("projectId")}
             routineId={searchParams.get("routineId")}
           />
-          <TodayContextStrip data={data} today={today} />
+          <TodayContextStrip />
           <MoreContext
             data={data}
             selectedRoutineTemplateId={selectedRoutineTemplateId}

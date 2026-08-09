@@ -830,7 +830,7 @@ export const messagesFa: Record<TranslationKey, string> = {
   "home.clearStartEmptyLabel": "اقدام بعدی",
   "home.clearStartAddTask": "افزودن کار",
   "home.todayContextTitle": "بافت امروز",
-  "home.todayContextDescription": "روز انتخاب‌شده، فشار صندوق ورودی و لینک‌های مستقیم برنامه‌ریزی کنار فضای کار امروز می‌مانند.",
+  "home.todayContextDescription": "بدون خروج از فضای کار روزانه به تقویم یا صندوق ورودی بروید.",
   "home.moreDashboard": "بخش‌های بیشتر",
   "home.moreDashboardDescription": "مرورهای تکمیلی، روتین‌ها و اطلاعات مرجع را فقط هنگام نیاز باز کنید.",
   "home.showInsightDetails": "نمایش جزئیات بینش‌ها",
