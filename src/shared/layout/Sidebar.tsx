@@ -1,12 +1,11 @@
 import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 
-import { mainNavigation } from "@/shared/constants/navigation";
 import { useI18n } from "@/shared/i18n";
 import { Button } from "@/shared/ui";
 import { aliosSurfaceMotion } from "@/shared/ui/motion";
 import { cn } from "@/shared/utils/cn";
 
-import { NavigationLink } from "./NavigationLink";
+import { NavigationGroupList } from "./NavigationGroupList";
 
 type SidebarProps = {
   collapsed: boolean;
@@ -57,9 +56,7 @@ export function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) {
           className="flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto p-3"
           aria-label={t("nav.main")}
         >
-          {mainNavigation.map((item) => (
-            <NavigationLink key={item.href} item={item} collapsed={collapsed} />
-          ))}
+          <NavigationGroupList collapsed={collapsed} />
         </nav>
       </div>
     </aside>

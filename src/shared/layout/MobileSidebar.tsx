@@ -1,12 +1,11 @@
 import { X } from "lucide-react";
 import { useEffect, useRef } from "react";
 
-import { mainNavigation } from "@/shared/constants/navigation";
 import { useI18n } from "@/shared/i18n";
 import { Button } from "@/shared/ui";
 import { cn } from "@/shared/utils/cn";
 
-import { NavigationLink } from "./NavigationLink";
+import { NavigationGroupList } from "./NavigationGroupList";
 
 type MobileSidebarProps = {
   open: boolean;
@@ -117,9 +116,7 @@ export function MobileSidebar({ open, onClose }: MobileSidebarProps) {
         </div>
 
         <nav className="flex flex-1 flex-col gap-1.5 overflow-y-auto p-3" aria-label={t("nav.mobile")}>
-          {mainNavigation.map((item) => (
-            <NavigationLink key={item.href} item={item} onNavigate={onClose} />
-          ))}
+          <NavigationGroupList onNavigate={onClose} />
         </nav>
       </aside>
     </div>
