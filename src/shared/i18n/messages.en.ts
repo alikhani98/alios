@@ -1104,6 +1104,8 @@ export const messagesEn = {
   "projects.reviewDate": "Review date",
   "projects.next": "Next:",
   "projects.review": "Review {date}",
+  "projects.projectDetails": "Project details",
+  "projects.projectDetailsDescription": "Open linked tasks, linked goal context, and review timing when you need the deeper view.",
   "projects.taskProgress": "Linked task progress",
   "projects.taskProgressValue": "{completed} of {total} completed",
   "projects.openTodayTasks": "View today’s tasks",

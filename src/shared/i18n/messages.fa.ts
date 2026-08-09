@@ -1067,6 +1067,8 @@ export const messagesFa: Record<TranslationKey, string> = {
   "projects.reviewDate": "تاریخ بازبینی",
   "projects.next": "بعدی:",
   "projects.review": "بازبینی {date}",
+  "projects.projectDetails": "جزئیات پروژه",
+  "projects.projectDetailsDescription": "کارهای مرتبط، هدف مرتبط و زمان‌بندی بازبینی را فقط وقتی به نمای عمیق‌تر نیاز دارید باز کنید.",
   "projects.taskProgress": "پیشرفت کارهای مرتبط",
   "projects.taskProgressValue": "{completed} از {total} انجام شده",
   "projects.openTodayTasks": "مشاهده کارهای امروز",

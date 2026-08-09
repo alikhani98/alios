@@ -98,7 +98,9 @@ describe("Project goal links", () => {
     );
 
     expect(html).toContain("Linked goal");
+    expect(html).toContain("Project details");
     expect(html).toContain(goalRecord.title);
+    expect(html).toContain('id="project-fixture-id-details-content" hidden="" aria-hidden="true"');
     expect(html).toContain('href="/goals?focusId=fixture-id"');
     expect(html).toContain("View goal");
   });
