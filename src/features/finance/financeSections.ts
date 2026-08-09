@@ -144,6 +144,6 @@ export function writeStoredFinanceCollapsedSectionIds(
   }
 }
 
-export function getDefaultFinanceCollapsedSectionIds(isMobile: boolean) {
-  return isMobile ? [...financeCollapsibleSectionIds] : [];
+export function getDefaultFinanceCollapsedSectionIds(_isMobile: boolean) {
+  return [...financeCollapsibleSectionIds];
 }

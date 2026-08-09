@@ -1,0 +1,552 @@
+From 6687e794f39c60c252a30089e227416a7115802e Mon Sep 17 00:00:00 2001
+From: Codex <codex@openai.com>
+Date: Tue, 21 Jul 2026 10:43:08 +0200
+Subject: [PATCH] fix(tasks): separate routines from recurrence
+
+---
+ PROJECT_STATE.md                              | 162 +++++++++---------
+ .../backup/__tests__/backupValidation.test.ts |  20 +++
+ src/core/backup/backupMigration.ts            |  21 ++-
+ .../taskRelationshipMigration.test.ts         |  40 +++++
+ src/db/dexie/db.ts                            |  13 ++
+ src/db/dexie/schema.ts                        |   5 +
+ .../routines/components/RoutineForm.tsx       |   1 +
+ src/features/today/types.ts                   |   4 +-
+ src/shared/__tests__/markdownEncoding.test.ts |  27 +++
+ src/shared/i18n/messages.en.ts                |   3 +-
+ src/shared/i18n/messages.fa.ts                |   3 +-
+ src/shared/types/__tests__/schemas.test.ts    |  10 ++
+ src/shared/types/task.ts                      |  12 +-
+ 13 files changed, 234 insertions(+), 87 deletions(-)
+ create mode 100644 src/db/dexie/__tests__/taskRelationshipMigration.test.ts
+ create mode 100644 src/shared/__tests__/markdownEncoding.test.ts
+
+diff --git a/PROJECT_STATE.md b/PROJECT_STATE.md
+index cd744b2..de90a15 100644
+--- a/PROJECT_STATE.md
++++ b/PROJECT_STATE.md
+@@ -1,4 +1,4 @@
+-﻿# AliOS Project State
++# AliOS Project State
+ 
+ ## Project
+ 
+@@ -87,82 +87,82 @@
+ 
+ Stages 1–106 are complete.
+ 
+-- Stage 1 â€” Foundation
+-- Stage 2 â€” App Shell
+-- Stage 3 â€” Domain Foundation
+-- Stage 4 â€” Dexie Foundation
+-- Stage 5 â€” Repository CRUD Foundation
+-- Stage 6 â€” Projects CRUD UI
+-- Stage 7 â€” Journal CRUD UI
+-- Stage 8 â€” Knowledge CRUD UI + Simple Search
+-- Stage 9 â€” Today + Tasks + Daily Check-in
+-- Stage 10 â€” Backup / Restore
+-- Stage 11 â€” Internationalization Foundation
+-- Stage 12 â€” Home Dashboard Real Data
+-- Stage 13 â€” Settings Polish + Local Data Management
+-- Stage 14 â€” Calendar Display Foundation
+-- Stage 15 â€” Testing Foundation
+-- Stage 16 â€” Performance / Code Splitting
+-- Stage 17 â€” v1.0 Final QA / Release
+-- Stage 18 â€” Mobile / PWA Readiness
+-- Stage 19 â€” Static Deployment / GitHub Pages
+-- Stage 20 â€” Quick Capture Inbox
+-- Stage 21 â€” Inbox Processing / Triage
+-- Stage 22 â€” Inbox Search & Filters
+-- Stage 23 â€” Inbox Bulk Triage
+-- Stage 24 â€” Data Safety / Backup Hardening
+-- Stage 25 â€” Global Search Foundation
+-- Stage 26 â€” Search Result Focus Navigation
+-- Stage 27 â€” Local User Preferences & Theme Activation
+-- Stage 28 â€” Calendar Month View Foundation
+-- Stage 29 â€” Home Time Window Routine Nudges
+-- Stage 30 â€” Upcoming / Future Tasks Foundation
+-- Stage 31 â€” Routine Templates Foundation
+-- Stage 32 â€” Wellness / Badminton Routine Foundation
+-- Stage 33 â€” Visual Motion Polish
+-- Stage 34 â€” Premium Home Dashboard Visual Upgrade
+-- Stage 35 â€” Premium App Shell + Home Dashboard Customization
+-- Stage 36 â€” Premium Components + Lightweight Personal Insights
+-- Stage 37 â€” Premium Home Showcase + Core Pages Visual Alignment
+-- Stage 38 â€” UI Regression QA & Release Hardening
+-- Stage 39 â€” Topbar Dashboard Controls & Accent Color Palette
+-- Stage 40 â€” Finance Foundation
+-- Stage 41 â€” Finance Review & Budget Guard
+-- Stage 42 â€” Lightweight Finance Charts Foundation
+-- Stage 43 â€” Lightweight Motion & Interaction Polish
+-- Stage 44 â€” Finance Mobile UX & Section Navigation
+-- Stage 45 â€” Performance Audit & Bundle Optimization
+-- Stage 46 â€” Home Collapsible Dashboard Sections
+-- Stage 47 â€” Settings Help Center Foundation
+-- Stage 48 â€” Weekly Review Foundation
+-- Stage 49 â€” Decision Log Foundation
+-- Stage 50 â€” Backup / Restore Safety & Migration Foundation
+-- Stage 51 â€” App Error Boundary & Local Error Log Foundation
+-- Stage 53 â€” Mobile UX Hardening for dense pages
+-- Stage 54 â€” Empty States & First-Run Guidance Foundation
+-- Stage 55 â€” Backup Reminder & Last Backup Status Foundation
+-- Stage 56 â€” Export Center Foundation
+-- Stage 57 â€” Recovery Mode / Safe Mode Foundation
+-- Stage 58 â€” Finance Monthly Plan Foundation
+-- Stage 59 â€” Personal Manual Foundation
+-- Stage 60 â€” Personal Manual QA & Release Hardening
+-- Stage 61 â€” Personal Manual Export Center Integration
+-- Stage 62 â€” Bundle Size Audit & Initial Load Hardening
+-- Stage 63 â€” Personal Manual Weekly Review Integration
+-- Stage 64 â€” Personal Manual Search & Focus Navigation
+-- Stage 65 â€” Personal Manual Templates Foundation
+-- Stage 66 â€” Personal Manual Mobile & Dense Page Polish
+-- Stage 67 â€” Personal Manual Track Release Hardening
+-- Stage 68 â€” v1.50 Release Hardening
+-- Stage 69 â€” Goals Track Foundation
+-- Stage 70 â€” Goals Track QA & Mobile Hardening
+-- Stage 71 â€” Goals Templates & Quick Start
+-- Stage 72 â€” Life Areas Foundation
+-- Stage 73 â€” App Startup Resilience & Release Hygiene
+-- Stage 74 â€” Pull Request CI Foundation
+-- Stage 75 â€” Life Areas QA & Mobile Hardening
+-- Stage 76 â€” Goals ↔ Life Areas Derived Integration
+-- Stage 77 â€” Goals & Life Areas Release Hardening
++- Stage 1 — Foundation
++- Stage 2 — App Shell
++- Stage 3 — Domain Foundation
++- Stage 4 — Dexie Foundation
++- Stage 5 — Repository CRUD Foundation
++- Stage 6 — Projects CRUD UI
++- Stage 7 — Journal CRUD UI
++- Stage 8 — Knowledge CRUD UI + Simple Search
++- Stage 9 — Today + Tasks + Daily Check-in
++- Stage 10 — Backup / Restore
++- Stage 11 — Internationalization Foundation
++- Stage 12 — Home Dashboard Real Data
++- Stage 13 — Settings Polish + Local Data Management
++- Stage 14 — Calendar Display Foundation
++- Stage 15 — Testing Foundation
++- Stage 16 — Performance / Code Splitting
++- Stage 17 — v1.0 Final QA / Release
++- Stage 18 — Mobile / PWA Readiness
++- Stage 19 — Static Deployment / GitHub Pages
++- Stage 20 — Quick Capture Inbox
++- Stage 21 — Inbox Processing / Triage
++- Stage 22 — Inbox Search & Filters
++- Stage 23 — Inbox Bulk Triage
++- Stage 24 — Data Safety / Backup Hardening
++- Stage 25 — Global Search Foundation
++- Stage 26 — Search Result Focus Navigation
++- Stage 27 — Local User Preferences & Theme Activation
++- Stage 28 — Calendar Month View Foundation
++- Stage 29 — Home Time Window Routine Nudges
++- Stage 30 — Upcoming / Future Tasks Foundation
++- Stage 31 — Routine Templates Foundation
++- Stage 32 — Wellness / Badminton Routine Foundation
++- Stage 33 — Visual Motion Polish
++- Stage 34 — Premium Home Dashboard Visual Upgrade
++- Stage 35 — Premium App Shell + Home Dashboard Customization
++- Stage 36 — Premium Components + Lightweight Personal Insights
++- Stage 37 — Premium Home Showcase + Core Pages Visual Alignment
++- Stage 38 — UI Regression QA & Release Hardening
++- Stage 39 — Topbar Dashboard Controls & Accent Color Palette
++- Stage 40 — Finance Foundation
++- Stage 41 — Finance Review & Budget Guard
++- Stage 42 — Lightweight Finance Charts Foundation
++- Stage 43 — Lightweight Motion & Interaction Polish
++- Stage 44 — Finance Mobile UX & Section Navigation
++- Stage 45 — Performance Audit & Bundle Optimization
++- Stage 46 — Home Collapsible Dashboard Sections
++- Stage 47 — Settings Help Center Foundation
++- Stage 48 — Weekly Review Foundation
++- Stage 49 — Decision Log Foundation
++- Stage 50 — Backup / Restore Safety & Migration Foundation
++- Stage 51 — App Error Boundary & Local Error Log Foundation
++- Stage 53 — Mobile UX Hardening for dense pages
++- Stage 54 — Empty States & First-Run Guidance Foundation
++- Stage 55 — Backup Reminder & Last Backup Status Foundation
++- Stage 56 — Export Center Foundation
++- Stage 57 — Recovery Mode / Safe Mode Foundation
++- Stage 58 — Finance Monthly Plan Foundation
++- Stage 59 — Personal Manual Foundation
++- Stage 60 — Personal Manual QA & Release Hardening
++- Stage 61 — Personal Manual Export Center Integration
++- Stage 62 — Bundle Size Audit & Initial Load Hardening
++- Stage 63 — Personal Manual Weekly Review Integration
++- Stage 64 — Personal Manual Search & Focus Navigation
++- Stage 65 — Personal Manual Templates Foundation
++- Stage 66 — Personal Manual Mobile & Dense Page Polish
++- Stage 67 — Personal Manual Track Release Hardening
++- Stage 68 — v1.50 Release Hardening
++- Stage 69 — Goals Track Foundation
++- Stage 70 — Goals Track QA & Mobile Hardening
++- Stage 71 — Goals Templates & Quick Start
++- Stage 72 — Life Areas Foundation
++- Stage 73 — App Startup Resilience & Release Hygiene
++- Stage 74 — Pull Request CI Foundation
++- Stage 75 — Life Areas QA & Mobile Hardening
++- Stage 76 — Goals ↔ Life Areas Derived Integration
++- Stage 77 — Goals & Life Areas Release Hardening
+ - Stage 78 — Projects → Goals Link Foundation
+ - Stage 79 — Tasks → Projects Link Activation
+ - Stage 80 — Life Areas Persian Localization & Help Center Refresh
+@@ -432,13 +432,13 @@ Stage 36 completion is evidenced by reusable premium Home-facing card surfaces,
+ 
+ Next stage: complete the Stage 84 real-world usage pass and the deployed/throttled initial-load smoke test before approving additional product scope.
+ 
+-Stage 9 completion is evidenced by the Today page, daily check-in create/update form, date-scoped task CRUD, all approved task statuses, completed timestamps, and single-MIT selection synchronized with todayâ€™s check-in. Browser validation confirmed task and check-in persistence across refresh, task editing, status updates, MIT selection, deletion, and the task empty state. The feature consumes TasksRepository and DailyCheckinsRepository through the injected `StorageAdapter` and does not import Dexie. Health advice, Home dashboard data, recurring tasks, notifications, analytics, backup, AI, and cross-feature workflows remain unavailable. TypeScript validation and the production build pass.
++Stage 9 completion is evidenced by the Today page, daily check-in create/update form, date-scoped task CRUD, all approved task statuses, completed timestamps, and single-MIT selection synchronized with today’s check-in. Browser validation confirmed task and check-in persistence across refresh, task editing, status updates, MIT selection, deletion, and the task empty state. The feature consumes TasksRepository and DailyCheckinsRepository through the injected `StorageAdapter` and does not import Dexie. Health advice, Home dashboard data, recurring tasks, notifications, analytics, backup, AI, and cross-feature workflows remain unavailable. TypeScript validation and the production build pass.
+ 
+ Stage 10 completion is evidenced by the Settings backup/restore UI, versioned JSON validation, complete export of all six data tables, explicit restore confirmation, and atomic full-data replacement through a backup-specific `StorageAdapter` port. The UI and backup service do not import Dexie. Automatic backup, cloud sync, remote backup, encryption, compression, attachments, scheduling, notifications, AI, authentication, and backend services remain unavailable. TypeScript validation and the production build pass.
+ 
+ Stage 11 completion is evidenced by the custom lightweight i18n layer under `src/shared/i18n`, Persian and English message catalogs, `I18nProvider`, `useI18n`, the Settings language switch, localStorage persistence through `alios.language`, automatic document `lang` and `dir` updates, and translation-key coverage for existing visible UI strings where practical. Persian is the default language and uses RTL; English uses LTR. This stage added bilingual UI support only. It did not add business features, backend services, authentication, AI, database changes, repository changes, or backup format changes. TypeScript validation and the production build pass.
+ 
+-Stage 12 completion is evidenced by the real read-only Home dashboard, which loads Today tasks, todayâ€™s daily check-in, projects, journal entries, and knowledge items through existing repositories on the injected `StorageAdapter`. It derives summary counts, MIT/check-in details, active and recently updated projects, latest journal and knowledge items, empty/loading/error states, and quick links in memory. Browser validation confirmed the empty state, real persisted data after refresh, Persian RTL and English LTR rendering, preserved user-generated content, and no console errors. Charts, analytics, trends, weekly review, AI insights, recommendations, notifications, customization, and cross-feature automation remain unavailable. TypeScript validation and the production build pass.
++Stage 12 completion is evidenced by the real read-only Home dashboard, which loads Today tasks, today’s daily check-in, projects, journal entries, and knowledge items through existing repositories on the injected `StorageAdapter`. It derives summary counts, MIT/check-in details, active and recently updated projects, latest journal and knowledge items, empty/loading/error states, and quick links in memory. Browser validation confirmed the empty state, real persisted data after refresh, Persian RTL and English LTR rendering, preserved user-generated content, and no console errors. Charts, analytics, trends, weekly review, AI insights, recommendations, notifications, customization, and cross-feature automation remain unavailable. TypeScript validation and the production build pass.
+ 
+ Stage 13 completion is evidenced by the polished bilingual Settings control center, local table-count summary, app information, retained language and backup/restore controls, and a visually distinct Danger Zone with explicit two-step confirmation for clearing all six supported AliOS data tables. Summary and atomic clear operations extend the existing all-table backup storage boundary; Settings does not import Dexie. Browser validation confirmed populated counts, backup export feedback, confirmation before clearing, zeroed summaries after clear, preserved localStorage language preference, post-clear usability, Persian RTL and English LTR behavior, and no console errors. Cloud sync, automatic or scheduled backup, encryption, accounts, authentication, backend services, AI settings, notifications, analytics, and charts remain unavailable. TypeScript validation and the production build pass.
+ 
+@@ -450,11 +450,11 @@ Stage 16 completion is evidenced by route-level `React.lazy` and `Suspense` boun
+ 
+ Stage 17 completion is evidenced by the v1.0 README, static-hosting and backup guidance, explicit release checklist, frozen v1.0 roadmap, `1.0.0` release metadata, passing TypeScript/tests/build gates, and production-preview QA. Final QA covered empty and populated Home states, Today check-in/task/MIT/status flows, Projects, Journal, Knowledge search/filtering, Settings language/calendar/local-data controls, backup export feedback, clear confirmation and execution, language preservation, untranslated user content, route chunks, and an error-free console. Automated tests cover repository CRUD, all-table backup/clear/restore, invalid backup rejection, schemas, i18n, and date utilities. No product features, dependencies, storage changes, repository changes, backup format changes, or new abstractions were added.
+ 
+-Stage 18 completion is evidenced by mobile-safe shared control sizing, responsive page/card spacing, mobile shell overflow protection, a scrollable safe-area-aware drawer, reduced mobile topbar crowding, and verified form usability. The production preview passed at 360Ã—800, 390Ã—844, 430Ã—932, and desktop width across all six routes with no horizontal overflow or console errors. Task create/edit/delete, Knowledge search/filtering, Settings language/calendar controls, backup/import controls, and clear confirmation were verified at mobile width. The build includes a versioned web app manifest, mobile browser metadata, theme color, and scalable application icons. Mobile usage documentation explains that data remains local to each browser/device and that Backup/Restore is the only transfer method. No service worker, offline cache, sync, backend, authentication, cloud storage, dependency, schema, repository, backup-format, or product-feature change was added.
++Stage 18 completion is evidenced by mobile-safe shared control sizing, responsive page/card spacing, mobile shell overflow protection, a scrollable safe-area-aware drawer, reduced mobile topbar crowding, and verified form usability. The production preview passed at 360×800, 390×844, 430×932, and desktop width across all six routes with no horizontal overflow or console errors. Task create/edit/delete, Knowledge search/filtering, Settings language/calendar controls, backup/import controls, and clear confirmation were verified at mobile width. The build includes a versioned web app manifest, mobile browser metadata, theme color, and scalable application icons. Mobile usage documentation explains that data remains local to each browser/device and that Backup/Restore is the only transfer method. No service worker, offline cache, sync, backend, authentication, cloud storage, dependency, schema, repository, backup-format, or product-feature change was added.
+ 
+ Stage 19 completion is evidenced by the least-privilege GitHub Pages workflow for `main`, frozen pnpm installation, TypeScript/test/build gates, the `/alios/` production base, subpath-safe manifest and icon references, and deployment documentation for `https://alikhani98.github.io/alios/`. Hash routing remains compatible with static hosting, and the production artifact is published from `dist/`. This stage added deployment readiness only. It introduced no product feature, dependency, storage or schema change, repository change, backup-format change, backend, synchronization, authentication, or new abstraction.
+ 
+-Stage 20 completion is evidenced by the Inbox domain schema, repository contract, injected Dexie repository, additive database schema version 2, mobile-first Quick Capture page, localized navigation, unprocessed-first list, edit/delete/status actions, shared date display, Home summary, and local-data summary. Backup version 1 now exports `inboxItems`; valid older backups without the field parse it as an empty array and restore safely. Automated coverage verifies Inbox CRUD, processed/unprocessed transitions, validation, export, restore, old-backup compatibility, and clear-all behavior. Browser verification passed at 360Ã—800, 390Ã—844, 430Ã—932, and desktop width with no horizontal overflow or console errors; capture, validation, edit, processed/unprocessed, delete, Persian/English, RTL/LTR, and date display were exercised. No sync, backend, authentication, AI, routines, wellness, Inbox processing/conversion workflow, service worker, dependency, or new abstraction was added.
++Stage 20 completion is evidenced by the Inbox domain schema, repository contract, injected Dexie repository, additive database schema version 2, mobile-first Quick Capture page, localized navigation, unprocessed-first list, edit/delete/status actions, shared date display, Home summary, and local-data summary. Backup version 1 now exports `inboxItems`; valid older backups without the field parse it as an empty array and restore safely. Automated coverage verifies Inbox CRUD, processed/unprocessed transitions, validation, export, restore, old-backup compatibility, and clear-all behavior. Browser verification passed at 360×800, 390×844, 430×932, and desktop width with no horizontal overflow or console errors; capture, validation, edit, processed/unprocessed, delete, Persian/English, RTL/LTR, and date display were exercised. No sync, backend, authentication, AI, routines, wellness, Inbox processing/conversion workflow, service worker, dependency, or new abstraction was added.
+ 
+ Stage 21 completion is evidenced by the mobile-friendly Inbox processing actions and the focused Inbox use-case that converts captured items through existing repositories into a Today task, Journal entry, or Knowledge item. Each successful conversion creates the target record before marking the retained Inbox item processed; failed target creation leaves it unprocessed. Direct processed/unprocessed actions remain available. Automated coverage verifies all three conversions, retained Inbox history, failure ordering, and both status transitions. No AI, sync, backend, reminders, tags, workflow engine, dependency, schema migration, database table, Inbox field, or backup-format change was added.
+ 
+diff --git a/src/core/backup/__tests__/backupValidation.test.ts b/src/core/backup/__tests__/backupValidation.test.ts
+index ef950ab..db2f459 100644
+--- a/src/core/backup/__tests__/backupValidation.test.ts
++++ b/src/core/backup/__tests__/backupValidation.test.ts
+@@ -129,6 +129,26 @@ describe("backup validation and migration", () => {
+     expect(legacyBackup.data.tasks[0]?.projectId).toBeUndefined();
+   });
+ 
++  it("preserves routine links and clears conflicting recurrence links in older backups", () => {
++    const backup = validateAndMigrateBackupPayload({
++      app: ALIOS_BACKUP_APP,
++      backupVersion: ALIOS_BACKUP_VERSION,
++      exportedAt: "2026-07-05T08:30:00.000Z",
++      data: {
++        tasks: [
++          {
++            ...taskRecord,
++            routineId: "routine-id",
++            recurrenceSeriesId: "series-id",
++          },
++        ],
++      },
++    });
++
++    expect(backup.data.tasks[0]?.routineId).toBe("routine-id");
++    expect(backup.data.tasks[0]?.recurrenceSeriesId).toBeUndefined();
++  });
++
+   it("rejects invalid JSON before any restore write can happen", () => {
+     expect(() => validateAndMigrateBackup("{")).toThrow(ValidationError);
+     try {
+diff --git a/src/core/backup/backupMigration.ts b/src/core/backup/backupMigration.ts
+index 275cfd3..6dab090 100644
+--- a/src/core/backup/backupMigration.ts
++++ b/src/core/backup/backupMigration.ts
+@@ -28,7 +28,26 @@ import {
+ 
+ export const backupDataInputSchema = z.object({
+   dailyCheckins: z.array(dailyCheckinSchema).optional(),
+-  tasks: z.array(taskSchema).optional(),
++  tasks: z
++    .array(
++      z.preprocess((value) => {
++        if (
++          typeof value === "object" &&
++          value !== null &&
++          "routineId" in value &&
++          typeof value.routineId === "string" &&
++          value.routineId.length > 0 &&
++          "recurrenceSeriesId" in value &&
++          typeof value.recurrenceSeriesId === "string" &&
++          value.recurrenceSeriesId.length > 0
++        ) {
++          const { recurrenceSeriesId: _conflictingSeriesId, ...task } = value;
++          return task;
++        }
++        return value;
++      }, taskSchema)
++    )
++    .optional(),
+   goals: z.array(goalSchema).optional(),
+   lifeAreas: z.array(lifeAreaSchema).optional(),
+   decisionLogEntries: z.array(decisionLogEntrySchema).optional(),
+diff --git a/src/db/dexie/__tests__/taskRelationshipMigration.test.ts b/src/db/dexie/__tests__/taskRelationshipMigration.test.ts
+new file mode 100644
+index 0000000..92e9948
+--- /dev/null
++++ b/src/db/dexie/__tests__/taskRelationshipMigration.test.ts
+@@ -0,0 +1,40 @@
++import Dexie from "dexie";
++import { afterEach, beforeEach, describe, expect, it } from "vitest";
++
++import { taskRecord } from "@/test/factories";
++import { AliosDatabase } from "../db";
++import {
++  DEXIE_DATABASE_NAME,
++  DEXIE_SCHEMA_V10,
++  DEXIE_TABLE_NAMES,
++} from "../schema";
++
++describe("Task relationship migration", () => {
++  beforeEach(async () => {
++    await Dexie.delete(DEXIE_DATABASE_NAME);
++  });
++
++  afterEach(async () => {
++    await Dexie.delete(DEXIE_DATABASE_NAME);
++  });
++
++  it("keeps routineId and clears recurrenceSeriesId without deleting the task", async () => {
++    const legacyDatabase = new Dexie(DEXIE_DATABASE_NAME);
++    legacyDatabase.version(10).stores(DEXIE_SCHEMA_V10);
++    await legacyDatabase.table(DEXIE_TABLE_NAMES.tasks).add({
++      ...taskRecord,
++      routineId: "routine-id",
++      recurrence: { frequency: "daily" },
++      recurrenceSeriesId: "series-id",
++    });
++    legacyDatabase.close();
++
++    const migratedDatabase = new AliosDatabase();
++    const tasks = await migratedDatabase.tasks.toArray();
++
++    expect(tasks).toHaveLength(1);
++    expect(tasks[0]?.routineId).toBe("routine-id");
++    expect(tasks[0]?.recurrenceSeriesId).toBeUndefined();
++    migratedDatabase.close();
++  });
++});
+diff --git a/src/db/dexie/db.ts b/src/db/dexie/db.ts
+index 5901168..ac09839 100644
+--- a/src/db/dexie/db.ts
++++ b/src/db/dexie/db.ts
+@@ -19,6 +19,7 @@ import type {
+ } from "@/shared/types";
+ import {
+   DEXIE_DATABASE_NAME,
++  DEXIE_TABLE_NAMES,
+   DEXIE_SCHEMA_V1,
+   DEXIE_SCHEMA_V2,
+   DEXIE_SCHEMA_V3,
+@@ -29,6 +30,7 @@ import {
+   DEXIE_SCHEMA_V8,
+   DEXIE_SCHEMA_V9,
+   DEXIE_SCHEMA_V10,
++  DEXIE_SCHEMA_V11,
+   DEXIE_SCHEMA_VERSION,
+   DEXIE_SCHEMA_VERSION_3,
+   DEXIE_SCHEMA_VERSION_4,
+@@ -38,6 +40,7 @@ import {
+   DEXIE_SCHEMA_VERSION_8,
+   DEXIE_SCHEMA_VERSION_9,
+   DEXIE_SCHEMA_VERSION_10,
++  DEXIE_SCHEMA_VERSION_11,
+ } from "./schema";
+ 
+ export class AliosDatabase extends Dexie {
+@@ -69,6 +72,16 @@ export class AliosDatabase extends Dexie {
+     this.version(DEXIE_SCHEMA_VERSION_8).stores(DEXIE_SCHEMA_V8);
+     this.version(DEXIE_SCHEMA_VERSION_9).stores(DEXIE_SCHEMA_V9);
+     this.version(DEXIE_SCHEMA_VERSION_10).stores(DEXIE_SCHEMA_V10);
++    this.version(DEXIE_SCHEMA_VERSION_11)
++      .stores(DEXIE_SCHEMA_V11)
++      .upgrade(async (transaction) => {
++        await transaction
++          .table(DEXIE_TABLE_NAMES.tasks)
++          .filter((task) => Boolean(task.routineId && task.recurrenceSeriesId))
++          .modify((task) => {
++            delete task.recurrenceSeriesId;
++          });
++      });
+   }
+ }
+ 
+diff --git a/src/db/dexie/schema.ts b/src/db/dexie/schema.ts
+index 375ec2c..1678656 100644
+--- a/src/db/dexie/schema.ts
++++ b/src/db/dexie/schema.ts
+@@ -8,6 +8,7 @@ export const DEXIE_SCHEMA_VERSION_7 = 7;
+ export const DEXIE_SCHEMA_VERSION_8 = 8;
+ export const DEXIE_SCHEMA_VERSION_9 = 9;
+ export const DEXIE_SCHEMA_VERSION_10 = 10;
++export const DEXIE_SCHEMA_VERSION_11 = 11;
+ 
+ export const DEXIE_TABLE_NAMES = {
+   dailyCheckins: "dailyCheckins",
+@@ -109,3 +110,7 @@ export const DEXIE_SCHEMA_V10 = {
+   [DEXIE_TABLE_NAMES.tasks]:
+     "id, status, dueDate, projectId, routineId, recurrenceSeriesId, [routineId+dueDate], [recurrenceSeriesId+dueDate], isMit, createdAt, updatedAt",
+ } satisfies Record<DexieTableName, string>;
++
++export const DEXIE_SCHEMA_V11 = {
++  ...DEXIE_SCHEMA_V10,
++} satisfies Record<DexieTableName, string>;
+diff --git a/src/features/routines/components/RoutineForm.tsx b/src/features/routines/components/RoutineForm.tsx
+index a9a1296..be3eb8e 100644
+--- a/src/features/routines/components/RoutineForm.tsx
++++ b/src/features/routines/components/RoutineForm.tsx
+@@ -29,6 +29,7 @@ export function RoutineForm({ routine, isSubmitting, onSubmit, onCancel }: Props
+     void onSubmit({ title: String(data.get("title") ?? "").trim(), description: String(data.get("description") ?? "").trim() || undefined, weekdays, priority: String(data.get("priority") ?? "medium") as TaskPriority, isActive: data.get("isActive") === "on" });
+   };
+   return <form className="space-y-4" onSubmit={handleSubmit}>
++    <p className="text-sm leading-6 text-muted-foreground">{t("routines.creationChoiceHint")}</p>
+     <label className="block space-y-2"><span className="text-sm font-medium">{t("routines.titleLabel")}</span><Input name="title" required defaultValue={routine?.title ?? ""} /></label>
+     <label className="block space-y-2"><span className="text-sm font-medium">{t("routines.descriptionLabel")}</span><Textarea name="description" rows={3} defaultValue={routine?.description ?? ""} /></label>
+     <fieldset className="space-y-2">
+diff --git a/src/features/today/types.ts b/src/features/today/types.ts
+index 2a6e95b..f3d0bce 100644
+--- a/src/features/today/types.ts
++++ b/src/features/today/types.ts
+@@ -1,8 +1,8 @@
+ import { z } from "zod";
+ 
+-import { dailyCheckinSchema, taskSchema } from "@/shared/types";
++import { dailyCheckinSchema, taskBaseSchema } from "@/shared/types";
+ 
+-export const todayTaskFormSchema = taskSchema
++export const todayTaskFormSchema = taskBaseSchema
+   .pick({
+     title: true,
+     description: true,
+diff --git a/src/shared/__tests__/markdownEncoding.test.ts b/src/shared/__tests__/markdownEncoding.test.ts
+new file mode 100644
+index 0000000..c0b50f4
+--- /dev/null
++++ b/src/shared/__tests__/markdownEncoding.test.ts
+@@ -0,0 +1,27 @@
++import { readFileSync, readdirSync } from "node:fs";
++import { join } from "node:path";
++
++import { describe, expect, it } from "vitest";
++
++const mojibakePattern = /â€|â€™|â€œ|â€|â€“|â€”|Ã—|Ã|Â|ðŸ|ï»¿|�/u;
++
++function markdownFiles(): string[] {
++  const rootFiles = readdirSync(process.cwd())
++    .filter((file) => file.endsWith(".md"))
++    .map((file) => join(process.cwd(), file));
++  const docsDirectory = join(process.cwd(), "docs");
++  const docsFiles = readdirSync(docsDirectory, { recursive: true })
++    .filter((file): file is string => typeof file === "string" && file.endsWith(".md"))
++    .map((file) => join(docsDirectory, file));
++
++  return [...rootFiles, ...docsFiles];
++}
++
++describe("Markdown encoding", () => {
++  it.each(markdownFiles())("keeps %s as clean UTF-8 without a BOM", (file) => {
++    const content = readFileSync(file);
++
++    expect(content.subarray(0, 3)).not.toEqual(Buffer.from([0xef, 0xbb, 0xbf]));
++    expect(content.toString("utf8")).not.toMatch(mojibakePattern);
++  });
++});
+diff --git a/src/shared/i18n/messages.en.ts b/src/shared/i18n/messages.en.ts
+index 6c97795..ec82821 100644
+--- a/src/shared/i18n/messages.en.ts
++++ b/src/shared/i18n/messages.en.ts
+@@ -71,6 +71,7 @@ export const messagesEn = {
+   "routines.edit": "Edit routine",
+   "routines.titleLabel": "Routine title",
+   "routines.descriptionLabel": "Optional description",
++  "routines.creationChoiceHint": "Use a Routine for a reusable schedule that you choose to add to Today. Use Repeat on a Task when completing it should create its next occurrence automatically.",
+   "routines.weekdaysLabel": "Repeat on",
+   "routines.weekdaysRequired": "Select at least one day.",
+   "routines.activeLabel": "Routine is active",
+@@ -936,7 +937,7 @@ export const messagesEn = {
+   "today.recurrenceNone": "Does not repeat",
+   "today.recurrenceDaily": "Every day",
+   "today.recurrenceWeekly": "Every week",
+-  "today.recurrenceHint": "When this task is marked done, AliOS creates the next local occurrence from its planned date.",
++  "today.recurrenceHint": "Use Repeat when completing this Task should create its next occurrence automatically. For a reusable schedule that you add to Today only when needed, create a Routine instead.",
+   "today.optionalDetails": "Optional details",
+   "today.linkedProject": "Linked project",
+   "today.noLinkedProject": "No linked project",
+diff --git a/src/shared/i18n/messages.fa.ts b/src/shared/i18n/messages.fa.ts
+index a7af185..7d420ea 100644
+--- a/src/shared/i18n/messages.fa.ts
++++ b/src/shared/i18n/messages.fa.ts
+@@ -16,6 +16,7 @@ export const messagesFa: Record<TranslationKey, string> = {
+   "routines.edit": "ویرایش روتین",
+   "routines.titleLabel": "عنوان روتین",
+   "routines.descriptionLabel": "توضیح اختیاری",
++  "routines.creationChoiceHint": "برای برنامه‌ای قابل‌استفاده‌مجدد که خودتان در روزهای لازم به «امروز» اضافه می‌کنید، روتین بسازید. اگر انجام یک کار باید نوبت بعدی آن را خودکار ایجاد کند، از تکرار در فرم کار استفاده کنید.",
+   "routines.weekdaysLabel": "تکرار در روزهای",
+   "routines.weekdaysRequired": "حداقل یک روز را انتخاب کنید.",
+   "routines.activeLabel": "روتین فعال است",
+@@ -935,7 +936,7 @@ export const messagesFa: Record<TranslationKey, string> = {
+   "today.recurrenceNone": "بدون تکرار",
+   "today.recurrenceDaily": "هر روز",
+   "today.recurrenceWeekly": "هر هفته",
+-  "today.recurrenceHint": "با انجام این کار، AliOS نوبت بعدی محلی را از تاریخ برنامه‌ریزی‌شده می‌سازد.",
++  "today.recurrenceHint": "وقتی انجام این کار باید نوبت بعدی را خودکار بسازد، «تکرار» را انتخاب کنید. برای برنامه‌ای قابل‌استفاده‌مجدد که فقط در صورت نیاز به «امروز» اضافه می‌کنید، به‌جای آن روتین بسازید.",
+   "today.optionalDetails": "جزئیات اختیاری",
+   "today.linkedProject": "پروژه مرتبط",
+   "today.noLinkedProject": "بدون پروژه مرتبط",
+diff --git a/src/shared/types/__tests__/schemas.test.ts b/src/shared/types/__tests__/schemas.test.ts
+index 1d3ef95..0fecfb4 100644
+--- a/src/shared/types/__tests__/schemas.test.ts
++++ b/src/shared/types/__tests__/schemas.test.ts
+@@ -62,6 +62,16 @@ describe("core domain schemas", () => {
+     );
+   });
+ 
++  it("rejects a task linked to both a routine and a recurrence series", () => {
++    expect(
++      taskSchema.safeParse({
++        ...taskRecord,
++        routineId: "routine-id",
++        recurrenceSeriesId: "series-id",
++      }).success
++    ).toBe(false);
++  });
++
+   it.each([
+     ["project", projectSchema, projectRecord],
+     ["task", taskSchema, taskRecord],
+diff --git a/src/shared/types/task.ts b/src/shared/types/task.ts
+index ec4f14d..7e926fe 100644
+--- a/src/shared/types/task.ts
++++ b/src/shared/types/task.ts
+@@ -14,7 +14,7 @@ export const taskRecurrenceSchema = z.object({
+   frequency: taskRecurrenceFrequencySchema,
+ });
+ 
+-export const taskSchema = z.object({
++export const taskBaseSchema = z.object({
+   id: z.string().min(1),
+   title: z.string().trim().min(1),
+   description: z.string().optional(),
+@@ -31,6 +31,16 @@ export const taskSchema = z.object({
+   completedAt: isoDateTimeSchema.optional(),
+ });
+ 
++export const taskSchema = taskBaseSchema.superRefine((task, context) => {
++  if (task.routineId && task.recurrenceSeriesId) {
++    context.addIssue({
++      code: z.ZodIssueCode.custom,
++      path: ["recurrenceSeriesId"],
++      message: "A task cannot belong to a routine and a recurrence series at the same time.",
++    });
++  }
++});
++
+ export type TaskStatus = z.infer<typeof taskStatusSchema>;
+ export type TaskPriority = z.infer<typeof taskPrioritySchema>;
+ export type TaskRecurrenceFrequency = z.infer<typeof taskRecurrenceFrequencySchema>;
+-- 
+2.51.1
+

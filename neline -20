@@ -1,0 +1,74 @@
+[1mdiff --git a/PROJECT_STATE.md b/PROJECT_STATE.md[m
+[1mindex 3f46cf1..bc155a6 100644[m
+[1m--- a/PROJECT_STATE.md[m
+[1m+++ b/PROJECT_STATE.md[m
+[36m@@ -4,8 +4,8 @@[m
+ [m
+ - Project name: AliOS[m
+ - Architecture version: AliOS 1.0[m
+[31m-- Current status: AliOS includes validated mobile-first Inbox capture, processing, global search, focused search-result navigation, filters, bulk triage, local appearance switching, local profile preferences, calendar month view foundation, home time-window routine nudges, upcoming task grouping, routine templates foundation, Wellness / Badminton Routine foundation, visual motion polish, premium Home dashboard visual upgrade, premium app shell polish, Home dashboard customization, premium reusable components, lightweight Personal Insights, Stage 37 premium Home showcase polish, light core-page visual alignment, hardened backup/restore safety, Stage 38 UI regression QA and release hardening with desktop sticky sidebar accessibility improvements, Stage 39 topbar dashboard controls plus accent color personalization, Stage 40 finance foundation, Stage 41 finance review and budget guard, Stage 42 lightweight finance charts foundation, Stage 43 lightweight motion and interaction polish, Stage 44 finance mobile UX and section navigation, Stage 45 performance audit and bundle optimization, Stage 46 Home collapsible dashboard sections, Stage 47 Settings Help Center Foundation, Stage 48 Weekly Review Foundation, Stage 49 Decision Log Foundation, Stage 50 Backup / Restore Safety & Migration Foundation, Stage 51 App Error Boundary & Local Error Log Foundation, Stage 53 Mobile UX Hardening for dense pages, Stage 54 Empty States & First-Run Guidance Foundation, Stage 55 Backup Reminder & Last Backup Status Foundation, Stage 56 Export Center Foundation, Stage 57 Recovery Mode / Safe Mode Foundation, Stage 58 Finance Monthly Plan Foundation, Stage 59 Personal Manual Foundation, Stage 60 Personal Manual QA & Release Hardening, Stage 61 Personal Manual Export Center Integration, Stage 62 Bundle Size Audit & Initial Load Hardening, Stage 63 Personal Manual Weekly Review Integration, Stage 64 Personal Manual Search & Focus Navigation, Stage 65 Personal Manual Templates Foundation, Stage 66 Personal Manual Mobile & Dense Page Polish, Stage 67 Personal Manual Track Release Hardening, Stage 68 v1.50 Release Hardening, Stage 69 Goals Track Foundation, Stage 70 Goals Track QA & Mobile Hardening, Stage 71 Goals Templates & Quick Start, and Stage 72 Life Areas Foundation, and remains ready for static GitHub Pages deployment.[m
+[31m-- Current Stage: Stage 72 Completed[m
+[32m+[m[32m- Current status: AliOS includes validated mobile-first Inbox capture, processing, global search, focused search-result navigation, filters, bulk triage, local appearance switching, local profile preferences, calendar month view foundation, home time-window routine nudges, upcoming task grouping, routine templates foundation, Wellness / Badminton Routine foundation, visual motion polish, premium Home dashboard visual upgrade, premium app shell polish, Home dashboard customization, premium reusable components, lightweight Personal Insights, Stage 37 premium Home showcase polish, light core-page visual alignment, hardened backup/restore safety, Stage 38 UI regression QA and release hardening with desktop sticky sidebar accessibility improvements, Stage 39 topbar dashboard controls plus accent color personalization, Stage 40 finance foundation, Stage 41 finance review and budget guard, Stage 42 lightweight finance charts foundation, Stage 43 lightweight motion and interaction polish, Stage 44 finance mobile UX and section navigation, Stage 45 performance audit and bundle optimization, Stage 46 Home collapsible dashboard sections, Stage 47 Settings Help Center Foundation, Stage 48 Weekly Review Foundation, Stage 49 Decision Log Foundation, Stage 50 Backup / Restore Safety & Migration Foundation, Stage 51 App Error Boundary & Local Error Log Foundation, Stage 53 Mobile UX Hardening for dense pages, Stage 54 Empty States & First-Run Guidance Foundation, Stage 55 Backup Reminder & Last Backup Status Foundation, Stage 56 Export Center Foundation, Stage 57 Recovery Mode / Safe Mode Foundation, Stage 58 Finance Monthly Plan Foundation, Stage 59 Personal Manual Foundation, Stage 60 Personal Manual QA & Release Hardening, Stage 61 Personal Manual Export Center Integration, Stage 62 Bundle Size Audit & Initial Load Hardening, Stage 63 Personal Manual Weekly Review Integration, Stage 64 Personal Manual Search & Focus Navigation, Stage 65 Personal Manual Templates Foundation, Stage 66 Personal Manual Mobile & Dense Page Polish, Stage 67 Personal Manual Track Release Hardening, Stage 68 v1.50 Release Hardening, Stage 69 Goals Track Foundation, Stage 70 Goals Track QA & Mobile Hardening, Stage 71 Goals Templates & Quick Start, Stage 72 Life Areas Foundation, Stage 73 Repository Hygiene, Stage 74 Goals and Life Areas Linking, the Stage 74 i18n Audit & Fix pass, Stage 75 Home Dashboard De-cluttering, and Stage 76 Public Release Readiness, and remains ready for static GitHub Pages deployment.[m
+[32m+[m[32m- Current Stage: Stage 76 Completed[m
+ [m
+ ## Architecture References[m
+ [m
+[36m@@ -38,7 +38,7 @@[m
+ [m
+ ## Completed Stages[m
+ [m
+[31m-Stages 1–72 are complete.[m
+[32m+[m[32mStages 1–76 are complete.[m
+ [m
+ - Stage 1 â€” Foundation[m
+ - Stage 2 â€” App Shell[m
+[36m@@ -111,6 +111,10 @@[m [mStages 1–72 are complete.[m
+ - Stage 70 â€” Goals Track QA & Mobile Hardening[m
+ - Stage 71 â€” Goals Templates & Quick Start[m
+ - Stage 72 â€” Life Areas Foundation[m
+[32m+[m[32m- Stage 73 â€” Repository Hygiene[m
+[32m+[m[32m- Stage 74 â€” Goals and Life Areas Linking[m
+[32m+[m[32m- Stage 75 â€” Home Dashboard De-cluttering[m
+[32m+[m[32m- Stage 76 â€” Public Release Readiness[m
+ [m
+ Stage 54 completion is evidenced by the calmer bilingual empty-state guidance across Home, Finance, Decisions, Weekly Review, Inbox, Projects, Journal, Knowledge, and Settings. The stage adds no schema migration, no backup-format change, no backup-version bump, no route redesign, no onboarding modal or tour, no backend, no sync, no cloud, no AI, no telemetry, and no new dependency. It keeps the existing local-first repository/storage-adapter boundaries intact while giving low-data users a clearer first step.[m
+ [m
+[36m@@ -150,6 +154,16 @@[m [mStage 71 completion is evidenced by the static Goals templates and quick-start p[m
+ [m
+ Stage 72 completion is evidenced by the local-first Life Areas foundation, which adds a dedicated life-areas module, repository CRUD, Dexie storage, a calm `/life-areas` page, Home summary awareness, Weekly Review due awareness, Global Search support, additive backup/restore support, and a readable Markdown export path. The stage keeps canonical starter areas local and visible without seeded manual DB setup, remains bilingual and repository-backed, and adds no backend, sync, cloud, AI, telemetry, or non-additive backup-format change.[m
+ [m
+[32m+[m[32mStage 73 completion is evidenced by removing the corrupted root-level artifact `torage) implement dexie foundation and storage adapter`, confirming there is no local `master` branch present, and adding the root MIT `LICENSE` file for public release. The stage leaves application code, Dexie schema, backup format, package scripts, and repository behavior unchanged. Validation from the relocated `C:\dev\alios-app-stage-2` root now passes TypeScript, Vitest (725 tests across 41 files), and the production build.[m
+[32m+[m
+[32m+[m[32mStage 74 completion is evidenced by the optional Goals-to-Life-Areas relation, which adds form selection, local filtering, badge display, search awareness, weekly-review visibility, export readability, and backup validation for goals that omit the link. The stage keeps the relationship additive and backward compatible, preserves the repository/storage-adapter boundary, and adds no backend, sync, cloud, AI, telemetry, or non-additive backup-format change. Validation from the relocated `C:\dev\alios-app-stage-2` root now passes TypeScript, Vitest (725 tests across 41 files), and the production build.[m
+[32m+[m
+[32m+[m[32mStage 74 i18n Audit & Fix completion is evidenced by adding the full Persian Life Areas catalog overrides, keeping the Life Areas page on the shared `useI18n` / message-catalog path, and confirming a repo-wide feature scan found no remaining hardcoded English JSX text or text-prop literals outside the catalog system. The stage keeps the existing local-first architecture, storage boundaries, and backup format unchanged. Validation from the relocated `C:\dev\alios-app-stage-2` root now passes TypeScript, Vitest (725 tests across 41 files), and the production build.[m
+[32m+[m
+[32m+[m[32mStage 75 Home Dashboard De-cluttering completion is evidenced by moving the local-data indicator into the Home hero, removing the repeated local-only chip from Personal Insights, keeping the detailed Projects, Journal, Knowledge, and Personal Manual overview sections available but collapsed by default for new users, and default-collapsing the other lower-priority Home sections (routine nudge, wellness / badminton, routine templates, summary stats, and quick links) while preserving saved collapse preferences. The stage keeps routing, module boundaries, customization logic, schema shape, backup format, and dependencies unchanged. This verification was rerun after relocating the workspace off Desktop/OneDrive sync to `C:\dev\alios-app-stage-2`, which resolved the Windows config-loader access-denied issue that previously blocked Vitest and Vite on the sync path. Validation from the relocated root now passes TypeScript, Vitest (725 tests across 41 files), and the production build.[m
+[32m+[m
+[32m+[m[32mStage 76 Public Release Readiness is evidenced by the public-facing README rewrite with a concise product summary, live demo link, grouped feature list, tech stack, and local development instructions, plus the Stage 76 changelog and state updates. The stage is documentation and repository-presentation only, and it keeps the application code, LICENSE, routing, schema shape, backup format, and dependencies unchanged.[m
+[32m+[m
+ Stage 53 completion is evidenced by the mobile-focused readability and overflow hardening pass across the dense Finance, Weekly Review, Decision Log, Settings, and Home surfaces. The stage keeps the existing product behavior intact while improving small-screen stacking, wrapping, button usability, and section readability on 360px, 390px, and 430px class devices. It does not change routes, storage, schemas, backup format, dependencies, or navigation architecture, and it remains aligned with static GitHub Pages deployment.[m
+ Stage 48 completion is evidenced by the derived-only Weekly Review foundation, which summarizes the last seven days of existing local tasks, projects, inbox items, journal entries, knowledge items, finance records, wellness/check-in data, and routine signals where available. The stage adds deterministic observations and suggested focus rules, keeps the review window local and read-only, and stores no new weekly-review data. It uses the existing feature/repository/storage-adapter boundaries, adds no schema migration, no backup-format change, no new dependency, no backend, no sync, no cloud, and no AI, and it remains aligned with static GitHub Pages deployment.[m
+ [m
+[36m@@ -247,16 +261,15 @@[m [mThe next stage is intentionally undefined pending explicit approval. Project con[m
+ [m
+ ## Git Latest Recommended Commit[m
+ [m
+[31m-`feat(life-areas): add local life areas foundation`[m
+[32m+[m[32m`docs(release): refresh README and release notes for public readiness`[m
+ [m
+ ## Build Status[m
+ [m
+[31m-- TypeScript: passing (`cmd /c node_modules\\.bin\\tsc.cmd --noEmit`)[m
+[31m-- Automated tests: passing (`cmd /c node_modules\\.bin\\vitest.cmd run`)[m
+[31m-- Production build: passing (`cmd /c node_modules\\.bin\\vite.cmd build`)[m
+[32m+[m[32m- TypeScript: passed from the relocated repo root on 2026-07-14[m
+[32m+[m[32m- Automated tests: 725 passing across 41 test files[m
+[32m+[m[32m- Production build: passed from the relocated repo root on 2026-07-14[m
+ - Production build warning: Vite reported a chunk-size warning for the main bundle[m
+[31m-- Automated test count: 708 passing across 39 suites[m
+[31m-- Last verified: 2026-07-11[m
+[32m+[m[32m- Last verified: 2026-07-14[m
+ [m
+ ## Rules Before Modifying the Project[m
+ [m

@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   FINANCE_COLLAPSED_SECTIONS_STORAGE_KEY,
   financeQuickNavItems,
+  getDefaultFinanceCollapsedSectionIds,
   normalizeFinanceCollapsedSectionIds,
 } from "../financeSections";
 
@@ -36,5 +37,24 @@ describe("finance section helpers", () => {
     expect(FINANCE_COLLAPSED_SECTIONS_STORAGE_KEY).toBe(
       "alios.finance.collapsedSections"
     );
+  });
+
+  it("starts secondary finance sections collapsed on desktop and mobile", () => {
+    expect(getDefaultFinanceCollapsedSectionIds(false)).toEqual([
+      "charts",
+      "review",
+      "obligations",
+      "transactions",
+      "addTransaction",
+      "addObligation",
+    ]);
+    expect(getDefaultFinanceCollapsedSectionIds(true)).toEqual([
+      "charts",
+      "review",
+      "obligations",
+      "transactions",
+      "addTransaction",
+      "addObligation",
+    ]);
   });
 });

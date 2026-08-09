@@ -63,6 +63,10 @@ vi.mock("../hooks/useFinance", () => ({
 
 import { FinancePage } from "../pages/FinancePage";
 
+function countOccurrences(value: string, needle: string) {
+  return value.split(needle).length - 1;
+}
+
 describe("FinancePage", () => {
   beforeEach(() => {
     localStorage.clear();
@@ -86,5 +90,34 @@ describe("FinancePage", () => {
     expect(markup).toContain("جستجوی رکوردهای مالی");
     expect(markup).toContain("آگاهی از همگام‌سازی مالی");
     expect(markup).not.toContain("AliOS could not prepare local data");
+  });
+
+  it("keeps finance summary, add path, filters, and first obligation direct while collapsing dense details", () => {
+    localStorage.setItem(LANGUAGE_STORAGE_KEY, "en");
+
+    const markup = renderToStaticMarkup(
+      <AccountRuntimeProvider>
+        <I18nProvider>
+          <DateDisplayProvider>
+            <FinancePage />
+          </DateDisplayProvider>
+        </I18nProvider>
+      </AccountRuntimeProvider>
+    );
+
+    expect(markup).toContain("Add income / expense");
+    expect(markup).toContain("Search finance records");
+    expect(markup).toContain(financeObligations[0].title);
+    expect(countOccurrences(markup, "This is a local summary from your entered data. It is not financial advice.")).toBe(
+      1
+    );
+    expect(markup).not.toContain("This is a local summary from the data you entered.");
+    expect(markup).toContain('id="finance-monthly-plan-content" hidden="" aria-hidden="true"');
+    expect(markup).toContain('id="finance-charts-content" hidden="" aria-hidden="true"');
+    expect(markup).toContain('id="finance-review-content" hidden="" aria-hidden="true"');
+    expect(markup).toContain('id="finance-obligations-content" hidden="" aria-hidden="true"');
+    expect(markup).toContain('id="finance-transactions-records-content" hidden="" aria-hidden="true"');
+    expect(markup).toContain('id="finance-add-transaction-content" hidden="" aria-hidden="true"');
+    expect(markup).toContain('id="finance-add-obligation-content" hidden="" aria-hidden="true"');
   });
 });

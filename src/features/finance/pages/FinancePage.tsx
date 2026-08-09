@@ -395,6 +395,7 @@ export function FinancePage() {
     [accountRuntimeState.syncStatus.categoryStatuses]
   );
   const budgetGuard = review.budgetGuard;
+  const primaryUpcomingObligation = review.upcomingObligations[0];
   const dueSoonCount = review.upcomingObligations.filter(
     (item) => item.label === "dueSoon"
   ).length;
@@ -520,7 +521,7 @@ export function FinancePage() {
       icon: <Wallet className="h-5 w-5" />,
       label: t("finance.remainingLiquidity"),
       value: formatAmount(summary.remainingLiquidity),
-      description: t("finance.localSummaryNote"),
+      description: currentMoneySignal,
       status: (
         <StatusChip tone={summary.remainingLiquidity >= 0 ? "success" : "danger"}>
           {summary.remainingLiquidity >= 0
@@ -694,10 +695,9 @@ export function FinancePage() {
                 </p>
               </div>
 
-              <div className="max-w-3xl space-y-2 text-sm leading-7 text-muted-foreground">
-                <p>{t("finance.reviewIntro")}</p>
-                <p>{t("finance.noAdviceNote")}</p>
-              </div>
+              <p className="max-w-3xl text-sm leading-7 text-muted-foreground">
+                {t("finance.noAdviceNote")}
+              </p>
 
               <div className="grid gap-3 sm:grid-cols-3">
                 <SoftPanel className="gap-2 border-primary/15 bg-background/80">
@@ -707,7 +707,6 @@ export function FinancePage() {
                   <p className="text-lg font-semibold tabular-nums">
                     {formatAmount(summary.remainingLiquidity)}
                   </p>
-                  <p className="text-sm text-muted-foreground">{t("finance.localSummaryNote")}</p>
                 </SoftPanel>
                 <SoftPanel className="gap-2 border-primary/15 bg-background/80">
                   <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
@@ -808,10 +807,6 @@ export function FinancePage() {
                   </p>
                 </SoftPanel>
               </div>
-              <div className="space-y-2 text-sm leading-7 text-muted-foreground">
-                <p>{t("finance.localSummaryNote")}</p>
-                <p>{t("finance.monthlyPlanRecordedDataNote")}</p>
-              </div>
             </SoftPanel>
           </div>
         </PremiumCard>
@@ -846,15 +841,118 @@ export function FinancePage() {
         </nav>
       </div>
 
-      <section id={FINANCE_SECTION_ANCHORS.monthlyPlan} className="scroll-mt-32 space-y-4">
-        <PremiumCard className="border-primary/15 bg-gradient-to-br from-primary/10 via-background to-background shadow-sm">
-          <div className="p-5 sm:p-6">
-            <SectionHeader
-              icon={<Wallet className="h-5 w-5" />}
-              eyebrow={t("finance.sectionMonthlyPlan")}
-              title={t("finance.sectionMonthlyPlan")}
-              description={t("finance.monthlyPlanDescription")}
-              status={
+      <CollapsibleSection
+        id={FINANCE_SECTION_ANCHORS.monthlyPlan}
+        title={t("finance.sectionMonthlyPlan")}
+        description={t("finance.monthlyPlanDescription")}
+        icon={<Wallet className="h-5 w-5" />}
+        status={
+          <StatusChip tone={getMonthlyPlanFocusTone(monthlyPlan.pressureLevel)}>
+            {t(
+              monthlyPlan.pressureLevel === "pressure"
+                ? "finance.guardPressure"
+                : monthlyPlan.pressureLevel === "watch"
+                  ? "finance.guardWatch"
+                  : "finance.guardCalm"
+            )}
+          </StatusChip>
+        }
+        defaultOpen={false}
+        expandLabel={t("common.expandSection")}
+        collapseLabel={t("common.collapseSection")}
+        className="scroll-mt-32"
+        contentClassName="space-y-5"
+      >
+        <div className="max-w-3xl space-y-2 text-sm leading-7 text-muted-foreground">
+          <p>{t("finance.monthlyPlanRecordedDataNote")}</p>
+          <p>{t("finance.monthlyPlanAdviceNote")}</p>
+          <p>{t("finance.monthlyPlanIncompleteDataNote")}</p>
+        </div>
+
+        {!monthlyPlan.hasUsefulData ? (
+          <EmptyState
+            icon={<Wallet className="h-6 w-6" />}
+            title={t("finance.monthlyPlanLowDataTitle")}
+            description={t("finance.monthlyPlanLowDataDescription")}
+            note={t("finance.monthlyPlanLowDataNote")}
+            actions={
+              <>
+                <Button
+                  type="button"
+                  onClick={() => handleQuickNav(FINANCE_SECTION_ANCHORS.addTransaction)}
+                >
+                  {t("finance.addTransaction")}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => handleQuickNav(FINANCE_SECTION_ANCHORS.addObligation)}
+                >
+                  {t("finance.addObligation")}
+                </Button>
+              </>
+            }
+          />
+        ) : (
+          <div className="space-y-4">
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              <MetricCard
+                icon={<CircleDollarSign className="h-5 w-5" />}
+                label={t("finance.monthlyPlanIncome")}
+                value={formatAmount(monthlyPlan.incomeThisMonth)}
+                description={t("finance.monthlyPlanIncomeDescription")}
+              />
+              <MetricCard
+                icon={<BadgeDollarSign className="h-5 w-5" />}
+                label={t("finance.monthlyPlanExpenses")}
+                value={formatAmount(monthlyPlan.expenseThisMonth)}
+                description={t("finance.monthlyPlanExpensesDescription")}
+              />
+              <MetricCard
+                icon={<ReceiptText className="h-5 w-5" />}
+                label={t("finance.monthlyPlanObligations")}
+                value={formatAmount(monthlyPlan.monthlyObligationsEstimate)}
+                description={t("finance.monthlyPlanObligationsDescription", {
+                  count: monthlyPlan.activeObligationCount,
+                })}
+                status={
+                  <StatusChip tone="neutral">
+                    {t("finance.monthlyPlanRemainingObligationTotal", {
+                      amount: formatAmount(monthlyPlan.activeObligationRemaining),
+                    })}
+                  </StatusChip>
+                }
+              />
+              <MetricCard
+                icon={<Wallet className="h-5 w-5" />}
+                label={t("finance.monthlyPlanRemaining")}
+                value={formatAmount(monthlyPlan.estimatedRemaining)}
+                description={t("finance.monthlyPlanRemainingDescription")}
+              />
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <MetricCard
+                icon={<Landmark className="h-5 w-5" />}
+                label={t("finance.monthlyPlanDailyRemaining")}
+                value={formatAmount(monthlyPlan.dailyRemainingEstimate)}
+                description={t("finance.monthlyPlanDailyRemainingDescription", {
+                  days: monthlyPlan.daysRemaining,
+                })}
+              />
+              <MetricCard
+                icon={<RotateCcw className="h-5 w-5" />}
+                label={t("finance.monthlyPlanDaysRemaining")}
+                value={String(monthlyPlan.daysRemaining)}
+                description={t("finance.monthlyPlanMonthProgressDescription", {
+                  elapsed: monthlyPlan.daysElapsed,
+                  total: monthlyPlan.daysInMonth,
+                })}
+              />
+            </div>
+
+            <SoftPanel className="space-y-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <StatusChip tone={getMonthlyPlanFocusTone(monthlyPlan.pressureLevel)}>
                   {t(
                     monthlyPlan.pressureLevel === "pressure"
@@ -864,126 +962,14 @@ export function FinancePage() {
                         : "finance.guardCalm"
                   )}
                 </StatusChip>
-              }
-            />
-
-            <div className="mt-4 max-w-3xl space-y-2 text-sm leading-7 text-muted-foreground">
-              <p>{t("finance.monthlyPlanRecordedDataNote")}</p>
-              <p>{t("finance.monthlyPlanAdviceNote")}</p>
-              <p>{t("finance.monthlyPlanIncompleteDataNote")}</p>
-            </div>
-
-            <div className="mt-5">
-              {!monthlyPlan.hasUsefulData ? (
-                <EmptyState
-                  icon={<Wallet className="h-6 w-6" />}
-                  title={t("finance.monthlyPlanLowDataTitle")}
-                  description={t("finance.monthlyPlanLowDataDescription")}
-                  note={t("finance.monthlyPlanLowDataNote")}
-                  actions={
-                    <>
-                      <Button
-                        type="button"
-                        onClick={() => handleQuickNav(FINANCE_SECTION_ANCHORS.addTransaction)}
-                      >
-                        {t("finance.addTransaction")}
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => handleQuickNav(FINANCE_SECTION_ANCHORS.addObligation)}
-                      >
-                        {t("finance.addObligation")}
-                      </Button>
-                    </>
-                  }
-                />
-              ) : (
-                <div className="space-y-4">
-                  <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                    <MetricCard
-                      icon={<CircleDollarSign className="h-5 w-5" />}
-                      label={t("finance.monthlyPlanIncome")}
-                      value={formatAmount(monthlyPlan.incomeThisMonth)}
-                      description={t("finance.monthlyPlanIncomeDescription")}
-                    />
-                    <MetricCard
-                      icon={<BadgeDollarSign className="h-5 w-5" />}
-                      label={t("finance.monthlyPlanExpenses")}
-                      value={formatAmount(monthlyPlan.expenseThisMonth)}
-                      description={t("finance.monthlyPlanExpensesDescription")}
-                    />
-                    <MetricCard
-                      icon={<ReceiptText className="h-5 w-5" />}
-                      label={t("finance.monthlyPlanObligations")}
-                      value={formatAmount(monthlyPlan.monthlyObligationsEstimate)}
-                      description={t("finance.monthlyPlanObligationsDescription", {
-                        count: monthlyPlan.activeObligationCount,
-                      })}
-                      status={
-                        <StatusChip tone="neutral">
-                          {t("finance.monthlyPlanRemainingObligationTotal", {
-                            amount: formatAmount(monthlyPlan.activeObligationRemaining),
-                          })}
-                        </StatusChip>
-                      }
-                    />
-                    <MetricCard
-                      icon={<Wallet className="h-5 w-5" />}
-                      label={t("finance.monthlyPlanRemaining")}
-                      value={formatAmount(monthlyPlan.estimatedRemaining)}
-                      description={t("finance.monthlyPlanRemainingDescription")}
-                    />
-                  </div>
-
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    <MetricCard
-                      icon={<Landmark className="h-5 w-5" />}
-                      label={t("finance.monthlyPlanDailyRemaining")}
-                      value={formatAmount(monthlyPlan.dailyRemainingEstimate)}
-                      description={t("finance.monthlyPlanDailyRemainingDescription", {
-                        days: monthlyPlan.daysRemaining,
-                      })}
-                    />
-                    <MetricCard
-                      icon={<RotateCcw className="h-5 w-5" />}
-                      label={t("finance.monthlyPlanDaysRemaining")}
-                      value={String(monthlyPlan.daysRemaining)}
-                      description={t("finance.monthlyPlanMonthProgressDescription", {
-                        elapsed: monthlyPlan.daysElapsed,
-                        total: monthlyPlan.daysInMonth,
-                      })}
-                    />
-                  </div>
-
-                  <SoftPanel className="space-y-2">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <StatusChip tone={getMonthlyPlanFocusTone(monthlyPlan.pressureLevel)}>
-                        {t(
-                          monthlyPlan.pressureLevel === "pressure"
-                            ? "finance.guardPressure"
-                            : monthlyPlan.pressureLevel === "watch"
-                              ? "finance.guardWatch"
-                              : "finance.guardCalm"
-                        )}
-                      </StatusChip>
-                      <span className="text-sm font-medium text-foreground">
-                        {t(monthlyPlan.focusKey)}
-                      </span>
-                    </div>
-                    <p className="text-sm leading-7 text-muted-foreground">
-                      {t("finance.monthlyPlanRecordedDataNote")}
-                    </p>
-                    <p className="text-xs leading-6 text-muted-foreground">
-                      {t("finance.monthlyPlanIncompleteDataNote")}
-                    </p>
-                  </SoftPanel>
-                </div>
-              )}
-            </div>
+                <span className="text-sm font-medium text-foreground">
+                  {t(monthlyPlan.focusKey)}
+                </span>
+              </div>
+            </SoftPanel>
           </div>
-        </PremiumCard>
-      </section>
+        )}
+      </CollapsibleSection>
 
       {successMessage ? (
         <div
@@ -1015,6 +1001,74 @@ export function FinancePage() {
           ) : null}
         </div>
       ) : null}
+
+      <PremiumCard id="finance-obligation-watchlist" className="border-warning/20 bg-card/95">
+        <div className="space-y-4 p-5 sm:p-6">
+          <SectionHeader
+            icon={<ReceiptText className="h-5 w-5" />}
+            title={t("finance.sectionObligations")}
+            description={t("finance.upcomingObligationPressureDescription")}
+            status={
+              <StatusChip tone={dueSoonCount > 0 ? "warning" : "neutral"}>
+                {review.upcomingObligations.length}
+              </StatusChip>
+            }
+            actions={
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => handleQuickNav(FINANCE_SECTION_ANCHORS.obligations)}
+              >
+                {t("finance.sectionObligations")}
+              </Button>
+            }
+          />
+
+          {primaryUpcomingObligation ? (
+            <SoftPanel className="space-y-3 border-warning/20 bg-background/90">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="min-w-0 space-y-2">
+                  <h3 className="text-base font-semibold leading-7">
+                    {primaryUpcomingObligation.obligation.title}
+                  </h3>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <StatusChip tone={primaryUpcomingObligation.label === "dueSoon" ? "warning" : "neutral"}>
+                      {t(
+                        primaryUpcomingObligation.label === "dueSoon"
+                          ? "finance.dueSoon"
+                          : primaryUpcomingObligation.label === "dueThisMonth"
+                            ? "finance.dueThisMonth"
+                            : "finance.noDueDate"
+                      )}
+                    </StatusChip>
+                    <StatusChip tone="neutral">
+                      {primaryUpcomingObligation.nextDueDate
+                        ? formatDate(primaryUpcomingObligation.nextDueDate)
+                        : t("finance.noDueDate")}
+                    </StatusChip>
+                  </div>
+                </div>
+                <p className="max-w-[11rem] break-words text-end text-base font-semibold tabular-nums">
+                  {formatAmount(primaryUpcomingObligation.remainingAmount)}
+                </p>
+              </div>
+              {review.upcomingObligations.length > 1 ? (
+                <p className="text-sm leading-7 text-muted-foreground">
+                  {t("common.showMoreCount", {
+                    count: review.upcomingObligations.length - 1,
+                  })}
+                </p>
+              ) : null}
+            </SoftPanel>
+          ) : (
+            <SoftPanel className="alios-surface-muted">
+              <p className="text-sm leading-7 text-muted-foreground">
+                {t("finance.noUpcomingObligationsYet")}
+              </p>
+            </SoftPanel>
+          )}
+        </div>
+      </PremiumCard>
 
       <CollapsibleSection
         id={FINANCE_SECTION_ANCHORS.charts}
@@ -1100,7 +1154,7 @@ export function FinancePage() {
       <CollapsibleSection
         id={FINANCE_SECTION_ANCHORS.review}
         title={t("finance.sectionReview")}
-        description={t("finance.reviewIntro")}
+        description={t("finance.budgetGuardDescription")}
         status={
           <StatusChip tone={getBudgetGuardTone(budgetGuard.status)}>
             {t(getBudgetGuardLabelKey(budgetGuard.status))}
@@ -1271,18 +1325,17 @@ export function FinancePage() {
         </div>
       </CollapsibleSection>
 
-      <CollapsibleSection
-        id={FINANCE_SECTION_ANCHORS.transactions}
-        title={t("finance.sectionTransactions")}
-        description={t("finance.recordFiltersDescription")}
-        status={<StatusChip tone="neutral">{t("finance.localOnlyData")}</StatusChip>}
-        open={!isCollapsedSection("transactions")}
-        onOpenChange={(open) => setCollapsedSectionOpen("transactions", open)}
-        expandLabel={t("common.expandSection")}
-        collapseLabel={t("common.collapseSection")}
-        className="scroll-mt-32"
-        contentClassName="space-y-4"
-      >
+      <section id={FINANCE_SECTION_ANCHORS.transactions} className="scroll-mt-32 space-y-4">
+        <PremiumCard className="border-border/70 bg-card/95">
+          <div className="p-5 sm:p-6">
+            <SectionHeader
+              title={t("finance.sectionTransactions")}
+              description={t("finance.recordFiltersDescription")}
+              status={<StatusChip tone="neutral">{t("finance.localOnlyData")}</StatusChip>}
+            />
+          </div>
+        </PremiumCard>
+
         <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
           {FINANCE_VIEW_FILTERS.map((option) => {
             const isSelected = selectedFilter === option.value;
@@ -1344,6 +1397,21 @@ export function FinancePage() {
           </div>
         </PremiumCard>
 
+        <CollapsibleSection
+          id={`${FINANCE_SECTION_ANCHORS.transactions}-records`}
+          title={t(transactionSectionTitleKey)}
+          description={t(transactionSectionDescriptionKey)}
+          status={
+            <StatusChip tone="neutral">
+              {searchedTransactions.length + searchedObligations.length}
+            </StatusChip>
+          }
+          open={!isCollapsedSection("transactions")}
+          onOpenChange={(open) => setCollapsedSectionOpen("transactions", open)}
+          expandLabel={t("common.expandSection")}
+          collapseLabel={t("common.collapseSection")}
+          contentClassName="space-y-4"
+        >
         <div className="space-y-4">
           {isLoading ? (
             <div className="grid gap-4 xl:grid-cols-2" aria-label={t("finance.loading")}>
@@ -1562,6 +1630,7 @@ export function FinancePage() {
           )}
         </div>
       </CollapsibleSection>
+      </section>
 
       <section id={FINANCE_SECTION_ANCHORS.add} className="scroll-mt-32 space-y-4">
         <PremiumCard>

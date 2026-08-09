@@ -1,0 +1,84 @@
+From 5e3093e15a7e5adf42d42c11ea689ddda2fdb94f Mon Sep 17 00:00:00 2001
+From: Codex <codex@openai.com>
+Date: Tue, 21 Jul 2026 10:21:42 +0200
+Subject: [PATCH] fix(release): consolidate app version metadata
+
+---
+ PROJECT_STATE.md                                       | 1 +
+ package.json                                           | 2 +-
+ src/features/today/__tests__/taskProjectLinks.test.tsx | 1 +
+ src/shared/constants/__tests__/app.test.ts             | 4 +++-
+ src/shared/constants/app.ts                            | 4 +++-
+ 5 files changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/PROJECT_STATE.md b/PROJECT_STATE.md
+index 4c269cb..cd744b2 100644
+--- a/PROJECT_STATE.md
++++ b/PROJECT_STATE.md
+@@ -4,6 +4,7 @@
+ 
+ - Project name: AliOS
+ - Architecture version: AliOS 1.0
++- Product version: `package.json` is the single source of truth, and the UI reads its value at build time. Internal Stage numbers track development work and are independent of SemVer. Version bumps are manual per product release and are made only in `package.json`; completing a Stage does not imply a version bump.
+ - Current status: AliOS includes validated mobile-first Inbox capture, processing, global search, focused search-result navigation, filters, bulk triage, local appearance switching, local profile preferences, calendar month view foundation, home time-window routine nudges, upcoming task grouping, routine templates, Wellness / Badminton Routine foundation, visual motion polish, premium Home dashboard visual upgrade, premium app shell polish, Home dashboard customization, premium reusable components, lightweight Personal Insights, Stage 37 premium Home showcase polish, light core-page visual alignment, hardened backup/restore safety, Stage 38 UI regression QA and release hardening with desktop sticky sidebar accessibility improvements, Stage 39 topbar dashboard controls plus accent color personalization, Stage 40 finance foundation, Stage 41 finance review and budget guard, Stage 42 lightweight finance charts foundation, Stage 43 lightweight motion and interaction polish, Stage 44 finance mobile UX and section navigation, Stage 45 performance audit and bundle optimization, Stage 46 Home collapsible dashboard sections, Stage 47 Settings Help Center Foundation, Stage 48 Weekly Review Foundation, Stage 49 Decision Log Foundation, Stage 50 Backup / Restore Safety & Migration Foundation, Stage 51 App Error Boundary & Local Error Log Foundation, Stage 53 Mobile UX Hardening for dense pages, Stage 54 Empty States & First-Run Guidance Foundation, Stage 55 Backup Reminder & Last Backup Status Foundation, Stage 56 Export Center Foundation, Stage 57 Recovery Mode / Safe Mode Foundation, Stage 58 Finance Monthly Plan Foundation, Stage 59 Personal Manual Foundation, Stage 60 Personal Manual QA & Release Hardening, Stage 61 Personal Manual Export Center Integration, Stage 62 Bundle Size Audit & Initial Load Hardening, Stage 63 Personal Manual Weekly Review Integration, Stage 64 Personal Manual Search & Focus Navigation, Stage 65 Personal Manual Templates Foundation, Stage 66 Personal Manual Mobile & Dense Page Polish, Stage 67 Personal Manual Track Release Hardening, Stage 68 v1.50 Release Hardening, Stage 69 Goals Track Foundation, Stage 70 Goals Track QA & Mobile Hardening, Stage 71 Goals Templates & Quick Start, Stage 72 Life Areas Foundation, Stage 73 App Startup Resilience & Release Hygiene, Stage 74 Pull Request CI Foundation, Stage 75 Life Areas QA & Mobile Hardening, Stage 76 Goals ↔ Life Areas Derived Integration, Stage 77 Goals & Life Areas Release Hardening, Stage 78 Projects → Goals Link Foundation, Stage 79 Tasks → Projects Link Activation, Stage 80 Life Areas Persian Localization & Help Center Refresh, Stage 81 AliOS Design System Contract, Stage 82 Design Contract Adoption & Form Control Consistency, Stage 83 UI Accessibility & Design Contract Release Hardening, Stage 84 Real-World Usage QA & Product Prioritization Foundation, and Stage 85 Bundle Performance & Initial Load Hardening, and remains ready for static GitHub Pages deployment.
+ - Current Stage: Stage 146 Completed (Stage 84 manual usage pass remains pending)
+ 
+diff --git a/package.json b/package.json
+index 0d42908..2901d5f 100644
+--- a/package.json
++++ b/package.json
+@@ -1,7 +1,7 @@
+ {
+   "name": "alios-app",
+   "private": true,
+-  "version": "1.2.0",
++  "version": "1.50.0",
+   "type": "module",
+   "scripts": {
+     "dev": "vite",
+diff --git a/src/features/today/__tests__/taskProjectLinks.test.tsx b/src/features/today/__tests__/taskProjectLinks.test.tsx
+index a31947d..c1851f0 100644
+--- a/src/features/today/__tests__/taskProjectLinks.test.tsx
++++ b/src/features/today/__tests__/taskProjectLinks.test.tsx
+@@ -73,6 +73,7 @@ describe("Task project links", () => {
+         isMit: false,
+         dueDate: "2026-07-17",
+         projectId: "",
++        recurrenceFrequency: "none",
+       }).success
+     ).toBe(true);
+   });
+diff --git a/src/shared/constants/__tests__/app.test.ts b/src/shared/constants/__tests__/app.test.ts
+index 513f5c3..26856df 100644
+--- a/src/shared/constants/__tests__/app.test.ts
++++ b/src/shared/constants/__tests__/app.test.ts
+@@ -1,10 +1,12 @@
+ import { describe, expect, it } from "vitest";
+ 
++import packageMetadata from "../../../../package.json";
++
+ import { appConfig } from "../app";
+ 
+ describe("app config", () => {
+   it("exposes the current release metadata", () => {
+     expect(appConfig.name).toBe("AliOS");
+-    expect(appConfig.version).toBe("1.50.0");
++    expect(appConfig.version).toBe(packageMetadata.version);
+   });
+ });
+diff --git a/src/shared/constants/app.ts b/src/shared/constants/app.ts
+index cd240ee..2d03a10 100644
+--- a/src/shared/constants/app.ts
++++ b/src/shared/constants/app.ts
+@@ -1,5 +1,7 @@
++import packageMetadata from "../../../package.json";
++
+ export const appConfig = {
+   name: "AliOS",
+   description: "Local-first personal life management system.",
+-  version: "1.50.0",
++  version: packageMetadata.version,
+ } as const;
+-- 
+2.51.1
+
