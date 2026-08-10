@@ -123,10 +123,13 @@ export function Topbar({
     }
 
     const frame = window.requestAnimationFrame(() => {
+      const focusableSelector =
+        activePanel === "profile" && window.matchMedia("(max-width: 767px)").matches
+          ? "button:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href]"
+          : "button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href]";
+
       activePanelContentRef.current
-        ?.querySelector<HTMLElement>(
-          "button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href]"
-        )
+        ?.querySelector<HTMLElement>(focusableSelector)
         ?.focus();
     });
 

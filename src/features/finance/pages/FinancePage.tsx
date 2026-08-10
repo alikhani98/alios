@@ -826,13 +826,13 @@ export function FinancePage() {
       </section>
 
       <div className="alios-surface-card sticky top-[calc(4rem+env(safe-area-inset-top))] z-20 px-3 py-2 backdrop-blur-xl sm:px-4 md:top-20">
-        <nav className="flex gap-2 overflow-x-auto pb-1" aria-label={t("finance.quickNavigation")}>
+        <nav className="flex touch-pan-x gap-2 overflow-x-auto pb-1" aria-label={t("finance.quickNavigation")}>
           {financeQuickNavItems.map((item) => (
             <Button
               key={item.id}
               type="button"
               variant="outline"
-              className="shrink-0 rounded-full px-4 py-2 text-start text-xs leading-5 whitespace-normal sm:text-sm"
+              className="min-h-11 shrink-0 rounded-full px-4 py-2 text-start text-xs leading-5 whitespace-normal sm:min-h-10 sm:text-sm"
               onClick={() => handleQuickNav(item.anchorId)}
             >
               {t(item.labelKey)}

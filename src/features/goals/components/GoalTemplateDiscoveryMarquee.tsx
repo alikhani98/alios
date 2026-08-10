@@ -270,7 +270,7 @@ export function GoalTemplateDiscoveryMarquee({
         <div
           ref={viewportRef}
           className={cn(
-            "relative min-w-0 overflow-x-auto overscroll-x-contain rounded-[1.75rem]",
+            "relative min-w-0 touch-pan-x overflow-x-auto overscroll-x-contain rounded-[1.75rem]",
             shouldAutoScroll ? "sm:overflow-hidden" : null,
             isDragging ? "cursor-grabbing select-none" : "cursor-grab"
           )}
