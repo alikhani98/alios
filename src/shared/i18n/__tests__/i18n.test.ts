@@ -325,6 +325,8 @@ describe("i18n utilities", () => {
     "finance.noDueDate",
     "finance.paidProgress",
     "finance.paidPercentage",
+    "finance.obligationDetails",
+    "finance.obligationDetailsDescription",
     "finance.allTransactions",
     "finance.allTransactionsDescription",
     "finance.incomeTransactions",

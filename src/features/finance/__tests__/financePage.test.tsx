@@ -116,6 +116,7 @@ describe("FinancePage", () => {
     expect(markup).toContain('id="finance-charts-content" hidden="" aria-hidden="true"');
     expect(markup).toContain('id="finance-review-content" hidden="" aria-hidden="true"');
     expect(markup).toContain('id="finance-obligations-content" hidden="" aria-hidden="true"');
+    expect(markup).toContain('id="finance-obligation-debt-1-details-content" hidden="" aria-hidden="true"');
     expect(markup).toContain('id="finance-transactions-records-content" hidden="" aria-hidden="true"');
     expect(markup).toContain('id="finance-add-transaction-content" hidden="" aria-hidden="true"');
     expect(markup).toContain('id="finance-add-obligation-content" hidden="" aria-hidden="true"');

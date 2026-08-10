@@ -1508,6 +1508,8 @@ export const messagesEn = {
   "finance.noDueDate": "No due date",
   "finance.paidProgress": "Paid progress",
   "finance.paidPercentage": "Paid {value}%",
+  "finance.obligationDetails": "Obligation details",
+  "finance.obligationDetailsDescription": "Open for payment progress, totals, counterparties, and notes.",
   "finance.allTransactions": "All transactions",
   "finance.allTransactionsDescription": "All local income and expense records, sorted newest first.",
   "finance.incomeTransactions": "Income transactions",

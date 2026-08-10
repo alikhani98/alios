@@ -1582,6 +1582,8 @@ export const messagesFa: Record<TranslationKey, string> = {
   "finance.noDueDate": "بدون تاریخ سررسید",
   "finance.paidProgress": "پیشرفت پرداخت",
   "finance.paidPercentage": "{value}٪ پرداخت‌شده",
+  "finance.obligationDetails": "جزئیات تعهد",
+  "finance.obligationDetailsDescription": "برای پیشرفت پرداخت، مبلغ‌ها، طرف مقابل و یادداشت‌ها باز کنید.",
   "finance.allTransactions": "همه تراکنش‌ها",
   "finance.allTransactionsDescription": "همه رکوردهای درآمد و هزینه محلی، از جدیدترین به قدیمی‌ترین.",
   "finance.incomeTransactions": "تراکنش‌های درآمدی",
