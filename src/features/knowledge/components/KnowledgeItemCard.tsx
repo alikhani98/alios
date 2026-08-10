@@ -51,7 +51,7 @@ export function KnowledgeItemCard({
         {item.source ? (
           <div className="flex items-start gap-2 text-sm text-muted-foreground">
             <ExternalLink className="mt-0.5 h-4 w-4 shrink-0" />
-            <span className="break-all">{item.source}</span>
+            <span className="break-words">{item.source}</span>
           </div>
         ) : null}
       </CardContent>

@@ -6,7 +6,7 @@ import { aliosFocusRing, aliosSubtleOutlineMotion } from "./motion";
 
 const badgeVariants = cva(
   cn(
-    "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold",
+    "inline-flex max-w-full items-center whitespace-normal break-words rounded-full border px-2.5 py-0.5 text-start text-xs font-semibold",
     aliosFocusRing,
     aliosSubtleOutlineMotion
   ),

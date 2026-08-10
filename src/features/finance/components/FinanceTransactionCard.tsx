@@ -49,7 +49,7 @@ export function FinanceTransactionCard({
             </StatusChip>
           </div>
           <div className="space-y-1">
-            <h3 className="text-lg font-semibold leading-7">{transaction.title}</h3>
+            <h3 className="break-words text-lg font-semibold leading-7">{transaction.title}</h3>
             <p className="text-sm text-muted-foreground">{formatDate(transaction.occurredAt)}</p>
           </div>
         </div>

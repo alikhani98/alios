@@ -120,7 +120,7 @@ export function StatusChip({
   return (
     <span
       className={cn(
-        "inline-flex min-h-6 items-center rounded-full border px-2.5 py-1 text-xs font-semibold leading-none",
+        "inline-flex min-h-6 max-w-full items-center whitespace-normal break-words rounded-full border px-2.5 py-1 text-start text-xs font-semibold leading-none",
         aliosSubtleOutlineMotion,
         "hover:border-border/80",
         toneClassName(tone),

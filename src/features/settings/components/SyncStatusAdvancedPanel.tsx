@@ -1335,7 +1335,7 @@ export function SyncStatusAdvancedPanel({
               </StatusChip>
               <Badge
                 variant="secondary"
-                className="max-w-full break-all text-start"
+                className="max-w-full break-words text-start"
               >
                 {accountPresentation.badgeLabel}
               </Badge>
@@ -1460,7 +1460,7 @@ export function SyncStatusAdvancedPanel({
                           role="listitem"
                         >
                           <div className="min-w-0">
-                            <p className="text-sm font-medium">{device.label}</p>
+                            <p className="break-words text-sm font-medium">{device.label}</p>
                             <p className="mt-1 text-xs leading-5 text-muted-foreground">
                               {device.deviceId === runtimeState.syncMetadata.device.deviceId
                                 ? t("settings.syncCurrentDeviceBadge")
@@ -1797,7 +1797,7 @@ export function SyncStatusAdvancedPanel({
                           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                             <div className="min-w-0 space-y-1">
                               <div className="flex flex-wrap items-center gap-2">
-                                <p className="text-sm font-semibold">
+                                <p className="min-w-0 flex-1 break-words text-sm font-semibold">
                                   {conflict.title}
                                 </p>
                                 <Badge variant="secondary">

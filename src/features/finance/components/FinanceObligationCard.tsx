@@ -73,7 +73,7 @@ export function FinanceObligationCard({
             </StatusChip>
           </div>
           <div className="space-y-1">
-            <h3 className="text-lg font-semibold leading-7">{obligation.title}</h3>
+            <h3 className="break-words text-lg font-semibold leading-7">{obligation.title}</h3>
             <p className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
               <CalendarClock className="h-4 w-4 shrink-0" />
               <span>{dueDateLabel}</span>

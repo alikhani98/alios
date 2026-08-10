@@ -1324,8 +1324,8 @@ export function WeeklyReviewPage() {
                     {displayedDueGoals.map((goal) => (
                     <SoftPanel key={goal.id} className="space-y-4">
                       <div className="flex flex-wrap items-start justify-between gap-3">
-                        <div className="space-y-1">
-                          <p className="font-semibold leading-7">{goal.title}</p>
+                        <div className="min-w-0 flex-1 space-y-1">
+                          <p className="break-words font-semibold leading-7">{goal.title}</p>
                           <p className="text-sm text-muted-foreground">
                             {getGoalReviewContext(goal, formatDateTime, t)}
                           </p>
@@ -1522,8 +1522,8 @@ export function WeeklyReviewPage() {
                     {displayedDueManualEntries.map((entry) => (
                     <SoftPanel key={entry.id} className="space-y-4">
                       <div className="flex flex-wrap items-start justify-between gap-3">
-                        <div className="space-y-1">
-                          <p className="font-semibold leading-7">{entry.title}</p>
+                        <div className="min-w-0 flex-1 space-y-1">
+                          <p className="break-words font-semibold leading-7">{entry.title}</p>
                           <p className="text-sm text-muted-foreground">
                             {getManualReviewContext(entry, formatDateTime, t)}
                           </p>

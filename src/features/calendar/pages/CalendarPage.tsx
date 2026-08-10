@@ -181,7 +181,7 @@ export function CalendarPage() {
               {selectedTasks.map((task) => (
                 <div key={task.id} className="rounded-2xl border bg-muted/20 p-4">
                   <div className="flex items-start justify-between gap-3">
-                    <p className="min-w-0 flex-1 font-medium">{task.title}</p>
+                    <p className="min-w-0 flex-1 break-words font-medium">{task.title}</p>
                     <Badge variant={task.status === "done" ? "secondary" : "outline"}>{t(taskStatusLabelKeys[task.status])}</Badge>
                   </div>
                   {task.description ? <p className="mt-2 line-clamp-2 text-sm leading-6 text-muted-foreground">{task.description}</p> : null}
