@@ -32,8 +32,8 @@ export function ClearStartCard({
   ).length;
 
   return (
-    <PremiumCard className="border-primary/15 bg-gradient-to-br from-primary/10 via-background to-background">
-      <CardContent className="grid gap-5 p-5 sm:p-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)]">
+    <PremiumCard className="alios-home-now-surface">
+      <CardContent className="relative z-10 grid gap-5 p-5 ps-12 sm:p-6 sm:ps-14 xl:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)]">
         <div className="space-y-5">
           <SectionHeader
             eyebrow={t("home.title")}
@@ -43,19 +43,19 @@ export function ClearStartCard({
           />
 
           <div className="grid gap-3 sm:grid-cols-2">
-            <SoftPanel className="gap-2 border-primary/15 bg-background/80">
+            <SoftPanel className="gap-2 border-border/70 bg-background/90">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                 {t("home.todayTasks")}
               </p>
-              <p className="text-2xl font-semibold tabular-nums">{activeTaskCount}</p>
+              <p className="font-mono text-2xl font-semibold tabular-nums">{activeTaskCount}</p>
               <p className="text-sm text-muted-foreground">{t("common.active")}</p>
             </SoftPanel>
 
-            <SoftPanel className="gap-2 border-primary/15 bg-background/80">
+            <SoftPanel className="alios-home-thread-anchor gap-2 border-alios-herb/30 bg-background/90">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                 {t("home.unprocessedInbox")}
               </p>
-              <p className="text-2xl font-semibold tabular-nums">
+              <p className="font-mono text-2xl font-semibold tabular-nums">
                 {data.inbox.unprocessedCount}
               </p>
               <p className="text-sm text-muted-foreground">{t("inbox.unprocessed")}</p>
@@ -63,9 +63,9 @@ export function ClearStartCard({
           </div>
         </div>
 
-        <SoftPanel className="flex h-full flex-col justify-between gap-5 border-primary/20 bg-primary/5">
-          <div className="flex items-start gap-3">
-            <span className="alios-icon-primary">
+        <SoftPanel className="alios-home-thread-panel flex h-full flex-col justify-between gap-5">
+          <div className="alios-home-thread-anchor alios-home-thread-item flex items-start gap-3">
+            <span className="alios-icon-primary alios-home-thread-node flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl">
               {currentFocus ? (
                 <Target className="h-5 w-5" aria-hidden="true" />
               ) : (
@@ -86,20 +86,20 @@ export function ClearStartCard({
           </div>
 
           <div className="grid gap-2">
-            <Button asChild className="w-full">
+            <Button asChild className="alios-home-thread-item w-full bg-alios-caspian text-white hover:bg-alios-caspian/90 dark:bg-alios-paper dark:text-alios-night dark:hover:bg-alios-paper/90">
               <Link to="/today">
                 <Plus className="me-2 h-4 w-4" aria-hidden="true" />
                 {t("home.clearStartAddTask")}
               </Link>
             </Button>
             <div className="grid gap-2 sm:grid-cols-2">
-              <Button asChild variant="outline" className="w-full">
+              <Button asChild variant="outline" className="alios-home-thread-item w-full border-alios-herb/35">
                 <Link to="/inbox">
                   <Inbox className="me-2 h-4 w-4" aria-hidden="true" />
                   {t("inbox.captureItem")}
                 </Link>
               </Button>
-              <Button asChild variant="ghost" className="w-full">
+              <Button asChild variant="ghost" className="alios-home-thread-anchor alios-home-thread-item w-full text-alios-caspian hover:bg-alios-saffron/10 dark:text-alios-paper">
                 <Link to="/weekly-review">
                   {t("weeklyReview.title")}
                   <ArrowUpLeft className="ms-2 h-4 w-4" aria-hidden="true" />
@@ -108,8 +108,8 @@ export function ClearStartCard({
             </div>
           </div>
 
-          <StatusChip tone={activeTaskCount > 0 ? "primary" : "neutral"} className="w-fit">
-            {activeTaskCount} {t("common.active")}
+          <StatusChip tone={activeTaskCount > 0 ? "primary" : "neutral"} className="alios-home-thread-item w-fit">
+            <span className="font-mono tabular-nums">{activeTaskCount}</span> {t("common.active")}
           </StatusChip>
         </SoftPanel>
       </CardContent>

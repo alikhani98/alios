@@ -22,6 +22,14 @@ const config = {
         sans: ["Vazirmatn", ...fontFamily.sans],
       },
       colors: {
+        alios: {
+          caspian: "#172033",
+          pomegranate: "#B23A48",
+          saffron: "#E7A928",
+          herb: "#5F8D6A",
+          paper: "#F6F1E8",
+          night: "#101820",
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

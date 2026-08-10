@@ -118,7 +118,11 @@ export function DailyCheckinForm({
       </div>
 
       <div className="border-t border-border/70 pt-4">
-        <Button type="submit" className="w-full sm:w-auto" disabled={isSubmitting}>
+        <Button
+          type="submit"
+          className="w-full bg-alios-caspian text-white hover:bg-alios-caspian/90 dark:bg-alios-paper dark:text-alios-night dark:hover:bg-alios-paper/90 sm:w-auto"
+          disabled={isSubmitting}
+        >
           {isSubmitting
             ? t("common.saving")
             : checkin

@@ -72,18 +72,18 @@ function SummaryCard({
   label: string;
   value: number;
 }) {
-  return <MetricCard icon={icon} label={label} value={value} />;
+  return <MetricCard icon={icon} label={label} value={<span className="font-mono tabular-nums">{value}</span>} />;
 }
 
 function OverviewPanel({ children }: { children: ReactNode }) {
   return (
-    <Card className="overflow-hidden border-primary/10 bg-gradient-to-br from-background via-background to-primary/5 shadow-md">
+    <Card className="alios-home-context-shelf overflow-hidden shadow-md">
       <CardContent className="space-y-4 p-5 sm:p-6">{children}</CardContent>
     </Card>
   );
 }
 
-function TodayContextStrip() {
+function TodayContextStrip({ inboxCount }: { inboxCount: number }) {
   const { t } = useI18n();
 
   return (
@@ -95,18 +95,34 @@ function TodayContextStrip() {
       defaultOpen={false}
       expandLabel={t("common.expandSection")}
       collapseLabel={t("common.collapseSection")}
-      className="overflow-hidden border-primary/10 bg-gradient-to-br from-background via-background to-primary/5 shadow-sm"
+      status={
+        <span className="flex flex-wrap items-center justify-end gap-2">
+          <StatusChip tone={inboxCount > 0 ? "warning" : "neutral"} className="alios-home-thread-marker">
+            <span className="font-mono tabular-nums">{inboxCount}</span> {t("nav.inbox")}
+          </StatusChip>
+          <Badge variant="outline" className="alios-home-thread-marker">
+            {t("weeklyReview.title")}
+          </Badge>
+        </span>
+      }
+      className="alios-home-thread-continuation alios-home-context-shelf overflow-hidden shadow-sm"
     >
-      <div className="grid gap-2 sm:grid-cols-2 md:flex md:justify-end">
+      <div className="grid gap-2 sm:grid-cols-3 md:flex md:justify-end">
         <Button asChild variant="outline" className="w-full md:w-auto">
           <Link to="/calendar">
             {t("nav.calendar")}
             <ArrowUpLeft className="ms-2 h-4 w-4" aria-hidden="true" />
           </Link>
         </Button>
-        <Button asChild variant="outline" className="w-full md:w-auto">
+        <Button asChild variant="outline" className="alios-home-thread-marker w-full md:w-auto">
           <Link to="/inbox">
             {t("nav.inbox")}
+            <ArrowUpLeft className="ms-2 h-4 w-4" aria-hidden="true" />
+          </Link>
+        </Button>
+        <Button asChild variant="outline" className="alios-home-thread-marker w-full md:w-auto">
+          <Link to="/weekly-review">
+            {t("weeklyReview.title")}
             <ArrowUpLeft className="ms-2 h-4 w-4" aria-hidden="true" />
           </Link>
         </Button>
@@ -157,11 +173,11 @@ function MoreContext({
       title={t("home.moreDashboard")}
       description={t("home.moreDashboardDescription")}
       icon={<SparklesIcon />}
-      status={<Badge variant="secondary">10</Badge>}
+      status={<Badge variant="secondary" className="font-mono tabular-nums">10</Badge>}
       defaultOpen={false}
       expandLabel={t("common.expandSection")}
       collapseLabel={t("common.collapseSection")}
-      className="overflow-hidden border-border/70 bg-card/95 shadow-sm"
+      className="alios-home-context-shelf overflow-hidden shadow-sm"
       contentClassName="space-y-5"
     >
       <div className="grid min-w-0 gap-5 xl:grid-cols-12 xl:items-start">
@@ -240,11 +256,11 @@ function ProjectsOverview({
       title={t("home.projectsOverview")}
       description={`${t("home.activeProjects")}: ${data.projects.activeCount} / ${data.projects.totalCount}`}
       icon={<FolderKanban className="h-5 w-5" aria-hidden="true" />}
-      status={<Badge variant="secondary">{data.projects.totalCount}</Badge>}
+      status={<Badge variant="secondary" className="font-mono tabular-nums">{data.projects.totalCount}</Badge>}
       defaultOpen={false}
       expandLabel={t("common.expandSection")}
       collapseLabel={t("common.collapseSection")}
-      className="overflow-hidden border-primary/10 bg-gradient-to-br from-background via-background to-primary/5 shadow-sm"
+      className="alios-home-context-shelf overflow-hidden shadow-sm"
       contentClassName="space-y-4"
     >
       <OverviewPanel>
@@ -286,11 +302,11 @@ function JournalOverview({
       title={t("home.journalOverview")}
       description={`${t("home.journalEntries")}: ${data.journal.totalCount}`}
       icon={<BookOpenText className="h-5 w-5" aria-hidden="true" />}
-      status={<Badge variant="secondary">{data.journal.totalCount}</Badge>}
+      status={<Badge variant="secondary" className="font-mono tabular-nums">{data.journal.totalCount}</Badge>}
       defaultOpen={false}
       expandLabel={t("common.expandSection")}
       collapseLabel={t("common.collapseSection")}
-      className="overflow-hidden border-primary/10 bg-gradient-to-br from-background via-background to-primary/5 shadow-sm"
+      className="alios-home-context-shelf overflow-hidden shadow-sm"
       contentClassName="space-y-4"
     >
       <OverviewPanel>
@@ -325,11 +341,11 @@ function KnowledgeOverview({
       title={t("home.knowledgeOverview")}
       description={`${t("home.knowledgeItems")}: ${data.knowledge.totalCount}`}
       icon={<Brain className="h-5 w-5" aria-hidden="true" />}
-      status={<Badge variant="secondary">{data.knowledge.totalCount}</Badge>}
+      status={<Badge variant="secondary" className="font-mono tabular-nums">{data.knowledge.totalCount}</Badge>}
       defaultOpen={false}
       expandLabel={t("common.expandSection")}
       collapseLabel={t("common.collapseSection")}
-      className="overflow-hidden border-primary/10 bg-gradient-to-br from-background via-background to-primary/5 shadow-sm"
+      className="alios-home-context-shelf overflow-hidden shadow-sm"
       contentClassName="space-y-4"
     >
       <OverviewPanel>
@@ -357,11 +373,11 @@ function SummaryStats({ data }: { data: HomeDashboardData }) {
       id="unified-home-summaryStats"
       title={t("home.sectionSummaryStats")}
       icon={<CalendarCheck2 className="h-5 w-5" aria-hidden="true" />}
-      status={<Badge variant="secondary">5</Badge>}
+      status={<Badge variant="secondary" className="font-mono tabular-nums">5</Badge>}
       defaultOpen={false}
       expandLabel={t("common.expandSection")}
       collapseLabel={t("common.collapseSection")}
-      className="overflow-hidden border-primary/10 bg-gradient-to-br from-background via-background to-primary/5 shadow-sm"
+      className="alios-home-context-shelf overflow-hidden shadow-sm"
       contentClassName="space-y-4"
     >
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
@@ -408,11 +424,11 @@ function QuickActions() {
       id="unified-home-quickActions"
       title={t("home.quickActions")}
       icon={<ArrowUpLeft className="h-5 w-5" aria-hidden="true" />}
-      status={<Badge variant="secondary">{quickLinks.length}</Badge>}
+      status={<Badge variant="secondary" className="font-mono tabular-nums">{quickLinks.length}</Badge>}
       defaultOpen={false}
       expandLabel={t("common.expandSection")}
       collapseLabel={t("common.collapseSection")}
-      className="overflow-hidden border-primary/10 bg-gradient-to-br from-background via-background to-primary/5 shadow-sm"
+      className="alios-home-context-shelf overflow-hidden shadow-sm"
       contentClassName="space-y-4"
     >
       <div className="grid gap-3 sm:flex sm:flex-wrap">
@@ -452,7 +468,7 @@ export function UnifiedHomePage() {
   }
 
   return (
-    <section className="alios-page space-y-5 lg:space-y-6">
+    <section className="alios-page alios-home-page space-y-5 lg:space-y-6">
       {hasError ? (
         <div
           role="alert"
@@ -475,9 +491,9 @@ export function UnifiedHomePage() {
       ) : null}
 
       {showBackupReminder ? (
-        <SoftPanel className="flex flex-col gap-3 border-primary/10 bg-gradient-to-l from-primary/5 via-background to-background p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:gap-5">
+        <SoftPanel className="flex flex-col gap-3 border-alios-saffron/30 bg-gradient-to-l from-alios-saffron/10 via-background to-background p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:gap-5">
           <div className="flex min-w-0 items-start gap-3">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-primary/10 bg-primary/10 text-primary">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-alios-saffron/30 bg-alios-saffron/15 text-alios-caspian dark:text-alios-paper">
               <ShieldCheck className="h-5 w-5" aria-hidden="true" />
             </span>
             <div className="min-w-0 space-y-1">
@@ -504,12 +520,13 @@ export function UnifiedHomePage() {
 
       {isLoading ? (
         <div className="space-y-4" aria-label={t("home.loading")}>
-          <div className="h-72 animate-pulse rounded-[2rem] border border-primary/10 bg-gradient-to-br from-muted/70 via-muted/55 to-muted/70 shadow-sm" />
-          <div className="h-96 animate-pulse rounded-[2rem] border border-primary/10 bg-gradient-to-br from-muted/65 via-muted/50 to-muted/65 shadow-sm" />
+          <div className="h-72 animate-pulse rounded-[2rem] border border-alios-saffron/20 bg-gradient-to-br from-alios-paper via-muted/55 to-muted/70 shadow-sm dark:from-alios-night" />
+          <div className="h-96 animate-pulse rounded-[2rem] border border-alios-saffron/20 bg-gradient-to-br from-alios-paper via-muted/50 to-muted/65 shadow-sm dark:from-alios-night" />
         </div>
       ) : data ? (
         <>
           <ClearStartCard data={data} />
+          <TodayContextStrip inboxCount={data.inbox.unprocessedCount} />
           <TodayWorkspace
             today={today}
             focusId={searchParams.get("focusId")}
@@ -520,7 +537,6 @@ export function UnifiedHomePage() {
             projectId={searchParams.get("projectId")}
             routineId={searchParams.get("routineId")}
           />
-          <TodayContextStrip />
           <MoreContext
             data={data}
             selectedRoutineTemplateId={selectedRoutineTemplateId}

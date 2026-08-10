@@ -38,8 +38,27 @@
   }
 }
 
+@keyframes alios-thread-draw {
+  from {
+    opacity: 0;
+    transform: scaleY(0);
+  }
+
+  to {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
 @layer base {
   :root {
+    --alios-caspian-ink: #172033;
+    --alios-pomegranate-signal: #b23a48;
+    --alios-saffron-thread: #e7a928;
+    --alios-herb-glass: #5f8d6a;
+    --alios-morning-paper: #f6f1e8;
+    --alios-night-garden: #101820;
+
     --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;
 
@@ -77,6 +96,13 @@
   }
 
   .dark {
+    --alios-caspian-ink: #dbe5ef;
+    --alios-pomegranate-signal: #d97a84;
+    --alios-saffron-thread: #f0c76a;
+    --alios-herb-glass: #8fba98;
+    --alios-morning-paper: #18242c;
+    --alios-night-garden: #101820;
+
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
 
@@ -205,6 +231,138 @@
   .alios-status-danger {
     @apply border-transparent bg-destructive/10 text-destructive;
   }
+
+  .alios-home-page {
+    color: var(--alios-caspian-ink);
+  }
+
+  .dark .alios-home-page {
+    color: hsl(var(--foreground));
+  }
+
+  .alios-home-now-surface {
+    position: relative;
+    overflow: hidden;
+    border-color: color-mix(in srgb, var(--alios-saffron-thread) 36%, transparent);
+    background:
+      linear-gradient(135deg, color-mix(in srgb, var(--alios-morning-paper) 72%, white), hsl(var(--background)) 54%),
+      radial-gradient(circle at 12% 8%, color-mix(in srgb, var(--alios-saffron-thread) 14%, transparent), transparent 30%);
+    box-shadow: 0 1.5rem 4rem color-mix(in srgb, var(--alios-caspian-ink) 12%, transparent);
+  }
+
+  .alios-home-now-surface::before {
+    content: "";
+    position: absolute;
+    inset-block: 1.4rem;
+    inset-inline-start: 1.5rem;
+    z-index: 0;
+    width: 3px;
+    border-radius: 999px;
+    background: linear-gradient(
+      to bottom,
+      var(--alios-saffron-thread),
+      color-mix(in srgb, var(--alios-saffron-thread) 70%, var(--alios-herb-glass)),
+      var(--alios-saffron-thread)
+    );
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--alios-saffron-thread) 28%, transparent);
+    opacity: 0.96;
+    transform-origin: top;
+    animation: alios-thread-draw 620ms ease-out both;
+  }
+
+  .dark .alios-home-now-surface {
+    background:
+      linear-gradient(135deg, color-mix(in srgb, var(--alios-night-garden) 92%, hsl(var(--background))), hsl(var(--background)) 70%),
+      radial-gradient(circle at 12% 8%, color-mix(in srgb, var(--alios-saffron-thread) 14%, transparent), transparent 34%);
+    box-shadow: 0 1.5rem 4rem color-mix(in srgb, black 32%, transparent);
+  }
+
+  .alios-home-thread-panel {
+    position: relative;
+    border-color: color-mix(in srgb, var(--alios-saffron-thread) 42%, transparent);
+    background:
+      linear-gradient(180deg, color-mix(in srgb, var(--alios-saffron-thread) 8%, hsl(var(--background))), hsl(var(--background)));
+  }
+
+  .alios-home-thread-item {
+    position: relative;
+    z-index: 1;
+  }
+
+  .alios-home-thread-node {
+    box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--alios-saffron-thread) 18%, transparent);
+  }
+
+  .alios-home-thread-anchor {
+    position: relative;
+  }
+
+  .alios-home-thread-anchor::before {
+    content: "";
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: -2.15rem;
+    z-index: 2;
+    width: 0.7rem;
+    height: 0.7rem;
+    border: 2px solid hsl(var(--background));
+    border-radius: 999px;
+    background: var(--alios-saffron-thread);
+    box-shadow: 0 0 0 0.22rem color-mix(in srgb, var(--alios-saffron-thread) 20%, transparent);
+    transform: translateY(-50%);
+  }
+
+  .alios-home-thread-continuation {
+    position: relative;
+  }
+
+  .alios-home-thread-continuation::before {
+    content: "";
+    position: absolute;
+    inset-block: 0.85rem;
+    inset-inline-start: 1.45rem;
+    z-index: 0;
+    width: 2px;
+    border-radius: 999px;
+    background: linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--alios-saffron-thread) 82%, transparent),
+      color-mix(in srgb, var(--alios-saffron-thread) 36%, transparent)
+    );
+  }
+
+  .alios-home-thread-continuation > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .alios-home-thread-marker {
+    position: relative;
+  }
+
+  .alios-home-thread-marker::before {
+    content: "";
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: -0.45rem;
+    width: 0.45rem;
+    height: 0.45rem;
+    border: 1px solid hsl(var(--background));
+    border-radius: 999px;
+    background: var(--alios-saffron-thread);
+    box-shadow: 0 0 0 0.16rem color-mix(in srgb, var(--alios-saffron-thread) 16%, transparent);
+    transform: translateY(-50%);
+  }
+
+  .alios-home-context-shelf {
+    border-color: color-mix(in srgb, var(--alios-caspian-ink) 10%, hsl(var(--border)));
+    background: color-mix(in srgb, hsl(var(--card)) 96%, hsl(var(--background)));
+  }
+
+  .dark .alios-home-context-shelf {
+    border-color: color-mix(in srgb, var(--alios-saffron-thread) 12%, hsl(var(--border)));
+    background: color-mix(in srgb, hsl(var(--card)) 94%, var(--alios-night-garden));
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -214,7 +372,8 @@
 
   .alios-page-transition,
   .animate-pulse,
-  .animate-spin {
+  .animate-spin,
+  .alios-home-now-surface::before {
     animation: none !important;
   }
 }
