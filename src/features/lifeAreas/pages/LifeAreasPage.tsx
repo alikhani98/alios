@@ -272,7 +272,7 @@ export function LifeAreasPage() {
 
   return (
     <section className="alios-page min-w-0 space-y-6">
-      <PremiumCard className="border-primary/15 bg-gradient-to-br from-primary/10 via-background to-background shadow-sm">
+      <PremiumCard className="alios-now-surface shadow-sm">
         <div className="p-4 sm:p-6">
           <SectionHeader
             eyebrow={t("lifeAreas.title")}

@@ -431,7 +431,7 @@ export function SettingsPage() {
 
   return (
     <section className="alios-page space-y-6">
-      <PremiumCard className="border-primary/15 bg-gradient-to-br from-primary/10 via-card to-background shadow-sm">
+      <PremiumCard className="alios-now-surface shadow-sm">
         <CardContent className="grid gap-5 p-5 sm:p-6 lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)]">
           <SectionHeader
             icon={<SlidersHorizontal className="h-5 w-5" />}
@@ -836,7 +836,7 @@ export function SettingsPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <SlidersHorizontal className="h-5 w-5 text-primary" />
+          <SlidersHorizontal className="h-5 w-5 text-alios-caspian dark:text-alios-paper" />
             {t("home.homeLayout")}
           </CardTitle>
           <CardDescription>{t("home.localOnlyDashboardPreference")}</CardDescription>

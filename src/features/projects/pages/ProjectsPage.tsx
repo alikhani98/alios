@@ -201,7 +201,7 @@ export function ProjectsPage() {
 
   return (
     <section className="alios-page space-y-6">
-      <PremiumCard className="border-primary/15 bg-primary/5">
+      <PremiumCard className="alios-now-surface">
         <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
           <SectionHeader
             icon={<FolderKanban className="h-5 w-5" />}

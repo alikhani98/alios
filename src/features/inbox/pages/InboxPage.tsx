@@ -203,7 +203,7 @@ export function InboxPage() {
 
   return (
     <section className="alios-page space-y-6">
-      <PremiumCard className="border-primary/15 bg-primary/5">
+      <PremiumCard className="alios-now-surface">
         <CardContent className="p-5 sm:p-6">
           <SectionHeader
             icon={<Inbox className="h-5 w-5" />}
@@ -237,7 +237,7 @@ export function InboxPage() {
             id="inbox-search-filters"
             title={t("inbox.filters")}
             description={t("inbox.filtersDescription")}
-            status={filtersActive ? <span className="text-xs font-medium text-primary">{t("inbox.filtersActive")}</span> : null}
+            status={filtersActive ? <span className="text-xs font-medium text-alios-caspian dark:text-alios-paper">{t("inbox.filtersActive")}</span> : null}
             defaultOpen={false}
             expandLabel={t("common.expandSection")}
             collapseLabel={t("common.collapseSection")}

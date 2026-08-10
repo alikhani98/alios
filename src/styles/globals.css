@@ -68,8 +68,8 @@
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
 
-    --primary: 221 83% 53%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 221 38% 15%;
+    --primary-foreground: 0 0% 100%;
 
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
@@ -80,17 +80,17 @@
     --accent: 210 40% 96.1%;
     --accent-foreground: 222.2 47.4% 11.2%;
 
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 353 51% 46%;
     --destructive-foreground: 210 40% 98%;
 
-    --success: 158 64% 38%;
+    --success: 136 20% 46%;
     --success-foreground: 0 0% 100%;
-    --warning: 38 92% 50%;
-    --warning-foreground: 24 9.8% 10%;
+    --warning: 41 80% 53%;
+    --warning-foreground: 221 38% 15%;
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 221 83% 53%;
+    --ring: 41 80% 53%;
 
     --radius: 0.875rem;
   }
@@ -112,8 +112,8 @@
     --popover: 240 10% 3.9%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 217 91% 60%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 37 44% 94%;
+    --primary-foreground: 221 38% 15%;
 
     --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 0 0% 98%;
@@ -124,17 +124,17 @@
     --accent: 240 3.7% 15.9%;
     --accent-foreground: 0 0% 98%;
 
-    --destructive: 0 72% 51%;
+    --destructive: 353 56% 66%;
     --destructive-foreground: 0 0% 98%;
 
-    --success: 158 64% 52%;
+    --success: 136 28% 65%;
     --success-foreground: 240 10% 3.9%;
-    --warning: 38 92% 58%;
-    --warning-foreground: 240 10% 3.9%;
+    --warning: 41 82% 68%;
+    --warning-foreground: 221 38% 15%;
 
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
-    --ring: 217 91% 60%;
+    --ring: 41 82% 68%;
   }
 
   * {
@@ -201,7 +201,7 @@
   }
 
   .alios-surface-elevated {
-    @apply rounded-surface border border-primary/15 bg-gradient-to-br from-background via-background to-primary/5 text-card-foreground shadow-md backdrop-blur-sm;
+    @apply rounded-surface border border-alios-caspian/15 bg-gradient-to-br from-background via-background to-alios-saffron/5 text-card-foreground shadow-md backdrop-blur-sm;
   }
 
   .alios-surface-soft {
@@ -217,19 +217,45 @@
   }
 
   .alios-icon-primary {
-    @apply border border-primary/10 bg-primary/10 text-primary shadow-sm;
+    @apply border border-alios-saffron/30 bg-alios-saffron/15 text-alios-caspian shadow-sm dark:text-alios-paper;
+  }
+
+  .alios-status-primary {
+    @apply border-transparent bg-alios-caspian/10 text-alios-caspian dark:bg-alios-paper/10 dark:text-alios-paper;
   }
 
   .alios-status-success {
-    @apply border-transparent bg-success/10 text-success;
+    @apply border-transparent bg-alios-herb/10 text-alios-herb;
   }
 
   .alios-status-warning {
-    @apply border-transparent bg-warning/10 text-warning;
+    @apply border-transparent bg-alios-saffron/15 text-alios-caspian dark:text-alios-paper;
   }
 
   .alios-status-danger {
-    @apply border-transparent bg-destructive/10 text-destructive;
+    @apply border-transparent bg-alios-pomegranate/10 text-alios-pomegranate;
+  }
+
+  .alios-now-surface {
+    position: relative;
+    overflow: hidden;
+    border-color: color-mix(in srgb, var(--alios-saffron-thread) 32%, transparent);
+    background:
+      linear-gradient(135deg, color-mix(in srgb, var(--alios-morning-paper) 58%, white), hsl(var(--background)) 56%),
+      radial-gradient(circle at 8% 10%, color-mix(in srgb, var(--alios-saffron-thread) 10%, transparent), transparent 30%);
+    box-shadow: 0 1.25rem 3.5rem color-mix(in srgb, var(--alios-caspian-ink) 10%, transparent);
+  }
+
+  .dark .alios-now-surface {
+    background:
+      linear-gradient(135deg, color-mix(in srgb, var(--alios-night-garden) 90%, hsl(var(--background))), hsl(var(--background)) 72%),
+      radial-gradient(circle at 8% 10%, color-mix(in srgb, var(--alios-saffron-thread) 12%, transparent), transparent 34%);
+    box-shadow: 0 1.25rem 3.5rem color-mix(in srgb, black 28%, transparent);
+  }
+
+  .alios-thread-accent {
+    border-color: color-mix(in srgb, var(--alios-saffron-thread) 34%, transparent);
+    background: color-mix(in srgb, var(--alios-saffron-thread) 9%, hsl(var(--background)));
   }
 
   .alios-home-page {

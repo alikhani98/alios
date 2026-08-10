@@ -38,7 +38,7 @@ export function NavigationLink({
           aliosInteractiveMotion,
           aliosInteractiveLift,
           isActive
-            ? "border border-primary/15 bg-primary text-primary-foreground shadow-lg shadow-primary/10"
+            ? "border border-alios-caspian/15 bg-alios-caspian text-white shadow-lg shadow-alios-caspian/10 dark:border-alios-paper/15 dark:bg-alios-paper dark:text-alios-night"
             : "border border-transparent bg-transparent text-muted-foreground hover:border-border/70 hover:bg-accent/70 hover:text-accent-foreground",
           collapsed && "justify-center px-2"
         )
@@ -50,7 +50,7 @@ export function NavigationLink({
           <span
             className={cn(
               "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-transparent bg-background/65 text-muted-foreground shadow-sm transition-[transform,box-shadow,border-color,background-color,color] duration-200 ease-out motion-reduce:transition-none motion-reduce:transform-none",
-              isActive && "bg-primary/15 text-primary",
+              isActive && "bg-alios-saffron/20 text-alios-caspian dark:text-alios-paper",
               !isActive &&
                 "group-hover:bg-background group-hover:text-foreground group-hover:shadow-md"
             )}

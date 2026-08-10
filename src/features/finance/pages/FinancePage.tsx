@@ -670,7 +670,7 @@ export function FinancePage() {
   return (
     <section className="alios-page space-y-6">
       <section id={FINANCE_SECTION_ANCHORS.summary} className="scroll-mt-32 space-y-4">
-        <PremiumCard className="border-primary/15 bg-gradient-to-br from-primary/10 via-background to-background shadow-sm">
+        <PremiumCard className="alios-now-surface shadow-sm">
           <div className="grid gap-5 p-5 lg:grid-cols-[minmax(0,1.25fr)_minmax(18rem,0.75fr)] sm:p-6">
             <div className="space-y-5">
               <SectionHeader
@@ -700,7 +700,7 @@ export function FinancePage() {
               </p>
 
               <div className="grid gap-3 sm:grid-cols-3">
-                <SoftPanel className="gap-2 border-primary/15 bg-background/80">
+                <SoftPanel className="gap-2 border-alios-saffron/25 bg-background/85">
                   <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                     {t("finance.remainingLiquidity")}
                   </p>
@@ -708,7 +708,7 @@ export function FinancePage() {
                     {formatAmount(summary.remainingLiquidity)}
                   </p>
                 </SoftPanel>
-                <SoftPanel className="gap-2 border-primary/15 bg-background/80">
+                <SoftPanel className="gap-2 border-alios-saffron/25 bg-background/85">
                   <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                     {t("finance.dueSoon")}
                   </p>
@@ -717,7 +717,7 @@ export function FinancePage() {
                     {t("finance.upcomingObligationPressureDescription")}
                   </p>
                 </SoftPanel>
-                <SoftPanel className="gap-2 border-primary/15 bg-background/80">
+                <SoftPanel className="gap-2 border-alios-saffron/25 bg-background/85">
                   <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                     {t("finance.budgetGuardPressure")}
                   </p>
@@ -734,7 +734,7 @@ export function FinancePage() {
               </div>
             </div>
 
-            <SoftPanel className="space-y-4 border-primary/20 bg-primary/5">
+            <SoftPanel className="space-y-4 alios-thread-accent">
               <div className="space-y-1">
                 <p className="text-sm font-medium text-muted-foreground">
                   {t("finance.sectionAdd")}

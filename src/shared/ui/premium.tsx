@@ -13,7 +13,7 @@ type Tone = "neutral" | "primary" | "success" | "warning" | "danger";
 function toneClassName(tone: Tone) {
   switch (tone) {
     case "primary":
-      return "border-transparent bg-primary/10 text-primary";
+      return "alios-status-primary";
     case "success":
       return "alios-status-success";
     case "warning":
@@ -33,7 +33,7 @@ export function PremiumCard({ className, ...props }: PremiumCardProps) {
     <Card
       className={cn(
         "alios-surface-elevated overflow-hidden",
-        "hover:border-primary/20 hover:shadow-lg",
+        "hover:border-alios-saffron/30 hover:shadow-lg",
         className
       )}
       {...props}
@@ -91,7 +91,7 @@ export function SectionHeader({
           </p>
         ) : null}
         <div className="flex flex-wrap items-center gap-2">
-          {icon ? <span className="text-primary">{icon}</span> : null}
+          {icon ? <span className="text-alios-caspian dark:text-alios-paper">{icon}</span> : null}
           <h3 className="break-words text-xl font-semibold tracking-tight sm:text-[1.4rem]">
             {title}
           </h3>
@@ -150,7 +150,7 @@ export function MiniProgressBar({ value, className, label }: MiniProgressBarProp
       ) : null}
       <div className="h-2 overflow-hidden rounded-full bg-muted">
         <div
-          className="h-full rounded-full bg-primary transition-[width] duration-300 ease-out motion-reduce:transition-none"
+          className="h-full rounded-full bg-alios-saffron transition-[width] duration-300 ease-out motion-reduce:transition-none"
           style={{ width: `${safeValue}%` }}
         />
       </div>

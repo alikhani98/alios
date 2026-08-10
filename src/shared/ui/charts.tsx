@@ -45,7 +45,7 @@ export function HorizontalBarList({
           <li
             key={item.id}
             className={cn(
-              "alios-surface-muted group space-y-3 p-4 hover:border-primary/20 hover:shadow-sm",
+              "alios-surface-muted group space-y-3 p-4 hover:border-alios-saffron/30 hover:shadow-sm",
               aliosSurfaceMotion,
               aliosInteractiveLift
             )}
@@ -64,7 +64,7 @@ export function HorizontalBarList({
             </div>
             <div className="h-2 overflow-hidden rounded-full bg-muted">
               <div
-                className="h-full rounded-full bg-primary transition-[width,opacity] duration-300 ease-out motion-reduce:transition-none"
+                className="h-full rounded-full bg-alios-saffron transition-[width,opacity] duration-300 ease-out motion-reduce:transition-none"
                 style={{ width: `${width}%` }}
               />
             </div>
@@ -142,7 +142,7 @@ export function MiniCashflowBars({
           <div
             key={item.id}
             className={cn(
-              "alios-surface-muted group space-y-3 p-4 hover:border-primary/20 hover:shadow-sm",
+              "alios-surface-muted group space-y-3 p-4 hover:border-alios-saffron/30 hover:shadow-sm",
               aliosSurfaceMotion,
               aliosInteractiveLift
             )}
@@ -169,7 +169,7 @@ export function MiniCashflowBars({
             </div>
 
             <div className="space-y-2">
-              <BarRow label={incomeLabel} value={item.income} scale={scale} tone="bg-primary" />
+              <BarRow label={incomeLabel} value={item.income} scale={scale} tone="bg-alios-herb" />
               <BarRow label={expensesLabel} value={item.expenses} scale={scale} tone="bg-warning" />
               <BarRow label={obligationsLabel} value={item.obligations} scale={scale} tone="bg-slate-400 dark:bg-slate-500" />
             </div>
@@ -243,7 +243,7 @@ export function ProgressBarList({
           <li
             key={item.id}
             className={cn(
-              "alios-surface-muted group space-y-3 p-4 hover:border-primary/20 hover:shadow-sm",
+              "alios-surface-muted group space-y-3 p-4 hover:border-alios-saffron/30 hover:shadow-sm",
               aliosSurfaceMotion,
               aliosInteractiveLift
             )}
@@ -265,7 +265,7 @@ export function ProgressBarList({
             </div>
             <div className="h-2 overflow-hidden rounded-full bg-muted">
               <div
-                className="h-full rounded-full bg-primary transition-[width,opacity] duration-300 ease-out motion-reduce:transition-none"
+                className="h-full rounded-full bg-alios-saffron transition-[width,opacity] duration-300 ease-out motion-reduce:transition-none"
                 style={{ width: `${width}%` }}
               />
             </div>

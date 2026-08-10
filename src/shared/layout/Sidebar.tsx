@@ -31,7 +31,7 @@ export function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) {
               <span className="truncate text-xs text-muted-foreground">{t("app.tagline")}</span>
             </div>
           ) : (
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-primary/80 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/20">
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-alios-caspian to-alios-caspian/85 text-sm font-bold text-white shadow-lg shadow-alios-caspian/20 dark:from-alios-paper dark:to-alios-paper/85 dark:text-alios-night">
               A
             </div>
           )}

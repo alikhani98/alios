@@ -326,7 +326,7 @@ export function Topbar({
           onClick={(event) => handleOpenProfilePanel(event.currentTarget)}
         >
           {hasDisplayName ? (
-            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-[0.65rem] font-semibold text-primary-foreground">
+            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-alios-caspian text-[0.65rem] font-semibold text-white dark:bg-alios-paper dark:text-alios-night">
               {initials}
             </span>
           ) : (
@@ -427,7 +427,7 @@ export function Topbar({
             aria-label={t("settings.localProfile")}
           >
             <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-primary text-sm font-semibold text-primary-foreground">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-alios-caspian text-sm font-semibold text-white dark:bg-alios-paper dark:text-alios-night">
                 {hasDisplayName ? initials : <UserCircle className="h-6 w-6" />}
               </div>
               <div className="min-w-0">
@@ -549,7 +549,7 @@ export function Topbar({
 
         {savedMessage ? (
           <div
-            className="absolute top-full mt-2 rounded-2xl border border-primary/20 bg-primary/10 px-3 py-2 text-xs font-medium text-primary shadow-sm"
+            className="absolute top-full mt-2 rounded-2xl border border-alios-saffron/30 bg-alios-saffron/15 px-3 py-2 text-xs font-medium text-alios-caspian shadow-sm dark:text-alios-paper"
             role="status"
             aria-live="polite"
           >

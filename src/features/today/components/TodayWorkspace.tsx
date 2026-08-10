@@ -430,7 +430,7 @@ export function TodayWorkspace({
   return (
     <section className="alios-page space-y-6">
       {hideHero ? null : (
-        <PremiumCard className="border-primary/15 bg-gradient-to-br from-primary/10 via-background to-background">
+        <PremiumCard className="alios-now-surface">
           <CardContent className="grid gap-5 p-5 sm:p-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)]">
             <div className="space-y-5">
               <SectionHeader
@@ -440,20 +440,20 @@ export function TodayWorkspace({
                 description={t("today.description")}
               />
               <div className="grid gap-3 sm:grid-cols-3">
-                <SoftPanel className="gap-2 border-primary/15 bg-background/80">
+                <SoftPanel className="gap-2 border-alios-saffron/25 bg-background/85">
                   <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                     {t("home.taskDate")}
                   </p>
                   <p className="text-lg font-semibold leading-8">{formatDate(today)}</p>
                 </SoftPanel>
-                <SoftPanel className="gap-2 border-primary/15 bg-background/80">
+                <SoftPanel className="gap-2 border-alios-saffron/25 bg-background/85">
                   <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                     {t("today.tasks")}
                   </p>
                   <p className="text-lg font-semibold tabular-nums">{activeTaskCount}</p>
                   <p className="text-sm text-muted-foreground">{t("common.active")}</p>
                 </SoftPanel>
-                <SoftPanel className="gap-2 border-primary/15 bg-background/80">
+                <SoftPanel className="gap-2 border-alios-saffron/25 bg-background/85">
                   <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                     {t("common.completed")}
                   </p>
@@ -464,7 +464,7 @@ export function TodayWorkspace({
                 </SoftPanel>
               </div>
             </div>
-            <SoftPanel className="space-y-4 border-primary/20 bg-primary/5">
+            <SoftPanel className="space-y-4 alios-thread-accent">
               <div className="flex items-start gap-3">
                 <span className="alios-icon-primary">
                   {mitTask ? <Target className="h-5 w-5" aria-hidden="true" /> : <Sparkles className="h-5 w-5" aria-hidden="true" />}

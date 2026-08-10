@@ -302,7 +302,7 @@ export function DecisionLogPage() {
 
   return (
     <section className="alios-page space-y-6">
-      <PremiumCard className="border-primary/15 bg-gradient-to-br from-primary/10 via-background to-background shadow-sm">
+      <PremiumCard className="alios-now-surface shadow-sm">
         <div className="grid gap-5 p-5 sm:p-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)]">
           <div className="space-y-5">
             <SectionHeader
@@ -328,21 +328,21 @@ export function DecisionLogPage() {
             </div>
 
             <div className="grid gap-3 sm:grid-cols-3">
-              <SoftPanel className="gap-2 border-primary/15 bg-background/80">
+              <SoftPanel className="gap-2 border-alios-saffron/25 bg-background/85">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                   {t("decisions.reviewDue")}
                 </p>
                 <p className="text-lg font-semibold tabular-nums">{needsReviewEntries.length}</p>
                 <p className="text-sm text-muted-foreground">{t("decisions.needsReviewSectionDescription")}</p>
               </SoftPanel>
-              <SoftPanel className="gap-2 border-primary/15 bg-background/80">
+              <SoftPanel className="gap-2 border-alios-saffron/25 bg-background/85">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                   {t("decisions.openDecisions")}
                 </p>
                 <p className="text-lg font-semibold tabular-nums">{filterCounts.open}</p>
                 <p className="text-sm text-muted-foreground">{t("decisions.formDescription")}</p>
               </SoftPanel>
-              <SoftPanel className="gap-2 border-primary/15 bg-background/80">
+              <SoftPanel className="gap-2 border-alios-saffron/25 bg-background/85">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                   {t("decisions.reviewedDecisions")}
                 </p>
@@ -352,7 +352,7 @@ export function DecisionLogPage() {
             </div>
           </div>
 
-          <SoftPanel className="space-y-4 border-primary/20 bg-primary/5">
+          <SoftPanel className="space-y-4 alios-thread-accent">
             <div className="space-y-1">
               <p className="text-sm font-medium text-muted-foreground">
                 {t("decisions.createDecision")}

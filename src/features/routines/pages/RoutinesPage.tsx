@@ -142,7 +142,7 @@ export function RoutinesPage() {
 
   return (
     <section className="alios-page space-y-6">
-      <PremiumCard className="border-primary/15 bg-primary/5">
+      <PremiumCard className="alios-now-surface">
         <CardContent className="p-5 sm:p-6">
           <SectionHeader
             icon={<Repeat2 className="h-5 w-5" />}
