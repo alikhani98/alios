@@ -5,8 +5,8 @@ import { useI18n } from "@/shared/i18n";
 import {
   Button,
   CardContent,
+  CollapsibleSection,
   MiniProgressBar,
-  PremiumCard,
   StatusChip,
 } from "@/shared/ui";
 
@@ -39,7 +39,25 @@ export function TodayWeeklyPlanCard({ focus, isLoading }: TodayWeeklyPlanCardPro
   }
 
   return (
-    <PremiumCard className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/10 via-background to-background">
+    <CollapsibleSection
+      id="today-weekly-plan"
+      title={t("today.weeklyPlanFocus")}
+      description={focus.plan.focusTitle}
+      icon={<CalendarDays className="h-5 w-5" aria-hidden="true" />}
+      status={
+        <span className="flex flex-wrap justify-end gap-2">
+          <StatusChip tone={executionStatus.tone}>{executionStatus.label}</StatusChip>
+          <StatusChip tone="primary">
+            {focus.linkedTaskCompleted} / {focus.linkedTaskTotal}
+          </StatusChip>
+        </span>
+      }
+      defaultOpen={false}
+      expandLabel={t("common.expandSection")}
+      collapseLabel={t("common.collapseSection")}
+      contentClassName="p-0"
+      className="border-primary/20 bg-gradient-to-br from-primary/10 via-background to-background"
+    >
       <CardContent className="grid gap-5 p-5 sm:p-6 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,0.7fr)]">
         <div className="min-w-0 space-y-4">
           <div className="flex flex-wrap items-start justify-between gap-3">
@@ -107,6 +125,6 @@ export function TodayWeeklyPlanCard({ focus, isLoading }: TodayWeeklyPlanCardPro
           <MiniProgressBar value={progress} label={t("home.completion")} className="mt-4" />
         </div>
       </CardContent>
-    </PremiumCard>
+    </CollapsibleSection>
   );
 }

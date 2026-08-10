@@ -10,6 +10,7 @@ import { projectRecord, taskRecord } from "@/test/factories";
 
 import { TodayTaskCard } from "../components/TodayTaskCard";
 import { TodayTaskForm } from "../components/TodayTaskForm";
+import { TodayWeeklyPlanCard } from "../components/TodayWeeklyPlanCard";
 import {
   createAllTodayTasksPath,
   createLinkedProjectPath,
@@ -136,6 +137,59 @@ describe("Task project links", () => {
       '<option value="deleted-project">Current linked project is unavailable</option>'
     );
     expect(unavailableFormHtml).toContain("The task remains usable");
+  });
+
+  it("keeps optional task form metadata behind a collapsed disclosure", () => {
+    const html = renderTodayUi(
+      <TodayTaskForm
+        projects={[projectRecord]}
+        isProjectsLoading={false}
+        areProjectsUnavailable={false}
+        defaultDueDate="2026-07-17"
+        isSubmitting={false}
+        onSubmit={async () => undefined}
+        onCancel={() => undefined}
+      />
+    );
+
+    expect(html).toContain("Task title");
+    expect(html).toContain("Create task");
+    expect(html).toContain('id="today-task-advanced-fields"');
+    expect(html).toContain("Advanced task fields");
+    expect(html).toContain('aria-expanded="false"');
+    expect(html).toContain(
+      'id="today-task-advanced-fields-content" hidden="" aria-hidden="true"'
+    );
+    expect(html).toContain("Linked project");
+    expect(html).toContain("Repeat");
+  });
+
+  it("keeps the weekly planning detail collapsed while showing its status summary", () => {
+    const html = renderTodayUi(
+      <TodayWeeklyPlanCard
+        isLoading={false}
+        focus={{
+          plan: {
+            id: "weekly-plan",
+            weekStart: "2026-07-13",
+            focusTitle: "Ship a calmer Today workspace",
+            intention: "Use the plan as context, not another task list.",
+            createdAt: "2026-07-13T08:00:00.000Z",
+            updatedAt: "2026-07-13T08:00:00.000Z",
+          },
+          linkedTaskTotal: 3,
+          linkedTaskCompleted: 1,
+        }}
+      />
+    );
+
+    expect(html).toContain('id="today-weekly-plan"');
+    expect(html).toContain("Weekly plan focus");
+    expect(html).toContain("Ship a calmer Today workspace");
+    expect(html).toContain('aria-expanded="false"');
+    expect(html).toContain('id="today-weekly-plan-content" hidden="" aria-hidden="true"');
+    expect(html).toContain("1 / 3");
+    expect(html).toContain("Weekly Review");
   });
 
   it("renders the linked Project controls in Persian", () => {

@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { PROJECT_STATUS_LABEL_KEYS } from "@/features/projects/constants";
 import type { Project, Task } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
-import { Button, DateValueHint, Input, Select, Textarea } from "@/shared/ui";
+import { Button, CollapsibleSection, DateValueHint, Input, Select, Textarea } from "@/shared/ui";
 import { TASK_PRIORITY_OPTIONS, TASK_STATUS_OPTIONS } from "../constants";
 import { todayTaskFormSchema, type TodayTaskFormValues } from "../types";
 
@@ -55,23 +55,34 @@ export function TodayTaskForm({
       className="grid gap-5"
       onSubmit={handleSubmit((values) => void onSubmit(values))}
     >
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)]">
-        <div className="grid gap-5">
-          <div className="alios-surface-muted grid gap-2 border-border/60 p-4">
-            <label htmlFor="today-task-title" className="text-sm font-medium">
-              {t("today.taskTitle")}
-            </label>
-            <Input
-              id="today-task-title"
-              autoFocus
-              placeholder={t("today.taskTitlePlaceholder")}
-              aria-invalid={Boolean(errors.title)}
-              {...register("title")}
-            />
-            {errors.title ? (
-              <p className="text-sm text-destructive">{t("common.validation")}</p>
-            ) : null}
-          </div>
+      <div className="alios-surface-muted grid gap-2 border-border/60 p-4">
+        <label htmlFor="today-task-title" className="text-sm font-medium">
+          {t("today.taskTitle")}
+        </label>
+        <Input
+          id="today-task-title"
+          autoFocus
+          placeholder={t("today.taskTitlePlaceholder")}
+          aria-invalid={Boolean(errors.title)}
+          {...register("title")}
+        />
+        {errors.title ? (
+          <p className="text-sm text-destructive">{t("common.validation")}</p>
+        ) : null}
+      </div>
+
+      <CollapsibleSection
+        id="today-task-advanced-fields"
+        title={t("today.advancedTaskFields")}
+        description={t("today.advancedTaskFieldsDescription")}
+        defaultOpen={false}
+        expandLabel={t("common.expandSection")}
+        collapseLabel={t("common.collapseSection")}
+        contentClassName="grid gap-5"
+        className="border-border/70 bg-card/95"
+      >
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)]">
+          <div className="grid gap-5">
 
           <div className="alios-surface-muted grid gap-2 border-border/60 p-4">
             <label htmlFor="today-task-description" className="text-sm font-medium">
@@ -202,7 +213,8 @@ export function TodayTaskForm({
             </p>
           </div>
         </div>
-      </div>
+        </div>
+      </CollapsibleSection>
 
       <div className="flex flex-col gap-3 border-t border-border/70 pt-4 sm:flex-row sm:flex-wrap">
         <Button type="submit" className="w-full sm:w-auto" disabled={isSubmitting}>
