@@ -1,4 +1,4 @@
-import { AlertCircle, CheckCircle2, Circle, Inbox, RotateCcw, Search, SearchX, Trash2, X } from "lucide-react";
+import { AlertCircle, CheckCircle2, Circle, Inbox, Plus, RotateCcw, Search, SearchX, Trash2, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
@@ -213,7 +213,7 @@ export function InboxPage() {
         </CardContent>
       </PremiumCard>
 
-      <PremiumCard>
+      <PremiumCard id="inbox-quick-capture">
         <CardHeader><CardTitle>{t("inbox.quickCapture")}</CardTitle></CardHeader>
         <CardContent>
           <InboxItemForm isSubmitting={isCapturing} onSubmit={capture} />
@@ -390,6 +390,19 @@ export function InboxPage() {
           title={t("inbox.emptyTitle")}
           description={t("inbox.emptyDescription")}
           note={t("inbox.emptyNote")}
+          actions={
+            <Button
+              type="button"
+              onClick={() =>
+                document
+                  .getElementById("inbox-quick-capture")
+                  ?.scrollIntoView({ behavior: "smooth", block: "start" })
+              }
+            >
+              <Plus className="me-2 h-4 w-4" />
+              {t("inbox.captureItem")}
+            </Button>
+          }
         />
       ) : filteredItems.length === 0 ? (
         <EmptyState

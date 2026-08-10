@@ -90,9 +90,11 @@ vi.mock("@/features/today/components/TodayWorkspace", () => ({
   ),
 }));
 
+let mockedDashboardData: HomeDashboardData = dashboardData;
+
 vi.mock("../hooks/useHomeDashboard", () => ({
   useHomeDashboard: () => ({
-    data: dashboardData,
+    data: mockedDashboardData,
     isLoading: false,
     hasError: false,
     loadDashboard: vi.fn(),
@@ -130,6 +132,7 @@ describe("UnifiedHomePage", () => {
   beforeEach(() => {
     localStorage.clear();
     localStorage.setItem(LANGUAGE_STORAGE_KEY, "en");
+    mockedDashboardData = dashboardData;
   });
 
   it("renders the clear start card and prepared Today workspace without route wiring", () => {
@@ -159,5 +162,27 @@ describe("UnifiedHomePage", () => {
     expect(markup).toContain('aria-expanded="false"');
     expect(markup).toContain('id="unified-home-more-context-content" hidden="" aria-hidden="true"');
     expect(markup).toContain("Quick links");
+  });
+
+  it("guides a no-task day toward a small inbox-processing step", () => {
+    mockedDashboardData = {
+      ...dashboardData,
+      tasks: [],
+      today: {
+        tasks: [],
+        completedTaskCount: 0,
+        mitTask: undefined,
+      },
+      inbox: {
+        unprocessedCount: 32,
+      },
+    };
+
+    const markup = renderUnifiedHome();
+
+    expect(markup).toContain("Your inbox has 32 item(s) waiting");
+    expect(markup).toContain("Start small: process 3 item(s)");
+    expect(markup).toContain("Process inbox");
+    expect(markup).toContain("Start with 3 inbox item(s)");
   });
 });

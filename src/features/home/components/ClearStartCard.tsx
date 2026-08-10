@@ -30,6 +30,18 @@ export function ClearStartCard({
   const activeTaskCount = data.today.tasks.filter(
     (task) => task.status === "todo" || task.status === "doing"
   ).length;
+  const inboxBacklogCount = data.inbox.unprocessedCount;
+  const suggestedInboxBatchCount = Math.min(3, inboxBacklogCount);
+  const shouldStartWithInbox = activeTaskCount === 0 && inboxBacklogCount > 0;
+  const primaryActionHref = shouldStartWithInbox ? "/inbox" : "/today";
+  const primaryActionLabel = shouldStartWithInbox
+    ? t("home.clearStartProcessInbox")
+    : t("home.clearStartAddTask");
+  const primaryActionIcon = shouldStartWithInbox ? (
+    <Inbox className="me-2 h-4 w-4" aria-hidden="true" />
+  ) : (
+    <Plus className="me-2 h-4 w-4" aria-hidden="true" />
+  );
 
   return (
     <PremiumCard className="alios-home-now-surface">
@@ -56,7 +68,7 @@ export function ClearStartCard({
                 {t("home.unprocessedInbox")}
               </p>
               <p className="font-mono text-2xl font-semibold tabular-nums">
-                {data.inbox.unprocessedCount}
+                {inboxBacklogCount}
               </p>
               <p className="text-sm text-muted-foreground">{t("inbox.unprocessed")}</p>
             </SoftPanel>
@@ -77,19 +89,30 @@ export function ClearStartCard({
                 {currentFocus ? t("home.clearStartFocusLabel") : t("home.clearStartEmptyLabel")}
               </p>
               <p className="break-words text-xl font-semibold leading-8">
-                {currentFocus?.title ?? t("today.noTasks")}
+                {currentFocus?.title
+                  ?? (shouldStartWithInbox
+                    ? t("home.clearStartInboxBacklogTitle", {
+                        count: inboxBacklogCount,
+                      })
+                    : t("today.noTasks"))}
               </p>
               <p className="text-sm leading-6 text-muted-foreground">
-                {currentFocus ? t("today.tasksDescription") : t("today.noTasksDescription")}
+                {currentFocus
+                  ? t("today.tasksDescription")
+                  : shouldStartWithInbox
+                    ? t("home.clearStartInboxBacklogDescription", {
+                        count: suggestedInboxBatchCount,
+                      })
+                    : t("today.noTasksDescription")}
               </p>
             </div>
           </div>
 
           <div className="grid gap-2">
             <Button asChild className="alios-home-thread-item w-full bg-alios-caspian text-white hover:bg-alios-caspian/90 dark:bg-alios-paper dark:text-alios-night dark:hover:bg-alios-paper/90">
-              <Link to="/today">
-                <Plus className="me-2 h-4 w-4" aria-hidden="true" />
-                {t("home.clearStartAddTask")}
+              <Link to={primaryActionHref}>
+                {primaryActionIcon}
+                {primaryActionLabel}
               </Link>
             </Button>
             <div className="grid gap-2 sm:grid-cols-2">
@@ -108,8 +131,14 @@ export function ClearStartCard({
             </div>
           </div>
 
-          <StatusChip tone={activeTaskCount > 0 ? "primary" : "neutral"} className="alios-home-thread-item w-fit">
-            <span className="font-mono tabular-nums">{activeTaskCount}</span> {t("common.active")}
+          <StatusChip tone={activeTaskCount > 0 ? "primary" : shouldStartWithInbox ? "warning" : "neutral"} className="alios-home-thread-item w-fit">
+            {shouldStartWithInbox ? (
+              t("home.clearStartInboxBacklogStatus", { count: suggestedInboxBatchCount })
+            ) : (
+              <>
+                <span className="font-mono tabular-nums">{activeTaskCount}</span> {t("common.active")}
+              </>
+            )}
           </StatusChip>
         </SoftPanel>
       </CardContent>
