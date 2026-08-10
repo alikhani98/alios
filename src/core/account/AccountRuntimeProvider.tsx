@@ -29,12 +29,14 @@ const AccountRuntimeContext = createContext<AccountRuntimeContextValue | null>(
 type AccountRuntimeProviderProps = Readonly<{
   boundary?: AccountRuntimeBoundary;
   store?: AccountRuntimeStateStore;
+  refreshOnMount?: boolean;
   children: ReactNode;
 }>;
 
 export function AccountRuntimeProvider({
   boundary = localOnlyAccountRuntimeBoundary,
   store,
+  refreshOnMount = true,
   children,
 }: AccountRuntimeProviderProps) {
   const runtimeStore = useMemo(
@@ -43,8 +45,12 @@ export function AccountRuntimeProvider({
   );
 
   useEffect(() => {
+    if (!refreshOnMount) {
+      return;
+    }
+
     void runtimeStore.refresh();
-  }, [runtimeStore]);
+  }, [refreshOnMount, runtimeStore]);
 
   const value = useMemo<AccountRuntimeContextValue>(
     () => ({

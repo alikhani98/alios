@@ -15,6 +15,14 @@ module.exports = defineConfig(({ mode }) => ({
     rollupOptions: {
       output: {
         manualChunks(id) {
+          if (id.includes("src/shared/i18n/messages.en.ts")) {
+            return "i18n-en";
+          }
+
+          if (id.includes("src/shared/i18n/messages.fa.ts")) {
+            return "i18n-fa";
+          }
+
           if (!id.includes("node_modules")) {
             return;
           }

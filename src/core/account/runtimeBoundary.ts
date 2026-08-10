@@ -5,18 +5,18 @@ import {
 import type {
   AuthProvider,
   AuthSession,
-  AuthSessionSource,
   AuthSessionStatus,
-} from "@/core/auth";
-import { localOnlyAuthProvider } from "@/core/auth";
-import {
-  localOnlySyncProvider,
-  type SyncConflictRecord,
-  type SyncConflictResolutionInput,
-  type SyncConflictResolutionResult,
-  type SyncProvider,
-} from "@/core/sync";
-import { LOCAL_ONLY_SYNC_METADATA, type SyncMetadataSnapshot } from "@/core/sync";
+} from "@/core/auth/types";
+import type { AuthSessionSource } from "@/core/auth/authSessionStore";
+import { localOnlyAuthProvider } from "@/core/auth/LocalOnlyAuthProvider";
+import { localOnlySyncProvider } from "@/core/sync/LocalOnlySyncProvider";
+import { LOCAL_ONLY_SYNC_METADATA, type SyncMetadataSnapshot } from "@/core/sync/syncMetadata";
+import type {
+  SyncConflictRecord,
+  SyncConflictResolutionInput,
+  SyncConflictResolutionResult,
+  SyncProvider,
+} from "@/core/sync/types";
 import type { SyncStatus } from "@/core/sync/types";
 import {
   LOCAL_ONLY_ACCOUNT_CAPABILITY_SET,

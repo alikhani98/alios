@@ -44,13 +44,11 @@ import { Input } from "@/shared/ui";
 import { aliosPopoverMotion, aliosSurfaceMotion } from "@/shared/ui/motion";
 import { cn } from "@/shared/utils/cn";
 
-import { useHomeDashboardLayout } from "@/features/home/hooks/useHomeDashboardLayout";
-
 type ActivePanel = "dashboard" | "theme" | "profile" | null;
 
-const HomeDashboardCustomizer = lazyWithRetry(() =>
-  import("@/features/home/components/HomeDashboardCustomizer").then((module) => ({
-    default: module.HomeDashboardCustomizer,
+const TopbarDashboardPanel = lazyWithRetry(() =>
+  import("./TopbarDashboardPanel").then((module) => ({
+    default: module.TopbarDashboardPanel,
   }))
 );
 
@@ -96,13 +94,6 @@ export function Topbar({
   });
   const { value: accentColorPreference, setValue: setAccentColorPreference } =
     useAccentColorPreference();
-  const {
-    layout,
-    moveSectionUp,
-    moveSectionDown,
-    toggleSectionVisibility,
-    resetLayout,
-  } = useHomeDashboardLayout();
   const [activePanel, setActivePanel] = useState<ActivePanel>(null);
   const [draftDisplayName, setDraftDisplayName] = useState(displayName);
   const [savedMessage, setSavedMessage] = useState<string | null>(null);
@@ -214,30 +205,6 @@ export function Topbar({
       setSavedMessage(null);
       savedMessageTimer.current = null;
     }, 1800);
-  };
-
-  const handleMoveSectionUp = (sectionId: Parameters<typeof moveSectionUp>[0]) => {
-    moveSectionUp(sectionId);
-    showSavedFeedback();
-  };
-
-  const handleMoveSectionDown = (
-    sectionId: Parameters<typeof moveSectionDown>[0]
-  ) => {
-    moveSectionDown(sectionId);
-    showSavedFeedback();
-  };
-
-  const handleToggleSectionVisibility = (
-    sectionId: Parameters<typeof toggleSectionVisibility>[0]
-  ) => {
-    toggleSectionVisibility(sectionId);
-    showSavedFeedback();
-  };
-
-  const handleResetLayout = () => {
-    resetLayout();
-    showSavedFeedback();
   };
 
   const handleSelectAccentColor = (
@@ -438,28 +405,7 @@ export function Topbar({
                 </div>
               }
             >
-              <div className="space-y-4">
-                <SectionHeader
-                  icon={<LayoutDashboard className="h-5 w-5" />}
-                  title={t("home.dashboardControlsTitle")}
-                  description={t("home.dashboardControlsDescription")}
-                  status={
-                    <Badge variant="secondary" className="shrink-0">
-                      {t("home.localOnlyDashboardPreference")}
-                    </Badge>
-                  }
-                />
-
-                <div className="rounded-2xl border border-border/70 bg-background/70 p-3">
-                  <HomeDashboardCustomizer
-                    layout={layout}
-                    onMoveUp={handleMoveSectionUp}
-                    onMoveDown={handleMoveSectionDown}
-                    onToggleVisibility={handleToggleSectionVisibility}
-                    onReset={handleResetLayout}
-                  />
-                </div>
-              </div>
+              <TopbarDashboardPanel onChange={showSavedFeedback} />
             </Suspense>
           </div>
         ) : null}

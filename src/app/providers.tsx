@@ -1,28 +1,16 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { AlertTriangle, RefreshCcw, RotateCcw } from "lucide-react";
 
-import {
-  AccountRuntimeProvider,
-  createAccountRuntimeBoundary,
-  emailAccountProvider,
-  googleAccountProvider,
-  localOnlyAccountProvider,
-  type AccountProvider,
-} from "@/core/account";
-import {
-  AuthRuntimeProvider,
-  createAuthSessionStore,
-  emailAuthProvider,
-  googleAuthRuntime,
-  googleAuthProvider,
-  localOnlyAuthProvider,
-  type AuthProvider,
-} from "@/core/auth";
-import {
-  localOnlySyncProvider,
-  SupabasePreferenceSyncProvider,
-  type SyncProvider,
-} from "@/core/sync";
+import { AccountRuntimeProvider } from "@/core/account/AccountRuntimeProvider";
+import { createAccountRuntimeBoundary } from "@/core/account/runtimeBoundary";
+import { localOnlyAccountProvider } from "@/core/account/LocalOnlyAccountProvider";
+import type { AccountProvider } from "@/core/account/types";
+import { AuthRuntimeProvider } from "@/core/auth/AuthRuntimeProvider";
+import { createAuthSessionStore } from "@/core/auth/authSessionStore";
+import { localOnlyAuthProvider } from "@/core/auth/LocalOnlyAuthProvider";
+import type { AuthProvider } from "@/core/auth/types";
+import { localOnlySyncProvider } from "@/core/sync/LocalOnlySyncProvider";
+import type { SyncProvider } from "@/core/sync/types";
 import { StorageAdapterProvider, type StorageAdapter } from "@/core/storage";
 import { I18nProvider, useI18n } from "@/shared/i18n";
 import { DateDisplayProvider } from "@/shared/date";
@@ -36,6 +24,15 @@ import {
   CardTitle,
   RouteLoadingFallback,
 } from "@/shared/ui";
+import {
+  isOptionalAuthConfigured,
+  isOptionalSyncConfigured,
+  LazySupabaseSyncProvider,
+  lazyEmailAccountProvider,
+  lazyEmailAuthProvider,
+  lazyGoogleAccountProvider,
+  lazyGoogleAuthProvider,
+} from "./lazyRuntimeProviders";
 
 type AppProvidersProps = {
   children: ReactNode;
@@ -55,18 +52,28 @@ type BootstrapState =
   | { status: "ready"; adapter: StorageAdapter }
   | { status: "error"; error: Error };
 
+type ActivatableSyncProvider = SyncProvider & {
+  activate: () => void;
+  deactivate?: () => void;
+};
+
+const isActivatableSyncProvider = (
+  provider: SyncProvider
+): provider is ActivatableSyncProvider =>
+  "activate" in provider && typeof provider.activate === "function";
+
 function resolveDefaultAccountProvider() {
-  if (emailAuthProvider.isConfigured()) {
+  if (lazyEmailAuthProvider.isConfigured()) {
     return {
-      accountProvider: emailAccountProvider,
-      authProvider: emailAuthProvider,
+      accountProvider: lazyEmailAccountProvider,
+      authProvider: lazyEmailAuthProvider,
     };
   }
 
-  if (googleAuthProvider.isConfigured()) {
+  if (lazyGoogleAuthProvider.isConfigured()) {
     return {
-      accountProvider: googleAccountProvider,
-      authProvider: googleAuthProvider,
+      accountProvider: lazyGoogleAccountProvider,
+      authProvider: lazyGoogleAuthProvider,
     };
   }
 
@@ -173,7 +180,7 @@ export function AppProviders({
       return syncProvider;
     }
 
-    if (!emailAuthProvider.isConfigured() && !googleAuthProvider.isConfigured()) {
+    if (!isOptionalAuthConfigured() || !isOptionalSyncConfigured()) {
       return localOnlySyncProvider;
     }
 
@@ -181,10 +188,12 @@ export function AppProviders({
       return localOnlySyncProvider;
     }
 
-    return new SupabasePreferenceSyncProvider({
+    return new LazySupabaseSyncProvider({
       authProvider: authSessionSource,
       idTokenProvider:
-        authProvider === googleAuthProvider ? googleAuthRuntime : undefined,
+        authProvider.name === lazyGoogleAuthProvider.name
+          ? lazyGoogleAuthProvider
+          : undefined,
       backupStorage: bootstrapState.adapter.backup,
     });
   }, [authProvider, authSessionSource, bootstrapState, syncProvider]);
@@ -203,7 +212,7 @@ export function AppProviders({
   useEffect(() => {
     if (
       bootstrapState.status !== "ready" ||
-      !(resolvedSyncProvider instanceof SupabasePreferenceSyncProvider)
+      !isActivatableSyncProvider(resolvedSyncProvider)
     ) {
       return;
     }
@@ -211,7 +220,7 @@ export function AppProviders({
     resolvedSyncProvider.activate();
 
     return () => {
-      resolvedSyncProvider.deactivate();
+      resolvedSyncProvider.deactivate?.();
     };
   }, [bootstrapState.status, resolvedSyncProvider]);
 
@@ -265,7 +274,10 @@ export function AppProviders({
             }}
           />
         ) : (
-          <AccountRuntimeProvider boundary={accountRuntimeBoundary}>
+          <AccountRuntimeProvider
+            boundary={accountRuntimeBoundary}
+            refreshOnMount={false}
+          >
             <AuthRuntimeProvider
               provider={authProvider}
               sessionSource={authSessionSource}
