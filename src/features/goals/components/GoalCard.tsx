@@ -18,9 +18,9 @@ import {
   Button,
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
+  CollapsibleSection,
   MiniProgressBar,
   SoftPanel,
   StatusChip,
@@ -87,9 +87,6 @@ export function GoalCard({
               ) : null}
             </div>
             <CardTitle className="break-words text-xl leading-8">{goal.title}</CardTitle>
-            <CardDescription className="max-w-3xl break-words whitespace-pre-wrap text-sm leading-7">
-              {goal.description}
-            </CardDescription>
           </div>
           <div className="shrink-0 text-end">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
@@ -135,83 +132,106 @@ export function GoalCard({
           />
         </SoftPanel>
 
-        <div className="grid gap-3 lg:grid-cols-2">
-          <SoftPanel className="min-w-0">
-            <div className="flex min-w-0 items-start justify-between gap-3">
-              <div className="min-w-0 space-y-1">
-                <p className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-                  <FolderKanban className="h-4 w-4 shrink-0 text-primary" />
-                  {t("projects.title")}
-                </p>
-                <p className="break-words text-base font-semibold">{linkedProjectSummary}</p>
-                <p className="break-words text-xs leading-5 text-muted-foreground">
-                  {t("projects.taskProgress")}
-                </p>
-              </div>
-              <Button asChild size="sm" variant="outline" className="shrink-0">
-                <Link to={createGoalProjectsPath(goal.id)}>
-                  <FolderKanban className="me-2 h-4 w-4" />
-                  {t("projects.title")}
-                </Link>
-              </Button>
-            </div>
+        <CollapsibleSection
+          id={`goal-${goal.id}-details`}
+          title={t("goals.goalDetails")}
+          description={t("goals.goalDetailsDescription")}
+          icon={<Target className="h-5 w-5" />}
+          status={<StatusChip tone="primary">{progressLabel}</StatusChip>}
+          expandLabel={t("common.expandSection")}
+          collapseLabel={t("common.collapseSection")}
+          defaultOpen={false}
+          className="rounded-2xl border border-border/70 bg-muted/20 shadow-none"
+          contentClassName="space-y-4"
+        >
+          <SoftPanel className="space-y-2">
+            <p className="text-sm font-semibold">{t("goals.descriptionLabel")}</p>
+            <p className="break-words whitespace-pre-wrap text-sm leading-7 text-muted-foreground">
+              {goal.description}
+            </p>
           </SoftPanel>
 
-          <SoftPanel className="min-w-0">
-            <div className="flex min-w-0 items-start justify-between gap-3">
-              <div className="min-w-0 space-y-1">
-                <p className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-                  <ListChecks className="h-4 w-4 shrink-0 text-primary" />
-                  {t("nav.today")}
-                </p>
-                <p className="break-words text-base font-semibold">{linkedTaskSummary}</p>
-                <p className="break-words text-xs leading-5 text-muted-foreground">
-                  {t("projects.openTodayTasks")}
-                </p>
+          <div className="grid gap-3 lg:grid-cols-2">
+            <SoftPanel className="min-w-0">
+              <div className="flex min-w-0 items-start justify-between gap-3">
+                <div className="min-w-0 space-y-1">
+                  <p className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                    <FolderKanban className="h-4 w-4 shrink-0 text-primary" />
+                    {t("projects.title")}
+                  </p>
+                  <p className="break-words text-base font-semibold">{linkedProjectSummary}</p>
+                  <p className="break-words text-xs leading-5 text-muted-foreground">
+                    {t("projects.taskProgress")}
+                  </p>
+                </div>
+                <Button asChild size="sm" variant="outline" className="shrink-0">
+                  <Link to={createGoalProjectsPath(goal.id)}>
+                    <FolderKanban className="me-2 h-4 w-4" />
+                    {t("projects.title")}
+                  </Link>
+                </Button>
               </div>
-              <Button asChild size="sm" variant="outline" className="shrink-0">
-                <Link to={createTodayTasksPath({ goalId: goal.id })}>
-                  <ListChecks className="me-2 h-4 w-4" />
-                  {t("nav.today")}
-                </Link>
-              </Button>
-            </div>
-          </SoftPanel>
-        </div>
+            </SoftPanel>
 
-        <div className="grid gap-2 border-t border-border/70 pt-4 text-sm text-muted-foreground sm:grid-cols-2">
-          <p className="min-w-0 break-words">
-            {t("goals.targetDateLabel")}:{" "}
-            {goal.targetDate ? formatDate(goal.targetDate) : t("common.notRecorded")}
-          </p>
-          <p className="min-w-0 break-words">
-            {t("goals.reviewIntervalDaysLabel")}:{" "}
-            {goal.reviewIntervalDays ?? t("common.notRecorded")}
-          </p>
-          <p className="min-w-0 break-words">
-            {t("goals.lastReviewedLabel")}:{" "}
-            {goal.lastReviewedAt
-              ? formatDateTime(goal.lastReviewedAt)
-              : t("common.notRecorded")}
-          </p>
-          <p className="min-w-0 break-words">
-            {t("goals.updatedAtLabel")}: {formatDateTime(goal.updatedAt)}
-          </p>
-        </div>
-
-        {goal.tags.length > 0 ? (
-          <div className="flex flex-wrap gap-2">
-            {goal.tags.map((tag) => (
-              <Badge
-                key={tag}
-                variant="secondary"
-                className="max-w-full break-words whitespace-normal text-start"
-              >
-                {tag}
-              </Badge>
-            ))}
+            <SoftPanel className="min-w-0">
+              <div className="flex min-w-0 items-start justify-between gap-3">
+                <div className="min-w-0 space-y-1">
+                  <p className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                    <ListChecks className="h-4 w-4 shrink-0 text-primary" />
+                    {t("nav.today")}
+                  </p>
+                  <p className="break-words text-base font-semibold">{linkedTaskSummary}</p>
+                  <p className="break-words text-xs leading-5 text-muted-foreground">
+                    {t("projects.openTodayTasks")}
+                  </p>
+                </div>
+                <Button asChild size="sm" variant="outline" className="shrink-0">
+                  <Link to={createTodayTasksPath({ goalId: goal.id })}>
+                    <ListChecks className="me-2 h-4 w-4" />
+                    {t("nav.today")}
+                  </Link>
+                </Button>
+              </div>
+            </SoftPanel>
           </div>
-        ) : null}
+
+          <div className="grid gap-2 border-t border-border/70 pt-4 text-sm text-muted-foreground sm:grid-cols-2">
+            <p className="min-w-0 break-words">
+              {t("goals.targetDateLabel")}:{" "}
+              {goal.targetDate ? formatDate(goal.targetDate) : t("common.notRecorded")}
+            </p>
+            <p className="min-w-0 break-words">
+              {t("goals.reviewIntervalDaysLabel")}:{" "}
+              {goal.reviewIntervalDays ?? t("common.notRecorded")}
+            </p>
+            <p className="min-w-0 break-words">
+              {t("goals.lastReviewedLabel")}:{" "}
+              {goal.lastReviewedAt
+                ? formatDateTime(goal.lastReviewedAt)
+                : t("common.notRecorded")}
+            </p>
+            <p className="min-w-0 break-words">
+              {t("goals.updatedAtLabel")}: {formatDateTime(goal.updatedAt)}
+            </p>
+          </div>
+
+          {goal.tags.length > 0 ? (
+            <div className="space-y-2">
+              <p className="text-sm font-semibold">{t("goals.tagsLabel")}</p>
+              <div className="flex flex-wrap gap-2">
+                {goal.tags.map((tag) => (
+                  <Badge
+                    key={tag}
+                    variant="secondary"
+                    className="max-w-full break-words whitespace-normal text-start"
+                  >
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          ) : null}
+        </CollapsibleSection>
 
         <div className="flex flex-col gap-2 border-t border-border/70 pt-4 sm:flex-row sm:flex-wrap">
           <Button size="sm" className="w-full sm:w-auto" asChild>

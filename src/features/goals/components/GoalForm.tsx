@@ -1,7 +1,7 @@
 import { useMemo, useState, type FormEvent } from "react";
 
 import { useI18n } from "@/shared/i18n";
-import { Button, DateValueHint, Input, Select, SoftPanel, Textarea } from "@/shared/ui";
+import { Button, CollapsibleSection, DateValueHint, Input, Select, SoftPanel, Textarea } from "@/shared/ui";
 
 import {
   GOAL_AREA_OPTIONS,
@@ -161,7 +161,16 @@ export function GoalForm({
             </label>
           </SoftPanel>
 
-          <SoftPanel className="grid gap-4">
+          <CollapsibleSection
+            id="goals-form-advanced"
+            title={t("goals.advancedFields")}
+            description={t("goals.advancedFieldsDescription")}
+            expandLabel={t("common.expandSection")}
+            collapseLabel={t("common.collapseSection")}
+            defaultOpen={false}
+            className="rounded-2xl border border-border/70 bg-muted/20 shadow-none"
+            contentClassName="space-y-4"
+          >
             <label className="space-y-2">
               <span className="text-sm font-medium">{t("goals.targetDateLabel")}</span>
               <Input
@@ -192,7 +201,7 @@ export function GoalForm({
                 placeholder={t("goals.tagsPlaceholder")}
               />
             </label>
-          </SoftPanel>
+          </CollapsibleSection>
         </div>
       </div>
 
