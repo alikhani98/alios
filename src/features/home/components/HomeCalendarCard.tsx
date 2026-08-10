@@ -184,13 +184,13 @@ export function HomeCalendarCard({
                         isToday && "ring-1 ring-primary/25"
                       )}
                     >
-                      <span className="truncate text-[0.625rem] font-medium text-muted-foreground sm:text-xs">
+                      <span className="truncate text-xs font-medium text-muted-foreground">
                         {weekLabels[index]}
                       </span>
                       <span className="text-base font-semibold tabular-nums sm:text-xl">
                         {formatDayNumber(date, { language, calendar: resolvedCalendar })}
                       </span>
-                      <span className={cn("truncate text-[0.625rem] font-medium sm:text-xs", taskCount > 0 ? "text-primary" : "text-muted-foreground")}>
+                      <span className={cn("truncate text-xs font-medium", taskCount > 0 ? "text-primary" : "text-muted-foreground")}>
                         <span className="sm:hidden">{taskCount || "—"}</span>
                         <span className="hidden sm:inline">
                           {taskCount > 0 ? `${taskCount} ${t("home.todayTasks")}` : t("home.noItemsForThisDay")}
@@ -203,7 +203,7 @@ export function HomeCalendarCard({
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-7 gap-1 text-center text-[0.7rem] font-medium uppercase tracking-wide text-muted-foreground sm:text-xs">
+              <div className="grid grid-cols-7 gap-1 text-center text-xs font-medium uppercase tracking-wide text-muted-foreground">
                 {weekdayLabels.map((label) => (
                   <div key={label} className="px-1 py-2">
                     {label}

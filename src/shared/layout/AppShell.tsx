@@ -123,7 +123,7 @@ export function AppShell() {
             showDashboardControls={location.pathname === "/"}
           />
 
-          <main className="min-w-0 flex-1 overflow-x-hidden px-3 pb-4 pt-3 sm:px-4 sm:pb-5 sm:pt-4 lg:px-6 lg:pb-7 xl:px-8">
+          <main className="min-w-0 flex-1 overflow-x-hidden px-3 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-3 sm:px-4 sm:pb-[calc(1.25rem+env(safe-area-inset-bottom))] sm:pt-4 lg:px-6 lg:pb-[calc(1.75rem+env(safe-area-inset-bottom))] xl:px-8">
             <div
               key={location.pathname}
               className="alios-page-transition min-h-full space-y-4"
