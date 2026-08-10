@@ -11,6 +11,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
+  CollapsibleSection,
   SoftPanel,
   StatusChip,
 } from "@/shared/ui";
@@ -30,15 +31,6 @@ type ManualEntryCardProps = {
   onDelete: () => Promise<void>;
   onMarkReviewed: () => Promise<void>;
 };
-
-function previewText(value: string, fallback: string) {
-  const trimmed = value.trim();
-  if (!trimmed) {
-    return fallback;
-  }
-
-  return trimmed.length > 220 ? `${trimmed.slice(0, 220)}…` : trimmed;
-}
 
 export function ManualEntryCard({
   entry,
@@ -91,69 +83,86 @@ export function ManualEntryCard({
             {t(MANUAL_IMPORTANCE_LABEL_KEYS[entry.importance])}
           </Badge>
         </div>
-        <p className="max-w-3xl break-words text-sm leading-7 whitespace-pre-wrap text-muted-foreground">
-          {previewText(entry.body, t("manual.noBodyPreview"))}
-        </p>
       </CardHeader>
 
       <CardContent className="min-w-0 flex-1 space-y-4">
-        <div className="flex flex-wrap gap-2 border-t border-border/70 pt-4">
-          <Badge
-            variant="secondary"
-            className="max-w-full break-words whitespace-normal text-start leading-5"
-          >
-            {t(MANUAL_CATEGORY_LABEL_KEYS[entry.category])}
-          </Badge>
-          {entry.reviewIntervalDays ? (
+        <CollapsibleSection
+          id={`manual-entry-${entry.id}-details`}
+          title={t("manual.entryDetails")}
+          description={t("manual.entryDetailsDescription")}
+          icon={<BookText className="h-5 w-5" />}
+          status={entry.reviewIntervalDays ? <StatusChip tone="neutral">{entry.reviewIntervalDays}</StatusChip> : null}
+          expandLabel={t("common.expandSection")}
+          collapseLabel={t("common.collapseSection")}
+          defaultOpen={false}
+          className="rounded-2xl border border-border/70 bg-muted/20 shadow-none"
+          contentClassName="space-y-4"
+        >
+          <SoftPanel className="space-y-2">
+            <p className="text-sm font-semibold">{t("common.content")}</p>
+            <p className="break-words whitespace-pre-wrap text-sm leading-7 text-muted-foreground">
+              {entry.body}
+            </p>
+          </SoftPanel>
+
+          <div className="flex flex-wrap gap-2">
             <Badge
-              variant="outline"
+              variant="secondary"
               className="max-w-full break-words whitespace-normal text-start leading-5"
             >
-              {t("manual.reviewIntervalDays")}: {entry.reviewIntervalDays}
+              {t(MANUAL_CATEGORY_LABEL_KEYS[entry.category])}
             </Badge>
-          ) : null}
-        </div>
+            {entry.reviewIntervalDays ? (
+              <Badge
+                variant="outline"
+                className="max-w-full break-words whitespace-normal text-start leading-5"
+              >
+                {t("manual.reviewIntervalDays")}: {entry.reviewIntervalDays}
+              </Badge>
+            ) : null}
+          </div>
 
-        <div className="grid gap-3 sm:grid-cols-2">
-          <SoftPanel className="rounded-surface space-y-1 px-4 py-3">
-            <p className="text-xs text-muted-foreground">{t("manual.updatedAt")}</p>
-            <p className="mt-1 text-sm font-medium">{formatDateTime(entry.updatedAt)}</p>
-          </SoftPanel>
-          <SoftPanel className="rounded-surface space-y-1 px-4 py-3">
-            <p className="text-xs text-muted-foreground">{t("manual.lastReviewedAt")}</p>
-            <p className="mt-1 text-sm font-medium">
-              {entry.lastReviewedAt ? formatDateTime(entry.lastReviewedAt) : t("common.notRecorded")}
-            </p>
-          </SoftPanel>
-        </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <SoftPanel className="rounded-surface space-y-1 px-4 py-3">
+              <p className="text-xs text-muted-foreground">{t("manual.updatedAt")}</p>
+              <p className="mt-1 text-sm font-medium">{formatDateTime(entry.updatedAt)}</p>
+            </SoftPanel>
+            <SoftPanel className="rounded-surface space-y-1 px-4 py-3">
+              <p className="text-xs text-muted-foreground">{t("manual.lastReviewedAt")}</p>
+              <p className="mt-1 text-sm font-medium">
+                {entry.lastReviewedAt ? formatDateTime(entry.lastReviewedAt) : t("common.notRecorded")}
+              </p>
+            </SoftPanel>
+          </div>
 
-        {entry.tags.length > 0 ? (
-          <SoftPanel className="space-y-3 bg-muted/60">
-            <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-              <Tag className="h-4 w-4 shrink-0" />
-              {t("manual.tags")}
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {entry.tags.map((tag) => (
-                <Badge
-                  key={tag}
-                  variant="outline"
-                  className="max-w-full break-words whitespace-normal text-start leading-5"
-                >
-                  {tag}
-                </Badge>
-              ))}
-            </div>
-          </SoftPanel>
-        ) : (
-          <SoftPanel className="space-y-2 bg-muted/60">
-            <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-              <BookText className="h-4 w-4 shrink-0" />
-              {t("manual.tags")}
-            </p>
-            <p className="text-sm text-muted-foreground">{t("common.notRecorded")}</p>
-          </SoftPanel>
-        )}
+          {entry.tags.length > 0 ? (
+            <SoftPanel className="space-y-3 bg-muted/60">
+              <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                <Tag className="h-4 w-4 shrink-0" />
+                {t("manual.tags")}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {entry.tags.map((tag) => (
+                  <Badge
+                    key={tag}
+                    variant="outline"
+                    className="max-w-full break-words whitespace-normal text-start leading-5"
+                  >
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+            </SoftPanel>
+          ) : (
+            <SoftPanel className="space-y-2 bg-muted/60">
+              <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                <Tag className="h-4 w-4 shrink-0" />
+                {t("manual.tags")}
+              </p>
+              <p className="text-sm text-muted-foreground">{t("common.notRecorded")}</p>
+            </SoftPanel>
+          )}
+        </CollapsibleSection>
       </CardContent>
 
       <CardFooter className="flex flex-col gap-2 border-t border-border/70 pt-4 sm:flex-row sm:flex-wrap sm:items-center">

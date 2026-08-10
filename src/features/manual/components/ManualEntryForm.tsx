@@ -1,7 +1,7 @@
 import type { FormEvent } from "react";
 
 import { useI18n } from "@/shared/i18n";
-import { Button, Input, SoftPanel, Textarea, Select } from "@/shared/ui";
+import { Button, CollapsibleSection, Input, SoftPanel, Textarea, Select } from "@/shared/ui";
 import type { ManualEntry } from "@/shared/types";
 
 import {
@@ -134,7 +134,18 @@ export function ManualEntryForm({
                 ))}
               </Select>
             </label>
+          </SoftPanel>
 
+          <CollapsibleSection
+            id="manual-entry-form-advanced"
+            title={t("manual.advancedFields")}
+            description={t("manual.advancedFieldsDescription")}
+            expandLabel={t("common.expandSection")}
+            collapseLabel={t("common.collapseSection")}
+            defaultOpen={false}
+            className="rounded-2xl border border-border/70 bg-muted/20 shadow-none"
+            contentClassName="space-y-4"
+          >
             <label className="space-y-1.5">
               <span className="text-sm font-medium">
                 {t("manual.reviewIntervalDays")}
@@ -148,9 +159,7 @@ export function ManualEntryForm({
                 placeholder={t("manual.reviewIntervalDaysPlaceholder")}
               />
             </label>
-          </SoftPanel>
 
-          <SoftPanel className="grid gap-2 bg-background/80">
             <label className="space-y-1.5">
               <span className="text-sm font-medium">{t("manual.tags")}</span>
               <Input
@@ -159,7 +168,7 @@ export function ManualEntryForm({
                 placeholder={t("manual.tagsPlaceholder")}
               />
             </label>
-          </SoftPanel>
+          </CollapsibleSection>
         </div>
       </div>
 
