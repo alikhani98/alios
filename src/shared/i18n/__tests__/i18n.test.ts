@@ -178,6 +178,8 @@ describe("i18n utilities", () => {
     "routines.whatToImproveTomorrow",
     "settings.appearance",
     "settings.localProfile",
+    "settings.advancedSyncDetailsTitle",
+    "settings.advancedSyncDetailsDescription",
     "settings.pwaUpdateTitle",
     "settings.pwaUpdateAction",
     "settings.accentColor",

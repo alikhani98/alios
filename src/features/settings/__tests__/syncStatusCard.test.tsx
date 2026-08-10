@@ -42,6 +42,7 @@ import type {
 import { I18nProvider, LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
 import { messagesFa } from "@/shared/i18n/messages.fa";
 
+import { SyncStatusAdvancedPanel } from "../components/SyncStatusAdvancedPanel";
 import { SyncStatusCard } from "../components/SyncStatusCard";
 
 class TestAccountProvider implements AccountProvider {
@@ -232,6 +233,24 @@ async function renderCardToStaticMarkup(
   );
 }
 
+async function renderAdvancedPanelToStaticMarkup(
+  boundary = createAccountRuntimeBoundary(),
+  authProvider: AuthProvider = localOnlyAuthProvider
+) {
+  const store = createAccountRuntimeStateStore(boundary);
+  await store.refresh();
+
+  return renderToStaticMarkup(
+    <I18nProvider>
+      <AccountRuntimeProvider boundary={boundary} store={store}>
+        <AuthRuntimeProvider provider={authProvider}>
+          <SyncStatusAdvancedPanel onGoToBackupRestore={vi.fn()} />
+        </AuthRuntimeProvider>
+      </AccountRuntimeProvider>
+    </I18nProvider>
+  );
+}
+
 describe("SyncStatusCard", () => {
   beforeEach(() => {
     localStorage.clear();
@@ -249,12 +268,6 @@ describe("SyncStatusCard", () => {
     expect(markup).toContain('aria-label="Account and sync snapshot"');
     expect(markup).toContain("Local only");
     expect(markup).toContain("Sync health");
-    expect(markup).toContain("Other sync states");
-    expect(markup).toContain("Sync available");
-    expect(markup).toContain("Sync paused");
-    expect(markup).toContain("Offline");
-    expect(markup).toContain("Conflict detected");
-    expect(markup).toContain("Limited now");
     expect(markup).toContain("Create account");
     expect(markup).toContain("Sign in");
     expect(markup).toContain("Enable sync");
@@ -262,15 +275,15 @@ describe("SyncStatusCard", () => {
     expect(markup).toContain(
       'aria-describedby="account-sync-future-actions-description"'
     );
-    expect(markup).toContain('aria-label="Account actions"');
+    expect(markup).toContain('aria-label="Email account actions"');
     expect(markup).toContain("Expand section");
     expect(markup).toContain('aria-expanded="false"');
-    expect(markup).toContain('aria-controls="account-sync-other-states-content"');
-    expect(markup).toContain('aria-controls="account-sync-consent-content"');
-    expect(markup).toContain('aria-controls="account-sync-offline-content"');
-    expect(markup).toContain('aria-controls="account-sync-conflict-content"');
-    expect(markup).toContain('aria-controls="account-sync-device-transfer-content"');
-    expect(markup).toContain("Data stays on this device");
+    expect(markup).toContain("Advanced sync details");
+    expect(markup).toContain(
+      'aria-controls="account-sync-advanced-panel-loader-content"'
+    );
+    expect(markup).not.toContain("Other sync states");
+    expect(markup).not.toContain("Data stays on this device");
     expect(markup).toContain("sm:grid-cols-2");
     expect(markup).toContain("xl:grid-cols-3");
     expect(markup).toContain("min-h-11");
@@ -305,7 +318,7 @@ describe("SyncStatusCard", () => {
       syncProvider: new TestSyncProvider("local-only", LOCAL_ONLY_SYNC_STATUS),
     });
 
-    const markup = await renderCardToStaticMarkup(boundary, authProvider);
+    const markup = await renderAdvancedPanelToStaticMarkup(boundary, authProvider);
 
     expect(markup).toContain("Signed out");
     expect(markup).toContain("Google sign-in");
@@ -374,7 +387,7 @@ describe("SyncStatusCard", () => {
       syncProvider: new TestSyncProvider("local-only", LOCAL_ONLY_SYNC_STATUS),
     });
 
-    const markup = await renderCardToStaticMarkup(boundary, authProvider);
+    const markup = await renderAdvancedPanelToStaticMarkup(boundary, authProvider);
 
     expect(markup).toContain("Signed in");
     expect(markup).toContain("Google sign-in");
@@ -503,7 +516,7 @@ describe("SyncStatusCard", () => {
       }),
     });
 
-    const markup = await renderCardToStaticMarkup(boundary, authProvider);
+    const markup = await renderAdvancedPanelToStaticMarkup(boundary, authProvider);
 
     expect(markup).toContain("Sync available");
     expect(markup).toContain("Current sync provider: supabase.");
@@ -594,7 +607,7 @@ describe("SyncStatusCard", () => {
       }),
     });
 
-    const markup = await renderCardToStaticMarkup(boundary, authProvider);
+    const markup = await renderAdvancedPanelToStaticMarkup(boundary, authProvider);
 
     expect(markup).toContain("Offline");
     expect(markup).toContain("Sync issue detected");
@@ -686,7 +699,7 @@ describe("SyncStatusCard", () => {
       ),
     });
 
-    const markup = await renderCardToStaticMarkup(boundary, authProvider);
+    const markup = await renderAdvancedPanelToStaticMarkup(boundary, authProvider);
 
     expect(markup).toContain("Hide conflict review");
     expect(markup).toContain("Conflict review required");
@@ -758,7 +771,7 @@ describe("SyncStatusCard", () => {
       }),
     });
 
-    const markup = await renderCardToStaticMarkup(boundary, authProvider);
+    const markup = await renderAdvancedPanelToStaticMarkup(boundary, authProvider);
 
     expect(markup).toContain("No conflicts");
     expect(markup).toContain(
@@ -864,7 +877,7 @@ describe("SyncStatusCard", () => {
   it("renders the Persian account and sync copy for the settings surface", async () => {
     localStorage.setItem(LANGUAGE_STORAGE_KEY, "fa");
 
-    const markup = await renderCardToStaticMarkup();
+    const markup = await renderAdvancedPanelToStaticMarkup();
 
     expect(markup).toContain(messagesFa["settings.accountSyncTitle"]);
     expect(markup).toContain(messagesFa["settings.syncStatusLocalOnly"]);

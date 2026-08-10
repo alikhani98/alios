@@ -19,7 +19,7 @@ import {
   SunMedium,
   Trees,
 } from "lucide-react";
-import { useRef, useState } from "react";
+import { lazy, Suspense, useRef, useState } from "react";
 
 import {
   useAccountRuntimeState,
@@ -52,6 +52,7 @@ import {
   CollapsibleSection,
   Input,
   PremiumCard,
+  RouteLoadingFallback,
   SectionHeader,
   SoftPanel,
   StatusChip,
@@ -59,13 +60,9 @@ import {
 import {
   WELLNESS_BADMINTON_ROUTINE_ENABLED_STORAGE_KEY,
 } from "@/features/wellness";
-import { SettingsHelpCenter } from "../components/SettingsHelpCenter";
 import { RecoveryModeSection } from "../components/RecoveryModeSection";
-import { ExportCenterSection } from "../components/ExportCenterSection";
 import { LocalErrorLogSection } from "../components/LocalErrorLogSection";
 import { SyncStatusCard } from "../components/SyncStatusCard";
-import { WeeklyTaskBudgetSection } from "../components/WeeklyTaskBudgetSection";
-import { LocalAiSetupCard } from "@/features/localAi";
 import { resetHomeDashboardLayoutPreference } from "@/features/home/hooks/useHomeDashboardLayout";
 import {
   BACKUP_TABLE_KEYS,
@@ -76,6 +73,27 @@ import { useBackupRestore } from "../hooks/useBackupRestore";
 import { useLocalDataManagement } from "../hooks/useLocalDataManagement";
 import type { BackupStatusFreshness } from "@/shared/preferences";
 import { checkForServiceWorkerUpdate, type ServiceWorkerUpdateResult } from "@/shared/pwa";
+
+const LazySettingsHelpCenter = lazy(() =>
+  import("../components/SettingsHelpCenter").then((module) => ({
+    default: module.SettingsHelpCenter,
+  }))
+);
+const LazyExportCenterSection = lazy(() =>
+  import("../components/ExportCenterSection").then((module) => ({
+    default: module.ExportCenterSection,
+  }))
+);
+const LazyWeeklyTaskBudgetSection = lazy(() =>
+  import("../components/WeeklyTaskBudgetSection").then((module) => ({
+    default: module.WeeklyTaskBudgetSection,
+  }))
+);
+const LazyLocalAiSetupCard = lazy(() =>
+  import("@/features/localAi/components/LocalAiSetupCard").then((module) => ({
+    default: module.LocalAiSetupCard,
+  }))
+);
 
 type CountItemProps = { label: string; value: number };
 
@@ -332,6 +350,12 @@ export function SettingsPage() {
     ServiceWorkerUpdateResult | "checking" | null
   >(null);
   const [showAllDataCounts, setShowAllDataCounts] = useState(false);
+  const [helpCenterOpen, setHelpCenterOpen] = useState(false);
+  const [additionalPreferencesOpen, setAdditionalPreferencesOpen] =
+    useState(false);
+  const [exportCenterOpen, setExportCenterOpen] = useState(false);
+  const [advancedDeveloperOpen, setAdvancedDeveloperOpen] = useState(false);
+  const [advancedLocalToolsOpen, setAdvancedLocalToolsOpen] = useState(false);
   const dataManagement = useLocalDataManagement();
   const backup = useBackupRestore(dataManagement.loadSummary);
   const restorePreview = backup.pendingBackup
@@ -649,8 +673,14 @@ export function SettingsPage() {
         expandLabel={t("common.expandSection")}
         collapseLabel={t("common.collapseSection")}
         defaultOpen={false}
+        open={helpCenterOpen}
+        onOpenChange={setHelpCenterOpen}
       >
-        <SettingsHelpCenter />
+        {helpCenterOpen ? (
+          <Suspense fallback={<RouteLoadingFallback />}>
+            <LazySettingsHelpCenter />
+          </Suspense>
+        ) : null}
       </CollapsibleSection>
 
       <CollapsibleSection
@@ -793,9 +823,15 @@ export function SettingsPage() {
           expandLabel={t("common.expandSection")}
           collapseLabel={t("common.collapseSection")}
           defaultOpen={false}
+          open={additionalPreferencesOpen}
+          onOpenChange={setAdditionalPreferencesOpen}
         >
           <div className="grid gap-4 xl:grid-cols-2">
-            <WeeklyTaskBudgetSection />
+            {additionalPreferencesOpen ? (
+              <Suspense fallback={<RouteLoadingFallback />}>
+                <LazyWeeklyTaskBudgetSection />
+              </Suspense>
+            ) : null}
 
       <Card>
         <CardHeader>
@@ -1098,8 +1134,14 @@ export function SettingsPage() {
           expandLabel={t("common.expandSection")}
           collapseLabel={t("common.collapseSection")}
           defaultOpen={false}
+          open={exportCenterOpen}
+          onOpenChange={setExportCenterOpen}
         >
-          <ExportCenterSection id="settings-export-center" />
+          {exportCenterOpen ? (
+            <Suspense fallback={<RouteLoadingFallback />}>
+              <LazyExportCenterSection id="settings-export-center" />
+            </Suspense>
+          ) : null}
         </CollapsibleSection>
         </div>
       </CollapsibleSection>
@@ -1113,6 +1155,8 @@ export function SettingsPage() {
         expandLabel={t("common.expandSection")}
         collapseLabel={t("common.collapseSection")}
         defaultOpen={false}
+        open={advancedDeveloperOpen}
+        onOpenChange={setAdvancedDeveloperOpen}
       >
         <div className="space-y-4">
 
@@ -1124,10 +1168,16 @@ export function SettingsPage() {
           expandLabel={t("common.expandSection")}
           collapseLabel={t("common.collapseSection")}
           defaultOpen={false}
+          open={advancedLocalToolsOpen}
+          onOpenChange={setAdvancedLocalToolsOpen}
         >
           <div className="space-y-4">
             <LocalErrorLogSection id="settings-local-error-log" />
-            <LocalAiSetupCard />
+            {advancedLocalToolsOpen ? (
+              <Suspense fallback={<RouteLoadingFallback />}>
+                <LazyLocalAiSetupCard />
+              </Suspense>
+            ) : null}
           </div>
         </CollapsibleSection>
 

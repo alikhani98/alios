@@ -93,6 +93,8 @@ export const messagesFa: Record<TranslationKey, string> = {
   "settings.localAiStageNote": "این فقط بررسی امن اتصال برای نسخهٔ ۲ است. پرامپت، خلاصه‌سازی و هرگونه دسترسی اختیاری به داده‌های محلی در مرحله‌های جداگانه و با تأیید روشن اضافه می‌شوند.",
   "settings.accountSyncTitle": "حساب و همگام‌سازی",
   "settings.accountSyncDescription": "AliOS حتی وقتی همین دستگاه به ورود حساب و همگام‌سازی مبتنی بر Supabase متصل می‌شود، local-first می‌ماند. در این مرحله ترجیح‌ها، وظیفه‌ها، روتین‌ها، پروژه‌ها، هدف‌ها، داده‌های مالی، و رکوردهای دفترچهٔ شخصی بعد از رضایت صریح شما همگام می‌شوند.",
+  "settings.advancedSyncDetailsTitle": "جزئیات پیشرفتهٔ همگام‌سازی",
+  "settings.advancedSyncDetailsDescription": "تاریخچهٔ دستگاه، محدودهٔ حریم خصوصی، مرور تعارض و راهنمای بازیابی فقط زمانی بارگذاری می‌شود که به زمینهٔ عمیق‌تر همگام‌سازی نیاز داشته باشید.",
   "settings.accountCurrentStateLabel": "وضعیت فعلی",
   "settings.accountCurrentStateDescription": "هیچ حسابی متصل نیست. داده‌های شما محلی می‌مانند مگر این‌که خودتان آن‌ها را خروجی بگیرید یا یک ارائه‌دهندهٔ همگام‌سازیِ آینده جداگانه تأیید و فعال شود.",
   "settings.accountDetailsLabel": "جزئیات حساب",
