@@ -152,6 +152,8 @@ describe("UnifiedHomePage", () => {
     expect(markup).toContain("Today context");
     expect(markup).toContain("Calendar");
     expect(markup).toContain("Inbox");
+    expect(markup).toContain('id="unified-home-today-context"');
+    expect(markup).toContain('id="unified-home-today-context-content" hidden="" aria-hidden="true"');
     expect(markup).toContain("More sections");
     expect(markup).toContain('id="unified-home-more-context"');
     expect(markup).toContain('aria-expanded="false"');

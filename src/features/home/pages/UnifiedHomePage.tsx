@@ -87,12 +87,16 @@ function TodayContextStrip() {
   const { t } = useI18n();
 
   return (
-    <PremiumContextCard>
-      <SectionHeader
-        icon={<CalendarDays className="h-5 w-5" aria-hidden="true" />}
-        title={t("home.todayContextTitle")}
-        description={t("home.todayContextDescription")}
-      />
+    <CollapsibleSection
+      id="unified-home-today-context"
+      title={t("home.todayContextTitle")}
+      description={t("home.todayContextDescription")}
+      icon={<CalendarDays className="h-5 w-5" aria-hidden="true" />}
+      defaultOpen={false}
+      expandLabel={t("common.expandSection")}
+      collapseLabel={t("common.collapseSection")}
+      className="overflow-hidden border-primary/10 bg-gradient-to-br from-background via-background to-primary/5 shadow-sm"
+    >
       <div className="grid gap-2 sm:grid-cols-2 md:flex md:justify-end">
         <Button asChild variant="outline" className="w-full md:w-auto">
           <Link to="/calendar">
@@ -107,15 +111,7 @@ function TodayContextStrip() {
           </Link>
         </Button>
       </div>
-    </PremiumContextCard>
-  );
-}
-
-function PremiumContextCard({ children }: { children: ReactNode }) {
-  return (
-    <Card className="overflow-hidden border-primary/10 bg-gradient-to-br from-background via-background to-primary/5 shadow-sm">
-      <CardContent className="space-y-4 p-5 sm:p-6">{children}</CardContent>
-    </Card>
+    </CollapsibleSection>
   );
 }
 

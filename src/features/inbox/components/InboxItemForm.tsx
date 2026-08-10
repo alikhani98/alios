@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 
 import { INBOX_ITEM_TYPE_VALUES, type InboxItem } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
-import { Button, Textarea, Select } from "@/shared/ui";
+import { Button, CollapsibleSection, Textarea, Select } from "@/shared/ui";
 import { INBOX_TYPE_LABEL_KEYS } from "../constants";
 import { inboxFormSchema, type InboxFormValues } from "../types";
 
@@ -54,17 +54,27 @@ export function InboxItemForm({ item, isSubmitting, onSubmit, onCancel }: Props)
         />
         {errors.content ? <p className="text-sm text-destructive">{t("inbox.contentRequired")}</p> : null}
       </div>
-      <div className="grid gap-2 sm:max-w-xs">
-        <label htmlFor={item ? `inbox-type-${item.id}` : "inbox-type"} className="text-sm font-medium">
-          {t("common.type")}
-        </label>
-        <Select
-          id={item ? `inbox-type-${item.id}` : "inbox-type"}
-          {...register("type")}
-        >
-          {INBOX_ITEM_TYPE_VALUES.map((type) => <option key={type} value={type}>{t(INBOX_TYPE_LABEL_KEYS[type])}</option>)}
-        </Select>
-      </div>
+      <CollapsibleSection
+        id={item ? `inbox-type-details-${item.id}` : "inbox-type-details"}
+        title={t("inbox.captureDetails")}
+        description={t("inbox.captureDetailsDescription")}
+        defaultOpen={Boolean(item)}
+        expandLabel={t("common.expandSection")}
+        collapseLabel={t("common.collapseSection")}
+        className="border-border/70 bg-card/95"
+      >
+        <div className="grid gap-2 sm:max-w-xs">
+          <label htmlFor={item ? `inbox-type-${item.id}` : "inbox-type"} className="text-sm font-medium">
+            {t("common.type")}
+          </label>
+          <Select
+            id={item ? `inbox-type-${item.id}` : "inbox-type"}
+            {...register("type")}
+          >
+            {INBOX_ITEM_TYPE_VALUES.map((type) => <option key={type} value={type}>{t(INBOX_TYPE_LABEL_KEYS[type])}</option>)}
+          </Select>
+        </div>
+      </CollapsibleSection>
       <div className="flex flex-wrap gap-3">
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting ? t("common.saving") : item ? t("common.saveChanges") : t("inbox.capture")}

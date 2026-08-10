@@ -12,6 +12,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
+  CollapsibleSection,
   SoftPanel,
   StatusChip,
 } from "@/shared/ui";
@@ -120,92 +121,95 @@ export function DecisionLogCard({
           </SoftPanel>
         </div>
 
-        {decision.category || decision.tags.length > 0 ? (
+        <CollapsibleSection
+          id={`decision-details-${decision.id}`}
+          title={t("decisions.entryDetails")}
+          description={t("decisions.entryDetailsDescription")}
+          defaultOpen={false}
+          expandLabel={t("common.expandSection")}
+          collapseLabel={t("common.collapseSection")}
+          className="border-border/70 bg-card/95"
+          contentClassName="space-y-4"
+        >
+          {decision.tags.length > 0 ? (
+            <div className="flex flex-wrap gap-2">
+              {decision.tags.map((tag) => (
+                <Badge
+                  key={tag}
+                  variant="outline"
+                  className="max-w-full break-words whitespace-normal text-start leading-5"
+                >
+                  {tag}
+                </Badge>
+              ))}
+            </div>
+          ) : null}
+
+          {decision.chosenOption ? (
+            <SoftPanel className="space-y-2 rounded-surface bg-muted/60 px-4 py-3 text-sm">
+              <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                <GitBranch className="h-4 w-4 shrink-0" />
+                {t("decisions.chosenOption")}
+              </p>
+              <p className="break-words text-muted-foreground">{decision.chosenOption}</p>
+            </SoftPanel>
+          ) : null}
+
+          {decision.reasoning ? (
+            <div className="space-y-1 text-sm">
+              <p className="font-medium">{t("decisions.reasoning")}</p>
+              <p className="break-words text-muted-foreground">
+                {previewText(decision.reasoning, t("common.notRecorded"))}
+              </p>
+            </div>
+          ) : null}
+
+          {decision.expectedOutcome ? (
+            <div className="space-y-1 text-sm">
+              <p className="font-medium">{t("decisions.expectedOutcome")}</p>
+              <p className="break-words text-muted-foreground">
+                {previewText(decision.expectedOutcome, t("common.notRecorded"))}
+              </p>
+            </div>
+          ) : null}
+
+          {decision.actualOutcome || decision.lesson ? (
+            <div className="grid gap-3 sm:grid-cols-2">
+              {decision.actualOutcome ? (
+                <SoftPanel className="space-y-2 bg-muted/60 text-sm">
+                  <p className="font-medium">{t("decisions.actualOutcome")}</p>
+                  <p className="break-words text-muted-foreground">
+                    {previewText(decision.actualOutcome, t("common.notRecorded"))}
+                  </p>
+                </SoftPanel>
+              ) : null}
+              {decision.lesson ? (
+                <SoftPanel className="space-y-2 bg-muted/60 text-sm">
+                  <p className="flex items-center gap-2 font-medium">
+                    <Lightbulb className="h-4 w-4 shrink-0 text-primary" />
+                    {t("decisions.lesson")}
+                  </p>
+                  <p className="break-words text-muted-foreground">
+                    {previewText(decision.lesson, t("common.notRecorded"))}
+                  </p>
+                </SoftPanel>
+              ) : null}
+            </div>
+          ) : null}
+
           <div className="flex flex-wrap gap-2 border-t border-border/70 pt-4">
-            {decision.category ? (
-              <Badge
-                variant="secondary"
-                className="max-w-full break-words whitespace-normal text-start leading-5"
-              >
-                {decision.category}
-              </Badge>
+            {decision.confidence ? (
+              <StatusChip tone="neutral">
+                {t("decisions.confidence")}: {decision.confidence}/5
+              </StatusChip>
             ) : null}
-            {decision.tags.map((tag) => (
-              <Badge
-                key={tag}
-                variant="outline"
-                className="max-w-full break-words whitespace-normal text-start leading-5"
-              >
-                {tag}
-              </Badge>
-            ))}
-          </div>
-        ) : null}
-
-        {decision.chosenOption ? (
-          <SoftPanel className="space-y-2 rounded-surface bg-muted/60 px-4 py-3 text-sm">
-            <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-              <GitBranch className="h-4 w-4 shrink-0" />
-              {t("decisions.chosenOption")}
-            </p>
-            <p className="break-words text-muted-foreground">{decision.chosenOption}</p>
-          </SoftPanel>
-        ) : null}
-
-        {decision.reasoning ? (
-          <div className="space-y-1 border-t border-border/70 pt-4 text-sm">
-            <p className="font-medium">{t("decisions.reasoning")}</p>
-            <p className="break-words text-muted-foreground">
-              {previewText(decision.reasoning, t("common.notRecorded"))}
-            </p>
-          </div>
-        ) : null}
-
-        {decision.expectedOutcome ? (
-          <div className="space-y-1 text-sm">
-            <p className="font-medium">{t("decisions.expectedOutcome")}</p>
-            <p className="break-words text-muted-foreground">
-              {previewText(decision.expectedOutcome, t("common.notRecorded"))}
-            </p>
-          </div>
-        ) : null}
-
-        {decision.actualOutcome || decision.lesson ? (
-          <div className="grid gap-3 sm:grid-cols-2">
-            {decision.actualOutcome ? (
-              <SoftPanel className="space-y-2 bg-muted/60 text-sm">
-                <p className="font-medium">{t("decisions.actualOutcome")}</p>
-                <p className="break-words text-muted-foreground">
-                  {previewText(decision.actualOutcome, t("common.notRecorded"))}
-                </p>
-              </SoftPanel>
-            ) : null}
-            {decision.lesson ? (
-              <SoftPanel className="space-y-2 bg-muted/60 text-sm">
-                <p className="flex items-center gap-2 font-medium">
-                  <Lightbulb className="h-4 w-4 shrink-0 text-primary" />
-                  {t("decisions.lesson")}
-                </p>
-                <p className="break-words text-muted-foreground">
-                  {previewText(decision.lesson, t("common.notRecorded"))}
-                </p>
-              </SoftPanel>
+            {decision.importance ? (
+              <StatusChip tone="neutral">
+                {t("decisions.importance")}: {decision.importance}/5
+              </StatusChip>
             ) : null}
           </div>
-        ) : null}
-
-        <div className="flex flex-wrap gap-2 border-t border-border/70 pt-4">
-          {decision.confidence ? (
-            <StatusChip tone="neutral">
-              {t("decisions.confidence")}: {decision.confidence}/5
-            </StatusChip>
-          ) : null}
-          {decision.importance ? (
-            <StatusChip tone="neutral">
-              {t("decisions.importance")}: {decision.importance}/5
-            </StatusChip>
-          ) : null}
-        </div>
+        </CollapsibleSection>
       </CardContent>
 
       <CardFooter className="flex flex-col gap-2 border-t border-border/70 pt-4 sm:flex-row sm:flex-wrap sm:items-center">

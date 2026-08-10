@@ -7,7 +7,6 @@ import { useI18n, type TranslationKey } from "@/shared/i18n";
 import { useViewDensityMode } from "@/shared/preferences/viewDensityMode";
 import {
   Button,
-  CardContent,
   EmptyState,
   MetricCard,
   PremiumCard,
@@ -163,6 +162,7 @@ export function DecisionLogPage() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [showAllDecisions, setShowAllDecisions] = useState(false);
   const [isContextualHelpOpen, setIsContextualHelpOpen] = useState(false);
+  const [isEditorOpen, setIsEditorOpen] = useState(false);
   const formRef = useRef<HTMLDivElement | null>(null);
   const referenceDate = useMemo(() => new Date(), []);
   const hasActiveFilter = selectedFilter !== "all";
@@ -208,6 +208,7 @@ export function DecisionLogPage() {
 
   const closeEditor = () => {
     setEditingDecision(undefined);
+    setIsEditorOpen(false);
   };
 
   const handleSubmit = async (values: DecisionLogFormValues) => {
@@ -368,6 +369,7 @@ export function DecisionLogPage() {
                 className="w-full"
                 onClick={() => {
                   setEditingDecision(undefined);
+                  setIsEditorOpen(true);
                   clearMessages();
                   formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
                 }}
@@ -456,8 +458,19 @@ export function DecisionLogPage() {
       ) : null}
 
       <div ref={formRef}>
-        <PremiumCard>
-          <CardContent className="p-5 sm:p-6">
+        <CollapsibleSection
+          id="decision-log-editor"
+          title={editingDecision ? t("decisions.editDecision") : t("decisions.createDecision")}
+          description={t("decisions.formDescription")}
+          status={<StatusChip tone="neutral">{t("decisions.formStatus")}</StatusChip>}
+          defaultOpen={false}
+          open={isEditorOpen}
+          onOpenChange={setIsEditorOpen}
+          expandLabel={t("common.expandSection")}
+          collapseLabel={t("common.collapseSection")}
+          className="border-border/70 bg-card/95"
+          contentClassName="p-5 sm:p-6"
+        >
             <SectionHeader
               title={editingDecision ? t("decisions.editDecision") : t("decisions.createDecision")}
               description={t("decisions.formDescription")}
@@ -479,8 +492,7 @@ export function DecisionLogPage() {
                 onCancel={editingDecision ? closeEditor : undefined}
               />
             </div>
-          </CardContent>
-        </PremiumCard>
+        </CollapsibleSection>
       </div>
 
       <SoftPanel className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
@@ -529,7 +541,10 @@ export function DecisionLogPage() {
                 key={decision.id}
                 decision={decision}
                 isDeleting={deletingId === decision.id}
-                onEdit={() => setEditingDecision(decision)}
+                onEdit={() => {
+                  setEditingDecision(decision);
+                  setIsEditorOpen(true);
+                }}
                 onDelete={() => handleDelete(decision)}
                 onMarkReviewed={() => handleMarkReviewed(decision)}
                 onArchive={() => handleArchive(decision)}
@@ -558,7 +573,13 @@ export function DecisionLogPage() {
                 {t("decisions.filterAll")}
               </Button>
             ) : (
-              <Button type="button" onClick={() => setEditingDecision(undefined)}>
+              <Button
+                type="button"
+                onClick={() => {
+                  setEditingDecision(undefined);
+                  setIsEditorOpen(true);
+                }}
+              >
                 <Plus className="me-2 h-4 w-4" />
                 {t("decisions.emptyAction")}
               </Button>
@@ -572,7 +593,10 @@ export function DecisionLogPage() {
               key={decision.id}
               decision={decision}
               isDeleting={deletingId === decision.id}
-              onEdit={() => setEditingDecision(decision)}
+              onEdit={() => {
+                setEditingDecision(decision);
+                setIsEditorOpen(true);
+              }}
               onDelete={() => handleDelete(decision)}
               onMarkReviewed={() => handleMarkReviewed(decision)}
               onArchive={() => handleArchive(decision)}

@@ -10,6 +10,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  CollapsibleSection,
   EmptyState,
   Input,
   PremiumCard,
@@ -232,38 +233,49 @@ export function InboxPage() {
               aria-label={t("inbox.searchInbox")}
             />
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <label className="grid gap-2 text-sm font-medium">
-              {t("inbox.filterByStatus")}
-              <Select
-                value={statusFilter}
-                onChange={(event) => setStatusFilter(event.target.value as InboxStatusFilter)}
-              >
-                <option value="all">{t("inbox.allStatuses")}</option>
-                <option value="unprocessed">{t(INBOX_STATUS_LABEL_KEYS.unprocessed)}</option>
-                <option value="processed">{t(INBOX_STATUS_LABEL_KEYS.processed)}</option>
-              </Select>
-            </label>
-            <label className="grid gap-2 text-sm font-medium">
-              {t("inbox.filterByType")}
-              <Select
-                value={typeFilter}
-                onChange={(event) => setTypeFilter(event.target.value as InboxTypeFilter)}
-              >
-                <option value="all">{t("inbox.allTypes")}</option>
-                {INBOX_ITEM_TYPE_VALUES.map((type) => (
-                  <option key={type} value={type}>{t(INBOX_TYPE_LABEL_KEYS[type])}</option>
-                ))}
-              </Select>
-            </label>
-          </div>
-          {filtersActive ? (
-            <div>
-              <Button type="button" variant="ghost" size="sm" onClick={clearFilters}>
-                <X className="me-2 h-4 w-4" />{t("inbox.clearFilters")}
-              </Button>
+          <CollapsibleSection
+            id="inbox-search-filters"
+            title={t("inbox.filters")}
+            description={t("inbox.filtersDescription")}
+            status={filtersActive ? <span className="text-xs font-medium text-primary">{t("inbox.filtersActive")}</span> : null}
+            defaultOpen={false}
+            expandLabel={t("common.expandSection")}
+            collapseLabel={t("common.collapseSection")}
+            className="border-border/70 bg-card/95"
+          >
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="grid gap-2 text-sm font-medium">
+                {t("inbox.filterByStatus")}
+                <Select
+                  value={statusFilter}
+                  onChange={(event) => setStatusFilter(event.target.value as InboxStatusFilter)}
+                >
+                  <option value="all">{t("inbox.allStatuses")}</option>
+                  <option value="unprocessed">{t(INBOX_STATUS_LABEL_KEYS.unprocessed)}</option>
+                  <option value="processed">{t(INBOX_STATUS_LABEL_KEYS.processed)}</option>
+                </Select>
+              </label>
+              <label className="grid gap-2 text-sm font-medium">
+                {t("inbox.filterByType")}
+                <Select
+                  value={typeFilter}
+                  onChange={(event) => setTypeFilter(event.target.value as InboxTypeFilter)}
+                >
+                  <option value="all">{t("inbox.allTypes")}</option>
+                  {INBOX_ITEM_TYPE_VALUES.map((type) => (
+                    <option key={type} value={type}>{t(INBOX_TYPE_LABEL_KEYS[type])}</option>
+                  ))}
+                </Select>
+              </label>
             </div>
-          ) : null}
+            {filtersActive ? (
+              <div className="mt-4">
+                <Button type="button" variant="ghost" size="sm" onClick={clearFilters}>
+                  <X className="me-2 h-4 w-4" />{t("inbox.clearFilters")}
+                </Button>
+              </div>
+            ) : null}
+          </CollapsibleSection>
         </CardContent>
       </PremiumCard>
 

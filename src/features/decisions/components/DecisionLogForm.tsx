@@ -186,7 +186,7 @@ export function DecisionLogForm({
         id="decision-log-options"
         title={t("decisions.formOptions")}
         description={t("decisions.formOptionsDescription")}
-        defaultOpen
+        defaultOpen={false}
         className="alios-surface-soft shadow-none"
         contentClassName="space-y-4"
         expandLabel={t("common.expandSection")}
