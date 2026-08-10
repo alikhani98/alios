@@ -147,8 +147,8 @@ export function TodayTaskCard({
                     <span className="break-words">{t("today.linkedProject")}</span>
                   </p>
                   {linkedProject ? (
-                    <div className="flex min-w-0 flex-wrap items-center gap-2">
-                      <p className="min-w-0 break-words text-sm font-medium">
+                    <div className="flex min-w-0 flex-col items-start gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+                      <p className="w-full min-w-0 break-words text-sm font-medium sm:w-auto sm:min-w-[12rem] sm:flex-1">
                         {linkedProject.title}
                       </p>
                       <Badge variant="secondary">
