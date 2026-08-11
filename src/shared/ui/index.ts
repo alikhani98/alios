@@ -10,4 +10,5 @@ export * from "./page-placeholder";
 export * from "./route-loading-fallback";
 export * from "./select";
 export * from "./separator";
+export * from "./swipe-action-surface";
 export * from "./textarea";

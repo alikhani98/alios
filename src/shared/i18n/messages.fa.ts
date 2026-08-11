@@ -1065,6 +1065,7 @@ export const messagesFa: Record<TranslationKey, string> = {
   "home.emptyNote": "از صندوق ورودی، مالی، یا تصمیم‌ها شروع کنید.",
   "home.todayOverview": "نمای کلی امروز",
   "home.todayTasks": "کارهای امروز",
+  "home.todayTasksFriendlyEmpty": "هیچ کاری برای امروز نداری؟ از صندوق ورودی شروع کن 👋",
   "home.mit": "مهم‌ترین کار",
   "home.noMit": "کار مهمی انتخاب نشده",
   "home.dailyCheckin": "بررسی روزانه",

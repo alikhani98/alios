@@ -488,7 +488,7 @@ export function GoalsPage() {
 
   return (
     <section className="alios-page space-y-6">
-      <PremiumCard className="alios-now-surface shadow-sm">
+      <PremiumCard className="alios-now-surface alios-primary-surface">
         <div className="grid gap-5 p-5 sm:p-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)]">
           <div className="space-y-5">
             <SectionHeader

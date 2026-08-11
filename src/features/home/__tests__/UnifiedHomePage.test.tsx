@@ -249,4 +249,25 @@ describe("UnifiedHomePage", () => {
     expect(markup).toContain("Open routine");
     expect(markup).toContain("Routine ready");
   });
+
+  it("uses a friendlier task stat when there is no more specific next action", () => {
+    mockedDashboardData = {
+      ...dashboardData,
+      tasks: [],
+      today: {
+        tasks: [],
+        completedTaskCount: 0,
+        mitTask: undefined,
+      },
+      inbox: {
+        unprocessedCount: 0,
+      },
+    };
+
+    const markup = renderUnifiedHome();
+
+    expect(markup).toContain("No task for today? Start from the inbox");
+    expect(markup).not.toContain("Your inbox has 32 item(s) waiting");
+    expect(markup).not.toContain("Keep Morning review moving today");
+  });
 });

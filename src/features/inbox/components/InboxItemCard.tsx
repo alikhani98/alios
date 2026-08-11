@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useDateFormatter } from "@/shared/date";
 import { useI18n } from "@/shared/i18n";
 import type { InboxItem } from "@/shared/types";
-import { Badge, Button, Card, CardContent, CardFooter } from "@/shared/ui";
+import { Badge, Button, Card, CardContent, CardFooter, SwipeActionSurface } from "@/shared/ui";
 import { INBOX_STATUS_LABEL_KEYS, INBOX_TYPE_LABEL_KEYS } from "../constants";
 import { InboxItemForm } from "./InboxItemForm";
 import type { InboxFormValues } from "../types";
@@ -48,6 +48,14 @@ export function InboxItemCard({
   }
 
   return (
+    <SwipeActionSurface
+      processLabel={t("inbox.processInbox")}
+      deleteLabel={t("common.delete")}
+      processDisabled={isBusy || item.status !== "unprocessed"}
+      deleteDisabled={isBusy}
+      onProcess={() => setShowProcessing(true)}
+      onDeleteIntent={() => setConfirmingDelete(true)}
+    >
     <Card className={item.status === "processed" ? "bg-muted/30" : undefined}>
       <CardContent className="space-y-4 p-5">
         <label className="flex min-h-11 cursor-pointer items-center gap-3 rounded-xl border bg-background px-3 py-2 text-sm font-medium">
@@ -99,5 +107,6 @@ export function InboxItemCard({
         </>}
       </CardFooter>
     </Card>
+    </SwipeActionSurface>
   );
 }

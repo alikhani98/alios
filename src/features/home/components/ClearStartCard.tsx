@@ -64,6 +64,12 @@ export function ClearStartCard({
     : undefined;
   const shouldStartWithInbox = activeTaskCount === 0 && !urgentTask && inboxBacklogCount > 0;
   const shouldStartWithRoutine = Boolean(routineSuggestion);
+  const shouldShowFriendlyTaskEmptyState =
+    activeTaskCount === 0 &&
+    !currentFocus &&
+    !urgentTask &&
+    !shouldStartWithInbox &&
+    !shouldStartWithRoutine;
   const suggestedTask = currentFocus ?? urgentTask;
   const primaryActionHref = shouldStartWithInbox
     ? "/inbox"
@@ -100,7 +106,7 @@ export function ClearStartCard({
       : t("today.noTasksDescription");
 
   return (
-    <PremiumCard className="alios-home-now-surface">
+    <PremiumCard className="alios-home-now-surface alios-primary-surface">
       <CardContent className="relative z-10 grid gap-5 p-5 ps-12 sm:p-6 sm:ps-14 xl:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)]">
         <div className="space-y-5">
           <SectionHeader
@@ -115,8 +121,16 @@ export function ClearStartCard({
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                 {t("home.todayTasks")}
               </p>
-              <p className="font-mono text-2xl font-semibold tabular-nums">{activeTaskCount}</p>
-              <p className="text-sm text-muted-foreground">{t("common.active")}</p>
+              {shouldShowFriendlyTaskEmptyState ? (
+                <p className="break-words text-sm font-medium leading-7 text-alios-caspian dark:text-alios-paper">
+                  {t("home.todayTasksFriendlyEmpty")}
+                </p>
+              ) : (
+                <>
+                  <p className="font-mono text-2xl font-semibold tabular-nums">{activeTaskCount}</p>
+                  <p className="text-sm text-muted-foreground">{t("common.active")}</p>
+                </>
+              )}
             </SoftPanel>
 
             <SoftPanel className="alios-home-thread-anchor gap-2 border-alios-herb/30 bg-background/90">

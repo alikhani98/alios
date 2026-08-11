@@ -945,6 +945,7 @@ export const messagesEn = {
   "home.emptyNote": "Start with Inbox, Finance, or Decisions.",
   "home.todayOverview": "Today overview",
   "home.todayTasks": "Today’s tasks",
+  "home.todayTasksFriendlyEmpty": "No task for today? Start from the inbox 👋",
   "home.mit": "Most Important Task",
   "home.noMit": "No MIT selected",
   "home.dailyCheckin": "Daily check-in",

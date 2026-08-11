@@ -94,6 +94,8 @@ describe("Task project links", () => {
     expect(html).toContain(projectRecord.title);
     expect(html).toContain('href="/projects?focusId=fixture-id"');
     expect(html).toContain("View project");
+    expect(html).toContain("Done");
+    expect(html).toContain("Delete");
   });
 
   it("keeps an orphaned Task usable without a cascade", () => {

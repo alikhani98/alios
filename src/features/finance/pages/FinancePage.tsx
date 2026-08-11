@@ -670,7 +670,7 @@ export function FinancePage() {
   return (
     <section className="alios-page space-y-6">
       <section id={FINANCE_SECTION_ANCHORS.summary} className="scroll-mt-32 space-y-4">
-        <PremiumCard className="alios-now-surface shadow-sm">
+        <PremiumCard className="alios-now-surface alios-primary-surface">
           <div className="grid gap-5 p-5 lg:grid-cols-[minmax(0,1.25fr)_minmax(18rem,0.75fr)] sm:p-6">
             <div className="space-y-5">
               <SectionHeader

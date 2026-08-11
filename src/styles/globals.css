@@ -253,6 +253,20 @@
     box-shadow: 0 1.25rem 3.5rem color-mix(in srgb, black 28%, transparent);
   }
 
+  .alios-primary-surface {
+    border-inline-start-width: 4px;
+    border-inline-start-color: var(--alios-saffron-thread);
+    box-shadow:
+      0 1.35rem 3.75rem color-mix(in srgb, var(--alios-caspian-ink) 12%, transparent),
+      inset 0 0 0 1px color-mix(in srgb, var(--alios-saffron-thread) 10%, transparent);
+  }
+
+  .dark .alios-primary-surface {
+    box-shadow:
+      0 1.35rem 3.75rem color-mix(in srgb, black 34%, transparent),
+      inset 0 0 0 1px color-mix(in srgb, var(--alios-saffron-thread) 14%, transparent);
+  }
+
   .alios-thread-accent {
     border-color: color-mix(in srgb, var(--alios-saffron-thread) 34%, transparent);
     background: color-mix(in srgb, var(--alios-saffron-thread) 9%, hsl(var(--background)));

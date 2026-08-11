@@ -16,7 +16,7 @@ import { Link } from "react-router-dom";
 import { PROJECT_STATUS_LABEL_KEYS } from "@/features/projects/constants";
 import type { Project, Task, TaskStatus } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
-import { Badge, Button, Card, CardContent, Select, StatusChip } from "@/shared/ui";
+import { Badge, Button, Card, CardContent, Select, StatusChip, SwipeActionSurface } from "@/shared/ui";
 import {
   TASK_PRIORITY_LABEL_KEYS,
   TASK_STATUS_OPTIONS,
@@ -74,6 +74,14 @@ export function TodayTaskCard({
             : <CircleDashed className="h-3.5 w-3.5" aria-hidden="true" />;
 
   return (
+    <SwipeActionSurface
+      processLabel={t("today.done")}
+      deleteLabel={t("common.delete")}
+      processDisabled={isBusy || completed}
+      deleteDisabled={isBusy}
+      onProcess={() => void onStatusChange("done")}
+      onDeleteIntent={() => setConfirmingDelete(true)}
+    >
     <Card
       className={
         completed
@@ -260,5 +268,6 @@ export function TodayTaskCard({
         </div>
       </CardContent>
     </Card>
+    </SwipeActionSurface>
   );
 }
