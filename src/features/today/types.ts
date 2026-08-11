@@ -1,6 +1,11 @@
 import { z } from "zod";
 
-import { dailyCheckinSchema, taskBaseSchema } from "@/shared/types";
+import {
+  dailyCheckinSchema,
+  taskBaseSchema,
+  taskEstimatedMinutesSchema,
+  taskScheduledStartTimeSchema,
+} from "@/shared/types";
 
 export const todayTaskFormSchema = taskBaseSchema
   .pick({
@@ -10,10 +15,20 @@ export const todayTaskFormSchema = taskBaseSchema
     priority: true,
     isMit: true,
     dueDate: true,
+    scheduledStartTime: true,
+    estimatedMinutes: true,
   })
   .extend({
     description: z.string().optional(),
     projectId: z.union([z.string().min(1), z.literal("")]).optional(),
+    scheduledStartTime: z.union([taskScheduledStartTimeSchema, z.literal("")]).optional(),
+    estimatedMinutes: z.preprocess((value) => {
+      if (value === "" || value === null || value === undefined) {
+        return undefined;
+      }
+
+      return Number(value);
+    }, taskEstimatedMinutesSchema.optional()),
     recurrenceFrequency: z.enum(["none", "daily", "weekly"]).default("none"),
   });
 

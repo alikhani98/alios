@@ -62,6 +62,22 @@ describe("core domain schemas", () => {
     );
   });
 
+  it("keeps task time-blocking metadata optional and validates supplied values", () => {
+    expect(
+      taskSchema.safeParse({
+        ...taskRecord,
+        scheduledStartTime: "09:30",
+        estimatedMinutes: 45,
+      }).success
+    ).toBe(true);
+    expect(
+      taskSchema.safeParse({ ...taskRecord, scheduledStartTime: "9:30" }).success
+    ).toBe(false);
+    expect(
+      taskSchema.safeParse({ ...taskRecord, estimatedMinutes: 3 }).success
+    ).toBe(false);
+  });
+
   it("accepts a valid routine task", () => {
     expect(
       taskSchema.safeParse({

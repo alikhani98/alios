@@ -11,6 +11,11 @@ import { dateOnlySchema, isoDateTimeSchema } from "@/shared/utils/domain";
 export const taskStatusSchema = z.enum(TASK_STATUS_VALUES);
 export const taskPrioritySchema = z.enum(TASK_PRIORITY_VALUES);
 export const taskRecurrenceFrequencySchema = z.enum(TASK_RECURRENCE_FREQUENCY_VALUES);
+export const taskScheduledStartTimeSchema = z.string().regex(
+  /^([01]\d|2[0-3]):[0-5]\d$/,
+  { message: "Expected a time in HH:mm format" }
+);
+export const taskEstimatedMinutesSchema = z.number().int().min(5).max(720);
 export const taskRecurrenceSchema = z.object({
   frequency: taskRecurrenceFrequencySchema,
 });
@@ -25,6 +30,8 @@ export const taskBaseSchema = z.object({
   isMit: z.boolean(),
   projectId: z.string().min(1).optional(),
   routineId: z.string().min(1).optional(),
+  scheduledStartTime: taskScheduledStartTimeSchema.optional(),
+  estimatedMinutes: taskEstimatedMinutesSchema.optional(),
   recurrence: taskRecurrenceSchema.optional(),
   recurrenceSeriesId: z.string().min(1).optional(),
   createdAt: isoDateTimeSchema,

@@ -19,7 +19,24 @@ import {
 import { cn } from "@/shared/utils";
 
 import { useGlobalSearch } from "../hooks/useGlobalSearch";
-import { searchLocalData, type SearchResult } from "../searchLocalData";
+import {
+  filterSearchResults,
+  searchLocalData,
+  type SearchResult,
+  type SearchResultKind,
+} from "../searchLocalData";
+
+const searchResultKindOrder: SearchResultKind[] = [
+  "inbox",
+  "task",
+  "routine",
+  "project",
+  "goal",
+  "lifeArea",
+  "journal",
+  "knowledge",
+  "manual",
+];
 
 function SearchResultCard({ result }: { result: SearchResult }) {
   const { direction, t } = useI18n();
@@ -73,15 +90,42 @@ export function SearchPage() {
   const { direction, t } = useI18n();
   const { data, hasError, isLoading, reload } = useGlobalSearch();
   const [query, setQuery] = useState("");
+  const [selectedKinds, setSelectedKinds] = useState<SearchResultKind[]>([]);
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
   const [showAllResults, setShowAllResults] = useState(false);
 
-  const results = useMemo(() => (data ? searchLocalData(data, query) : []), [data, query]);
+  const rawResults = useMemo(() => (data ? searchLocalData(data, query) : []), [data, query]);
+  const results = useMemo(
+    () =>
+      filterSearchResults(rawResults, {
+        kinds: selectedKinds,
+        dateFrom,
+        dateTo,
+      }),
+    [dateFrom, dateTo, rawResults, selectedKinds]
+  );
   const hasQuery = query.trim().length > 0;
+  const hasFilters = selectedKinds.length > 0 || dateFrom.length > 0 || dateTo.length > 0;
   const resultPreviewLimit = 12;
   const displayedResults = showAllResults
     ? results
     : results.slice(0, resultPreviewLimit);
   const hiddenResultCount = Math.max(results.length - displayedResults.length, 0);
+  const toggleKind = (kind: SearchResultKind) => {
+    setSelectedKinds((current) =>
+      current.includes(kind)
+        ? current.filter((item) => item !== kind)
+        : [...current, kind]
+    );
+    setShowAllResults(false);
+  };
+  const clearFilters = () => {
+    setSelectedKinds([]);
+    setDateFrom("");
+    setDateTo("");
+    setShowAllResults(false);
+  };
 
   return (
     <section className="alios-page space-y-6">
@@ -121,6 +165,66 @@ export function SearchPage() {
               placeholder={t("search.placeholder")}
               className={direction === "rtl" ? "h-11 pr-9" : "h-11 pl-9"}
             />
+          </div>
+          <div className="mt-5 space-y-4">
+            <div className="space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <p className="text-sm font-semibold text-foreground">
+                  {t("search.typeFilterLabel")}
+                </p>
+                {hasFilters ? (
+                  <Button type="button" variant="ghost" size="sm" onClick={clearFilters}>
+                    {t("search.clearFilters")}
+                  </Button>
+                ) : null}
+              </div>
+              <div className="flex flex-wrap gap-2" aria-label={t("search.typeFilterLabel")}>
+                {searchResultKindOrder.map((kind) => {
+                  const active = selectedKinds.includes(kind);
+                  const labelKey = `search.type${kind[0].toUpperCase()}${kind.slice(1)}` as SearchResult["kindLabelKey"];
+                  return (
+                    <button
+                      key={kind}
+                      type="button"
+                      aria-pressed={active}
+                      onClick={() => toggleKind(kind)}
+                      className={cn(
+                        "min-h-11 rounded-full border px-3 py-2 text-sm font-medium transition-colors sm:min-h-10",
+                        active
+                          ? "border-alios-caspian bg-alios-caspian text-white dark:border-alios-paper dark:bg-alios-paper dark:text-alios-night"
+                          : "border-border bg-background text-muted-foreground hover:border-alios-caspian/40 hover:text-foreground"
+                      )}
+                    >
+                      {t(labelKey)}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="space-y-2 text-sm font-medium">
+                <span>{t("search.dateFromLabel")}</span>
+                <Input
+                  type="date"
+                  value={dateFrom}
+                  onChange={(event) => {
+                    setDateFrom(event.target.value);
+                    setShowAllResults(false);
+                  }}
+                />
+              </label>
+              <label className="space-y-2 text-sm font-medium">
+                <span>{t("search.dateToLabel")}</span>
+                <Input
+                  type="date"
+                  value={dateTo}
+                  onChange={(event) => {
+                    setDateTo(event.target.value);
+                    setShowAllResults(false);
+                  }}
+                />
+              </label>
+            </div>
           </div>
         </CardContent>
       </PremiumCard>

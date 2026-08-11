@@ -10,6 +10,7 @@ import { projectRecord, taskRecord } from "@/test/factories";
 
 import { TodayTaskCard } from "../components/TodayTaskCard";
 import { TodayTaskForm } from "../components/TodayTaskForm";
+import { TodayTimeBlockingTimeline } from "../components/TodayTimeBlockingTimeline";
 import { TodayWeeklyPlanCard } from "../components/TodayWeeklyPlanCard";
 import {
   createAllTodayTasksPath,
@@ -76,8 +77,32 @@ describe("Task project links", () => {
         isMit: false,
         dueDate: "2026-07-17",
         projectId: "",
+        scheduledStartTime: "",
+        estimatedMinutes: "",
       }).success
     ).toBe(true);
+  });
+
+  it("accepts optional time-blocking metadata in the Task form", () => {
+    const parsed = todayTaskFormSchema.safeParse({
+      title: "Write the launch note",
+      description: "",
+      status: "todo",
+      priority: "medium",
+      isMit: false,
+      dueDate: "2026-07-17",
+      projectId: "",
+      scheduledStartTime: "09:30",
+      estimatedMinutes: "45",
+    });
+
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data).toMatchObject({
+        scheduledStartTime: "09:30",
+        estimatedMinutes: 45,
+      });
+    }
   });
 
   it("renders an available linked Project and focused navigation", () => {
@@ -164,6 +189,31 @@ describe("Task project links", () => {
     );
     expect(html).toContain("Linked project");
     expect(html).toContain("Repeat");
+    expect(html).toContain("Start time");
+    expect(html).toContain("Estimated duration");
+  });
+
+  it("keeps the optional time-blocking timeline collapsed while showing scheduled tasks", () => {
+    const html = renderTodayUi(
+      <TodayTimeBlockingTimeline
+        tasks={[
+          {
+            ...taskRecord,
+            title: "Focused writing block",
+            scheduledStartTime: "09:30",
+            estimatedMinutes: 45,
+          },
+        ]}
+      />
+    );
+
+    expect(html).toContain('id="today-time-blocking"');
+    expect(html).toContain("Time blocks");
+    expect(html).toContain('aria-expanded="false"');
+    expect(html).toContain('id="today-time-blocking-content" hidden="" aria-hidden="true"');
+    expect(html).toContain("Focused writing block");
+    expect(html).toContain("09:30");
+    expect(html).toContain("45m planned");
   });
 
   it("keeps the weekly planning detail collapsed while showing its status summary", () => {

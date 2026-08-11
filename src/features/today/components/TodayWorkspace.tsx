@@ -27,6 +27,7 @@ import { DailyCheckinForm } from "../components/DailyCheckinForm";
 import { TodayWeeklyPlanCard } from "../components/TodayWeeklyPlanCard";
 import { TodayTaskCard } from "../components/TodayTaskCard";
 import { TodayTaskForm } from "../components/TodayTaskForm";
+import { TodayTimeBlockingTimeline } from "../components/TodayTimeBlockingTimeline";
 import { useTodayData } from "../hooks/useTodayData";
 import { useTodayWeeklyPlan } from "../hooks/useTodayWeeklyPlan";
 import { getPlannedTaskOutsideToday } from "../todayWeeklyPlan";
@@ -284,6 +285,8 @@ export function TodayWorkspace({
       ...taskValues,
       description: values.description || undefined,
       projectId: values.projectId || undefined,
+      scheduledStartTime: values.scheduledStartTime || undefined,
+      estimatedMinutes: values.estimatedMinutes || undefined,
       recurrence:
         recurrenceFrequency === "none"
           ? undefined
@@ -712,6 +715,8 @@ export function TodayWorkspace({
         </div>
 
         <div className="space-y-6">
+          <TodayTimeBlockingTimeline tasks={orderedVisibleTasks} />
+
           <TodayWeeklyPlanCard focus={weeklyPlanFocus} isLoading={isWeeklyPlanLoading} />
 
           <CollapsibleSection

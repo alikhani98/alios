@@ -1,6 +1,7 @@
 import {
   AlertCircle,
   CalendarDays,
+  Clock3,
   Download,
   FileJson,
   HardDrive,
@@ -26,6 +27,8 @@ import {
 } from "@/core/account";
 import {
   APPEARANCE_STORAGE_KEY,
+  APPEARANCE_SCHEDULE_END_STORAGE_KEY,
+  APPEARANCE_SCHEDULE_START_STORAGE_KEY,
   RECOVERY_MODE_ENABLED_STORAGE_KEY,
   MORNING_WARMUP_ENABLED_STORAGE_KEY,
 } from "@/shared/constants";
@@ -35,6 +38,7 @@ import { usePersistentBoolean, usePersistentString } from "@/shared/hooks";
 import { useI18n, type TranslationKey } from "@/shared/i18n";
 import {
   DEFAULT_APPEARANCE_PREFERENCE,
+  DEFAULT_APPEARANCE_SCHEDULE,
   parseAppearancePreference,
 } from "@/shared/preferences";
 import {
@@ -139,6 +143,7 @@ const appearanceOptions = [
   { value: "light", icon: SunMedium, labelKey: "settings.light" },
   { value: "dark", icon: Moon, labelKey: "settings.dark" },
   { value: "system", icon: MonitorSmartphone, labelKey: "settings.system" },
+  { value: "scheduled", icon: Clock3, labelKey: "settings.scheduled" },
 ] as const;
 
 const viewDensityOptions: {
@@ -328,6 +333,20 @@ export function SettingsPage() {
       key: APPEARANCE_STORAGE_KEY,
       defaultValue: DEFAULT_APPEARANCE_PREFERENCE,
     });
+  const {
+    value: appearanceScheduleStart,
+    setValue: setAppearanceScheduleStart,
+  } = usePersistentString({
+    key: APPEARANCE_SCHEDULE_START_STORAGE_KEY,
+    defaultValue: DEFAULT_APPEARANCE_SCHEDULE.start,
+  });
+  const {
+    value: appearanceScheduleEnd,
+    setValue: setAppearanceScheduleEnd,
+  } = usePersistentString({
+    key: APPEARANCE_SCHEDULE_END_STORAGE_KEY,
+    defaultValue: DEFAULT_APPEARANCE_SCHEDULE.end,
+  });
   const { value: morningWarmupEnabled, setValue: setMorningWarmupEnabled } =
     usePersistentBoolean({
       key: MORNING_WARMUP_ENABLED_STORAGE_KEY,
@@ -723,6 +742,39 @@ export function SettingsPage() {
               </Button>
             ))}
           </div>
+          {currentAppearance === "scheduled" ? (
+            <SoftPanel className="mt-4 space-y-3 alios-surface-muted">
+              <div className="flex items-start gap-2">
+                <Clock3 className="mt-0.5 h-4 w-4 shrink-0 text-alios-caspian dark:text-alios-paper" />
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">
+                    {t("settings.scheduledAppearanceTitle")}
+                  </p>
+                  <p className="text-sm leading-6 text-muted-foreground">
+                    {t("settings.scheduledAppearanceDescription")}
+                  </p>
+                </div>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <label className="space-y-2 text-sm font-medium">
+                  <span>{t("settings.scheduledAppearanceStart")}</span>
+                  <Input
+                    type="time"
+                    value={appearanceScheduleStart}
+                    onChange={(event) => setAppearanceScheduleStart(event.target.value)}
+                  />
+                </label>
+                <label className="space-y-2 text-sm font-medium">
+                  <span>{t("settings.scheduledAppearanceEnd")}</span>
+                  <Input
+                    type="time"
+                    value={appearanceScheduleEnd}
+                    onChange={(event) => setAppearanceScheduleEnd(event.target.value)}
+                  />
+                </label>
+              </div>
+            </SoftPanel>
+          ) : null}
         </CardContent>
       </Card>
 

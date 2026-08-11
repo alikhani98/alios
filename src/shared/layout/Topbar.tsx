@@ -1,5 +1,6 @@
 import {
   Check,
+  Clock3,
   LayoutDashboard,
   Menu,
   Moon,
@@ -20,6 +21,8 @@ import { Link, useNavigate } from "react-router-dom";
 
 import {
   APPEARANCE_STORAGE_KEY,
+  APPEARANCE_SCHEDULE_END_STORAGE_KEY,
+  APPEARANCE_SCHEDULE_START_STORAGE_KEY,
   DISPLAY_NAME_STORAGE_KEY,
 } from "@/shared/constants/preferences";
 import { appConfig } from "@/shared/constants/app";
@@ -32,6 +35,7 @@ import {
 } from "@/shared/preferences/accentColor";
 import {
   DEFAULT_APPEARANCE_PREFERENCE,
+  DEFAULT_APPEARANCE_SCHEDULE,
   parseAppearancePreference,
   resolveAppearance,
 } from "@/shared/preferences/appearance";
@@ -56,6 +60,7 @@ const appearanceOptions = [
   { value: "light", icon: SunMedium, labelKey: "settings.light" },
   { value: "dark", icon: Moon, labelKey: "settings.dark" },
   { value: "system", icon: MonitorSmartphone, labelKey: "settings.system" },
+  { value: "scheduled", icon: Clock3, labelKey: "settings.scheduled" },
 ] as const;
 
 type TopbarProps = {
@@ -88,6 +93,14 @@ export function Topbar({
       key: APPEARANCE_STORAGE_KEY,
       defaultValue: DEFAULT_APPEARANCE_PREFERENCE,
     });
+  const { value: appearanceScheduleStart } = usePersistentString({
+    key: APPEARANCE_SCHEDULE_START_STORAGE_KEY,
+    defaultValue: DEFAULT_APPEARANCE_SCHEDULE.start,
+  });
+  const { value: appearanceScheduleEnd } = usePersistentString({
+    key: APPEARANCE_SCHEDULE_END_STORAGE_KEY,
+    defaultValue: DEFAULT_APPEARANCE_SCHEDULE.end,
+  });
   const { value: displayName, setValue: setDisplayName } = usePersistentString({
     key: DISPLAY_NAME_STORAGE_KEY,
     defaultValue: "",
@@ -107,6 +120,15 @@ export function Topbar({
             ? window.matchMedia("(prefers-color-scheme: dark)").matches
             : false
         )
+      : currentAppearance === "scheduled"
+        ? resolveAppearance(
+            currentAppearance,
+            false,
+            {
+              start: appearanceScheduleStart,
+              end: appearanceScheduleEnd,
+            }
+          )
       : currentAppearance;
   const hasDisplayName = displayName.trim().length > 0;
   const initials = getDisplayNameInitials(displayName);

@@ -1,4 +1,8 @@
 export const APPEARANCE_STORAGE_KEY = "alios.appearance";
+export const APPEARANCE_SCHEDULE_START_STORAGE_KEY =
+  "alios.appearance.schedule.start";
+export const APPEARANCE_SCHEDULE_END_STORAGE_KEY =
+  "alios.appearance.schedule.end";
 export const ACCENT_COLOR_STORAGE_KEY = "alios.preferences.accentColor";
 export const DISPLAY_NAME_STORAGE_KEY = "alios.displayName";
 export const RECOVERY_MODE_ENABLED_STORAGE_KEY =

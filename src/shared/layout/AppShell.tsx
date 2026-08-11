@@ -7,6 +7,8 @@ import { usePersistentString } from "@/shared/hooks/usePersistentString";
 import { useI18n } from "@/shared/i18n";
 import {
   APPEARANCE_STORAGE_KEY,
+  APPEARANCE_SCHEDULE_END_STORAGE_KEY,
+  APPEARANCE_SCHEDULE_START_STORAGE_KEY,
   RECOVERY_MODE_ENABLED_STORAGE_KEY,
 } from "@/shared/constants/preferences";
 import { ErrorBoundary } from "@/shared/error";
@@ -17,6 +19,7 @@ import {
 } from "@/shared/preferences/accentColor";
 import {
   DEFAULT_APPEARANCE_PREFERENCE,
+  DEFAULT_APPEARANCE_SCHEDULE,
   parseAppearancePreference,
   resolveAppearance,
 } from "@/shared/preferences/appearance";
@@ -39,6 +42,14 @@ export function AppShell() {
   const { value: appearancePreference } = usePersistentString({
     key: APPEARANCE_STORAGE_KEY,
     defaultValue: DEFAULT_APPEARANCE_PREFERENCE,
+  });
+  const { value: appearanceScheduleStart } = usePersistentString({
+    key: APPEARANCE_SCHEDULE_START_STORAGE_KEY,
+    defaultValue: DEFAULT_APPEARANCE_SCHEDULE.start,
+  });
+  const { value: appearanceScheduleEnd } = usePersistentString({
+    key: APPEARANCE_SCHEDULE_END_STORAGE_KEY,
+    defaultValue: DEFAULT_APPEARANCE_SCHEDULE.end,
   });
   const { value: accentColorPreference } = useAccentColorPreference();
   const {
@@ -63,11 +74,16 @@ export function AppShell() {
     }
 
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const parsedAppearancePreference = parseAppearancePreference(appearancePreference);
 
     const applyTheme = () => {
       const resolvedAppearance = resolveAppearance(
-        parseAppearancePreference(appearancePreference),
-        mediaQuery.matches
+        parsedAppearancePreference,
+        mediaQuery.matches,
+        {
+          start: appearanceScheduleStart,
+          end: appearanceScheduleEnd,
+        }
       );
 
       document.documentElement.classList.toggle(
@@ -82,16 +98,33 @@ export function AppShell() {
 
     applyTheme();
 
-    if (parseAppearancePreference(appearancePreference) !== "system") {
-      return;
+    let intervalId: number | null = null;
+    if (parsedAppearancePreference === "scheduled") {
+      intervalId = window.setInterval(applyTheme, 60_000);
+    }
+
+    if (parsedAppearancePreference !== "system") {
+      return () => {
+        if (intervalId !== null) {
+          window.clearInterval(intervalId);
+        }
+      };
     }
 
     mediaQuery.addEventListener("change", applyTheme);
 
     return () => {
+      if (intervalId !== null) {
+        window.clearInterval(intervalId);
+      }
       mediaQuery.removeEventListener("change", applyTheme);
     };
-  }, [appearancePreference, accentColorPreference]);
+  }, [
+    accentColorPreference,
+    appearancePreference,
+    appearanceScheduleEnd,
+    appearanceScheduleStart,
+  ]);
 
   useEffect(() => {
     if (typeof window === "undefined") {

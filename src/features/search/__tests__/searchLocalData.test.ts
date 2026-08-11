@@ -11,7 +11,7 @@ import type {
   Task,
 } from "@/shared/types";
 
-import { searchLocalData } from "../searchLocalData";
+import { filterSearchResults, searchLocalData } from "../searchLocalData";
 import { routineRecord } from "@/test/factories";
 
 const inboxItems: InboxItem[] = [
@@ -408,5 +408,38 @@ describe("searchLocalData", () => {
     expect(results.some((result) => result.kind === "lifeArea")).toBe(true);
     expect(results.some((result) => result.kindLabelKey === "search.typeLifeArea")).toBe(true);
     expect(results.some((result) => result.href === "/life-areas?focusId=life-area-1")).toBe(true);
+  });
+
+  it("narrows existing search results by content type and date range", () => {
+    const results = searchLocalData(
+      {
+        inboxItems,
+        tasks,
+        projects,
+        goals,
+        journalEntries,
+        knowledgeItems,
+        manualEntries,
+      },
+      "local"
+    );
+
+    expect(results.map((result) => result.kind)).toEqual(
+      expect.arrayContaining(["journal", "knowledge", "goal"])
+    );
+
+    expect(filterSearchResults(results, { kinds: ["knowledge"] })).toEqual([
+      expect.objectContaining({ kind: "knowledge" }),
+    ]);
+
+    expect(
+      filterSearchResults(results, {
+        dateFrom: "2026-07-04",
+        dateTo: "2026-07-05",
+      }).every((result) => {
+        const date = result.date?.slice(0, 10);
+        return Boolean(date && date >= "2026-07-04" && date <= "2026-07-05");
+      })
+    ).toBe(true);
   });
 });

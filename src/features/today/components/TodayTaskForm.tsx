@@ -44,6 +44,8 @@ export function TodayTaskForm({
       priority: task?.priority ?? "medium",
       isMit: task?.isMit ?? false,
       dueDate: task?.dueDate ?? defaultDueDate,
+      scheduledStartTime: task?.scheduledStartTime ?? "",
+      estimatedMinutes: task?.estimatedMinutes,
       projectId: task?.projectId ?? "",
       recurrenceFrequency: task?.recurrence?.frequency ?? "none",
     },
@@ -203,6 +205,42 @@ export function TodayTaskForm({
                   <option value="daily">{t("today.recurrenceDaily")}</option>
                   <option value="weekly">{t("today.recurrenceWeekly")}</option>
                 </Select>
+              </div>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid gap-2">
+                <label htmlFor="today-task-start-time" className="text-sm font-medium">
+                  {t("today.scheduledStartTime")}
+                </label>
+                <Input
+                  id="today-task-start-time"
+                  type="time"
+                  aria-invalid={Boolean(errors.scheduledStartTime)}
+                  {...register("scheduledStartTime")}
+                />
+                {errors.scheduledStartTime ? (
+                  <p className="text-sm text-destructive">{t("common.validation")}</p>
+                ) : null}
+              </div>
+
+              <div className="grid gap-2">
+                <label htmlFor="today-task-estimated-minutes" className="text-sm font-medium">
+                  {t("today.estimatedMinutes")}
+                </label>
+                <Input
+                  id="today-task-estimated-minutes"
+                  type="number"
+                  min={5}
+                  max={720}
+                  step={5}
+                  placeholder={t("today.estimatedMinutesPlaceholder")}
+                  aria-invalid={Boolean(errors.estimatedMinutes)}
+                  {...register("estimatedMinutes")}
+                />
+                {errors.estimatedMinutes ? (
+                  <p className="text-sm text-destructive">{t("common.validation")}</p>
+                ) : null}
               </div>
             </div>
             <p className="text-xs leading-5 text-muted-foreground">

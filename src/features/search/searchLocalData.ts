@@ -70,6 +70,12 @@ export type SearchResult = {
   score: number;
 };
 
+export type SearchResultFilters = {
+  kinds?: SearchResultKind[];
+  dateFrom?: string;
+  dateTo?: string;
+};
+
 export type SearchLocalDataInput = {
   inboxItems: InboxItem[];
   tasks: Task[];
@@ -421,4 +427,36 @@ export function searchLocalData(
   }
 
   return results.sort((a, b) => b.score - a.score || b.sortKey.localeCompare(a.sortKey));
+}
+
+function toComparableDate(value: string | undefined): string | undefined {
+  if (!value) return undefined;
+  return value.slice(0, 10);
+}
+
+export function filterSearchResults(
+  results: SearchResult[],
+  filters: SearchResultFilters
+): SearchResult[] {
+  const selectedKinds = new Set(filters.kinds ?? []);
+  const hasKindFilter = selectedKinds.size > 0;
+  const dateFrom = toComparableDate(filters.dateFrom);
+  const dateTo = toComparableDate(filters.dateTo);
+
+  return results.filter((result) => {
+    if (hasKindFilter && !selectedKinds.has(result.kind)) {
+      return false;
+    }
+
+    const resultDate = toComparableDate(result.date);
+    if (dateFrom && (!resultDate || resultDate < dateFrom)) {
+      return false;
+    }
+
+    if (dateTo && (!resultDate || resultDate > dateTo)) {
+      return false;
+    }
+
+    return true;
+  });
 }
