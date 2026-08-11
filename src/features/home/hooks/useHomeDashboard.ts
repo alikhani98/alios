@@ -1,4 +1,4 @@
-import { format } from "date-fns";
+import { format, getDay } from "date-fns";
 import { useCallback, useEffect, useState } from "react";
 
 import { useStorageAdapter } from "@/core/storage";
@@ -44,7 +44,7 @@ function byUpdatedAtDescending<T extends { updatedAt: string }>(a: T, b: T) {
 }
 
 export function useHomeDashboard() {
-  const { tasks, dailyCheckins, projects, journal, knowledge, goals, lifeAreas, manual, inbox, weeklyPlans, finance } =
+  const { tasks, dailyCheckins, projects, journal, knowledge, goals, lifeAreas, manual, inbox, weeklyPlans, finance, routines } =
     useStorageAdapter();
   const { t } = useI18n();
   const [data, setData] = useState<HomeDashboardData | null>(null);
@@ -70,6 +70,7 @@ export function useHomeDashboard() {
         weeklyPlan,
         financeTransactions,
         financeObligations,
+        routineEntries,
       ] =
         await Promise.all([
           tasks.list(),
@@ -84,9 +85,21 @@ export function useHomeDashboard() {
           weeklyPlans.getByWeekStart(getWeeklyPlanWeekStart()),
           finance.listTransactions(),
           finance.listObligations(),
+          routines.list(),
         ]);
 
       const todayTasks = allTasks.filter((task) => task.dueDate === today);
+      const createdRoutineIdsToday = new Set(
+        todayTasks
+          .filter((task) => task.routineId)
+          .map((task) => task.routineId)
+      );
+      const routineSuggestion = routineEntries.find(
+        (routine) =>
+          routine.isActive &&
+          routine.weekdays.includes(getDay(new Date())) &&
+          !createdRoutineIdsToday.has(routine.id)
+      );
       const recentProjects = [...allProjects]
         .sort(byUpdatedAtDescending)
         .slice(0, 3);
@@ -160,6 +173,7 @@ export function useHomeDashboard() {
         inbox: {
           unprocessedCount: inboxItems.filter((item) => item.status === "unprocessed").length,
         },
+        routineSuggestion,
         planningFocus: getHomePlanningFocus(goalEntries, allProjects, allTasks),
         weeklyPlan,
         weeklyPlanLinks: getHomeWeeklyPlanLinks(weeklyPlan, goalEntries, allProjects, allTasks),
@@ -181,7 +195,7 @@ export function useHomeDashboard() {
     } finally {
       setIsLoading(false);
     }
-  }, [dailyCheckins, finance, goals, inbox, journal, knowledge, lifeAreas, manual, projects, tasks, t, weeklyPlans]);
+  }, [dailyCheckins, finance, goals, inbox, journal, knowledge, lifeAreas, manual, projects, routines, tasks, t, weeklyPlans]);
 
   useEffect(() => {
     void loadDashboard();

@@ -8,6 +8,7 @@ import {
   findRoutineFilter,
 } from "../routineTaskLinks";
 import { getRoutineTaskProgress } from "../routineTaskProgress";
+import { getRoutineCurrentStreak } from "../routineStreak";
 
 const routine: Routine = {
   id: "routine / one",
@@ -63,5 +64,38 @@ describe("routine task progress", () => {
     expect(findRoutineFilter(routine.id, [routine])).toEqual(routine);
     expect(findRoutineFilter("deleted-routine", [routine])).toBeUndefined();
     expect(findRoutineFilter(null, [routine])).toBeUndefined();
+  });
+
+  it("counts the current streak from consecutive completed routine days", () => {
+    const dailyRoutine = { ...routine, weekdays: [0, 1, 2, 3, 4, 5, 6] };
+
+    expect(
+      getRoutineCurrentStreak(
+        dailyRoutine,
+        [
+          createTask("today", {
+            routineId: dailyRoutine.id,
+            status: "done",
+            dueDate: "2026-07-18",
+          }),
+          createTask("yesterday", {
+            routineId: dailyRoutine.id,
+            status: "done",
+            dueDate: "2026-07-17",
+          }),
+          createTask("two-days", {
+            routineId: dailyRoutine.id,
+            status: "done",
+            dueDate: "2026-07-16",
+          }),
+          createTask("older", {
+            routineId: dailyRoutine.id,
+            status: "done",
+            dueDate: "2026-07-14",
+          }),
+        ],
+        "2026-07-18"
+      )
+    ).toBe(3);
   });
 });

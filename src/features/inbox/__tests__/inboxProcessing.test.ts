@@ -5,6 +5,7 @@ import { createTestStorage, destroyTestDatabase } from "@/test/database";
 import {
   deleteInboxItems,
   processInboxItem,
+  processInboxItems,
   setInboxItemProcessed,
   setInboxItemsProcessed,
 } from "../inboxProcessing";
@@ -147,5 +148,34 @@ describe("Inbox processing", () => {
     expect(await storage.inbox.getById(first.id)).toBeUndefined();
     expect(await storage.inbox.getById(second.id)).toBeUndefined();
     expect(await storage.inbox.getById(untouched.id)).toBeDefined();
+  });
+
+  it("bulk converts selected Inbox items to Today tasks and keeps unselected items pending", async () => {
+    const first = await storage.inbox.create({ content: "First batch task", type: "task" });
+    const second = await storage.inbox.create({ content: "Second batch task", type: "note" });
+    const untouched = await storage.inbox.create({ content: "Keep in inbox", type: "idea" });
+
+    await processInboxItems(storage, [first.id, second.id], "todayTask", "2026-07-05");
+
+    const tasks = await storage.tasks.list();
+
+    expect(tasks).toHaveLength(2);
+    expect(tasks).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          title: "First batch task",
+          dueDate: "2026-07-05",
+          status: "todo",
+        }),
+        expect.objectContaining({
+          title: "Second batch task",
+          dueDate: "2026-07-05",
+          status: "todo",
+        }),
+      ])
+    );
+    expect((await storage.inbox.getById(first.id))?.status).toBe("processed");
+    expect((await storage.inbox.getById(second.id))?.status).toBe("processed");
+    expect((await storage.inbox.getById(untouched.id))?.status).toBe("unprocessed");
   });
 });

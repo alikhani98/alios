@@ -41,7 +41,9 @@ type GoalCardProps = {
   isReviewDue: boolean;
   projectProgress?: GoalProjectProgress;
   isProjectProgressLoading?: boolean;
+  useAutoProgress?: boolean;
   isDeleting: boolean;
+  onAutoProgressChange?: (enabled: boolean) => void;
   onEdit: () => void;
   onDelete: () => void;
   onMarkReviewed: () => void;
@@ -54,7 +56,9 @@ export function GoalCard({
   isReviewDue,
   projectProgress,
   isProjectProgressLoading,
+  useAutoProgress = false,
   isDeleting,
+  onAutoProgressChange,
   onEdit,
   onDelete,
   onMarkReviewed,
@@ -63,7 +67,17 @@ export function GoalCard({
 }: GoalCardProps) {
   const { t } = useI18n();
   const { formatDateTime, formatDate } = useDateFormatter();
-  const progressLabel = `${goal.progressPercent}%`;
+  const autoProgressPercent =
+    !isProjectProgressLoading && projectProgress?.completionPercent !== null
+      ? projectProgress?.completionPercent
+      : undefined;
+  const hasAutoProgress = typeof autoProgressPercent === "number";
+  const displayedProgressPercent =
+    useAutoProgress && hasAutoProgress ? autoProgressPercent : goal.progressPercent;
+  const progressLabel = `${displayedProgressPercent}%`;
+  const autoProgressLabel = hasAutoProgress
+    ? t("goals.autoProgressValue", { percent: autoProgressPercent })
+    : t("goals.autoProgressUnavailable");
   const linkedProjectSummary = isProjectProgressLoading
     ? t("common.loading")
     : projectProgress && projectProgress.projectCount > 0
@@ -122,14 +136,31 @@ export function GoalCard({
         <SoftPanel className="space-y-3">
           <div className="flex items-center justify-between gap-3">
             <p className="text-sm font-semibold">{t("goals.progressLabel")}</p>
-            <StatusChip tone={goal.progressPercent >= 100 ? "success" : "primary"}>
+            <StatusChip tone={displayedProgressPercent >= 100 ? "success" : "primary"}>
               {progressLabel}
             </StatusChip>
           </div>
           <MiniProgressBar
-            value={goal.progressPercent}
+            value={displayedProgressPercent}
             label={t("goals.progressLabel")}
           />
+          <label className="flex min-h-11 cursor-pointer items-start gap-3 rounded-xl border border-border/70 bg-background/70 p-3 text-sm">
+            <input
+              type="checkbox"
+              className="mt-1 h-4 w-4 shrink-0 accent-alios-caspian"
+              checked={useAutoProgress && hasAutoProgress}
+              disabled={!hasAutoProgress || isProjectProgressLoading}
+              onChange={(event) => onAutoProgressChange?.(event.currentTarget.checked)}
+            />
+            <span className="min-w-0 space-y-1">
+              <span className="block font-medium text-foreground">
+                {t("goals.autoProgressToggle")}
+              </span>
+              <span className="block break-words text-xs leading-5 text-muted-foreground">
+                {autoProgressLabel}
+              </span>
+            </span>
+          </label>
         </SoftPanel>
 
         <CollapsibleSection

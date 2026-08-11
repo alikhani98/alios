@@ -1,4 +1,4 @@
-import { ArrowUpLeft, CheckSquare2, Inbox, Plus, Sparkles, Target } from "lucide-react";
+import { ArrowUpLeft, CheckSquare2, Inbox, Plus, Repeat2, Sparkles, Target } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { useI18n } from "@/shared/i18n";
@@ -20,6 +20,32 @@ function findCurrentFocus(data: HomeDashboardData): Task | undefined {
     ?? data.today.tasks.find((task) => task.status === "todo");
 }
 
+function findUrgentTask(data: HomeDashboardData): Task | undefined {
+  const today = new Date().toISOString().slice(0, 10);
+
+  return data.tasks
+    .filter(
+      (task) =>
+        (task.status === "todo" || task.status === "doing") &&
+        task.dueDate &&
+        task.dueDate <= today
+    )
+    .sort((first, second) => {
+      const dateComparison = (first.dueDate ?? "").localeCompare(second.dueDate ?? "");
+      return dateComparison === 0
+        ? second.updatedAt.localeCompare(first.updatedAt)
+        : dateComparison;
+    })[0];
+}
+
+function createTodayTaskFocusPath(task: Task): string {
+  const searchParams = new URLSearchParams({ focusId: task.id });
+  if (task.dueDate) {
+    searchParams.set("date", task.dueDate);
+  }
+  return `/today?${searchParams.toString()}`;
+}
+
 export function ClearStartCard({
   data,
 }: {
@@ -27,21 +53,51 @@ export function ClearStartCard({
 }) {
   const { t } = useI18n();
   const currentFocus = findCurrentFocus(data);
+  const urgentTask = currentFocus ? undefined : findUrgentTask(data);
   const activeTaskCount = data.today.tasks.filter(
     (task) => task.status === "todo" || task.status === "doing"
   ).length;
   const inboxBacklogCount = data.inbox.unprocessedCount;
   const suggestedInboxBatchCount = Math.min(3, inboxBacklogCount);
-  const shouldStartWithInbox = activeTaskCount === 0 && inboxBacklogCount > 0;
-  const primaryActionHref = shouldStartWithInbox ? "/inbox" : "/today";
+  const routineSuggestion = activeTaskCount === 0 && !urgentTask && inboxBacklogCount === 0
+    ? data.routineSuggestion
+    : undefined;
+  const shouldStartWithInbox = activeTaskCount === 0 && !urgentTask && inboxBacklogCount > 0;
+  const shouldStartWithRoutine = Boolean(routineSuggestion);
+  const suggestedTask = currentFocus ?? urgentTask;
+  const primaryActionHref = shouldStartWithInbox
+    ? "/inbox"
+    : routineSuggestion
+      ? `/today?${new URLSearchParams({ routineId: routineSuggestion.id }).toString()}`
+      : suggestedTask
+        ? createTodayTaskFocusPath(suggestedTask)
+        : "/today";
   const primaryActionLabel = shouldStartWithInbox
     ? t("home.clearStartProcessInbox")
+    : routineSuggestion
+      ? t("home.clearStartAddRoutine")
     : t("home.clearStartAddTask");
   const primaryActionIcon = shouldStartWithInbox ? (
     <Inbox className="me-2 h-4 w-4" aria-hidden="true" />
+  ) : routineSuggestion ? (
+    <Repeat2 className="me-2 h-4 w-4" aria-hidden="true" />
   ) : (
     <Plus className="me-2 h-4 w-4" aria-hidden="true" />
   );
+  const emptyActionTitle = shouldStartWithInbox
+    ? t("home.clearStartInboxBacklogTitle", {
+        count: inboxBacklogCount,
+      })
+    : routineSuggestion
+      ? t("home.clearStartRoutineTitle", { title: routineSuggestion.title })
+      : t("today.noTasks");
+  const emptyActionDescription = shouldStartWithInbox
+    ? t("home.clearStartInboxBacklogDescription", {
+        count: suggestedInboxBatchCount,
+      })
+    : routineSuggestion
+      ? t("home.clearStartRoutineDescription")
+      : t("today.noTasksDescription");
 
   return (
     <PremiumCard className="alios-home-now-surface">
@@ -86,24 +142,21 @@ export function ClearStartCard({
             </span>
             <div className="min-w-0 space-y-1">
               <p className="text-sm font-medium text-muted-foreground">
-                {currentFocus ? t("home.clearStartFocusLabel") : t("home.clearStartEmptyLabel")}
+                {suggestedTask
+                  ? urgentTask
+                    ? t("home.clearStartUrgentLabel")
+                    : t("home.clearStartFocusLabel")
+                  : t("home.clearStartEmptyLabel")}
               </p>
               <p className="break-words text-xl font-semibold leading-8">
-                {currentFocus?.title
-                  ?? (shouldStartWithInbox
-                    ? t("home.clearStartInboxBacklogTitle", {
-                        count: inboxBacklogCount,
-                      })
-                    : t("today.noTasks"))}
+                {suggestedTask?.title ?? emptyActionTitle}
               </p>
               <p className="text-sm leading-6 text-muted-foreground">
-                {currentFocus
-                  ? t("today.tasksDescription")
-                  : shouldStartWithInbox
-                    ? t("home.clearStartInboxBacklogDescription", {
-                        count: suggestedInboxBatchCount,
-                      })
-                    : t("today.noTasksDescription")}
+                {suggestedTask
+                  ? urgentTask
+                    ? t("home.clearStartUrgentDescription")
+                    : t("today.tasksDescription")
+                  : emptyActionDescription}
               </p>
             </div>
           </div>
@@ -131,9 +184,13 @@ export function ClearStartCard({
             </div>
           </div>
 
-          <StatusChip tone={activeTaskCount > 0 ? "primary" : shouldStartWithInbox ? "warning" : "neutral"} className="alios-home-thread-item w-fit">
+          <StatusChip tone={activeTaskCount > 0 || urgentTask ? "primary" : shouldStartWithInbox ? "warning" : shouldStartWithRoutine ? "success" : "neutral"} className="alios-home-thread-item w-fit">
             {shouldStartWithInbox ? (
               t("home.clearStartInboxBacklogStatus", { count: suggestedInboxBatchCount })
+            ) : routineSuggestion ? (
+              t("home.clearStartRoutineStatus")
+            ) : urgentTask ? (
+              t("home.clearStartUrgentStatus")
             ) : (
               <>
                 <span className="font-mono tabular-nums">{activeTaskCount}</span> {t("common.active")}

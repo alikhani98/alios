@@ -190,6 +190,7 @@ export function GoalsPage() {
   const [showAllGoals, setShowAllGoals] = useState(false);
   const [showSimpleTemplates, setShowSimpleTemplates] = useState(false);
   const [isContextualHelpOpen, setIsContextualHelpOpen] = useState(false);
+  const [autoProgressGoalIds, setAutoProgressGoalIds] = useState<string[]>([]);
   const goalRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const formRef = useRef<HTMLDivElement | null>(null);
   const focusId = searchParams.get("focusId");
@@ -426,6 +427,15 @@ export function GoalsPage() {
           : t("goals.reactivateError")
       );
     }
+  };
+
+  const handleAutoProgressChange = (goalId: string, enabled: boolean) => {
+    setAutoProgressGoalIds((current) => {
+      if (enabled) {
+        return current.includes(goalId) ? current : [...current, goalId];
+      }
+      return current.filter((id) => id !== goalId);
+    });
   };
 
   useEffect(() => {
@@ -804,21 +814,29 @@ export function GoalsPage() {
                 status={<StatusChip tone="warning">{reviewDueGoals.length}</StatusChip>}
               />
               <div className="grid min-w-0 gap-4">
-                {reviewDueGoals.slice(0, 4).map((goal) => (
-                  <GoalCard
-                    key={`review-${goal.id}`}
-                    goal={goal}
-                    isReviewDue
-                    projectProgress={getGoalProjectProgress(goal.id, projects, tasks)}
-                    isProjectProgressLoading={isProjectProgressLoading}
-                    isDeleting={deletingId === goal.id}
-                    onEdit={() => openEditForm(goal)}
-                    onDelete={() => void handleDelete(goal)}
-                    onMarkReviewed={() => void handleMarkReviewed(goal)}
-                    onMarkCompleted={() => void handleMarkCompleted(goal)}
-                    onReactivate={() => void handleReactivate(goal)}
-                  />
-                ))}
+                {reviewDueGoals.slice(0, 4).map((goal) => {
+                  const projectProgress = getGoalProjectProgress(goal.id, projects, tasks);
+
+                  return (
+                    <GoalCard
+                      key={`review-${goal.id}`}
+                      goal={goal}
+                      isReviewDue
+                      projectProgress={projectProgress}
+                      isProjectProgressLoading={isProjectProgressLoading}
+                      useAutoProgress={autoProgressGoalIds.includes(goal.id)}
+                      isDeleting={deletingId === goal.id}
+                      onAutoProgressChange={(enabled) =>
+                        handleAutoProgressChange(goal.id, enabled)
+                      }
+                      onEdit={() => openEditForm(goal)}
+                      onDelete={() => void handleDelete(goal)}
+                      onMarkReviewed={() => void handleMarkReviewed(goal)}
+                      onMarkCompleted={() => void handleMarkCompleted(goal)}
+                      onReactivate={() => void handleReactivate(goal)}
+                    />
+                  );
+                })}
               </div>
             </section>
           ) : null}
@@ -862,31 +880,39 @@ export function GoalsPage() {
         />
       ) : (
         <div className="grid min-w-0 gap-4 xl:grid-cols-2">
-          {displayedGoals.map((goal) => (
-            <div
-              key={goal.id}
-              ref={(node) => {
-                goalRefs.current[goal.id] = node;
-              }}
-              className={cn(
-                "min-w-0 scroll-mt-6 rounded-[1.75rem] transition-shadow",
-                focusedGoalId === goal.id ? "ring-2 ring-primary/20" : null
-              )}
-            >
-              <GoalCard
-                goal={goal}
-                isReviewDue={isGoalReviewDue(goal)}
-                projectProgress={getGoalProjectProgress(goal.id, projects, tasks)}
-                isProjectProgressLoading={isProjectProgressLoading}
-                isDeleting={deletingId === goal.id}
-                onEdit={() => openEditForm(goal)}
-                onDelete={() => void handleDelete(goal)}
-                onMarkReviewed={() => void handleMarkReviewed(goal)}
-                onMarkCompleted={() => void handleMarkCompleted(goal)}
-                onReactivate={() => void handleReactivate(goal)}
-              />
-            </div>
-          ))}
+          {displayedGoals.map((goal) => {
+            const projectProgress = getGoalProjectProgress(goal.id, projects, tasks);
+
+            return (
+              <div
+                key={goal.id}
+                ref={(node) => {
+                  goalRefs.current[goal.id] = node;
+                }}
+                className={cn(
+                  "min-w-0 scroll-mt-6 rounded-[1.75rem] transition-shadow",
+                  focusedGoalId === goal.id ? "ring-2 ring-primary/20" : null
+                )}
+              >
+                <GoalCard
+                  goal={goal}
+                  isReviewDue={isGoalReviewDue(goal)}
+                  projectProgress={projectProgress}
+                  isProjectProgressLoading={isProjectProgressLoading}
+                  useAutoProgress={autoProgressGoalIds.includes(goal.id)}
+                  isDeleting={deletingId === goal.id}
+                  onAutoProgressChange={(enabled) =>
+                    handleAutoProgressChange(goal.id, enabled)
+                  }
+                  onEdit={() => openEditForm(goal)}
+                  onDelete={() => void handleDelete(goal)}
+                  onMarkReviewed={() => void handleMarkReviewed(goal)}
+                  onMarkCompleted={() => void handleMarkCompleted(goal)}
+                  onReactivate={() => void handleReactivate(goal)}
+                />
+              </div>
+            );
+          })}
         </div>
       )}
       {filteredEntries.length > goalPreviewLimit && !focusRequiresAllGoals ? (

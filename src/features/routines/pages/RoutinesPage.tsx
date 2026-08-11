@@ -1,5 +1,6 @@
 import {
   AlertCircle,
+  Flame,
   ListChecks,
   Pencil,
   Plus,
@@ -34,6 +35,7 @@ import {
 import { useRoutines } from "../hooks/useRoutines";
 import { createRoutineTodayTasksPath } from "../routineTaskLinks";
 import { getRoutineTaskProgress } from "../routineTaskProgress";
+import { getRoutineCurrentStreak } from "../routineStreak";
 
 export function RoutinesPage() {
   const { t } = useI18n();
@@ -231,6 +233,7 @@ export function RoutinesPage() {
         <div className="grid gap-4 xl:grid-cols-2">
           {displayedRoutines.map((routine) => {
             const progress = getRoutineTaskProgress(routine.id, tasks);
+            const streak = getRoutineCurrentStreak(routine, tasks);
 
             return (
               <PremiumCard
@@ -246,6 +249,13 @@ export function RoutinesPage() {
                       </Badge>
                       <Badge variant="outline">
                         {t(TASK_PRIORITY_LABEL_KEYS[routine.priority])}
+                      </Badge>
+                      <Badge
+                        variant="outline"
+                        className="border-alios-saffron/50 bg-alios-saffron/10 text-alios-caspian dark:text-alios-paper"
+                      >
+                        <Flame className="me-1 h-3.5 w-3.5 text-alios-saffron" />
+                        {t("routines.currentStreak", { count: streak })}
                       </Badge>
                     </div>
                   </div>

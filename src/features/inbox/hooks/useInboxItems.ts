@@ -9,6 +9,7 @@ import type { InboxItem } from "@/shared/types";
 import {
   deleteInboxItems,
   processInboxItem,
+  processInboxItems,
   setInboxItemProcessed,
   setInboxItemsProcessed,
   type InboxProcessingTarget,
@@ -85,6 +86,18 @@ export function useInboxItems() {
     [storage]
   );
 
+  const convertItems = useCallback(
+    async (ids: string[], target: InboxProcessingTarget) => {
+      const updatedItems = await processInboxItems(storage, ids, target);
+      const updatedById = new Map(updatedItems.map((item) => [item.id, item]));
+      setItems((current) =>
+        sortInboxItems(current.map((entry) => updatedById.get(entry.id) ?? entry))
+      );
+      return updatedItems;
+    },
+    [storage]
+  );
+
   const markProcessed = useCallback(
     async (id: string) => {
       const item = await setInboxItemProcessed(storage, id, true);
@@ -149,6 +162,7 @@ export function useInboxItems() {
     updateItem,
     deleteItem,
     convertItem,
+    convertItems,
     markProcessed,
     markUnprocessed,
     markItemsProcessed,

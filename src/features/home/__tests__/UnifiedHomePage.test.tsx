@@ -17,6 +17,17 @@ const todayTask = {
   updatedAt: "2026-08-01T08:00:00.000Z",
 } as const;
 
+const overdueTask = {
+  id: "home-task-overdue",
+  title: "Send the overdue document",
+  status: "todo",
+  priority: "high",
+  dueDate: "2026-08-01",
+  isMit: false,
+  createdAt: "2026-08-01T08:00:00.000Z",
+  updatedAt: "2026-08-02T08:00:00.000Z",
+} as const;
+
 const dashboardData: HomeDashboardData = {
   tasks: [todayTask],
   today: {
@@ -184,5 +195,58 @@ describe("UnifiedHomePage", () => {
     expect(markup).toContain("Start small: process 3 item(s)");
     expect(markup).toContain("Process inbox");
     expect(markup).toContain("Start with 3 inbox item(s)");
+  });
+
+  it("suggests the most urgent dated task before the inbox backlog", () => {
+    mockedDashboardData = {
+      ...dashboardData,
+      tasks: [overdueTask],
+      today: {
+        tasks: [],
+        completedTaskCount: 0,
+        mitTask: undefined,
+      },
+      inbox: {
+        unprocessedCount: 32,
+      },
+    };
+
+    const markup = renderUnifiedHome();
+
+    expect(markup).toContain("Needs attention");
+    expect(markup).toContain("Send the overdue document");
+    expect(markup).toContain("Start with the dated task");
+    expect(markup).not.toContain("Your inbox has 32 item(s) waiting");
+  });
+
+  it("suggests an active routine when there are no tasks or inbox backlog", () => {
+    mockedDashboardData = {
+      ...dashboardData,
+      tasks: [],
+      today: {
+        tasks: [],
+        completedTaskCount: 0,
+        mitTask: undefined,
+      },
+      inbox: {
+        unprocessedCount: 0,
+      },
+      routineSuggestion: {
+        id: "routine-one",
+        title: "Morning review",
+        weekdays: [2],
+        priority: "medium",
+        isActive: true,
+        createdAt: "2026-08-01T08:00:00.000Z",
+        updatedAt: "2026-08-01T08:00:00.000Z",
+      },
+    };
+
+    const markup = renderUnifiedHome();
+
+    expect(markup).toContain("Keep Morning review moving today");
+    expect(markup).toContain("This active routine is scheduled for today");
+    expect(markup).toContain("Open routine");
+    expect(markup).toContain("Routine ready");
   });
 });

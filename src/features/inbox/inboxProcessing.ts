@@ -83,6 +83,21 @@ export async function setInboxItemsProcessed(
   return updatedItems;
 }
 
+export async function processInboxItems(
+  storage: StorageAdapter,
+  ids: string[],
+  target: InboxProcessingTarget,
+  today = format(new Date(), "yyyy-MM-dd")
+): Promise<InboxItem[]> {
+  const updatedItems: InboxItem[] = [];
+
+  for (const id of ids) {
+    updatedItems.push(await processInboxItem(storage, id, target, today));
+  }
+
+  return updatedItems;
+}
+
 export async function deleteInboxItems(
   storage: StorageAdapter,
   ids: string[]

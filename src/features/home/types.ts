@@ -5,6 +5,7 @@ import type {
   KnowledgeItem,
   ManualEntry,
   Project,
+  Routine,
   Task,
   WeeklyPlan,
 } from "@/shared/types";
@@ -64,6 +65,7 @@ export type HomeDashboardData = {
   inbox: {
     unprocessedCount: number;
   };
+  routineSuggestion?: Routine;
   planningFocus?: HomePlanningFocus;
   weeklyPlan?: WeeklyPlan;
   weeklyPlanLinks?: WeeklyPlanLink[];

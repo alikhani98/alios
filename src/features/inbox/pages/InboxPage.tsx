@@ -1,4 +1,4 @@
-import { AlertCircle, CheckCircle2, Circle, Inbox, Plus, RotateCcw, Search, SearchX, Trash2, X } from "lucide-react";
+import { AlertCircle, CheckCircle2, Circle, Inbox, ListTodo, Plus, RotateCcw, Search, SearchX, Trash2, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
@@ -42,6 +42,7 @@ export function InboxPage() {
     updateItem,
     deleteItem,
     convertItem,
+    convertItems,
     markProcessed,
     markUnprocessed,
     markItemsProcessed,
@@ -83,6 +84,10 @@ export function InboxPage() {
   );
   const selectedVisibleIds = selectedIds.filter((id) => visibleItemIds.includes(id));
   const selectedVisibleCount = selectedVisibleIds.length;
+  const selectedUnprocessedVisibleIds = selectedVisibleIds.filter((id) =>
+    items.some((item) => item.id === id && item.status === "unprocessed")
+  );
+  const selectedUnprocessedVisibleCount = selectedUnprocessedVisibleIds.length;
   const allVisibleSelected =
     visibleItemIds.length > 0 && visibleItemIds.every((id) => selectedIds.includes(id));
 
@@ -149,6 +154,30 @@ export function InboxPage() {
   const runBulk = async (action: () => Promise<void>, success: string) => {
     if (selectedVisibleIds.length === 0) {
       setActionError(t("inbox.noItemsSelected"));
+      return;
+    }
+
+    setIsBulkBusy(true);
+    setActionError(null);
+    setMessage(null);
+    try {
+      await action();
+      setMessage(success);
+      clearSelection();
+    } catch {
+      setActionError(t("inbox.actionError"));
+    } finally {
+      setIsBulkBusy(false);
+    }
+  };
+
+  const runBulkForIds = async (
+    ids: string[],
+    action: () => Promise<void>,
+    success: string
+  ) => {
+    if (ids.length === 0) {
+      setActionError(t("inbox.noUnprocessedItemsSelected"));
       return;
     }
 
@@ -308,9 +337,16 @@ export function InboxPage() {
         <PremiumCard>
           <CardContent className="grid gap-3 p-4">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-sm font-medium">
-                {t("inbox.selectedCount").replace("{count}", String(selectedVisibleCount))}
-              </p>
+              <div className="space-y-1">
+                <p className="text-sm font-semibold">{t("inbox.batchProcess")}</p>
+                <p className="text-sm text-muted-foreground">
+                  {t("inbox.selectedCount").replace("{count}", String(selectedVisibleCount))}
+                  {" · "}
+                  {t("inbox.unprocessedSelectedCount", {
+                    count: selectedUnprocessedVisibleCount,
+                  })}
+                </p>
+              </div>
               <div className="flex flex-wrap gap-2">
                 <Button
                   type="button"
@@ -330,6 +366,19 @@ export function InboxPage() {
               <Button
                 type="button"
                 size="sm"
+                disabled={isBulkBusy || selectedUnprocessedVisibleCount === 0}
+                onClick={() => void runBulkForIds(
+                  selectedUnprocessedVisibleIds,
+                  () => convertItems(selectedUnprocessedVisibleIds, "todayTask").then(() => undefined),
+                  t("inbox.bulkConvertedToTodayTask")
+                )}
+              >
+                <ListTodo className="me-2 h-4 w-4" />{t("inbox.convertSelectedToTodayTask")}
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
                 disabled={isBulkBusy}
                 onClick={() => void runBulk(
                   () => markItemsProcessed(selectedVisibleIds).then(() => undefined),
