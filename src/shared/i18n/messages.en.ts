@@ -1,6 +1,7 @@
 export const messagesEn = {
   "app.tagline": "Personal OS",
   "nav.home": "Home",
+  "nav.menu": "Menu",
   "nav.search": "Search",
   "nav.today": "Today",
   "nav.calendar": "Calendar",

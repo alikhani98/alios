@@ -801,6 +801,7 @@ export const messagesFa: Record<TranslationKey, string> = {
   "weeklyReview.focusAddFirstTask": "یک تمرکز آرام می‌تواند افزودن یک کار برای شروع هفته باشد.",
   "app.tagline": "سیستم‌عامل شخصی",
   "nav.home": "خانه",
+  "nav.menu": "منو",
   "nav.search": "جستجو",
   "nav.today": "امروز",
   "nav.calendar": "تقویم",

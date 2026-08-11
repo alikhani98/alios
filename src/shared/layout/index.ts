@@ -1,4 +1,5 @@
 export * from "./AppShell";
+export * from "./BottomNav";
 export * from "./MobileSidebar";
 export * from "./NavigationLink";
 export * from "./Sidebar";
