@@ -32,6 +32,31 @@ function parseOptionalPositiveInteger(value: string | undefined): number | undef
   return Number.isInteger(parsed) && parsed > 0 ? parsed : undefined;
 }
 
+function createMilestoneId(title: string, index: number): string {
+  return `milestone-${index + 1}-${title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 32) || "item"}`;
+}
+
+function parseMilestones(value: string | undefined): Project["milestones"] {
+  return (value ?? "")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line, index) => {
+      const done = /^\[(x|X)\]/.test(line);
+      const withoutCheckbox = line.replace(/^\[\s?\]|\[(x|X)\]/, "").trim();
+      const [rawTitle, rawDate] = withoutCheckbox.split("|").map((part) => part.trim());
+      const date = rawDate && /^\d{4}-\d{2}-\d{2}$/.test(rawDate) ? rawDate : undefined;
+
+      return {
+        id: createMilestoneId(rawTitle, index),
+        title: rawTitle,
+        done,
+        date,
+      };
+    })
+    .filter((milestone) => milestone.title.length > 0);
+}
+
 export function ProjectsPage() {
   const { t } = useI18n();
   const { tasks: tasksRepository } = useStorageAdapter();
@@ -113,6 +138,7 @@ export function ProjectsPage() {
       nextAction: values.nextAction || undefined,
       reviewDate: values.reviewDate || undefined,
       reviewIntervalDays: parseOptionalPositiveInteger(values.reviewIntervalDays),
+      milestones: parseMilestones(values.milestonesText),
     };
 
     try {

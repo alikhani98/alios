@@ -13,6 +13,7 @@ import { Link } from "react-router-dom";
 import { useDateFormatter } from "@/shared/date";
 import { useI18n } from "@/shared/i18n";
 import type { Goal } from "@/shared/types";
+import { cn } from "@/shared/utils";
 import {
   Badge,
   Button,
@@ -75,6 +76,14 @@ export function GoalCard({
   const displayedProgressPercent =
     useAutoProgress && hasAutoProgress ? autoProgressPercent : goal.progressPercent;
   const progressLabel = `${displayedProgressPercent}%`;
+  const keyResults = goal.keyResults ?? [];
+  const keyResultsAverage =
+    keyResults.length > 0
+      ? Math.round(
+          keyResults.reduce((total, keyResult) => total + keyResult.progressPercent, 0) /
+            keyResults.length
+        )
+      : undefined;
   const autoProgressLabel = hasAutoProgress
     ? t("goals.autoProgressValue", { percent: autoProgressPercent })
     : t("goals.autoProgressUnavailable");
@@ -144,6 +153,32 @@ export function GoalCard({
             value={displayedProgressPercent}
             label={t("goals.progressLabel")}
           />
+          {keyResults.length > 0 ? (
+            <div className="space-y-3 rounded-2xl border border-alios-saffron/25 bg-background/80 p-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-sm font-semibold">{t("goals.keyResults")}</p>
+                <StatusChip tone="primary">
+                  {t("goals.keyResultsAverage", { percent: keyResultsAverage ?? 0 })}
+                </StatusChip>
+              </div>
+              <div className="space-y-2">
+                {keyResults.map((keyResult) => (
+                  <div key={keyResult.id} className="space-y-1">
+                    <div className="flex items-center justify-between gap-3 text-sm">
+                      <span className="min-w-0 break-words">{keyResult.title}</span>
+                      <span className="shrink-0 tabular-nums text-muted-foreground">
+                        {keyResult.progressPercent}%
+                      </span>
+                    </div>
+                    <MiniProgressBar
+                      value={keyResult.progressPercent}
+                      label={keyResult.title}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : null}
           <label className="flex min-h-11 cursor-pointer items-start gap-3 rounded-xl border border-border/70 bg-background/70 p-3 text-sm">
             <input
               type="checkbox"
@@ -261,6 +296,33 @@ export function GoalCard({
                 ))}
               </div>
             </div>
+          ) : null}
+
+          {(goal.milestones?.length ?? 0) > 0 ? (
+            <SoftPanel className="space-y-3 border-alios-saffron/25 bg-background/80">
+              <p className="text-sm font-semibold">{t("goals.milestones")}</p>
+              <ul className="space-y-2">
+                {goal.milestones?.map((milestone) => (
+                  <li key={milestone.id} className="flex min-w-0 items-start gap-2 text-sm">
+                    <CheckCircle2
+                      className={cn(
+                        "mt-0.5 h-4 w-4 shrink-0",
+                        milestone.done ? "text-primary" : "text-muted-foreground"
+                      )}
+                      aria-hidden="true"
+                    />
+                    <span className="min-w-0 break-words">
+                      <span className={milestone.done ? "line-through decoration-primary/60" : undefined}>
+                        {milestone.title}
+                      </span>
+                      {milestone.date ? (
+                        <span className="text-muted-foreground"> · {formatDate(milestone.date)}</span>
+                      ) : null}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </SoftPanel>
           ) : null}
         </CollapsibleSection>
 

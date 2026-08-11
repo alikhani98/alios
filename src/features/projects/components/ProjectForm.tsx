@@ -47,6 +47,11 @@ export function ProjectForm({
       nextAction: project?.nextAction ?? "",
       reviewDate: project?.reviewDate ?? "",
       reviewIntervalDays: project?.reviewIntervalDays ? String(project.reviewIntervalDays) : "",
+      milestonesText: (project?.milestones ?? [])
+        .map((milestone) =>
+          `${milestone.done ? "[x]" : "[ ]"} ${milestone.title}${milestone.date ? ` | ${milestone.date}` : ""}`
+        )
+        .join("\n"),
     },
   });
   const reviewDateValue = watch("reviewDate");
@@ -179,6 +184,21 @@ export function ProjectForm({
           placeholder={t("goals.reviewIntervalDaysPlaceholder")}
           {...register("reviewIntervalDays")}
         />
+      </div>
+
+      <div className="grid gap-2">
+        <label htmlFor="project-milestones" className="text-sm font-medium">
+          {t("projects.milestones")}
+        </label>
+        <Textarea
+          id="project-milestones"
+          rows={4}
+          placeholder={t("projects.milestonesPlaceholder")}
+          {...register("milestonesText")}
+        />
+        <p className="text-sm leading-6 text-muted-foreground">
+          {t("projects.milestonesHelp")}
+        </p>
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">

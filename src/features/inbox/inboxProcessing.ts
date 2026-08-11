@@ -2,6 +2,7 @@ import { format } from "date-fns";
 
 import { NotFoundError } from "@/core/errors";
 import type { StorageAdapter } from "@/core/storage";
+import { detectNaturalDate } from "@/shared/date";
 import type { InboxItem } from "@/shared/types";
 
 export type InboxProcessingTarget = "todayTask" | "journalEntry" | "knowledgeItem";
@@ -33,11 +34,12 @@ export async function processInboxItem(
   const title = createTitle(item.content);
 
   if (target === "todayTask") {
+    const suggestedDate = detectNaturalDate(item.content, new Date(`${today}T00:00:00`));
     await storage.tasks.create({
       title,
       status: "todo",
       priority: "medium",
-      dueDate: today,
+      dueDate: suggestedDate?.date ?? today,
       isMit: false,
     });
   } else if (target === "journalEntry") {

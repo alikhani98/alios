@@ -20,6 +20,7 @@ export const projectFormSchema = projectSchema
     nextAction: z.string().optional(),
     reviewDate: z.union([dateOnlySchema, z.literal("")]).optional(),
     reviewIntervalDays: z.string().optional(),
+    milestonesText: z.string().optional(),
   })
   .refine(({ status }) => status !== "archived", {
     message: "Archiving is not available in this stage.",

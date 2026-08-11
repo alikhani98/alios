@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
 import { PROJECT_STATUS_LABEL_KEYS } from "@/features/projects/constants";
+import { detectNaturalDate } from "@/shared/date";
 import type { Project, Task } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
 import { Button, CollapsibleSection, DateValueHint, Input, Select, Textarea } from "@/shared/ui";
@@ -33,6 +34,7 @@ export function TodayTaskForm({
   const {
     register,
     watch,
+    setValue,
     handleSubmit,
     formState: { errors },
   } = useForm<TodayTaskFormValues>({
@@ -50,7 +52,9 @@ export function TodayTaskForm({
       recurrenceFrequency: task?.recurrence?.frequency ?? "none",
     },
   });
+  const titleValue = watch("title");
   const dueDateValue = watch("dueDate");
+  const dateSuggestion = detectNaturalDate(titleValue ?? "");
 
   return (
     <form
@@ -70,6 +74,24 @@ export function TodayTaskForm({
         />
         {errors.title ? (
           <p className="text-sm text-destructive">{t("common.validation")}</p>
+        ) : null}
+        {dateSuggestion && dateSuggestion.date !== dueDateValue ? (
+          <div className="flex flex-col gap-2 rounded-control border border-alios-saffron/40 bg-alios-saffron/10 px-3 py-2 text-sm leading-6 sm:flex-row sm:items-center sm:justify-between">
+            <span>
+              {t("today.naturalDateSuggestion", {
+                date: dateSuggestion.date,
+                phrase: dateSuggestion.phrase,
+              })}
+            </span>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={() => setValue("dueDate", dateSuggestion.date, { shouldDirty: true })}
+            >
+              {t("today.useSuggestedDate")}
+            </Button>
+          </div>
         ) : null}
       </div>
 

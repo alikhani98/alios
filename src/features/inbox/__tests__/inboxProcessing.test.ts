@@ -44,6 +44,21 @@ describe("Inbox processing", () => {
     });
   });
 
+  it("uses a natural-language due date when converting an Inbox item to a Today task", async () => {
+    const inboxItem = await storage.inbox.create({
+      content: "Buy printer paper tomorrow",
+      type: "task",
+    });
+
+    await processInboxItem(storage, inboxItem.id, "todayTask", "2026-07-05");
+
+    const [task] = await storage.tasks.list();
+    expect(task).toMatchObject({
+      title: inboxItem.content,
+      dueDate: "2026-07-06",
+    });
+  });
+
   it("converts an Inbox item to a Journal entry", async () => {
     const inboxItem = await storage.inbox.create({
       content: "A useful reflection captured for the daily journal.",

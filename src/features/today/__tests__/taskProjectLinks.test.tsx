@@ -12,6 +12,7 @@ import { TodayTaskCard } from "../components/TodayTaskCard";
 import { TodayTaskForm } from "../components/TodayTaskForm";
 import { TodayTimeBlockingTimeline } from "../components/TodayTimeBlockingTimeline";
 import { TodayWeeklyPlanCard } from "../components/TodayWeeklyPlanCard";
+import { getFocusModeTasks } from "../components/TodayWorkspace";
 import {
   createAllTodayTasksPath,
   createLinkedProjectPath,
@@ -103,6 +104,18 @@ describe("Task project links", () => {
         estimatedMinutes: 45,
       });
     }
+  });
+
+  it("keeps Focus Mode bounded to the top actionable tasks", () => {
+    const focusTasks = getFocusModeTasks([
+      { ...taskRecord, id: "mit", title: "MIT", status: "todo", priority: "high", isMit: true },
+      { ...taskRecord, id: "doing", title: "Doing", status: "doing", priority: "medium", isMit: false },
+      { ...taskRecord, id: "todo", title: "Todo", status: "todo", priority: "medium", isMit: false },
+      { ...taskRecord, id: "done", title: "Done", status: "done", priority: "high", isMit: false },
+      { ...taskRecord, id: "later", title: "Later", status: "deferred", priority: "high", isMit: false },
+    ]);
+
+    expect(focusTasks.map((task) => task.id)).toEqual(["mit", "doing", "todo"]);
   });
 
   it("renders an available linked Project and focused navigation", () => {

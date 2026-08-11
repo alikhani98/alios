@@ -15,7 +15,9 @@ import {
   CardHeader,
   CardTitle,
   CollapsibleSection,
+  SoftPanel,
 } from "@/shared/ui";
+import { cn } from "@/shared/utils";
 import {
   PROJECT_PRIORITY_LABEL_KEYS,
   PROJECT_STATUS_LABEL_KEYS,
@@ -176,6 +178,32 @@ export function ProjectCard({
               {t("goals.lastReviewedLabel")}: {project.lastReviewedAt ? formatDateTime(project.lastReviewedAt) : t("common.notRecorded")}
             </p>
           </div>
+          {(project.milestones?.length ?? 0) > 0 ? (
+            <SoftPanel className="space-y-3 border-alios-saffron/25 bg-background/80">
+              <p className="text-sm font-semibold">{t("projects.milestones")}</p>
+              <ul className="space-y-2">
+                {project.milestones?.map((milestone) => (
+                  <li key={milestone.id} className="flex min-w-0 items-start gap-2 text-sm">
+                    <CheckCircle2
+                      className={cn(
+                        "mt-0.5 h-4 w-4 shrink-0",
+                        milestone.done ? "text-primary" : "text-muted-foreground"
+                      )}
+                      aria-hidden="true"
+                    />
+                    <span className="min-w-0 break-words">
+                      <span className={milestone.done ? "line-through decoration-primary/60" : undefined}>
+                        {milestone.title}
+                      </span>
+                      {milestone.date ? (
+                        <span className="text-muted-foreground"> · {formatDate(milestone.date)}</span>
+                      ) : null}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </SoftPanel>
+          ) : null}
         </CollapsibleSection>
       </CardContent>
 

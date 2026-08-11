@@ -84,6 +84,50 @@ function parseOptionalDate(value: string): string | undefined {
   return trimmed.length > 0 ? trimmed : undefined;
 }
 
+function createStructuredItemId(prefix: string, title: string, index: number): string {
+  return `${prefix}-${index + 1}-${title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 32) || "item"}`;
+}
+
+function parseMilestones(value: string): Goal["milestones"] {
+  return value
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line, index) => {
+      const done = /^\[(x|X)\]/.test(line);
+      const withoutCheckbox = line.replace(/^\[\s?\]|\[(x|X)\]/, "").trim();
+      const [rawTitle, rawDate] = withoutCheckbox.split("|").map((part) => part.trim());
+      const date = rawDate && /^\d{4}-\d{2}-\d{2}$/.test(rawDate) ? rawDate : undefined;
+
+      return {
+        id: createStructuredItemId("milestone", rawTitle, index),
+        title: rawTitle,
+        done,
+        date,
+      };
+    })
+    .filter((milestone) => milestone.title.length > 0);
+}
+
+function parseKeyResults(value: string): Goal["keyResults"] {
+  return value
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .slice(0, 4)
+    .map((line, index) => {
+      const [rawTitle, rawProgress] = line.split("|").map((part) => part.trim());
+      const progressPercent = clampGoalProgressPercent(Number.parseInt(rawProgress ?? "0", 10));
+
+      return {
+        id: createStructuredItemId("key-result", rawTitle, index),
+        title: rawTitle,
+        progressPercent,
+      };
+    })
+    .filter((keyResult) => keyResult.title.length > 0);
+}
+
 type GoalsContextualHelpProps = {
   isOpen: boolean;
   onToggle: () => void;
@@ -276,6 +320,8 @@ export function GoalsPage() {
       progressPercent: goal.progressPercent,
       targetDate: goal.targetDate,
       reviewIntervalDays: goal.reviewIntervalDays,
+      milestones: goal.milestones,
+      keyResults: goal.keyResults,
       tags: [...goal.tags],
     });
     setDraftGoalTemplateId(null);
@@ -344,6 +390,8 @@ export function GoalsPage() {
       ),
       targetDate: parseOptionalDate(values.targetDate),
       reviewIntervalDays: parseOptionalNumber(values.reviewIntervalDays),
+      milestones: parseMilestones(values.milestonesText),
+      keyResults: parseKeyResults(values.keyResultsText),
       tags: splitTags(values.tagsText),
     };
 

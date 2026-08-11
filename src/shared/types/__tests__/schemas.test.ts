@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   dailyCheckinSchema,
   decisionLogEntrySchema,
+  goalSchema,
   journalEntrySchema,
   inboxItemSchema,
   knowledgeItemSchema,
@@ -15,6 +16,7 @@ import {
 import {
   dailyCheckinRecord,
   decisionLogRecord,
+  goalRecord,
   journalEntryRecord,
   inboxItemRecord,
   knowledgeItemRecord,
@@ -60,6 +62,46 @@ describe("core domain schemas", () => {
     expect(taskSchema.safeParse({ ...taskRecord, projectId: "" }).success).toBe(
       false
     );
+  });
+
+  it("keeps project milestones optional and validates supplied checklist items", () => {
+    expect(projectSchema.safeParse(projectRecord).success).toBe(true);
+    expect(
+      projectSchema.safeParse({
+        ...projectRecord,
+        milestones: [
+          { id: "outline", title: "Outline", done: false, date: "2026-09-01" },
+        ],
+      }).success
+    ).toBe(true);
+    expect(
+      projectSchema.safeParse({
+        ...projectRecord,
+        milestones: [{ id: "bad", title: " ", done: false }],
+      }).success
+    ).toBe(false);
+  });
+
+  it("keeps goal milestones and key results optional and validates supplied values", () => {
+    expect(goalSchema.safeParse(goalRecord).success).toBe(true);
+    expect(
+      goalSchema.safeParse({
+        ...goalRecord,
+        milestones: [
+          { id: "first", title: "First milestone", done: true, date: "2026-09-01" },
+        ],
+        keyResults: [
+          { id: "kr-1", title: "Finish draft", progressPercent: 75 },
+          { id: "kr-2", title: "Publish review", progressPercent: 20 },
+        ],
+      }).success
+    ).toBe(true);
+    expect(
+      goalSchema.safeParse({
+        ...goalRecord,
+        keyResults: [{ id: "bad", title: "Impossible", progressPercent: 120 }],
+      }).success
+    ).toBe(false);
   });
 
   it("keeps task time-blocking metadata optional and validates supplied values", () => {
@@ -113,6 +155,7 @@ describe("core domain schemas", () => {
 
   it.each([
     ["project", projectSchema, projectRecord],
+    ["goal", goalSchema, goalRecord],
     ["task", taskSchema, taskRecord],
     ["routine", routineSchema, routineRecord],
     ["journal entry", journalEntrySchema, journalEntryRecord],

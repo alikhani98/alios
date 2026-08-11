@@ -24,6 +24,16 @@ import { KNOWLEDGE_TYPE_OPTIONS } from "../constants";
 import { useKnowledgeItems } from "../hooks/useKnowledgeItems";
 import type { KnowledgeItemFormValues } from "../types";
 
+function extractWikiReferences(content: string): string[] {
+  return Array.from(content.matchAll(/\[\[([^\]]+)\]\]/g))
+    .map((match) => match[1]?.trim())
+    .filter((value): value is string => Boolean(value));
+}
+
+function normalizeReferenceTitle(value: string): string {
+  return value.trim().toLocaleLowerCase();
+}
+
 export function KnowledgePage() {
   const { direction, t } = useI18n();
   const [searchParams] = useSearchParams();
@@ -64,6 +74,28 @@ export function KnowledgePage() {
     ? visibleItems
     : visibleItems.slice(0, knowledgePreviewLimit);
   const hiddenItemCount = Math.max(visibleItems.length - displayedItems.length, 0);
+  const backlinksByItemId = useMemo(() => {
+    const titleToItem = new Map(
+      items.map((item) => [normalizeReferenceTitle(item.title), item])
+    );
+    const backlinks = new Map<string, KnowledgeItem[]>();
+
+    items.forEach((source) => {
+      extractWikiReferences(source.content).forEach((reference) => {
+        const target = titleToItem.get(normalizeReferenceTitle(reference));
+        if (!target || target.id === source.id) {
+          return;
+        }
+
+        const current = backlinks.get(target.id) ?? [];
+        if (!current.some((item) => item.id === source.id)) {
+          backlinks.set(target.id, [...current, source]);
+        }
+      });
+    });
+
+    return backlinks;
+  }, [items]);
 
   const openCreateForm = () => {
     setEditingItem(undefined);
@@ -357,6 +389,7 @@ export function KnowledgePage() {
             >
               <KnowledgeItemCard
                 item={item}
+                backlinks={backlinksByItemId.get(item.id) ?? []}
                 isDeleting={deletingId === item.id}
                 onEdit={() => openEditForm(item)}
                 onDelete={() => handleDelete(item)}

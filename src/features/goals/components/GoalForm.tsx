@@ -31,6 +31,22 @@ export function GoalForm({
 }: GoalFormProps) {
   const { t } = useI18n();
   const initialTags = useMemo(() => goal?.tags.join(", ") ?? "", [goal]);
+  const initialMilestones = useMemo(
+    () =>
+      (goal?.milestones ?? [])
+        .map((milestone) =>
+          `${milestone.done ? "[x]" : "[ ]"} ${milestone.title}${milestone.date ? ` | ${milestone.date}` : ""}`
+        )
+        .join("\n"),
+    [goal]
+  );
+  const initialKeyResults = useMemo(
+    () =>
+      (goal?.keyResults ?? [])
+        .map((keyResult) => `${keyResult.title} | ${keyResult.progressPercent}`)
+        .join("\n"),
+    [goal]
+  );
   const [targetDateValue, setTargetDateValue] = useState(goal?.targetDate ?? "");
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -47,6 +63,8 @@ export function GoalForm({
       progressPercent: readValue(form, "progressPercent"),
       targetDate: readValue(form, "targetDate"),
       reviewIntervalDays: readValue(form, "reviewIntervalDays"),
+      milestonesText: readValue(form, "milestonesText"),
+      keyResultsText: readValue(form, "keyResultsText"),
       tagsText: readValue(form, "tagsText"),
     });
   };
@@ -200,6 +218,32 @@ export function GoalForm({
                 defaultValue={initialTags}
                 placeholder={t("goals.tagsPlaceholder")}
               />
+            </label>
+
+            <label className="space-y-2">
+              <span className="text-sm font-medium">{t("goals.milestones")}</span>
+              <Textarea
+                name="milestonesText"
+                rows={4}
+                defaultValue={initialMilestones}
+                placeholder={t("goals.milestonesPlaceholder")}
+              />
+              <p className="text-sm leading-6 text-muted-foreground">
+                {t("goals.milestonesHelp")}
+              </p>
+            </label>
+
+            <label className="space-y-2">
+              <span className="text-sm font-medium">{t("goals.keyResults")}</span>
+              <Textarea
+                name="keyResultsText"
+                rows={4}
+                defaultValue={initialKeyResults}
+                placeholder={t("goals.keyResultsPlaceholder")}
+              />
+              <p className="text-sm leading-6 text-muted-foreground">
+                {t("goals.keyResultsHelp")}
+              </p>
             </label>
           </CollapsibleSection>
         </div>

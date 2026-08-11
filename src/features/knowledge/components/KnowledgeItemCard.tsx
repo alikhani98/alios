@@ -1,5 +1,6 @@
-import { ExternalLink, Pencil, Trash2 } from "lucide-react";
+import { ExternalLink, Link2, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 import type { KnowledgeItem } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
@@ -16,6 +17,7 @@ import { KNOWLEDGE_TYPE_LABEL_KEYS } from "../constants";
 
 type KnowledgeItemCardProps = {
   item: KnowledgeItem;
+  backlinks?: ReadonlyArray<KnowledgeItem>;
   isDeleting: boolean;
   onEdit: () => void;
   onDelete: () => Promise<void>;
@@ -23,6 +25,7 @@ type KnowledgeItemCardProps = {
 
 export function KnowledgeItemCard({
   item,
+  backlinks = [],
   isDeleting,
   onEdit,
   onDelete,
@@ -52,6 +55,25 @@ export function KnowledgeItemCard({
           <div className="flex items-start gap-2 text-sm text-muted-foreground">
             <ExternalLink className="mt-0.5 h-4 w-4 shrink-0" />
             <span className="break-words">{item.source}</span>
+          </div>
+        ) : null}
+        {backlinks.length > 0 ? (
+          <div className="rounded-2xl border border-alios-saffron/25 bg-muted/30 p-3">
+            <p className="flex items-center gap-2 text-sm font-semibold">
+              <Link2 className="h-4 w-4 text-primary" aria-hidden="true" />
+              {t("knowledge.backlinks")}
+            </p>
+            <ul className="mt-2 space-y-2">
+              {backlinks.map((backlink) => (
+                <li key={backlink.id} className="text-sm">
+                  <Button asChild size="sm" variant="link" className="h-auto min-h-0 p-0 text-start">
+                    <Link to={`/knowledge?focusId=${encodeURIComponent(backlink.id)}`}>
+                      {backlink.title}
+                    </Link>
+                  </Button>
+                </li>
+              ))}
+            </ul>
           </div>
         ) : null}
       </CardContent>

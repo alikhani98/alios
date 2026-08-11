@@ -10,6 +10,8 @@ export type GoalFormValues = {
   progressPercent: string;
   targetDate: string;
   reviewIntervalDays: string;
+  milestonesText: string;
+  keyResultsText: string;
   tagsText: string;
 };
 
@@ -24,5 +26,7 @@ export type GoalFormSeed = Pick<
   | "progressPercent"
   | "targetDate"
   | "reviewIntervalDays"
+  | "milestones"
+  | "keyResults"
   | "tags"
 >;

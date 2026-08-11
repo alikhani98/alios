@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
+import { detectNaturalDate } from "@/shared/date";
 import { INBOX_ITEM_TYPE_VALUES, type InboxItem } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
 import { Button, CollapsibleSection, Textarea, Select } from "@/shared/ui";
@@ -21,11 +22,14 @@ export function InboxItemForm({ item, isSubmitting, onSubmit, onCancel }: Props)
     register,
     handleSubmit,
     reset,
+    watch,
     formState: { errors },
   } = useForm<InboxFormValues>({
     resolver: zodResolver(inboxFormSchema),
     defaultValues: { content: item?.content ?? "", type: item?.type ?? "note" },
   });
+  const contentValue = watch("content");
+  const dateSuggestion = detectNaturalDate(contentValue ?? "");
 
   useEffect(() => {
     reset({ content: item?.content ?? "", type: item?.type ?? "note" });
@@ -53,6 +57,14 @@ export function InboxItemForm({ item, isSubmitting, onSubmit, onCancel }: Props)
           {...register("content")}
         />
         {errors.content ? <p className="text-sm text-destructive">{t("inbox.contentRequired")}</p> : null}
+        {dateSuggestion ? (
+          <p className="rounded-control border border-alios-saffron/40 bg-alios-saffron/10 px-3 py-2 text-sm leading-6 text-foreground">
+            {t("inbox.naturalDateSuggestion", {
+              date: dateSuggestion.date,
+              phrase: dateSuggestion.phrase,
+            })}
+          </p>
+        ) : null}
       </div>
       <CollapsibleSection
         id={item ? `inbox-type-details-${item.id}` : "inbox-type-details"}

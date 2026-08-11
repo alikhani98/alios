@@ -74,6 +74,15 @@ function useSimpleViewMode() {
   return isSimpleView;
 }
 
+export function getFocusModeTasks(tasks: Task[], limit = 3): Task[] {
+  const actionableTasks = tasks.filter(
+    (task) => task.status === "todo" || task.status === "doing"
+  );
+  const source = actionableTasks.length > 0 ? actionableTasks : tasks;
+
+  return source.slice(0, limit);
+}
+
 export interface TodayWorkspaceProps {
   focusId: string | null;
   goalId: string | null;
@@ -141,6 +150,7 @@ export function TodayWorkspace({
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [focusedTaskId, setFocusedTaskId] = useState<string | null>(null);
   const [focusMessage, setFocusMessage] = useState<string | null>(null);
+  const [isFocusMode, setIsFocusMode] = useState(false);
   const [showAllRoutineSuggestions, setShowAllRoutineSuggestions] = useState(false);
   const [showAllTasks, setShowAllTasks] = useState(false);
   const taskRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -194,6 +204,17 @@ export function TodayWorkspace({
   }, [visibleTasks]);
   const taskPreviewLimit = isSimpleView ? 6 : 12;
   const displayedTasks = useMemo(() => {
+    if (isFocusMode) {
+      const focusTasks = getFocusModeTasks(orderedVisibleTasks);
+      const focusedTask = focusId
+        ? orderedVisibleTasks.find((task) => task.id === focusId)
+        : undefined;
+
+      return focusedTask && !focusTasks.some((task) => task.id === focusedTask.id)
+        ? [...focusTasks, focusedTask]
+        : focusTasks;
+    }
+
     if (showAllTasks || orderedVisibleTasks.length <= taskPreviewLimit) {
       return orderedVisibleTasks;
     }
@@ -206,7 +227,7 @@ export function TodayWorkspace({
     return focusedTask && !preview.some((task) => task.id === focusedTask.id)
       ? [...preview, focusedTask]
       : preview;
-  }, [focusId, orderedVisibleTasks, showAllTasks]);
+  }, [focusId, isFocusMode, orderedVisibleTasks, showAllTasks, taskPreviewLimit]);
   const hiddenTaskCount = Math.max(visibleTasks.length - displayedTasks.length, 0);
   const plannedTaskOutsideToday = getPlannedTaskOutsideToday(weeklyPlanFocus, today);
   const routineSuggestions = getRoutineSuggestions(
@@ -603,6 +624,15 @@ export function TodayWorkspace({
               <Plus className="me-2 h-4 w-4" />
               {t("today.newTask")}
             </Button>
+            <Button
+              type="button"
+              variant={isFocusMode ? "default" : "outline"}
+              onClick={() => setIsFocusMode((current) => !current)}
+              aria-pressed={isFocusMode}
+            >
+              <Target className="me-2 h-4 w-4" />
+              {isFocusMode ? t("today.focusModeOn") : t("today.focusMode")}
+            </Button>
           </CardContent>
         </PremiumCard>
       )}
@@ -673,6 +703,31 @@ export function TodayWorkspace({
             />
           ) : visibleTasks.length > 0 ? (
             <div className="space-y-3">
+              {isFocusMode ? (
+                <SoftPanel className="border-alios-saffron/40 bg-alios-saffron/10">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="min-w-0 space-y-1">
+                      <p className="text-sm font-semibold text-foreground">
+                        {t("today.focusMode")}
+                      </p>
+                      <p className="text-sm leading-6 text-muted-foreground">
+                        {t("today.focusModeDescription", {
+                          count: Math.min(displayedTasks.length, 3),
+                        })}
+                      </p>
+                    </div>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      className="w-full sm:w-auto"
+                      onClick={() => setIsFocusMode(false)}
+                    >
+                      {t("today.showAllTasks")}
+                    </Button>
+                  </div>
+                </SoftPanel>
+              ) : null}
               {displayedTasks.map((task) => (
                 <div
                   key={task.id}
@@ -698,7 +753,7 @@ export function TodayWorkspace({
                   />
                 </div>
               ))}
-              {visibleTasks.length > taskPreviewLimit ? (
+              {!isFocusMode && visibleTasks.length > taskPreviewLimit ? (
                 <Button
                   type="button"
                   variant="outline"
