@@ -1,10 +1,11 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { MemoryRouter } from "react-router-dom";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { DateDisplayProvider } from "@/shared/date";
 import { I18nProvider, LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
 import type { HomeDashboardData } from "../types";
+import { getDailyBriefingViewModel } from "../components/DailyBriefingCard";
 
 const todayTask = {
   id: "home-task-1",
@@ -141,14 +142,22 @@ function renderUnifiedHome(initialEntry = "/?date=2026-08-09") {
 
 describe("UnifiedHomePage", () => {
   beforeEach(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 7, 9, 8, 0, 0));
     localStorage.clear();
     localStorage.setItem(LANGUAGE_STORAGE_KEY, "en");
     mockedDashboardData = dashboardData;
   });
 
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it("renders the clear start card and prepared Today workspace without route wiring", () => {
     const markup = renderUnifiedHome("/?date=2026-08-09&focusId=home-task-1");
 
+    expect(markup).toContain("Morning briefing");
+    expect(markup).toContain("Today has 1 active task(s)");
     expect(markup).toContain("What should I do now?");
     expect(markup).toContain("Review the unified Home workspace");
     expect(markup).toContain("Add task");
@@ -269,5 +278,50 @@ describe("UnifiedHomePage", () => {
     expect(markup).toContain("No task for today? Start from the inbox");
     expect(markup).not.toContain("Your inbox has 32 item(s) waiting");
     expect(markup).not.toContain("Keep Morning review moving today");
+  });
+
+  it("keeps the daily briefing time-aware without changing dashboard data", () => {
+    const morning = getDailyBriefingViewModel(
+      dashboardData,
+      new Date("2026-08-09T08:00:00.000Z")
+    );
+    const midday = getDailyBriefingViewModel(
+      dashboardData,
+      new Date("2026-08-09T13:00:00.000Z")
+    );
+    const evening = getDailyBriefingViewModel(
+      dashboardData,
+      new Date("2026-08-09T19:00:00.000Z")
+    );
+
+    expect(morning.titleKey).toBe("home.dailyBriefingMorningTitle");
+    expect(morning.actionHref).toBe("/today");
+    expect(midday.titleKey).toBe("home.dailyBriefingMiddayTitle");
+    expect(midday.descriptionValues).toMatchObject({ completed: 0, remaining: 1 });
+    expect(evening.titleKey).toBe("home.dailyBriefingEveningTitle");
+    expect(evening.actionHref).toBe("/today");
+  });
+
+  it("sends a clear evening to Journal instead of inventing backend work", () => {
+    mockedDashboardData = {
+      ...dashboardData,
+      tasks: [],
+      today: {
+        tasks: [],
+        completedTaskCount: 2,
+        mitTask: undefined,
+      },
+      inbox: {
+        unprocessedCount: 0,
+      },
+    };
+
+    const evening = getDailyBriefingViewModel(
+      mockedDashboardData,
+      new Date("2026-08-09T20:00:00.000Z")
+    );
+
+    expect(evening.descriptionKey).toBe("home.dailyBriefingEveningClearDescription");
+    expect(evening.actionHref).toBe("/journal");
   });
 });

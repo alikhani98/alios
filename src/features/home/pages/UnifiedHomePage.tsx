@@ -34,6 +34,7 @@ import {
 } from "@/shared/ui";
 
 import { ClearStartCard } from "../components/ClearStartCard";
+import { DailyBriefingCard } from "../components/DailyBriefingCard";
 import { HomeCalendarCard } from "../components/HomeCalendarCard";
 import { HomeManualCard } from "../components/HomeManualCard";
 import { HomePersonalInsightsCard } from "../components/HomePersonalInsightsCard";
@@ -525,6 +526,7 @@ export function UnifiedHomePage() {
         </div>
       ) : data ? (
         <>
+          <DailyBriefingCard data={data} />
           <ClearStartCard data={data} />
           <TodayContextStrip inboxCount={data.inbox.unprocessedCount} />
           <TodayWorkspace

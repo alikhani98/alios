@@ -8,6 +8,34 @@ import type { InboxItem } from "@/shared/types";
 export type InboxProcessingTarget = "todayTask" | "journalEntry" | "knowledgeItem";
 
 const TITLE_MAX_LENGTH = 60;
+const URL_PATTERN = /https?:\/\/\S+|www\.\S+/i;
+const TASK_VERB_PATTERN =
+  /\b(call|email|send|buy|pay|write|review|schedule|book|return|finish|fix|update|prepare|clean|read)\b/i;
+const PERSIAN_TASK_VERB_PATTERN =
+  /(بخر|خرید|تماس|بفرست|ارسال|پرداخت|بنویس|بررسی|زمان‌بندی|رزرو|برگردان|تمام|اصلاح|آماده)/;
+
+export function suggestInboxProcessingTarget(
+  content: string
+): InboxProcessingTarget {
+  const normalized = content.trim();
+
+  if (URL_PATTERN.test(normalized)) {
+    return "knowledgeItem";
+  }
+
+  if (normalized.includes("?") || normalized.includes("؟")) {
+    return "journalEntry";
+  }
+
+  if (
+    TASK_VERB_PATTERN.test(normalized) ||
+    PERSIAN_TASK_VERB_PATTERN.test(normalized)
+  ) {
+    return "todayTask";
+  }
+
+  return "journalEntry";
+}
 
 function createTitle(content: string): string {
   const normalized = content.trim().replace(/\s+/g, " ");

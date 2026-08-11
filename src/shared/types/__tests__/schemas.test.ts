@@ -190,4 +190,11 @@ describe("core domain schemas", () => {
   ])("rejects an inbox item with %s", (_name, value) => {
     expect(inboxItemSchema.safeParse(value).success).toBe(false);
   });
+
+  it("accepts an optional Inbox snooze date without requiring legacy records to have it", () => {
+    expect(inboxItemSchema.parse(inboxItemRecord).snoozedUntil).toBeUndefined();
+    expect(
+      inboxItemSchema.parse({ ...inboxItemRecord, snoozedUntil: "2026-07-06" })
+    ).toMatchObject({ snoozedUntil: "2026-07-06" });
+  });
 });

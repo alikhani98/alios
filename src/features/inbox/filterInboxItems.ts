@@ -7,7 +7,12 @@ export type InboxFilters = {
   query: string;
   status: InboxStatusFilter;
   type: InboxTypeFilter;
+  today?: string;
 };
+
+export function isInboxItemSnoozed(item: InboxItem, today: string): boolean {
+  return Boolean(item.snoozedUntil && item.snoozedUntil > today);
+}
 
 export function filterInboxItems(
   items: InboxItem[],
@@ -16,6 +21,10 @@ export function filterInboxItems(
   const query = filters.query.trim().toLocaleLowerCase();
 
   return items.filter((item) => {
+    if (filters.today && isInboxItemSnoozed(item, filters.today)) {
+      return false;
+    }
+
     const matchesQuery =
       query.length === 0 || item.content.toLocaleLowerCase().includes(query);
     const matchesStatus =

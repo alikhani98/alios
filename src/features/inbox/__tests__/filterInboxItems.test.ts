@@ -83,4 +83,17 @@ describe("filterInboxItems", () => {
 
     expect(selectVisibleInboxItemIds(visibleItems)).toEqual(["idea"]);
   });
+
+  it("hides snoozed items until their snooze date arrives", () => {
+    const visibleItems = filterInboxItems(
+      [
+        { ...items[0], snoozedUntil: "2026-07-06" },
+        { ...items[1], snoozedUntil: "2026-07-05" },
+        items[2],
+      ],
+      { query: "", status: "all", type: "all", today: "2026-07-05" }
+    );
+
+    expect(visibleItems.map((item) => item.id)).toEqual(["task", "note"]);
+  });
 });

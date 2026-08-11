@@ -8,6 +8,7 @@ import {
   processInboxItems,
   setInboxItemProcessed,
   setInboxItemsProcessed,
+  suggestInboxProcessingTarget,
 } from "../inboxProcessing";
 
 describe("Inbox processing", () => {
@@ -192,5 +193,11 @@ describe("Inbox processing", () => {
     expect((await storage.inbox.getById(first.id))?.status).toBe("processed");
     expect((await storage.inbox.getById(second.id))?.status).toBe("processed");
     expect((await storage.inbox.getById(untouched.id))?.status).toBe("unprocessed");
+  });
+
+  it("suggests likely processing targets with simple local heuristics", () => {
+    expect(suggestInboxProcessingTarget("https://example.com/reference")).toBe("knowledgeItem");
+    expect(suggestInboxProcessingTarget("Call the dentist tomorrow")).toBe("todayTask");
+    expect(suggestInboxProcessingTarget("Should I change the plan?")).toBe("journalEntry");
   });
 });

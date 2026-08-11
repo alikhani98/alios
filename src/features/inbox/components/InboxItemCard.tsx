@@ -1,4 +1,5 @@
-import { BookOpen, CheckCircle2, Circle, ListTodo, Pencil, Sparkles, Trash2 } from "lucide-react";
+import { addDays, format } from "date-fns";
+import { BookOpen, CheckCircle2, Circle, Clock3, ListTodo, Pencil, Sparkles, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 import { useDateFormatter } from "@/shared/date";
@@ -8,7 +9,7 @@ import { Badge, Button, Card, CardContent, CardFooter, SwipeActionSurface } from
 import { INBOX_STATUS_LABEL_KEYS, INBOX_TYPE_LABEL_KEYS } from "../constants";
 import { InboxItemForm } from "./InboxItemForm";
 import type { InboxFormValues } from "../types";
-import type { InboxProcessingTarget } from "../inboxProcessing";
+import { suggestInboxProcessingTarget, type InboxProcessingTarget } from "../inboxProcessing";
 
 type Props = {
   item: InboxItem;
@@ -17,9 +18,17 @@ type Props = {
   onSelectionChange: (selected: boolean) => void;
   onEdit: (values: InboxFormValues) => Promise<boolean>;
   onToggleStatus: () => Promise<void>;
+  onSnooze: (date: string) => Promise<void>;
+  onClearSnooze: () => Promise<void>;
   onConvert: (target: InboxProcessingTarget) => Promise<void>;
   onDelete: () => Promise<void>;
 };
+
+function getThisWeekendDate(today = new Date()): string {
+  const day = today.getDay();
+  const daysUntilFriday = (5 - day + 7) % 7 || 7;
+  return format(addDays(today, daysUntilFriday), "yyyy-MM-dd");
+}
 
 export function InboxItemCard({
   item,
@@ -28,6 +37,8 @@ export function InboxItemCard({
   onSelectionChange,
   onEdit,
   onToggleStatus,
+  onSnooze,
+  onClearSnooze,
   onConvert,
   onDelete,
 }: Props) {
@@ -36,6 +47,17 @@ export function InboxItemCard({
   const [isEditing, setIsEditing] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [showProcessing, setShowProcessing] = useState(false);
+  const [showSnooze, setShowSnooze] = useState(false);
+  const [customSnoozeDate, setCustomSnoozeDate] = useState("");
+  const tomorrow = format(addDays(new Date(), 1), "yyyy-MM-dd");
+  const thisWeekend = getThisWeekendDate();
+  const suggestedTarget = suggestInboxProcessingTarget(item.content);
+  const suggestedTargetLabelKey =
+    suggestedTarget === "todayTask"
+      ? "inbox.convertToTodayTask"
+      : suggestedTarget === "knowledgeItem"
+        ? "inbox.convertToKnowledgeItem"
+        : "inbox.convertToJournalEntry";
 
   if (isEditing) {
     return (
@@ -72,10 +94,56 @@ export function InboxItemCard({
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant="outline">{t(INBOX_TYPE_LABEL_KEYS[item.type])}</Badge>
           <Badge variant={item.status === "processed" ? "secondary" : "default"}>{t(INBOX_STATUS_LABEL_KEYS[item.status])}</Badge>
+          {item.snoozedUntil ? <Badge variant="secondary">{t("inbox.snoozedUntil", { date: item.snoozedUntil })}</Badge> : null}
           <span className="text-xs text-muted-foreground">{formatDate(item.createdAt)}</span>
         </div>
+        {item.status === "unprocessed" && showSnooze ? (
+          <div className="grid gap-2 rounded-xl border border-alios-saffron/30 bg-alios-saffron/10 p-3 sm:grid-cols-2">
+            <Button type="button" size="sm" variant="outline" disabled={isBusy} onClick={() => void onSnooze(tomorrow)}>
+              {t("inbox.snoozeTomorrow")}
+            </Button>
+            <Button type="button" size="sm" variant="outline" disabled={isBusy} onClick={() => void onSnooze(thisWeekend)}>
+              {t("inbox.snoozeThisWeekend")}
+            </Button>
+            <label className="grid gap-1 text-sm font-medium sm:col-span-2">
+              {t("inbox.snoozeCustomDate")}
+              <input
+                type="date"
+                value={customSnoozeDate}
+                onChange={(event) => setCustomSnoozeDate(event.target.value)}
+                className="min-h-11 rounded-control border border-input bg-background px-3 py-2 text-base sm:text-sm"
+              />
+            </label>
+            <div className="flex flex-wrap gap-2 sm:col-span-2">
+              <Button
+                type="button"
+                size="sm"
+                disabled={isBusy || customSnoozeDate.length === 0}
+                onClick={() => void onSnooze(customSnoozeDate)}
+              >
+                {t("inbox.applySnooze")}
+              </Button>
+              {item.snoozedUntil ? (
+                <Button type="button" size="sm" variant="ghost" disabled={isBusy} onClick={() => void onClearSnooze()}>
+                  {t("inbox.clearSnooze")}
+                </Button>
+              ) : null}
+            </div>
+          </div>
+        ) : null}
         {item.status === "unprocessed" && showProcessing ? (
-          <div className="grid gap-2 rounded-xl border bg-muted/30 p-3 sm:grid-cols-3">
+          <div className="grid gap-3 rounded-xl border bg-muted/30 p-3">
+            <div className="flex flex-col gap-2 rounded-xl border border-alios-herb/30 bg-alios-herb/10 p-3 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-sm leading-6 text-foreground">
+                {t("inbox.suggestedProcessing", {
+                  target: t(suggestedTargetLabelKey),
+                })}
+              </p>
+              <Button type="button" size="sm" disabled={isBusy} onClick={() => void onConvert(suggestedTarget)}>
+                {t("inbox.useSuggestedProcessing")}
+              </Button>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-3">
             <Button type="button" size="sm" variant="outline" disabled={isBusy} onClick={() => void onConvert("todayTask")}>
               <ListTodo className="me-2 h-4 w-4" />{t("inbox.convertToTodayTask")}
             </Button>
@@ -85,6 +153,7 @@ export function InboxItemCard({
             <Button type="button" size="sm" variant="outline" disabled={isBusy} onClick={() => void onConvert("knowledgeItem")}>
               <Sparkles className="me-2 h-4 w-4" />{t("inbox.convertToKnowledgeItem")}
             </Button>
+            </div>
           </div>
         ) : null}
       </CardContent>
@@ -102,6 +171,11 @@ export function InboxItemCard({
             {item.status === "unprocessed" ? <CheckCircle2 className="me-2 h-4 w-4" /> : <Circle className="me-2 h-4 w-4" />}
             {item.status === "unprocessed" ? t("inbox.markProcessed") : t("inbox.markUnprocessed")}
           </Button>
+          {item.status === "unprocessed" ? (
+            <Button type="button" size="sm" variant="outline" disabled={isBusy} onClick={() => setShowSnooze((current) => !current)}>
+              <Clock3 className="me-2 h-4 w-4" />{t("inbox.snooze")}
+            </Button>
+          ) : null}
           <Button type="button" size="sm" variant="outline" onClick={() => setIsEditing(true)}><Pencil className="me-2 h-4 w-4" />{t("common.edit")}</Button>
           <Button type="button" size="sm" variant="ghost" className="text-destructive hover:text-destructive" onClick={() => setConfirmingDelete(true)}><Trash2 className="me-2 h-4 w-4" />{t("common.delete")}</Button>
         </>}

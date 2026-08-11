@@ -120,6 +120,28 @@ export function useInboxItems() {
     [storage]
   );
 
+  const snoozeItem = useCallback(
+    async (id: string, snoozedUntil: string) => {
+      const item = await inbox.update(id, { snoozedUntil });
+      setItems((current) =>
+        sortInboxItems(current.map((entry) => (entry.id === id ? item : entry)))
+      );
+      return item;
+    },
+    [inbox]
+  );
+
+  const clearSnooze = useCallback(
+    async (id: string) => {
+      const item = await inbox.update(id, { snoozedUntil: undefined });
+      setItems((current) =>
+        sortInboxItems(current.map((entry) => (entry.id === id ? item : entry)))
+      );
+      return item;
+    },
+    [inbox]
+  );
+
   const markItemsProcessed = useCallback(
     async (ids: string[]) => {
       const updatedItems = await setInboxItemsProcessed(storage, ids, true);
@@ -165,6 +187,8 @@ export function useInboxItems() {
     convertItems,
     markProcessed,
     markUnprocessed,
+    snoozeItem,
+    clearSnooze,
     markItemsProcessed,
     markItemsUnprocessed,
     deleteItems,

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { isoDateTimeSchema } from "@/shared/utils/domain";
+import { dateOnlySchema, isoDateTimeSchema } from "@/shared/utils/domain";
 
 export const INBOX_ITEM_TYPE_VALUES = [
   "note",
@@ -19,6 +19,7 @@ export const inboxItemSchema = z.object({
   content: z.string().trim().min(1),
   type: inboxItemTypeSchema,
   status: inboxItemStatusSchema,
+  snoozedUntil: dateOnlySchema.optional(),
   createdAt: isoDateTimeSchema,
   updatedAt: isoDateTimeSchema,
 });

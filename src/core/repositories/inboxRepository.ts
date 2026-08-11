@@ -3,7 +3,7 @@ import type { InboxItem } from "@/shared/types";
 export type CreateInboxItemInput = Pick<InboxItem, "content" | "type"> &
   Partial<Pick<InboxItem, "status">>;
 export type UpdateInboxItemInput = Partial<
-  Pick<InboxItem, "content" | "type" | "status">
+  Pick<InboxItem, "content" | "type" | "status" | "snoozedUntil">
 >;
 
 export interface InboxRepository {

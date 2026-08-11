@@ -1,3 +1,4 @@
+import { format } from "date-fns";
 import { AlertCircle, CheckCircle2, Circle, Inbox, ListTodo, Plus, RotateCcw, Search, SearchX, Trash2, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
@@ -45,6 +46,8 @@ export function InboxPage() {
     convertItems,
     markProcessed,
     markUnprocessed,
+    snoozeItem,
+    clearSnooze,
     markItemsProcessed,
     markItemsUnprocessed,
     deleteItems,
@@ -65,11 +68,13 @@ export function InboxPage() {
   const itemRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const focusId = searchParams.get("focusId");
   const inboxPreviewLimit = 12;
+  const todayDate = format(new Date(), "yyyy-MM-dd");
 
   const filteredItems = filterInboxItems(items, {
     query: searchQuery,
     status: statusFilter,
     type: typeFilter,
+    today: todayDate,
   });
   const filtersActive =
     searchQuery.trim().length > 0 || statusFilter !== "all" || typeFilter !== "all";
@@ -497,6 +502,16 @@ export function InboxPage() {
                   item.id,
                   () => (item.status === "unprocessed" ? markProcessed(item.id) : markUnprocessed(item.id)).then(() => undefined),
                   t("inbox.statusUpdated")
+                )}
+                onSnooze={(date) => run(
+                  item.id,
+                  () => snoozeItem(item.id, date).then(() => undefined),
+                  t("inbox.snoozed")
+                )}
+                onClearSnooze={() => run(
+                  item.id,
+                  () => clearSnooze(item.id).then(() => undefined),
+                  t("inbox.snoozeCleared")
                 )}
                 onConvert={(target) => run(
                   item.id,
