@@ -61,7 +61,7 @@ export function CollapsibleSection({
     <section
       id={id}
       className={cn(
-        "alios-surface-soft overflow-hidden bg-card/90",
+        "alios-collapsible-section alios-surface-soft overflow-hidden bg-card/90",
         aliosSurfaceMotion,
         className
       )}
@@ -69,7 +69,7 @@ export function CollapsibleSection({
       <button
         type="button"
         className={cn(
-          "flex w-full flex-col items-start justify-between gap-3 p-5 text-start sm:flex-row sm:items-start sm:gap-4 sm:p-6",
+          "alios-collapsible-trigger flex w-full flex-col items-start justify-between gap-3 p-5 text-start sm:flex-row sm:items-start sm:gap-4 sm:p-6",
           aliosFocusRing,
           "focus-visible:-m-px focus-visible:rounded-[1.65rem]"
         )}
@@ -112,7 +112,10 @@ export function CollapsibleSection({
         id={contentId}
         hidden={!isOpen}
         aria-hidden={!isOpen}
-        className={cn("border-t border-border/70 px-5 py-5 sm:px-6", contentClassName)}
+        className={cn(
+          "alios-collapsible-content border-t border-border/70 px-5 py-5 sm:px-6",
+          contentClassName
+        )}
       >
         {children}
       </div>

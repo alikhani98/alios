@@ -212,6 +212,23 @@
     @apply rounded-surface border border-border/70 bg-background/75 shadow-sm;
   }
 
+  .alios-collapsible-content .alios-collapsible-section {
+    border-inline-start: 2px solid hsl(var(--ring) / 0.45);
+    margin-inline: -0.25rem;
+  }
+
+  .alios-collapsible-content .alios-collapsible-section > .alios-collapsible-trigger {
+    @apply gap-3 p-4 sm:p-4;
+  }
+
+  .alios-collapsible-content .alios-collapsible-section > .alios-collapsible-content {
+    @apply px-4 py-4 sm:px-4;
+  }
+
+  .alios-collapsible-content .alios-collapsible-section .alios-collapsible-section {
+    margin-inline: -0.125rem;
+  }
+
   .alios-control-field {
     @apply rounded-control border border-input bg-background ring-offset-background;
   }

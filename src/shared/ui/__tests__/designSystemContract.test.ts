@@ -64,4 +64,20 @@ describe("AliOS design system contract", () => {
     expect(offenders).toEqual([]);
     expect(readFileSync(sharedSelectPath, "utf8")).toMatch(/<select(?:\s|>)/);
   });
+
+  it("keeps nested collapsible sections compact and rail-based", () => {
+    const collapsibleSection = readRepositoryFile(
+      "src/shared/ui/collapsible-section.tsx"
+    );
+    const globalStyles = readRepositoryFile("src/styles/globals.css");
+
+    expect(collapsibleSection).toContain("alios-collapsible-section");
+    expect(collapsibleSection).toContain("alios-collapsible-trigger");
+    expect(collapsibleSection).toContain("alios-collapsible-content");
+    expect(globalStyles).toContain(
+      ".alios-collapsible-content .alios-collapsible-section"
+    );
+    expect(globalStyles).toContain("border-inline-start");
+    expect(globalStyles).toContain("> .alios-collapsible-content");
+  });
 });
