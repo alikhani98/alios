@@ -10,6 +10,7 @@ export const FINANCE_SECTION_ANCHORS = {
   add: "finance-add",
   addTransaction: "finance-add-transaction",
   addObligation: "finance-add-obligation",
+  importTransactions: "finance-import-transactions",
 } as const;
 
 export type FinanceSectionId = keyof typeof FINANCE_SECTION_ANCHORS;
@@ -64,7 +65,8 @@ export type FinanceCollapsibleSectionId =
   | "obligations"
   | "transactions"
   | "addTransaction"
-  | "addObligation";
+  | "addObligation"
+  | "importTransactions";
 
 export const financeCollapsibleSectionIds: ReadonlyArray<FinanceCollapsibleSectionId> = [
   "charts",
@@ -73,6 +75,7 @@ export const financeCollapsibleSectionIds: ReadonlyArray<FinanceCollapsibleSecti
   "transactions",
   "addTransaction",
   "addObligation",
+  "importTransactions",
 ] as const;
 
 export const FINANCE_COLLAPSED_SECTIONS_STORAGE_KEY =

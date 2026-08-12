@@ -47,6 +47,7 @@ describe("finance section helpers", () => {
       "transactions",
       "addTransaction",
       "addObligation",
+      "importTransactions",
     ]);
     expect(getDefaultFinanceCollapsedSectionIds(true)).toEqual([
       "charts",
@@ -55,6 +56,7 @@ describe("finance section helpers", () => {
       "transactions",
       "addTransaction",
       "addObligation",
+      "importTransactions",
     ]);
   });
 });

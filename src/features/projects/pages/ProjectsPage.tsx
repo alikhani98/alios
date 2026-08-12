@@ -1,12 +1,11 @@
-import { AlertCircle, FolderKanban, Plus, RotateCcw } from "lucide-react";
+import { AlertCircle, FolderKanban, KanbanSquare, List, Plus, RotateCcw } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 
 import type { CreateProjectInput } from "@/core/repositories";
 import { useGoals } from "@/features/goals/hooks/useGoals";
 import { useStorageAdapter } from "@/core/storage";
-import type { Task } from "@/shared/types";
-import type { Project } from "@/shared/types";
+import type { Project, ProjectStatus, Task } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
 import {
   Button,
@@ -21,6 +20,7 @@ import {
 import { cn } from "@/shared/utils";
 import { ProjectCard } from "../components/ProjectCard";
 import { ProjectForm } from "../components/ProjectForm";
+import { ProjectKanbanBoard } from "../components/ProjectKanbanBoard";
 import { useProjects } from "../hooks/useProjects";
 import { findGoalProjectFilter, findLinkedGoal } from "../projectGoalLinks";
 import { getProjectTaskProgress } from "../projectTaskProgress";
@@ -86,6 +86,8 @@ export function ProjectsPage() {
   const [focusMessage, setFocusMessage] = useState<string | null>(null);
   const [showAllProjects, setShowAllProjects] = useState(false);
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [viewMode, setViewMode] = useState<"list" | "kanban">("list");
+  const [draggedProjectId, setDraggedProjectId] = useState<string | null>(null);
   const projectRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const focusId = searchParams.get("focusId");
   const goalId = searchParams.get("goalId");
@@ -99,7 +101,6 @@ export function ProjectsPage() {
     ? visibleProjects
     : visibleProjects.slice(0, projectPreviewLimit);
   const hiddenProjectCount = Math.max(visibleProjects.length - displayedProjects.length, 0);
-
   useEffect(() => {
     void tasksRepository.list().then(setTasks).catch(() => setTasks([]));
   }, [tasksRepository]);
@@ -194,6 +195,34 @@ export function ProjectsPage() {
       );
     } finally {
       setDeletingId(null);
+    }
+  };
+
+  const handleKanbanStatusChange = async (
+    projectId: string,
+    nextStatus: ProjectStatus
+  ) => {
+    const project = projects.find((item) => item.id === projectId);
+    if (!project || project.status === nextStatus) {
+      setDraggedProjectId(null);
+      return;
+    }
+
+    setActionError(null);
+    setSuccessMessage(null);
+
+    try {
+      await updateProject(projectId, {
+        status: nextStatus,
+        archivedAt: nextStatus === "archived" ? new Date().toISOString() : undefined,
+      });
+      setSuccessMessage(t("projects.statusUpdated"));
+    } catch (updateError) {
+      setActionError(
+        updateError instanceof Error ? updateError.message : t("projects.saveError")
+      );
+    } finally {
+      setDraggedProjectId(null);
     }
   };
 
@@ -320,6 +349,32 @@ export function ProjectsPage() {
         </div>
       ) : null}
 
+      {projects.length > 0 ? (
+        <div className="flex flex-col gap-3 rounded-2xl border bg-card/90 p-3 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-muted-foreground">{t("projects.viewModeDescription")}</p>
+          <div className="grid gap-2 sm:flex sm:items-center" role="group" aria-label={t("projects.viewMode")}>
+            <Button
+              type="button"
+              size="sm"
+              variant={viewMode === "list" ? "default" : "outline"}
+              onClick={() => setViewMode("list")}
+            >
+              <List className="me-2 h-4 w-4" aria-hidden="true" />
+              {t("projects.listView")}
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant={viewMode === "kanban" ? "default" : "outline"}
+              onClick={() => setViewMode("kanban")}
+            >
+              <KanbanSquare className="me-2 h-4 w-4" aria-hidden="true" />
+              {t("projects.kanbanView")}
+            </Button>
+          </div>
+        </div>
+      ) : null}
+
       {goalId ? (
         <div
           role="status"
@@ -368,6 +423,15 @@ export function ProjectsPage() {
               <Link to="/projects">{t("goals.clearFilters")}</Link>
             </Button>
           }
+        />
+      ) : viewMode === "kanban" ? (
+        <ProjectKanbanBoard
+          draggedProjectId={draggedProjectId}
+          onDragEnd={() => setDraggedProjectId(null)}
+          onDragStart={setDraggedProjectId}
+          onEditProject={openEditForm}
+          onStatusChange={(projectId, status) => void handleKanbanStatusChange(projectId, status)}
+          projects={visibleProjects}
         />
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">

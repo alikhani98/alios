@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { DateDisplayProvider } from "@/shared/date";
 import { I18nProvider, LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
 import { goalRecord, projectRecord, taskRecord } from "@/test/factories";
+import { ProjectKanbanBoard, groupProjectsByStatus } from "../components/ProjectKanbanBoard";
 
 vi.mock("@/core/storage", () => ({
   useStorageAdapter: () => ({
@@ -65,11 +66,53 @@ describe("ProjectsPage density", () => {
     const markup = renderPage();
 
     expect(markup).toContain("New project");
+    expect(markup).toContain("List");
+    expect(markup).toContain("Kanban");
     expect(markup).toContain("Project density review");
     expect(markup).toContain("Edit");
     expect(markup).toContain("Project details");
     expect(markup).toContain('id="project-project-density-details-content" hidden="" aria-hidden="true"');
     expect(markup).not.toContain("Create project");
     expect(markup).not.toContain('id="project-title"');
+  });
+
+  it("groups every existing project status into the Kanban board without inventing new statuses", () => {
+    const projects = [
+      { ...projectRecord, id: "project-active", title: "Active project", status: "active" as const },
+      { ...projectRecord, id: "project-waiting", title: "Waiting project", status: "waiting" as const },
+      { ...projectRecord, id: "project-later", title: "Later project", status: "later" as const },
+      { ...projectRecord, id: "project-completed", title: "Completed project", status: "completed" as const },
+      { ...projectRecord, id: "project-archived", title: "Archived project", status: "archived" as const },
+    ];
+
+    const grouped = groupProjectsByStatus(projects);
+    const markup = renderToStaticMarkup(
+      <MemoryRouter>
+        <I18nProvider>
+          <ProjectKanbanBoard
+            draggedProjectId={null}
+            onDragEnd={() => undefined}
+            onDragStart={() => undefined}
+            onEditProject={() => undefined}
+            onStatusChange={() => undefined}
+            projects={projects}
+          />
+        </I18nProvider>
+      </MemoryRouter>
+    );
+
+    expect(grouped.map((group) => group.status)).toEqual([
+      "active",
+      "waiting",
+      "later",
+      "completed",
+      "archived",
+    ]);
+    expect(markup).toContain("Project Kanban board");
+    expect(markup).toContain("Active project");
+    expect(markup).toContain("Waiting project");
+    expect(markup).toContain("Later project");
+    expect(markup).toContain("Completed project");
+    expect(markup).toContain("Archived project");
   });
 });

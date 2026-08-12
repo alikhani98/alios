@@ -38,6 +38,7 @@ import {
 import { calculateFinanceMonthlyPlan } from "../financeMonthlyPlan";
 import { FinanceObligationCard } from "../components/FinanceObligationCard";
 import { FinanceObligationForm } from "../components/FinanceObligationForm";
+import { FinanceCsvImportSection } from "../components/FinanceCsvImportSection";
 import { FinanceTransactionCard } from "../components/FinanceTransactionCard";
 import { FinanceTransactionForm } from "../components/FinanceTransactionForm";
 import {
@@ -252,6 +253,7 @@ export function FinancePage() {
   const [obligationBusyId, setObligationBusyId] = useState<string | null>(null);
   const [isTransactionSubmitting, setIsTransactionSubmitting] = useState(false);
   const [isObligationSubmitting, setIsObligationSubmitting] = useState(false);
+  const [isTransactionImporting, setIsTransactionImporting] = useState(false);
   const [transactionError, setTransactionError] = useState<string | null>(null);
   const [obligationError, setObligationError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -495,6 +497,23 @@ export function FinancePage() {
       setObligationError(caught instanceof Error ? caught.message : t("finance.storageError"));
     } finally {
       setIsObligationSubmitting(false);
+    }
+  };
+
+  const handleTransactionImport = async (
+    values: Parameters<typeof createTransaction>[0][]
+  ) => {
+    clearMessages();
+    setIsTransactionImporting(true);
+    try {
+      for (const value of values) {
+        await createTransaction(value);
+      }
+      setSuccessMessage(t("finance.importCsvSuccess", { count: values.length }));
+    } catch (caught) {
+      setTransactionError(caught instanceof Error ? caught.message : t("finance.storageError"));
+    } finally {
+      setIsTransactionImporting(false);
     }
   };
 
@@ -1167,7 +1186,7 @@ export function FinancePage() {
         className="scroll-mt-32"
         contentClassName="space-y-4"
       >
-        <div className="grid gap-4 xl:grid-cols-2">
+        <div className="grid gap-4 xl:grid-cols-3">
           <SoftPanel className="space-y-3">
             <div className="space-y-1">
               <h3 className="text-lg font-semibold">
@@ -1687,6 +1706,24 @@ export function FinancePage() {
               onCancel={
                 editingObligation ? () => setEditingObligation(undefined) : undefined
               }
+            />
+          </CollapsibleSection>
+
+          <CollapsibleSection
+            id={FINANCE_SECTION_ANCHORS.importTransactions}
+            title={t("finance.importCsvTitle")}
+            description={t("finance.importCsvDescription")}
+            status={<StatusChip tone="neutral">{t("finance.localOnlyData")}</StatusChip>}
+            open={!isCollapsedSection("importTransactions")}
+            onOpenChange={(open) => setCollapsedSectionOpen("importTransactions", open)}
+            expandLabel={t("common.expandSection")}
+            collapseLabel={t("common.collapseSection")}
+            className="h-full"
+            contentClassName="space-y-4"
+          >
+            <FinanceCsvImportSection
+              isImporting={isTransactionImporting}
+              onImport={handleTransactionImport}
             />
           </CollapsibleSection>
         </div>

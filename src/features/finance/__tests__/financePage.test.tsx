@@ -106,6 +106,7 @@ describe("FinancePage", () => {
     );
 
     expect(markup).toContain("Add income / expense");
+    expect(markup).toContain("Import bank CSV");
     expect(markup).toContain("Search finance records");
     expect(markup).toContain(financeObligations[0].title);
     expect(countOccurrences(markup, "This is a local summary from your entered data. It is not financial advice.")).toBe(
@@ -120,5 +121,6 @@ describe("FinancePage", () => {
     expect(markup).toContain('id="finance-transactions-records-content" hidden="" aria-hidden="true"');
     expect(markup).toContain('id="finance-add-transaction-content" hidden="" aria-hidden="true"');
     expect(markup).toContain('id="finance-add-obligation-content" hidden="" aria-hidden="true"');
+    expect(markup).toContain('id="finance-import-transactions-content" hidden="" aria-hidden="true"');
   });
 });

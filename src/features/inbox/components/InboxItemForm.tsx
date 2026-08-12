@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
+import { Mic, MicOff } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { detectNaturalDate } from "@/shared/date";
@@ -16,12 +17,36 @@ type Props = {
   onCancel?: () => void;
 };
 
+type SpeechRecognitionResultEvent = {
+  results: ArrayLike<ArrayLike<{ transcript: string }>>;
+};
+
+type SpeechRecognitionInstance = {
+  interimResults: boolean;
+  lang: string;
+  maxAlternatives: number;
+  onend: (() => void) | null;
+  onerror: (() => void) | null;
+  onresult: ((event: SpeechRecognitionResultEvent) => void) | null;
+  start: () => void;
+};
+
+type SpeechRecognitionConstructor = new () => SpeechRecognitionInstance;
+
+declare global {
+  interface Window {
+    SpeechRecognition?: SpeechRecognitionConstructor;
+    webkitSpeechRecognition?: SpeechRecognitionConstructor;
+  }
+}
+
 export function InboxItemForm({ item, isSubmitting, onSubmit, onCancel }: Props) {
-  const { t } = useI18n();
+  const { language, t } = useI18n();
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
     watch,
     formState: { errors },
   } = useForm<InboxFormValues>({
@@ -30,15 +55,62 @@ export function InboxItemForm({ item, isSubmitting, onSubmit, onCancel }: Props)
   });
   const contentValue = watch("content");
   const dateSuggestion = detectNaturalDate(contentValue ?? "");
+  const [speechRecognition, setSpeechRecognition] =
+    useState<SpeechRecognitionConstructor | null>(null);
+  const [isListening, setIsListening] = useState(false);
+  const speechLanguage = useMemo(
+    () => (language === "fa" ? "fa-IR" : "en-US"),
+    [language]
+  );
 
   useEffect(() => {
     reset({ content: item?.content ?? "", type: item?.type ?? "note" });
   }, [item, reset]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const Recognition =
+      window.SpeechRecognition ?? window.webkitSpeechRecognition ?? null;
+    setSpeechRecognition(() => Recognition);
+  }, []);
+
   const submit = async (values: InboxFormValues) => {
     if (await onSubmit(values)) {
       reset({ content: "", type: "note" });
     }
+  };
+
+  const startVoiceCapture = () => {
+    if (!speechRecognition || isListening) {
+      return;
+    }
+
+    const recognition = new speechRecognition();
+    recognition.lang = speechLanguage;
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    recognition.onresult = (event) => {
+      const transcript = event.results[0]?.[0]?.transcript?.trim();
+      if (!transcript) {
+        return;
+      }
+
+      const nextValue = [contentValue, transcript]
+        .filter((value) => value && value.trim().length > 0)
+        .join("\n");
+      setValue("content", nextValue, {
+        shouldDirty: true,
+        shouldTouch: true,
+        shouldValidate: true,
+      });
+    };
+    recognition.onerror = () => setIsListening(false);
+    recognition.onend = () => setIsListening(false);
+    setIsListening(true);
+    recognition.start();
   };
 
   return (
@@ -47,15 +119,37 @@ export function InboxItemForm({ item, isSubmitting, onSubmit, onCancel }: Props)
         <label htmlFor={item ? `inbox-content-${item.id}` : "inbox-content"} className="text-sm font-medium">
           {item ? t("inbox.editItem") : t("inbox.captureItem")}
         </label>
-        <Textarea
-          id={item ? `inbox-content-${item.id}` : "inbox-content"}
-          autoFocus={Boolean(item)}
-          rows={item ? 4 : 5}
-          className="min-h-32 resize-y text-base"
-          placeholder={t("inbox.contentPlaceholder")}
-          aria-invalid={Boolean(errors.content)}
-          {...register("content")}
-        />
+        <div className="relative">
+          <Textarea
+            id={item ? `inbox-content-${item.id}` : "inbox-content"}
+            autoFocus={Boolean(item)}
+            rows={item ? 4 : 5}
+            className="min-h-32 resize-y pe-14 text-base"
+            placeholder={t("inbox.contentPlaceholder")}
+            aria-invalid={Boolean(errors.content)}
+            {...register("content")}
+          />
+          {speechRecognition ? (
+            <Button
+              type="button"
+              size="icon"
+              variant="outline"
+              className="absolute bottom-3 end-3"
+              aria-label={
+                isListening ? t("inbox.voiceListening") : t("inbox.voiceCapture")
+              }
+              title={isListening ? t("inbox.voiceListening") : t("inbox.voiceCapture")}
+              disabled={isListening}
+              onClick={startVoiceCapture}
+            >
+              {isListening ? (
+                <MicOff className="h-4 w-4" aria-hidden="true" />
+              ) : (
+                <Mic className="h-4 w-4" aria-hidden="true" />
+              )}
+            </Button>
+          ) : null}
+        </div>
         {errors.content ? <p className="text-sm text-destructive">{t("inbox.contentRequired")}</p> : null}
         {dateSuggestion ? (
           <p className="rounded-control border border-alios-saffron/40 bg-alios-saffron/10 px-3 py-2 text-sm leading-6 text-foreground">
