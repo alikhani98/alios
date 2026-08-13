@@ -13,6 +13,8 @@ describe("accent color preference helpers", () => {
     expect(parseAccentColorPreference("violet")).toBe("violet");
     expect(parseAccentColorPreference(null)).toBe("default");
     expect(normalizeAccentColorPreference("rose")).toBe("rose");
+    expect(normalizeAccentColorPreference("caspian")).toBe("caspian");
+    expect(normalizeAccentColorPreference("saffron")).toBe("saffron");
     expect(normalizeAccentColorPreference("sepia")).toBe("default");
   });
 
@@ -27,6 +29,18 @@ describe("accent color preference helpers", () => {
       primary: "158 64% 46%",
       primaryForeground: "222.2 47.4% 11.2%",
       ring: "158 64% 46%",
+    });
+
+    expect(getAccentColorThemeVariables("caspian", false)).toEqual({
+      primary: "221 38% 15%",
+      primaryForeground: "40 47% 94%",
+      ring: "221 38% 15%",
+    });
+
+    expect(getAccentColorThemeVariables("herb", true)).toEqual({
+      primary: "134 24% 58%",
+      primaryForeground: "221 38% 15%",
+      ring: "134 24% 58%",
     });
   });
 });

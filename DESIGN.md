@@ -119,7 +119,11 @@ Supported accent preferences are:
 - rose;
 - amber;
 - emerald;
-- slate.
+- slate;
+- caspian;
+- pomegranate;
+- saffron;
+- herb.
 
 Do not assume primary is always blue. New components must remain readable with every supported accent in light and dark mode.
 

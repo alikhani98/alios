@@ -16,7 +16,11 @@ export type AccentColorPreference =
   | "rose"
   | "amber"
   | "emerald"
-  | "slate";
+  | "slate"
+  | "caspian"
+  | "pomegranate"
+  | "saffron"
+  | "herb";
 
 export type AccentColorThemeVariables = {
   primary: string;
@@ -33,6 +37,10 @@ export const accentColorPreferences: ReadonlyArray<AccentColorPreference> = [
   "amber",
   "emerald",
   "slate",
+  "caspian",
+  "pomegranate",
+  "saffron",
+  "herb",
 ];
 
 const accentColorPalette: Record<
@@ -112,6 +120,54 @@ const accentColorPalette: Record<
       primary: "215 16% 64%",
       primaryForeground: "222.2 47.4% 11.2%",
       ring: "215 16% 64%",
+    },
+  },
+  caspian: {
+    light: {
+      primary: "221 38% 15%",
+      primaryForeground: "40 47% 94%",
+      ring: "221 38% 15%",
+    },
+    dark: {
+      primary: "40 47% 94%",
+      primaryForeground: "221 38% 15%",
+      ring: "40 47% 94%",
+    },
+  },
+  pomegranate: {
+    light: {
+      primary: "353 51% 46%",
+      primaryForeground: "210 40% 98%",
+      ring: "353 51% 46%",
+    },
+    dark: {
+      primary: "353 64% 65%",
+      primaryForeground: "221 38% 15%",
+      ring: "353 64% 65%",
+    },
+  },
+  saffron: {
+    light: {
+      primary: "41 80% 53%",
+      primaryForeground: "221 38% 15%",
+      ring: "41 80% 53%",
+    },
+    dark: {
+      primary: "41 84% 64%",
+      primaryForeground: "221 38% 15%",
+      ring: "41 84% 64%",
+    },
+  },
+  herb: {
+    light: {
+      primary: "134 19% 46%",
+      primaryForeground: "210 40% 98%",
+      ring: "134 19% 46%",
+    },
+    dark: {
+      primary: "134 24% 58%",
+      primaryForeground: "221 38% 15%",
+      ring: "134 24% 58%",
     },
   },
 };

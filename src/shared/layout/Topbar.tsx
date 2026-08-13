@@ -2,6 +2,7 @@ import {
   Check,
   Clock3,
   LayoutDashboard,
+  Languages,
   Menu,
   Moon,
   MonitorSmartphone,
@@ -24,6 +25,7 @@ import {
   APPEARANCE_SCHEDULE_END_STORAGE_KEY,
   APPEARANCE_SCHEDULE_START_STORAGE_KEY,
   DISPLAY_NAME_STORAGE_KEY,
+  PROFILE_AVATAR_STORAGE_KEY,
 } from "@/shared/constants/preferences";
 import { appConfig } from "@/shared/constants/app";
 import { usePersistentString } from "@/shared/hooks/usePersistentString";
@@ -42,6 +44,8 @@ import {
 import {
   getDisplayNameInitials,
   normalizeDisplayName,
+  normalizeProfileAvatarPreference,
+  type ProfileAvatarPreference,
 } from "@/shared/preferences/profile";
 import { Badge, Button, SectionHeader } from "@/shared/ui";
 import { Input } from "@/shared/ui";
@@ -76,14 +80,68 @@ const accentColorOptions = [
   { value: "amber", labelKey: "settings.accentAmber" },
   { value: "emerald", labelKey: "settings.accentEmerald" },
   { value: "slate", labelKey: "settings.accentSlate" },
+  { value: "caspian", labelKey: "settings.accentCaspian" },
+  { value: "pomegranate", labelKey: "settings.accentPomegranate" },
+  { value: "saffron", labelKey: "settings.accentSaffron" },
+  { value: "herb", labelKey: "settings.accentHerb" },
 ] as const;
+
+const profileAvatarOptions: ReadonlyArray<{
+  value: ProfileAvatarPreference;
+  labelKey:
+    | "settings.profileAvatarInitials"
+    | "settings.profileAvatarSaffron"
+    | "settings.profileAvatarHerb"
+    | "settings.profileAvatarPomegranate"
+    | "settings.profileAvatarCaspian"
+    | "settings.profileAvatarPaper";
+  symbol: string | null;
+  className: string;
+}> = [
+  {
+    value: "initials",
+    labelKey: "settings.profileAvatarInitials",
+    symbol: null,
+    className: "bg-alios-caspian text-white dark:bg-alios-paper dark:text-alios-night",
+  },
+  {
+    value: "saffron",
+    labelKey: "settings.profileAvatarSaffron",
+    symbol: "✦",
+    className: "bg-alios-saffron text-alios-caspian",
+  },
+  {
+    value: "herb",
+    labelKey: "settings.profileAvatarHerb",
+    symbol: "◆",
+    className: "bg-alios-herb text-white",
+  },
+  {
+    value: "pomegranate",
+    labelKey: "settings.profileAvatarPomegranate",
+    symbol: "●",
+    className: "bg-alios-pomegranate text-white",
+  },
+  {
+    value: "caspian",
+    labelKey: "settings.profileAvatarCaspian",
+    symbol: "◇",
+    className: "bg-alios-caspian text-white",
+  },
+  {
+    value: "paper",
+    labelKey: "settings.profileAvatarPaper",
+    symbol: "◐",
+    className: "bg-alios-paper text-alios-caspian",
+  },
+];
 
 export function Topbar({
   title,
   onOpenMobileSidebar,
   showDashboardControls = false,
 }: TopbarProps) {
-  const { direction, t } = useI18n();
+  const { direction, language, setLanguage, t } = useI18n();
   const navigate = useNavigate();
   const panelRef = useRef<HTMLDivElement>(null);
   const activePanelContentRef = useRef<HTMLDivElement>(null);
@@ -105,6 +163,11 @@ export function Topbar({
     key: DISPLAY_NAME_STORAGE_KEY,
     defaultValue: "",
   });
+  const { value: rawProfileAvatar, setValue: setProfileAvatar } =
+    usePersistentString({
+      key: PROFILE_AVATAR_STORAGE_KEY,
+      defaultValue: "initials",
+    });
   const { value: accentColorPreference, setValue: setAccentColorPreference } =
     useAccentColorPreference();
   const [activePanel, setActivePanel] = useState<ActivePanel>(null);
@@ -132,6 +195,13 @@ export function Topbar({
       : currentAppearance;
   const hasDisplayName = displayName.trim().length > 0;
   const initials = getDisplayNameInitials(displayName);
+  const profileAvatarPreference =
+    normalizeProfileAvatarPreference(rawProfileAvatar);
+  const selectedProfileAvatar =
+    profileAvatarOptions.find(
+      (option) => option.value === profileAvatarPreference
+    ) ?? profileAvatarOptions[0];
+  const profileAvatarLabel = t(selectedProfileAvatar.labelKey);
 
   useEffect(() => {
     if (!showDashboardControls && activePanel === "dashboard") {
@@ -236,6 +306,16 @@ export function Topbar({
     value: (typeof accentColorOptions)[number]["value"]
   ) => {
     setAccentColorPreference(value);
+    showSavedFeedback();
+  };
+
+  const handleSelectProfileAvatar = (value: ProfileAvatarPreference) => {
+    setProfileAvatar(normalizeProfileAvatarPreference(value));
+    showSavedFeedback();
+  };
+
+  const handleSelectLanguage = (nextLanguage: "fa" | "en") => {
+    setLanguage(nextLanguage);
     showSavedFeedback();
   };
 
@@ -347,8 +427,24 @@ export function Topbar({
           title={t("settings.localProfile")}
           onClick={(event) => handleOpenProfilePanel(event.currentTarget)}
         >
-          {hasDisplayName ? (
-            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-alios-caspian text-[0.65rem] font-semibold text-white dark:bg-alios-paper dark:text-alios-night">
+          {selectedProfileAvatar.symbol ? (
+            <span
+              className={cn(
+                "flex h-7 w-7 items-center justify-center rounded-full text-sm font-semibold shadow-sm",
+                selectedProfileAvatar.className
+              )}
+              aria-hidden="true"
+              title={profileAvatarLabel}
+            >
+              {selectedProfileAvatar.symbol}
+            </span>
+          ) : hasDisplayName ? (
+            <span
+              className={cn(
+                "flex h-7 w-7 items-center justify-center rounded-full text-[0.65rem] font-semibold shadow-sm",
+                selectedProfileAvatar.className
+              )}
+            >
               {initials}
             </span>
           ) : (
@@ -449,8 +545,15 @@ export function Topbar({
             aria-label={t("settings.localProfile")}
           >
             <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-alios-caspian text-sm font-semibold text-white dark:bg-alios-paper dark:text-alios-night">
-                {hasDisplayName ? initials : <UserCircle className="h-6 w-6" />}
+              <div
+                className={cn(
+                  "flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-base font-semibold shadow-sm",
+                  selectedProfileAvatar.className
+                )}
+                title={profileAvatarLabel}
+              >
+                {selectedProfileAvatar.symbol ??
+                  (hasDisplayName ? initials : <UserCircle className="h-6 w-6" />)}
               </div>
               <div className="min-w-0">
                 <p className="text-xs font-medium text-muted-foreground">
@@ -500,6 +603,92 @@ export function Topbar({
             </form>
 
             <div className="mt-4 space-y-3 rounded-2xl border border-border/70 bg-background/70 p-3">
+              <div className="space-y-1">
+                <p className="text-sm font-semibold">
+                  {t("settings.profileAvatar")}
+                </p>
+                <p className="text-xs leading-5 text-muted-foreground">
+                  {t("settings.profileAvatarDescription")}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                {profileAvatarOptions.map((option) => {
+                  const isSelected = profileAvatarPreference === option.value;
+                  const preview =
+                    option.symbol ??
+                    (hasDisplayName ? initials : getDisplayNameInitials(""));
+
+                  return (
+                    <Button
+                      key={option.value}
+                      type="button"
+                      variant={isSelected ? "secondary" : "outline"}
+                      className="h-auto justify-start gap-3 rounded-2xl px-3 py-3 text-start"
+                      onClick={() => handleSelectProfileAvatar(option.value)}
+                      aria-pressed={isSelected}
+                    >
+                      <span
+                        className={cn(
+                          "flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-semibold shadow-sm",
+                          option.className
+                        )}
+                        aria-hidden="true"
+                      >
+                        {preview}
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-sm font-medium">
+                          {t(option.labelKey)}
+                        </span>
+                        <span className="block text-xs text-muted-foreground">
+                          {isSelected
+                            ? t("home.currentAccentColor")
+                            : t("home.selectAccentColor")}
+                        </span>
+                      </span>
+                    </Button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="mt-4 space-y-3 rounded-2xl border border-border/70 bg-background/70 p-3">
+              <div className="flex items-start gap-2">
+                <Languages className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                <div className="min-w-0 space-y-1">
+                  <p className="text-sm font-semibold">{t("settings.language")}</p>
+                  <p className="text-xs leading-5 text-muted-foreground">
+                    {t("settings.languageDescription")}
+                  </p>
+                </div>
+              </div>
+
+              <div
+                className="grid grid-cols-2 gap-2"
+                role="group"
+                aria-label={t("settings.language")}
+              >
+                <Button
+                  type="button"
+                  variant={language === "fa" ? "secondary" : "outline"}
+                  aria-pressed={language === "fa"}
+                  onClick={() => handleSelectLanguage("fa")}
+                >
+                  {t("settings.persian")}
+                </Button>
+                <Button
+                  type="button"
+                  variant={language === "en" ? "secondary" : "outline"}
+                  aria-pressed={language === "en"}
+                  onClick={() => handleSelectLanguage("en")}
+                >
+                  {t("settings.english")}
+                </Button>
+              </div>
+            </div>
+
+            <div className="mt-4 space-y-3 rounded-2xl border border-border/70 bg-background/70 p-3">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0 space-y-1">
                   <p className="text-sm font-semibold">
@@ -538,7 +727,9 @@ export function Topbar({
                         {isSelected ? (
                           <Check
                             className={`h-4 w-4 ${
-                              value === "amber" ? "text-slate-900" : "text-white"
+                              value === "amber" || value === "saffron"
+                                ? "text-slate-900"
+                                : "text-white"
                             }`}
                           />
                         ) : null}

@@ -1,4 +1,16 @@
 export const DEFAULT_DISPLAY_NAME = "";
+export const DEFAULT_PROFILE_AVATAR_PREFERENCE = "initials";
+
+export type ProfileAvatarPreference =
+  | "initials"
+  | "saffron"
+  | "herb"
+  | "pomegranate"
+  | "caspian"
+  | "paper";
+
+export const profileAvatarPreferences: ReadonlyArray<ProfileAvatarPreference> =
+  ["initials", "saffron", "herb", "pomegranate", "caspian", "paper"];
 
 export function normalizeDisplayName(value: string): string {
   return value.trim();
@@ -24,4 +36,13 @@ export function getDisplayNameInitials(
     .join("");
 
   return initials ? initials.toLocaleUpperCase() : fallback;
+}
+
+export function normalizeProfileAvatarPreference(
+  value: unknown
+): ProfileAvatarPreference {
+  return typeof value === "string" &&
+    profileAvatarPreferences.includes(value as ProfileAvatarPreference)
+    ? (value as ProfileAvatarPreference)
+    : DEFAULT_PROFILE_AVATAR_PREFERENCE;
 }
