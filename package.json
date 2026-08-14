@@ -2,6 +2,7 @@
   "name": "alios-app",
   "private": true,
   "version": "1.50.0",
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "dev": "vite",

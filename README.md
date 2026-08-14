@@ -1,132 +1,69 @@
 # AliOS
 
-AliOS is a bilingual, local-first personal life-management system. It brings quick capture, Today planning, projects, journaling, personal knowledge, a read-only dashboard, monthly calendar and upcoming-task views, routine templates, Personal Manual, Personal Manual starter templates, Goals, Goals templates and quick start, Life Areas, manual backup/restore, local data controls, a compact topbar dashboard customizer with a local accent palette, a Finance foundation with a local review layer, budget guard, lightweight local charts, mobile quick navigation, collapsible sections, Jalali due-date previews, a Weekly Review foundation, a Decision Log foundation, a readable Settings export center, an app error boundary with a local error log foundation, backup/restore safety and migration validation, a beginner-friendly Help Center inside Settings, a Recovery Mode / Safe Mode foundation, Stage 53 mobile UX hardening for dense pages, Stage 54 empty-state and first-run guidance polish, Stage 55 backup reminder and last backup status foundation, Stage 56 export center foundation, Stage 57 recovery mode foundation, Stage 59 Personal Manual foundation, Stage 64 Personal Manual search and focus navigation, Stage 65 Personal Manual templates foundation, Stage 66 Personal Manual mobile and dense page polish, Stage 67 Personal Manual track release hardening, Stage 68 v1.50 release hardening, Stage 70 Goals track QA and mobile hardening, Stage 71 Goals templates and quick start, Stage 72 Life Areas foundation, and Stage 73 app startup resilience into one static web application.
+AliOS is a bilingual, local-first personal life-management PWA for one person who wants tasks, planning, finances, notes, decisions, and personal reference material in one private operating space.
 
-Stages 74–85 add pull-request validation, Life Areas QA, derived Goals ↔ Life Areas navigation, release hardening for the combined track, optional Project → Goal and Task → Project links, complete Persian Life Areas localization, an updated in-app Help Center, a repository-native design system contract, shared select-control adoption, keyboard-safe shell dialogs, an evidence-first real-world usage protocol, and a measured initial-load hardening pass without changing AliOS's local-first default architecture.
+> Screenshot placeholder: add a real product screenshot here when one is ready.
 
-Stage 92 adds repository-backed recurring routines with explicit weekday schedules and opt-in Today suggestions. AliOS never creates Routine tasks in the background; each suggestion requires a user action, and duplicate same-day tasks are prevented transactionally.
+## Why AliOS
 
-Stage 93 adds derived Routine progress, safe Routine-to-Today filtering, and a Weekly Review summary based only on Tasks the user explicitly created from a Routine.
+AliOS is built around local ownership first:
 
-Stage 38 was a UI regression QA and release-hardening pass. It did not add a new feature; it kept the existing local-first scope intact and hardened desktop sidebar accessibility on long scrolling pages.
-Stage 39 moves dashboard customization into the topbar and adds a local-only accent color palette for restrained visual personalization.
-Stage 40 adds a local-first Finance module for income, expenses, installments, debts, and a simple monthly liquidity summary.
-Stage 41 adds a local Finance review layer with spending-by-category review, upcoming obligation pressure, obligation progress, and a neutral budget guard.
-Stage 42 adds a lightweight Finance chart foundation with dependency-free spending, cashflow, and obligation progress visuals.
-Stage 43 adds lightweight motion and interaction polish across the shell, premium cards, charts, and major pages using CSS-only transitions that respect reduced-motion preferences.
-Stage 44 adds Finance mobile UX and section navigation polish with collapsible sections, sticky quick navigation, Jalali due-date previews, and the accent palette moved into the profile popover.
-Stage 45 performs a safe performance audit and bundle optimization pass that keeps behavior unchanged while trimming a little avoidable work from the shared shell and Finance page.
-Stage 46 adds Home dashboard collapsible sections with local-only open/closed persistence separate from dashboard layout customization.
-Stage 47 adds a Settings Help Center with static bilingual guidance for first-time use, module roles, local-first storage, backup/restore, Home collapsible sections, and Finance basics.
-Stage 48 adds a Weekly Review foundation that summarizes the last 7 days of existing local data with deterministic observations and suggested focus rules.
-Stage 49 adds a Decision Log foundation that records local decisions, review dates, outcomes, and reflections with deterministic review-due awareness.
-Stage 50 adds backup and restore safety with validation before write, additive normalization for older backups, and clearer restore errors.
-Stage 51 adds an app error boundary and local error log foundation so a failed page can fall back calmly without sending telemetry or changing the data schema.
-Stage 53 hardens dense pages for mobile with improved wrapping, stacking, and readability on Finance, Weekly Review, Decision Log, Settings, and Home without changing data models, routes, or storage.
-Stage 54 improves empty states and first-run guidance across Home, Finance, Decisions, Weekly Review, Inbox, Projects, Journal, Knowledge, and Settings without changing routes, schemas, storage, or backup behavior.
-Stage 55 adds a local-only backup status foundation with calm reminder copy in Settings and an optional Home hint while keeping manual backup export and restore unchanged.
-Stage 56 adds a readable export center foundation for finance CSV, decision log Markdown, journal Markdown, and knowledge Markdown without changing backup behavior.
-Stage 57 adds a local-only Recovery Mode / Safe Mode foundation with a calm shell banner, a Settings recovery section, and an error-boundary recovery action without changing storage schemas or backup behavior.
-Stage 58 adds a derived-only Finance Monthly Plan foundation that summarizes current-month income, spending, obligations, remaining estimate, and daily remaining pace without changing storage, backup format, backup version, or route architecture.
-Stage 59 adds a Personal Manual foundation that stores user-authored local notes, summary counts, and review pressure without changing storage boundaries or backup compatibility.
-Stage 66 polishes Personal Manual for mobile widths and dense content with tighter wrapping and spacing without changing behavior, storage, or backup compatibility.
-Stage 67 hardens the Personal Manual track with importance-aware search coverage and a concise smoke-test checklist without changing behavior, storage, or backup compatibility.
-Stage 68 hardens the v1.50 release with a small app-version metadata fix, a release smoke-test checklist, and defensive QA coverage without changing behavior, storage, or backup compatibility.
-Stage 73 hardens the asynchronous storage bootstrap with a calm bilingual retry/reload fallback and bounded local error capture, without changing routes, storage schemas, backup compatibility, or dependencies.
-Stage 74 adds a least-privilege GitHub pull-request validation gate for TypeScript, automated tests, and the production build without changing application behavior or runtime dependencies.
-Stage 75 hardens Life Areas with focused deterministic helper tests and safer mobile wrapping at 360px, 390px, and 430px class widths without changing behavior, storage, backup compatibility, or dependencies.
-Stage 76 connects Goals and Life Areas with derived goal summaries and two-way area navigation using their existing shared key, without adding a stored relationship, migration, cascade, or backup change.
-Stage 77 release-hardens the Goals and Life Areas connection with bilingual card rendering tests, safer URL parameter handling, and narrow-screen wrapping without changing product behavior or storage.
-Stage 78 lets each Project optionally reference one Goal, relink or remove that reference, and open the linked Goal while preserving the Project if the Goal later becomes unavailable.
-Stage 79 activates the existing optional Task → Project relationship in Today so a task can be linked, relinked, unlinked, and navigated to its Project without cascade behavior.
-Stage 80 completes Persian Life Areas localization, safely re-localizes untouched canonical text persisted by earlier versions, and refreshes the bilingual Settings Help Center for the modules and links added after Stage 47.
-Stage 81 adds `DESIGN.md` as the canonical design contract for consistent human- and AI-assisted UI work, grounded in the existing AliOS tokens, shared components, bilingual directions, responsive targets, motion, and accessibility rules.
-Stage 82 adopts that contract for form controls by routing all 43 feature-level select controls through one shared, mobile-safe, focus-visible `Select` primitive while preserving existing form behavior.
-Stage 83 hardens the Topbar panels and mobile sidebar for predictable keyboard focus, Escape dismissal, and narrow-screen release checks while preserving the current design and local-only architecture.
-Stage 84 adds a manual, local-only real-world usage QA guide so future work is prioritized from observed daily workflows rather than speculative product scope.
-Stage 85 splits stable third-party build output into cacheable chunks and keeps form validation code out of the initial module-preload path; see [`docs/PERFORMANCE.md`](docs/PERFORMANCE.md).
-Stage 86 turns that measured boundary into a repeatable local and pull-request CI guard through `pnpm performance:check`.
+- Your browser-local data is the first readable and writable copy.
+- The app works without an account, authentication, backend, subscription, hosted AI service, or paid API.
+- It is deployable as static files; no production Node.js server is required.
+- Manual export, import, backup, and restore remain first-class safety mechanisms.
+- Optional account creation and Supabase-backed sync exist as additive capabilities only. They require explicit user action and must not replace local storage or silently upload, overwrite, hide, or delete local records.
 
-AliOS is still designed for one person first and keeps its local browser data in IndexedDB through Dexie. The application remains usable without an account, but the repository now also contains optional account and sync capabilities that can be enabled explicitly by the user. Those additive capabilities do not replace local ownership, do not make cloud usage mandatory, and do not turn AliOS into a subscription or hosted-AI product.
+The product is intentionally single-user by default. It is meant to be dependable for real daily use before growing into more advanced assistant-like capabilities.
 
-## Core features
+## Implemented Features
 
-- Home dashboard with Today, project, journal, and knowledge summaries
-- Monthly calendar view on Home with local task indicators and simple day previews
-- Routine templates section on Home with built-in local-only previews
-- Personal Manual for local user-authored principles, values, rules, preferences, boundaries, routines, lessons, and identity notes
-- Personal Manual starter templates for calm note scaffolding before saving a final entry
-- Goals templates for calm goal scaffolding before saving a final goal
-- Life Areas foundation for local user-authored areas with calm review awareness, search, and export support
-- Derived Goals ↔ Life Areas summaries and two-way area navigation with no additional persisted relationship
-- Release-hardened Goals and Life Areas cards, URLs, loading states, and mobile actions
-- Optional Project → Goal links with bilingual selection, safe unlinking, and non-cascading unavailable states
-- Optional Task → Project links in Today with bilingual selection, focused navigation, safe unlinking, and no schema change
-- Complete Persian Life Areas UI coverage plus an updated bilingual Help Center for current modules, data safety, recovery, exports, and planning links
-- Personal Manual track release hardening for search, review, export, backup, and mobile smoke-test coverage
-- Personal Manual mobile and dense-page polish for long titles, body previews, badges, and tag chips
-- Upcoming tasks foundation on Home with overdue, today, tomorrow, this week, and later groupings
-- Simple morning warm-up reminder on Home that appears only in a local time window
-- Wellness / Badminton routine card on Home with local-only warm-up, water, cool-down, and reflection checklists
-- Subtle visual motion polish across the shared UI with reduced-motion support
-- Premium Home dashboard visual upgrade with calmer hero composition and stronger card hierarchy
-- Premium Home showcase polish with denser summary surfaces, a more balanced calendar, and lighter visual alignment for core pages
-- Premium app shell with calmer sidebar, topbar, page background, and mobile drawer feel
-- Home dashboard customization with local show/hide and move up/down controls for existing sections, now accessible from a compact topbar popover
-- Home dashboard collapsible sections with local-only open/closed persistence separate from layout customization
-- Local accent color personalization with six restrained presets stored only on this device
-- Reusable premium metric, insight, status, empty-state, and soft-panel surfaces for Home
-- Compact Personal Insights on Home using only existing local task, project, inbox, journal, knowledge, and wellness checklist data
-- Local-first Finance foundation with income, expenses, installments, debts, a simple monthly liquidity summary, category review, a neutral budget guard, and lightweight charts
-- Finance mobile quick navigation, collapsible sections, and Jalali due-date previews while keeping ISO/Gregorian storage
-- Decision Log foundation with local decision entries, review dates, outcome fields, and deterministic review-due awareness
-- Local accent color personalization in the profile popover and compact dashboard layout controls in the topbar
-- Beginner-friendly Help Center inside Settings with static bilingual guidance for current modules, optional planning links, data safety, backup, exports, Recovery Mode, Home sections, and Finance usage
-- Readable export center inside Settings for finance CSV, decision log Markdown, journal Markdown, and knowledge Markdown
-- Recovery Mode / Safe Mode foundation in Settings and the app shell for calm access to backup, export, and local error review
-- Mobile-first Quick Capture Inbox with note, task, idea, link, and other item types
-- Process captured items into Today tasks, Journal entries, or Knowledge items while retaining Inbox history
-- Search captured content and combine status and type filters locally
-- Bulk triage selected Inbox items with select all visible, mark processed/unprocessed, and confirmed delete
-- Edit, delete, and processed/unprocessed Inbox status
-- Today tasks, statuses, Most Important Task selection, and daily check-in
-- Simple due/planned date input for future task planning using the existing task date field
-- Project create, list, edit, and delete
-- Journal create, list, edit, and delete
-- Global local search across Inbox, Today, Projects, Journal, Knowledge, and Personal Manual with focused links into the exact local record
-- Knowledge create, list, edit, delete, text search, and type filtering
-- Persian and English interface with automatic RTL/LTR direction
-- Gregorian and Persian/Jalali date display while storing ISO/Gregorian dates
-- Manual versioned JSON backup and restore with safety summary, preview, and explicit confirmation
-- Local data summary and confirmed clear-all operation
-- Automated data-layer, validation, backup, i18n, and date tests
-- Route-level code splitting for feature pages
-- Mobile-responsive layouts, Add to Home Screen readiness, and conservative static-shell offline reopening after an online visit
+Current implementation evidence is tracked in [PROJECT_STATE.md](PROJECT_STATE.md). At a high level, AliOS currently includes:
 
-## Architecture and technology
+- Unified Home dashboard with a Today workspace, daily briefing, Inbox and Weekly Review entry points, collapsed context shelves, backup reminders, and local dashboard customization.
+- Today tasks with statuses, Most Important Task selection, daily check-in, due/planned dates, optional task-to-project links, recurring task support, Focus Mode, time-blocking display, and bounded dense-list rendering.
+- Inbox quick capture with note/task/idea/link-style capture, search and filters, processing into Today tasks, Journal entries, or Knowledge items, bulk triage, snooze, batch processing, auto-categorization suggestions, and voice input through the browser Web Speech API when available.
+- Projects with CRUD, optional Project-to-Goal links, review timing, linked-task progress, milestones, and optional Kanban view.
+- Goals with CRUD, templates, Life Area integration, review awareness, linked-task/project progress, milestones, and optional lightweight key results.
+- Life Areas with local CRUD, canonical starter areas, derived Goal summaries, review awareness, Global Search support, and backup/export support.
+- Routines with repository-backed schedules, Today suggestions, duplicate same-day task protection, derived progress, streak display, and safe Routine-to-Today filtering.
+- Finance with local income, expenses, obligations, monthly liquidity summaries, neutral budget guard, lightweight charts, monthly plan, CSV import flow, mobile navigation, and disclosure-based dense sections.
+- Weekly Review with deterministic local summaries, planning dashboard, review queue, retrospective, suggested focus, and collapsed detail bands.
+- Decision Log with local decisions, review dates, outcomes, lessons, deterministic review-due awareness, and bounded dense-list rendering.
+- Journal, Knowledge, and Personal Manual modules with local CRUD, search/focus navigation, backup/export support, and density-aware presentation. Knowledge also supports local backlinks between items.
+- Global Search across implemented local content with type/date filters and focused links back into the source module.
+- Calendar month/week views derived from existing dated Tasks, direct navigation to Today by date, local recurrence handling, and local ICS export for active scheduled Tasks.
+- Settings for appearance, language, profile preferences, accent colors, optional account and sync controls, backup/restore, readable exports, Recovery Mode, Help Center, local error log, local AI readiness check, and advanced/developer details.
+- Persian and English UI with RTL/LTR support, Vazirmatn typography, light/dark/system/scheduled theme handling, accent-color personalization, and mobile-first shell navigation.
+- Manual versioned JSON backup/restore with validation, impact preview, additive compatibility for newer tables, readable exports, and local data safety summaries.
+- Route-level code splitting, measured performance checks, app error boundary, bounded local error log, service-worker shell caching for installed/offline reopening after an online visit, and CI-oriented validation scripts.
 
-AliOS is a static React application built with Vite and TypeScript. It uses Tailwind CSS and shadcn/ui-compatible components for the interface, React Router with hash routing, Zod and React Hook Form for validation and forms, and Dexie over IndexedDB for local persistence.
+AliOS does not include mandatory cloud usage, forced login, hosted AI, Firebase, telemetry, analytics, bank account integration, Gmail/Outlook inbox sync, Google Calendar sync, or a production backend requirement for local-only usage.
 
-Application features access persistence through Repository and Storage Adapter boundaries. UI code does not access Dexie directly. IndexedDB remains the primary local persistence layer and the first readable/writable copy of user data. Optional Supabase-backed authentication and sync may be enabled as additive capabilities, but they must preserve local-first safety, explicit sync opt-in, backup compatibility, and repository ownership.
+## Tech Stack
 
-Architecture references:
+- Vite
+- React
+- TypeScript
+- React Router
+- Tailwind CSS
+- shadcn/ui-compatible local primitives
+- Vazirmatn
+- Dexie over IndexedDB
+- Zod
+- React Hook Form
+- date-fns
+- Vitest
 
-- [Design system contract](DESIGN.md)
-- [Architecture](docs/ARCHITECTURE.md)
-- [Architecture decisions](docs/DECISIONS.md)
-- [Project state](PROJECT_STATE.md)
-- [Roadmap](docs/ROADMAP.md)
-- [Release checklist](docs/RELEASE_CHECKLIST.md)
-- [Release readiness pass](docs/RELEASE_READINESS.md)
-- [Mobile usage](docs/MOBILE_USAGE.md)
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the full architecture contract.
 
-## Requirements
+## Getting Started
 
-- A current Node.js release suitable for the declared Vite toolchain
+Requirements:
+
+- Node.js compatible with the Vite 5 and TypeScript toolchain declared in [package.json](package.json)
 - pnpm
-- A modern browser with IndexedDB, localStorage, and file download/upload support
-
-## Local development
+- A modern browser with IndexedDB and localStorage support
 
 Install dependencies:
 
@@ -134,28 +71,31 @@ Install dependencies:
 pnpm install
 ```
 
-Start the development server:
+Start the local development server:
 
 ```bash
 pnpm dev
 ```
 
-Run TypeScript validation and automated tests:
+Run the automated test suite:
 
 ```bash
-pnpm exec tsc --noEmit
 pnpm test:run
 ```
 
-## Production build and preview
+Run TypeScript validation:
 
-Build static production files:
+```bash
+pnpm exec tsc --noEmit
+```
+
+Build the static production app:
 
 ```bash
 pnpm build
 ```
 
-Preview the generated build locally:
+Preview the production build locally:
 
 ```bash
 pnpm preview
@@ -163,97 +103,73 @@ pnpm preview
 
 The production output is written to `dist/`.
 
-## GitHub Pages deployment
+## Architecture Summary
 
-AliOS is configured for the `alikhani98/alios` GitHub project site at:
+AliOS follows a feature-based architecture with strict boundaries:
+
+```text
+UI Layer
+↓
+Feature Layer
+↓
+Application / Use-case Layer
+↓
+Repository Layer
+↓
+Storage Adapter Layer
+↓
+Dexie / IndexedDB
+```
+
+Feature UI should not access Dexie directly. Data flows through repositories and storage adapters so the local persistence layer can evolve without pushing database concerns into pages or components.
+
+Optional account, authentication, and sync code is implemented as bounded adapter infrastructure. It must remain additive to the local-first model and must preserve explicit user consent, backup compatibility, and repository ownership.
+
+Architecture references:
+
+- [Architecture](docs/ARCHITECTURE.md)
+- [Architecture decisions](docs/DECISIONS.md)
+- [Design system contract](DESIGN.md)
+- [Project state](PROJECT_STATE.md)
+
+## Project Status and Roadmap
+
+AliOS is actively developed as a local-first personal system. The current repository includes many implemented v1 foundations plus approved optional account/sync capabilities. Future scope is intended to be driven by real usage evidence rather than speculative product expansion.
+
+Roadmap references:
+
+- [Roadmap](docs/ROADMAP.md)
+- [Project state](PROJECT_STATE.md)
+- [Release checklist](docs/RELEASE_CHECKLIST.md)
+
+## Deployment Notes
+
+AliOS is compatible with static hosting. The current GitHub Pages deployment target is:
 
 ```text
 https://alikhani98.github.io/alios/
 ```
 
-The production build uses `/alios/` as its Vite base path. Local development remains available at the development server root. The deployment workflow runs TypeScript validation, automated tests, and the production build before publishing `dist/`.
+The Vite production build uses `/alios/` as its base path. Hash routing keeps direct navigation compatible with static hosting.
 
-Pull requests targeting `main` run the same TypeScript, test, and production-build gates through the **Validate Pull Request** workflow. Reviewers should wait for that workflow to pass before merging. New commits pushed to the same pull request cancel superseded validation runs automatically.
+## Backup and Data Ownership
 
-To enable deployment:
+AliOS stores user records in the browser's IndexedDB for the current origin and browser profile. Clearing browser storage, switching browser profiles, or changing deployment origins can make local data unavailable.
 
-1. In the GitHub repository, open **Settings → Pages**.
-2. Under **Build and deployment**, select **GitHub Actions** as the source.
-3. Push the approved changes to `main` or manually run the **Deploy GitHub Pages** workflow.
-4. Wait for both workflow jobs to pass, then open the Pages URL above.
+Use Settings to export a versioned AliOS JSON backup and store it outside the browser profile. Restore validates the selected file and shows an impact preview before replacing local data. Manual backup and restore remain valid even when optional sync is configured.
 
-AliOS uses hash routing (`#/today`, `#/projects`, and similar routes), so direct navigation does not require server rewrite rules. A production build can also be uploaded to static hosting at a matching `/alios/` path. No production Node.js server is required.
+## Optional Account and Sync
 
-Deployment creates a public application URL. By default, records still stay local to each browser/device. When the optional account and sync capability is not configured or not enabled by the user, Backup Export and Backup Import remain the manual cross-device transfer path. When the optional account and sync capability is configured and explicitly enabled, the current repository supports additive Supabase-backed synchronization for the implemented data scope only. Local appearance and profile preferences continue to be local-first preferences, and only the explicitly synchronized preference subset participates in the opt-in sync flow.
+Supabase-backed Email authentication and synchronization are supported as optional capabilities. The app remains usable without them.
 
-## Backup and restore
+Sync currently requires:
 
-Open Settings to export all supported IndexedDB tables into one versioned AliOS JSON file. Exported filenames follow `alios-backup-YYYY-MM-DD-HH-mm.json`. Keep exported files somewhere outside the browser profile.
+1. Supabase configuration in the frontend environment.
+2. User sign-in.
+3. Explicit user activation of sync from the UI.
 
-Settings also shows a local data safety summary with table counts, total local records, and the last successful backup and restore times.
-It also shows a local-only backup status reminder with the last manual backup time and a calm freshness hint.
+See [docs/SYNC_SETUP.md](docs/SYNC_SETUP.md) for setup details.
 
-Restore validates the selected file before showing confirmation. The restore preview shows the backup version, export time, and record counts by table before you confirm replacement. Confirming restore replaces all supported local AliOS tables with the backup contents. Invalid JSON or an incompatible backup is rejected before stored data changes.
+## License
 
-Backups now include `inboxItems`. Valid older backups without this field remain compatible and restore with an empty Inbox. Stage 50 also keeps additive `financeTransactions`, `financeObligations`, and `decisionLogEntries` compatibility by restoring missing arrays as empty lists while still rejecting malformed records before any write.
-
-Clearing browser storage, using a different browser profile, changing the deployment origin, or losing the device can make local data unavailable. Export backups regularly. Backup, export, import, and restore remain valid user-controlled safety paths even when optional account and sync features are enabled.
-
-## Browser support
-
-AliOS targets current mobile and desktop releases of Chromium-based browsers, Firefox, and Safari that support IndexedDB and modern JavaScript modules. The release is manually checked at common phone widths as well as desktop width. Private-browsing storage policies and aggressive browser cleanup settings may reduce persistence guarantees.
-
-## Mobile use and home-screen installation
-
-Open the deployed AliOS URL in a mobile browser. Where the browser and platform support it, use **Add to Home Screen** or **Install app** to launch AliOS in a standalone window. The app uses a native Service Worker to cache its static shell and loaded same-origin assets after a normal online visit. User records remain only in IndexedDB; the first offline launch is not supported and updates are not forced mid-session.
-
-Data belongs first to the local browser, device, and deployed origin where it was created. Mobile and laptop data do not synchronize automatically unless the optional account and sync capability is configured and explicitly enabled by the user. Manual backup transfer remains a supported and trustworthy path. To move data between devices manually:
-
-1. Export a backup from Settings on the source device.
-2. Transfer the JSON file using a method you trust.
-3. Open Settings on the destination device and import the backup.
-4. Review the restore preview, including the backup version, export time, and table counts.
-5. Explicitly confirm replacement only after reading the warning that the restore is local-device specific.
-6. Verify Inbox, Today, Projects, Journal, Knowledge, and Settings after restore.
-
-See [Mobile usage](docs/MOBILE_USAGE.md) for platform guidance and safety notes.
-
-## Quick Capture Inbox
-
-Open Inbox to save a thought, task, idea, link, reminder, or note with minimal typing. Unprocessed items appear first; each item can be edited, deleted, marked processed/unprocessed, or converted into a Today task, Journal entry, or Knowledge item. Search matches captured content case-insensitively and combines with status and type filters. Inbox also supports bulk triage for selected visible items: select all visible, clear selection, mark selected processed/unprocessed, or delete selected items after confirmation. Successful conversion keeps the original Inbox item as history and marks it processed. Project conversion, bulk conversion, and more complex triage remain deferred.
-
-## v1.0 scope and limitations
-
-Version 1.0 remains intentionally single-user by default and local-first. It does not include:
-
-- Mandatory accounts, forced authentication, or mandatory cloud usage
-- Cloud or scheduled backup, encryption, compression, or attachments
-- Full routines and wellness engines
-- Routine templates are preview-only foundations and do not create recurring routines
-- Decision Log is a local-first foundation and does not decide for the user
-- Personal Manual templates are static starter structures only and do not create separate saved template records
-- AI features or hosted AI providers
-- Gmail or Outlook inbox synchronization, Google Calendar, ICS export, notifications, and analytics
-- UI automation or end-to-end browser tests
-- Advanced routines and wellness engines beyond the simple local checklist foundation
-- Local-only Home dashboard layout preferences with no drag-and-drop builder yet
-- Local-only Home dashboard collapse preferences separate from visibility and ordering
-- Derived-only Weekly Review summaries for the last 7 days with no stored review snapshots
-
-Dates remain stored as ISO/Gregorian strings; Jalali support is display-only. User-generated content is never automatically translated.
-The Home dashboard also includes a small local-only morning reminder that can be dismissed for the day or disabled in Settings, a routine templates section with built-in previews, a local Wellness / Badminton routine card with daily checklist state, and an upcoming tasks summary that helps separate overdue, today, tomorrow, this week, and later work.
-
-## Optional account and sync
-
-The current repository includes additive account and sync foundations beyond the original local-only release line.
-
-- AliOS remains local-first and usable without an account.
-- Account creation and sign-in are optional.
-- Sync activates only after explicit user action.
-- Supabase-backed auth and sync are additive adapters, not replacements for local repositories or local ownership.
-- The implemented sync scope is limited to the categories already evidenced in the repository and project state.
-- Email authentication means account sign-in with email credentials. It does not mean synchronizing a Gmail or Outlook inbox.
-
-## After v1.0
-
-AliOS should first be used with real personal data. Post-v1.0 priorities will be chosen from observed needs rather than hypothetical flexibility. Deferred roadmap items require separate approval and must preserve the local-first architecture.
+See [LICENSE](LICENSE).
