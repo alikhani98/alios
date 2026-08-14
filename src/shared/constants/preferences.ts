@@ -6,6 +6,7 @@ export const APPEARANCE_SCHEDULE_END_STORAGE_KEY =
 export const ACCENT_COLOR_STORAGE_KEY = "alios.preferences.accentColor";
 export const DISPLAY_NAME_STORAGE_KEY = "alios.displayName";
 export const PROFILE_AVATAR_STORAGE_KEY = "alios.profile.avatar";
+export const PROFILE_AVATAR_IMAGE_STORAGE_KEY = "alios.profile.avatar.image";
 export const RECOVERY_MODE_ENABLED_STORAGE_KEY =
   "alios.recoveryMode.enabled";
 export const MORNING_WARMUP_ENABLED_STORAGE_KEY =

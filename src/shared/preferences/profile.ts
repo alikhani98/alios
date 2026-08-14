@@ -7,10 +7,11 @@ export type ProfileAvatarPreference =
   | "herb"
   | "pomegranate"
   | "caspian"
-  | "paper";
+  | "paper"
+  | "photo";
 
 export const profileAvatarPreferences: ReadonlyArray<ProfileAvatarPreference> =
-  ["initials", "saffron", "herb", "pomegranate", "caspian", "paper"];
+  ["initials", "saffron", "herb", "pomegranate", "caspian", "paper", "photo"];
 
 export function normalizeDisplayName(value: string): string {
   return value.trim();

@@ -1,6 +1,7 @@
 import {
   Check,
   Clock3,
+  ImageIcon,
   LayoutDashboard,
   Languages,
   Menu,
@@ -9,10 +10,13 @@ import {
   Search,
   SunMedium,
   SunMoon,
+  Trash2,
+  Upload,
   UserCircle,
 } from "lucide-react";
 import {
   Suspense,
+  ChangeEvent,
   FormEvent,
   useEffect,
   useRef,
@@ -25,6 +29,7 @@ import {
   APPEARANCE_SCHEDULE_END_STORAGE_KEY,
   APPEARANCE_SCHEDULE_START_STORAGE_KEY,
   DISPLAY_NAME_STORAGE_KEY,
+  PROFILE_AVATAR_IMAGE_STORAGE_KEY,
   PROFILE_AVATAR_STORAGE_KEY,
 } from "@/shared/constants/preferences";
 import { appConfig } from "@/shared/constants/app";
@@ -32,6 +37,7 @@ import { usePersistentString } from "@/shared/hooks/usePersistentString";
 import { useI18n } from "@/shared/i18n";
 import { lazyWithRetry } from "@/shared/runtime/lazyWithRetry";
 import {
+  applyAccentColorThemeVariables,
   getAccentColorThemeVariables,
   useAccentColorPreference,
 } from "@/shared/preferences/accentColor";
@@ -136,6 +142,70 @@ const profileAvatarOptions: ReadonlyArray<{
   },
 ];
 
+const PROFILE_AVATAR_IMAGE_SIZE = 160;
+
+function isStoredProfileAvatarImage(value: string): boolean {
+  return value.startsWith("data:image/");
+}
+
+function resizeProfileAvatarImage(file: File): Promise<string> {
+  if (!file.type.startsWith("image/")) {
+    return Promise.reject(new Error("Unsupported avatar image type"));
+  }
+
+  return new Promise((resolve, reject) => {
+    const objectUrl = URL.createObjectURL(file);
+    const image = new window.Image();
+
+    image.onload = () => {
+      try {
+        const canvas = document.createElement("canvas");
+        canvas.width = PROFILE_AVATAR_IMAGE_SIZE;
+        canvas.height = PROFILE_AVATAR_IMAGE_SIZE;
+
+        const context = canvas.getContext("2d");
+        if (!context) {
+          throw new Error("Avatar canvas context unavailable");
+        }
+
+        const sourceSize = Math.min(image.naturalWidth, image.naturalHeight);
+        const sourceX = Math.max(0, (image.naturalWidth - sourceSize) / 2);
+        const sourceY = Math.max(0, (image.naturalHeight - sourceSize) / 2);
+
+        context.drawImage(
+          image,
+          sourceX,
+          sourceY,
+          sourceSize,
+          sourceSize,
+          0,
+          0,
+          PROFILE_AVATAR_IMAGE_SIZE,
+          PROFILE_AVATAR_IMAGE_SIZE
+        );
+
+        const webpDataUrl = canvas.toDataURL("image/webp", 0.78);
+        resolve(
+          webpDataUrl.startsWith("data:image/webp")
+            ? webpDataUrl
+            : canvas.toDataURL("image/jpeg", 0.82)
+        );
+      } catch (error) {
+        reject(error);
+      } finally {
+        URL.revokeObjectURL(objectUrl);
+      }
+    };
+
+    image.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      reject(new Error("Avatar image could not be loaded"));
+    };
+
+    image.src = objectUrl;
+  });
+}
+
 export function Topbar({
   title,
   onOpenMobileSidebar,
@@ -146,6 +216,7 @@ export function Topbar({
   const panelRef = useRef<HTMLDivElement>(null);
   const activePanelContentRef = useRef<HTMLDivElement>(null);
   const activePanelTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const avatarImageInputRef = useRef<HTMLInputElement>(null);
   const { value: appearancePreference, setValue: setAppearancePreference } =
     usePersistentString({
       key: APPEARANCE_STORAGE_KEY,
@@ -168,11 +239,20 @@ export function Topbar({
       key: PROFILE_AVATAR_STORAGE_KEY,
       defaultValue: "initials",
     });
+  const { value: profileAvatarImage, setValue: setProfileAvatarImage } =
+    usePersistentString({
+      key: PROFILE_AVATAR_IMAGE_STORAGE_KEY,
+      defaultValue: "",
+    });
   const { value: accentColorPreference, setValue: setAccentColorPreference } =
     useAccentColorPreference();
   const [activePanel, setActivePanel] = useState<ActivePanel>(null);
   const [draftDisplayName, setDraftDisplayName] = useState(displayName);
   const [savedMessage, setSavedMessage] = useState<string | null>(null);
+  const [avatarImageStatus, setAvatarImageStatus] = useState<
+    "idle" | "processing"
+  >("idle");
+  const [avatarImageError, setAvatarImageError] = useState<string | null>(null);
   const savedMessageTimer = useRef<number | null>(null);
   const currentAppearance = parseAppearancePreference(appearancePreference);
   const resolvedAppearance =
@@ -197,11 +277,16 @@ export function Topbar({
   const initials = getDisplayNameInitials(displayName);
   const profileAvatarPreference =
     normalizeProfileAvatarPreference(rawProfileAvatar);
+  const hasProfileAvatarPhoto =
+    profileAvatarPreference === "photo" &&
+    isStoredProfileAvatarImage(profileAvatarImage);
   const selectedProfileAvatar =
     profileAvatarOptions.find(
       (option) => option.value === profileAvatarPreference
     ) ?? profileAvatarOptions[0];
-  const profileAvatarLabel = t(selectedProfileAvatar.labelKey);
+  const profileAvatarLabel = hasProfileAvatarPhoto
+    ? t("settings.profileAvatarPhoto")
+    : t(selectedProfileAvatar.labelKey);
 
   useEffect(() => {
     if (!showDashboardControls && activePanel === "dashboard") {
@@ -305,12 +390,46 @@ export function Topbar({
   const handleSelectAccentColor = (
     value: (typeof accentColorOptions)[number]["value"]
   ) => {
+    applyAccentColorThemeVariables(value, resolvedAppearance === "dark");
     setAccentColorPreference(value);
     showSavedFeedback();
   };
 
   const handleSelectProfileAvatar = (value: ProfileAvatarPreference) => {
     setProfileAvatar(normalizeProfileAvatarPreference(value));
+    setAvatarImageError(null);
+    showSavedFeedback();
+  };
+
+  const handleProfileAvatarImageChange = async (
+    event: ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    setAvatarImageStatus("processing");
+    setAvatarImageError(null);
+
+    try {
+      const resizedImage = await resizeProfileAvatarImage(file);
+      setProfileAvatarImage(resizedImage);
+      setProfileAvatar("photo");
+      showSavedFeedback();
+    } catch {
+      setAvatarImageError(t("settings.profileAvatarPhotoError"));
+    } finally {
+      setAvatarImageStatus("idle");
+      event.target.value = "";
+    }
+  };
+
+  const handleRemoveProfileAvatarImage = () => {
+    setProfileAvatarImage("");
+    setProfileAvatar("initials");
+    setAvatarImageError(null);
     showSavedFeedback();
   };
 
@@ -427,7 +546,15 @@ export function Topbar({
           title={t("settings.localProfile")}
           onClick={(event) => handleOpenProfilePanel(event.currentTarget)}
         >
-          {selectedProfileAvatar.symbol ? (
+          {hasProfileAvatarPhoto ? (
+            <img
+              src={profileAvatarImage}
+              alt=""
+              className="h-7 w-7 rounded-full object-cover shadow-sm"
+              aria-hidden="true"
+              title={profileAvatarLabel}
+            />
+          ) : selectedProfileAvatar.symbol ? (
             <span
               className={cn(
                 "flex h-7 w-7 items-center justify-center rounded-full text-sm font-semibold shadow-sm",
@@ -548,16 +675,25 @@ export function Topbar({
               <div
                 className={cn(
                   "flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-base font-semibold shadow-sm",
-                  selectedProfileAvatar.className
+                  hasProfileAvatarPhoto ? "overflow-hidden bg-muted" : selectedProfileAvatar.className
                 )}
                 title={profileAvatarLabel}
               >
-                {selectedProfileAvatar.symbol ??
-                  (hasDisplayName ? initials : <UserCircle className="h-6 w-6" />)}
+                {hasProfileAvatarPhoto ? (
+                  <img
+                    src={profileAvatarImage}
+                    alt=""
+                    className="h-full w-full object-cover"
+                    aria-hidden="true"
+                  />
+                ) : (
+                  selectedProfileAvatar.symbol ??
+                  (hasDisplayName ? initials : <UserCircle className="h-6 w-6" />)
+                )}
               </div>
               <div className="min-w-0">
                 <p className="text-xs font-medium text-muted-foreground">
-                  {t("settings.editProfile")}
+                  {t("settings.localProfile")}
                 </p>
                 <p className="truncate text-sm font-semibold">
                   {hasDisplayName ? displayName : t("settings.localProfile")}
@@ -650,6 +786,63 @@ export function Topbar({
                     </Button>
                   );
                 })}
+              </div>
+
+              <div className="space-y-2 rounded-2xl border border-dashed border-border/70 bg-card/70 p-3">
+                <div className="flex items-start gap-2">
+                  <ImageIcon className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                  <div className="min-w-0 space-y-1">
+                    <p className="text-sm font-semibold">
+                      {t("settings.profileAvatarPhoto")}
+                    </p>
+                    <p className="text-xs leading-5 text-muted-foreground">
+                      {t("settings.profileAvatarPhotoDescription")}
+                    </p>
+                  </div>
+                </div>
+
+                <input
+                  ref={avatarImageInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="sr-only"
+                  onChange={handleProfileAvatarImageChange}
+                  aria-label={t("settings.profileAvatarPhotoUpload")}
+                />
+
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    type="button"
+                    variant={hasProfileAvatarPhoto ? "secondary" : "outline"}
+                    className="flex-1 justify-center gap-2"
+                    onClick={() => avatarImageInputRef.current?.click()}
+                    disabled={avatarImageStatus === "processing"}
+                    aria-pressed={hasProfileAvatarPhoto}
+                  >
+                    <Upload className="h-4 w-4 shrink-0" />
+                    {avatarImageStatus === "processing"
+                      ? t("settings.profileAvatarPhotoProcessing")
+                      : t("settings.profileAvatarPhotoUpload")}
+                  </Button>
+
+                  {isStoredProfileAvatarImage(profileAvatarImage) ? (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="flex-1 justify-center gap-2"
+                      onClick={handleRemoveProfileAvatarImage}
+                    >
+                      <Trash2 className="h-4 w-4 shrink-0" />
+                      {t("settings.profileAvatarPhotoRemove")}
+                    </Button>
+                  ) : null}
+                </div>
+
+                {avatarImageError ? (
+                  <p className="text-xs leading-5 text-destructive">
+                    {avatarImageError}
+                  </p>
+                ) : null}
               </div>
             </div>
 

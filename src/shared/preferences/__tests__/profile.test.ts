@@ -22,6 +22,7 @@ describe("profile helpers", () => {
   it("normalizes the local avatar preference", () => {
     expect(DEFAULT_PROFILE_AVATAR_PREFERENCE).toBe("initials");
     expect(normalizeProfileAvatarPreference("saffron")).toBe("saffron");
+    expect(normalizeProfileAvatarPreference("photo")).toBe("photo");
     expect(normalizeProfileAvatarPreference("unknown")).toBe("initials");
   });
 });
