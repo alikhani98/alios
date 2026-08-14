@@ -176,7 +176,7 @@ export function ClearStartCard({
           </div>
 
           <div className="grid gap-2">
-            <Button asChild className="alios-home-thread-item w-full bg-alios-caspian text-white hover:bg-alios-caspian/90 dark:bg-alios-paper dark:text-alios-night dark:hover:bg-alios-paper/90">
+            <Button asChild className="alios-home-thread-item w-full">
               <Link to={primaryActionHref}>
                 {primaryActionIcon}
                 {primaryActionLabel}
@@ -189,7 +189,7 @@ export function ClearStartCard({
                   {t("inbox.captureItem")}
                 </Link>
               </Button>
-              <Button asChild variant="ghost" className="alios-home-thread-anchor alios-home-thread-item w-full text-alios-caspian hover:bg-alios-saffron/10 dark:text-alios-paper">
+              <Button asChild variant="ghost" className="alios-home-thread-anchor alios-home-thread-item w-full text-primary hover:bg-primary/10">
                 <Link to="/weekly-review">
                   {t("weeklyReview.title")}
                   <ArrowUpLeft className="ms-2 h-4 w-4" aria-hidden="true" />

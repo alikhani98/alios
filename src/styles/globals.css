@@ -234,11 +234,11 @@
   }
 
   .alios-icon-primary {
-    @apply border border-alios-saffron/30 bg-alios-saffron/15 text-alios-caspian shadow-sm dark:text-alios-paper;
+    @apply border border-primary/30 bg-primary/10 text-primary shadow-sm;
   }
 
   .alios-status-primary {
-    @apply border-transparent bg-alios-caspian/10 text-alios-caspian dark:bg-alios-paper/10 dark:text-alios-paper;
+    @apply border-transparent bg-primary/10 text-primary;
   }
 
   .alios-status-success {

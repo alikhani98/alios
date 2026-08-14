@@ -133,7 +133,7 @@ export function CalendarPage() {
                 const isoDate = format(date, "yyyy-MM-dd");
                 const taskCount = groupedTasks[isoDate]?.length ?? 0;
                 return (
-                  <button key={isoDate} type="button" onClick={() => setSelectedDate(date)} aria-pressed={isoDate === selectedIsoDate} className={cn("flex min-h-28 flex-col justify-between rounded-xl border p-2 text-center transition hover:border-alios-saffron/60 hover:shadow-sm sm:min-h-40 sm:rounded-2xl sm:p-4", isoDate === selectedIsoDate && "border-alios-caspian bg-alios-saffron/10 dark:border-alios-paper", isoDate === todayIsoDate && "ring-1 ring-alios-saffron/35")}>
+                  <button key={isoDate} type="button" onClick={() => setSelectedDate(date)} aria-pressed={isoDate === selectedIsoDate} className={cn("flex min-h-28 flex-col justify-between rounded-xl border p-2 text-center transition hover:border-primary/60 hover:shadow-sm sm:min-h-40 sm:rounded-2xl sm:p-4", isoDate === selectedIsoDate && "border-primary bg-primary/10", isoDate === todayIsoDate && "ring-1 ring-primary/35")}>
                     <span className="text-[0.65rem] font-medium text-muted-foreground sm:text-sm">{weekLabels[index]}</span>
                     <span className="text-lg font-semibold tabular-nums sm:text-3xl">{formatDayNumber(date, { language, calendar: resolvedCalendar })}</span>
                     <Badge variant="secondary" className="mx-auto w-fit">{taskCount}</Badge>
@@ -150,7 +150,7 @@ export function CalendarPage() {
                 {monthCells.map((cell) => {
                   const secondaryLabel = resolvedCalendar === "jalali" ? formatDayNumber(cell.date, { language, calendar: "gregorian" }) : null;
                   return (
-                    <button key={cell.isoDate} type="button" onClick={() => setSelectedDate(cell.date)} aria-pressed={cell.isoDate === selectedIsoDate} className={cn("flex min-h-20 flex-col justify-between rounded-xl border p-2 text-start transition hover:border-alios-saffron/60 hover:shadow-sm sm:min-h-32 sm:rounded-2xl sm:p-3", cell.isCurrentMonth ? "bg-background" : "bg-muted/40 text-muted-foreground", cell.isoDate === selectedIsoDate && "border-alios-caspian bg-alios-saffron/10 dark:border-alios-paper", cell.isToday && "ring-1 ring-alios-saffron/35")}>
+                    <button key={cell.isoDate} type="button" onClick={() => setSelectedDate(cell.date)} aria-pressed={cell.isoDate === selectedIsoDate} className={cn("flex min-h-20 flex-col justify-between rounded-xl border p-2 text-start transition hover:border-primary/60 hover:shadow-sm sm:min-h-32 sm:rounded-2xl sm:p-3", cell.isCurrentMonth ? "bg-background" : "bg-muted/40 text-muted-foreground", cell.isoDate === selectedIsoDate && "border-primary bg-primary/10", cell.isToday && "ring-1 ring-primary/35")}>
                       <span className="text-sm font-semibold sm:text-lg">{formatDayNumber(cell.date, { language, calendar: resolvedCalendar })}</span>
                       {secondaryLabel ? <span className="text-[0.625rem] text-muted-foreground">{secondaryLabel}</span> : null}
                       {cell.taskCount > 0 ? <Badge variant="secondary" className="w-fit">{cell.taskCount}</Badge> : <span />}

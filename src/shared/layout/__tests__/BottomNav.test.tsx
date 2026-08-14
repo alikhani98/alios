@@ -51,7 +51,7 @@ describe("BottomNav", () => {
     ).toContain("min-h-11");
     expect(
       container.querySelector('a[href="/today"]')?.className
-    ).toContain("text-alios-caspian");
+    ).toContain("text-primary");
   });
 
   it("opens the existing mobile navigation drawer from the Menu tab", () => {
@@ -70,7 +70,7 @@ describe("BottomNav", () => {
     const menuButton = container.querySelector("button");
 
     expect(menuButton?.getAttribute("aria-expanded")).toBe("true");
-    expect(menuButton?.className).toContain("text-alios-caspian");
+    expect(menuButton?.className).toContain("text-primary");
 
     act(() => {
       menuButton?.click();

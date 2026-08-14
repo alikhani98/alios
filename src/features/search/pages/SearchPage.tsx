@@ -191,8 +191,8 @@ export function SearchPage() {
                       className={cn(
                         "min-h-11 rounded-full border px-3 py-2 text-sm font-medium transition-colors sm:min-h-10",
                         active
-                          ? "border-alios-caspian bg-alios-caspian text-white dark:border-alios-paper dark:bg-alios-paper dark:text-alios-night"
-                          : "border-border bg-background text-muted-foreground hover:border-alios-caspian/40 hover:text-foreground"
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground"
                       )}
                     >
                       {t(labelKey)}

@@ -91,7 +91,7 @@ export function SectionHeader({
           </p>
         ) : null}
         <div className="flex flex-wrap items-center gap-2">
-          {icon ? <span className="text-alios-caspian dark:text-alios-paper">{icon}</span> : null}
+          {icon ? <span className="text-primary">{icon}</span> : null}
           <h3 className="break-words text-xl font-semibold tracking-tight sm:text-[1.4rem]">
             {title}
           </h3>

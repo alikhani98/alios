@@ -60,7 +60,7 @@ export function BottomNav({ onOpenMenu, menuOpen = false }: BottomNavProps) {
                   aliosFocusRing,
                   aliosInteractiveMotion,
                   isActive
-                    ? "text-alios-caspian dark:text-alios-paper"
+                    ? "text-primary"
                     : "text-muted-foreground hover:bg-accent/70 hover:text-foreground"
                 )
               }
@@ -70,7 +70,7 @@ export function BottomNav({ onOpenMenu, menuOpen = false }: BottomNavProps) {
                   <span
                     className={cn(
                       "absolute top-1 h-1 w-6 rounded-full transition-colors duration-150",
-                      isActive ? "bg-alios-caspian dark:bg-alios-paper" : "bg-transparent"
+                      isActive ? "bg-primary" : "bg-transparent"
                     )}
                     aria-hidden="true"
                   />
@@ -89,7 +89,7 @@ export function BottomNav({ onOpenMenu, menuOpen = false }: BottomNavProps) {
             aliosFocusRing,
             aliosInteractiveMotion,
             menuOpen
-              ? "text-alios-caspian dark:text-alios-paper"
+              ? "text-primary"
               : "text-muted-foreground hover:bg-accent/70 hover:text-foreground"
           )}
           aria-label={t("shell.openMenu")}
@@ -99,7 +99,7 @@ export function BottomNav({ onOpenMenu, menuOpen = false }: BottomNavProps) {
           <span
             className={cn(
               "absolute top-1 h-1 w-6 rounded-full transition-colors duration-150",
-              menuOpen ? "bg-alios-caspian dark:bg-alios-paper" : "bg-transparent"
+              menuOpen ? "bg-primary" : "bg-transparent"
             )}
             aria-hidden="true"
           />
