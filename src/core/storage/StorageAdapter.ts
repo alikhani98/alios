@@ -3,6 +3,7 @@ import type {
   DecisionLogRepository,
   GoalsRepository,
   FinanceRepository,
+  FocusSessionsRepository,
   JournalRepository,
   LifeAreasRepository,
   ManualRepository,
@@ -26,6 +27,7 @@ export interface StorageAdapter {
   decisions: DecisionLogRepository;
   goals: GoalsRepository;
   finance: FinanceRepository;
+  focusSessions: FocusSessionsRepository;
   lifeAreas: LifeAreasRepository;
   manual: ManualRepository;
   projects: ProjectsRepository;

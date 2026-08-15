@@ -6,6 +6,7 @@ import type {
   Goal,
   FinanceObligation,
   FinanceTransaction,
+  FocusSession,
   JournalEntry,
   LifeArea,
   InboxItem,
@@ -29,6 +30,7 @@ import {
   DEXIE_SCHEMA_V8,
   DEXIE_SCHEMA_V9,
   DEXIE_SCHEMA_V10,
+  DEXIE_SCHEMA_V11,
   DEXIE_SCHEMA_VERSION,
   DEXIE_SCHEMA_VERSION_3,
   DEXIE_SCHEMA_VERSION_4,
@@ -38,6 +40,7 @@ import {
   DEXIE_SCHEMA_VERSION_8,
   DEXIE_SCHEMA_VERSION_9,
   DEXIE_SCHEMA_VERSION_10,
+  DEXIE_SCHEMA_VERSION_11,
 } from "./schema";
 
 export class AliosDatabase extends Dexie {
@@ -56,6 +59,7 @@ export class AliosDatabase extends Dexie {
   financeObligations!: Table<FinanceObligation, string>;
   routines!: Table<Routine, string>;
   weeklyPlans!: Table<WeeklyPlan, string>;
+  focusSessions!: Table<FocusSession, string>;
 
   constructor() {
     super(DEXIE_DATABASE_NAME);
@@ -69,6 +73,7 @@ export class AliosDatabase extends Dexie {
     this.version(DEXIE_SCHEMA_VERSION_8).stores(DEXIE_SCHEMA_V8);
     this.version(DEXIE_SCHEMA_VERSION_9).stores(DEXIE_SCHEMA_V9);
     this.version(DEXIE_SCHEMA_VERSION_10).stores(DEXIE_SCHEMA_V10);
+    this.version(DEXIE_SCHEMA_VERSION_11).stores(DEXIE_SCHEMA_V11);
   }
 }
 

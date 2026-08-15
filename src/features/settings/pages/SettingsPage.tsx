@@ -130,6 +130,7 @@ const backupTableLabelKeys = [
   "settings.manualEntriesCount",
   "settings.financeTransactionsCount",
   "settings.financeObligationsCount",
+  "settings.focusSessionsCount",
   "settings.projectsCount",
   "settings.journalCount",
   "settings.knowledgeCount",
@@ -262,6 +263,7 @@ function getTotalRecords(summary: {
   manualEntries: number;
   financeTransactions: number;
   financeObligations: number;
+  focusSessions: number;
   projects: number;
   journalEntries: number;
   knowledgeItems: number;
@@ -279,6 +281,7 @@ function getTotalRecords(summary: {
     summary.manualEntries +
     summary.financeTransactions +
     summary.financeObligations +
+    summary.focusSessions +
     summary.projects +
     summary.journalEntries +
     summary.knowledgeItems +
@@ -411,6 +414,7 @@ export function SettingsPage() {
         { label: t("settings.manualEntriesCount"), value: dataManagement.summary.manualEntries },
         { label: t("settings.financeTransactionsCount"), value: dataManagement.summary.financeTransactions },
         { label: t("settings.financeObligationsCount"), value: dataManagement.summary.financeObligations },
+        { label: t("settings.focusSessionsCount"), value: dataManagement.summary.focusSessions },
         { label: t("settings.journalCount"), value: dataManagement.summary.journalEntries },
         { label: t("settings.knowledgeCount"), value: dataManagement.summary.knowledgeItems },
         { label: t("settings.checkinsCount"), value: dataManagement.summary.dailyCheckins },

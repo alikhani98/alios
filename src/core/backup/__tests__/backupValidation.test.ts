@@ -7,6 +7,7 @@ import {
   goalRecord,
   financeObligationRecord,
   financeTransactionRecord,
+  focusSessionRecord,
   inboxItemRecord,
   journalEntryRecord,
   knowledgeItemRecord,
@@ -61,6 +62,7 @@ describe("backup validation and migration", () => {
     expect(migrated.data.manualEntries).toEqual([]);
     expect(migrated.data.financeTransactions).toEqual([]);
     expect(migrated.data.financeObligations).toEqual([]);
+    expect(migrated.data.focusSessions).toEqual([]);
     expect(migrated.data.inboxItems).toEqual([]);
     expect(migrated.data.tasks).not.toBe(payload.data.tasks);
   });
@@ -88,6 +90,7 @@ describe("backup validation and migration", () => {
     expect(backup.data.manualEntries).toEqual([]);
     expect(backup.data.financeTransactions).toEqual([]);
     expect(backup.data.financeObligations).toEqual([]);
+    expect(backup.data.focusSessions).toEqual([]);
     expect(backup.data.inboxItems).toEqual([]);
   });
 
@@ -216,6 +219,7 @@ describe("backup validation and migration", () => {
       manualEntries: [manualEntryRecord],
       financeTransactions: [financeTransactionRecord],
       financeObligations: [financeObligationRecord],
+      focusSessions: [focusSessionRecord],
       projects: [projectRecord],
       journalEntries: [journalEntryRecord],
       knowledgeItems: [knowledgeItemRecord],
@@ -235,5 +239,6 @@ describe("backup validation and migration", () => {
     expect(normalized.inboxItems).not.toBe(input.inboxItems);
     expect(normalized.routines).not.toBe(input.routines);
     expect(normalized.weeklyPlans).not.toBe(input.weeklyPlans);
+    expect(normalized.focusSessions).not.toBe(input.focusSessions);
   });
 });

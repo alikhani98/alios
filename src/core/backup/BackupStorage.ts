@@ -9,6 +9,7 @@ export type LocalDataSummary = {
   manualEntries: number;
   financeTransactions: number;
   financeObligations: number;
+  focusSessions: number;
   projects: number;
   journalEntries: number;
   knowledgeItems: number;

@@ -9,6 +9,7 @@ export const BACKUP_TABLE_KEYS = [
   "manualEntries",
   "financeTransactions",
   "financeObligations",
+  "focusSessions",
   "projects",
   "journalEntries",
   "knowledgeItems",

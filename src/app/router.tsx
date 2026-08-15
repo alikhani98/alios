@@ -20,6 +20,11 @@ const CalendarPage = lazyWithRetry(() =>
     default: module.CalendarPage,
   }))
 );
+const FocusPage = lazyWithRetry(() =>
+  import("@/features/focus/pages/FocusPage").then((module) => ({
+    default: module.FocusPage,
+  }))
+);
 const RoutinesPage = lazyWithRetry(() =>
   import("@/features/routines/pages/RoutinesPage").then((module) => ({ default: module.RoutinesPage }))
 );
@@ -110,6 +115,14 @@ const router = createHashRouter([
         element: (
           <Suspense fallback={<RouteLoadingFallback />}>
             <CalendarPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "focus",
+        element: (
+          <Suspense fallback={<RouteLoadingFallback />}>
+            <FocusPage />
           </Suspense>
         ),
       },

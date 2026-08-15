@@ -4,6 +4,7 @@ import type {
   CreateGoalInput,
   CreateFinanceObligationInput,
   CreateFinanceTransactionInput,
+  CreateFocusSessionInput,
   CreateJournalEntryInput,
   CreateInboxItemInput,
   CreateKnowledgeItemInput,
@@ -20,6 +21,7 @@ import type {
   Goal,
   FinanceObligation,
   FinanceTransaction,
+  FocusSession,
   JournalEntry,
   InboxItem,
   KnowledgeItem,
@@ -132,6 +134,15 @@ export const financeObligationInput: CreateFinanceObligationInput = {
   notes: "Monthly installment for the phone",
 };
 
+export const focusSessionInput: CreateFocusSessionInput = {
+  startedAt: "2026-07-05T08:30:00.000Z",
+  durationMinutes: 25,
+  mode: "pomodoro",
+  taskId: "fixture-id",
+  completedAt: "2026-07-05T08:55:00.000Z",
+  interrupted: false,
+};
+
 export const decisionLogInput: CreateDecisionLogEntryInput = {
   title: "Choose release focus",
   decisionDate: "2026-07-05",
@@ -226,6 +237,10 @@ export const financeTransactionRecord: FinanceTransaction = {
 export const financeObligationRecord: FinanceObligation = {
   ...financeObligationInput,
   ...metadata,
+};
+export const focusSessionRecord: FocusSession = {
+  ...focusSessionInput,
+  id: "fixture-id",
 };
 export const decisionLogRecord: DecisionLogEntry = {
   ...decisionLogInput,

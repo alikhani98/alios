@@ -7,6 +7,7 @@ export * from "./lifeAreasRepository";
 export * from "./decisionLogRepository";
 export * from "./goalsRepository";
 export * from "./financeRepository";
+export * from "./focusSessionsRepository";
 export * from "./projectsRepository";
 export * from "./settingsRepository";
 export * from "./tasksRepository";

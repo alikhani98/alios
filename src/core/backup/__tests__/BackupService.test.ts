@@ -9,6 +9,7 @@ import {
   goalInput,
   financeObligationInput,
   financeTransactionInput,
+  focusSessionInput,
   journalEntryInput,
   inboxItemInput,
   knowledgeItemInput,
@@ -65,6 +66,10 @@ describe("BackupService with DexieBackupStorage", () => {
     const inboxItem = await storage.inbox.create(inboxItemInput);
     const routine = await storage.routines.create(routineInput);
     const weeklyPlan = await storage.weeklyPlans.save({ ...weeklyPlanInput, goalId: goal.id, projectId: project.id, taskId: task.id });
+    const focusSession = await storage.focusSessions.create({
+      ...focusSessionInput,
+      taskId: task.id,
+    });
 
     const backup = await service.createBackup();
 
@@ -81,6 +86,7 @@ describe("BackupService with DexieBackupStorage", () => {
         "manualEntries",
         "financeTransactions",
         "financeObligations",
+        "focusSessions",
         "projects",
         "journalEntries",
         "knowledgeItems",
@@ -94,6 +100,7 @@ describe("BackupService with DexieBackupStorage", () => {
     expect(backup.data.tasks).toEqual([task]);
     expect(backup.data.routines).toEqual([routine]);
     expect(backup.data.weeklyPlans).toEqual([weeklyPlan]);
+    expect(backup.data.focusSessions).toEqual([focusSession]);
     expect(backup.data.goals).toEqual([goal]);
     expect(backup.data.projects[0]?.goalId).toBe(goal.id);
     expect(backup.data.tasks[0]?.projectId).toBe(project.id);
@@ -125,6 +132,7 @@ describe("BackupService with DexieBackupStorage", () => {
       manualEntries: 0,
       financeTransactions: 0,
       financeObligations: 0,
+      focusSessions: 0,
       projects: 0,
       journalEntries: 0,
       knowledgeItems: 0,
@@ -142,6 +150,7 @@ describe("BackupService with DexieBackupStorage", () => {
     expect(await storage.goals.getById(goal.id)).toEqual(goal);
     expect(await storage.routines.list()).toEqual([routine]);
     expect(await storage.weeklyPlans.getByWeekStart(weeklyPlan.weekStart)).toEqual(weeklyPlan);
+    expect(await storage.focusSessions.list()).toEqual([focusSession]);
     expect(await storage.finance.getTransactionById(financeTransaction.id)).toEqual(
       financeTransaction
     );
@@ -176,12 +185,14 @@ describe("BackupService with DexieBackupStorage", () => {
       manualEntries: _omittedManualEntries,
       financeTransactions: _omittedFinanceTransactions,
       financeObligations: _omittedFinanceObligations,
+      focusSessions: _omittedFocusSessions,
       ...oldData
     } = backup.data;
     const oldBackup = service.parseBackup(JSON.stringify({ ...backup, data: oldData }));
 
     expect(oldBackup.data.financeTransactions).toEqual([]);
     expect(oldBackup.data.financeObligations).toEqual([]);
+    expect(oldBackup.data.focusSessions).toEqual([]);
     expect(oldBackup.data.goals).toEqual([]);
     expect(oldBackup.data.decisionLogEntries).toEqual([]);
     expect(oldBackup.data.manualEntries).toEqual([]);

@@ -68,6 +68,7 @@ describe("backup preview", () => {
       { key: "manualEntries", count: 1 },
       { key: "financeTransactions", count: 1 },
       { key: "financeObligations", count: 1 },
+      { key: "focusSessions", count: 0 },
       { key: "projects", count: 1 },
       { key: "journalEntries", count: 1 },
       { key: "knowledgeItems", count: 1 },
@@ -86,7 +87,7 @@ describe("backup preview", () => {
     const impact = createBackupRestoreImpactPreview(backup, {
       dailyCheckins: 0, tasks: 4, goals: 0, lifeAreas: 0, decisionLogEntries: 0,
       manualEntries: 0, financeTransactions: 0, financeObligations: 0, projects: 0,
-      journalEntries: 0, knowledgeItems: 0, settings: 0, inboxItems: 0,
+      focusSessions: 0, journalEntries: 0, knowledgeItems: 0, settings: 0, inboxItems: 0,
       routines: 0, weeklyPlans: 2,
     });
 

@@ -12,6 +12,7 @@ import {
   Search,
   Settings,
   Target,
+  Timer,
   Wallet,
   X,
   type LucideIcon,
@@ -56,6 +57,7 @@ const commandIcons: Record<CommandIconName, LucideIcon> = {
   search: Search,
   settings: Settings,
   target: Target,
+  timer: Timer,
   wallet: Wallet,
 };
 

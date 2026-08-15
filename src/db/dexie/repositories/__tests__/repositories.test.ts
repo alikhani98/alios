@@ -7,6 +7,7 @@ import {
   decisionLogInput,
   financeObligationInput,
   financeTransactionInput,
+  focusSessionInput,
   journalEntryInput,
   inboxItemInput,
   knowledgeItemInput,
@@ -246,6 +247,27 @@ describe("Dexie repositories", () => {
     await storage.finance.deleteObligation(created.id);
     expect(await storage.finance.listObligations()).toEqual([]);
     expect(await storage.finance.getObligationById(created.id)).toBeUndefined();
+  });
+
+  it("saves a FocusSession with a linked task id", async () => {
+    const created = await storage.focusSessions.create(focusSessionInput);
+
+    expect(created.id).toMatch(/^[0-9a-f-]{36}$/i);
+    expect(created.taskId).toBe("fixture-id");
+    expect(created.mode).toBe("pomodoro");
+    expect(await storage.focusSessions.list()).toEqual([created]);
+  });
+
+  it("saves a FocusSession without a task id", async () => {
+    const created = await storage.focusSessions.create({
+      ...focusSessionInput,
+      taskId: undefined,
+      mode: "free",
+    });
+
+    expect(created.taskId).toBeUndefined();
+    expect(created.mode).toBe("free");
+    expect(await storage.focusSessions.list()).toEqual([created]);
   });
 
   it("supports the complete Decision Log CRUD lifecycle", async () => {

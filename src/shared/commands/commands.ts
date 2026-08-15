@@ -16,6 +16,7 @@ export type CommandIconName =
   | "search"
   | "settings"
   | "target"
+  | "timer"
   | "wallet";
 
 export type AppCommand = {
@@ -48,6 +49,13 @@ export const appCommands: AppCommand[] = [
     labelKey: "nav.calendar",
     href: "/calendar",
     icon: "calendar-range",
+  },
+  {
+    id: "nav-focus",
+    category: "navigation",
+    labelKey: "nav.focus",
+    href: "/focus",
+    icon: "timer",
   },
   {
     id: "nav-projects",
@@ -113,6 +121,14 @@ export const appCommands: AppCommand[] = [
     descriptionKey: "command.newTodayTaskDescription",
     href: "/today",
     icon: "plus",
+  },
+  {
+    id: "quick-focus-session",
+    category: "quickActions",
+    labelKey: "command.startFocusSession",
+    descriptionKey: "command.startFocusSessionDescription",
+    href: "/focus",
+    icon: "timer",
   },
   {
     id: "quick-journal-entry",

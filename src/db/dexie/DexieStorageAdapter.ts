@@ -7,6 +7,7 @@ import {
   DexieGoalsRepository,
   DexieLifeAreasRepository,
   DexieFinanceRepository,
+  DexieFocusSessionsRepository,
   DexieJournalRepository,
   DexieInboxRepository,
   DexieKnowledgeRepository,
@@ -28,6 +29,7 @@ export class DexieStorageAdapter implements StorageAdapter {
   readonly decisions: DexieDecisionLogRepository;
   readonly goals: DexieGoalsRepository;
   readonly finance: DexieFinanceRepository;
+  readonly focusSessions: DexieFocusSessionsRepository;
   readonly lifeAreas: DexieLifeAreasRepository;
   readonly manual: DexieManualRepository;
   readonly projects: DexieProjectsRepository;
@@ -45,6 +47,7 @@ export class DexieStorageAdapter implements StorageAdapter {
     this.decisions = new DexieDecisionLogRepository(database);
     this.goals = new DexieGoalsRepository(database);
     this.finance = new DexieFinanceRepository(database);
+    this.focusSessions = new DexieFocusSessionsRepository(database);
     this.lifeAreas = new DexieLifeAreasRepository(database);
     this.manual = new DexieManualRepository(database);
     this.projects = new DexieProjectsRepository(database);

@@ -13,11 +13,12 @@ import { I18nProvider, LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
 
 import { NavigationGroupList } from "../NavigationGroupList";
 
-const previousNavigationHrefs = [
+const expectedNavigationHrefs = [
   "/",
   "/search",
   "/today",
   "/calendar",
+  "/focus",
   "/routines",
   "/weekly-review",
   "/decisions",
@@ -52,13 +53,13 @@ describe("navigation groups", () => {
     localStorage.clear();
   });
 
-  it("keeps every previous navigation destination inside exactly one group", () => {
+  it("keeps every navigation destination inside exactly one group", () => {
     const groupedHrefs = navigationGroups.flatMap((group) =>
       group.items.map((item) => item.href)
     );
 
-    expect(new Set(groupedHrefs)).toEqual(new Set(previousNavigationHrefs));
-    expect(groupedHrefs).toHaveLength(previousNavigationHrefs.length);
+    expect(new Set(groupedHrefs)).toEqual(new Set(expectedNavigationHrefs));
+    expect(groupedHrefs).toHaveLength(expectedNavigationHrefs.length);
     expect(mainNavigation.map((item) => item.href)).toEqual(groupedHrefs);
   });
 
@@ -72,6 +73,7 @@ describe("navigation groups", () => {
       "/search",
     ]);
     expect(planReviewGroup?.items.map((item) => item.href)).toContain("/today");
+    expect(planReviewGroup?.items.map((item) => item.href)).toContain("/focus");
 
     act(() => {
       root.render(

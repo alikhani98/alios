@@ -9,6 +9,7 @@ export type NavIconName =
   | "search"
   | "calendar-check"
   | "calendar-range"
+  | "timer"
   | "repeat"
   | "git-branch"
   | "inbox"
@@ -77,6 +78,11 @@ export const navigationGroups: NavigationGroup[] = [
         titleKey: "nav.today",
         href: "/today",
         icon: "calendar-check",
+      },
+      {
+        titleKey: "nav.focus",
+        href: "/focus",
+        icon: "timer",
       },
       {
         titleKey: "nav.routines",

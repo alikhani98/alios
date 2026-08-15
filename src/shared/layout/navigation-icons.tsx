@@ -13,6 +13,7 @@ import {
   Search,
   Repeat2,
   Settings,
+  Timer,
   Wallet,
   type LucideIcon,
 } from "lucide-react";
@@ -24,6 +25,7 @@ export const navigationIcons: Record<NavIconName, LucideIcon> = {
   search: Search,
   "calendar-check": CalendarCheck,
   "calendar-range": CalendarRange,
+  timer: Timer,
   repeat: Repeat2,
   "git-branch": GitBranch,
   inbox: Inbox,

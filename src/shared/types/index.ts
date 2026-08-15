@@ -5,6 +5,7 @@ export * from "./knowledge";
 export * from "./manual";
 export * from "./life-area";
 export * from "./finance";
+export * from "./focus-session";
 export * from "./decision-log";
 export * from "./goal";
 export * from "./project";

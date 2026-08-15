@@ -54,12 +54,13 @@ export function useLocalDataManagement() {
         manualEntries: 0,
         financeTransactions: 0,
         financeObligations: 0,
+        focusSessions: 0,
         projects: 0,
         journalEntries: 0,
         knowledgeItems: 0,
         inboxItems: 0,
-      routines: 0,
-      weeklyPlans: 0,
+        routines: 0,
+        weeklyPlans: 0,
         settings: 0,
       });
       setSuccess(t("settings.clearSuccess"));

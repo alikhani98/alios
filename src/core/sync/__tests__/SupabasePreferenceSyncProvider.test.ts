@@ -290,6 +290,7 @@ function createBackupStorageStub(input?: {
     inboxItems: [],
     routines: input?.routines ?? [],
     weeklyPlans: [],
+    focusSessions: [],
   };
 
   const backupStorage: BackupStorage = {
@@ -306,6 +307,7 @@ function createBackupStorageStub(input?: {
       manualEntries: data.manualEntries.length,
       financeTransactions: data.financeTransactions.length,
       financeObligations: data.financeObligations.length,
+      focusSessions: data.focusSessions.length,
       projects: data.projects.length,
       journalEntries: data.journalEntries.length,
       knowledgeItems: data.knowledgeItems.length,
@@ -324,6 +326,7 @@ function createBackupStorageStub(input?: {
         manualEntries: [],
         financeTransactions: [],
         financeObligations: [],
+        focusSessions: [],
       };
     }),
   };

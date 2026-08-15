@@ -2,6 +2,7 @@ export * from "./DexieDailyCheckinsRepository";
 export * from "./DexieJournalRepository";
 export * from "./DexieInboxRepository";
 export * from "./DexieFinanceRepository";
+export * from "./DexieFocusSessionsRepository";
 export * from "./DexieDecisionLogRepository";
 export * from "./DexieGoalsRepository";
 export * from "./DexieLifeAreasRepository";

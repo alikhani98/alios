@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased - Focus / Deep Work Timer
+
+- Added a local `/focus` route with Pomodoro and free countdown modes, start/pause/reset controls, and a large countdown display.
+- Added optional linking to active Tasks due today while still allowing unlinked focus sessions.
+- Added `FocusSession` Zod schema, repository contract, Dexie repository/table, Storage Adapter wiring, backup/restore inclusion, and local-data summary support.
+- Added local Web Audio completion beep and permission-gated browser notification without adding Service Worker, push notification, backend, dependency, or external API behavior.
+- Added Focus navigation and Command Palette entry points.
+- Added regression coverage for Pomodoro phase transition, free timer completion, and FocusSession persistence with and without `taskId`.
+
 ## Unreleased - Weekly Review Check-in Timeline and Streak
 
 - Added a seven-day check-in timeline to Weekly Review's Wellness / Routines section while preserving the existing last-7-days review window.
