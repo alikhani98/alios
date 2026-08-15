@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased - Weekly Review Check-in Timeline and Streak
+
+- Added a seven-day check-in timeline to Weekly Review's Wellness / Routines section while preserving the existing last-7-days review window.
+- Added current check-in streak calculation that counts from today when checked in, or from yesterday when today is still pending.
+- Added localized short weekday labels and focused coverage for streak calculation, broken streaks, and seven rendered day-status cells.
+
 ## Unreleased - Universal Linking for Journal, Decisions, and Knowledge
 
 - Added optional Project and Goal links to Journal entries, Decision Log entries, and Knowledge items using existing local-first foreign-key fields.

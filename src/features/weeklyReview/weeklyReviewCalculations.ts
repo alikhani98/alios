@@ -147,6 +147,15 @@ export type WeeklyReviewWellnessSummary = {
   notesCountInWindow: number;
   averageMoodLevel: number | null;
   averageEnergyLevel: number | null;
+  checkinDays: WeeklyReviewCheckinDay[];
+  currentCheckinStreak: number;
+};
+
+export type WeeklyReviewCheckinDay = {
+  date: string;
+  weekdayIndex: number;
+  hasCheckin: boolean;
+  isToday: boolean;
 };
 
 export type WeeklyReviewSectionId =
@@ -297,6 +306,53 @@ export function getWeeklyReviewWindow(referenceDate = new Date()): WeeklyReviewW
     startDate: format(boundaries.start, "yyyy-MM-dd"),
     endDate: format(boundaries.end, "yyyy-MM-dd"),
   };
+}
+
+function getDateKey(value: Date): string {
+  return format(startOfDay(value), "yyyy-MM-dd");
+}
+
+export function getWeeklyReviewCheckinDays(
+  checkins: ReadonlyArray<DailyCheckin>,
+  referenceDate = new Date()
+): WeeklyReviewCheckinDay[] {
+  const boundaries = getWeeklyReviewBoundaries(referenceDate);
+  const checkinDateKeys = new Set(checkins.map((checkin) => checkin.date));
+  const todayKey = getDateKey(referenceDate);
+
+  return Array.from({ length: 7 }, (_, index) => {
+    const day = addDays(boundaries.start, index);
+    const date = getDateKey(day);
+
+    return {
+      date,
+      weekdayIndex: day.getDay(),
+      hasCheckin: checkinDateKeys.has(date),
+      isToday: date === todayKey,
+    };
+  });
+}
+
+export function getCurrentCheckinStreak(
+  checkins: ReadonlyArray<DailyCheckin>,
+  referenceDate = new Date()
+): number {
+  const checkinDateKeys = new Set(checkins.map((checkin) => checkin.date));
+  const todayKey = getDateKey(referenceDate);
+  let cursor = startOfDay(referenceDate);
+
+  if (!checkinDateKeys.has(todayKey)) {
+    cursor = subDays(cursor, 1);
+  }
+
+  let streak = 0;
+
+  while (checkinDateKeys.has(getDateKey(cursor))) {
+    streak += 1;
+    cursor = subDays(cursor, 1);
+  }
+
+  return streak;
 }
 
 function calculateAverageLevel(
@@ -798,6 +854,8 @@ export function buildWeeklyReviewSummary(
     ).length,
     averageMoodLevel: getMeanLevel(wellnessMoodValues),
     averageEnergyLevel: getMeanLevel(wellnessEnergyValues),
+    checkinDays: getWeeklyReviewCheckinDays(data.dailyCheckins, referenceDate),
+    currentCheckinStreak: getCurrentCheckinStreak(data.dailyCheckins, referenceDate),
   };
 
   const summary: WeeklyReviewSummary = {

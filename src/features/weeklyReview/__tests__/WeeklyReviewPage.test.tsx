@@ -166,6 +166,16 @@ function buildSummary(): WeeklyReviewSummary {
       notesCountInWindow: 1,
       averageMoodLevel: 4,
       averageEnergyLevel: 3,
+      checkinDays: [
+        { date: "2026-07-01", weekdayIndex: 3, hasCheckin: true, isToday: false },
+        { date: "2026-07-02", weekdayIndex: 4, hasCheckin: false, isToday: false },
+        { date: "2026-07-03", weekdayIndex: 5, hasCheckin: true, isToday: false },
+        { date: "2026-07-04", weekdayIndex: 6, hasCheckin: false, isToday: false },
+        { date: "2026-07-05", weekdayIndex: 0, hasCheckin: true, isToday: false },
+        { date: "2026-07-06", weekdayIndex: 1, hasCheckin: true, isToday: false },
+        { date: "2026-07-07", weekdayIndex: 2, hasCheckin: false, isToday: true },
+      ],
+      currentCheckinStreak: 2,
     },
     focusObservations: [
       {
@@ -262,5 +272,17 @@ describe("WeeklyReviewPage density bands", () => {
     expect(markup).toContain("Weekly signals");
     expect(countOccurrences(markup, "What this week says")).toBe(1);
     expect(countOccurrences(markup, "A helpful next focus could be reviewing due goals.")).toBe(1);
+  });
+
+  it("renders the seven-day check-in timeline with day statuses and current streak", () => {
+    const markup = renderWeeklyReviewPage();
+
+    expect(countOccurrences(markup, 'data-testid="weekly-checkin-day"')).toBe(7);
+    expect(markup).toContain("Check-in days");
+    expect(markup).toContain("Current streak");
+    expect(markup).toContain("2 day(s)");
+    expect(markup).toContain("Today is pending");
+    expect(markup).toContain("Check-in recorded");
+    expect(markup).toContain("No check-in");
   });
 });

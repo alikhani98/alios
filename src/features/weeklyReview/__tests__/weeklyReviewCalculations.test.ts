@@ -17,6 +17,8 @@ import type {
 
 import {
   buildWeeklyReviewSummary,
+  getCurrentCheckinStreak,
+  getWeeklyReviewCheckinDays,
   getWeeklyReviewManualDueEntries,
   getWeeklyReviewWindow,
 } from "../weeklyReviewCalculations";
@@ -324,6 +326,16 @@ describe("weekly review calculations", () => {
       notesCountInWindow: 0,
       averageMoodLevel: null,
       averageEnergyLevel: null,
+      checkinDays: [
+        { date: "2026-07-04", weekdayIndex: 6, hasCheckin: false, isToday: false },
+        { date: "2026-07-05", weekdayIndex: 0, hasCheckin: false, isToday: false },
+        { date: "2026-07-06", weekdayIndex: 1, hasCheckin: false, isToday: false },
+        { date: "2026-07-07", weekdayIndex: 2, hasCheckin: false, isToday: false },
+        { date: "2026-07-08", weekdayIndex: 3, hasCheckin: false, isToday: false },
+        { date: "2026-07-09", weekdayIndex: 4, hasCheckin: false, isToday: false },
+        { date: "2026-07-10", weekdayIndex: 5, hasCheckin: false, isToday: true },
+      ],
+      currentCheckinStreak: 0,
     });
     expect(summary.focusObservations).toEqual([
       { kind: "noData", tone: "awareness" },
@@ -640,6 +652,64 @@ describe("weekly review calculations", () => {
     ]);
     expect(first.suggestedFocus).toEqual([
       { kind: "processInbox", tone: "next-focus" },
+    ]);
+  });
+
+  it("calculates a current check-in streak across three consecutive days", () => {
+    const referenceDate = new Date(2026, 6, 10);
+    const streak = getCurrentCheckinStreak(
+      [
+        createCheckin("day-1", { date: "2026-07-08" }),
+        createCheckin("day-2", { date: "2026-07-09" }),
+        createCheckin("day-3", { date: "2026-07-10" }),
+        createCheckin("older", { date: "2026-07-04" }),
+      ],
+      referenceDate
+    );
+
+    expect(streak).toBe(3);
+  });
+
+  it("calculates a broken check-in streak from the latest available day", () => {
+    const referenceDate = new Date(2026, 6, 10);
+    const todayPendingStreak = getCurrentCheckinStreak(
+      [
+        createCheckin("yesterday", { date: "2026-07-09" }),
+        createCheckin("gap-before", { date: "2026-07-07" }),
+      ],
+      referenceDate
+    );
+    const todayDoneButBrokenStreak = getCurrentCheckinStreak(
+      [
+        createCheckin("today", { date: "2026-07-10" }),
+        createCheckin("gap-before", { date: "2026-07-08" }),
+      ],
+      referenceDate
+    );
+
+    expect(todayPendingStreak).toBe(1);
+    expect(todayDoneButBrokenStreak).toBe(1);
+  });
+
+  it("builds seven check-in day statuses for the review window", () => {
+    const days = getWeeklyReviewCheckinDays(
+      [
+        createCheckin("start", { date: "2026-07-04" }),
+        createCheckin("middle", { date: "2026-07-07" }),
+        createCheckin("today", { date: "2026-07-10" }),
+        createCheckin("outside", { date: "2026-07-03" }),
+      ],
+      new Date(2026, 6, 10)
+    );
+
+    expect(days).toEqual([
+      { date: "2026-07-04", weekdayIndex: 6, hasCheckin: true, isToday: false },
+      { date: "2026-07-05", weekdayIndex: 0, hasCheckin: false, isToday: false },
+      { date: "2026-07-06", weekdayIndex: 1, hasCheckin: false, isToday: false },
+      { date: "2026-07-07", weekdayIndex: 2, hasCheckin: true, isToday: false },
+      { date: "2026-07-08", weekdayIndex: 3, hasCheckin: false, isToday: false },
+      { date: "2026-07-09", weekdayIndex: 4, hasCheckin: false, isToday: false },
+      { date: "2026-07-10", weekdayIndex: 5, hasCheckin: true, isToday: true },
     ]);
   });
 

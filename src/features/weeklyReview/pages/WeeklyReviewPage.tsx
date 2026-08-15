@@ -2,6 +2,7 @@ import {
   ArrowUpRight,
   BookText,
   Brain,
+  Circle,
   CircleAlert,
   CircleCheckBig,
   CalendarDays,
@@ -10,6 +11,7 @@ import {
   Compass,
   GitBranch,
   FolderKanban,
+  Flame,
   Inbox,
   NotebookPen,
   RefreshCcw,
@@ -193,6 +195,26 @@ function hasEmptyState(
   sectionId: string
 ) {
   return emptyStates.some((item) => item.sectionId === sectionId);
+}
+
+function getWeekdayShortKey(weekdayIndex: number): TranslationKey {
+  switch (weekdayIndex) {
+    case 0:
+      return "weeklyReview.weekdayShortSunday";
+    case 1:
+      return "weeklyReview.weekdayShortMonday";
+    case 2:
+      return "weeklyReview.weekdayShortTuesday";
+    case 3:
+      return "weeklyReview.weekdayShortWednesday";
+    case 4:
+      return "weeklyReview.weekdayShortThursday";
+    case 5:
+      return "weeklyReview.weekdayShortFriday";
+    case 6:
+    default:
+      return "weeklyReview.weekdayShortSaturday";
+  }
 }
 
 function getManualReviewContext(
@@ -1647,6 +1669,68 @@ export function WeeklyReviewPage() {
                 <SoftPanel className="alios-surface-muted">
                   <p className="text-xs text-muted-foreground">{t("weeklyReview.averageEnergy")}</p>
                   <p className="mt-1 text-lg font-semibold tabular-nums">{formatAverage(summary.wellnessSummary.averageEnergyLevel)}</p>
+                </SoftPanel>
+              </div>
+              <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_14rem]">
+                <SoftPanel className="alios-surface-muted space-y-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <p className="text-sm font-semibold">
+                      {t("weeklyReview.checkinTimeline")}
+                    </p>
+                    <StatusChip tone="neutral">
+                      {t("weeklyReview.last7Days")}
+                    </StatusChip>
+                  </div>
+                  <div className="grid grid-cols-7 gap-2" aria-label={t("weeklyReview.checkinTimeline")}>
+                    {summary.wellnessSummary.checkinDays.map((day) => {
+                      const dayLabel = t(getWeekdayShortKey(day.weekdayIndex));
+                      const statusLabel = day.hasCheckin
+                        ? t("weeklyReview.checkinDone")
+                        : day.isToday
+                          ? t("weeklyReview.checkinPendingToday")
+                          : t("weeklyReview.checkinMissing");
+
+                      return (
+                        <div
+                          key={day.date}
+                          data-testid="weekly-checkin-day"
+                          className={[
+                            "flex min-h-20 flex-col items-center justify-center gap-2 rounded-surface border px-2 py-3 text-center",
+                            day.hasCheckin
+                              ? "border-success/25 bg-success/10 text-success"
+                              : day.isToday
+                                ? "border-primary/30 bg-primary/5 text-primary"
+                                : "border-border bg-background text-muted-foreground",
+                          ].join(" ")}
+                          title={`${dayLabel} · ${statusLabel}`}
+                        >
+                          {day.hasCheckin ? (
+                            <CircleCheckBig className="h-5 w-5" aria-hidden="true" />
+                          ) : day.isToday ? (
+                            <Clock3 className="h-5 w-5" aria-hidden="true" />
+                          ) : (
+                            <Circle className="h-5 w-5" aria-hidden="true" />
+                          )}
+                          <span className="text-xs font-semibold">{dayLabel}</span>
+                          <span className="sr-only">{statusLabel}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </SoftPanel>
+                <SoftPanel className="alios-surface-muted gap-3">
+                  <div className="flex items-center gap-2 text-primary">
+                    <Flame className="h-5 w-5" aria-hidden="true" />
+                    <p className="text-sm font-semibold">{t("weeklyReview.currentCheckinStreak")}</p>
+                  </div>
+                  <p className="text-2xl font-semibold tabular-nums">
+                    {t("weeklyReview.checkinStreakDays", {
+                      count: summary.wellnessSummary.currentCheckinStreak,
+                    })}
+                  </p>
+                  <p className="text-xs leading-6 text-muted-foreground">
+                    {t("weeklyReview.checkinStreakDescription")}
+                  </p>
                 </SoftPanel>
               </div>
               <SoftPanel className="space-y-2 alios-surface-muted">
