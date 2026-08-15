@@ -8,6 +8,16 @@ import { I18nProvider, LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
 
 import { CommandPalette } from "../CommandPalette";
 
+function typeIntoInput(input: HTMLInputElement, value: string) {
+  const valueSetter = Object.getOwnPropertyDescriptor(
+    HTMLInputElement.prototype,
+    "value"
+  )?.set;
+
+  valueSetter?.call(input, value);
+  input.dispatchEvent(new Event("input", { bubbles: true }));
+}
+
 function Harness() {
   const [open, setOpen] = useState(false);
 
@@ -65,7 +75,7 @@ describe("CommandPalette", () => {
     expect(container.textContent).toContain("Command Palette");
   });
 
-  it("filters commands by typed label", () => {
+  it("filters commands by typed label", async () => {
     act(() => {
       root.render(
         <MemoryRouter>
@@ -81,9 +91,8 @@ describe("CommandPalette", () => {
     );
     expect(input).not.toBeNull();
 
-    act(() => {
-      input!.value = "finance";
-      input!.dispatchEvent(new Event("input", { bubbles: true }));
+    await act(async () => {
+      typeIntoInput(input!, "finance");
     });
 
     expect(container.textContent).toContain("Finance");
