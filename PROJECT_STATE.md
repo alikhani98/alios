@@ -22,6 +22,22 @@ As of the merged Stage 256 implementation, optional Email authentication and Sup
 
 The older absolute "No Supabase / No Authentication / No Backend" language remains valid as historical context for earlier stages, but it is superseded as a current hard prohibition by the approved optional account and sync direction.
 
+## Current Local Hardening - Projects and Goals Storage Error States
+
+- Projects and Goals now keep linked Task repository read failures separate from empty-state rendering.
+- Projects shows a localized retryable warning when linked task progress cannot be loaded while preserving the visible project list and all project CRUD behavior.
+- Goals shows a localized retryable warning when linked project/task progress cannot be loaded while preserving the visible goal list and all goal CRUD behavior.
+- Focused regression coverage verifies that these storage read failures render error UI instead of silently presenting empty project or goal states.
+- This hardening changes no repository contract, storage adapter, Dexie schema, backup format, sync behavior, calculations, filters, or route behavior.
+
+## Current Shell Navigation - Command Palette Foundation
+
+- AliOS now includes a global Command Palette opened with Ctrl+K / Cmd+K or the Topbar search control.
+- The palette provides local navigation commands for the primary app destinations and quick-action entry points for Inbox capture, Today tasks, Journal, Knowledge, and manual backup tools.
+- Quick actions navigate to existing feature entry points only; they do not create records, bypass feature forms, call repositories, or change storage behavior.
+- Focused regression coverage verifies keyboard opening, label filtering, and Escape dismissal.
+- This shell addition changes no route definitions, repository contract, storage adapter, Dexie schema, backup format, sync behavior, or user-data model.
+
 ## Stage 255 Project Memory & Documentation Alignment
 
 - Stage 255 aligns the repository's long-lived documentation with the actual post-Stage-254 architecture and implementation evidence.

@@ -10,7 +10,7 @@ import {
   Target,
   X,
 } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
 import type { CreateGoalInput } from "@/core/repositories";
@@ -209,9 +209,15 @@ export function GoalsPage() {
     markGoalCompleted,
     reactivateGoal,
   } = useGoals();
-  const { projects, isLoading: isProjectsLoading } = useProjects();
+  const {
+    projects,
+    isLoading: isProjectsLoading,
+    error: projectsError,
+    loadProjects,
+  } = useProjects();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isTasksLoading, setIsTasksLoading] = useState(true);
+  const [taskLoadError, setTaskLoadError] = useState<string | null>(null);
   const [formOpen, setFormOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<Goal | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -242,15 +248,26 @@ export function GoalsPage() {
 
   const summary = useMemo(() => getGoalsSummary(entries), [entries]);
   const isProjectProgressLoading = isProjectsLoading || isTasksLoading;
+  const linkedWorkLoadError =
+    taskLoadError ?? (projectsError ? t("goals.linkedWorkLoadError") : null);
+
+  const loadLinkedTasks = useCallback(async () => {
+    setIsTasksLoading(true);
+    setTaskLoadError(null);
+
+    try {
+      setTasks(await tasksRepository.list());
+    } catch {
+      setTasks([]);
+      setTaskLoadError(t("goals.linkedWorkLoadError"));
+    } finally {
+      setIsTasksLoading(false);
+    }
+  }, [tasksRepository, t]);
 
   useEffect(() => {
-    setIsTasksLoading(true);
-    void tasksRepository
-      .list()
-      .then(setTasks)
-      .catch(() => setTasks([]))
-      .finally(() => setIsTasksLoading(false));
-  }, [tasksRepository]);
+    void loadLinkedTasks();
+  }, [loadLinkedTasks]);
 
   const templateCards = useMemo(
     () =>
@@ -653,6 +670,33 @@ export function GoalsPage() {
               {t("common.tryAgain")}
             </Button>
           ) : null}
+        </div>
+      ) : null}
+      {linkedWorkLoadError ? (
+        <div
+          role="alert"
+          className="alios-surface-muted flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div className="flex items-start gap-2 text-sm text-muted-foreground">
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+            <span className="min-w-0 break-words">{linkedWorkLoadError}</span>
+          </div>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => {
+              if (taskLoadError) {
+                void loadLinkedTasks();
+              }
+              if (projectsError) {
+                void loadProjects();
+              }
+            }}
+          >
+            <RotateCcw className="me-2 h-4 w-4" />
+            {t("common.tryAgain")}
+          </Button>
         </div>
       ) : null}
 

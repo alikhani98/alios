@@ -1,3 +1,6 @@
+// @vitest-environment jsdom
+import { act } from "react";
+import { createRoot, type Root } from "react-dom/client";
 import { renderToStaticMarkup } from "react-dom/server";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -7,12 +10,16 @@ import { I18nProvider, LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
 import { goalRecord, projectRecord, taskRecord } from "@/test/factories";
 import { ProjectKanbanBoard, groupProjectsByStatus } from "../components/ProjectKanbanBoard";
 
-vi.mock("@/core/storage", () => ({
-  useStorageAdapter: () => ({
+const taskRepositoryMock = vi.hoisted(() => ({
+  storage: {
     tasks: {
-      list: async () => [taskRecord],
+      list: vi.fn(),
     },
-  }),
+  },
+}));
+
+vi.mock("@/core/storage", () => ({
+  useStorageAdapter: () => taskRepositoryMock.storage,
 }));
 
 vi.mock("../hooks/useProjects", () => ({
@@ -56,10 +63,40 @@ function renderPage(): string {
   );
 }
 
+async function renderPageClient(): Promise<{
+  container: HTMLDivElement;
+  root: Root;
+}> {
+  const container = document.createElement("div");
+  const root = createRoot(container);
+  document.body.appendChild(container);
+
+  await act(async () => {
+    root.render(
+      <MemoryRouter initialEntries={["/projects"]}>
+        <I18nProvider>
+          <DateDisplayProvider>
+            <ProjectsPage />
+          </DateDisplayProvider>
+        </I18nProvider>
+      </MemoryRouter>
+    );
+  });
+
+  await act(async () => {
+    await Promise.resolve();
+    await Promise.resolve();
+  });
+
+  return { container, root };
+}
+
 describe("ProjectsPage density", () => {
   beforeEach(() => {
     localStorage.clear();
     localStorage.setItem(LANGUAGE_STORAGE_KEY, "en");
+    taskRepositoryMock.storage.tasks.list.mockReset();
+    taskRepositoryMock.storage.tasks.list.mockResolvedValue([taskRecord]);
   });
 
   it("keeps the primary project action direct while project forms and details stay collapsed by default", () => {
@@ -114,5 +151,25 @@ describe("ProjectsPage density", () => {
     expect(markup).toContain("Later project");
     expect(markup).toContain("Completed project");
     expect(markup).toContain("Archived project");
+  });
+
+  it("shows linked task load failures separately from the empty project state", async () => {
+    taskRepositoryMock.storage.tasks.list.mockRejectedValueOnce(new Error("Task storage failed."));
+
+    const { container, root } = await renderPageClient();
+
+    try {
+      expect(container.textContent).toContain("Project density review");
+      expect(container.textContent).toContain(
+        "Linked task progress could not be loaded. Your projects are still available."
+      );
+      expect(container.textContent).toContain("Try again");
+      expect(container.textContent).not.toContain("No projects yet");
+    } finally {
+      await act(async () => {
+        root.unmount();
+      });
+      container.remove();
+    }
   });
 });

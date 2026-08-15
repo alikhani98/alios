@@ -1,5 +1,5 @@
 import { AlertCircle, FolderKanban, KanbanSquare, List, Plus, RotateCcw } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 
 import type { CreateProjectInput } from "@/core/repositories";
@@ -86,6 +86,7 @@ export function ProjectsPage() {
   const [focusMessage, setFocusMessage] = useState<string | null>(null);
   const [showAllProjects, setShowAllProjects] = useState(false);
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [taskLoadError, setTaskLoadError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"list" | "kanban">("list");
   const [draggedProjectId, setDraggedProjectId] = useState<string | null>(null);
   const projectRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -101,9 +102,20 @@ export function ProjectsPage() {
     ? visibleProjects
     : visibleProjects.slice(0, projectPreviewLimit);
   const hiddenProjectCount = Math.max(visibleProjects.length - displayedProjects.length, 0);
+  const loadLinkedTasks = useCallback(async () => {
+    setTaskLoadError(null);
+
+    try {
+      setTasks(await tasksRepository.list());
+    } catch {
+      setTasks([]);
+      setTaskLoadError(t("projects.taskProgressLoadError"));
+    }
+  }, [tasksRepository, t]);
+
   useEffect(() => {
-    void tasksRepository.list().then(setTasks).catch(() => setTasks([]));
-  }, [tasksRepository]);
+    void loadLinkedTasks();
+  }, [loadLinkedTasks]);
 
   const openCreateForm = () => {
     setEditingProject(undefined);
@@ -334,6 +346,26 @@ export function ProjectsPage() {
             size="sm"
             variant="outline"
             onClick={() => void loadGoals()}
+          >
+            <RotateCcw className="me-2 h-4 w-4" />
+            {t("common.tryAgain")}
+          </Button>
+        </div>
+      ) : null}
+      {taskLoadError ? (
+        <div
+          role="alert"
+          className="flex flex-col gap-3 rounded-xl border border-border/70 bg-muted/30 p-4 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div className="flex items-start gap-2 text-sm text-muted-foreground">
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+            <span className="min-w-0 break-words">{taskLoadError}</span>
+          </div>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => void loadLinkedTasks()}
           >
             <RotateCcw className="me-2 h-4 w-4" />
             {t("common.tryAgain")}

@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased - Command Palette Foundation
+
+- Added a global Command Palette opened with Ctrl+K / Cmd+K or the Topbar search control.
+- Added local navigation commands plus quick-action entry points for Inbox capture, Today tasks, Journal, Knowledge, and manual backup tools without creating records or changing repository behavior.
+- Added focused Command Palette coverage for keyboard opening, label filtering, and Escape dismissal.
+
+## Unreleased - Projects and Goals Storage Error State Hardening
+
+- Added distinct linked-task/linked-work load error states to Projects and Goals so a failed Task repository read no longer appears as an empty linked-progress surface.
+- Added localized retry UI for the affected derived-data reads while preserving the existing project and goal records, CRUD behavior, filters, density disclosures, and repository/storage boundaries.
+- Added focused regression coverage for Projects and Goals to verify storage read failures render an error state instead of the empty state.
+
 ## Stage 255 - Project Memory & Documentation Alignment
 
 - Added `AI_CONTEXT.md` as a compact repository-native recovery guide for new Codex sessions so project reality no longer depends on prior chat history

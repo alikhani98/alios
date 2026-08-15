@@ -22,7 +22,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import {
   APPEARANCE_STORAGE_KEY,
@@ -76,6 +76,7 @@ const appearanceOptions = [
 type TopbarProps = {
   title: string;
   onOpenMobileSidebar: () => void;
+  onOpenCommandPalette: () => void;
   showDashboardControls?: boolean;
 };
 
@@ -209,10 +210,10 @@ function resizeProfileAvatarImage(file: File): Promise<string> {
 export function Topbar({
   title,
   onOpenMobileSidebar,
+  onOpenCommandPalette,
   showDashboardControls = false,
 }: TopbarProps) {
   const { direction, language, setLanguage, t } = useI18n();
-  const navigate = useNavigate();
   const panelRef = useRef<HTMLDivElement>(null);
   const activePanelContentRef = useRef<HTMLDivElement>(null);
   const activePanelTriggerRef = useRef<HTMLButtonElement | null>(null);
@@ -478,13 +479,27 @@ export function Topbar({
           type="button"
           variant="outline"
           className="h-10 w-full justify-start gap-2 rounded-2xl border-border/70 bg-card/80 text-muted-foreground shadow-sm"
-          onClick={() => navigate("/search")}
-          aria-label={t("nav.search")}
+          onClick={onOpenCommandPalette}
+          aria-label={t("command.open")}
         >
           <Search className="h-4 w-4 shrink-0" />
           <span className="truncate">{t("shell.searchPlaceholder")}</span>
+          <span className="ms-auto rounded-lg border border-border/70 bg-background/70 px-2 py-0.5 text-[0.65rem] font-semibold text-muted-foreground">
+            Ctrl K
+          </span>
         </Button>
       </div>
+
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        className="rounded-full md:hidden"
+        onClick={onOpenCommandPalette}
+        aria-label={t("command.open")}
+      >
+        <Search className="h-5 w-5" />
+      </Button>
 
       <div
         ref={panelRef}

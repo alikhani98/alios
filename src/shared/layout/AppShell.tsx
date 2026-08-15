@@ -13,6 +13,7 @@ import {
 } from "@/shared/constants/preferences";
 import { ErrorBoundary } from "@/shared/error";
 import { RecoveryModeBanner, applyRecoveryModeUrlFlag } from "@/shared/recovery";
+import { CommandPalette } from "@/shared/components/CommandPalette";
 import {
   applyAccentColorThemeVariables,
   useAccentColorPreference,
@@ -36,6 +37,7 @@ export function AppShell() {
   const location = useLocation();
   const currentNavigationItem = getNavigationItemByPath(location.pathname);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const closeMobileSidebar = useCallback(() => {
     setMobileSidebarOpen(false);
   }, []);
@@ -154,6 +156,7 @@ export function AppShell() {
           <Topbar
             title={t(currentNavigationItem.titleKey)}
             onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
+            onOpenCommandPalette={() => setCommandPaletteOpen(true)}
             showDashboardControls={location.pathname === "/"}
           />
 
@@ -175,6 +178,11 @@ export function AppShell() {
           <BottomNav
             menuOpen={mobileSidebarOpen}
             onOpenMenu={() => setMobileSidebarOpen(true)}
+          />
+          <CommandPalette
+            open={commandPaletteOpen}
+            onOpen={() => setCommandPaletteOpen(true)}
+            onClose={() => setCommandPaletteOpen(false)}
           />
         </div>
       </div>
