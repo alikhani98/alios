@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased - First-run Onboarding Wizard
+
+- Added a one-time local onboarding wizard that appears when `alios.onboarding.completed` is absent from browser `localStorage`.
+- Collected a local display name, starter Life Areas, and an optional first Task without requiring account creation, sync, backend, AI, or external services.
+- Created starter Life Areas, Tasks, one Journal entry, and one Project through existing repository boundaries after the user completes onboarding.
+- Kept incomplete dismissal non-persistent so closing the wizard before completion shows it again on the next load.
+- Added focused coverage for first-run visibility, completed-state suppression, selected Life Area creation, and starter repository data.
+
 ## Unreleased - Home Personal Metrics
 
 - Added a collapsible "My life stats" card to Unified Home with a local roll-up of existing Tasks, Journal, Knowledge, Projects, Goals, and Daily Check-in records.

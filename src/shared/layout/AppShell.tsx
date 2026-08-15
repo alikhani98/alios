@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 
 import { getNavigationItemByPath } from "@/shared/constants/navigation";
+import { OnboardingWizard } from "@/features/onboarding/components/OnboardingWizard";
 import { usePersistentBoolean } from "@/shared/hooks/usePersistentBoolean";
 import { usePersistentString } from "@/shared/hooks/usePersistentString";
 import { useI18n } from "@/shared/i18n";
@@ -172,6 +173,7 @@ export function AppShell() {
               ) : null}
               <ErrorBoundary resetKey={`${location.pathname}${location.search}${location.hash}`}>
                 <Outlet />
+                <OnboardingWizard />
               </ErrorBoundary>
             </div>
           </main>
