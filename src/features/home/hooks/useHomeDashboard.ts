@@ -9,6 +9,7 @@ import { getGoalsSummary } from "@/features/goals";
 import { getLifeAreasSummary, mergeLifeAreas } from "@/features/lifeAreas";
 import { getManualEntrySummary } from "@/features/manual";
 import { getHomePlanningFocus } from "../homePlanningFocus";
+import { buildHomePersonalMetrics } from "../personalMetrics";
 import { getWeeklyPlanWeekStart } from "@/features/weeklyReview/weeklyPlan";
 import type { HomeDashboardData } from "../types";
 
@@ -59,7 +60,7 @@ export function useHomeDashboard() {
       const today = format(new Date(), "yyyy-MM-dd");
       const [
         allTasks,
-        checkin,
+        allCheckins,
         allProjects,
         journalEntries,
         knowledgeItems,
@@ -74,7 +75,7 @@ export function useHomeDashboard() {
       ] =
         await Promise.all([
           tasks.list(),
-          dailyCheckins.getByDate(today),
+          dailyCheckins.list(),
           projects.list(),
           journal.list(),
           knowledge.list(),
@@ -89,6 +90,7 @@ export function useHomeDashboard() {
         ]);
 
       const todayTasks = allTasks.filter((task) => task.dueDate === today);
+      const checkin = allCheckins.find((entry) => entry.date === today);
       const createdRoutineIdsToday = new Set(
         todayTasks
           .filter((task) => task.routineId)
@@ -177,6 +179,14 @@ export function useHomeDashboard() {
         planningFocus: getHomePlanningFocus(goalEntries, allProjects, allTasks),
         weeklyPlan,
         weeklyPlanLinks: getHomeWeeklyPlanLinks(weeklyPlan, goalEntries, allProjects, allTasks),
+        personalMetrics: buildHomePersonalMetrics({
+          tasks: allTasks,
+          journalEntries,
+          knowledgeItems,
+          projects: allProjects,
+          goals: goalEntries,
+          dailyCheckins: allCheckins,
+        }),
         isEmpty:
           allTasks.length === 0 &&
           !checkin &&

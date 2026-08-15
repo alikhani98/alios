@@ -11,6 +11,7 @@ import type {
 } from "@/shared/types";
 import type { LifeAreaView } from "@/features/lifeAreas";
 import type { HomePlanningFocus } from "./homePlanningFocus";
+import type { HomePersonalMetrics } from "./personalMetrics";
 import type { WeeklyPlanLink } from "@/features/weeklyReview/weeklyPlanLinks";
 
 export type HomeDashboardData = {
@@ -69,5 +70,6 @@ export type HomeDashboardData = {
   planningFocus?: HomePlanningFocus;
   weeklyPlan?: WeeklyPlan;
   weeklyPlanLinks?: WeeklyPlanLink[];
+  personalMetrics: HomePersonalMetrics;
   isEmpty: boolean;
 };

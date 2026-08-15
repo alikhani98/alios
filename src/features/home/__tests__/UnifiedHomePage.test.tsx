@@ -6,6 +6,7 @@ import { DateDisplayProvider } from "@/shared/date";
 import { I18nProvider, LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
 import type { HomeDashboardData } from "../types";
 import { getDailyBriefingViewModel } from "../components/DailyBriefingCard";
+import { buildHomePersonalMetrics } from "../personalMetrics";
 
 const todayTask = {
   id: "home-task-1",
@@ -75,6 +76,17 @@ const dashboardData: HomeDashboardData = {
   inbox: {
     unprocessedCount: 2,
   },
+  personalMetrics: buildHomePersonalMetrics(
+    {
+      tasks: [todayTask],
+      journalEntries: [],
+      knowledgeItems: [],
+      projects: [],
+      goals: [],
+      dailyCheckins: [],
+    },
+    new Date("2026-08-09T08:00:00.000Z")
+  ),
   isEmpty: false,
 };
 

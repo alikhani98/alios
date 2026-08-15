@@ -37,6 +37,7 @@ import { ClearStartCard } from "../components/ClearStartCard";
 import { DailyBriefingCard } from "../components/DailyBriefingCard";
 import { HomeCalendarCard } from "../components/HomeCalendarCard";
 import { HomeManualCard } from "../components/HomeManualCard";
+import { HomePersonalMetricsCard } from "../components/HomePersonalMetricsCard";
 import { HomePersonalInsightsCard } from "../components/HomePersonalInsightsCard";
 import { useHomeDashboard } from "../hooks/useHomeDashboard";
 import type { HomeCollapsibleSectionId } from "../homeCollapsedSections";
@@ -174,7 +175,7 @@ function MoreContext({
       title={t("home.moreDashboard")}
       description={t("home.moreDashboardDescription")}
       icon={<SparklesIcon />}
-      status={<Badge variant="secondary" className="font-mono tabular-nums">10</Badge>}
+      status={<Badge variant="secondary" className="font-mono tabular-nums">11</Badge>}
       defaultOpen={false}
       expandLabel={t("common.expandSection")}
       collapseLabel={t("common.collapseSection")}
@@ -197,6 +198,9 @@ function MoreContext({
             sectionId="manualOverview"
             {...sectionOpenProps("manualOverview")}
           />
+        </div>
+        <div className="min-w-0 xl:col-span-12">
+          <HomePersonalMetricsCard metrics={data.personalMetrics} />
         </div>
         <div className="min-w-0 xl:col-span-12">
           <SummaryStats data={data} />

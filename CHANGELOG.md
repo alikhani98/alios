@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased - Home Personal Metrics
+
+- Added a collapsible "My life stats" card to Unified Home with a local roll-up of existing Tasks, Journal, Knowledge, Projects, Goals, and Daily Check-in records.
+- Added derived metrics for all-time completed Tasks, last-seven-days completed Tasks, active Tasks, Journal totals and last-thirty-days entries, Knowledge totals, active Projects and Goals, current check-in streak, and thirty-day check-in completion rate.
+- Reused the Weekly Review check-in streak calculation and kept the card's open/closed state in local browser preference storage.
+- Added focused coverage for metric calculation, the zero-data empty state, and persisted collapse-state restoration.
+
 ## Unreleased - Focus / Deep Work Timer
 
 - Added a local `/focus` route with Pomodoro and free countdown modes, start/pause/reset controls, and a large countdown display.

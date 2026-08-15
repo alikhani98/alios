@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { HomeDashboardData } from "../types";
+import { buildHomePersonalMetrics } from "../personalMetrics";
 import {
   buildPersonalInsightsSnapshot,
   calculateCompletionPercentage,
@@ -108,6 +109,14 @@ function createHomeData(overrides: Partial<HomeDashboardData> = {}): HomeDashboa
     inbox: {
       unprocessedCount: 0,
     },
+    personalMetrics: buildHomePersonalMetrics({
+      tasks: [],
+      journalEntries: [],
+      knowledgeItems: [],
+      projects: [],
+      goals: [],
+      dailyCheckins: [],
+    }),
     isEmpty: true,
     ...overrides,
   };
