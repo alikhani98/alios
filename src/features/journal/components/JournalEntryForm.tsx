@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { useForm } from "react-hook-form";
 
-import type { JournalEntry } from "@/shared/types";
+import type { Goal, JournalEntry, Project } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
 import { Button, DateValueHint, Input, Textarea, Select } from "@/shared/ui";
 import { JOURNAL_TYPE_OPTIONS, LEVEL_OPTIONS } from "../constants";
@@ -13,6 +13,8 @@ import {
 
 type JournalEntryFormProps = {
   entry?: JournalEntry;
+  projects?: ReadonlyArray<Project>;
+  goals?: ReadonlyArray<Goal>;
   isSubmitting: boolean;
   onSubmit: (values: JournalEntryFormValues) => Promise<void>;
   onCancel: () => void;
@@ -20,6 +22,8 @@ type JournalEntryFormProps = {
 
 export function JournalEntryForm({
   entry,
+  projects = [],
+  goals = [],
   isSubmitting,
   onSubmit,
   onCancel,
@@ -37,11 +41,18 @@ export function JournalEntryForm({
       type: entry?.type ?? "daily",
       title: entry?.title ?? "",
       content: entry?.content ?? "",
+      projectId: entry?.projectId ?? "",
+      goalId: entry?.goalId ?? "",
       moodLevel: entry?.moodLevel ?? "",
       energyLevel: entry?.energyLevel ?? "",
     },
   });
   const dateValue = watch("date");
+  const selectedProjectIsUnavailable =
+    Boolean(entry?.projectId) &&
+    !projects.some((project) => project.id === entry?.projectId);
+  const selectedGoalIsUnavailable =
+    Boolean(entry?.goalId) && !goals.some((goal) => goal.id === entry?.goalId);
 
   return (
     <form
@@ -112,6 +123,46 @@ export function JournalEntryForm({
         {errors.content ? (
           <p className="text-sm text-destructive">{t("common.validation")}</p>
         ) : null}
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-2">
+          <label htmlFor="journal-project" className="text-sm font-medium">
+            {t("links.projectLabel")}
+          </label>
+          <Select id="journal-project" {...register("projectId")}>
+            <option value="">{t("links.noProject")}</option>
+            {selectedProjectIsUnavailable ? (
+              <option value={entry?.projectId}>
+                {t("links.projectUnavailable")}
+              </option>
+            ) : null}
+            {projects.map((project) => (
+              <option key={project.id} value={project.id}>
+                {project.title}
+              </option>
+            ))}
+          </Select>
+        </div>
+
+        <div className="grid gap-2">
+          <label htmlFor="journal-goal" className="text-sm font-medium">
+            {t("links.goalLabel")}
+          </label>
+          <Select id="journal-goal" {...register("goalId")}>
+            <option value="">{t("links.noGoal")}</option>
+            {selectedGoalIsUnavailable ? (
+              <option value={entry?.goalId}>
+                {t("links.goalUnavailable")}
+              </option>
+            ) : null}
+            {goals.map((goal) => (
+              <option key={goal.id} value={goal.id}>
+                {goal.title}
+              </option>
+            ))}
+          </Select>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">

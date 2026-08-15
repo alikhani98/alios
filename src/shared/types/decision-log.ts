@@ -28,6 +28,8 @@ export const decisionLogEntrySchema = z.object({
   status: decisionLogStatusSchema.default("open"),
   category: z.string().trim().min(1).optional(),
   context: z.string().trim().min(1),
+  projectId: z.string().min(1).optional(),
+  goalId: z.string().min(1).optional(),
   options: z.array(z.string().trim().min(1)).default([]),
   chosenOption: z.string().trim().min(1).optional(),
   reasoning: z.string().trim().min(1).optional(),

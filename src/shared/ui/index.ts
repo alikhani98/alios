@@ -5,6 +5,7 @@ export * from "./collapsible-section";
 export * from "./date-value-hint";
 export * from "./charts";
 export * from "./input";
+export * from "./LinkedEntitySummary";
 export * from "./premium";
 export * from "./page-placeholder";
 export * from "./route-loading-fallback";

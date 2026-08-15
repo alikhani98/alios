@@ -64,6 +64,46 @@ describe("core domain schemas", () => {
     );
   });
 
+  it("keeps legacy Journal, Knowledge, and Decision records without structural links valid", () => {
+    const { projectId: _journalProjectId, goalId: _journalGoalId, ...legacyJournalEntry } =
+      journalEntryRecord;
+    const {
+      projectId: _knowledgeProjectId,
+      goalId: _knowledgeGoalId,
+      ...legacyKnowledgeItem
+    } = knowledgeItemRecord;
+    const {
+      projectId: _decisionProjectId,
+      goalId: _decisionGoalId,
+      ...legacyDecisionEntry
+    } = decisionLogRecord;
+
+    expect(journalEntrySchema.safeParse(legacyJournalEntry).success).toBe(true);
+    expect(knowledgeItemSchema.safeParse(legacyKnowledgeItem).success).toBe(true);
+    expect(decisionLogEntrySchema.safeParse(legacyDecisionEntry).success).toBe(true);
+  });
+
+  it("rejects empty structural Project and Goal links on Journal, Knowledge, and Decision records", () => {
+    expect(
+      journalEntrySchema.safeParse({ ...journalEntryRecord, projectId: "" }).success
+    ).toBe(false);
+    expect(
+      journalEntrySchema.safeParse({ ...journalEntryRecord, goalId: "" }).success
+    ).toBe(false);
+    expect(
+      knowledgeItemSchema.safeParse({ ...knowledgeItemRecord, projectId: "" }).success
+    ).toBe(false);
+    expect(
+      knowledgeItemSchema.safeParse({ ...knowledgeItemRecord, goalId: "" }).success
+    ).toBe(false);
+    expect(
+      decisionLogEntrySchema.safeParse({ ...decisionLogRecord, projectId: "" }).success
+    ).toBe(false);
+    expect(
+      decisionLogEntrySchema.safeParse({ ...decisionLogRecord, goalId: "" }).success
+    ).toBe(false);
+  });
+
   it("keeps project milestones optional and validates supplied checklist items", () => {
     expect(projectSchema.safeParse(projectRecord).success).toBe(true);
     expect(

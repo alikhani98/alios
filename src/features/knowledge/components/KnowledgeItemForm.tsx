@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
-import type { KnowledgeItem } from "@/shared/types";
+import type { Goal, KnowledgeItem, Project } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
 import { Button, Input, Textarea, Select } from "@/shared/ui";
 import { KNOWLEDGE_TYPE_OPTIONS } from "../constants";
@@ -12,6 +12,8 @@ import {
 
 type KnowledgeItemFormProps = {
   item?: KnowledgeItem;
+  projects?: ReadonlyArray<Project>;
+  goals?: ReadonlyArray<Goal>;
   isSubmitting: boolean;
   onSubmit: (values: KnowledgeItemFormValues) => Promise<void>;
   onCancel: () => void;
@@ -19,6 +21,8 @@ type KnowledgeItemFormProps = {
 
 export function KnowledgeItemForm({
   item,
+  projects = [],
+  goals = [],
   isSubmitting,
   onSubmit,
   onCancel,
@@ -36,8 +40,15 @@ export function KnowledgeItemForm({
       summary: item?.summary ?? "",
       content: item?.content ?? "",
       source: item?.source ?? "",
+      projectId: item?.projectId ?? "",
+      goalId: item?.goalId ?? "",
     },
   });
+  const selectedProjectIsUnavailable =
+    Boolean(item?.projectId) &&
+    !projects.some((project) => project.id === item?.projectId);
+  const selectedGoalIsUnavailable =
+    Boolean(item?.goalId) && !goals.some((goal) => goal.id === item?.goalId);
 
   return (
     <form
@@ -114,6 +125,46 @@ export function KnowledgeItemForm({
           placeholder={t("knowledge.sourcePlaceholder")}
           {...register("source")}
         />
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid gap-2">
+          <label htmlFor="knowledge-project" className="text-sm font-medium">
+            {t("links.projectLabel")}
+          </label>
+          <Select id="knowledge-project" {...register("projectId")}>
+            <option value="">{t("links.noProject")}</option>
+            {selectedProjectIsUnavailable ? (
+              <option value={item?.projectId}>
+                {t("links.projectUnavailable")}
+              </option>
+            ) : null}
+            {projects.map((project) => (
+              <option key={project.id} value={project.id}>
+                {project.title}
+              </option>
+            ))}
+          </Select>
+        </div>
+
+        <div className="grid gap-2">
+          <label htmlFor="knowledge-goal" className="text-sm font-medium">
+            {t("links.goalLabel")}
+          </label>
+          <Select id="knowledge-goal" {...register("goalId")}>
+            <option value="">{t("links.noGoal")}</option>
+            {selectedGoalIsUnavailable ? (
+              <option value={item?.goalId}>
+                {t("links.goalUnavailable")}
+              </option>
+            ) : null}
+            {goals.map((goal) => (
+              <option key={goal.id} value={goal.id}>
+                {goal.title}
+              </option>
+            ))}
+          </Select>
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-3">

@@ -3,7 +3,12 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
 import type { CreateJournalEntryInput } from "@/core/repositories";
-import type { JournalEntry } from "@/shared/types";
+import { useStorageAdapter } from "@/core/storage";
+import {
+  findLinkedGoalById,
+  findLinkedProjectById,
+} from "@/shared/entityLinks";
+import type { Goal, JournalEntry, Project } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
 import {
   Button,
@@ -24,6 +29,8 @@ import type { JournalEntryFormValues } from "../types";
 export function JournalPage() {
   const { t } = useI18n();
   const [searchParams] = useSearchParams();
+  const { projects: projectsRepository, goals: goalsRepository } =
+    useStorageAdapter();
   const {
     entries,
     isLoading,
@@ -42,6 +49,9 @@ export function JournalPage() {
   const [focusedEntryId, setFocusedEntryId] = useState<string | null>(null);
   const [focusMessage, setFocusMessage] = useState<string | null>(null);
   const [showAllEntries, setShowAllEntries] = useState(false);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [goals, setGoals] = useState<Goal[]>([]);
+  const [linkOptionsError, setLinkOptionsError] = useState<string | null>(null);
   const entryRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const focusId = searchParams.get("focusId");
   const journalPreviewLimit = 12;
@@ -60,6 +70,34 @@ export function JournalPage() {
       : initialEntries;
   }, [entries, focusId, showAllEntries]);
   const hiddenEntryCount = Math.max(entries.length - displayedEntries.length, 0);
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    void Promise.all([projectsRepository.list(), goalsRepository.list()])
+      .then(([nextProjects, nextGoals]) => {
+        if (isCancelled) {
+          return;
+        }
+
+        setProjects(nextProjects);
+        setGoals(nextGoals);
+        setLinkOptionsError(null);
+      })
+      .catch(() => {
+        if (isCancelled) {
+          return;
+        }
+
+        setProjects([]);
+        setGoals([]);
+        setLinkOptionsError(t("links.loadError"));
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [goalsRepository, projectsRepository, t]);
 
   const openCreateForm = () => {
     setEditingEntry(undefined);
@@ -91,6 +129,8 @@ export function JournalPage() {
       type: values.type,
       title: values.title,
       content: values.content,
+      projectId: values.projectId || undefined,
+      goalId: values.goalId || undefined,
       moodLevel: values.moodLevel || undefined,
       energyLevel: values.energyLevel || undefined,
     };
@@ -189,6 +229,8 @@ export function JournalPage() {
             <JournalEntryForm
               key={editingEntry?.id ?? "new-entry"}
               entry={editingEntry}
+              projects={projects}
+              goals={goals}
               isSubmitting={isSubmitting}
               onSubmit={handleSubmit}
               onCancel={closeForm}
@@ -206,14 +248,14 @@ export function JournalPage() {
         </div>
       ) : null}
 
-      {error || actionError ? (
+      {error || actionError || linkOptionsError ? (
         <div
           role="alert"
           className="flex flex-col gap-3 rounded-xl border border-destructive/30 bg-destructive/5 p-4 sm:flex-row sm:items-center sm:justify-between"
         >
           <div className="flex items-start gap-2 text-sm text-destructive">
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-            <span>{actionError ?? error}</span>
+            <span>{actionError ?? error ?? linkOptionsError}</span>
           </div>
           {error ? (
             <Button
@@ -276,6 +318,8 @@ export function JournalPage() {
             >
               <JournalEntryCard
                 entry={entry}
+                linkedProject={findLinkedProjectById(entry, projects)}
+                linkedGoal={findLinkedGoalById(entry, goals)}
                 isDeleting={deletingId === entry.id}
                 onEdit={() => openEditForm(entry)}
                 onDelete={() => handleDelete(entry)}

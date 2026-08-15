@@ -1,7 +1,7 @@
 import { Archive, CheckCircle2, GitBranch, Lightbulb, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 
-import type { DecisionLogEntry } from "@/shared/types";
+import type { DecisionLogEntry, Goal, Project } from "@/shared/types";
 import { useDateFormatter } from "@/shared/date";
 import { useI18n, type TranslationKey } from "@/shared/i18n";
 import {
@@ -15,6 +15,7 @@ import {
   CollapsibleSection,
   SoftPanel,
   StatusChip,
+  LinkedEntitySummary,
 } from "@/shared/ui";
 import { decisionLogStatusValues } from "@/shared/types";
 
@@ -32,6 +33,8 @@ const statusLabelKeys: Record<
 
 type DecisionLogCardProps = {
   decision: DecisionLogEntry;
+  linkedProject?: Project;
+  linkedGoal?: Goal;
   isDeleting: boolean;
   onEdit: () => void;
   onDelete: () => Promise<void>;
@@ -50,6 +53,8 @@ function previewText(value: string, fallback: string) {
 
 export function DecisionLogCard({
   decision,
+  linkedProject,
+  linkedGoal,
   isDeleting,
   onEdit,
   onDelete,
@@ -210,6 +215,12 @@ export function DecisionLogCard({
             ) : null}
           </div>
         </CollapsibleSection>
+        <LinkedEntitySummary
+          projectId={decision.projectId}
+          goalId={decision.goalId}
+          project={linkedProject}
+          goal={linkedGoal}
+        />
       </CardContent>
 
       <CardFooter className="flex flex-col gap-2 border-t border-border/70 pt-4 sm:flex-row sm:flex-wrap sm:items-center">

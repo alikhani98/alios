@@ -11,6 +11,8 @@ export const decisionLogFormSchema = z.object({
   status: decisionLogStatusSchema,
   category: optionalTextSchema,
   context: z.string().trim().min(1),
+  projectId: optionalTextSchema,
+  goalId: optionalTextSchema,
   optionsText: optionalTextSchema,
   chosenOption: optionalTextSchema,
   reasoning: optionalTextSchema,

@@ -2,7 +2,10 @@ import {
   CheckCircle2,
   Clock3,
   Compass,
+  BookOpen,
+  BookOpenText,
   FolderKanban,
+  GitBranch,
   ListChecks,
   RotateCcw,
   Target,
@@ -12,7 +15,7 @@ import { Link } from "react-router-dom";
 
 import { useDateFormatter } from "@/shared/date";
 import { useI18n } from "@/shared/i18n";
-import type { Goal } from "@/shared/types";
+import type { DecisionLogEntry, Goal, JournalEntry, KnowledgeItem } from "@/shared/types";
 import { cn } from "@/shared/utils";
 import {
   Badge,
@@ -41,6 +44,9 @@ type GoalCardProps = {
   goal: Goal;
   isReviewDue: boolean;
   projectProgress?: GoalProjectProgress;
+  linkedJournalEntries?: ReadonlyArray<JournalEntry>;
+  linkedDecisions?: ReadonlyArray<DecisionLogEntry>;
+  linkedKnowledgeItems?: ReadonlyArray<KnowledgeItem>;
   isProjectProgressLoading?: boolean;
   useAutoProgress?: boolean;
   isDeleting: boolean;
@@ -56,6 +62,9 @@ export function GoalCard({
   goal,
   isReviewDue,
   projectProgress,
+  linkedJournalEntries = [],
+  linkedDecisions = [],
+  linkedKnowledgeItems = [],
   isProjectProgressLoading,
   useAutoProgress = false,
   isDeleting,
@@ -319,6 +328,63 @@ export function GoalCard({
                         <span className="text-muted-foreground"> · {formatDate(milestone.date)}</span>
                       ) : null}
                     </span>
+                  </li>
+                ))}
+              </ul>
+            </SoftPanel>
+          ) : null}
+
+          {linkedJournalEntries.length > 0 ? (
+            <SoftPanel className="space-y-3 border-primary/15 bg-background/80">
+              <p className="flex items-center gap-2 text-sm font-semibold">
+                <BookOpenText className="h-4 w-4 shrink-0 text-primary" />
+                {t("links.relatedJournalEntries")}
+              </p>
+              <ul className="space-y-2">
+                {linkedJournalEntries.map((entry) => (
+                  <li key={entry.id} className="text-sm">
+                    <p className="break-words font-medium">{entry.title}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatDate(entry.date)}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </SoftPanel>
+          ) : null}
+
+          {linkedDecisions.length > 0 ? (
+            <SoftPanel className="space-y-3 border-primary/15 bg-background/80">
+              <p className="flex items-center gap-2 text-sm font-semibold">
+                <GitBranch className="h-4 w-4 shrink-0 text-primary" />
+                {t("links.relatedDecisions")}
+              </p>
+              <ul className="space-y-2">
+                {linkedDecisions.map((decision) => (
+                  <li key={decision.id} className="text-sm">
+                    <p className="break-words font-medium">{decision.title}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatDate(decision.decisionDate)}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </SoftPanel>
+          ) : null}
+
+          {linkedKnowledgeItems.length > 0 ? (
+            <SoftPanel className="space-y-3 border-primary/15 bg-background/80">
+              <p className="flex items-center gap-2 text-sm font-semibold">
+                <BookOpen className="h-4 w-4 shrink-0 text-primary" />
+                {t("links.relatedKnowledgeItems")}
+              </p>
+              <ul className="space-y-2">
+                {linkedKnowledgeItems.map((item) => (
+                  <li key={item.id} className="text-sm">
+                    <p className="break-words font-medium">{item.title}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatDateTime(item.updatedAt)}
+                    </p>
                   </li>
                 ))}
               </ul>

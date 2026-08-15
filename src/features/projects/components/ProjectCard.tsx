@@ -1,9 +1,26 @@
-import { CalendarDays, CheckCircle2, Clock3, ListChecks, Pencil, Target, Trash2 } from "lucide-react";
+import {
+  BookOpen,
+  BookOpenText,
+  CalendarDays,
+  CheckCircle2,
+  Clock3,
+  GitBranch,
+  ListChecks,
+  Pencil,
+  Target,
+  Trash2,
+} from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
 import { GOAL_STATUS_LABEL_KEYS } from "@/features/goals/constants";
-import type { Goal, Project } from "@/shared/types";
+import type {
+  DecisionLogEntry,
+  Goal,
+  JournalEntry,
+  KnowledgeItem,
+  Project,
+} from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
 import { useDateFormatter } from "@/shared/date";
 import {
@@ -28,6 +45,9 @@ import { createProjectTodayTasksPath, type ProjectTaskProgress } from "../projec
 type ProjectCardProps = {
   project: Project;
   linkedGoal?: Goal;
+  linkedJournalEntries?: ReadonlyArray<JournalEntry>;
+  linkedDecisions?: ReadonlyArray<DecisionLogEntry>;
+  linkedKnowledgeItems?: ReadonlyArray<KnowledgeItem>;
   taskProgress?: ProjectTaskProgress;
   isLinkedGoalLoading: boolean;
   isReviewDue?: boolean;
@@ -40,6 +60,9 @@ type ProjectCardProps = {
 export function ProjectCard({
   project,
   linkedGoal,
+  linkedJournalEntries = [],
+  linkedDecisions = [],
+  linkedKnowledgeItems = [],
   taskProgress = { total: 0, completed: 0 },
   isLinkedGoalLoading,
   isReviewDue,
@@ -199,6 +222,62 @@ export function ProjectCard({
                         <span className="text-muted-foreground"> · {formatDate(milestone.date)}</span>
                       ) : null}
                     </span>
+                  </li>
+                ))}
+              </ul>
+            </SoftPanel>
+          ) : null}
+          {linkedJournalEntries.length > 0 ? (
+            <SoftPanel className="space-y-3 border-primary/15 bg-background/80">
+              <p className="flex items-center gap-2 text-sm font-semibold">
+                <BookOpenText className="h-4 w-4 shrink-0 text-primary" />
+                {t("links.relatedJournalEntries")}
+              </p>
+              <ul className="space-y-2">
+                {linkedJournalEntries.map((entry) => (
+                  <li key={entry.id} className="text-sm">
+                    <p className="break-words font-medium">{entry.title}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatDate(entry.date)}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </SoftPanel>
+          ) : null}
+
+          {linkedDecisions.length > 0 ? (
+            <SoftPanel className="space-y-3 border-primary/15 bg-background/80">
+              <p className="flex items-center gap-2 text-sm font-semibold">
+                <GitBranch className="h-4 w-4 shrink-0 text-primary" />
+                {t("links.relatedDecisions")}
+              </p>
+              <ul className="space-y-2">
+                {linkedDecisions.map((decision) => (
+                  <li key={decision.id} className="text-sm">
+                    <p className="break-words font-medium">{decision.title}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatDate(decision.decisionDate)}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </SoftPanel>
+          ) : null}
+
+          {linkedKnowledgeItems.length > 0 ? (
+            <SoftPanel className="space-y-3 border-primary/15 bg-background/80">
+              <p className="flex items-center gap-2 text-sm font-semibold">
+                <BookOpen className="h-4 w-4 shrink-0 text-primary" />
+                {t("links.relatedKnowledgeItems")}
+              </p>
+              <ul className="space-y-2">
+                {linkedKnowledgeItems.map((item) => (
+                  <li key={item.id} className="text-sm">
+                    <p className="break-words font-medium">{item.title}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatDateTime(item.updatedAt)}
+                    </p>
                   </li>
                 ))}
               </ul>

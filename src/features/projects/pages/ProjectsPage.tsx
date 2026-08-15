@@ -5,7 +5,14 @@ import { Link, useSearchParams } from "react-router-dom";
 import type { CreateProjectInput } from "@/core/repositories";
 import { useGoals } from "@/features/goals/hooks/useGoals";
 import { useStorageAdapter } from "@/core/storage";
-import type { Project, ProjectStatus, Task } from "@/shared/types";
+import type {
+  DecisionLogEntry,
+  JournalEntry,
+  KnowledgeItem,
+  Project,
+  ProjectStatus,
+  Task,
+} from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
 import {
   Button,
@@ -59,7 +66,12 @@ function parseMilestones(value: string | undefined): Project["milestones"] {
 
 export function ProjectsPage() {
   const { t } = useI18n();
-  const { tasks: tasksRepository } = useStorageAdapter();
+  const {
+    tasks: tasksRepository,
+    journal: journalRepository,
+    decisions: decisionsRepository,
+    knowledge: knowledgeRepository,
+  } = useStorageAdapter();
   const [searchParams] = useSearchParams();
   const {
     projects,
@@ -87,6 +99,10 @@ export function ProjectsPage() {
   const [showAllProjects, setShowAllProjects] = useState(false);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [taskLoadError, setTaskLoadError] = useState<string | null>(null);
+  const [linkedJournalEntries, setLinkedJournalEntries] = useState<JournalEntry[]>([]);
+  const [linkedDecisions, setLinkedDecisions] = useState<DecisionLogEntry[]>([]);
+  const [linkedKnowledgeItems, setLinkedKnowledgeItems] = useState<KnowledgeItem[]>([]);
+  const [linkedContentLoadError, setLinkedContentLoadError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"list" | "kanban">("list");
   const [draggedProjectId, setDraggedProjectId] = useState<string | null>(null);
   const projectRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -116,6 +132,32 @@ export function ProjectsPage() {
   useEffect(() => {
     void loadLinkedTasks();
   }, [loadLinkedTasks]);
+
+  const loadLinkedContent = useCallback(async () => {
+    setLinkedContentLoadError(null);
+
+    try {
+      const [journalEntries, decisionEntries, knowledgeItems] =
+        await Promise.all([
+          journalRepository.list(),
+          decisionsRepository.list(),
+          knowledgeRepository.list(),
+        ]);
+
+      setLinkedJournalEntries(journalEntries);
+      setLinkedDecisions(decisionEntries);
+      setLinkedKnowledgeItems(knowledgeItems);
+    } catch {
+      setLinkedJournalEntries([]);
+      setLinkedDecisions([]);
+      setLinkedKnowledgeItems([]);
+      setLinkedContentLoadError(t("links.relatedContentLoadError"));
+    }
+  }, [decisionsRepository, journalRepository, knowledgeRepository, t]);
+
+  useEffect(() => {
+    void loadLinkedContent();
+  }, [loadLinkedContent]);
 
   const openCreateForm = () => {
     setEditingProject(undefined);
@@ -372,6 +414,26 @@ export function ProjectsPage() {
           </Button>
         </div>
       ) : null}
+      {linkedContentLoadError ? (
+        <div
+          role="alert"
+          className="flex flex-col gap-3 rounded-xl border border-border/70 bg-muted/30 p-4 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div className="flex items-start gap-2 text-sm text-muted-foreground">
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+            <span className="min-w-0 break-words">{linkedContentLoadError}</span>
+          </div>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onClick={() => void loadLinkedContent()}
+          >
+            <RotateCcw className="me-2 h-4 w-4" />
+            {t("common.tryAgain")}
+          </Button>
+        </div>
+      ) : null}
       {focusMessage ? (
         <div
           role="status"
@@ -483,6 +545,15 @@ export function ProjectsPage() {
               <ProjectCard
                 project={project}
                 linkedGoal={findLinkedGoal(project, goals)}
+                linkedJournalEntries={linkedJournalEntries.filter(
+                  (entry) => entry.projectId === project.id
+                )}
+                linkedDecisions={linkedDecisions.filter(
+                  (decision) => decision.projectId === project.id
+                )}
+                linkedKnowledgeItems={linkedKnowledgeItems.filter(
+                  (item) => item.projectId === project.id
+                )}
                 taskProgress={getProjectTaskProgress(project.id, tasks)}
                 isLinkedGoalLoading={isGoalsLoading}
                 isReviewDue={isProjectReviewDue(project)}

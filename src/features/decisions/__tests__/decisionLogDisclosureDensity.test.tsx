@@ -2,11 +2,13 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { ReactElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import { StaticRouter } from "react-router-dom/server";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { DateDisplayProvider } from "@/shared/date";
 import { I18nProvider, LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
 import type { DecisionLogEntry } from "@/shared/types";
+import { goalRecord, projectRecord } from "@/test/factories";
 
 import { DecisionLogCard } from "../components/DecisionLogCard";
 import { DecisionLogForm } from "../components/DecisionLogForm";
@@ -34,9 +36,11 @@ const decision: DecisionLogEntry = {
 
 function renderDecisionUi(element: ReactElement) {
   return renderToStaticMarkup(
-    <I18nProvider>
-      <DateDisplayProvider>{element}</DateDisplayProvider>
-    </I18nProvider>
+    <StaticRouter location="/decisions">
+      <I18nProvider>
+        <DateDisplayProvider>{element}</DateDisplayProvider>
+      </I18nProvider>
+    </StaticRouter>
   );
 }
 
@@ -84,6 +88,40 @@ describe("Decision Log disclosure density", () => {
     expect(markup).toContain('id="decision-log-options"');
     expect(markup).toContain('id="decision-log-options-content" hidden="" aria-hidden="true"');
     expect(markup).toContain('id="decision-log-review-content" hidden="" aria-hidden="true"');
+  });
+
+  it("renders linked Project and Goal context and tolerates orphaned links", () => {
+    const linkedMarkup = renderDecisionUi(
+      <DecisionLogCard
+        decision={{ ...decision, projectId: projectRecord.id, goalId: goalRecord.id }}
+        linkedProject={projectRecord}
+        linkedGoal={goalRecord}
+        isDeleting={false}
+        onEdit={() => undefined}
+        onDelete={async () => undefined}
+        onMarkReviewed={async () => undefined}
+        onArchive={async () => undefined}
+      />
+    );
+    const orphanMarkup = renderDecisionUi(
+      <DecisionLogCard
+        decision={{ ...decision, projectId: "deleted-project", goalId: "deleted-goal" }}
+        isDeleting={false}
+        onEdit={() => undefined}
+        onDelete={async () => undefined}
+        onMarkReviewed={async () => undefined}
+        onArchive={async () => undefined}
+      />
+    );
+
+    expect(linkedMarkup).toContain("Linked project");
+    expect(linkedMarkup).toContain(projectRecord.title);
+    expect(linkedMarkup).toContain('href="/projects?focusId=fixture-id"');
+    expect(linkedMarkup).toContain(goalRecord.title);
+    expect(linkedMarkup).toContain('href="/goals?focusId=fixture-id"');
+    expect(orphanMarkup).toContain("Linked project unavailable");
+    expect(orphanMarkup).toContain("Linked goal unavailable");
+    expect(orphanMarkup).toContain("Edit");
   });
 
   it("keeps the page editor itself collapsed until the user chooses create or edit", () => {

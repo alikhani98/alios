@@ -6,7 +6,12 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { GoalCard, GoalForm } from "@/features/goals";
 import { DateDisplayProvider } from "@/shared/date";
 import { I18nProvider, LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
-import { goalRecord } from "@/test/factories";
+import {
+  decisionLogRecord,
+  goalRecord,
+  journalEntryRecord,
+  knowledgeItemRecord,
+} from "@/test/factories";
 
 function renderGoalCard(
   overrides: Partial<ComponentProps<typeof GoalCard>> = {}
@@ -104,6 +109,23 @@ describe("Goals disclosure density", () => {
 
     expect(markup).toContain("Link projects or tasks to use auto progress.");
     expect(markup).toContain("35%");
+  });
+
+  it("renders related Journal, Decision, and Knowledge records only when linked", () => {
+    const unlinkedMarkup = renderGoalCard();
+    const linkedMarkup = renderGoalCard({
+      linkedJournalEntries: [{ ...journalEntryRecord, goalId: goalRecord.id }],
+      linkedDecisions: [{ ...decisionLogRecord, goalId: goalRecord.id }],
+      linkedKnowledgeItems: [{ ...knowledgeItemRecord, goalId: goalRecord.id }],
+    });
+
+    expect(unlinkedMarkup).not.toContain("Related journal entries");
+    expect(linkedMarkup).toContain("Related journal entries");
+    expect(linkedMarkup).toContain(journalEntryRecord.title);
+    expect(linkedMarkup).toContain("Related decisions");
+    expect(linkedMarkup).toContain(decisionLogRecord.title);
+    expect(linkedMarkup).toContain("Related Knowledge notes");
+    expect(linkedMarkup).toContain(knowledgeItemRecord.title);
   });
 
   it("keeps advanced goal form metadata collapsed without removing fields from the form", () => {

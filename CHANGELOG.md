@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased - Universal Linking for Journal, Decisions, and Knowledge
+
+- Added optional Project and Goal links to Journal entries, Decision Log entries, and Knowledge items using existing local-first foreign-key fields.
+- Added optional Project/Goal selectors to the Journal, Decision Log, and Knowledge forms, plus linked-context display on their cards.
+- Added related Journal, Decision, and Knowledge sections to Project and Goal cards only when linked records exist.
+- Added regression coverage for linked/unlinked persistence, legacy schema compatibility, orphan-safe UI rendering, and related-content display.
+
 ## Unreleased - Command Palette Foundation
 
 - Added a global Command Palette opened with Ctrl+K / Cmd+K or the Topbar search control.

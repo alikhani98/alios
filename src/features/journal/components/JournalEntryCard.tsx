@@ -1,7 +1,7 @@
 import { BatteryMedium, CalendarDays, Heart, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 
-import type { JournalEntry } from "@/shared/types";
+import type { Goal, JournalEntry, Project } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
 import { useDateFormatter } from "@/shared/date";
 import {
@@ -12,11 +12,14 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
+  LinkedEntitySummary,
 } from "@/shared/ui";
 import { JOURNAL_TYPE_LABEL_KEYS, LEVEL_LABEL_KEYS } from "../constants";
 
 type JournalEntryCardProps = {
   entry: JournalEntry;
+  linkedProject?: Project;
+  linkedGoal?: Goal;
   isDeleting: boolean;
   onEdit: () => void;
   onDelete: () => Promise<void>;
@@ -24,6 +27,8 @@ type JournalEntryCardProps = {
 
 export function JournalEntryCard({
   entry,
+  linkedProject,
+  linkedGoal,
   isDeleting,
   onEdit,
   onDelete,
@@ -69,6 +74,12 @@ export function JournalEntryCard({
             ) : null}
           </div>
         ) : null}
+        <LinkedEntitySummary
+          projectId={entry.projectId}
+          goalId={entry.goalId}
+          project={linkedProject}
+          goal={linkedGoal}
+        />
       </CardContent>
 
       <CardFooter className="flex-wrap gap-2 border-t pt-4">

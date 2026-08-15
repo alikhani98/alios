@@ -5,7 +5,14 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import { DateDisplayProvider } from "@/shared/date";
 import { I18nProvider, LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
-import { goalRecord, projectRecord, taskRecord } from "@/test/factories";
+import {
+  decisionLogRecord,
+  goalRecord,
+  journalEntryRecord,
+  knowledgeItemRecord,
+  projectRecord,
+  taskRecord,
+} from "@/test/factories";
 
 import { ProjectCard } from "../components/ProjectCard";
 import { ProjectForm } from "../components/ProjectForm";
@@ -103,6 +110,46 @@ describe("Project goal links", () => {
     expect(html).toContain('id="project-fixture-id-details-content" hidden="" aria-hidden="true"');
     expect(html).toContain('href="/goals?focusId=fixture-id"');
     expect(html).toContain("View goal");
+  });
+
+  it("renders related Journal, Decision, and Knowledge records only when linked", () => {
+    const unlinkedHtml = renderProjectUi(
+      <ProjectCard
+        project={projectRecord}
+        linkedGoal={goalRecord}
+        isLinkedGoalLoading={false}
+        isDeleting={false}
+        onEdit={() => undefined}
+        onDelete={async () => undefined}
+      />
+    );
+    const linkedHtml = renderProjectUi(
+      <ProjectCard
+        project={projectRecord}
+        linkedGoal={goalRecord}
+        linkedJournalEntries={[
+          { ...journalEntryRecord, projectId: projectRecord.id },
+        ]}
+        linkedDecisions={[
+          { ...decisionLogRecord, projectId: projectRecord.id },
+        ]}
+        linkedKnowledgeItems={[
+          { ...knowledgeItemRecord, projectId: projectRecord.id },
+        ]}
+        isLinkedGoalLoading={false}
+        isDeleting={false}
+        onEdit={() => undefined}
+        onDelete={async () => undefined}
+      />
+    );
+
+    expect(unlinkedHtml).not.toContain("Related journal entries");
+    expect(linkedHtml).toContain("Related journal entries");
+    expect(linkedHtml).toContain(journalEntryRecord.title);
+    expect(linkedHtml).toContain("Related decisions");
+    expect(linkedHtml).toContain(decisionLogRecord.title);
+    expect(linkedHtml).toContain("Related Knowledge notes");
+    expect(linkedHtml).toContain(knowledgeItemRecord.title);
   });
 
   it("keeps the Project → Today planning handoff readable for long content", () => {

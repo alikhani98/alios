@@ -3,7 +3,12 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
 import type { CreateKnowledgeItemInput } from "@/core/repositories";
-import type { KnowledgeItem, KnowledgeItemType } from "@/shared/types";
+import { useStorageAdapter } from "@/core/storage";
+import {
+  findLinkedGoalById,
+  findLinkedProjectById,
+} from "@/shared/entityLinks";
+import type { Goal, KnowledgeItem, KnowledgeItemType, Project } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
 import {
   Button,
@@ -37,6 +42,8 @@ function normalizeReferenceTitle(value: string): string {
 export function KnowledgePage() {
   const { direction, t } = useI18n();
   const [searchParams] = useSearchParams();
+  const { projects: projectsRepository, goals: goalsRepository } =
+    useStorageAdapter();
   const {
     items,
     isLoading,
@@ -58,6 +65,9 @@ export function KnowledgePage() {
   const [focusedItemId, setFocusedItemId] = useState<string | null>(null);
   const [focusMessage, setFocusMessage] = useState<string | null>(null);
   const [showAllItems, setShowAllItems] = useState(false);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [goals, setGoals] = useState<Goal[]>([]);
+  const [linkOptionsError, setLinkOptionsError] = useState<string | null>(null);
   const itemRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const focusId = searchParams.get("focusId");
   const knowledgePreviewLimit = 12;
@@ -96,6 +106,34 @@ export function KnowledgePage() {
 
     return backlinks;
   }, [items]);
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    void Promise.all([projectsRepository.list(), goalsRepository.list()])
+      .then(([nextProjects, nextGoals]) => {
+        if (isCancelled) {
+          return;
+        }
+
+        setProjects(nextProjects);
+        setGoals(nextGoals);
+        setLinkOptionsError(null);
+      })
+      .catch(() => {
+        if (isCancelled) {
+          return;
+        }
+
+        setProjects([]);
+        setGoals([]);
+        setLinkOptionsError(t("links.loadError"));
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [goalsRepository, projectsRepository, t]);
 
   const openCreateForm = () => {
     setEditingItem(undefined);
@@ -143,6 +181,8 @@ export function KnowledgePage() {
       summary: values.summary || undefined,
       content: values.content,
       source: values.source || undefined,
+      projectId: values.projectId || undefined,
+      goalId: values.goalId || undefined,
     };
 
     try {
@@ -242,6 +282,8 @@ export function KnowledgePage() {
             <KnowledgeItemForm
               key={editingItem?.id ?? "new-item"}
               item={editingItem}
+              projects={projects}
+              goals={goals}
               isSubmitting={isSubmitting}
               onSubmit={handleSubmit}
               onCancel={closeForm}
@@ -305,14 +347,14 @@ export function KnowledgePage() {
         </div>
       ) : null}
 
-      {error || actionError ? (
+      {error || actionError || linkOptionsError ? (
         <div
           role="alert"
           className="flex flex-col gap-3 rounded-xl border border-destructive/30 bg-destructive/5 p-4 sm:flex-row sm:items-center sm:justify-between"
         >
           <div className="flex items-start gap-2 text-sm text-destructive">
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-            <span>{actionError ?? error}</span>
+            <span>{actionError ?? error ?? linkOptionsError}</span>
           </div>
           {error ? (
             <Button
@@ -390,6 +432,8 @@ export function KnowledgePage() {
               <KnowledgeItemCard
                 item={item}
                 backlinks={backlinksByItemId.get(item.id) ?? []}
+                linkedProject={findLinkedProjectById(item, projects)}
+                linkedGoal={findLinkedGoalById(item, goals)}
                 isDeleting={deletingId === item.id}
                 onEdit={() => openEditForm(item)}
                 onDelete={() => handleDelete(item)}

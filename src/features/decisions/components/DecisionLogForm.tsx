@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
-import type { DecisionLogEntry } from "@/shared/types";
+import type { DecisionLogEntry, Goal, Project } from "@/shared/types";
 import { useI18n, type TranslationKey } from "@/shared/i18n";
 import {
   Button,
@@ -18,6 +18,8 @@ import { decisionLogFormSchema, type DecisionLogFormValues } from "../types";
 
 type DecisionLogFormProps = {
   decision?: DecisionLogEntry;
+  projects?: ReadonlyArray<Project>;
+  goals?: ReadonlyArray<Goal>;
   isSubmitting: boolean;
   onSubmit: (values: DecisionLogFormValues) => Promise<void>;
   onCancel?: () => void;
@@ -41,6 +43,8 @@ function getDefaultValues(decision?: DecisionLogEntry): DecisionLogFormValues {
     status: decision?.status ?? "open",
     category: decision?.category ?? "",
     context: decision?.context ?? "",
+    projectId: decision?.projectId ?? "",
+    goalId: decision?.goalId ?? "",
     optionsText: decision?.options.join("\n") ?? "",
     chosenOption: decision?.chosenOption ?? "",
     reasoning: decision?.reasoning ?? "",
@@ -56,6 +60,8 @@ function getDefaultValues(decision?: DecisionLogEntry): DecisionLogFormValues {
 
 export function DecisionLogForm({
   decision,
+  projects = [],
+  goals = [],
   isSubmitting,
   onSubmit,
   onCancel,
@@ -72,6 +78,12 @@ export function DecisionLogForm({
   });
   const decisionDateValue = watch("decisionDate");
   const reviewDateValue = watch("reviewDate");
+  const selectedProjectIsUnavailable =
+    Boolean(decision?.projectId) &&
+    !projects.some((project) => project.id === decision?.projectId);
+  const selectedGoalIsUnavailable =
+    Boolean(decision?.goalId) &&
+    !goals.some((goal) => goal.id === decision?.goalId);
 
   return (
     <form
@@ -146,6 +158,44 @@ export function DecisionLogForm({
               placeholder={t("decisions.categoryPlaceholder")}
               {...register("category")}
             />
+          </div>
+
+          <div className="grid gap-2">
+            <label htmlFor="decision-project" className="text-sm font-medium">
+              {t("links.projectLabel")}
+            </label>
+            <Select id="decision-project" {...register("projectId")}>
+              <option value="">{t("links.noProject")}</option>
+              {selectedProjectIsUnavailable ? (
+                <option value={decision?.projectId}>
+                  {t("links.projectUnavailable")}
+                </option>
+              ) : null}
+              {projects.map((project) => (
+                <option key={project.id} value={project.id}>
+                  {project.title}
+                </option>
+              ))}
+            </Select>
+          </div>
+
+          <div className="grid gap-2">
+            <label htmlFor="decision-goal" className="text-sm font-medium">
+              {t("links.goalLabel")}
+            </label>
+            <Select id="decision-goal" {...register("goalId")}>
+              <option value="">{t("links.noGoal")}</option>
+              {selectedGoalIsUnavailable ? (
+                <option value={decision?.goalId}>
+                  {t("links.goalUnavailable")}
+                </option>
+              ) : null}
+              {goals.map((goal) => (
+                <option key={goal.id} value={goal.id}>
+                  {goal.title}
+                </option>
+              ))}
+            </Select>
           </div>
 
           <div className="grid gap-2">

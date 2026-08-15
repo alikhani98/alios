@@ -2,7 +2,12 @@ import { AlertCircle, GitBranch, Info, Plus, RotateCcw } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import type { CreateDecisionLogEntryInput } from "@/core/repositories";
-import type { DecisionLogEntry } from "@/shared/types";
+import { useStorageAdapter } from "@/core/storage";
+import {
+  findLinkedGoalById,
+  findLinkedProjectById,
+} from "@/shared/entityLinks";
+import type { DecisionLogEntry, Goal, Project } from "@/shared/types";
 import { useI18n, type TranslationKey } from "@/shared/i18n";
 import { useViewDensityMode } from "@/shared/preferences/viewDensityMode";
 import {
@@ -142,6 +147,8 @@ export function DecisionLogContextualHelp({
 export function DecisionLogPage() {
   const { t } = useI18n();
   const { isSimpleView } = useViewDensityMode();
+  const { projects: projectsRepository, goals: goalsRepository } =
+    useStorageAdapter();
   const {
     entries,
     isLoading,
@@ -163,6 +170,9 @@ export function DecisionLogPage() {
   const [showAllDecisions, setShowAllDecisions] = useState(false);
   const [isContextualHelpOpen, setIsContextualHelpOpen] = useState(false);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [goals, setGoals] = useState<Goal[]>([]);
+  const [linkOptionsError, setLinkOptionsError] = useState<string | null>(null);
   const formRef = useRef<HTMLDivElement | null>(null);
   const referenceDate = useMemo(() => new Date(), []);
   const hasActiveFilter = selectedFilter !== "all";
@@ -194,6 +204,34 @@ export function DecisionLogPage() {
   }, [selectedFilter]);
 
   useEffect(() => {
+    let isCancelled = false;
+
+    void Promise.all([projectsRepository.list(), goalsRepository.list()])
+      .then(([nextProjects, nextGoals]) => {
+        if (isCancelled) {
+          return;
+        }
+
+        setProjects(nextProjects);
+        setGoals(nextGoals);
+        setLinkOptionsError(null);
+      })
+      .catch(() => {
+        if (isCancelled) {
+          return;
+        }
+
+        setProjects([]);
+        setGoals([]);
+        setLinkOptionsError(t("links.loadError"));
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [goalsRepository, projectsRepository, t]);
+
+  useEffect(() => {
     if (!editingDecision) {
       return;
     }
@@ -221,6 +259,8 @@ export function DecisionLogPage() {
       status: values.status,
       category: parseOptionalText(values.category),
       context: values.context,
+      projectId: parseOptionalText(values.projectId),
+      goalId: parseOptionalText(values.goalId),
       options: splitTextList(values.optionsText),
       chosenOption: parseOptionalText(values.chosenOption),
       reasoning: parseOptionalText(values.reasoning),
@@ -439,14 +479,14 @@ export function DecisionLogPage() {
         </div>
       ) : null}
 
-      {error || actionError ? (
+      {error || actionError || linkOptionsError ? (
         <div
           role="alert"
           className="alios-status-danger flex flex-col gap-3 rounded-surface border p-4 sm:flex-row sm:items-center sm:justify-between"
         >
           <div className="flex items-start gap-2 text-sm text-destructive">
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-            <span>{actionError ?? error}</span>
+            <span>{actionError ?? error ?? linkOptionsError}</span>
           </div>
           {error ? (
             <Button type="button" size="sm" variant="outline" onClick={() => void loadEntries()}>
@@ -487,6 +527,8 @@ export function DecisionLogPage() {
               <DecisionLogForm
                 key={editingDecision?.id ?? "decision-log-form"}
                 decision={editingDecision}
+                projects={projects}
+                goals={goals}
                 isSubmitting={isSubmitting}
                 onSubmit={handleSubmit}
                 onCancel={editingDecision ? closeEditor : undefined}
@@ -540,6 +582,8 @@ export function DecisionLogPage() {
               <DecisionLogCard
                 key={decision.id}
                 decision={decision}
+                linkedProject={findLinkedProjectById(decision, projects)}
+                linkedGoal={findLinkedGoalById(decision, goals)}
                 isDeleting={deletingId === decision.id}
                 onEdit={() => {
                   setEditingDecision(decision);
@@ -592,6 +636,8 @@ export function DecisionLogPage() {
             <DecisionLogCard
               key={decision.id}
               decision={decision}
+              linkedProject={findLinkedProjectById(decision, projects)}
+              linkedGoal={findLinkedGoalById(decision, goals)}
               isDeleting={deletingId === decision.id}
               onEdit={() => {
                 setEditingDecision(decision);

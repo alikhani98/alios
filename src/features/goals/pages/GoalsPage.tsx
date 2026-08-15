@@ -18,7 +18,7 @@ import { useStorageAdapter } from "@/core/storage";
 import { useProjects } from "@/features/projects/hooks/useProjects";
 import { useI18n } from "@/shared/i18n";
 import { useViewDensityMode } from "@/shared/preferences/viewDensityMode";
-import type { Goal, Task } from "@/shared/types";
+import type { DecisionLogEntry, Goal, JournalEntry, KnowledgeItem, Task } from "@/shared/types";
 import {
   Button,
   CollapsibleSection,
@@ -195,7 +195,12 @@ export function GoalsContextualHelp({
 export function GoalsPage() {
   const { direction, t } = useI18n();
   const { isSimpleView } = useViewDensityMode();
-  const { tasks: tasksRepository } = useStorageAdapter();
+  const {
+    tasks: tasksRepository,
+    journal: journalRepository,
+    decisions: decisionsRepository,
+    knowledge: knowledgeRepository,
+  } = useStorageAdapter();
   const [searchParams, setSearchParams] = useSearchParams();
   const {
     entries,
@@ -218,6 +223,10 @@ export function GoalsPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isTasksLoading, setIsTasksLoading] = useState(true);
   const [taskLoadError, setTaskLoadError] = useState<string | null>(null);
+  const [linkedJournalEntries, setLinkedJournalEntries] = useState<JournalEntry[]>([]);
+  const [linkedDecisions, setLinkedDecisions] = useState<DecisionLogEntry[]>([]);
+  const [linkedKnowledgeItems, setLinkedKnowledgeItems] = useState<KnowledgeItem[]>([]);
+  const [linkedContentLoadError, setLinkedContentLoadError] = useState<string | null>(null);
   const [formOpen, setFormOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<Goal | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -249,7 +258,9 @@ export function GoalsPage() {
   const summary = useMemo(() => getGoalsSummary(entries), [entries]);
   const isProjectProgressLoading = isProjectsLoading || isTasksLoading;
   const linkedWorkLoadError =
-    taskLoadError ?? (projectsError ? t("goals.linkedWorkLoadError") : null);
+    taskLoadError ??
+    (projectsError ? t("goals.linkedWorkLoadError") : null) ??
+    linkedContentLoadError;
 
   const loadLinkedTasks = useCallback(async () => {
     setIsTasksLoading(true);
@@ -268,6 +279,32 @@ export function GoalsPage() {
   useEffect(() => {
     void loadLinkedTasks();
   }, [loadLinkedTasks]);
+
+  const loadLinkedContent = useCallback(async () => {
+    setLinkedContentLoadError(null);
+
+    try {
+      const [journalEntries, decisionEntries, knowledgeItems] =
+        await Promise.all([
+          journalRepository.list(),
+          decisionsRepository.list(),
+          knowledgeRepository.list(),
+        ]);
+
+      setLinkedJournalEntries(journalEntries);
+      setLinkedDecisions(decisionEntries);
+      setLinkedKnowledgeItems(knowledgeItems);
+    } catch {
+      setLinkedJournalEntries([]);
+      setLinkedDecisions([]);
+      setLinkedKnowledgeItems([]);
+      setLinkedContentLoadError(t("links.relatedContentLoadError"));
+    }
+  }, [decisionsRepository, journalRepository, knowledgeRepository, t]);
+
+  useEffect(() => {
+    void loadLinkedContent();
+  }, [loadLinkedContent]);
 
   const templateCards = useMemo(
     () =>
@@ -692,6 +729,9 @@ export function GoalsPage() {
               if (projectsError) {
                 void loadProjects();
               }
+              if (linkedContentLoadError) {
+                void loadLinkedContent();
+              }
             }}
           >
             <RotateCcw className="me-2 h-4 w-4" />
@@ -915,6 +955,15 @@ export function GoalsPage() {
                       goal={goal}
                       isReviewDue
                       projectProgress={projectProgress}
+                      linkedJournalEntries={linkedJournalEntries.filter(
+                        (entry) => entry.goalId === goal.id
+                      )}
+                      linkedDecisions={linkedDecisions.filter(
+                        (decision) => decision.goalId === goal.id
+                      )}
+                      linkedKnowledgeItems={linkedKnowledgeItems.filter(
+                        (item) => item.goalId === goal.id
+                      )}
                       isProjectProgressLoading={isProjectProgressLoading}
                       useAutoProgress={autoProgressGoalIds.includes(goal.id)}
                       isDeleting={deletingId === goal.id}
@@ -990,6 +1039,15 @@ export function GoalsPage() {
                   goal={goal}
                   isReviewDue={isGoalReviewDue(goal)}
                   projectProgress={projectProgress}
+                  linkedJournalEntries={linkedJournalEntries.filter(
+                    (entry) => entry.goalId === goal.id
+                  )}
+                  linkedDecisions={linkedDecisions.filter(
+                    (decision) => decision.goalId === goal.id
+                  )}
+                  linkedKnowledgeItems={linkedKnowledgeItems.filter(
+                    (item) => item.goalId === goal.id
+                  )}
                   isProjectProgressLoading={isProjectProgressLoading}
                   useAutoProgress={autoProgressGoalIds.includes(goal.id)}
                   isDeleting={deletingId === goal.id}

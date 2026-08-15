@@ -12,6 +12,8 @@ export const journalEntrySchema = z.object({
   type: journalEntryTypeSchema,
   title: z.string().trim().min(1),
   content: z.string().min(1),
+  projectId: z.string().min(1).optional(),
+  goalId: z.string().min(1).optional(),
   moodLevel: level3Schema.optional(),
   energyLevel: level3Schema.optional(),
   createdAt: isoDateTimeSchema,
