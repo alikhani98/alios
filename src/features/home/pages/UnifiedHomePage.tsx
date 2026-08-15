@@ -10,6 +10,7 @@ import {
   RotateCcw,
   ShieldCheck,
   Target,
+  X,
 } from "lucide-react";
 import { type ReactNode, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
@@ -21,6 +22,7 @@ import { WellnessBadmintonCard } from "@/features/wellness";
 import { useDateFormatter } from "@/shared/date";
 import { useBackupStatus } from "@/shared/hooks";
 import { useI18n, type TranslationKey } from "@/shared/i18n";
+import { getBackupAgeInDays } from "@/shared/preferences/backupStatus";
 import {
   Badge,
   Button,
@@ -39,6 +41,11 @@ import { HomeCalendarCard } from "../components/HomeCalendarCard";
 import { HomeManualCard } from "../components/HomeManualCard";
 import { HomePersonalMetricsCard } from "../components/HomePersonalMetricsCard";
 import { HomePersonalInsightsCard } from "../components/HomePersonalInsightsCard";
+import {
+  readHomeBackupReminderDismissedUntil,
+  shouldShowHomeBackupReminder,
+  writeHomeBackupReminderDismissal,
+} from "../backupReminder";
 import { useHomeDashboard } from "../hooks/useHomeDashboard";
 import type { HomeCollapsibleSectionId } from "../homeCollapsedSections";
 import type { HomeDashboardData } from "../types";
@@ -452,21 +459,27 @@ function QuickActions() {
 
 export function UnifiedHomePage() {
   const { t } = useI18n();
-  const { freshness: backupFreshness } = useBackupStatus();
+  const { freshness: backupFreshness, status: backupStatus } = useBackupStatus();
   const { data, isLoading, hasError, loadDashboard } = useHomeDashboard();
   const [searchParams] = useSearchParams();
   const today = getRequestedToday(searchParams);
   const [selectedRoutineTemplateId, setSelectedRoutineTemplateId] =
     useState<RoutineTemplateId | null>(null);
+  const [backupReminderDismissedUntil, setBackupReminderDismissedUntil] =
+    useState(() => readHomeBackupReminderDismissedUntil());
 
   const showBackupReminder =
     !isLoading &&
     !hasError &&
-    (backupFreshness === "never" || backupFreshness === "overdue");
-  const backupReminderBodyKey =
-    backupFreshness === "never"
-      ? "home.backupReminderNever"
-      : "home.backupReminderOverdue";
+    shouldShowHomeBackupReminder({
+      lastBackupAt: backupStatus?.lastBackupAt,
+      dismissedUntil: backupReminderDismissedUntil,
+    });
+  const backupAgeInDays = getBackupAgeInDays(backupStatus?.lastBackupAt);
+  const backupReminderBody =
+    backupAgeInDays === null
+      ? t("home.backupReminderNever")
+      : t("home.backupReminderDaysAgo", { count: backupAgeInDays });
 
   if (!data && !isLoading && !hasError) {
     return null;
@@ -513,13 +526,27 @@ export function UnifiedHomePage() {
                 </StatusChip>
               </div>
               <p className="text-sm leading-6 text-muted-foreground">
-                {t(backupReminderBodyKey)}
+                {backupReminderBody}
               </p>
             </div>
           </div>
-          <Button asChild variant="outline" size="sm" className="w-full shrink-0 sm:w-auto">
-            <Link to="/settings">{t("home.backupReminderAction")}</Link>
-          </Button>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <Button asChild variant="outline" size="sm" className="w-full shrink-0 sm:w-auto">
+              <Link to="/settings#settings-backup-restore">{t("home.backupReminderAction")}</Link>
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="w-full shrink-0 sm:w-auto"
+              onClick={() => {
+                setBackupReminderDismissedUntil(writeHomeBackupReminderDismissal());
+              }}
+            >
+              <X className="me-2 h-4 w-4" aria-hidden="true" />
+              {t("home.backupReminderDismiss")}
+            </Button>
+          </div>
         </SoftPanel>
       ) : null}
 

@@ -4,7 +4,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { DateDisplayProvider } from "@/shared/date";
 import { I18nProvider, LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
+import type {
+  BackupStatusFreshness,
+  BackupStatusMetadata,
+} from "@/shared/preferences/backupStatus";
 import type { HomeDashboardData } from "../types";
+import { HOME_BACKUP_REMINDER_DISMISSED_UNTIL_KEY } from "../backupReminder";
 import { getDailyBriefingViewModel } from "../components/DailyBriefingCard";
 import { buildHomePersonalMetrics } from "../personalMetrics";
 
@@ -115,6 +120,8 @@ vi.mock("@/features/today/components/TodayWorkspace", () => ({
 }));
 
 let mockedDashboardData: HomeDashboardData = dashboardData;
+let mockedBackupStatus: BackupStatusMetadata | null = null;
+let mockedBackupFreshness: BackupStatusFreshness = "fresh";
 
 vi.mock("../hooks/useHomeDashboard", () => ({
   useHomeDashboard: () => ({
@@ -131,8 +138,8 @@ vi.mock("@/shared/hooks", async () => {
   return {
     ...actual,
     useBackupStatus: () => ({
-      freshness: "fresh",
-      lastBackupAt: null,
+      freshness: mockedBackupFreshness,
+      status: mockedBackupStatus,
       updateLastBackupStatus: vi.fn(),
     }),
   };
@@ -159,6 +166,12 @@ describe("UnifiedHomePage", () => {
     localStorage.clear();
     localStorage.setItem(LANGUAGE_STORAGE_KEY, "en");
     mockedDashboardData = dashboardData;
+    mockedBackupStatus = {
+      lastBackupAt: "2026-08-09T07:00:00.000Z",
+      lastBackupVersion: 1,
+      updatedAt: "2026-08-09T07:00:00.000Z",
+    };
+    mockedBackupFreshness = "fresh";
   });
 
   afterEach(() => {
@@ -194,6 +207,60 @@ describe("UnifiedHomePage", () => {
     expect(markup).toContain('aria-expanded="false"');
     expect(markup).toContain('id="unified-home-more-context-content" hidden="" aria-hidden="true"');
     expect(markup).toContain("Quick links");
+  });
+
+  it("shows the backup reminder when the last backup is older than seven days", () => {
+    mockedBackupStatus = {
+      lastBackupAt: "2026-08-01T07:00:00.000Z",
+      lastBackupVersion: 1,
+      updatedAt: "2026-08-01T07:00:00.000Z",
+    };
+    mockedBackupFreshness = "dueSoon";
+
+    const markup = renderUnifiedHome();
+
+    expect(markup).toContain("Backup reminder");
+    expect(markup).toContain("Last backup was 8 day(s) ago");
+    expect(markup).toContain("Open backup settings");
+    expect(markup).toContain("Hide for 3 days");
+  });
+
+  it("hides the backup reminder when the last backup is recent", () => {
+    mockedBackupStatus = {
+      lastBackupAt: "2026-08-06T07:00:00.000Z",
+      lastBackupVersion: 1,
+      updatedAt: "2026-08-06T07:00:00.000Z",
+    };
+    mockedBackupFreshness = "fresh";
+
+    const markup = renderUnifiedHome();
+
+    expect(markup).not.toContain("Backup reminder");
+    expect(markup).not.toContain("Open backup settings");
+  });
+
+  it("hides the backup reminder for three days after dismiss", () => {
+    mockedBackupStatus = {
+      lastBackupAt: "2026-08-01T07:00:00.000Z",
+      lastBackupVersion: 1,
+      updatedAt: "2026-08-01T07:00:00.000Z",
+    };
+    mockedBackupFreshness = "dueSoon";
+    localStorage.setItem(
+      HOME_BACKUP_REMINDER_DISMISSED_UNTIL_KEY,
+      "2026-08-12T08:00:00.000Z"
+    );
+
+    const hiddenMarkup = renderUnifiedHome();
+
+    expect(hiddenMarkup).not.toContain("Backup reminder");
+
+    vi.setSystemTime(new Date("2026-08-12T08:01:00.000Z"));
+
+    const visibleMarkup = renderUnifiedHome();
+
+    expect(visibleMarkup).toContain("Backup reminder");
+    expect(visibleMarkup).toContain("Last backup was 11 day(s) ago");
   });
 
   it("guides a no-task day toward a small inbox-processing step", () => {

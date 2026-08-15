@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased - Home Backup Reminder Refresh
+
+- Refined the Home backup reminder so it appears when no manual backup exists or the last recorded backup is older than seven days.
+- Added a local three-day dismiss action stored in browser `localStorage` without changing backup export, restore, backup metadata, repositories, schemas, or storage behavior.
+- Updated the Home reminder copy to show the last-backup age and link directly to the Settings backup section.
+- Added focused Home coverage for stale backups, recent backups, and dismiss-window behavior.
+
 ## Unreleased - First-run Onboarding Wizard
 
 - Added a one-time local onboarding wizard that appears when `alios.onboarding.completed` is absent from browser `localStorage`.
