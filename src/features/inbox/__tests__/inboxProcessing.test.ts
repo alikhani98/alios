@@ -60,6 +60,23 @@ describe("Inbox processing", () => {
     });
   });
 
+  it("uses natural-language time and duration when converting an Inbox item to a Today task", async () => {
+    const inboxItem = await storage.inbox.create({
+      content: "جلسه فردا ساعت ۱۵ به مدت ۳۰ دقیقه",
+      type: "task",
+    });
+
+    await processInboxItem(storage, inboxItem.id, "todayTask", "2026-07-05");
+
+    const [task] = await storage.tasks.list();
+    expect(task).toMatchObject({
+      title: inboxItem.content,
+      dueDate: "2026-07-06",
+      scheduledStartTime: "15:00",
+      estimatedMinutes: 30,
+    });
+  });
+
   it("converts an Inbox item to a Journal entry", async () => {
     const inboxItem = await storage.inbox.create({
       content: "A useful reflection captured for the daily journal.",

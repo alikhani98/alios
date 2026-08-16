@@ -7,6 +7,7 @@ import {
   Pencil,
   Repeat2,
   Star,
+  Timer,
   Trash2,
   XCircle,
 } from "lucide-react";
@@ -30,6 +31,7 @@ type TodayTaskCardProps = {
   isBusy: boolean;
   contextLabel?: string;
   allowMit?: boolean;
+  focusSessionPath?: string;
   onEdit: () => void;
   onStatusChange: (status: TaskStatus) => Promise<void>;
   onSelectMit: () => Promise<void>;
@@ -43,6 +45,7 @@ export function TodayTaskCard({
   isBusy,
   contextLabel,
   allowMit = true,
+  focusSessionPath,
   onEdit,
   onStatusChange,
   onSelectMit,
@@ -216,6 +219,15 @@ export function TodayTaskCard({
             >
               <Star className="me-2 h-4 w-4" />
               {t("today.makeMitShort")}
+            </Button>
+          ) : null}
+
+          {focusSessionPath ? (
+            <Button asChild size="sm" variant="outline" className="w-full sm:w-auto">
+              <Link to={focusSessionPath}>
+                <Timer className="me-2 h-4 w-4" aria-hidden="true" />
+                {t("today.startFocusSession")}
+              </Link>
             </Button>
           ) : null}
 

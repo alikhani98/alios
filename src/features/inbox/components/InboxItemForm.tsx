@@ -54,7 +54,7 @@ export function InboxItemForm({ item, isSubmitting, onSubmit, onCancel }: Props)
     defaultValues: { content: item?.content ?? "", type: item?.type ?? "note" },
   });
   const contentValue = watch("content");
-  const dateSuggestion = detectNaturalDate(contentValue ?? "");
+  const scheduleSuggestion = detectNaturalDate(contentValue ?? "");
   const [speechRecognition, setSpeechRecognition] =
     useState<SpeechRecognitionConstructor | null>(null);
   const [isListening, setIsListening] = useState(false);
@@ -151,11 +151,17 @@ export function InboxItemForm({ item, isSubmitting, onSubmit, onCancel }: Props)
           ) : null}
         </div>
         {errors.content ? <p className="text-sm text-destructive">{t("inbox.contentRequired")}</p> : null}
-        {dateSuggestion ? (
+        {scheduleSuggestion ? (
           <p className="rounded-control border border-alios-saffron/40 bg-alios-saffron/10 px-3 py-2 text-sm leading-6 text-foreground">
-            {t("inbox.naturalDateSuggestion", {
-              date: dateSuggestion.date,
-              phrase: dateSuggestion.phrase,
+            {t("inbox.naturalScheduleSuggestion", {
+              date: scheduleSuggestion.date ?? t("today.noSuggestedDate"),
+              duration: scheduleSuggestion.estimatedMinutes
+                ? t("today.suggestedDurationMinutes", {
+                    minutes: scheduleSuggestion.estimatedMinutes,
+                  })
+                : t("today.noSuggestedDuration"),
+              phrase: scheduleSuggestion.phrase,
+              time: scheduleSuggestion.scheduledStartTime ?? t("today.noSuggestedTime"),
             })}
           </p>
         ) : null}

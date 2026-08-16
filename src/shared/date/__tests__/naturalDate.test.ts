@@ -29,4 +29,21 @@ describe("natural date detection", () => {
       phrase: "دوشنبه بعد",
     });
   });
+
+  it("detects time and duration alongside Persian date phrases", () => {
+    expect(
+      detectNaturalDate("جلسه فردا ساعت ۱۵ به مدت ۳۰ دقیقه", baseDate)
+    ).toMatchObject({
+      date: "2026-07-06",
+      scheduledStartTime: "15:00",
+      estimatedMinutes: 30,
+    });
+  });
+
+  it("detects English time and duration without forcing a date", () => {
+    expect(detectNaturalDate("Planning block at 3pm for 45 minutes", baseDate)).toMatchObject({
+      scheduledStartTime: "15:00",
+      estimatedMinutes: 45,
+    });
+  });
 });

@@ -10,7 +10,10 @@ import { projectRecord, taskRecord } from "@/test/factories";
 
 import { TodayTaskCard } from "../components/TodayTaskCard";
 import { TodayTaskForm } from "../components/TodayTaskForm";
-import { TodayTimeBlockingTimeline } from "../components/TodayTimeBlockingTimeline";
+import {
+  findConflictingTimeBlockTaskIds,
+  TodayTimeBlockingTimeline,
+} from "../components/TodayTimeBlockingTimeline";
 import { TodayWeeklyPlanCard } from "../components/TodayWeeklyPlanCard";
 import {
   getDefaultCompletedTasksOpen,
@@ -158,6 +161,20 @@ describe("Task project links", () => {
     expect(html).toContain("Delete");
   });
 
+  it("renders a Focus timer handoff action when Focus Mode provides a task path", () => {
+    const html = renderTodayUi(
+      <TodayTaskCard
+        task={taskRecord}
+        isLinkedProjectLoading={false}
+        focusSessionPath={`/focus?taskId=${encodeURIComponent(taskRecord.id)}`}
+        {...taskActions}
+      />
+    );
+
+    expect(html).toContain("Start focus session");
+    expect(html).toContain('href="/focus?taskId=fixture-id"');
+  });
+
   it("keeps an orphaned Task usable without a cascade", () => {
     const html = renderTodayUi(
       <TodayTaskCard
@@ -249,6 +266,57 @@ describe("Task project links", () => {
     expect(html).toContain("Focused writing block");
     expect(html).toContain("09:30");
     expect(html).toContain("45m planned");
+  });
+
+  it("flags overlapping time blocks without changing unscheduled tasks", () => {
+    const conflicts = findConflictingTimeBlockTaskIds([
+      {
+        ...taskRecord,
+        id: "first",
+        title: "First block",
+        scheduledStartTime: "09:00",
+        estimatedMinutes: 60,
+      },
+      {
+        ...taskRecord,
+        id: "second",
+        title: "Second block",
+        scheduledStartTime: "09:30",
+        estimatedMinutes: 30,
+      },
+      {
+        ...taskRecord,
+        id: "unscheduled",
+        title: "Unscheduled task",
+        scheduledStartTime: undefined,
+        estimatedMinutes: undefined,
+      },
+    ]);
+
+    expect(Array.from(conflicts).sort()).toEqual(["first", "second"]);
+
+    const html = renderTodayUi(
+      <TodayTimeBlockingTimeline
+        tasks={[
+          {
+            ...taskRecord,
+            id: "first",
+            title: "First block",
+            scheduledStartTime: "09:00",
+            estimatedMinutes: 60,
+          },
+          {
+            ...taskRecord,
+            id: "second",
+            title: "Second block",
+            scheduledStartTime: "09:30",
+            estimatedMinutes: 30,
+          },
+        ]}
+      />
+    );
+
+    expect(html).toContain("Overlaps another time block.");
   });
 
   it("keeps the weekly planning detail collapsed while showing its status summary", () => {

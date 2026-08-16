@@ -9,6 +9,7 @@ import {
   Timer,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 import { useStorageAdapter } from "@/core/storage";
 import { useI18n } from "@/shared/i18n";
@@ -143,7 +144,9 @@ function getPhaseLabelKey(timerState: FocusTimerState) {
 
 export function FocusPage() {
   const { t } = useI18n();
+  const [searchParams] = useSearchParams();
   const { focusSessions, tasks: tasksRepository } = useStorageAdapter();
+  const requestedTaskId = searchParams.get("taskId") ?? "";
   const [timerState, setTimerState] = useState<FocusTimerState>(() =>
     createInitialFocusTimerState()
   );
@@ -176,6 +179,13 @@ export function FocusPage() {
       setTasks(todayTasks);
       setSessions(allSessions);
       if (
+        requestedTaskId &&
+        todayTasks.some((task) => task.id === requestedTaskId)
+      ) {
+        setSelectedTaskId(requestedTaskId);
+        return;
+      }
+      if (
         selectedTaskIdRef.current &&
         !todayTasks.some((task) => task.id === selectedTaskIdRef.current)
       ) {
@@ -188,7 +198,7 @@ export function FocusPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [focusSessions, tasksRepository, t]);
+  }, [focusSessions, requestedTaskId, tasksRepository, t]);
 
   useEffect(() => {
     void loadFocusData();

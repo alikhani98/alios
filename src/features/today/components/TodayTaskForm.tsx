@@ -54,7 +54,37 @@ export function TodayTaskForm({
   });
   const titleValue = watch("title");
   const dueDateValue = watch("dueDate");
-  const dateSuggestion = detectNaturalDate(titleValue ?? "");
+  const scheduledStartTimeValue = watch("scheduledStartTime");
+  const estimatedMinutesValue = watch("estimatedMinutes");
+  const scheduleSuggestion = detectNaturalDate(titleValue ?? "");
+  const hasUnusedScheduleSuggestion = Boolean(
+    scheduleSuggestion &&
+      ((scheduleSuggestion.date && scheduleSuggestion.date !== dueDateValue) ||
+        (scheduleSuggestion.scheduledStartTime &&
+          scheduleSuggestion.scheduledStartTime !== scheduledStartTimeValue) ||
+        (scheduleSuggestion.estimatedMinutes &&
+          scheduleSuggestion.estimatedMinutes !== Number(estimatedMinutesValue)))
+  );
+
+  const applyScheduleSuggestion = () => {
+    if (!scheduleSuggestion) {
+      return;
+    }
+
+    if (scheduleSuggestion.date) {
+      setValue("dueDate", scheduleSuggestion.date, { shouldDirty: true });
+    }
+    if (scheduleSuggestion.scheduledStartTime) {
+      setValue("scheduledStartTime", scheduleSuggestion.scheduledStartTime, {
+        shouldDirty: true,
+      });
+    }
+    if (scheduleSuggestion.estimatedMinutes) {
+      setValue("estimatedMinutes", scheduleSuggestion.estimatedMinutes, {
+        shouldDirty: true,
+      });
+    }
+  };
 
   return (
     <form
@@ -75,21 +105,27 @@ export function TodayTaskForm({
         {errors.title ? (
           <p className="text-sm text-destructive">{t("common.validation")}</p>
         ) : null}
-        {dateSuggestion && dateSuggestion.date !== dueDateValue ? (
+        {scheduleSuggestion && hasUnusedScheduleSuggestion ? (
           <div className="flex flex-col gap-2 rounded-control border border-alios-saffron/40 bg-alios-saffron/10 px-3 py-2 text-sm leading-6 sm:flex-row sm:items-center sm:justify-between">
             <span>
-              {t("today.naturalDateSuggestion", {
-                date: dateSuggestion.date,
-                phrase: dateSuggestion.phrase,
+              {t("today.naturalScheduleSuggestion", {
+                date: scheduleSuggestion.date ?? t("today.noSuggestedDate"),
+                duration: scheduleSuggestion.estimatedMinutes
+                  ? t("today.suggestedDurationMinutes", {
+                      minutes: scheduleSuggestion.estimatedMinutes,
+                    })
+                  : t("today.noSuggestedDuration"),
+                phrase: scheduleSuggestion.phrase,
+                time: scheduleSuggestion.scheduledStartTime ?? t("today.noSuggestedTime"),
               })}
             </span>
             <Button
               type="button"
               size="sm"
               variant="outline"
-              onClick={() => setValue("dueDate", dateSuggestion.date, { shouldDirty: true })}
+              onClick={applyScheduleSuggestion}
             >
-              {t("today.useSuggestedDate")}
+              {t("today.useSuggestedSchedule")}
             </Button>
           </div>
         ) : null}

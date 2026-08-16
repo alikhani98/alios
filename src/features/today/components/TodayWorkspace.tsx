@@ -435,6 +435,14 @@ export function TodayWorkspace({
       t("today.taskDeleteError")
     );
 
+  const handleScheduleTask = (task: Task, scheduledStartTime: string) =>
+    runTaskAction(
+      task.id,
+      () => updateTask(task.id, { scheduledStartTime }),
+      t("today.timeBlockingMoved"),
+      t("today.taskSaveError")
+    );
+
   const handleAddRoutine = async (routine: (typeof routines)[number]) => {
     setBusyRoutineId(routine.id);
     setActionError(null);
@@ -799,6 +807,11 @@ export function TodayWorkspace({
                     linkedProject={findLinkedProject(task, projects)}
                     isLinkedProjectLoading={isProjectsLoading}
                     isBusy={busyTaskId === task.id}
+                    focusSessionPath={
+                      isFocusMode
+                        ? `/focus?taskId=${encodeURIComponent(task.id)}`
+                        : undefined
+                    }
                     onEdit={() => openEditTask(task)}
                     onStatusChange={(status) => handleStatusChange(task, status)}
                     onSelectMit={() => handleSelectMit(task)}
@@ -863,7 +876,10 @@ export function TodayWorkspace({
         </div>
 
         <div className="space-y-6">
-          <TodayTimeBlockingTimeline tasks={orderedVisibleTasks} />
+          <TodayTimeBlockingTimeline
+            tasks={orderedVisibleTasks}
+            onTaskScheduleChange={handleScheduleTask}
+          />
 
           <TodayWeeklyPlanCard focus={weeklyPlanFocus} isLoading={isWeeklyPlanLoading} />
 

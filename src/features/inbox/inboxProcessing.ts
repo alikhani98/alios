@@ -69,6 +69,8 @@ export async function processInboxItem(
       priority: "medium",
       dueDate: suggestedDate?.date ?? today,
       isMit: false,
+      scheduledStartTime: suggestedDate?.scheduledStartTime,
+      estimatedMinutes: suggestedDate?.estimatedMinutes,
     });
   } else if (target === "journalEntry") {
     await storage.journal.create({
