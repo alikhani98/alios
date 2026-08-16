@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased - Sync Security Disclosure
+
+- Documented the current Supabase sync security model honestly in Settings, README, and the Supabase setup guide.
+- Clarified that sync uses HTTPS, Supabase authentication, and row-level security, but synced records are not end-to-end encrypted in the current implementation.
+- Noted that synced payloads are stored as readable records in the user's Supabase project and that highly sensitive content can remain local-only.
+- Changed no sync provider, repository, schema, storage, authentication, dependency, or data behavior.
+
 ## Unreleased - Accessibility Hardening
 
 - Added a keyboard skip link from the app shell to the main route content.

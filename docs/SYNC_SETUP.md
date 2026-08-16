@@ -151,6 +151,14 @@ VITE_SUPABASE_ANON_KEY=...
 
   This does not delete local AliOS data in the browser. It only removes remote sync rows from Supabase.
 
+## Security Notes
+
+- Sync requests should use the HTTPS Supabase project URL, and AliOS sends authenticated requests through the current Supabase session.
+- The setup SQL enables row-level security so each signed-in user can access only rows where `user_id = auth.uid()`.
+- AliOS does not provide end-to-end encryption in this stage. Synced payloads are stored as readable JSONB records in your Supabase project.
+- If your privacy needs require no cloud-readable copy, keep highly sensitive content local-only and rely on manual backup/export instead of sync for that content.
+- End-to-end encryption can be considered as a future improvement, but it is not part of the current verified sync implementation.
+
 ## Architecture Summary
 
 - Email authentication is implemented through `src/core/auth/EmailAuthProvider.ts`.

@@ -162,6 +162,8 @@ Use Settings to export a versioned AliOS JSON backup and store it outside the br
 
 Supabase-backed Email authentication and synchronization are supported as optional capabilities. The app remains usable without them.
 
+Sync uses HTTPS and Supabase row-level security for protection; data is not end-to-end encrypted at this stage.
+
 Sync currently requires:
 
 1. Supabase configuration in the frontend environment.

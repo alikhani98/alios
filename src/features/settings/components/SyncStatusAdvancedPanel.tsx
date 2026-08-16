@@ -1631,6 +1631,11 @@ export function SyncStatusAdvancedPanel({
                 <li>{t("settings.syncPrivacyRuleNoCategoryActivation")}</li>
                 <li>{t("settings.syncPrivacyRuleLocalAvailability")}</li>
               </ul>
+              <SoftPanel className="border-primary/20 bg-primary/5">
+                <p className="text-sm leading-6 text-muted-foreground">
+                  {t("settings.syncSecurityPlaintextNotice")}
+                </p>
+              </SoftPanel>
             </div>
           </CollapsibleSection>
           {showRetryPanel ? (

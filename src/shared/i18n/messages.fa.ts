@@ -399,6 +399,7 @@ export const messagesFa: Record<TranslationKey, string> = {
   "settings.syncVisibilityBadge": "نمایش: {visibility}",
   "settings.syncPrivacySectionTitle": "حریم خصوصی همگام‌سازی",
   "settings.syncPrivacySectionDescription": "AliOS نشان می‌دهد کدام دسته‌ها همگام می‌شوند، کدام دسته‌ها محلی می‌مانند، و مرز مرحلهٔ فعلی پیش از هر تغییر گسترده‌تر در اشتراک داده کجاست.",
+  "settings.syncSecurityPlaintextNotice": "داده‌های همگام‌شده با HTTPS، احراز هویت Supabase و امنیت سطح ردیف محافظت می‌شوند، اما رمزگذاری سرتاسری (E2EE) ندارند. داده‌ها به صورت خوانا در پروژه Supabase شما ذخیره می‌شوند. اگر ترجیح می‌دهید هیچ داده‌ای در فضای ابری نباشد، محتوای حساس را فقط محلی نگه دارید.",
   "settings.syncPrivacySectionStatus": "دامنهٔ صریح",
   "settings.syncPrivacySyncedTitle": "چه چیزهایی الآن همگام می‌شوند",
   "settings.syncPrivacySyncedDescription": "ترجیح‌ها، وظیفه‌ها، روتین‌ها، پروژه‌ها، هدف‌ها، داده‌های مالی، و ورودی‌های دفترچهٔ شخصی بعد از اتصال حساب و اقدام صریح کاربر می‌توانند همگام شوند.",

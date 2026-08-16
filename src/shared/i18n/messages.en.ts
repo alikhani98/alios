@@ -465,6 +465,7 @@ export const messagesEn = {
   "settings.syncVisibilityBadge": "Visibility: {visibility}",
   "settings.syncPrivacySectionTitle": "Sync privacy",
   "settings.syncPrivacySectionDescription": "AliOS shows which categories sync, which remain local, and where the current stage stops before any broader data-sharing change is allowed.",
+  "settings.syncSecurityPlaintextNotice": "Synced records are protected by HTTPS, Supabase authentication, and row-level security, but are not end-to-end encrypted. Data is stored as readable records in your Supabase project. Keep highly sensitive content local-only if you prefer no cloud storage.",
   "settings.syncPrivacySectionStatus": "Explicit scope",
   "settings.syncPrivacySyncedTitle": "What syncs now",
   "settings.syncPrivacySyncedDescription": "Preferences, tasks, routines, projects, goals, Finance, and Personal Manual entries can sync after account connection and explicit user action.",
