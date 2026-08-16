@@ -1,13 +1,19 @@
 import type {
+  CreateFinanceAssetInput,
+  CreateFinanceCategoryBudgetInput,
   CreateFinanceObligationInput,
   CreateFinanceTransactionInput,
+  UpdateFinanceAssetInput,
+  UpdateFinanceCategoryBudgetInput,
   UpdateFinanceObligationInput,
   UpdateFinanceTransactionInput,
 } from "@/core/repositories";
 import {
+  FINANCE_ASSET_TYPE_VALUES,
   FINANCE_OBLIGATION_STATUS_VALUES,
   FINANCE_OBLIGATION_TYPE_VALUES,
   FINANCE_TRANSACTION_TYPE_VALUES,
+  type FinanceAssetType,
   type FinanceObligationStatus,
   type FinanceObligationType,
   type FinanceTransactionType,
@@ -17,6 +23,10 @@ export type FinanceTransactionFormValues = CreateFinanceTransactionInput;
 export type FinanceTransactionUpdateValues = UpdateFinanceTransactionInput;
 export type FinanceObligationFormValues = CreateFinanceObligationInput;
 export type FinanceObligationUpdateValues = UpdateFinanceObligationInput;
+export type FinanceCategoryBudgetFormValues = CreateFinanceCategoryBudgetInput;
+export type FinanceCategoryBudgetUpdateValues = UpdateFinanceCategoryBudgetInput;
+export type FinanceAssetFormValues = CreateFinanceAssetInput;
+export type FinanceAssetUpdateValues = UpdateFinanceAssetInput;
 
 export const FINANCE_TRANSACTION_TYPE_OPTIONS = FINANCE_TRANSACTION_TYPE_VALUES.map(
   (value) =>
@@ -53,6 +63,21 @@ export const FINANCE_OBLIGATION_STATUS_OPTIONS = FINANCE_OBLIGATION_STATUS_VALUE
     }) as const
 );
 
+export const FINANCE_ASSET_TYPE_OPTIONS = FINANCE_ASSET_TYPE_VALUES.map(
+  (value) =>
+    ({
+      value,
+      labelKey:
+        value === "stock"
+          ? "finance.assetTypeStock"
+          : value === "gold"
+            ? "finance.assetTypeGold"
+            : value === "savings"
+              ? "finance.assetTypeSavings"
+              : "finance.assetTypeOther",
+    }) as const
+);
+
 export const FINANCE_CATEGORY_OPTIONS = [
   { value: "salary", labelKey: "finance.categorySalary" },
   { value: "freelance", labelKey: "finance.categoryFreelance" },
@@ -82,6 +107,8 @@ export const DEFAULT_FINANCE_OBLIGATION_TYPE: FinanceObligationType =
 
 export const DEFAULT_FINANCE_OBLIGATION_STATUS: FinanceObligationStatus =
   "active";
+
+export const DEFAULT_FINANCE_ASSET_TYPE: FinanceAssetType = "savings";
 
 export function getFinanceTransactionCategoryLabelKey(
   category: string

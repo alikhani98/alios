@@ -54,6 +54,8 @@ export function useLocalDataManagement() {
         manualEntries: 0,
         financeTransactions: 0,
         financeObligations: 0,
+        financeCategoryBudgets: 0,
+        financeAssets: 0,
         focusSessions: 0,
         projects: 0,
         journalEntries: 0,

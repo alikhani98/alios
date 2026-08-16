@@ -2,6 +2,8 @@ import type {
   CreateDailyCheckinInput,
   CreateDecisionLogEntryInput,
   CreateGoalInput,
+  CreateFinanceAssetInput,
+  CreateFinanceCategoryBudgetInput,
   CreateFinanceObligationInput,
   CreateFinanceTransactionInput,
   CreateFocusSessionInput,
@@ -19,6 +21,8 @@ import type {
   DailyCheckin,
   DecisionLogEntry,
   Goal,
+  FinanceAsset,
+  FinanceCategoryBudget,
   FinanceObligation,
   FinanceTransaction,
   FocusSession,
@@ -134,6 +138,18 @@ export const financeObligationInput: CreateFinanceObligationInput = {
   notes: "Monthly installment for the phone",
 };
 
+export const financeCategoryBudgetInput: CreateFinanceCategoryBudgetInput = {
+  category: "groceries",
+  monthlyLimitAmount: 1200,
+};
+
+export const financeAssetInput: CreateFinanceAssetInput = {
+  title: "Emergency savings",
+  type: "savings",
+  currentValue: 10000,
+  notes: "Manual savings balance",
+};
+
 export const focusSessionInput: CreateFocusSessionInput = {
   startedAt: "2026-07-05T08:30:00.000Z",
   durationMinutes: 25,
@@ -236,6 +252,14 @@ export const financeTransactionRecord: FinanceTransaction = {
 };
 export const financeObligationRecord: FinanceObligation = {
   ...financeObligationInput,
+  ...metadata,
+};
+export const financeCategoryBudgetRecord: FinanceCategoryBudget = {
+  ...financeCategoryBudgetInput,
+  ...metadata,
+};
+export const financeAssetRecord: FinanceAsset = {
+  ...financeAssetInput,
   ...metadata,
 };
 export const focusSessionRecord: FocusSession = {

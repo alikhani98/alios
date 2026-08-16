@@ -1,4 +1,6 @@
 import type {
+  FinanceAsset,
+  FinanceCategoryBudget,
   FinanceObligation,
   FinanceTransaction,
 } from "@/shared/types";
@@ -16,6 +18,21 @@ export type CreateFinanceObligationInput = Omit<
 >;
 
 export type UpdateFinanceObligationInput = Partial<CreateFinanceObligationInput>;
+
+export type CreateFinanceCategoryBudgetInput = Omit<
+  FinanceCategoryBudget,
+  "id" | "createdAt" | "updatedAt"
+>;
+
+export type UpdateFinanceCategoryBudgetInput =
+  Partial<CreateFinanceCategoryBudgetInput>;
+
+export type CreateFinanceAssetInput = Omit<
+  FinanceAsset,
+  "id" | "createdAt" | "updatedAt"
+>;
+
+export type UpdateFinanceAssetInput = Partial<CreateFinanceAssetInput>;
 
 export interface FinanceRepository {
   listTransactions(): Promise<FinanceTransaction[]>;
@@ -39,4 +56,24 @@ export interface FinanceRepository {
     input: UpdateFinanceObligationInput
   ): Promise<FinanceObligation>;
   deleteObligation(id: string): Promise<void>;
+
+  listCategoryBudgets(): Promise<FinanceCategoryBudget[]>;
+  getCategoryBudgetById(id: string): Promise<FinanceCategoryBudget | undefined>;
+  createCategoryBudget(
+    input: CreateFinanceCategoryBudgetInput
+  ): Promise<FinanceCategoryBudget>;
+  updateCategoryBudget(
+    id: string,
+    input: UpdateFinanceCategoryBudgetInput
+  ): Promise<FinanceCategoryBudget>;
+  deleteCategoryBudget(id: string): Promise<void>;
+
+  listAssets(): Promise<FinanceAsset[]>;
+  getAssetById(id: string): Promise<FinanceAsset | undefined>;
+  createAsset(input: CreateFinanceAssetInput): Promise<FinanceAsset>;
+  updateAsset(
+    id: string,
+    input: UpdateFinanceAssetInput
+  ): Promise<FinanceAsset>;
+  deleteAsset(id: string): Promise<void>;
 }

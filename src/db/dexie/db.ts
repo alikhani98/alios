@@ -4,7 +4,9 @@ import type {
   DailyCheckin,
   DecisionLogEntry,
   Goal,
+  FinanceAsset,
   FinanceObligation,
+  FinanceCategoryBudget,
   FinanceTransaction,
   FocusSession,
   JournalEntry,
@@ -31,6 +33,8 @@ import {
   DEXIE_SCHEMA_V9,
   DEXIE_SCHEMA_V10,
   DEXIE_SCHEMA_V11,
+  DEXIE_SCHEMA_V12,
+  DEXIE_SCHEMA_V13,
   DEXIE_SCHEMA_VERSION,
   DEXIE_SCHEMA_VERSION_3,
   DEXIE_SCHEMA_VERSION_4,
@@ -41,6 +45,8 @@ import {
   DEXIE_SCHEMA_VERSION_9,
   DEXIE_SCHEMA_VERSION_10,
   DEXIE_SCHEMA_VERSION_11,
+  DEXIE_SCHEMA_VERSION_12,
+  DEXIE_SCHEMA_VERSION_13,
 } from "./schema";
 
 export class AliosDatabase extends Dexie {
@@ -57,6 +63,8 @@ export class AliosDatabase extends Dexie {
   inboxItems!: Table<InboxItem, string>;
   financeTransactions!: Table<FinanceTransaction, string>;
   financeObligations!: Table<FinanceObligation, string>;
+  financeCategoryBudgets!: Table<FinanceCategoryBudget, string>;
+  financeAssets!: Table<FinanceAsset, string>;
   routines!: Table<Routine, string>;
   weeklyPlans!: Table<WeeklyPlan, string>;
   focusSessions!: Table<FocusSession, string>;
@@ -74,6 +82,8 @@ export class AliosDatabase extends Dexie {
     this.version(DEXIE_SCHEMA_VERSION_9).stores(DEXIE_SCHEMA_V9);
     this.version(DEXIE_SCHEMA_VERSION_10).stores(DEXIE_SCHEMA_V10);
     this.version(DEXIE_SCHEMA_VERSION_11).stores(DEXIE_SCHEMA_V11);
+    this.version(DEXIE_SCHEMA_VERSION_12).stores(DEXIE_SCHEMA_V12);
+    this.version(DEXIE_SCHEMA_VERSION_13).stores(DEXIE_SCHEMA_V13);
   }
 }
 

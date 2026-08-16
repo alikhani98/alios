@@ -15,6 +15,7 @@ describe("finance section helpers", () => {
       "finance-charts",
       "finance-review",
       "finance-obligations",
+      "finance-assets",
       "finance-transactions",
       "finance-add",
     ]);
@@ -24,12 +25,13 @@ describe("finance section helpers", () => {
     expect(
       normalizeFinanceCollapsedSectionIds([
         "charts",
-        "review",
-        "charts",
-        "invalid",
-        "transactions",
+      "review",
+      "charts",
+      "invalid",
+      "assets",
+      "transactions",
       ])
-    ).toEqual(["charts", "review", "transactions"]);
+    ).toEqual(["charts", "review", "assets", "transactions"]);
     expect(normalizeFinanceCollapsedSectionIds("not-an-array")).toEqual([]);
   });
 
@@ -44,6 +46,7 @@ describe("finance section helpers", () => {
       "charts",
       "review",
       "obligations",
+      "assets",
       "transactions",
       "addTransaction",
       "addObligation",
@@ -53,6 +56,7 @@ describe("finance section helpers", () => {
       "charts",
       "review",
       "obligations",
+      "assets",
       "transactions",
       "addTransaction",
       "addObligation",

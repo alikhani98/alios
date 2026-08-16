@@ -1,25 +1,34 @@
 import { Upload } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import type { CreateFinanceTransactionInput } from "@/core/repositories";
 import { useI18n } from "@/shared/i18n";
 import { Button, Input, Select, SoftPanel, StatusChip } from "@/shared/ui";
 
 import {
+  createFinanceCsvMappingPreset,
+  findFinanceCsvMappingPreset,
   guessFinanceCsvMapping,
   parseCsvTable,
   parseFinanceCsvRecords,
+  readFinanceCsvMappingPresets,
+  upsertFinanceCsvMappingPreset,
   type FinanceCsvMapping,
+  type FinanceCsvMappingPreset,
+  writeFinanceCsvMappingPresets,
+  writeFinanceLastCsvImportAt,
 } from "../financeCsvImport";
 
 type FinanceCsvImportSectionProps = {
   isImporting: boolean;
   onImport: (transactions: CreateFinanceTransactionInput[]) => Promise<void>;
+  onImportComplete?: (timestamp: string) => void;
 };
 
 export function FinanceCsvImportSection({
   isImporting,
   onImport,
+  onImportComplete,
 }: FinanceCsvImportSectionProps) {
   const { t } = useI18n();
   const [headers, setHeaders] = useState<string[]>([]);
@@ -29,7 +38,14 @@ export function FinanceCsvImportSection({
     date: "",
     description: "",
   });
+  const [presets, setPresets] = useState<FinanceCsvMappingPreset[]>([]);
+  const [appliedPresetName, setAppliedPresetName] = useState<string | null>(null);
+  const [presetName, setPresetName] = useState("");
   const [fileError, setFileError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setPresets(readFinanceCsvMappingPresets());
+  }, []);
 
   const parsedRows = useMemo(
     () => parseFinanceCsvRecords(records, mapping),
@@ -49,6 +65,7 @@ export function FinanceCsvImportSection({
     setHeaders([]);
     setRecords([]);
     setMapping({ amount: "", date: "", description: "" });
+    setAppliedPresetName(null);
 
     if (!file) {
       return;
@@ -65,7 +82,13 @@ export function FinanceCsvImportSection({
 
       setHeaders(table.headers);
       setRecords(table.records);
-      setMapping(guessFinanceCsvMapping(table.headers));
+      const matchingPreset = findFinanceCsvMappingPreset(table.headers, presets);
+      if (matchingPreset) {
+        setMapping(matchingPreset.mapping);
+        setAppliedPresetName(matchingPreset.name);
+      } else {
+        setMapping(guessFinanceCsvMapping(table.headers));
+      }
     } catch {
       setFileError(t("finance.importCsvReadError"));
     }
@@ -77,9 +100,23 @@ export function FinanceCsvImportSection({
 
   const handleImport = async () => {
     await onImport(validRows.map((row) => row.input));
+    if (presetName.trim()) {
+      const preset = createFinanceCsvMappingPreset({
+        headers,
+        mapping,
+        name: presetName,
+      });
+      const nextPresets = upsertFinanceCsvMappingPreset(presets, preset);
+      setPresets(nextPresets);
+      writeFinanceCsvMappingPresets(nextPresets);
+      setPresetName("");
+    }
+    const importedAt = writeFinanceLastCsvImportAt();
+    onImportComplete?.(importedAt);
     setHeaders([]);
     setRecords([]);
     setMapping({ amount: "", date: "", description: "" });
+    setAppliedPresetName(null);
   };
 
   return (
@@ -133,6 +170,37 @@ export function FinanceCsvImportSection({
                 </Select>
               </div>
             ))}
+          </SoftPanel>
+
+          <SoftPanel className="space-y-3 bg-background/80">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="min-w-0 space-y-1">
+                <p className="text-sm font-semibold text-foreground">
+                  {t("finance.importCsvPresetsTitle")}
+                </p>
+                <p className="text-sm leading-7 text-muted-foreground">
+                  {appliedPresetName
+                    ? t("finance.importCsvPresetApplied", {
+                        name: appliedPresetName,
+                      })
+                    : t("finance.importCsvPresetsDescription")}
+                </p>
+              </div>
+              <StatusChip tone={appliedPresetName ? "success" : "neutral"}>
+                {t("finance.importCsvSavedPresetCount", { count: presets.length })}
+              </StatusChip>
+            </div>
+            <div className="grid gap-2 sm:max-w-sm">
+              <label htmlFor="finance-import-preset-name" className="text-sm font-medium">
+                {t("finance.importCsvPresetName")}
+              </label>
+              <Input
+                id="finance-import-preset-name"
+                value={presetName}
+                placeholder={t("finance.importCsvPresetNamePlaceholder")}
+                onChange={(event) => setPresetName(event.target.value)}
+              />
+            </div>
           </SoftPanel>
 
           <SoftPanel className="space-y-3 bg-background/80">

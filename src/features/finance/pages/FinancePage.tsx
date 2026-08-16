@@ -1,11 +1,13 @@
 import {
   BadgeDollarSign,
+  CalendarClock,
   CircleDollarSign,
   Landmark,
   Search,
   ReceiptText,
   RotateCcw,
   Wallet,
+  WalletCards,
 } from "lucide-react";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 
@@ -28,6 +30,8 @@ import {
   Input,
 } from "@/shared/ui";
 import {
+  calculateFinanceCategoryBudgetUsage,
+  calculateFinanceAssetTotal,
   calculateFinanceReview,
   calculateLastMonthsFinanceSeries,
   formatFinanceMonthLabel,
@@ -36,8 +40,17 @@ import {
   getRecentFinanceTransactions,
 } from "../financeCalculations";
 import { calculateFinanceMonthlyPlan } from "../financeMonthlyPlan";
+import {
+  readFinanceCsvImportReminderDismissedUntil,
+  readFinanceLastCsvImportAt,
+  shouldShowFinanceCsvImportReminder,
+  writeFinanceCsvImportReminderDismissal,
+} from "../financeCsvImport";
 import { FinanceObligationCard } from "../components/FinanceObligationCard";
 import { FinanceObligationForm } from "../components/FinanceObligationForm";
+import { FinanceAssetCard } from "../components/FinanceAssetCard";
+import { FinanceAssetForm } from "../components/FinanceAssetForm";
+import { FinanceCategoryBudgetForm } from "../components/FinanceCategoryBudgetForm";
 import { FinanceCsvImportSection } from "../components/FinanceCsvImportSection";
 import { FinanceTransactionCard } from "../components/FinanceTransactionCard";
 import { FinanceTransactionForm } from "../components/FinanceTransactionForm";
@@ -52,6 +65,8 @@ import {
 import { getFinanceTransactionCategoryLabelKey } from "../domain/finance";
 import { useFinance } from "../hooks/useFinance";
 import type {
+  FinanceCategoryBudget,
+  FinanceAsset,
   FinanceObligation,
   FinanceTransaction,
 } from "@/shared/types";
@@ -239,6 +254,8 @@ export function FinancePage() {
   const {
     transactions,
     obligations,
+    categoryBudgets,
+    assets,
     isLoading,
     error,
     loadFinance,
@@ -248,14 +265,33 @@ export function FinancePage() {
     createObligation,
     updateObligation,
     deleteObligation,
+    createCategoryBudget,
+    updateCategoryBudget,
+    deleteCategoryBudget,
+    createAsset,
+    updateAsset,
+    deleteAsset,
   } = useFinance();
   const [transactionBusyId, setTransactionBusyId] = useState<string | null>(null);
   const [obligationBusyId, setObligationBusyId] = useState<string | null>(null);
+  const [assetBusyId, setAssetBusyId] = useState<string | null>(null);
   const [isTransactionSubmitting, setIsTransactionSubmitting] = useState(false);
   const [isObligationSubmitting, setIsObligationSubmitting] = useState(false);
+  const [isAssetSubmitting, setIsAssetSubmitting] = useState(false);
+  const [isCategoryBudgetSubmitting, setIsCategoryBudgetSubmitting] =
+    useState(false);
   const [isTransactionImporting, setIsTransactionImporting] = useState(false);
+  const [lastCsvImportAt, setLastCsvImportAt] = useState(() =>
+    readFinanceLastCsvImportAt()
+  );
+  const [csvImportReminderDismissedUntil, setCsvImportReminderDismissedUntil] =
+    useState(() => readFinanceCsvImportReminderDismissedUntil());
   const [transactionError, setTransactionError] = useState<string | null>(null);
   const [obligationError, setObligationError] = useState<string | null>(null);
+  const [categoryBudgetError, setCategoryBudgetError] = useState<string | null>(
+    null
+  );
+  const [assetError, setAssetError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [selectedFilter, setSelectedFilter] =
     useState<FinanceViewFilter>("all");
@@ -268,6 +304,7 @@ export function FinancePage() {
   const [editingObligation, setEditingObligation] = useState<
     FinanceObligation | undefined
   >();
+  const [editingAsset, setEditingAsset] = useState<FinanceAsset | undefined>();
   const [collapsedSectionIds, setCollapsedSectionIds] = useState<
     FinanceCollapsibleSectionId[]
   >(() => {
@@ -311,6 +348,19 @@ export function FinancePage() {
   const monthlyCashflowSeries = useMemo(
     () => calculateLastMonthsFinanceSeries(transactions, obligations, referenceDate),
     [obligations, referenceDate, transactions]
+  );
+  const categoryBudgetUsage = useMemo(
+    () =>
+      calculateFinanceCategoryBudgetUsage(
+        transactions,
+        categoryBudgets,
+        referenceDate
+      ),
+    [categoryBudgets, referenceDate, transactions]
+  );
+  const totalAssetValue = useMemo(
+    () => calculateFinanceAssetTotal(assets),
+    [assets]
   );
   const obligationProgressChartData = useMemo(
     () =>
@@ -405,6 +455,11 @@ export function FinancePage() {
     summary.remainingLiquidity >= 0
       ? t("finance.liquidityPositive")
       : t("finance.liquidityNegative");
+  const showCsvImportReminder = shouldShowFinanceCsvImportReminder({
+    dismissedUntil: csvImportReminderDismissedUntil,
+    lastImportAt: lastCsvImportAt,
+    referenceDate,
+  });
 
   type SummaryCard = {
     icon: ReactNode;
@@ -417,6 +472,8 @@ export function FinancePage() {
   const clearMessages = () => {
     setTransactionError(null);
     setObligationError(null);
+    setCategoryBudgetError(null);
+    setAssetError(null);
     setSuccessMessage(null);
   };
 
@@ -500,6 +557,23 @@ export function FinancePage() {
     }
   };
 
+  const runAssetAction = async (
+    asset: FinanceAsset,
+    action: () => Promise<void>
+  ) => {
+    setAssetBusyId(asset.id);
+    setAssetError(null);
+    setSuccessMessage(null);
+    try {
+      await action();
+      setSuccessMessage(t("finance.savedSuccessfully"));
+    } catch (caught) {
+      setAssetError(caught instanceof Error ? caught.message : t("finance.storageError"));
+    } finally {
+      setAssetBusyId(null);
+    }
+  };
+
   const handleTransactionImport = async (
     values: Parameters<typeof createTransaction>[0][]
   ) => {
@@ -514,6 +588,62 @@ export function FinancePage() {
       setTransactionError(caught instanceof Error ? caught.message : t("finance.storageError"));
     } finally {
       setIsTransactionImporting(false);
+    }
+  };
+
+  const handleCategoryBudgetSubmit = async (
+    existingBudget: FinanceCategoryBudget | undefined,
+    values: Parameters<typeof createCategoryBudget>[0]
+  ) => {
+    clearMessages();
+    setIsCategoryBudgetSubmitting(true);
+    try {
+      if (existingBudget) {
+        await updateCategoryBudget(existingBudget.id, values);
+      } else {
+        await createCategoryBudget(values);
+      }
+      setSuccessMessage(t("finance.categoryBudgetSaved"));
+    } catch (caught) {
+      setCategoryBudgetError(
+        caught instanceof Error ? caught.message : t("finance.storageError")
+      );
+    } finally {
+      setIsCategoryBudgetSubmitting(false);
+    }
+  };
+
+  const handleCategoryBudgetDelete = async (budget: FinanceCategoryBudget) => {
+    clearMessages();
+    setIsCategoryBudgetSubmitting(true);
+    try {
+      await deleteCategoryBudget(budget.id);
+      setSuccessMessage(t("finance.categoryBudgetDeleted"));
+    } catch (caught) {
+      setCategoryBudgetError(
+        caught instanceof Error ? caught.message : t("finance.storageError")
+      );
+    } finally {
+      setIsCategoryBudgetSubmitting(false);
+    }
+  };
+
+  const handleAssetSubmit = async (values: Parameters<typeof createAsset>[0]) => {
+    clearMessages();
+    setIsAssetSubmitting(true);
+    try {
+      if (editingAsset) {
+        await updateAsset(editingAsset.id, values);
+        setSuccessMessage(t("finance.assetUpdated"));
+      } else {
+        await createAsset(values);
+        setSuccessMessage(t("finance.assetCreated"));
+      }
+      setEditingAsset(undefined);
+    } catch (caught) {
+      setAssetError(caught instanceof Error ? caught.message : t("finance.storageError"));
+    } finally {
+      setIsAssetSubmitting(false);
     }
   };
 
@@ -549,6 +679,17 @@ export function FinancePage() {
         </StatusChip>
       ),
     },
+    ...(assets.length > 0
+      ? [
+          {
+            icon: <WalletCards className="h-5 w-5" />,
+            label: t("finance.totalAssetValue"),
+            value: formatAmount(totalAssetValue),
+            description: t("finance.totalAssetValueDescription"),
+            status: <StatusChip tone="primary">{assets.length}</StatusChip>,
+          },
+        ]
+      : []),
   ] as const;
 
   const filterCounts: Record<FinanceViewFilter, number> = {
@@ -677,13 +818,20 @@ export function FinancePage() {
       setCollapsedSectionOpen("review", true);
     } else if (anchorId === FINANCE_SECTION_ANCHORS.obligations) {
       setCollapsedSectionOpen("obligations", true);
+    } else if (anchorId === FINANCE_SECTION_ANCHORS.assets) {
+      setCollapsedSectionOpen("assets", true);
     } else if (anchorId === FINANCE_SECTION_ANCHORS.transactions) {
       setCollapsedSectionOpen("transactions", true);
+    } else if (anchorId === FINANCE_SECTION_ANCHORS.importTransactions) {
+      setCollapsedSectionOpen("importTransactions", true);
     }
 
     window.setTimeout(() => {
       scrollToSection(anchorId);
     }, 0);
+  };
+  const dismissCsvImportReminder = () => {
+    setCsvImportReminderDismissedUntil(writeFinanceCsvImportReminderDismissal());
   };
 
   return (
@@ -844,6 +992,46 @@ export function FinancePage() {
         </div>
       </section>
 
+      {showCsvImportReminder ? (
+        <SoftPanel className="border-warning/30 bg-warning/10">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex min-w-0 items-start gap-3">
+              <CalendarClock
+                className="mt-1 h-5 w-5 shrink-0 text-warning"
+                aria-hidden="true"
+              />
+              <div className="min-w-0 space-y-1">
+                <p className="font-semibold">{t("finance.importReminderTitle")}</p>
+                <p className="text-sm leading-7 text-muted-foreground">
+                  {lastCsvImportAt
+                    ? t("finance.importReminderStale", {
+                        date: formatDate(lastCsvImportAt),
+                      })
+                    : t("finance.importReminderNever")}
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+              <Button
+                type="button"
+                size="sm"
+                onClick={() => handleQuickNav(FINANCE_SECTION_ANCHORS.importTransactions)}
+              >
+                {t("finance.importReminderAction")}
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                onClick={dismissCsvImportReminder}
+              >
+                {t("finance.importReminderDismiss")}
+              </Button>
+            </div>
+          </div>
+        </SoftPanel>
+      ) : null}
+
       <div className="alios-surface-card sticky top-[calc(4rem+env(safe-area-inset-top))] z-20 px-3 py-2 backdrop-blur-xl sm:px-4 md:top-20">
         <nav className="flex touch-pan-x gap-2 overflow-x-auto pb-1" aria-label={t("finance.quickNavigation")}>
           {financeQuickNavItems.map((item) => (
@@ -999,14 +1187,20 @@ export function FinancePage() {
         </div>
       ) : null}
 
-      {error || transactionError || obligationError ? (
+      {error || transactionError || obligationError || categoryBudgetError || assetError ? (
         <div
           role="alert"
           className="alios-status-danger flex flex-col gap-3 rounded-surface border p-4 sm:flex-row sm:items-center sm:justify-between"
         >
           <div className="flex items-start gap-2 text-sm text-destructive">
             <Landmark className="mt-0.5 h-4 w-4 shrink-0" />
-            <span>{transactionError ?? obligationError ?? error}</span>
+            <span>
+              {transactionError ??
+                obligationError ??
+                categoryBudgetError ??
+                assetError ??
+                error}
+            </span>
           </div>
           {error ? (
             <button
@@ -1273,6 +1467,82 @@ export function FinancePage() {
               </div>
             </div>
           </SoftPanel>
+
+          <SoftPanel className="space-y-4">
+            <div className="space-y-1">
+              <h3 className="text-lg font-semibold">
+                {t("finance.smartCategoryBudget")}
+              </h3>
+              <p className="text-sm leading-7 text-muted-foreground">
+                {t("finance.smartCategoryBudgetDescription")}
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              {categoryBudgetUsage.length === 0 ? (
+                <SoftPanel>
+                  <p className="text-sm text-muted-foreground">
+                    {t("finance.categoryBudgetEmpty")}
+                  </p>
+                </SoftPanel>
+              ) : (
+                categoryBudgetUsage.map((item) => {
+                  const usedPercent =
+                    item.limitAmount > 0
+                      ? Math.min(Math.max(item.usageRatio * 100, 0), 100)
+                      : 0;
+
+                  return (
+                    <SoftPanel key={item.budget.id} className="space-y-3">
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div className="min-w-0 space-y-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h4 className="font-medium">
+                              {t(
+                                getFinanceTransactionCategoryLabelKey(
+                                  item.budget.category
+                                )
+                              )}
+                            </h4>
+                            <StatusChip tone={getBudgetGuardTone(item.status)}>
+                              {t(getBudgetGuardLabelKey(item.status))}
+                            </StatusChip>
+                          </div>
+                          <p className="text-xs leading-6 text-muted-foreground">
+                            {t("finance.categoryBudgetUsed", {
+                              spent: formatAmount(item.spentThisMonth),
+                              limit: formatAmount(item.limitAmount),
+                            })}
+                          </p>
+                        </div>
+                        <p className="text-sm font-semibold tabular-nums">
+                          {Math.round(item.usageRatio * 100)}%
+                        </p>
+                      </div>
+                      <div className="h-2 overflow-hidden rounded-full bg-muted">
+                        <div
+                          className="h-full rounded-full bg-alios-saffron transition-[width] duration-300 ease-out motion-reduce:transition-none"
+                          style={{ width: `${usedPercent}%` }}
+                        />
+                      </div>
+                      <p className="text-xs leading-6 text-muted-foreground">
+                        {t("finance.categoryBudgetRemaining", {
+                          amount: formatAmount(item.remainingAmount),
+                        })}
+                      </p>
+                    </SoftPanel>
+                  );
+                })
+              )}
+            </div>
+
+            <FinanceCategoryBudgetForm
+              budgets={categoryBudgets}
+              isSubmitting={isCategoryBudgetSubmitting}
+              onSubmit={handleCategoryBudgetSubmit}
+              onDelete={handleCategoryBudgetDelete}
+            />
+          </SoftPanel>
         </div>
       </CollapsibleSection>
 
@@ -1342,6 +1612,84 @@ export function FinancePage() {
             ))
           )}
         </div>
+      </CollapsibleSection>
+
+      <CollapsibleSection
+        id={FINANCE_SECTION_ANCHORS.assets}
+        title={t("finance.sectionAssets")}
+        description={t("finance.assetsDescription")}
+        status={
+          <StatusChip tone={assets.length > 0 ? "primary" : "neutral"}>
+            {assets.length}
+          </StatusChip>
+        }
+        open={!isCollapsedSection("assets")}
+        onOpenChange={(open) => setCollapsedSectionOpen("assets", open)}
+        expandLabel={t("common.expandSection")}
+        collapseLabel={t("common.collapseSection")}
+        className="scroll-mt-32"
+        contentClassName="space-y-4"
+      >
+        <PremiumCard className="border-border/70 bg-card/95">
+          <div className="space-y-5 p-5 sm:p-6">
+            <SectionHeader
+              icon={<WalletCards className="h-5 w-5" />}
+              title={t("finance.assetsAndInvestments")}
+              description={t("finance.assetsManualLedger")}
+              status={
+                assets.length > 0 ? (
+                  <StatusChip tone="primary">
+                    {t("finance.totalAssetValue")}: {formatAmount(totalAssetValue)}
+                  </StatusChip>
+                ) : (
+                  <StatusChip tone="neutral">{t("finance.localOnlyData")}</StatusChip>
+                )
+              }
+            />
+
+            <SoftPanel className="bg-background/80">
+              <FinanceAssetForm
+                key={editingAsset?.id ?? "new-asset"}
+                asset={editingAsset}
+                isSubmitting={isAssetSubmitting}
+                onSubmit={handleAssetSubmit}
+                onCancel={
+                  editingAsset ? () => setEditingAsset(undefined) : undefined
+                }
+              />
+            </SoftPanel>
+
+            {assets.length === 0 ? (
+              <EmptyState
+                icon={<WalletCards className="h-6 w-6" />}
+                title={t("finance.assetsEmptyTitle")}
+                description={t("finance.assetsEmptyDescription")}
+              />
+            ) : (
+              <div className="grid gap-4 xl:grid-cols-2">
+                {assets.map((asset) => (
+                  <FinanceAssetCard
+                    key={asset.id}
+                    asset={asset}
+                    isBusy={assetBusyId === asset.id}
+                    onEdit={() => {
+                      setEditingAsset(asset);
+                      handleQuickNav(FINANCE_SECTION_ANCHORS.assets);
+                    }}
+                    onDelete={() =>
+                      runAssetAction(asset, async () => {
+                        await deleteAsset(asset.id);
+                        if (editingAsset?.id === asset.id) {
+                          setEditingAsset(undefined);
+                        }
+                      })
+                    }
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </PremiumCard>
       </CollapsibleSection>
 
       <section id={FINANCE_SECTION_ANCHORS.transactions} className="scroll-mt-32 space-y-4">
@@ -1724,6 +2072,7 @@ export function FinancePage() {
             <FinanceCsvImportSection
               isImporting={isTransactionImporting}
               onImport={handleTransactionImport}
+              onImportComplete={setLastCsvImportAt}
             />
           </CollapsibleSection>
         </div>

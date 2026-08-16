@@ -1,9 +1,15 @@
 import { describe, expect, it } from "vitest";
 
-import type { FinanceObligation, FinanceTransaction } from "@/shared/types";
+import type {
+  FinanceAsset,
+  FinanceObligation,
+  FinanceTransaction,
+} from "@/shared/types";
 import {
   calculateBudgetGuard,
   calculateExpenseCategoryBreakdown,
+  calculateFinanceAssetTotal,
+  calculateFinanceCategoryBudgetUsage,
   calculateExpenseCategoryChartData,
   calculateFinanceReview,
   calculateFinanceSummary,
@@ -100,6 +106,25 @@ const obligations: FinanceObligation[] = [
     dueAmount: 100,
     dueDate: "2026-07-08",
     status: "paid",
+    createdAt: "2026-07-05T08:30:00.000Z",
+    updatedAt: "2026-07-05T08:30:00.000Z",
+  },
+];
+
+const assets: FinanceAsset[] = [
+  {
+    id: "asset-1",
+    title: "Emergency savings",
+    type: "savings",
+    currentValue: 10000,
+    createdAt: "2026-07-05T08:30:00.000Z",
+    updatedAt: "2026-07-05T08:30:00.000Z",
+  },
+  {
+    id: "asset-2",
+    title: "Gold",
+    type: "gold",
+    currentValue: 3500,
     createdAt: "2026-07-05T08:30:00.000Z",
     updatedAt: "2026-07-05T08:30:00.000Z",
   },
@@ -407,6 +432,66 @@ describe("finance calculations", () => {
         totalRemainingObligation: 0,
       }).status
     ).toBe("calm");
+  });
+
+  it("calculates manual asset totals without changing liquidity", () => {
+    expect(calculateFinanceAssetTotal(assets)).toBe(13500);
+    expect(calculateFinanceAssetTotal([])).toBe(0);
+  });
+
+  it("calculates category budget usage for the current month", () => {
+    expect(
+      calculateFinanceCategoryBudgetUsage(
+        [
+          ...transactions,
+          {
+            id: "expense-transport",
+            type: "expense",
+            title: "Transport",
+            amount: 90,
+            category: "transport",
+            occurredAt: "2026-07-07",
+            createdAt: "2026-07-07T08:30:00.000Z",
+            updatedAt: "2026-07-07T08:30:00.000Z",
+          },
+        ],
+        [
+          {
+            id: "budget-groceries",
+            category: "groceries",
+            monthlyLimitAmount: 1000,
+            createdAt: "2026-07-01T08:30:00.000Z",
+            updatedAt: "2026-07-01T08:30:00.000Z",
+          },
+          {
+            id: "budget-transport",
+            category: "transport",
+            monthlyLimitAmount: 100,
+            createdAt: "2026-07-01T08:30:00.000Z",
+            updatedAt: "2026-07-01T08:30:00.000Z",
+          },
+        ],
+        new Date("2026-07-09T12:00:00.000Z")
+      ).map((item) => ({
+        id: item.budget.id,
+        spentThisMonth: item.spentThisMonth,
+        remainingAmount: item.remainingAmount,
+        status: item.status,
+      }))
+    ).toEqual([
+      {
+        id: "budget-groceries",
+        spentThisMonth: 1200,
+        remainingAmount: 0,
+        status: "pressure",
+      },
+      {
+        id: "budget-transport",
+        spentThisMonth: 90,
+        remainingAmount: 10,
+        status: "watch",
+      },
+    ]);
   });
 
   it("calculates obligation progress safely for zero totals", () => {

@@ -4,7 +4,12 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AccountRuntimeProvider } from "@/core/account";
 import { DateDisplayProvider } from "@/shared/date";
 import { I18nProvider, LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
-import type { FinanceObligation, FinanceTransaction } from "@/shared/types";
+import type {
+  FinanceAsset,
+  FinanceCategoryBudget,
+  FinanceObligation,
+  FinanceTransaction,
+} from "@/shared/types";
 
 const financeTransactions: FinanceTransaction[] = [
   {
@@ -45,10 +50,33 @@ const financeObligations: FinanceObligation[] = [
   },
 ];
 
+const financeCategoryBudgets: FinanceCategoryBudget[] = [
+  {
+    id: "budget-groceries",
+    category: "groceries",
+    monthlyLimitAmount: 1000,
+    createdAt: "2026-07-01T08:30:00.000Z",
+    updatedAt: "2026-07-01T08:30:00.000Z",
+  },
+];
+
+const financeAssets: FinanceAsset[] = [
+  {
+    id: "asset-savings",
+    title: "Emergency savings",
+    type: "savings",
+    currentValue: 12000,
+    createdAt: "2026-07-01T08:30:00.000Z",
+    updatedAt: "2026-07-01T08:30:00.000Z",
+  },
+];
+
 vi.mock("../hooks/useFinance", () => ({
   useFinance: () => ({
     transactions: financeTransactions,
     obligations: financeObligations,
+    categoryBudgets: financeCategoryBudgets,
+    assets: financeAssets,
     isLoading: false,
     error: null,
     loadFinance: async () => undefined,
@@ -58,6 +86,12 @@ vi.mock("../hooks/useFinance", () => ({
     createObligation: async () => undefined,
     updateObligation: async () => undefined,
     deleteObligation: async () => undefined,
+    createCategoryBudget: async () => undefined,
+    updateCategoryBudget: async () => undefined,
+    deleteCategoryBudget: async () => undefined,
+    createAsset: async () => undefined,
+    updateAsset: async () => undefined,
+    deleteAsset: async () => undefined,
   }),
 }));
 
@@ -87,6 +121,7 @@ describe("FinancePage", () => {
     expect(markup).toContain("بانک مهر شماره 1");
     expect(markup).toContain("ویرایش");
     expect(markup).toContain("افزودن قسط / بدهی");
+    expect(markup).toContain("دارایی‌ها");
     expect(markup).toContain("جستجوی رکوردهای مالی");
     expect(markup).toContain("آگاهی از همگام‌سازی مالی");
     expect(markup).not.toContain("AliOS could not prepare local data");
@@ -107,6 +142,10 @@ describe("FinancePage", () => {
 
     expect(markup).toContain("Add income / expense");
     expect(markup).toContain("Import bank CSV");
+    expect(markup).toContain("Smart budget");
+    expect(markup).toContain("1 category budgets saved.");
+    expect(markup).toContain("Asset value");
+    expect(markup).toContain("Assets and investments");
     expect(markup).toContain("Search finance records");
     expect(markup).toContain(financeObligations[0].title);
     expect(countOccurrences(markup, "This is a local summary from your entered data. It is not financial advice.")).toBe(
@@ -117,6 +156,7 @@ describe("FinancePage", () => {
     expect(markup).toContain('id="finance-charts-content" hidden="" aria-hidden="true"');
     expect(markup).toContain('id="finance-review-content" hidden="" aria-hidden="true"');
     expect(markup).toContain('id="finance-obligations-content" hidden="" aria-hidden="true"');
+    expect(markup).toContain('id="finance-assets-content" hidden="" aria-hidden="true"');
     expect(markup).toContain('id="finance-obligation-debt-1-details-content" hidden="" aria-hidden="true"');
     expect(markup).toContain('id="finance-transactions-records-content" hidden="" aria-hidden="true"');
     expect(markup).toContain('id="finance-add-transaction-content" hidden="" aria-hidden="true"');

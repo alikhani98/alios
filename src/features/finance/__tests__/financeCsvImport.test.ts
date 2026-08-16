@@ -1,9 +1,13 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  findFinanceCsvMappingPreset,
   guessFinanceCsvMapping,
   parseCsvTable,
   parseFinanceCsvRecords,
+  shouldShowFinanceCsvImportReminder,
+  upsertFinanceCsvMappingPreset,
+  type FinanceCsvMappingPreset,
 } from "../financeCsvImport";
 
 describe("finance CSV import", () => {
@@ -65,5 +69,80 @@ describe("finance CSV import", () => {
         status: "error",
       },
     ]);
+  });
+
+  it("matches and updates saved CSV mapping presets by normalized headers", () => {
+    const preset: FinanceCsvMappingPreset = {
+      id: "preset-1",
+      name: "My bank",
+      headers: ["Posted", "Memo", "Value"],
+      mapping: {
+        amount: "Value",
+        date: "Posted",
+        description: "Memo",
+      },
+      createdAt: "2026-08-01T00:00:00.000Z",
+      updatedAt: "2026-08-01T00:00:00.000Z",
+    };
+
+    expect(findFinanceCsvMappingPreset(["value", "memo", "posted"], [preset])).toEqual(
+      preset
+    );
+
+    const updated = upsertFinanceCsvMappingPreset([preset], {
+      ...preset,
+      id: "new-id",
+      mapping: {
+        amount: "Debit",
+        date: "Date",
+        description: "Description",
+      },
+      updatedAt: "2026-08-02T00:00:00.000Z",
+    });
+
+    expect(updated).toEqual([
+      expect.objectContaining({
+        id: "preset-1",
+        createdAt: "2026-08-01T00:00:00.000Z",
+        mapping: {
+          amount: "Debit",
+          date: "Date",
+          description: "Description",
+        },
+      }),
+    ]);
+  });
+
+  it("shows the monthly CSV import reminder only when import state is stale", () => {
+    const referenceDate = new Date("2026-08-16T12:00:00.000Z");
+
+    expect(
+      shouldShowFinanceCsvImportReminder({
+        dismissedUntil: null,
+        lastImportAt: null,
+        referenceDate,
+      })
+    ).toBe(true);
+    expect(
+      shouldShowFinanceCsvImportReminder({
+        dismissedUntil: null,
+        lastImportAt: "2026-08-01T12:00:00.000Z",
+        referenceDate,
+      })
+    ).toBe(false);
+    expect(
+      shouldShowFinanceCsvImportReminder({
+        dismissedUntil: null,
+        lastImportAt: "2026-07-01T12:00:00.000Z",
+        referenceDate,
+      })
+    ).toBe(true);
+    expect(
+      shouldShowFinanceCsvImportReminder({
+        dismissedUntil: "2026-08-20T12:00:00.000Z",
+        lastImportAt: "2026-07-01T12:00:00.000Z",
+        referenceDate,
+      })
+    ).toBe(false);
   });
 });

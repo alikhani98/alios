@@ -6,6 +6,7 @@ export const FINANCE_SECTION_ANCHORS = {
   charts: "finance-charts",
   review: "finance-review",
   obligations: "finance-obligations",
+  assets: "finance-assets",
   transactions: "finance-transactions",
   add: "finance-add",
   addTransaction: "finance-add-transaction",
@@ -48,6 +49,11 @@ export const financeQuickNavItems: ReadonlyArray<FinanceQuickNavItem> = [
     anchorId: FINANCE_SECTION_ANCHORS.obligations,
   },
   {
+    id: "assets",
+    labelKey: "finance.sectionAssets",
+    anchorId: FINANCE_SECTION_ANCHORS.assets,
+  },
+  {
     id: "transactions",
     labelKey: "finance.sectionTransactions",
     anchorId: FINANCE_SECTION_ANCHORS.transactions,
@@ -63,6 +69,7 @@ export type FinanceCollapsibleSectionId =
   | "charts"
   | "review"
   | "obligations"
+  | "assets"
   | "transactions"
   | "addTransaction"
   | "addObligation"
@@ -72,6 +79,7 @@ export const financeCollapsibleSectionIds: ReadonlyArray<FinanceCollapsibleSecti
   "charts",
   "review",
   "obligations",
+  "assets",
   "transactions",
   "addTransaction",
   "addObligation",

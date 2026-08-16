@@ -5,6 +5,7 @@ import {
   dailyCheckinInput,
   decisionLogInput,
   goalInput,
+  financeAssetInput,
   financeObligationInput,
   financeTransactionInput,
   inboxItemInput,
@@ -47,6 +48,7 @@ describe("backup preview", () => {
     await storage.manual.create(manualEntryInput);
     await storage.finance.createTransaction(financeTransactionInput);
     await storage.finance.createObligation(financeObligationInput);
+    await storage.finance.createAsset(financeAssetInput);
     await storage.journal.create(journalEntryInput);
     await storage.knowledge.create(knowledgeItemInput);
     await storage.dailyCheckins.create(dailyCheckinInput);
@@ -58,7 +60,7 @@ describe("backup preview", () => {
 
     expect(preview.backupVersion).toBe(1);
     expect(new Date(preview.exportedAt).toISOString()).toBe(preview.exportedAt);
-    expect(preview.totalRecords).toBe(14);
+    expect(preview.totalRecords).toBe(15);
     expect(preview.tableCounts).toEqual([
       { key: "dailyCheckins", count: 1 },
       { key: "tasks", count: 1 },
@@ -68,6 +70,8 @@ describe("backup preview", () => {
       { key: "manualEntries", count: 1 },
       { key: "financeTransactions", count: 1 },
       { key: "financeObligations", count: 1 },
+      { key: "financeCategoryBudgets", count: 0 },
+      { key: "financeAssets", count: 1 },
       { key: "focusSessions", count: 0 },
       { key: "projects", count: 1 },
       { key: "journalEntries", count: 1 },
@@ -86,7 +90,8 @@ describe("backup preview", () => {
 
     const impact = createBackupRestoreImpactPreview(backup, {
       dailyCheckins: 0, tasks: 4, goals: 0, lifeAreas: 0, decisionLogEntries: 0,
-      manualEntries: 0, financeTransactions: 0, financeObligations: 0, projects: 0,
+      manualEntries: 0, financeTransactions: 0, financeObligations: 0,
+      financeCategoryBudgets: 0, financeAssets: 0, projects: 0,
       focusSessions: 0, journalEntries: 0, knowledgeItems: 0, settings: 0, inboxItems: 0,
       routines: 0, weeklyPlans: 2,
     });

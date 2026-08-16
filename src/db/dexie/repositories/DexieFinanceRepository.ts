@@ -1,13 +1,21 @@
 import type {
+  CreateFinanceCategoryBudgetInput,
+  CreateFinanceAssetInput,
   CreateFinanceObligationInput,
   CreateFinanceTransactionInput,
   FinanceRepository,
+  UpdateFinanceCategoryBudgetInput,
+  UpdateFinanceAssetInput,
   UpdateFinanceObligationInput,
   UpdateFinanceTransactionInput,
 } from "@/core/repositories";
 import {
+  financeAssetSchema,
+  financeCategoryBudgetSchema,
   financeObligationSchema,
   financeTransactionSchema,
+  type FinanceAsset,
+  type FinanceCategoryBudget,
   type FinanceObligation,
   type FinanceTransaction,
 } from "@/shared/types";
@@ -175,6 +183,143 @@ export class DexieFinanceRepository
           entity: "financeObligations",
           operation: "delete",
         });
+      })
+    );
+  }
+
+  async listCategoryBudgets(): Promise<FinanceCategoryBudget[]> {
+    return this.execute("listing finance category budgets", async () => {
+      const records = await this.database.financeCategoryBudgets.toArray();
+      return records
+        .map((record) => financeCategoryBudgetSchema.parse(record))
+        .sort((left, right) => left.category.localeCompare(right.category));
+    });
+  }
+
+  async getCategoryBudgetById(
+    id: string
+  ): Promise<FinanceCategoryBudget | undefined> {
+    return this.execute("reading a finance category budget", async () => {
+      const record = await this.database.financeCategoryBudgets.get(id);
+      return record === undefined
+        ? undefined
+        : financeCategoryBudgetSchema.parse(record);
+    });
+  }
+
+  async createCategoryBudget(
+    input: CreateFinanceCategoryBudgetInput
+  ): Promise<FinanceCategoryBudget> {
+    return this.execute("creating a finance category budget", async () => {
+      const budget = financeCategoryBudgetSchema.parse({
+        ...input,
+        ...this.createMetadata(),
+      });
+      await this.database.financeCategoryBudgets.add(budget);
+      return budget;
+    });
+  }
+
+  async updateCategoryBudget(
+    id: string,
+    input: UpdateFinanceCategoryBudgetInput
+  ): Promise<FinanceCategoryBudget> {
+    return this.execute("updating a finance category budget", () =>
+      this.database.transaction("rw", this.database.financeCategoryBudgets, async () => {
+        const current = this.requireEntity(
+          "Finance category budget",
+          id,
+          await this.database.financeCategoryBudgets.get(id)
+        );
+        const budget = financeCategoryBudgetSchema.parse({
+          ...current,
+          ...input,
+          id: current.id,
+          createdAt: current.createdAt,
+          updatedAt: new Date().toISOString(),
+        });
+        await this.database.financeCategoryBudgets.put(budget);
+        return budget;
+      })
+    );
+  }
+
+  async deleteCategoryBudget(id: string): Promise<void> {
+    return this.execute("deleting a finance category budget", () =>
+      this.database.transaction("rw", this.database.financeCategoryBudgets, async () => {
+        this.requireEntity(
+          "Finance category budget",
+          id,
+          await this.database.financeCategoryBudgets.get(id)
+        );
+        await this.database.financeCategoryBudgets.delete(id);
+      })
+    );
+  }
+
+  async listAssets(): Promise<FinanceAsset[]> {
+    return this.execute("listing finance assets", async () => {
+      const records = await this.database.financeAssets.toArray();
+      return records
+        .map((record) => financeAssetSchema.parse(record))
+        .sort((left, right) =>
+          right.updatedAt.localeCompare(left.updatedAt) ||
+          left.title.localeCompare(right.title)
+        );
+    });
+  }
+
+  async getAssetById(id: string): Promise<FinanceAsset | undefined> {
+    return this.execute("reading a finance asset", async () => {
+      const record = await this.database.financeAssets.get(id);
+      return record === undefined ? undefined : financeAssetSchema.parse(record);
+    });
+  }
+
+  async createAsset(input: CreateFinanceAssetInput): Promise<FinanceAsset> {
+    return this.execute("creating a finance asset", async () => {
+      const asset = financeAssetSchema.parse({
+        ...input,
+        ...this.createMetadata(),
+      });
+      await this.database.financeAssets.add(asset);
+      return asset;
+    });
+  }
+
+  async updateAsset(
+    id: string,
+    input: UpdateFinanceAssetInput
+  ): Promise<FinanceAsset> {
+    return this.execute("updating a finance asset", () =>
+      this.database.transaction("rw", this.database.financeAssets, async () => {
+        const current = this.requireEntity(
+          "Finance asset",
+          id,
+          await this.database.financeAssets.get(id)
+        );
+        const asset = financeAssetSchema.parse({
+          ...current,
+          ...input,
+          id: current.id,
+          createdAt: current.createdAt,
+          updatedAt: new Date().toISOString(),
+        });
+        await this.database.financeAssets.put(asset);
+        return asset;
+      })
+    );
+  }
+
+  async deleteAsset(id: string): Promise<void> {
+    return this.execute("deleting a finance asset", () =>
+      this.database.transaction("rw", this.database.financeAssets, async () => {
+        this.requireEntity(
+          "Finance asset",
+          id,
+          await this.database.financeAssets.get(id)
+        );
+        await this.database.financeAssets.delete(id);
       })
     );
   }

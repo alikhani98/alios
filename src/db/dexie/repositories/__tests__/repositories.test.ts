@@ -5,6 +5,8 @@ import type { AliosDatabase, DexieStorageAdapter } from "@/db/dexie";
 import {
   dailyCheckinInput,
   decisionLogInput,
+  financeAssetInput,
+  financeCategoryBudgetInput,
   financeObligationInput,
   financeTransactionInput,
   focusSessionInput,
@@ -247,6 +249,52 @@ describe("Dexie repositories", () => {
     await storage.finance.deleteObligation(created.id);
     expect(await storage.finance.listObligations()).toEqual([]);
     expect(await storage.finance.getObligationById(created.id)).toBeUndefined();
+  });
+
+  it("supports the complete Finance category budget CRUD lifecycle", async () => {
+    const created = await storage.finance.createCategoryBudget(
+      financeCategoryBudgetInput
+    );
+
+    expect(created.id).toMatch(/^[0-9a-f-]{36}$/i);
+    expect(await storage.finance.listCategoryBudgets()).toEqual([created]);
+    expect(await storage.finance.getCategoryBudgetById(created.id)).toEqual(
+      created
+    );
+
+    const updated = await storage.finance.updateCategoryBudget(created.id, {
+      monthlyLimitAmount: 1500,
+    });
+    expect(updated.monthlyLimitAmount).toBe(1500);
+    expect(
+      (await storage.finance.getCategoryBudgetById(created.id))?.monthlyLimitAmount
+    ).toBe(1500);
+
+    await storage.finance.deleteCategoryBudget(created.id);
+    expect(await storage.finance.listCategoryBudgets()).toEqual([]);
+    expect(await storage.finance.getCategoryBudgetById(created.id)).toBeUndefined();
+  });
+
+  it("supports the complete Finance asset CRUD lifecycle", async () => {
+    const created = await storage.finance.createAsset(financeAssetInput);
+
+    expect(created.id).toMatch(/^[0-9a-f-]{36}$/i);
+    expect(await storage.finance.listAssets()).toEqual([created]);
+    expect(await storage.finance.getAssetById(created.id)).toEqual(created);
+
+    const updated = await storage.finance.updateAsset(created.id, {
+      currentValue: 12500,
+      notes: undefined,
+    });
+    expect(updated.currentValue).toBe(12500);
+    expect(updated.notes).toBeUndefined();
+    expect((await storage.finance.getAssetById(created.id))?.currentValue).toBe(
+      12500
+    );
+
+    await storage.finance.deleteAsset(created.id);
+    expect(await storage.finance.listAssets()).toEqual([]);
+    expect(await storage.finance.getAssetById(created.id)).toBeUndefined();
   });
 
   it("saves a FocusSession with a linked task id", async () => {

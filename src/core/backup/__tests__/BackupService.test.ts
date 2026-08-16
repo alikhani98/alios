@@ -7,6 +7,8 @@ import {
   dailyCheckinInput,
   decisionLogInput,
   goalInput,
+  financeAssetInput,
+  financeCategoryBudgetInput,
   financeObligationInput,
   financeTransactionInput,
   focusSessionInput,
@@ -56,6 +58,10 @@ describe("BackupService with DexieBackupStorage", () => {
     const financeObligation = await storage.finance.createObligation(
       financeObligationInput
     );
+    const financeCategoryBudget = await storage.finance.createCategoryBudget(
+      financeCategoryBudgetInput
+    );
+    const financeAsset = await storage.finance.createAsset(financeAssetInput);
     const lifeArea = await storage.lifeAreas.upsert(lifeAreaInput);
     const decisionLogEntry = await storage.decisions.create(decisionLogInput);
     const manualEntry = await storage.manual.create(manualEntryInput);
@@ -86,6 +92,8 @@ describe("BackupService with DexieBackupStorage", () => {
         "manualEntries",
         "financeTransactions",
         "financeObligations",
+        "financeCategoryBudgets",
+        "financeAssets",
         "focusSessions",
         "projects",
         "journalEntries",
@@ -107,6 +115,8 @@ describe("BackupService with DexieBackupStorage", () => {
     expect(backup.data.lifeAreas).toEqual([lifeArea]);
     expect(backup.data.financeTransactions).toEqual([financeTransaction]);
     expect(backup.data.financeObligations).toEqual([financeObligation]);
+    expect(backup.data.financeCategoryBudgets).toEqual([financeCategoryBudget]);
+    expect(backup.data.financeAssets).toEqual([financeAsset]);
     expect(backup.data.journalEntries).toEqual([journalEntry]);
     expect(backup.data.knowledgeItems).toEqual([knowledgeItem]);
     expect(backup.data.dailyCheckins).toEqual([dailyCheckin]);
@@ -132,6 +142,8 @@ describe("BackupService with DexieBackupStorage", () => {
       manualEntries: 0,
       financeTransactions: 0,
       financeObligations: 0,
+      financeCategoryBudgets: 0,
+      financeAssets: 0,
       focusSessions: 0,
       projects: 0,
       journalEntries: 0,
@@ -156,6 +168,12 @@ describe("BackupService with DexieBackupStorage", () => {
     );
     expect(await storage.finance.getObligationById(financeObligation.id)).toEqual(
       financeObligation
+    );
+    expect(
+      await storage.finance.getCategoryBudgetById(financeCategoryBudget.id)
+    ).toEqual(financeCategoryBudget);
+    expect(await storage.finance.getAssetById(financeAsset.id)).toEqual(
+      financeAsset
     );
     expect(await storage.journal.getById(journalEntry.id)).toEqual(journalEntry);
     expect(await storage.knowledge.getById(knowledgeItem.id)).toEqual(
@@ -185,6 +203,8 @@ describe("BackupService with DexieBackupStorage", () => {
       manualEntries: _omittedManualEntries,
       financeTransactions: _omittedFinanceTransactions,
       financeObligations: _omittedFinanceObligations,
+      financeCategoryBudgets: _omittedFinanceCategoryBudgets,
+      financeAssets: _omittedFinanceAssets,
       focusSessions: _omittedFocusSessions,
       ...oldData
     } = backup.data;
@@ -192,6 +212,8 @@ describe("BackupService with DexieBackupStorage", () => {
 
     expect(oldBackup.data.financeTransactions).toEqual([]);
     expect(oldBackup.data.financeObligations).toEqual([]);
+    expect(oldBackup.data.financeCategoryBudgets).toEqual([]);
+    expect(oldBackup.data.financeAssets).toEqual([]);
     expect(oldBackup.data.focusSessions).toEqual([]);
     expect(oldBackup.data.goals).toEqual([]);
     expect(oldBackup.data.decisionLogEntries).toEqual([]);

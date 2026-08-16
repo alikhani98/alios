@@ -9,6 +9,8 @@ export const DEXIE_SCHEMA_VERSION_8 = 8;
 export const DEXIE_SCHEMA_VERSION_9 = 9;
 export const DEXIE_SCHEMA_VERSION_10 = 10;
 export const DEXIE_SCHEMA_VERSION_11 = 11;
+export const DEXIE_SCHEMA_VERSION_12 = 12;
+export const DEXIE_SCHEMA_VERSION_13 = 13;
 
 export const DEXIE_TABLE_NAMES = {
   dailyCheckins: "dailyCheckins",
@@ -24,6 +26,8 @@ export const DEXIE_TABLE_NAMES = {
   inboxItems: "inboxItems",
   financeTransactions: "financeTransactions",
   financeObligations: "financeObligations",
+  financeCategoryBudgets: "financeCategoryBudgets",
+  financeAssets: "financeAssets",
   routines: "routines",
   weeklyPlans: "weeklyPlans",
   focusSessions: "focusSessions",
@@ -116,4 +120,15 @@ export const DEXIE_SCHEMA_V11 = {
   ...DEXIE_SCHEMA_V10,
   [DEXIE_TABLE_NAMES.focusSessions]:
     "id, mode, taskId, startedAt, completedAt, interrupted",
+} satisfies Partial<Record<DexieTableName, string>>;
+
+export const DEXIE_SCHEMA_V12 = {
+  ...DEXIE_SCHEMA_V11,
+  [DEXIE_TABLE_NAMES.financeCategoryBudgets]:
+    "id, &category, createdAt, updatedAt",
+} satisfies Partial<Record<DexieTableName, string>>;
+
+export const DEXIE_SCHEMA_V13 = {
+  ...DEXIE_SCHEMA_V12,
+  [DEXIE_TABLE_NAMES.financeAssets]: "id, type, createdAt, updatedAt",
 } satisfies Record<DexieTableName, string>;

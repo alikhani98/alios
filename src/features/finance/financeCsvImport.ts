@@ -1,4 +1,9 @@
 import type { CreateFinanceTransactionInput } from "@/core/repositories";
+import {
+  readStoredPreference,
+  writeStoredPreference,
+  type PreferenceStorage,
+} from "@/shared/preferences/storage";
 
 import { DEFAULT_FINANCE_TRANSACTION_CATEGORY } from "./domain/finance";
 
@@ -6,6 +11,15 @@ export type FinanceCsvMapping = {
   amount: string;
   date: string;
   description: string;
+};
+
+export type FinanceCsvMappingPreset = {
+  id: string;
+  name: string;
+  headers: string[];
+  mapping: FinanceCsvMapping;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type FinanceCsvParsedRow =
@@ -99,6 +113,228 @@ export function guessFinanceCsvMapping(headers: readonly string[]): FinanceCsvMa
     date: findHeader(["date", "posted", "transaction date", "تاریخ"]),
     description: findHeader(["description", "details", "memo", "title", "شرح"]),
   };
+}
+
+export const FINANCE_CSV_MAPPING_PRESETS_STORAGE_KEY =
+  "alios.finance.csvImport.mappingPresets";
+export const FINANCE_LAST_CSV_IMPORT_AT_STORAGE_KEY =
+  "alios.finance.csvImport.lastImportAt";
+export const FINANCE_CSV_IMPORT_REMINDER_DISMISSED_UNTIL_STORAGE_KEY =
+  "alios.finance.csvImport.reminderDismissedUntil";
+
+const IMPORT_REMINDER_THRESHOLD_DAYS = 30;
+const IMPORT_REMINDER_DISMISS_DAYS = 7;
+const DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;
+
+function normalizeHeaders(headers: readonly string[]): string[] {
+  return headers.map((header) => header.trim().toLocaleLowerCase()).sort();
+}
+
+export function headersMatchFinanceCsvPreset(
+  headers: readonly string[],
+  preset: FinanceCsvMappingPreset
+): boolean {
+  return (
+    JSON.stringify(normalizeHeaders(headers)) ===
+    JSON.stringify(normalizeHeaders(preset.headers))
+  );
+}
+
+function parseFinanceCsvMappingPresets(
+  value: string | null | undefined
+): FinanceCsvMappingPreset[] {
+  if (!value) {
+    return [];
+  }
+
+  try {
+    const parsed = JSON.parse(value);
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+
+    return parsed.filter((preset): preset is FinanceCsvMappingPreset => {
+      return (
+        typeof preset?.id === "string" &&
+        typeof preset.name === "string" &&
+        Array.isArray(preset.headers) &&
+        preset.headers.every((header: unknown) => typeof header === "string") &&
+        typeof preset.mapping?.amount === "string" &&
+        typeof preset.mapping.date === "string" &&
+        typeof preset.mapping.description === "string" &&
+        typeof preset.createdAt === "string" &&
+        typeof preset.updatedAt === "string"
+      );
+    });
+  } catch {
+    return [];
+  }
+}
+
+function parseStoredDate(value: string | null | undefined): string | null {
+  if (!value) {
+    return null;
+  }
+
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
+}
+
+export function readFinanceCsvMappingPresets(
+  storage?: PreferenceStorage | null
+): FinanceCsvMappingPreset[] {
+  return readStoredPreference(
+    FINANCE_CSV_MAPPING_PRESETS_STORAGE_KEY,
+    parseFinanceCsvMappingPresets,
+    [],
+    storage
+  );
+}
+
+export function writeFinanceCsvMappingPresets(
+  presets: readonly FinanceCsvMappingPreset[],
+  storage?: PreferenceStorage | null
+) {
+  writeStoredPreference(
+    FINANCE_CSV_MAPPING_PRESETS_STORAGE_KEY,
+    JSON.stringify(presets),
+    storage
+  );
+}
+
+export function findFinanceCsvMappingPreset(
+  headers: readonly string[],
+  presets: readonly FinanceCsvMappingPreset[]
+): FinanceCsvMappingPreset | null {
+  return presets.find((preset) => headersMatchFinanceCsvPreset(headers, preset)) ?? null;
+}
+
+export function createFinanceCsvMappingPreset({
+  headers,
+  mapping,
+  name,
+  referenceDate = new Date(),
+}: {
+  headers: readonly string[];
+  mapping: FinanceCsvMapping;
+  name: string;
+  referenceDate?: Date;
+}): FinanceCsvMappingPreset {
+  const timestamp = referenceDate.toISOString();
+
+  return {
+    id: crypto.randomUUID(),
+    name: name.trim(),
+    headers: [...headers],
+    mapping,
+    createdAt: timestamp,
+    updatedAt: timestamp,
+  };
+}
+
+export function upsertFinanceCsvMappingPreset(
+  presets: readonly FinanceCsvMappingPreset[],
+  preset: FinanceCsvMappingPreset
+): FinanceCsvMappingPreset[] {
+  const existingIndex = presets.findIndex(
+    (item) =>
+      item.name.trim().toLocaleLowerCase() === preset.name.trim().toLocaleLowerCase() ||
+      headersMatchFinanceCsvPreset(preset.headers, item)
+  );
+
+  if (existingIndex === -1) {
+    return [...presets, preset];
+  }
+
+  return presets.map((item, index) =>
+    index === existingIndex
+      ? {
+          ...preset,
+          id: item.id,
+          createdAt: item.createdAt,
+        }
+      : item
+  );
+}
+
+export function readFinanceLastCsvImportAt(
+  storage?: PreferenceStorage | null
+): string | null {
+  return readStoredPreference(
+    FINANCE_LAST_CSV_IMPORT_AT_STORAGE_KEY,
+    parseStoredDate,
+    null,
+    storage
+  );
+}
+
+export function writeFinanceLastCsvImportAt(
+  referenceDate = new Date(),
+  storage?: PreferenceStorage | null
+): string {
+  const timestamp = referenceDate.toISOString();
+  writeStoredPreference(FINANCE_LAST_CSV_IMPORT_AT_STORAGE_KEY, timestamp, storage);
+  return timestamp;
+}
+
+export function readFinanceCsvImportReminderDismissedUntil(
+  storage?: PreferenceStorage | null
+): string | null {
+  return readStoredPreference(
+    FINANCE_CSV_IMPORT_REMINDER_DISMISSED_UNTIL_STORAGE_KEY,
+    parseStoredDate,
+    null,
+    storage
+  );
+}
+
+export function writeFinanceCsvImportReminderDismissal(
+  referenceDate = new Date(),
+  storage?: PreferenceStorage | null
+): string {
+  const dismissedUntil = new Date(
+    referenceDate.getTime() + IMPORT_REMINDER_DISMISS_DAYS * DAY_IN_MILLISECONDS
+  ).toISOString();
+  writeStoredPreference(
+    FINANCE_CSV_IMPORT_REMINDER_DISMISSED_UNTIL_STORAGE_KEY,
+    dismissedUntil,
+    storage
+  );
+  return dismissedUntil;
+}
+
+export function shouldShowFinanceCsvImportReminder({
+  dismissedUntil,
+  lastImportAt,
+  referenceDate = new Date(),
+}: {
+  dismissedUntil: string | null | undefined;
+  lastImportAt: string | null | undefined;
+  referenceDate?: Date;
+}): boolean {
+  if (dismissedUntil) {
+    const parsedDismissedUntil = new Date(dismissedUntil);
+    if (
+      !Number.isNaN(parsedDismissedUntil.getTime()) &&
+      parsedDismissedUntil.getTime() > referenceDate.getTime()
+    ) {
+      return false;
+    }
+  }
+
+  if (!lastImportAt) {
+    return true;
+  }
+
+  const parsedImportDate = new Date(lastImportAt);
+  if (Number.isNaN(parsedImportDate.getTime())) {
+    return true;
+  }
+
+  return (
+    referenceDate.getTime() - parsedImportDate.getTime() >
+    IMPORT_REMINDER_THRESHOLD_DAYS * DAY_IN_MILLISECONDS
+  );
 }
 
 function normalizeAmount(value: string) {

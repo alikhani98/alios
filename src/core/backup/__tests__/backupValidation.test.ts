@@ -5,6 +5,8 @@ import {
   dailyCheckinRecord,
   decisionLogRecord,
   goalRecord,
+  financeAssetRecord,
+  financeCategoryBudgetRecord,
   financeObligationRecord,
   financeTransactionRecord,
   focusSessionRecord,
@@ -62,6 +64,8 @@ describe("backup validation and migration", () => {
     expect(migrated.data.manualEntries).toEqual([]);
     expect(migrated.data.financeTransactions).toEqual([]);
     expect(migrated.data.financeObligations).toEqual([]);
+    expect(migrated.data.financeCategoryBudgets).toEqual([]);
+    expect(migrated.data.financeAssets).toEqual([]);
     expect(migrated.data.focusSessions).toEqual([]);
     expect(migrated.data.inboxItems).toEqual([]);
     expect(migrated.data.tasks).not.toBe(payload.data.tasks);
@@ -90,6 +94,8 @@ describe("backup validation and migration", () => {
     expect(backup.data.manualEntries).toEqual([]);
     expect(backup.data.financeTransactions).toEqual([]);
     expect(backup.data.financeObligations).toEqual([]);
+    expect(backup.data.financeCategoryBudgets).toEqual([]);
+    expect(backup.data.financeAssets).toEqual([]);
     expect(backup.data.focusSessions).toEqual([]);
     expect(backup.data.inboxItems).toEqual([]);
   });
@@ -219,6 +225,8 @@ describe("backup validation and migration", () => {
       manualEntries: [manualEntryRecord],
       financeTransactions: [financeTransactionRecord],
       financeObligations: [financeObligationRecord],
+      financeCategoryBudgets: [financeCategoryBudgetRecord],
+      financeAssets: [financeAssetRecord],
       focusSessions: [focusSessionRecord],
       projects: [projectRecord],
       journalEntries: [journalEntryRecord],

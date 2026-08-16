@@ -1,13 +1,22 @@
 import { useCallback, useEffect, useState } from "react";
 
 import type {
+  CreateFinanceAssetInput,
+  CreateFinanceCategoryBudgetInput,
   CreateFinanceObligationInput,
   CreateFinanceTransactionInput,
+  UpdateFinanceAssetInput,
+  UpdateFinanceCategoryBudgetInput,
   UpdateFinanceObligationInput,
   UpdateFinanceTransactionInput,
 } from "@/core/repositories";
 import { useStorageAdapter } from "@/core/storage";
-import type { FinanceObligation, FinanceTransaction } from "@/shared/types";
+import type {
+  FinanceAsset,
+  FinanceCategoryBudget,
+  FinanceObligation,
+  FinanceTransaction,
+} from "@/shared/types";
 
 function getErrorMessage(error: unknown): string {
   return error instanceof Error
@@ -19,6 +28,10 @@ export function useFinance() {
   const { finance } = useStorageAdapter();
   const [transactions, setTransactions] = useState<FinanceTransaction[]>([]);
   const [obligations, setObligations] = useState<FinanceObligation[]>([]);
+  const [categoryBudgets, setCategoryBudgets] = useState<FinanceCategoryBudget[]>(
+    []
+  );
+  const [assets, setAssets] = useState<FinanceAsset[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,12 +40,22 @@ export function useFinance() {
     setError(null);
 
     try {
-      const [loadedTransactions, loadedObligations] = await Promise.all([
-        finance.listTransactions(),
-        finance.listObligations(),
-      ]);
+      const [
+        loadedTransactions,
+        loadedObligations,
+        loadedCategoryBudgets,
+        loadedAssets,
+      ] =
+        await Promise.all([
+          finance.listTransactions(),
+          finance.listObligations(),
+          finance.listCategoryBudgets(),
+          finance.listAssets(),
+        ]);
       setTransactions(loadedTransactions);
       setObligations(loadedObligations);
+      setCategoryBudgets(loadedCategoryBudgets);
+      setAssets(loadedAssets);
     } catch (loadError) {
       setError(getErrorMessage(loadError));
     } finally {
@@ -110,9 +133,73 @@ export function useFinance() {
     [finance]
   );
 
+  const createCategoryBudget = useCallback(
+    async (input: CreateFinanceCategoryBudgetInput) => {
+      setError(null);
+      const budget = await finance.createCategoryBudget(input);
+      setCategoryBudgets((current) => [...current, budget]);
+      return budget;
+    },
+    [finance]
+  );
+
+  const updateCategoryBudget = useCallback(
+    async (id: string, input: UpdateFinanceCategoryBudgetInput) => {
+      setError(null);
+      const budget = await finance.updateCategoryBudget(id, input);
+      setCategoryBudgets((current) =>
+        current.map((item) => (item.id === id ? budget : item))
+      );
+      return budget;
+    },
+    [finance]
+  );
+
+  const deleteCategoryBudget = useCallback(
+    async (id: string) => {
+      setError(null);
+      await finance.deleteCategoryBudget(id);
+      setCategoryBudgets((current) => current.filter((budget) => budget.id !== id));
+    },
+    [finance]
+  );
+
+  const createAsset = useCallback(
+    async (input: CreateFinanceAssetInput) => {
+      setError(null);
+      const asset = await finance.createAsset(input);
+      setAssets((current) => [asset, ...current]);
+      return asset;
+    },
+    [finance]
+  );
+
+  const updateAsset = useCallback(
+    async (id: string, input: UpdateFinanceAssetInput) => {
+      setError(null);
+      const asset = await finance.updateAsset(id, input);
+      setAssets((current) =>
+        current.map((item) => (item.id === id ? asset : item))
+      );
+      return asset;
+    },
+    [finance]
+  );
+
+  const deleteAsset = useCallback(
+    async (id: string) => {
+      setError(null);
+      await finance.deleteAsset(id);
+      setAssets((current) => current.filter((asset) => asset.id !== id));
+    },
+    [finance]
+  );
+
   return {
     transactions,
     obligations,
+    categoryBudgets,
+    assets,
     isLoading,
     error,
     loadFinance,
@@ -122,5 +209,11 @@ export function useFinance() {
     createObligation,
     updateObligation,
     deleteObligation,
+    createCategoryBudget,
+    updateCategoryBudget,
+    deleteCategoryBudget,
+    createAsset,
+    updateAsset,
+    deleteAsset,
   };
 }

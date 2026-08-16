@@ -13,6 +13,12 @@ export const FINANCE_OBLIGATION_STATUS_VALUES = [
   "paid",
   "paused",
 ] as const;
+export const FINANCE_ASSET_TYPE_VALUES = [
+  "stock",
+  "gold",
+  "savings",
+  "other",
+] as const;
 
 export const financeTransactionTypeSchema = z.enum(
   FINANCE_TRANSACTION_TYPE_VALUES
@@ -23,6 +29,7 @@ export const financeObligationTypeSchema = z.enum(
 export const financeObligationStatusSchema = z.enum(
   FINANCE_OBLIGATION_STATUS_VALUES
 );
+export const financeAssetTypeSchema = z.enum(FINANCE_ASSET_TYPE_VALUES);
 
 export const financeTransactionSchema = z.object({
   id: z.string().min(1),
@@ -55,10 +62,33 @@ export const financeObligationSchema = z.object({
   sync: recordSyncMetadataSchema.optional(),
 });
 
+export const financeCategoryBudgetSchema = z.object({
+  id: z.string().min(1),
+  category: z.string().trim().min(1),
+  monthlyLimitAmount: z.number().finite().nonnegative(),
+  createdAt: isoDateTimeSchema,
+  updatedAt: isoDateTimeSchema,
+  sync: recordSyncMetadataSchema.optional(),
+});
+
+export const financeAssetSchema = z.object({
+  id: z.string().min(1),
+  title: z.string().trim().min(1),
+  type: financeAssetTypeSchema,
+  currentValue: z.number().finite().nonnegative(),
+  notes: z.string().trim().min(1).optional(),
+  createdAt: isoDateTimeSchema,
+  updatedAt: isoDateTimeSchema,
+  sync: recordSyncMetadataSchema.optional(),
+});
+
 export type FinanceTransactionType = z.infer<typeof financeTransactionTypeSchema>;
 export type FinanceObligationType = z.infer<typeof financeObligationTypeSchema>;
 export type FinanceObligationStatus = z.infer<
   typeof financeObligationStatusSchema
 >;
+export type FinanceAssetType = z.infer<typeof financeAssetTypeSchema>;
 export type FinanceTransaction = z.infer<typeof financeTransactionSchema>;
 export type FinanceObligation = z.infer<typeof financeObligationSchema>;
+export type FinanceCategoryBudget = z.infer<typeof financeCategoryBudgetSchema>;
+export type FinanceAsset = z.infer<typeof financeAssetSchema>;

@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  financeAssetSchema,
+  financeCategoryBudgetSchema,
   financeObligationSchema,
   financeTransactionSchema,
 } from "../finance";
@@ -37,6 +39,28 @@ describe("finance schemas", () => {
         updatedAt: "2026-07-05T08:30:00.000Z",
       }).success
     ).toBe(true);
+
+    expect(
+      financeCategoryBudgetSchema.safeParse({
+        id: "budget-1",
+        category: "groceries",
+        monthlyLimitAmount: 1200,
+        createdAt: "2026-07-05T08:30:00.000Z",
+        updatedAt: "2026-07-05T08:30:00.000Z",
+      }).success
+    ).toBe(true);
+
+    expect(
+      financeAssetSchema.safeParse({
+        id: "asset-1",
+        title: "Emergency savings",
+        type: "savings",
+        currentValue: 10000,
+        notes: "Manual balance",
+        createdAt: "2026-07-05T08:30:00.000Z",
+        updatedAt: "2026-07-05T08:30:00.000Z",
+      }).success
+    ).toBe(true);
   });
 
   it("rejects invalid finance amounts and fields", () => {
@@ -62,6 +86,17 @@ describe("finance schemas", () => {
         paidAmount: 500,
         dueDay: 32,
         status: "active",
+        createdAt: "2026-07-05T08:30:00.000Z",
+        updatedAt: "2026-07-05T08:30:00.000Z",
+      }).success
+    ).toBe(false);
+
+    expect(
+      financeAssetSchema.safeParse({
+        id: "asset-1",
+        title: " ",
+        type: "crypto",
+        currentValue: -1,
         createdAt: "2026-07-05T08:30:00.000Z",
         updatedAt: "2026-07-05T08:30:00.000Z",
       }).success

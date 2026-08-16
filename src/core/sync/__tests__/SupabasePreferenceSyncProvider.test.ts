@@ -10,6 +10,8 @@ import {
 } from "@/shared/constants/preferences";
 import { LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
 import type {
+  FinanceAsset,
+  FinanceCategoryBudget,
   FinanceObligation,
   FinanceTransaction,
   Goal,
@@ -273,6 +275,8 @@ function createBackupStorageStub(input?: {
   manualEntries?: ManualEntry[];
   financeTransactions?: FinanceTransaction[];
   financeObligations?: FinanceObligation[];
+  financeCategoryBudgets?: FinanceCategoryBudget[];
+  financeAssets?: FinanceAsset[];
 }) {
   let data = {
     dailyCheckins: [],
@@ -283,6 +287,8 @@ function createBackupStorageStub(input?: {
     manualEntries: input?.manualEntries ?? [],
     financeTransactions: input?.financeTransactions ?? [],
     financeObligations: input?.financeObligations ?? [],
+    financeCategoryBudgets: input?.financeCategoryBudgets ?? [],
+    financeAssets: input?.financeAssets ?? [],
     projects: input?.projects ?? [],
     journalEntries: [],
     knowledgeItems: [],
@@ -307,6 +313,8 @@ function createBackupStorageStub(input?: {
       manualEntries: data.manualEntries.length,
       financeTransactions: data.financeTransactions.length,
       financeObligations: data.financeObligations.length,
+      financeCategoryBudgets: data.financeCategoryBudgets.length,
+      financeAssets: data.financeAssets.length,
       focusSessions: data.focusSessions.length,
       projects: data.projects.length,
       journalEntries: data.journalEntries.length,
@@ -326,6 +334,8 @@ function createBackupStorageStub(input?: {
         manualEntries: [],
         financeTransactions: [],
         financeObligations: [],
+        financeCategoryBudgets: [],
+        financeAssets: [],
         focusSessions: [],
       };
     }),

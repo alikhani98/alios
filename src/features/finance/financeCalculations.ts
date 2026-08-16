@@ -7,7 +7,12 @@ import {
   parseISO,
 } from "date-fns";
 
-import type { FinanceObligation, FinanceTransaction } from "@/shared/types";
+import type {
+  FinanceAsset,
+  FinanceCategoryBudget,
+  FinanceObligation,
+  FinanceTransaction,
+} from "@/shared/types";
 
 type FinanceSummary = {
   incomeThisMonth: number;
@@ -47,6 +52,15 @@ export type FinanceBudgetGuard = {
   expensesThisMonth: number;
   monthlyObligationsEstimate: number;
   remainingLiquidity: number;
+};
+
+export type FinanceCategoryBudgetUsage = {
+  budget: FinanceCategoryBudget;
+  spentThisMonth: number;
+  limitAmount: number;
+  remainingAmount: number;
+  usageRatio: number;
+  status: FinanceBudgetGuardStatus;
 };
 
 export type FinanceObligationDueLabel =
@@ -276,6 +290,13 @@ export function calculateRemainingObligationTotal(
   );
 }
 
+export function calculateFinanceAssetTotal(assets: FinanceAsset[]): number {
+  return assets.reduce(
+    (total, asset) => total + toSafeAmount(asset.currentValue),
+    0
+  );
+}
+
 export function calculateMonthlyObligationEstimate(
   obligations: FinanceObligation[],
   referenceDate = new Date()
@@ -434,6 +455,41 @@ export function calculateBudgetGuard(
     monthlyObligationsEstimate: summary.monthlyObligationsEstimate,
     remainingLiquidity: summary.remainingLiquidity,
   };
+}
+
+export function calculateFinanceCategoryBudgetUsage(
+  transactions: FinanceTransaction[],
+  categoryBudgets: FinanceCategoryBudget[],
+  referenceDate = new Date()
+): FinanceCategoryBudgetUsage[] {
+  const currentMonthExpenses = getCurrentMonthTransactions(
+    transactions,
+    referenceDate
+  ).filter((transaction) => transaction.type === "expense");
+  const groupedExpenses = groupExpensesByCategory(currentMonthExpenses);
+
+  return [...categoryBudgets]
+    .sort((left, right) => left.category.localeCompare(right.category))
+    .map((budget) => {
+      const limitAmount = toSafeAmount(budget.monthlyLimitAmount);
+      const spentThisMonth = groupedExpenses[budget.category]?.amount ?? 0;
+      const usageRatio = limitAmount > 0 ? spentThisMonth / limitAmount : 0;
+      const status: FinanceBudgetGuardStatus =
+        limitAmount > 0 && usageRatio >= 1
+          ? "pressure"
+          : limitAmount > 0 && usageRatio >= 0.8
+            ? "watch"
+            : "calm";
+
+      return {
+        budget,
+        spentThisMonth,
+        limitAmount,
+        remainingAmount: Math.max(limitAmount - spentThisMonth, 0),
+        usageRatio,
+        status,
+      };
+    });
 }
 
 export function getRecentFinanceTransactions(
