@@ -21,6 +21,15 @@
       "purpose": "any maskable"
     }
   ],
+  "share_target": {
+    "action": "/#/inbox",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
   "shortcuts": [
     {
       "name": "امروز",

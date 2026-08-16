@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased - PWA Share Target
+
+- Added a manifest-level GET share target that routes shared title, text, and URL content to the existing Inbox route.
+- Added Inbox handling for share target query parameters, creating a local note Inbox item through the existing Inbox repository path and clearing share parameters after capture.
+- Added focused Inbox page coverage for share-target capture and normal no-query Inbox loading.
+- Kept the Service Worker, Inbox schema, repository contracts, dependencies, routes, and local-first storage ownership unchanged.
+
 ## Unreleased - Settings Storage Usage Monitor
 
 - Added a Settings storage usage card that reads `navigator.storage.estimate()` and shows used space, quota, percentage, and a progress bar.

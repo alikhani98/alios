@@ -31,9 +31,71 @@ import { useInboxItems } from "../hooks/useInboxItems";
 import { selectVisibleInboxItemIds } from "../inboxSelection";
 import type { InboxFormValues } from "../types";
 
+const SHARE_TARGET_PARAM_NAMES = ["title", "text", "url"] as const;
+
+type ShareTargetParams = {
+  title: string;
+  text: string;
+  url: string;
+};
+
+function getShareTargetParam(
+  routeParams: URLSearchParams,
+  documentParams: URLSearchParams,
+  name: (typeof SHARE_TARGET_PARAM_NAMES)[number]
+) {
+  return (routeParams.get(name) ?? documentParams.get(name) ?? "").trim();
+}
+
+function getShareTargetParams(routeParams: URLSearchParams): ShareTargetParams | null {
+  const documentParams =
+    typeof window === "undefined"
+      ? new URLSearchParams()
+      : new URLSearchParams(window.location.search);
+  const params = {
+    title: getShareTargetParam(routeParams, documentParams, "title"),
+    text: getShareTargetParam(routeParams, documentParams, "text"),
+    url: getShareTargetParam(routeParams, documentParams, "url"),
+  };
+
+  return params.title || params.text || params.url ? params : null;
+}
+
+function createSharedInboxContent(params: ShareTargetParams) {
+  const parts = [params.title, params.text, params.url].filter(
+    (part, index, values) => part.length > 0 && values.indexOf(part) === index
+  );
+
+  return parts.join("\n");
+}
+
+function removeDocumentShareTargetParams() {
+  if (typeof window === "undefined" || window.location.search.length === 0) {
+    return;
+  }
+
+  const nextUrl = new URL(window.location.href);
+  let changed = false;
+
+  SHARE_TARGET_PARAM_NAMES.forEach((name) => {
+    if (nextUrl.searchParams.has(name)) {
+      nextUrl.searchParams.delete(name);
+      changed = true;
+    }
+  });
+
+  if (changed) {
+    window.history.replaceState(
+      window.history.state,
+      "",
+      `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`
+    );
+  }
+}
+
 export function InboxPage() {
   const { t } = useI18n();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const {
     items,
     isLoading,
@@ -67,6 +129,7 @@ export function InboxPage() {
   const [focusMessage, setFocusMessage] = useState<string | null>(null);
   const [showAllItems, setShowAllItems] = useState(false);
   const itemRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const processedShareTargetSignatureRef = useRef<string | null>(null);
   const focusId = searchParams.get("focusId");
   const inboxPreviewLimit = 12;
   const todayDate = format(new Date(), "yyyy-MM-dd");
@@ -96,6 +159,39 @@ export function InboxPage() {
   const selectedUnprocessedVisibleCount = selectedUnprocessedVisibleIds.length;
   const allVisibleSelected =
     visibleItemIds.length > 0 && visibleItemIds.every((id) => selectedIds.includes(id));
+
+  useEffect(() => {
+    const sharedParams = getShareTargetParams(searchParams);
+
+    if (!sharedParams) {
+      processedShareTargetSignatureRef.current = null;
+      return;
+    }
+
+    const signature = JSON.stringify(sharedParams);
+    if (processedShareTargetSignatureRef.current === signature) {
+      return;
+    }
+
+    processedShareTargetSignatureRef.current = signature;
+    const nextRouteParams = new URLSearchParams(searchParams);
+    SHARE_TARGET_PARAM_NAMES.forEach((name) => nextRouteParams.delete(name));
+
+    void createItem({
+      content: createSharedInboxContent(sharedParams),
+      type: "note",
+    })
+      .then(() => {
+        setMessage(t("inbox.captured"));
+        setActionError(null);
+        setSearchParams(nextRouteParams, { replace: true });
+        removeDocumentShareTargetParams();
+      })
+      .catch(() => {
+        processedShareTargetSignatureRef.current = null;
+        setActionError(t("inbox.saveError"));
+      });
+  }, [createItem, searchParams, setSearchParams, t]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {

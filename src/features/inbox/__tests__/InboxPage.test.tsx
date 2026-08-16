@@ -46,7 +46,10 @@ async function waitForInboxCount(storage: DexieStorageAdapter, count: number) {
   return storage.inbox.list();
 }
 
-async function renderInboxPage(storage: DexieStorageAdapter): Promise<{
+async function renderInboxPage(
+  storage: DexieStorageAdapter,
+  initialEntry = "/inbox"
+): Promise<{
   container: HTMLDivElement;
   root: Root;
 }> {
@@ -56,7 +59,7 @@ async function renderInboxPage(storage: DexieStorageAdapter): Promise<{
 
   await act(async () => {
     root.render(
-      <MemoryRouter initialEntries={["/inbox"]}>
+      <MemoryRouter initialEntries={[initialEntry]}>
         <StorageAdapterProvider adapter={storage}>
           <I18nProvider>
             <DateDisplayProvider>
@@ -132,6 +135,33 @@ describe("InboxPage bulk actions", () => {
       "Second captured item",
       "Keep this item",
     ]).toContain(remaining[0]?.content);
+  });
+
+  it("creates a note inbox item from PWA share target query params", async () => {
+    ({ container, root } = await renderInboxPage(
+      storage,
+      "/inbox?title=Shared%20Title&text=Shared%20body&url=https%3A%2F%2Fexample.test%2Fresource"
+    ));
+
+    const items = await waitForInboxCount(storage, 4);
+    const sharedItem = items.find((item) => item.content.includes("Shared Title"));
+
+    expect(sharedItem).toBeDefined();
+    expect(sharedItem?.type).toBe("note");
+    expect(sharedItem?.status).toBe("unprocessed");
+    expect(sharedItem?.content).toContain("Shared Title");
+    expect(sharedItem?.content).toContain("Shared body");
+    expect(sharedItem?.content).toContain("https://example.test/resource");
+    expect(container!.textContent).toContain("Item captured.");
+  });
+
+  it("opens normally without creating an item when share target query params are absent", async () => {
+    ({ container, root } = await renderInboxPage(storage));
+
+    const items = await waitForInboxCount(storage, 3);
+
+    expect(items).toHaveLength(3);
+    expect(container!.textContent).toContain("First captured item");
   });
 
   it("selects all visible inbox items and clears the selection", async () => {
