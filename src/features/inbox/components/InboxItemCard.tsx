@@ -1,11 +1,12 @@
 import { addDays, format } from "date-fns";
 import { BookOpen, CheckCircle2, Circle, Clock3, ListTodo, Pencil, Sparkles, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { type MouseEvent, useState } from "react";
 
 import { useDateFormatter } from "@/shared/date";
 import { useI18n } from "@/shared/i18n";
 import type { InboxItem } from "@/shared/types";
 import { Badge, Button, Card, CardContent, CardFooter, SwipeActionSurface } from "@/shared/ui";
+import { cn } from "@/shared/utils";
 import { INBOX_STATUS_LABEL_KEYS, INBOX_TYPE_LABEL_KEYS } from "../constants";
 import { InboxItemForm } from "./InboxItemForm";
 import type { InboxFormValues } from "../types";
@@ -14,6 +15,7 @@ import { suggestInboxProcessingTarget, type InboxProcessingTarget } from "../inb
 type Props = {
   item: InboxItem;
   isBusy: boolean;
+  isSelectionMode: boolean;
   isSelected: boolean;
   onSelectionChange: (selected: boolean) => void;
   onEdit: (values: InboxFormValues) => Promise<boolean>;
@@ -33,6 +35,7 @@ function getThisWeekendDate(today = new Date()): string {
 export function InboxItemCard({
   item,
   isBusy,
+  isSelectionMode,
   isSelected,
   onSelectionChange,
   onEdit,
@@ -58,6 +61,18 @@ export function InboxItemCard({
       : suggestedTarget === "knowledgeItem"
         ? "inbox.convertToKnowledgeItem"
         : "inbox.convertToJournalEntry";
+  const toggleSelectionFromCard = (event: MouseEvent<HTMLElement>) => {
+    if (!isSelectionMode) {
+      return;
+    }
+
+    const target = event.target as HTMLElement;
+    if (target.closest("button,input,textarea,select,a,label")) {
+      return;
+    }
+
+    onSelectionChange(!isSelected);
+  };
 
   if (isEditing) {
     return (
@@ -78,18 +93,27 @@ export function InboxItemCard({
       onProcess={() => setShowProcessing(true)}
       onDeleteIntent={() => setConfirmingDelete(true)}
     >
-    <Card className={item.status === "processed" ? "bg-muted/30" : undefined}>
+    <Card
+      className={cn(
+        item.status === "processed" ? "bg-muted/30" : undefined,
+        isSelectionMode ? "cursor-pointer border-primary/20" : undefined,
+        isSelectionMode && isSelected ? "ring-2 ring-primary/40 ring-offset-2 ring-offset-background" : undefined
+      )}
+      onClick={toggleSelectionFromCard}
+    >
       <CardContent className="space-y-4 p-5">
-        <label className="flex min-h-11 cursor-pointer items-center gap-3 rounded-xl border bg-background px-3 py-2 text-sm font-medium">
-          <input
-            type="checkbox"
-            checked={isSelected}
-            onChange={(event) => onSelectionChange(event.target.checked)}
-            className="h-5 w-5 shrink-0 accent-primary"
-            aria-label={t("inbox.select")}
-          />
-          <span>{t("inbox.select")}</span>
-        </label>
+        {isSelectionMode ? (
+          <label className="flex min-h-11 cursor-pointer items-center gap-3 rounded-xl border bg-background px-3 py-2 text-sm font-medium">
+            <input
+              type="checkbox"
+              checked={isSelected}
+              onChange={(event) => onSelectionChange(event.target.checked)}
+              className="h-5 w-5 shrink-0 accent-primary"
+              aria-label={t("inbox.select")}
+            />
+            <span>{t("inbox.select")}</span>
+          </label>
+        ) : null}
         <p className="whitespace-pre-wrap break-words text-base leading-7">{item.content}</p>
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant="outline">{t(INBOX_TYPE_LABEL_KEYS[item.type])}</Badge>

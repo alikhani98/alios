@@ -41,6 +41,7 @@ function renderInboxCard() {
         <InboxItemCard
           item={item}
           isBusy={false}
+          isSelectionMode={false}
           isSelected={false}
           onSelectionChange={() => undefined}
           onEdit={async () => true}

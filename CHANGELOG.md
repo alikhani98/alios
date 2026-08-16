@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased - Inbox Bulk Actions
+
+- Added an explicit Inbox bulk-select mode with visible selection controls, select-all, clear-selection, selected-count feedback, and Escape dismissal.
+- Added a bottom bulk action bar for selected Inbox items with group delete confirmation, group processed marking, group archive behavior through the existing processed status, and the existing batch conversion path.
+- Kept Inbox records on the existing `unprocessed` / `processed` status model without adding a schema migration, dependency, repository contract, backend, sync behavior, or new storage path.
+- Added focused Inbox page coverage for multiple selection and delete, select-all/clear-selection behavior, and Escape exit.
+
 ## Unreleased - Sync Security Disclosure
 
 - Documented the current Supabase sync security model honestly in Settings, README, and the Supabase setup guide.

@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import { AlertCircle, CheckCircle2, Circle, Inbox, ListTodo, Plus, RotateCcw, Search, SearchX, Trash2, X } from "lucide-react";
+import { AlertCircle, Archive, CheckCircle2, Circle, Inbox, ListTodo, Plus, RotateCcw, Search, SearchX, SquareCheckBig, Trash2, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
@@ -54,6 +54,7 @@ export function InboxPage() {
   } = useInboxItems();
   const [busyId, setBusyId] = useState<string | null>(null);
   const [isBulkBusy, setIsBulkBusy] = useState(false);
+  const [isBulkSelectMode, setIsBulkSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [confirmingBulkDelete, setConfirmingBulkDelete] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
@@ -95,6 +96,20 @@ export function InboxPage() {
   const selectedUnprocessedVisibleCount = selectedUnprocessedVisibleIds.length;
   const allVisibleSelected =
     visibleItemIds.length > 0 && visibleItemIds.every((id) => selectedIds.includes(id));
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape" || !isBulkSelectMode) {
+        return;
+      }
+
+      setIsBulkSelectMode(false);
+      clearSelection();
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [isBulkSelectMode]);
 
   useEffect(() => {
     setSelectedIds([]);
@@ -149,6 +164,11 @@ export function InboxPage() {
   const clearSelection = () => {
     setSelectedIds([]);
     setConfirmingBulkDelete(false);
+  };
+
+  const leaveBulkSelectMode = () => {
+    setIsBulkSelectMode(false);
+    clearSelection();
   };
 
   const selectAllVisible = () => {
@@ -338,8 +358,9 @@ export function InboxPage() {
         </div>
       ) : null}
 
-      {selectedVisibleCount > 0 ? (
-        <PremiumCard>
+      {isBulkSelectMode ? (
+        <div className="fixed inset-x-4 bottom-[calc(1rem+env(safe-area-inset-bottom))] z-40 mx-auto max-w-5xl">
+        <PremiumCard className="shadow-aliosFloating">
           <CardContent className="grid gap-3 p-4">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="space-y-1">
@@ -365,9 +386,12 @@ export function InboxPage() {
                 <Button type="button" size="sm" variant="ghost" disabled={isBulkBusy} onClick={clearSelection}>
                   <X className="me-2 h-4 w-4" />{t("inbox.clearSelection")}
                 </Button>
+                <Button type="button" size="sm" variant="ghost" disabled={isBulkBusy} onClick={leaveBulkSelectMode}>
+                  {t("inbox.exitBulkSelect")}
+                </Button>
               </div>
             </div>
-            <div className="grid gap-2 sm:grid-cols-3">
+            <div className="grid gap-2 sm:grid-cols-4">
               <Button
                 type="button"
                 size="sm"
@@ -391,6 +415,18 @@ export function InboxPage() {
                 )}
               >
                 <CheckCircle2 className="me-2 h-4 w-4" />{t("inbox.markSelectedProcessed")}
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                disabled={isBulkBusy}
+                onClick={() => void runBulk(
+                  () => markItemsProcessed(selectedVisibleIds).then(() => undefined),
+                  t("inbox.bulkArchived")
+                )}
+              >
+                <Archive className="me-2 h-4 w-4" />{t("inbox.archiveSelected")}
               </Button>
               <Button
                 type="button"
@@ -432,6 +468,7 @@ export function InboxPage() {
             </div>
           </CardContent>
         </PremiumCard>
+        </div>
       ) : null}
 
       {isLoading ? (
@@ -471,7 +508,48 @@ export function InboxPage() {
           }
         />
       ) : (
-        <div className="grid gap-4 md:grid-cols-2">
+        <>
+        <Card>
+          <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="space-y-1">
+              <p className="text-sm font-semibold">{t("inbox.bulkSelectToolbar")}</p>
+              <p className="text-sm text-muted-foreground">
+                {isBulkSelectMode
+                  ? t("inbox.bulkSelectHelp")
+                  : t("inbox.bulkSelectInactiveHelp")}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {isBulkSelectMode ? (
+                <>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    disabled={allVisibleSelected}
+                    onClick={selectAllVisible}
+                  >
+                    <SquareCheckBig className="me-2 h-4 w-4" />
+                    {t("inbox.selectAllVisible")}
+                  </Button>
+                  <Button type="button" size="sm" variant="ghost" onClick={clearSelection}>
+                    <X className="me-2 h-4 w-4" />
+                    {t("inbox.clearSelection")}
+                  </Button>
+                  <Button type="button" size="sm" variant="outline" onClick={leaveBulkSelectMode}>
+                    {t("inbox.exitBulkSelect")}
+                  </Button>
+                </>
+              ) : (
+                <Button type="button" size="sm" variant="outline" onClick={() => setIsBulkSelectMode(true)}>
+                  <SquareCheckBig className="me-2 h-4 w-4" />
+                  {t("inbox.enterBulkSelect")}
+                </Button>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+        <div className={cn("grid gap-4 md:grid-cols-2", isBulkSelectMode ? "pb-44" : undefined)}>
           {displayedItems.map((item) => (
             <div
               key={item.id}
@@ -488,6 +566,7 @@ export function InboxPage() {
               <InboxItemCard
                 item={item}
                 isBusy={busyId === item.id}
+                isSelectionMode={isBulkSelectMode}
                 isSelected={selectedIds.includes(item.id)}
                 onSelectionChange={(selected) => setItemSelected(item.id, selected)}
                 onEdit={async (values) => {
@@ -524,6 +603,7 @@ export function InboxPage() {
             </div>
           ))}
         </div>
+        </>
       )}
       {filteredItems.length > inboxPreviewLimit && !focusRequiresAllItems ? (
         <div className="flex justify-start">
