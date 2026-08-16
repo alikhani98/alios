@@ -275,6 +275,7 @@ export function OnboardingWizard() {
         role="dialog"
         aria-modal="true"
         aria-labelledby="onboarding-title"
+        aria-busy={isCompleting ? "true" : undefined}
         className="flex h-screen w-full max-w-5xl flex-col overflow-hidden rounded-none border-0 bg-background/98 shadow-2xl sm:h-[min(48rem,calc(100vh-2rem))] sm:rounded-[2rem] sm:border"
         dir={direction}
       >
@@ -342,11 +343,12 @@ export function OnboardingWizard() {
                       {t("onboarding.nameDescription")}
                     </p>
                   </div>
-                  <label className="block space-y-2">
+                  <label className="block space-y-2" htmlFor="onboarding-display-name">
                     <span className="text-sm font-semibold">
                       {t("settings.displayName")}
                     </span>
                     <Input
+                      id="onboarding-display-name"
                       value={name}
                       onChange={(event) => setName(event.target.value.slice(0, 50))}
                       maxLength={50}
@@ -420,11 +422,12 @@ export function OnboardingWizard() {
                       {t("onboarding.firstTaskDescription")}
                     </p>
                   </div>
-                  <label className="block space-y-2">
+                  <label className="block space-y-2" htmlFor="onboarding-first-task">
                     <span className="text-sm font-semibold">
                       {t("onboarding.firstTaskLabel")}
                     </span>
                     <Input
+                      id="onboarding-first-task"
                       value={firstTaskTitle}
                       onChange={(event) => setFirstTaskTitle(event.target.value)}
                       maxLength={120}

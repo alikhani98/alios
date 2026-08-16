@@ -651,7 +651,7 @@ export function Topbar({
           >
             <Suspense
               fallback={
-                <div className="space-y-4">
+                <div className="space-y-4" aria-busy="true">
                   <SectionHeader
                     icon={<LayoutDashboard className="h-5 w-5" />}
                     title={t("home.dashboardControlsTitle")}

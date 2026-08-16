@@ -8,6 +8,35 @@ function readSource(path: string) {
 }
 
 describe("shell keyboard accessibility", () => {
+  it("provides a keyboard skip link to the main route content", () => {
+    const appShell = readSource("src/shared/layout/AppShell.tsx");
+
+    expect(appShell).toContain('href="#main-content"');
+    expect(appShell).toContain('id="main-content"');
+    expect(appShell).toContain("tabIndex={-1}");
+    expect(appShell).toContain('t("shell.skipToMain")');
+  });
+
+  it("keeps audited icon-only controls named with aria-labels", () => {
+    const sources = [
+      readSource("src/shared/layout/Topbar.tsx"),
+      readSource("src/shared/layout/Sidebar.tsx"),
+      readSource("src/shared/layout/MobileSidebar.tsx"),
+      readSource("src/shared/layout/BottomNav.tsx"),
+      readSource("src/features/onboarding/components/OnboardingWizard.tsx"),
+    ].join("\n");
+
+    [
+      'aria-label={t("shell.openMenu")}',
+      'aria-label={collapsed ? t("shell.openSidebar") : t("shell.closeSidebar")}',
+      'aria-label={t("shell.closeMenu")}',
+      'aria-label={t("command.open")}',
+      'aria-label={t("settings.appearance")}',
+      'aria-label={t("settings.localProfile")}',
+      'aria-label={t("onboarding.close")}',
+    ].forEach((contract) => expect(sources).toContain(contract));
+  });
+
   it("keeps every topbar popover connected to its keyboard trigger", () => {
     const topbar = readSource("src/shared/layout/Topbar.tsx");
 
@@ -41,5 +70,16 @@ describe("shell keyboard accessibility", () => {
       "event.key !== \"Tab\"",
       "previousActiveElementRef.current?.focus()",
     ].forEach((contract) => expect(mobileSidebar).toContain(contract));
+  });
+
+  it("keeps grouped navigation keyboard-operable and announced", () => {
+    const navigationGroupList = readSource("src/shared/layout/NavigationGroupList.tsx");
+
+    [
+      "aria-expanded={isOpen}",
+      "aria-controls={panelId}",
+      "onClick={() => setGroupOpen(group.id, !isOpen)}",
+      'aria-label={title}',
+    ].forEach((contract) => expect(navigationGroupList).toContain(contract));
   });
 });

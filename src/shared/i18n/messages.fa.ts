@@ -932,6 +932,7 @@ export const messagesFa: Record<TranslationKey, string> = {
   "nav.mobile": "پیمایش موبایل",
   "shell.openSidebar": "باز کردن نوار کناری",
   "shell.closeSidebar": "بستن نوار کناری",
+  "shell.skipToMain": "رفتن به محتوای اصلی",
   "shell.openMenu": "باز کردن منوی اصلی",
   "shell.closeMenu": "بستن منوی موبایل",
   "shell.searchPlaceholder": "جستجو در داده‌های محلی",

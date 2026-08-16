@@ -340,7 +340,7 @@ export function FocusPage() {
     : t("focus.notificationUnavailable");
 
   return (
-    <div className="alios-page space-y-6">
+    <div className="alios-page space-y-6" aria-busy={isLoading ? "true" : undefined}>
       <section className="space-y-3">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0 space-y-2">

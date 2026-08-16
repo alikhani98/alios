@@ -68,6 +68,7 @@ function normalizeSearch(value: string) {
 export function CommandPalette({ open, onOpen, onClose }: CommandPaletteProps) {
   const { direction, t } = useI18n();
   const navigate = useNavigate();
+  const dialogRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const previouslyFocusedElementRef = useRef<HTMLElement | null>(null);
   const [query, setQuery] = useState("");
@@ -144,6 +145,30 @@ export function CommandPalette({ open, onOpen, onClose }: CommandPaletteProps) {
     if (event.key === "Escape") {
       event.preventDefault();
       onClose();
+      return;
+    }
+
+    if (event.key === "Tab") {
+      const focusableElements = Array.from(
+        dialogRef.current?.querySelectorAll<HTMLElement>(
+          "button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled])"
+        ) ?? []
+      );
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements.at(-1);
+
+      if (!firstElement || !lastElement) {
+        event.preventDefault();
+        return;
+      }
+
+      if (event.shiftKey && document.activeElement === firstElement) {
+        event.preventDefault();
+        lastElement.focus();
+      } else if (!event.shiftKey && document.activeElement === lastElement) {
+        event.preventDefault();
+        firstElement.focus();
+      }
       return;
     }
 
@@ -251,6 +276,7 @@ export function CommandPalette({ open, onOpen, onClose }: CommandPaletteProps) {
 
   return (
     <div
+      ref={dialogRef}
       className="fixed inset-0 z-[70] flex items-start justify-center bg-background/80 px-3 py-[calc(1rem+env(safe-area-inset-top))] backdrop-blur-md sm:px-4 sm:py-[calc(3rem+env(safe-area-inset-top))]"
       role="dialog"
       aria-modal="true"
@@ -261,6 +287,7 @@ export function CommandPalette({ open, onOpen, onClose }: CommandPaletteProps) {
         type="button"
         className="absolute inset-0 cursor-default"
         aria-label={t("command.close")}
+        tabIndex={-1}
         onClick={onClose}
       />
       <div

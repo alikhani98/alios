@@ -28,6 +28,7 @@ export const messagesEn = {
   "shell.closeSidebar": "Close sidebar",
   "shell.openMenu": "Open main menu",
   "shell.closeMenu": "Close mobile menu",
+  "shell.skipToMain": "Skip to main content",
   "shell.searchPlaceholder": "Search local data",
   "command.title": "Command Palette",
   "command.description": "Jump to a page or start a common local action.",

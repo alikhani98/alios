@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased - Accessibility Hardening
+
+- Added a keyboard skip link from the app shell to the main route content.
+- Hardened modal focus behavior by trapping Tab focus inside the global Command Palette and adding regression coverage for the existing Onboarding Wizard focus trap and Escape dismissal.
+- Added explicit label associations and busy-state announcements to first-run onboarding, Focus loading, and Topbar dashboard loading surfaces.
+- Added focused accessibility coverage for icon-only control labels, shell navigation keyboard contracts, modal focus containment, and Escape dismissal.
+
 ## Unreleased - Navigation Complexity Reduction
 
 - Consolidated the desktop and mobile drawer navigation into always-visible core destinations plus one persisted "More" section for advanced modules.

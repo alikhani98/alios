@@ -154,6 +154,75 @@ describe("OnboardingWizard", () => {
     expect(container.textContent).toContain("Welcome to AliOS");
   });
 
+  it("keeps keyboard focus trapped inside the wizard", async () => {
+    await act(async () => {
+      root.render(<Harness storage={createFakeStorage()} />);
+      await Promise.resolve();
+    });
+    act(() => {
+      vi.runOnlyPendingTimers();
+    });
+
+    const dialog = container.querySelector<HTMLElement>('[role="dialog"]');
+    const closeButton = container.querySelector<HTMLButtonElement>(
+      'button[aria-label="Close onboarding"]'
+    );
+    const focusableElements = Array.from(
+      dialog?.querySelectorAll<HTMLElement>(
+        "button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled])"
+      ) ?? []
+    );
+    const lastElement = focusableElements.at(-1);
+
+    expect(dialog?.getAttribute("aria-modal")).toBe("true");
+    expect(dialog?.getAttribute("aria-labelledby")).toBe("onboarding-title");
+    expect(closeButton).not.toBeNull();
+    expect(lastElement).toBeDefined();
+    expect(document.activeElement).toBe(closeButton);
+
+    act(() => {
+      document.dispatchEvent(
+        new KeyboardEvent("keydown", {
+          key: "Tab",
+          shiftKey: true,
+          bubbles: true,
+        })
+      );
+    });
+
+    expect(document.activeElement).toBe(lastElement);
+
+    act(() => {
+      document.dispatchEvent(
+        new KeyboardEvent("keydown", {
+          key: "Tab",
+          bubbles: true,
+        })
+      );
+    });
+
+    expect(document.activeElement).toBe(closeButton);
+  });
+
+  it("closes the wizard with Escape without marking onboarding complete", async () => {
+    await act(async () => {
+      root.render(<Harness storage={createFakeStorage()} />);
+      await Promise.resolve();
+    });
+
+    act(() => {
+      document.dispatchEvent(
+        new KeyboardEvent("keydown", {
+          key: "Escape",
+          bubbles: true,
+        })
+      );
+    });
+
+    expect(container.querySelector('[role="dialog"]')).toBeNull();
+    expect(localStorage.getItem(ONBOARDING_COMPLETED_STORAGE_KEY)).toBeNull();
+  });
+
   it("does not show the wizard after completion", async () => {
     localStorage.setItem(ONBOARDING_COMPLETED_STORAGE_KEY, "true");
 

@@ -124,4 +124,58 @@ describe("CommandPalette", () => {
 
     expect(container.querySelector('[role="dialog"]')).toBeNull();
   });
+
+  it("keeps Tab focus inside the open command dialog", () => {
+    act(() => {
+      root.render(
+        <MemoryRouter>
+          <I18nProvider>
+            <CommandPalette open onOpen={() => undefined} onClose={() => undefined} />
+          </I18nProvider>
+        </MemoryRouter>
+      );
+    });
+
+    const dialog = container.querySelector<HTMLElement>('[role="dialog"]');
+    const input = container.querySelector<HTMLInputElement>(
+      'input[role="searchbox"]'
+    );
+    const focusableElements = Array.from(
+      dialog?.querySelectorAll<HTMLElement>(
+        "button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled])"
+      ) ?? []
+    );
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements.at(-1);
+
+    expect(dialog?.getAttribute("aria-modal")).toBe("true");
+    expect(input).not.toBeNull();
+    expect(firstElement).toBeDefined();
+    expect(lastElement).toBeDefined();
+
+    act(() => {
+      firstElement?.focus();
+      dialog?.dispatchEvent(
+        new KeyboardEvent("keydown", {
+          key: "Tab",
+          shiftKey: true,
+          bubbles: true,
+        })
+      );
+    });
+
+    expect(document.activeElement).toBe(lastElement);
+
+    act(() => {
+      lastElement?.focus();
+      dialog?.dispatchEvent(
+        new KeyboardEvent("keydown", {
+          key: "Tab",
+          bubbles: true,
+        })
+      );
+    });
+
+    expect(document.activeElement).toBe(firstElement);
+  });
 });
