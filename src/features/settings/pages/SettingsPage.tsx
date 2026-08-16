@@ -67,6 +67,7 @@ import {
 import { RecoveryModeSection } from "../components/RecoveryModeSection";
 import { LocalErrorLogSection } from "../components/LocalErrorLogSection";
 import { SyncStatusCard } from "../components/SyncStatusCard";
+import { StorageUsageMonitor } from "../components/StorageUsageMonitor";
 import { resetHomeDashboardLayoutPreference } from "@/features/home/hooks/useHomeDashboardLayout";
 import {
   BACKUP_TABLE_KEYS,
@@ -1071,6 +1072,8 @@ export function SettingsPage() {
           </CardContent>
         </Card>
       </div>
+
+      <StorageUsageMonitor />
 
       {restorePreview ? (
         <Card className="border-destructive/40">

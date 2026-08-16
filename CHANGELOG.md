@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased - Settings Storage Usage Monitor
+
+- Added a Settings storage usage card that reads `navigator.storage.estimate()` and shows used space, quota, percentage, and a progress bar.
+- Added unavailable-browser fallback copy and a manual refresh action.
+- Added warning and danger messaging for high local browser storage usage without changing repositories, IndexedDB schema, backup/restore behavior, dependencies, or storage ownership.
+- Added focused Settings coverage for available and unavailable Storage Estimate API states.
+
 ## Unreleased - PWA App Shortcuts
 
 - Added manifest-level PWA app shortcuts for Today, Quick Capture / Inbox, Focus, and Search.
