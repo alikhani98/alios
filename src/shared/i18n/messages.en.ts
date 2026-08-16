@@ -23,6 +23,7 @@ export const messagesEn = {
   "nav.groupDirection": "Direction",
   "nav.groupMemory": "Memory",
   "nav.groupPersonalOps": "Personal Ops",
+  "nav.groupAdvanced": "More",
   "shell.openSidebar": "Open sidebar",
   "shell.closeSidebar": "Close sidebar",
   "shell.openMenu": "Open main menu",

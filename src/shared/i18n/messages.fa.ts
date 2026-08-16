@@ -17,6 +17,7 @@ export const messagesFa: Record<TranslationKey, string> = {
   "nav.groupDirection": "جهت‌گیری",
   "nav.groupMemory": "حافظه",
   "nav.groupPersonalOps": "عملیات شخصی",
+  "nav.groupAdvanced": "بیشتر",
   "command.title": "پالت فرمان",
   "command.description": "سریع به یک صفحه بروید یا یک کار محلی رایج را شروع کنید.",
   "command.open": "باز کردن پالت فرمان",

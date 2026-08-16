@@ -1,5 +1,6 @@
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 
 import {
   navigationGroups,
@@ -23,7 +24,7 @@ function useOpenNavigationGroups() {
     readStoredOpenNavigationGroupIds
   );
 
-  const setGroupOpen = (groupId: NavigationGroupId, open: boolean) => {
+  const setGroupOpen = useCallback((groupId: NavigationGroupId, open: boolean) => {
     setOpenGroupIds((current) => {
       const next = open
         ? [...current.filter((id) => id !== groupId), groupId]
@@ -32,7 +33,7 @@ function useOpenNavigationGroups() {
       writeStoredOpenNavigationGroupIds(next);
       return next;
     });
-  };
+  }, []);
 
   return { openGroupIds, setGroupOpen };
 }
@@ -42,7 +43,19 @@ export function NavigationGroupList({
   onNavigate,
 }: NavigationGroupListProps) {
   const { t } = useI18n();
+  const location = useLocation();
   const { openGroupIds, setGroupOpen } = useOpenNavigationGroups();
+  const activeGroup = navigationGroups.find(
+    (group) =>
+      group.id !== "direct" &&
+      group.items.some((item) => item.href === location.pathname)
+  );
+
+  useEffect(() => {
+    if (activeGroup && !openGroupIds.includes(activeGroup.id)) {
+      setGroupOpen(activeGroup.id, true);
+    }
+  }, [activeGroup, openGroupIds, setGroupOpen]);
 
   return (
     <>

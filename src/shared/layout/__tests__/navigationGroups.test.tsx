@@ -15,20 +15,20 @@ import { NavigationGroupList } from "../NavigationGroupList";
 
 const expectedNavigationHrefs = [
   "/",
-  "/search",
   "/today",
+  "/inbox",
+  "/projects",
   "/calendar",
   "/focus",
+  "/search",
   "/routines",
   "/weekly-review",
   "/decisions",
-  "/inbox",
-  "/projects",
   "/goals",
   "/life-areas",
   "/journal",
-  "/manual",
   "/knowledge",
+  "/manual",
   "/finance",
   "/settings",
 ] as const;
@@ -63,17 +63,22 @@ describe("navigation groups", () => {
     expect(mainNavigation.map((item) => item.href)).toEqual(groupedHrefs);
   });
 
-  it("keeps direct destinations visible and only opens the default planning group", () => {
+  it("keeps core destinations visible and advanced destinations collapsed by default", () => {
     const directGroup = navigationGroups.find((group) => group.id === "direct");
-    const planReviewGroup = navigationGroups.find((group) => group.id === "planReview");
+    const advancedGroup = navigationGroups.find((group) => group.id === "advanced");
 
     expect(directGroup?.items.map((item) => item.href)).toEqual([
       "/",
+      "/today",
       "/inbox",
+      "/projects",
+      "/calendar",
+      "/focus",
       "/search",
     ]);
-    expect(planReviewGroup?.items.map((item) => item.href)).toContain("/today");
-    expect(planReviewGroup?.items.map((item) => item.href)).toContain("/focus");
+    expect(advancedGroup?.items.map((item) => item.href)).toContain("/goals");
+    expect(advancedGroup?.items.map((item) => item.href)).toContain("/finance");
+    expect(advancedGroup?.items.map((item) => item.href)).toContain("/settings");
 
     act(() => {
       root.render(
@@ -88,14 +93,16 @@ describe("navigation groups", () => {
     expect(container.querySelector('a[href="/"]')).not.toBeNull();
     expect(container.querySelector('a[href="/today"]')).not.toBeNull();
     expect(container.querySelector('a[href="/inbox"]')).not.toBeNull();
-    expect(container.querySelector('a[href="/search"]')).not.toBeNull();
+    expect(container.querySelector('a[href="/projects"]')).not.toBeNull();
     expect(container.querySelector('a[href="/calendar"]')).not.toBeNull();
+    expect(container.querySelector('a[href="/focus"]')).not.toBeNull();
+    expect(container.querySelector('a[href="/search"]')).not.toBeNull();
     expect(container.querySelector('a[href="/goals"]')).toBeNull();
     expect(container.querySelector('a[href="/journal"]')).toBeNull();
     expect(container.querySelector('a[href="/finance"]')).toBeNull();
   });
 
-  it("toggles one group without changing the content of other groups", () => {
+  it("toggles advanced destinations without changing core destinations", () => {
     act(() => {
       root.render(
         <MemoryRouter>
@@ -106,23 +113,68 @@ describe("navigation groups", () => {
       );
     });
 
-    const directionToggle = Array.from(
+    const advancedToggle = Array.from(
       container.querySelectorAll("button")
-    ).find((button) => button.textContent?.includes("Direction"));
+    ).find((button) => button.textContent?.includes("More"));
 
-    expect(directionToggle).toBeDefined();
-    expect(directionToggle?.getAttribute("aria-expanded")).toBe("false");
+    expect(advancedToggle).toBeDefined();
+    expect(advancedToggle?.getAttribute("aria-expanded")).toBe("false");
 
     act(() => {
-      directionToggle?.click();
+      advancedToggle?.click();
     });
 
-    expect(directionToggle?.getAttribute("aria-expanded")).toBe("true");
+    expect(advancedToggle?.getAttribute("aria-expanded")).toBe("true");
     expect(container.querySelector('a[href="/goals"]')).not.toBeNull();
-    expect(container.querySelector('a[href="/projects"]')).not.toBeNull();
     expect(container.querySelector('a[href="/life-areas"]')).not.toBeNull();
+    expect(container.querySelector('a[href="/journal"]')).not.toBeNull();
+    expect(container.querySelector('a[href="/finance"]')).not.toBeNull();
+    expect(container.querySelector('a[href="/"]')).not.toBeNull();
+    expect(container.querySelector('a[href="/projects"]')).not.toBeNull();
     expect(container.querySelector('a[href="/calendar"]')).not.toBeNull();
-    expect(container.querySelector('a[href="/journal"]')).toBeNull();
-    expect(container.querySelector('a[href="/finance"]')).toBeNull();
+  });
+
+  it("restores the advanced navigation group from localStorage", () => {
+    localStorage.setItem(NAVIGATION_GROUPS_STORAGE_KEY, '["advanced"]');
+
+    act(() => {
+      root.render(
+        <MemoryRouter>
+          <I18nProvider>
+            <NavigationGroupList />
+          </I18nProvider>
+        </MemoryRouter>
+      );
+    });
+
+    const advancedToggle = Array.from(
+      container.querySelectorAll("button")
+    ).find((button) => button.textContent?.includes("More"));
+
+    expect(advancedToggle?.getAttribute("aria-expanded")).toBe("true");
+    expect(container.querySelector('a[href="/goals"]')).not.toBeNull();
+    expect(container.querySelector('a[href="/settings"]')).not.toBeNull();
+  });
+
+  it("auto-expands advanced navigation for direct visits to advanced routes", () => {
+    act(() => {
+      root.render(
+        <MemoryRouter initialEntries={["/goals"]}>
+          <I18nProvider>
+            <NavigationGroupList />
+          </I18nProvider>
+        </MemoryRouter>
+      );
+    });
+
+    const advancedToggle = Array.from(
+      container.querySelectorAll("button")
+    ).find((button) => button.textContent?.includes("More"));
+
+    expect(advancedToggle?.getAttribute("aria-expanded")).toBe("true");
+    expect(container.querySelector('a[href="/goals"]')).not.toBeNull();
+    expect(localStorage.getItem(NAVIGATION_GROUPS_STORAGE_KEY)).toBe(
+      '["advanced"]'
+    );
   });
 });

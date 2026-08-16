@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased - Navigation Complexity Reduction
+
+- Consolidated the desktop and mobile drawer navigation into always-visible core destinations plus one persisted "More" section for advanced modules.
+- Kept every existing route reachable while reducing the default visible navigation set for new users.
+- Auto-expands the advanced navigation section when the current route belongs to an advanced module so direct links and bookmarked pages still surface the active destination.
+- Added focused navigation coverage for core visibility, advanced expand/collapse behavior, localStorage restoration, and direct advanced-route expansion.
+
 ## Unreleased - Home Backup Reminder Refresh
 
 - Refined the Home backup reminder so it appears when no manual backup exists or the last recorded backup is older than seven days.
