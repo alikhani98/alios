@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased - Today Completed Tasks Disclosure
+
+- Grouped Today completed Tasks under a dedicated completed-count disclosure.
+- Defaulted the completed section open for three or fewer done Tasks and collapsed when more than three done Tasks would otherwise lengthen the Today workspace.
+- Persisted the user's completed-section open/closed choice in local browser preference storage.
+- Kept Task CRUD, status updates, recurrence behavior, repositories, schemas, backup format, sync behavior, dependencies, and local-first storage boundaries unchanged.
+- Added focused Today coverage for the default threshold and localStorage restoration.
+
 ## Unreleased - Inbox Bulk Actions
 
 - Added an explicit Inbox bulk-select mode with visible selection controls, select-all, clear-selection, selected-count feedback, and Escape dismissal.

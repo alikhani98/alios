@@ -12,7 +12,13 @@ import { TodayTaskCard } from "../components/TodayTaskCard";
 import { TodayTaskForm } from "../components/TodayTaskForm";
 import { TodayTimeBlockingTimeline } from "../components/TodayTimeBlockingTimeline";
 import { TodayWeeklyPlanCard } from "../components/TodayWeeklyPlanCard";
-import { getFocusModeTasks } from "../components/TodayWorkspace";
+import {
+  getDefaultCompletedTasksOpen,
+  getFocusModeTasks,
+  readStoredTodayCompletedTasksOpen,
+  TODAY_COMPLETED_TASKS_OPEN_STORAGE_KEY,
+  writeStoredTodayCompletedTasksOpen,
+} from "../components/TodayWorkspace";
 import {
   createAllTodayTasksPath,
   createLinkedProjectPath,
@@ -116,6 +122,22 @@ describe("Task project links", () => {
     ]);
 
     expect(focusTasks.map((task) => task.id)).toEqual(["mit", "doing", "todo"]);
+  });
+
+  it("collapses completed Today tasks by default when more than three are done", () => {
+    expect(getDefaultCompletedTasksOpen(3)).toBe(true);
+    expect(getDefaultCompletedTasksOpen(4)).toBe(false);
+    expect(readStoredTodayCompletedTasksOpen(4)).toBe(false);
+  });
+
+  it("persists and restores the completed Today tasks disclosure state", () => {
+    writeStoredTodayCompletedTasksOpen(true);
+    expect(localStorage.getItem(TODAY_COMPLETED_TASKS_OPEN_STORAGE_KEY)).toBe("true");
+    expect(readStoredTodayCompletedTasksOpen(8)).toBe(true);
+
+    writeStoredTodayCompletedTasksOpen(false);
+    expect(localStorage.getItem(TODAY_COMPLETED_TASKS_OPEN_STORAGE_KEY)).toBe("false");
+    expect(readStoredTodayCompletedTasksOpen(2)).toBe(false);
   });
 
   it("renders an available linked Project and focused navigation", () => {
@@ -281,6 +303,7 @@ describe("Task project links", () => {
     expect(source).toContain('id="today-routine-suggestions"');
     expect(source).toContain('id="today-daily-checkin"');
     expect(source).toContain('id="today-daily-insights"');
+    expect(source).toContain('id="today-completed-tasks"');
     expect(source.match(/defaultOpen={false}/g)?.length).toBeGreaterThanOrEqual(3);
     expect(source).toContain("openCreateTask");
     expect(source).toContain('t("today.newTask")');

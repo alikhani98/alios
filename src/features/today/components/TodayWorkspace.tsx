@@ -9,6 +9,7 @@ import type { Project, Task, TaskStatus } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
 import { useDateFormatter } from "@/shared/date";
 import { readStoredViewDensityMode } from "@/shared/preferences/viewDensityMode";
+import { getPreferenceStorage, writeStoredPreference } from "@/shared/preferences/storage";
 import {
   Button,
   Card,
@@ -42,6 +43,46 @@ import {
 import type { DailyCheckinFormValues, TodayTaskFormValues } from "../types";
 import { createRoutineTaskInput, getRoutineSuggestions } from "../routineSuggestions";
 import { clearDueProjectReviewDate, isProjectReviewDue } from "@/features/projects/projectReviews";
+
+export const TODAY_COMPLETED_TASKS_OPEN_STORAGE_KEY =
+  "alios.today.completedTasks.open";
+
+export function getDefaultCompletedTasksOpen(completedTaskCount: number) {
+  return completedTaskCount <= 3;
+}
+
+export function readStoredTodayCompletedTasksOpen(
+  completedTaskCount: number
+): boolean {
+  const storage = getPreferenceStorage();
+  const fallback = getDefaultCompletedTasksOpen(completedTaskCount);
+
+  if (!storage) {
+    return fallback;
+  }
+
+  try {
+    const storedValue = storage.getItem(TODAY_COMPLETED_TASKS_OPEN_STORAGE_KEY);
+    if (storedValue === null) {
+      return fallback;
+    }
+
+    return storedValue === "true";
+  } catch {
+    return fallback;
+  }
+}
+
+export function writeStoredTodayCompletedTasksOpen(open: boolean) {
+  try {
+    writeStoredPreference(
+      TODAY_COMPLETED_TASKS_OPEN_STORAGE_KEY,
+      String(open)
+    );
+  } catch {
+    // Keep the disclosure usable in memory when localStorage is unavailable.
+  }
+}
 
 function readSimpleViewMode() {
   try {
@@ -153,6 +194,7 @@ export function TodayWorkspace({
   const [isFocusMode, setIsFocusMode] = useState(false);
   const [showAllRoutineSuggestions, setShowAllRoutineSuggestions] = useState(false);
   const [showAllTasks, setShowAllTasks] = useState(false);
+  const [completedTasksOpen, setCompletedTasksOpen] = useState(true);
   const taskRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const plannedTaskRef = useRef<HTMLDivElement | null>(null);
   const filteredProject = findProjectFilter(projectId, projects);
@@ -254,6 +296,17 @@ export function TodayWorkspace({
   const completionRate = visibleTasks.length > 0
     ? Math.round((completedTaskCount / visibleTasks.length) * 100)
     : 0;
+  const visibleOpenTasks = displayedTasks.filter((task) => task.status !== "done");
+  const visibleCompletedTasks = orderedVisibleTasks.filter((task) => task.status === "done");
+
+  useEffect(() => {
+    setCompletedTasksOpen(readStoredTodayCompletedTasksOpen(completedTaskCount));
+  }, [completedTaskCount]);
+
+  const handleCompletedTasksOpenChange = (open: boolean) => {
+    setCompletedTasksOpen(open);
+    writeStoredTodayCompletedTasksOpen(open);
+  };
 
   const showError = (caught: unknown, fallback: string) => {
     setActionError(caught instanceof Error ? caught.message : fallback);
@@ -728,7 +781,7 @@ export function TodayWorkspace({
                   </div>
                 </SoftPanel>
               ) : null}
-              {displayedTasks.map((task) => (
+              {visibleOpenTasks.map((task) => (
                 <div
                   key={task.id}
                   ref={(node) => {
@@ -753,6 +806,46 @@ export function TodayWorkspace({
                   />
                 </div>
               ))}
+              {visibleCompletedTasks.length > 0 ? (
+                <CollapsibleSection
+                  id="today-completed-tasks"
+                  title={`${t("common.completed")} (${visibleCompletedTasks.length})`}
+                  icon={<CheckCircle2 className="h-5 w-5" aria-hidden="true" />}
+                  status={<StatusChip tone="success">{visibleCompletedTasks.length}</StatusChip>}
+                  open={completedTasksOpen}
+                  onOpenChange={handleCompletedTasksOpenChange}
+                  expandLabel={t("common.expandSection")}
+                  collapseLabel={t("common.collapseSection")}
+                  contentClassName="space-y-3"
+                  className="border-border/70 bg-card/95"
+                >
+                  {visibleCompletedTasks.map((task) => (
+                    <div
+                      key={task.id}
+                      ref={(node) => {
+                        taskRefs.current[task.id] = node;
+                      }}
+                      className={cn(
+                        "scroll-mt-24 rounded-2xl transition-[transform,box-shadow,border-color] duration-200 ease-out motion-reduce:transition-none motion-reduce:transform-none",
+                        focusedTaskId === task.id
+                          ? "ring-2 ring-primary/50 ring-offset-2 ring-offset-background shadow-lg shadow-primary/10"
+                          : null
+                      )}
+                    >
+                      <TodayTaskCard
+                        task={task}
+                        linkedProject={findLinkedProject(task, projects)}
+                        isLinkedProjectLoading={isProjectsLoading}
+                        isBusy={busyTaskId === task.id}
+                        onEdit={() => openEditTask(task)}
+                        onStatusChange={(status) => handleStatusChange(task, status)}
+                        onSelectMit={() => handleSelectMit(task)}
+                        onDelete={() => handleDeleteTask(task)}
+                      />
+                    </div>
+                  ))}
+                </CollapsibleSection>
+              ) : null}
               {!isFocusMode && visibleTasks.length > taskPreviewLimit ? (
                 <Button
                   type="button"
