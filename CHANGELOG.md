@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased - PWA App Shortcuts
+
+- Added manifest-level PWA app shortcuts for Today, Quick Capture / Inbox, Focus, and Search.
+- Reused the existing PWA app icons for shortcut icons because no route-specific shortcut icons exist yet.
+- Kept React routes, feature code, repositories, schemas, storage, dependencies, service worker behavior, and local-first data behavior unchanged.
+
 ## Unreleased - Today Completed Tasks Disclosure
 
 - Grouped Today completed Tasks under a dedicated completed-count disclosure.

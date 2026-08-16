@@ -20,5 +20,59 @@
       "type": "image/svg+xml",
       "purpose": "any maskable"
     }
+  ],
+  "shortcuts": [
+    {
+      "name": "امروز",
+      "short_name": "Today",
+      "url": "./#/today",
+      "icons": [
+        {
+          "src": "icons/icon-192.svg",
+          "sizes": "192x192",
+          "type": "image/svg+xml",
+          "purpose": "any maskable"
+        }
+      ]
+    },
+    {
+      "name": "ثبت سریع",
+      "short_name": "Capture",
+      "url": "./#/inbox",
+      "icons": [
+        {
+          "src": "icons/icon-192.svg",
+          "sizes": "192x192",
+          "type": "image/svg+xml",
+          "purpose": "any maskable"
+        }
+      ]
+    },
+    {
+      "name": "تمرکز",
+      "short_name": "Focus",
+      "url": "./#/focus",
+      "icons": [
+        {
+          "src": "icons/icon-192.svg",
+          "sizes": "192x192",
+          "type": "image/svg+xml",
+          "purpose": "any maskable"
+        }
+      ]
+    },
+    {
+      "name": "جستجو",
+      "short_name": "Search",
+      "url": "./#/search",
+      "icons": [
+        {
+          "src": "icons/icon-192.svg",
+          "sizes": "192x192",
+          "type": "image/svg+xml",
+          "purpose": "any maskable"
+        }
+      ]
+    }
   ]
 }
