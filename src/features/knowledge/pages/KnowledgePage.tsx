@@ -1,6 +1,6 @@
 import { AlertCircle, BookOpen, Plus, RotateCcw, Search, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import type { CreateKnowledgeItemInput } from "@/core/repositories";
 import { useStorageAdapter } from "@/core/storage";
@@ -25,22 +25,18 @@ import {
 import { cn } from "@/shared/utils";
 import { KnowledgeItemCard } from "../components/KnowledgeItemCard";
 import { KnowledgeItemForm } from "../components/KnowledgeItemForm";
+import { KnowledgeGraphView } from "../components/KnowledgeGraphView";
 import { KNOWLEDGE_TYPE_OPTIONS } from "../constants";
 import { useKnowledgeItems } from "../hooks/useKnowledgeItems";
+import {
+  buildBacklinksByItemId,
+  buildKnowledgeGraph,
+} from "../knowledgeGraph";
 import type { KnowledgeItemFormValues } from "../types";
-
-function extractWikiReferences(content: string): string[] {
-  return Array.from(content.matchAll(/\[\[([^\]]+)\]\]/g))
-    .map((match) => match[1]?.trim())
-    .filter((value): value is string => Boolean(value));
-}
-
-function normalizeReferenceTitle(value: string): string {
-  return value.trim().toLocaleLowerCase();
-}
 
 export function KnowledgePage() {
   const { direction, t } = useI18n();
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { projects: projectsRepository, goals: goalsRepository } =
     useStorageAdapter();
@@ -65,6 +61,7 @@ export function KnowledgePage() {
   const [focusedItemId, setFocusedItemId] = useState<string | null>(null);
   const [focusMessage, setFocusMessage] = useState<string | null>(null);
   const [showAllItems, setShowAllItems] = useState(false);
+  const [viewMode, setViewMode] = useState<"list" | "graph">("list");
   const [projects, setProjects] = useState<Project[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
   const [linkOptionsError, setLinkOptionsError] = useState<string | null>(null);
@@ -84,28 +81,11 @@ export function KnowledgePage() {
     ? visibleItems
     : visibleItems.slice(0, knowledgePreviewLimit);
   const hiddenItemCount = Math.max(visibleItems.length - displayedItems.length, 0);
-  const backlinksByItemId = useMemo(() => {
-    const titleToItem = new Map(
-      items.map((item) => [normalizeReferenceTitle(item.title), item])
-    );
-    const backlinks = new Map<string, KnowledgeItem[]>();
-
-    items.forEach((source) => {
-      extractWikiReferences(source.content).forEach((reference) => {
-        const target = titleToItem.get(normalizeReferenceTitle(reference));
-        if (!target || target.id === source.id) {
-          return;
-        }
-
-        const current = backlinks.get(target.id) ?? [];
-        if (!current.some((item) => item.id === source.id)) {
-          backlinks.set(target.id, [...current, source]);
-        }
-      });
-    });
-
-    return backlinks;
-  }, [items]);
+  const backlinksByItemId = useMemo(() => buildBacklinksByItemId(items), [items]);
+  const knowledgeGraph = useMemo(
+    () => buildKnowledgeGraph(visibleItems),
+    [visibleItems]
+  );
 
   useEffect(() => {
     let isCancelled = false;
@@ -226,6 +206,11 @@ export function KnowledgePage() {
   };
 
   const hasActiveSearch = appliedQuery.length > 0 || typeFilter !== "all";
+
+  const focusKnowledgeItem = (itemId: string) => {
+    navigate(`/knowledge?focusId=${encodeURIComponent(itemId)}`);
+    setViewMode("list");
+  };
 
   useEffect(() => {
     if (!focusId) {
@@ -415,6 +400,30 @@ export function KnowledgePage() {
           }
         />
       ) : (
+        <>
+          <div className="flex flex-wrap justify-start gap-2">
+            <Button
+              type="button"
+              variant={viewMode === "list" ? "default" : "outline"}
+              onClick={() => setViewMode("list")}
+            >
+              {t("knowledge.listView")}
+            </Button>
+            <Button
+              type="button"
+              variant={viewMode === "graph" ? "default" : "outline"}
+              onClick={() => setViewMode("graph")}
+            >
+              {t("knowledge.graphView")}
+            </Button>
+          </div>
+          {viewMode === "graph" ? (
+            <KnowledgeGraphView
+              graph={knowledgeGraph}
+              focusedItemId={focusId}
+              onSelectNode={focusKnowledgeItem}
+            />
+          ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {displayedItems.map((item) => (
             <div
@@ -441,8 +450,10 @@ export function KnowledgePage() {
             </div>
           ))}
         </div>
+          )}
+        </>
       )}
-      {visibleItems.length > knowledgePreviewLimit && !focusRequiresAllItems ? (
+      {viewMode === "list" && visibleItems.length > knowledgePreviewLimit && !focusRequiresAllItems ? (
         <div className="flex justify-start">
           <Button type="button" variant="outline" onClick={() => setShowAllItems((current) => !current)}>
             {showAllItems
