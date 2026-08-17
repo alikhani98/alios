@@ -154,6 +154,12 @@ The older absolute "No Supabase / No Authentication / No Backend" language remai
 - Weekly Review now calculates a current check-in streak in `weeklyReviewCalculations.ts`, counting backward from today when today is checked in or from yesterday when today is still pending.
 - Focused regression coverage verifies streak calculation, broken-streak behavior, and the seven-day timeline rendering.
 
+## Current Knowledge Smart Search
+
+- Knowledge now includes a no-AI "Ask your notes" panel that loads local Knowledge records through the existing repository boundary, debounces input, ranks matches with deterministic full-text rules, highlights matched excerpt terms, and links to the focused note.
+- Smart search is fully local and does not call Ollama, external APIs, vector search, backend services, sync providers, or new dependencies.
+- Focused regression coverage verifies smart-search ranking order, no-result behavior, highlighted excerpts, and the debounced panel UI.
+
 ## Stage 255 Project Memory & Documentation Alignment
 
 - Stage 255 aligns the repository's long-lived documentation with the actual post-Stage-254 architecture and implementation evidence.

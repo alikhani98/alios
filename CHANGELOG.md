@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased - Knowledge Smart Search
+
+- Added a no-AI "Ask your notes" smart search panel that ranks local Knowledge items, debounces input, shows highlighted excerpts, and links back to focused notes.
+- Reused the existing Knowledge repository `list()` path for smart search and kept Knowledge schemas, repositories, sync behavior, and external API usage unchanged.
+- Added focused coverage for smart-search ranking, empty states, excerpt highlighting, and the debounced ask panel.
+
 ## Unreleased - PWA Share Target
 
 - Added a manifest-level GET share target that routes shared title, text, and URL content to the existing Inbox route.

@@ -25,6 +25,7 @@ import {
 import { cn } from "@/shared/utils";
 import { KnowledgeItemCard } from "../components/KnowledgeItemCard";
 import { KnowledgeItemForm } from "../components/KnowledgeItemForm";
+import { KnowledgeAskPanel } from "../components/KnowledgeAskPanel";
 import { KnowledgeGraphView } from "../components/KnowledgeGraphView";
 import { KNOWLEDGE_TYPE_OPTIONS } from "../constants";
 import { useKnowledgeItems } from "../hooks/useKnowledgeItems";
@@ -38,8 +39,11 @@ export function KnowledgePage() {
   const { direction, t } = useI18n();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { projects: projectsRepository, goals: goalsRepository } =
-    useStorageAdapter();
+  const {
+    knowledge: knowledgeRepository,
+    projects: projectsRepository,
+    goals: goalsRepository,
+  } = useStorageAdapter();
   const {
     items,
     isLoading,
@@ -322,6 +326,8 @@ export function KnowledgePage() {
           </form>
         </CardContent>
       </PremiumCard>
+
+      <KnowledgeAskPanel knowledgeRepository={knowledgeRepository} />
 
       {successMessage ? (
         <div
