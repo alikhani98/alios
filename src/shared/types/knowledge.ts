@@ -14,6 +14,7 @@ export const knowledgeItemSchema = z.object({
   source: z.string().optional(),
   projectId: z.string().min(1).optional(),
   goalId: z.string().min(1).optional(),
+  taskId: z.string().min(1).optional(),
   createdAt: isoDateTimeSchema,
   updatedAt: isoDateTimeSchema,
 });

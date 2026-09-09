@@ -132,6 +132,14 @@ AliOS 1.0 is a local-first web app. Static-only deployment remains valid for sta
 - Deleting or changing a Project never cascades to a Task; a missing linked Project is shown as unavailable so the Task can still be edited, unlinked, relinked, completed, deferred, cancelled, selected as MIT, or deleted
 - Backup version 1 accepts both linked Tasks and older Task records that omit `projectId`
 
+## Content-to-Task Linking Boundary
+
+- Journal entries, Decision Log entries, and Knowledge items may optionally store one `taskId` alongside their existing optional `projectId` and `goalId` fields
+- Task records do not store reverse Journal, Decision, or Knowledge IDs; linked content shown from Today is derived in memory by reading the existing repositories and filtering records where `taskId` matches the Task
+- The relationship uses no Dexie index, table, relation collection, cascade delete, sync-specific path, backend, cloud service, AI, or dependency
+- If a linked Task is missing, the Journal, Decision, or Knowledge card shows the Task as unavailable while keeping the source record editable and non-destructive
+- Older backup and Dexie records that omit `taskId` remain compatible because the field is optional
+
 ## Life Areas Module Boundary
 
 - Life Areas data lives in a dedicated Dexie table for local user-managed areas of life

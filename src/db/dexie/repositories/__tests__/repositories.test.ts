@@ -113,12 +113,13 @@ describe("Dexie repositories", () => {
     expect(await storage.journal.getById(created.id)).toBeUndefined();
   });
 
-  it("persists optional Journal project and goal links without requiring them", async () => {
+  it("persists optional Journal project, goal, and task links without requiring them", async () => {
     const linked = await storage.journal.create({
       ...journalEntryInput,
       title: "Linked reflection",
       projectId: "project-1",
       goalId: "goal-1",
+      taskId: "task-1",
     });
     const unlinked = await storage.journal.create({
       ...journalEntryInput,
@@ -128,9 +129,11 @@ describe("Dexie repositories", () => {
     expect(linked).toMatchObject({
       projectId: "project-1",
       goalId: "goal-1",
+      taskId: "task-1",
     });
     expect(unlinked.projectId).toBeUndefined();
     expect(unlinked.goalId).toBeUndefined();
+    expect(unlinked.taskId).toBeUndefined();
   });
 
   it("supports the complete Knowledge CRUD lifecycle", async () => {
@@ -153,12 +156,13 @@ describe("Dexie repositories", () => {
     expect(await storage.knowledge.getById(created.id)).toBeUndefined();
   });
 
-  it("persists optional Knowledge project and goal links without requiring them", async () => {
+  it("persists optional Knowledge project, goal, and task links without requiring them", async () => {
     const linked = await storage.knowledge.create({
       ...knowledgeItemInput,
       title: "Linked rule",
       projectId: "project-1",
       goalId: "goal-1",
+      taskId: "task-1",
     });
     const unlinked = await storage.knowledge.create({
       ...knowledgeItemInput,
@@ -168,9 +172,11 @@ describe("Dexie repositories", () => {
     expect(linked).toMatchObject({
       projectId: "project-1",
       goalId: "goal-1",
+      taskId: "task-1",
     });
     expect(unlinked.projectId).toBeUndefined();
     expect(unlinked.goalId).toBeUndefined();
+    expect(unlinked.taskId).toBeUndefined();
   });
 
   it("supports the complete Daily Check-ins CRUD lifecycle", async () => {
@@ -336,12 +342,13 @@ describe("Dexie repositories", () => {
     expect(await storage.decisions.list()).toEqual([]);
   });
 
-  it("persists optional Decision project and goal links without requiring them", async () => {
+  it("persists optional Decision project, goal, and task links without requiring them", async () => {
     const linked = await storage.decisions.create({
       ...decisionLogInput,
       title: "Linked decision",
       projectId: "project-1",
       goalId: "goal-1",
+      taskId: "task-1",
     });
     const unlinked = await storage.decisions.create({
       ...decisionLogInput,
@@ -351,9 +358,11 @@ describe("Dexie repositories", () => {
     expect(linked).toMatchObject({
       projectId: "project-1",
       goalId: "goal-1",
+      taskId: "task-1",
     });
     expect(unlinked.projectId).toBeUndefined();
     expect(unlinked.goalId).toBeUndefined();
+    expect(unlinked.taskId).toBeUndefined();
   });
 
   it("supports the complete Personal Manual CRUD lifecycle", async () => {

@@ -2,7 +2,7 @@ import { ExternalLink, Link2, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
-import type { Goal, KnowledgeItem, Project } from "@/shared/types";
+import type { Goal, KnowledgeItem, Project, Task } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
 import {
   Badge,
@@ -21,6 +21,7 @@ type KnowledgeItemCardProps = {
   backlinks?: ReadonlyArray<KnowledgeItem>;
   linkedProject?: Project;
   linkedGoal?: Goal;
+  linkedTask?: Task;
   isDeleting: boolean;
   onEdit: () => void;
   onDelete: () => Promise<void>;
@@ -31,6 +32,7 @@ export function KnowledgeItemCard({
   backlinks = [],
   linkedProject,
   linkedGoal,
+  linkedTask,
   isDeleting,
   onEdit,
   onDelete,
@@ -84,8 +86,10 @@ export function KnowledgeItemCard({
         <LinkedEntitySummary
           projectId={item.projectId}
           goalId={item.goalId}
+          taskId={item.taskId}
           project={linkedProject}
           goal={linkedGoal}
+          task={linkedTask}
         />
       </CardContent>
 

@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import { DateDisplayProvider } from "@/shared/date";
 import { I18nProvider, LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
-import { goalRecord, journalEntryRecord, projectRecord } from "@/test/factories";
+import { goalRecord, journalEntryRecord, projectRecord, taskRecord } from "@/test/factories";
 
 import { JournalEntryCard } from "../components/JournalEntryCard";
 
@@ -34,15 +34,17 @@ describe("Journal structural links", () => {
     localStorage.setItem(LANGUAGE_STORAGE_KEY, "en");
   });
 
-  it("renders linked Project and Goal context", () => {
+  it("renders linked Project, Goal, and Task context", () => {
     const markup = renderJournalCard({
       entry: {
         ...journalEntryRecord,
         projectId: projectRecord.id,
         goalId: goalRecord.id,
+        taskId: taskRecord.id,
       },
       linkedProject: projectRecord,
       linkedGoal: goalRecord,
+      linkedTask: taskRecord,
     });
 
     expect(markup).toContain("Linked project");
@@ -50,19 +52,24 @@ describe("Journal structural links", () => {
     expect(markup).toContain('href="/projects?focusId=fixture-id"');
     expect(markup).toContain(goalRecord.title);
     expect(markup).toContain('href="/goals?focusId=fixture-id"');
+    expect(markup).toContain("Linked task");
+    expect(markup).toContain(taskRecord.title);
+    expect(markup).toContain('href="/today?focusId=fixture-id"');
   });
 
-  it("keeps orphaned Project and Goal links non-destructive", () => {
+  it("keeps orphaned Project, Goal, and Task links non-destructive", () => {
     const markup = renderJournalCard({
       entry: {
         ...journalEntryRecord,
         projectId: "deleted-project",
         goalId: "deleted-goal",
+        taskId: "deleted-task",
       },
     });
 
     expect(markup).toContain("Linked project unavailable");
     expect(markup).toContain("Linked goal unavailable");
+    expect(markup).toContain("Linked task unavailable");
     expect(markup).toContain("Edit");
   });
 });

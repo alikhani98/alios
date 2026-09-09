@@ -3,9 +3,17 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
 import type { UpdateTaskInput } from "@/core/repositories";
+import { useStorageAdapter } from "@/core/storage";
 import { useProjects } from "@/features/projects/hooks/useProjects";
 import { useRoutines } from "@/features/routines/hooks/useRoutines";
-import type { Project, Task, TaskStatus } from "@/shared/types";
+import type {
+  DecisionLogEntry,
+  JournalEntry,
+  KnowledgeItem,
+  Project,
+  Task,
+  TaskStatus,
+} from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
 import { useDateFormatter } from "@/shared/date";
 import { readStoredViewDensityMode } from "@/shared/preferences/viewDensityMode";
@@ -149,6 +157,11 @@ export function TodayWorkspace({
   const { formatDate } = useDateFormatter();
   const isSimpleView = useSimpleViewMode();
   const {
+    journal: journalRepository,
+    decisions: decisionsRepository,
+    knowledge: knowledgeRepository,
+  } = useStorageAdapter();
+  const {
     tasks,
     checkin,
     isLoading,
@@ -195,6 +208,10 @@ export function TodayWorkspace({
   const [showAllRoutineSuggestions, setShowAllRoutineSuggestions] = useState(false);
   const [showAllTasks, setShowAllTasks] = useState(false);
   const [completedTasksOpen, setCompletedTasksOpen] = useState(true);
+  const [linkedJournalEntries, setLinkedJournalEntries] = useState<JournalEntry[]>([]);
+  const [linkedDecisions, setLinkedDecisions] = useState<DecisionLogEntry[]>([]);
+  const [linkedKnowledgeItems, setLinkedKnowledgeItems] = useState<KnowledgeItem[]>([]);
+  const [linkedContentError, setLinkedContentError] = useState<string | null>(null);
   const taskRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const plannedTaskRef = useRef<HTMLDivElement | null>(null);
   const filteredProject = findProjectFilter(projectId, projects);
@@ -298,10 +315,49 @@ export function TodayWorkspace({
     : 0;
   const visibleOpenTasks = displayedTasks.filter((task) => task.status !== "done");
   const visibleCompletedTasks = orderedVisibleTasks.filter((task) => task.status === "done");
+  const linkedContentForTask = (task: Task) => ({
+    journalEntries: linkedJournalEntries.filter((entry) => entry.taskId === task.id),
+    decisions: linkedDecisions.filter((decision) => decision.taskId === task.id),
+    knowledgeItems: linkedKnowledgeItems.filter((item) => item.taskId === task.id),
+  });
 
   useEffect(() => {
     setCompletedTasksOpen(readStoredTodayCompletedTasksOpen(completedTaskCount));
   }, [completedTaskCount]);
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    void Promise.all([
+      journalRepository.list(),
+      decisionsRepository.list(),
+      knowledgeRepository.list(),
+    ])
+      .then(([nextJournalEntries, nextDecisions, nextKnowledgeItems]) => {
+        if (isCancelled) {
+          return;
+        }
+
+        setLinkedJournalEntries(nextJournalEntries);
+        setLinkedDecisions(nextDecisions);
+        setLinkedKnowledgeItems(nextKnowledgeItems);
+        setLinkedContentError(null);
+      })
+      .catch(() => {
+        if (isCancelled) {
+          return;
+        }
+
+        setLinkedJournalEntries([]);
+        setLinkedDecisions([]);
+        setLinkedKnowledgeItems([]);
+        setLinkedContentError(t("links.loadError"));
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [decisionsRepository, journalRepository, knowledgeRepository, t]);
 
   const handleCompletedTasksOpenChange = (open: boolean) => {
     setCompletedTasksOpen(open);
@@ -659,6 +715,15 @@ export function TodayWorkspace({
           ) : null}
         </div>
       ) : null}
+      {linkedContentError ? (
+        <div
+          role="alert"
+          className="alios-surface-muted flex items-start gap-2 p-4 text-sm text-muted-foreground"
+        >
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+          <span>{linkedContentError}</span>
+        </div>
+      ) : null}
       {focusMessage ? (
         <div
           role="status"
@@ -805,6 +870,9 @@ export function TodayWorkspace({
                   <TodayTaskCard
                     task={task}
                     linkedProject={findLinkedProject(task, projects)}
+                    linkedJournalEntries={linkedContentForTask(task).journalEntries}
+                    linkedDecisions={linkedContentForTask(task).decisions}
+                    linkedKnowledgeItems={linkedContentForTask(task).knowledgeItems}
                     isLinkedProjectLoading={isProjectsLoading}
                     isBusy={busyTaskId === task.id}
                     focusSessionPath={
@@ -848,6 +916,9 @@ export function TodayWorkspace({
                       <TodayTaskCard
                         task={task}
                         linkedProject={findLinkedProject(task, projects)}
+                        linkedJournalEntries={linkedContentForTask(task).journalEntries}
+                        linkedDecisions={linkedContentForTask(task).decisions}
+                        linkedKnowledgeItems={linkedContentForTask(task).knowledgeItems}
                         isLinkedProjectLoading={isProjectsLoading}
                         isBusy={busyTaskId === task.id}
                         onEdit={() => openEditTask(task)}
@@ -1013,6 +1084,9 @@ export function TodayWorkspace({
                       <TodayTaskCard
                         task={plannedTaskOutsideToday}
                         linkedProject={findLinkedProject(plannedTaskOutsideToday, projects)}
+                        linkedJournalEntries={linkedContentForTask(plannedTaskOutsideToday).journalEntries}
+                        linkedDecisions={linkedContentForTask(plannedTaskOutsideToday).decisions}
+                        linkedKnowledgeItems={linkedContentForTask(plannedTaskOutsideToday).knowledgeItems}
                         isLinkedProjectLoading={isProjectsLoading}
                         isBusy={busyTaskId === plannedTaskOutsideToday.id}
                         contextLabel={t("weeklyReview.title")}

@@ -866,3 +866,15 @@ The stage adds no account, credential, endpoint, request, cloud copy, backup-for
 Before a validated backup can replace current browser-local data, Settings compares every supported table's current count and selected-backup count. This gives a concise, read-only account of the impact without changing restore semantics or treating record counts as a merge plan.
 
 The stage adds no account, credential, endpoint, request, cloud copy, backup-format change, record, schema, migration, dependency, telemetry, or automation.
+
+## ADR-082: Store optional one-way content links to Tasks
+
+**Status:** Accepted (Content-to-Task linking implementation, 2026-08-17)
+
+Journal entries, decision log entries, and knowledge items may each store one optional `taskId` using the same source-owned foreign-key pattern already used for their optional `projectId` and `goalId` links. Tasks do not store reverse lists of linked journal, decision, or knowledge record IDs.
+
+Reverse display remains derived at read time: Today reads the relevant local repositories through the storage adapter and filters records in memory by `taskId`. This avoids a second persisted relationship model, keeps the feature local-first, and prevents link summaries from becoming stale roll-ups.
+
+No Dexie index is required for this relationship because the approved implementation does not issue direct indexed `taskId` queries. Existing records that omit `taskId` remain valid because the field is optional.
+
+Deleting or changing a Task does not cascade to Journal, Decision Log, or Knowledge records. Source cards tolerate orphaned task links and show the linked Task as unavailable so user-authored records remain editable, unlinkable, exportable, and restorable without destructive side effects.

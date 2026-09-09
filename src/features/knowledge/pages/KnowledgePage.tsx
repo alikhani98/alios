@@ -7,8 +7,9 @@ import { useStorageAdapter } from "@/core/storage";
 import {
   findLinkedGoalById,
   findLinkedProjectById,
+  findLinkedTaskById,
 } from "@/shared/entityLinks";
-import type { Goal, KnowledgeItem, KnowledgeItemType, Project } from "@/shared/types";
+import type { Goal, KnowledgeItem, KnowledgeItemType, Project, Task } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
 import {
   Button,
@@ -43,6 +44,7 @@ export function KnowledgePage() {
     knowledge: knowledgeRepository,
     projects: projectsRepository,
     goals: goalsRepository,
+    tasks: tasksRepository,
   } = useStorageAdapter();
   const {
     items,
@@ -68,6 +70,7 @@ export function KnowledgePage() {
   const [viewMode, setViewMode] = useState<"list" | "graph">("list");
   const [projects, setProjects] = useState<Project[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [linkOptionsError, setLinkOptionsError] = useState<string | null>(null);
   const itemRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const focusId = searchParams.get("focusId");
@@ -94,14 +97,19 @@ export function KnowledgePage() {
   useEffect(() => {
     let isCancelled = false;
 
-    void Promise.all([projectsRepository.list(), goalsRepository.list()])
-      .then(([nextProjects, nextGoals]) => {
+    void Promise.all([
+      projectsRepository.list(),
+      goalsRepository.list(),
+      tasksRepository.list(),
+    ])
+      .then(([nextProjects, nextGoals, nextTasks]) => {
         if (isCancelled) {
           return;
         }
 
         setProjects(nextProjects);
         setGoals(nextGoals);
+        setTasks(nextTasks);
         setLinkOptionsError(null);
       })
       .catch(() => {
@@ -111,13 +119,14 @@ export function KnowledgePage() {
 
         setProjects([]);
         setGoals([]);
+        setTasks([]);
         setLinkOptionsError(t("links.loadError"));
       });
 
     return () => {
       isCancelled = true;
     };
-  }, [goalsRepository, projectsRepository, t]);
+  }, [goalsRepository, projectsRepository, tasksRepository, t]);
 
   const openCreateForm = () => {
     setEditingItem(undefined);
@@ -167,6 +176,7 @@ export function KnowledgePage() {
       source: values.source || undefined,
       projectId: values.projectId || undefined,
       goalId: values.goalId || undefined,
+      taskId: values.taskId || undefined,
     };
 
     try {
@@ -273,6 +283,7 @@ export function KnowledgePage() {
               item={editingItem}
               projects={projects}
               goals={goals}
+              tasks={tasks}
               isSubmitting={isSubmitting}
               onSubmit={handleSubmit}
               onCancel={closeForm}
@@ -449,6 +460,7 @@ export function KnowledgePage() {
                 backlinks={backlinksByItemId.get(item.id) ?? []}
                 linkedProject={findLinkedProjectById(item, projects)}
                 linkedGoal={findLinkedGoalById(item, goals)}
+                linkedTask={findLinkedTaskById(item, tasks)}
                 isDeleting={deletingId === item.id}
                 onEdit={() => openEditForm(item)}
                 onDelete={() => handleDelete(item)}

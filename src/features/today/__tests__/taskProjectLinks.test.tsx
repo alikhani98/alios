@@ -6,7 +6,13 @@ import { StaticRouter } from "react-router-dom/server";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { I18nProvider, LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
-import { projectRecord, taskRecord } from "@/test/factories";
+import {
+  decisionLogRecord,
+  journalEntryRecord,
+  knowledgeItemRecord,
+  projectRecord,
+  taskRecord,
+} from "@/test/factories";
 
 import { TodayTaskCard } from "../components/TodayTaskCard";
 import { TodayTaskForm } from "../components/TodayTaskForm";
@@ -173,6 +179,40 @@ describe("Task project links", () => {
 
     expect(html).toContain("Start focus session");
     expect(html).toContain('href="/focus?taskId=fixture-id"');
+  });
+
+  it("renders derived Journal, Decision, and Knowledge backlinks for a task", () => {
+    const html = renderTodayUi(
+      <TodayTaskCard
+        task={taskRecord}
+        linkedJournalEntries={[{ ...journalEntryRecord, taskId: taskRecord.id }]}
+        linkedDecisions={[{ ...decisionLogRecord, taskId: taskRecord.id }]}
+        linkedKnowledgeItems={[{ ...knowledgeItemRecord, taskId: taskRecord.id }]}
+        isLinkedProjectLoading={false}
+        {...taskActions}
+      />
+    );
+
+    expect(html).toContain("Related journal entries");
+    expect(html).toContain(journalEntryRecord.title);
+    expect(html).toContain("Related decisions");
+    expect(html).toContain(decisionLogRecord.title);
+    expect(html).toContain("Related Knowledge notes");
+    expect(html).toContain(knowledgeItemRecord.title);
+  });
+
+  it("derives task backlinks in Today from local content repositories", () => {
+    const source = readFileSync(
+      join(process.cwd(), "src/features/today/components/TodayWorkspace.tsx"),
+      "utf8"
+    );
+
+    expect(source).toContain("journalRepository.list()");
+    expect(source).toContain("decisionsRepository.list()");
+    expect(source).toContain("knowledgeRepository.list()");
+    expect(source).toContain("entry.taskId === task.id");
+    expect(source).toContain("decision.taskId === task.id");
+    expect(source).toContain("item.taskId === task.id");
   });
 
   it("keeps an orphaned Task usable without a cascade", () => {

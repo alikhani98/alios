@@ -65,16 +65,22 @@ describe("core domain schemas", () => {
   });
 
   it("keeps legacy Journal, Knowledge, and Decision records without structural links valid", () => {
-    const { projectId: _journalProjectId, goalId: _journalGoalId, ...legacyJournalEntry } =
-      journalEntryRecord;
+    const {
+      projectId: _journalProjectId,
+      goalId: _journalGoalId,
+      taskId: _journalTaskId,
+      ...legacyJournalEntry
+    } = journalEntryRecord;
     const {
       projectId: _knowledgeProjectId,
       goalId: _knowledgeGoalId,
+      taskId: _knowledgeTaskId,
       ...legacyKnowledgeItem
     } = knowledgeItemRecord;
     const {
       projectId: _decisionProjectId,
       goalId: _decisionGoalId,
+      taskId: _decisionTaskId,
       ...legacyDecisionEntry
     } = decisionLogRecord;
 
@@ -83,12 +89,15 @@ describe("core domain schemas", () => {
     expect(decisionLogEntrySchema.safeParse(legacyDecisionEntry).success).toBe(true);
   });
 
-  it("rejects empty structural Project and Goal links on Journal, Knowledge, and Decision records", () => {
+  it("rejects empty structural Project, Goal, and Task links on Journal, Knowledge, and Decision records", () => {
     expect(
       journalEntrySchema.safeParse({ ...journalEntryRecord, projectId: "" }).success
     ).toBe(false);
     expect(
       journalEntrySchema.safeParse({ ...journalEntryRecord, goalId: "" }).success
+    ).toBe(false);
+    expect(
+      journalEntrySchema.safeParse({ ...journalEntryRecord, taskId: "" }).success
     ).toBe(false);
     expect(
       knowledgeItemSchema.safeParse({ ...knowledgeItemRecord, projectId: "" }).success
@@ -97,10 +106,16 @@ describe("core domain schemas", () => {
       knowledgeItemSchema.safeParse({ ...knowledgeItemRecord, goalId: "" }).success
     ).toBe(false);
     expect(
+      knowledgeItemSchema.safeParse({ ...knowledgeItemRecord, taskId: "" }).success
+    ).toBe(false);
+    expect(
       decisionLogEntrySchema.safeParse({ ...decisionLogRecord, projectId: "" }).success
     ).toBe(false);
     expect(
       decisionLogEntrySchema.safeParse({ ...decisionLogRecord, goalId: "" }).success
+    ).toBe(false);
+    expect(
+      decisionLogEntrySchema.safeParse({ ...decisionLogRecord, taskId: "" }).success
     ).toBe(false);
   });
 

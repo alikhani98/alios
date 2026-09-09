@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
-import type { DecisionLogEntry, Goal, Project } from "@/shared/types";
+import type { DecisionLogEntry, Goal, Project, Task } from "@/shared/types";
 import { useI18n, type TranslationKey } from "@/shared/i18n";
 import {
   Button,
@@ -20,6 +20,7 @@ type DecisionLogFormProps = {
   decision?: DecisionLogEntry;
   projects?: ReadonlyArray<Project>;
   goals?: ReadonlyArray<Goal>;
+  tasks?: ReadonlyArray<Task>;
   isSubmitting: boolean;
   onSubmit: (values: DecisionLogFormValues) => Promise<void>;
   onCancel?: () => void;
@@ -45,6 +46,7 @@ function getDefaultValues(decision?: DecisionLogEntry): DecisionLogFormValues {
     context: decision?.context ?? "",
     projectId: decision?.projectId ?? "",
     goalId: decision?.goalId ?? "",
+    taskId: decision?.taskId ?? "",
     optionsText: decision?.options.join("\n") ?? "",
     chosenOption: decision?.chosenOption ?? "",
     reasoning: decision?.reasoning ?? "",
@@ -62,6 +64,7 @@ export function DecisionLogForm({
   decision,
   projects = [],
   goals = [],
+  tasks = [],
   isSubmitting,
   onSubmit,
   onCancel,
@@ -84,6 +87,9 @@ export function DecisionLogForm({
   const selectedGoalIsUnavailable =
     Boolean(decision?.goalId) &&
     !goals.some((goal) => goal.id === decision?.goalId);
+  const selectedTaskIsUnavailable =
+    Boolean(decision?.taskId) &&
+    !tasks.some((task) => task.id === decision?.taskId);
 
   return (
     <form
@@ -193,6 +199,25 @@ export function DecisionLogForm({
               {goals.map((goal) => (
                 <option key={goal.id} value={goal.id}>
                   {goal.title}
+                </option>
+              ))}
+            </Select>
+          </div>
+
+          <div className="grid gap-2 md:col-span-2">
+            <label htmlFor="decision-task" className="text-sm font-medium">
+              {t("links.taskLabel")}
+            </label>
+            <Select id="decision-task" {...register("taskId")}>
+              <option value="">{t("links.noTask")}</option>
+              {selectedTaskIsUnavailable ? (
+                <option value={decision?.taskId}>
+                  {t("links.taskUnavailable")}
+                </option>
+              ) : null}
+              {tasks.map((task) => (
+                <option key={task.id} value={task.id}>
+                  {task.title}
                 </option>
               ))}
             </Select>

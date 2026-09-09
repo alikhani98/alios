@@ -1,7 +1,7 @@
 import { Archive, CheckCircle2, GitBranch, Lightbulb, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 
-import type { DecisionLogEntry, Goal, Project } from "@/shared/types";
+import type { DecisionLogEntry, Goal, Project, Task } from "@/shared/types";
 import { useDateFormatter } from "@/shared/date";
 import { useI18n, type TranslationKey } from "@/shared/i18n";
 import {
@@ -35,6 +35,7 @@ type DecisionLogCardProps = {
   decision: DecisionLogEntry;
   linkedProject?: Project;
   linkedGoal?: Goal;
+  linkedTask?: Task;
   isDeleting: boolean;
   onEdit: () => void;
   onDelete: () => Promise<void>;
@@ -55,6 +56,7 @@ export function DecisionLogCard({
   decision,
   linkedProject,
   linkedGoal,
+  linkedTask,
   isDeleting,
   onEdit,
   onDelete,
@@ -218,8 +220,10 @@ export function DecisionLogCard({
         <LinkedEntitySummary
           projectId={decision.projectId}
           goalId={decision.goalId}
+          taskId={decision.taskId}
           project={linkedProject}
           goal={linkedGoal}
+          task={linkedTask}
         />
       </CardContent>
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased - Content to Task Linking
+
+- Added optional `taskId` links to Journal, Decision Log, and Knowledge records using the existing one-way structural link pattern.
+- Added optional Task selectors to Journal, Decision, and Knowledge forms and Task link summaries on their cards, including unavailable linked-Task handling.
+- Added derived Today Task backlinks for linked Journal entries, decisions, and Knowledge notes without storing reverse IDs or adding cascade behavior.
+- Documented the one-way, no-reverse-persistence, no-cascade decision in Architecture and ADR docs.
+
 ## Unreleased - Knowledge Smart Search
 
 - Added a no-AI "Ask your notes" smart search panel that ranks local Knowledge items, debounces input, shows highlighted excerpts, and links back to focused notes.

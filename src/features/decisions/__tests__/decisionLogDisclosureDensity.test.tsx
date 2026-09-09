@@ -8,7 +8,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { DateDisplayProvider } from "@/shared/date";
 import { I18nProvider, LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
 import type { DecisionLogEntry } from "@/shared/types";
-import { goalRecord, projectRecord } from "@/test/factories";
+import { goalRecord, projectRecord, taskRecord } from "@/test/factories";
 
 import { DecisionLogCard } from "../components/DecisionLogCard";
 import { DecisionLogForm } from "../components/DecisionLogForm";
@@ -90,12 +90,18 @@ describe("Decision Log disclosure density", () => {
     expect(markup).toContain('id="decision-log-review-content" hidden="" aria-hidden="true"');
   });
 
-  it("renders linked Project and Goal context and tolerates orphaned links", () => {
+  it("renders linked Project, Goal, and Task context and tolerates orphaned links", () => {
     const linkedMarkup = renderDecisionUi(
       <DecisionLogCard
-        decision={{ ...decision, projectId: projectRecord.id, goalId: goalRecord.id }}
+        decision={{
+          ...decision,
+          projectId: projectRecord.id,
+          goalId: goalRecord.id,
+          taskId: taskRecord.id,
+        }}
         linkedProject={projectRecord}
         linkedGoal={goalRecord}
+        linkedTask={taskRecord}
         isDeleting={false}
         onEdit={() => undefined}
         onDelete={async () => undefined}
@@ -105,7 +111,12 @@ describe("Decision Log disclosure density", () => {
     );
     const orphanMarkup = renderDecisionUi(
       <DecisionLogCard
-        decision={{ ...decision, projectId: "deleted-project", goalId: "deleted-goal" }}
+        decision={{
+          ...decision,
+          projectId: "deleted-project",
+          goalId: "deleted-goal",
+          taskId: "deleted-task",
+        }}
         isDeleting={false}
         onEdit={() => undefined}
         onDelete={async () => undefined}
@@ -119,8 +130,12 @@ describe("Decision Log disclosure density", () => {
     expect(linkedMarkup).toContain('href="/projects?focusId=fixture-id"');
     expect(linkedMarkup).toContain(goalRecord.title);
     expect(linkedMarkup).toContain('href="/goals?focusId=fixture-id"');
+    expect(linkedMarkup).toContain("Linked task");
+    expect(linkedMarkup).toContain(taskRecord.title);
+    expect(linkedMarkup).toContain('href="/today?focusId=fixture-id"');
     expect(orphanMarkup).toContain("Linked project unavailable");
     expect(orphanMarkup).toContain("Linked goal unavailable");
+    expect(orphanMarkup).toContain("Linked task unavailable");
     expect(orphanMarkup).toContain("Edit");
   });
 

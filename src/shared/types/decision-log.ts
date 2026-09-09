@@ -30,6 +30,7 @@ export const decisionLogEntrySchema = z.object({
   context: z.string().trim().min(1),
   projectId: z.string().min(1).optional(),
   goalId: z.string().min(1).optional(),
+  taskId: z.string().min(1).optional(),
   options: z.array(z.string().trim().min(1)).default([]),
   chosenOption: z.string().trim().min(1).optional(),
   reasoning: z.string().trim().min(1).optional(),

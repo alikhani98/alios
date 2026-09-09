@@ -6,8 +6,9 @@ import { useStorageAdapter } from "@/core/storage";
 import {
   findLinkedGoalById,
   findLinkedProjectById,
+  findLinkedTaskById,
 } from "@/shared/entityLinks";
-import type { DecisionLogEntry, Goal, Project } from "@/shared/types";
+import type { DecisionLogEntry, Goal, Project, Task } from "@/shared/types";
 import { useI18n, type TranslationKey } from "@/shared/i18n";
 import { useViewDensityMode } from "@/shared/preferences/viewDensityMode";
 import {
@@ -147,7 +148,7 @@ export function DecisionLogContextualHelp({
 export function DecisionLogPage() {
   const { t } = useI18n();
   const { isSimpleView } = useViewDensityMode();
-  const { projects: projectsRepository, goals: goalsRepository } =
+  const { projects: projectsRepository, goals: goalsRepository, tasks: tasksRepository } =
     useStorageAdapter();
   const {
     entries,
@@ -172,6 +173,7 @@ export function DecisionLogPage() {
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [projects, setProjects] = useState<Project[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [linkOptionsError, setLinkOptionsError] = useState<string | null>(null);
   const formRef = useRef<HTMLDivElement | null>(null);
   const referenceDate = useMemo(() => new Date(), []);
@@ -206,14 +208,19 @@ export function DecisionLogPage() {
   useEffect(() => {
     let isCancelled = false;
 
-    void Promise.all([projectsRepository.list(), goalsRepository.list()])
-      .then(([nextProjects, nextGoals]) => {
+    void Promise.all([
+      projectsRepository.list(),
+      goalsRepository.list(),
+      tasksRepository.list(),
+    ])
+      .then(([nextProjects, nextGoals, nextTasks]) => {
         if (isCancelled) {
           return;
         }
 
         setProjects(nextProjects);
         setGoals(nextGoals);
+        setTasks(nextTasks);
         setLinkOptionsError(null);
       })
       .catch(() => {
@@ -223,13 +230,14 @@ export function DecisionLogPage() {
 
         setProjects([]);
         setGoals([]);
+        setTasks([]);
         setLinkOptionsError(t("links.loadError"));
       });
 
     return () => {
       isCancelled = true;
     };
-  }, [goalsRepository, projectsRepository, t]);
+  }, [goalsRepository, projectsRepository, tasksRepository, t]);
 
   useEffect(() => {
     if (!editingDecision) {
@@ -261,6 +269,7 @@ export function DecisionLogPage() {
       context: values.context,
       projectId: parseOptionalText(values.projectId),
       goalId: parseOptionalText(values.goalId),
+      taskId: parseOptionalText(values.taskId),
       options: splitTextList(values.optionsText),
       chosenOption: parseOptionalText(values.chosenOption),
       reasoning: parseOptionalText(values.reasoning),
@@ -529,6 +538,7 @@ export function DecisionLogPage() {
                 decision={editingDecision}
                 projects={projects}
                 goals={goals}
+                tasks={tasks}
                 isSubmitting={isSubmitting}
                 onSubmit={handleSubmit}
                 onCancel={editingDecision ? closeEditor : undefined}
@@ -584,6 +594,7 @@ export function DecisionLogPage() {
                 decision={decision}
                 linkedProject={findLinkedProjectById(decision, projects)}
                 linkedGoal={findLinkedGoalById(decision, goals)}
+                linkedTask={findLinkedTaskById(decision, tasks)}
                 isDeleting={deletingId === decision.id}
                 onEdit={() => {
                   setEditingDecision(decision);
@@ -638,6 +649,7 @@ export function DecisionLogPage() {
               decision={decision}
               linkedProject={findLinkedProjectById(decision, projects)}
               linkedGoal={findLinkedGoalById(decision, goals)}
+              linkedTask={findLinkedTaskById(decision, tasks)}
               isDeleting={deletingId === decision.id}
               onEdit={() => {
                 setEditingDecision(decision);

@@ -10,12 +10,14 @@ export const journalEntryFormSchema = journalEntrySchema
     content: true,
     projectId: true,
     goalId: true,
+    taskId: true,
     moodLevel: true,
     energyLevel: true,
   })
   .extend({
     projectId: z.union([z.string().min(1), z.literal("")]).optional(),
     goalId: z.union([z.string().min(1), z.literal("")]).optional(),
+    taskId: z.union([z.string().min(1), z.literal("")]).optional(),
     moodLevel: z.union([level3Schema, z.literal("")]).optional(),
     energyLevel: z.union([level3Schema, z.literal("")]).optional(),
   });

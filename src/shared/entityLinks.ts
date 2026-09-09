@@ -1,8 +1,9 @@
-import type { Goal, Project } from "@/shared/types";
+import type { Goal, Project, Task } from "@/shared/types";
 
 export type LinkableRecord = {
   projectId?: string;
   goalId?: string;
+  taskId?: string;
 };
 
 export function createProjectFocusPath(projectId: string): string {
@@ -11,6 +12,10 @@ export function createProjectFocusPath(projectId: string): string {
 
 export function createGoalFocusPath(goalId: string): string {
   return `/goals?${new URLSearchParams({ focusId: goalId }).toString()}`;
+}
+
+export function createTaskFocusPath(taskId: string): string {
+  return `/today?${new URLSearchParams({ focusId: taskId }).toString()}`;
 }
 
 export function findLinkedProjectById(
@@ -28,5 +33,14 @@ export function findLinkedGoalById(
 ): Goal | undefined {
   return record.goalId
     ? goals.find((goal) => goal.id === record.goalId)
+    : undefined;
+}
+
+export function findLinkedTaskById(
+  record: Pick<LinkableRecord, "taskId">,
+  tasks: ReadonlyArray<Task>
+): Task | undefined {
+  return record.taskId
+    ? tasks.find((task) => task.id === record.taskId)
     : undefined;
 }

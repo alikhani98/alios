@@ -2,7 +2,10 @@ import {
   CheckCircle2,
   CircleDashed,
   Clock3,
+  BookOpen,
+  BookOpenText,
   FolderKanban,
+  GitBranch,
   PauseCircle,
   Pencil,
   Repeat2,
@@ -15,7 +18,14 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 
 import { PROJECT_STATUS_LABEL_KEYS } from "@/features/projects/constants";
-import type { Project, Task, TaskStatus } from "@/shared/types";
+import type {
+  DecisionLogEntry,
+  JournalEntry,
+  KnowledgeItem,
+  Project,
+  Task,
+  TaskStatus,
+} from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
 import { Badge, Button, Card, CardContent, Select, StatusChip, SwipeActionSurface } from "@/shared/ui";
 import {
@@ -27,6 +37,9 @@ import { createLinkedProjectPath } from "../taskProjectLinks";
 type TodayTaskCardProps = {
   task: Task;
   linkedProject?: Project;
+  linkedJournalEntries?: ReadonlyArray<JournalEntry>;
+  linkedDecisions?: ReadonlyArray<DecisionLogEntry>;
+  linkedKnowledgeItems?: ReadonlyArray<KnowledgeItem>;
   isLinkedProjectLoading: boolean;
   isBusy: boolean;
   contextLabel?: string;
@@ -41,6 +54,9 @@ type TodayTaskCardProps = {
 export function TodayTaskCard({
   task,
   linkedProject,
+  linkedJournalEntries = [],
+  linkedDecisions = [],
+  linkedKnowledgeItems = [],
   isLinkedProjectLoading,
   isBusy,
   contextLabel,
@@ -187,6 +203,57 @@ export function TodayTaskCard({
                   </Button>
                 ) : null}
               </div>
+            </div>
+          ) : null}
+          {linkedJournalEntries.length > 0 ||
+          linkedDecisions.length > 0 ||
+          linkedKnowledgeItems.length > 0 ? (
+            <div className="grid gap-3 sm:grid-cols-3">
+              {linkedJournalEntries.length > 0 ? (
+                <div className="alios-surface-muted border-primary/15 bg-primary/5 p-3">
+                  <p className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                    <BookOpenText className="h-4 w-4 shrink-0 text-primary" />
+                    {t("links.relatedJournalEntries")}
+                  </p>
+                  <ul className="mt-2 space-y-1">
+                    {linkedJournalEntries.map((entry) => (
+                      <li key={entry.id} className="min-w-0 break-words text-sm font-medium">
+                        {entry.title}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+              {linkedDecisions.length > 0 ? (
+                <div className="alios-surface-muted border-primary/15 bg-primary/5 p-3">
+                  <p className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                    <GitBranch className="h-4 w-4 shrink-0 text-primary" />
+                    {t("links.relatedDecisions")}
+                  </p>
+                  <ul className="mt-2 space-y-1">
+                    {linkedDecisions.map((decision) => (
+                      <li key={decision.id} className="min-w-0 break-words text-sm font-medium">
+                        {decision.title}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+              {linkedKnowledgeItems.length > 0 ? (
+                <div className="alios-surface-muted border-primary/15 bg-primary/5 p-3">
+                  <p className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                    <BookOpen className="h-4 w-4 shrink-0 text-primary" />
+                    {t("links.relatedKnowledgeItems")}
+                  </p>
+                  <ul className="mt-2 space-y-1">
+                    {linkedKnowledgeItems.map((item) => (
+                      <li key={item.id} className="min-w-0 break-words text-sm font-medium">
+                        {item.title}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
             </div>
           ) : null}
         </div>

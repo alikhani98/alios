@@ -7,8 +7,9 @@ import { useStorageAdapter } from "@/core/storage";
 import {
   findLinkedGoalById,
   findLinkedProjectById,
+  findLinkedTaskById,
 } from "@/shared/entityLinks";
-import type { Goal, JournalEntry, Project } from "@/shared/types";
+import type { Goal, JournalEntry, Project, Task } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
 import {
   Button,
@@ -29,7 +30,7 @@ import type { JournalEntryFormValues } from "../types";
 export function JournalPage() {
   const { t } = useI18n();
   const [searchParams] = useSearchParams();
-  const { projects: projectsRepository, goals: goalsRepository } =
+  const { projects: projectsRepository, goals: goalsRepository, tasks: tasksRepository } =
     useStorageAdapter();
   const {
     entries,
@@ -51,6 +52,7 @@ export function JournalPage() {
   const [showAllEntries, setShowAllEntries] = useState(false);
   const [projects, setProjects] = useState<Project[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [linkOptionsError, setLinkOptionsError] = useState<string | null>(null);
   const entryRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const focusId = searchParams.get("focusId");
@@ -74,14 +76,19 @@ export function JournalPage() {
   useEffect(() => {
     let isCancelled = false;
 
-    void Promise.all([projectsRepository.list(), goalsRepository.list()])
-      .then(([nextProjects, nextGoals]) => {
+    void Promise.all([
+      projectsRepository.list(),
+      goalsRepository.list(),
+      tasksRepository.list(),
+    ])
+      .then(([nextProjects, nextGoals, nextTasks]) => {
         if (isCancelled) {
           return;
         }
 
         setProjects(nextProjects);
         setGoals(nextGoals);
+        setTasks(nextTasks);
         setLinkOptionsError(null);
       })
       .catch(() => {
@@ -91,13 +98,14 @@ export function JournalPage() {
 
         setProjects([]);
         setGoals([]);
+        setTasks([]);
         setLinkOptionsError(t("links.loadError"));
       });
 
     return () => {
       isCancelled = true;
     };
-  }, [goalsRepository, projectsRepository, t]);
+  }, [goalsRepository, projectsRepository, tasksRepository, t]);
 
   const openCreateForm = () => {
     setEditingEntry(undefined);
@@ -131,6 +139,7 @@ export function JournalPage() {
       content: values.content,
       projectId: values.projectId || undefined,
       goalId: values.goalId || undefined,
+      taskId: values.taskId || undefined,
       moodLevel: values.moodLevel || undefined,
       energyLevel: values.energyLevel || undefined,
     };
@@ -231,6 +240,7 @@ export function JournalPage() {
               entry={editingEntry}
               projects={projects}
               goals={goals}
+              tasks={tasks}
               isSubmitting={isSubmitting}
               onSubmit={handleSubmit}
               onCancel={closeForm}
@@ -320,6 +330,7 @@ export function JournalPage() {
                 entry={entry}
                 linkedProject={findLinkedProjectById(entry, projects)}
                 linkedGoal={findLinkedGoalById(entry, goals)}
+                linkedTask={findLinkedTaskById(entry, tasks)}
                 isDeleting={deletingId === entry.id}
                 onEdit={() => openEditForm(entry)}
                 onDelete={() => handleDelete(entry)}

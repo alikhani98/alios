@@ -14,6 +14,14 @@
   - Automated validation complete: automated checks must stay separate from live QA evidence and do not prove real-world behavior by themselves.
   - Real-world validation complete: only explicitly documented browser/device evidence counts as real-world validation.
 
+## Current Content to Task Linking
+
+- Journal entries, Decision Log entries, and Knowledge items now support an optional source-owned `taskId` link in the same style as their existing optional `projectId` and `goalId` links.
+- Journal, Decision, and Knowledge forms expose optional Task selectors, and their cards render linked Task summaries through the shared `LinkedEntitySummary` component.
+- Today derives reverse Task backlinks by reading Journal, Decision Log, and Knowledge repositories through the storage adapter and filtering records in memory where `taskId` matches the Task.
+- Task records store no reverse link fields, no cascade behavior is added, and missing linked Tasks are shown as unavailable rather than deleting or mutating source records.
+- The change keeps backup compatibility for older records because `taskId` is optional and does not require a Dexie table, index, or dependency.
+
 ## Current Account & Sync Rule
 
 AliOS is local-first by default. The app remains usable without an account, without sync, and without a backend connection.

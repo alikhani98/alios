@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
-import type { Goal, KnowledgeItem, Project } from "@/shared/types";
+import type { Goal, KnowledgeItem, Project, Task } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
 import { Button, Input, Textarea, Select } from "@/shared/ui";
 import { KNOWLEDGE_TYPE_OPTIONS } from "../constants";
@@ -14,6 +14,7 @@ type KnowledgeItemFormProps = {
   item?: KnowledgeItem;
   projects?: ReadonlyArray<Project>;
   goals?: ReadonlyArray<Goal>;
+  tasks?: ReadonlyArray<Task>;
   isSubmitting: boolean;
   onSubmit: (values: KnowledgeItemFormValues) => Promise<void>;
   onCancel: () => void;
@@ -23,6 +24,7 @@ export function KnowledgeItemForm({
   item,
   projects = [],
   goals = [],
+  tasks = [],
   isSubmitting,
   onSubmit,
   onCancel,
@@ -42,6 +44,7 @@ export function KnowledgeItemForm({
       source: item?.source ?? "",
       projectId: item?.projectId ?? "",
       goalId: item?.goalId ?? "",
+      taskId: item?.taskId ?? "",
     },
   });
   const selectedProjectIsUnavailable =
@@ -49,6 +52,8 @@ export function KnowledgeItemForm({
     !projects.some((project) => project.id === item?.projectId);
   const selectedGoalIsUnavailable =
     Boolean(item?.goalId) && !goals.some((goal) => goal.id === item?.goalId);
+  const selectedTaskIsUnavailable =
+    Boolean(item?.taskId) && !tasks.some((task) => task.id === item?.taskId);
 
   return (
     <form
@@ -127,7 +132,7 @@ export function KnowledgeItemForm({
         />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-3">
         <div className="grid gap-2">
           <label htmlFor="knowledge-project" className="text-sm font-medium">
             {t("links.projectLabel")}
@@ -161,6 +166,25 @@ export function KnowledgeItemForm({
             {goals.map((goal) => (
               <option key={goal.id} value={goal.id}>
                 {goal.title}
+              </option>
+            ))}
+          </Select>
+        </div>
+
+        <div className="grid gap-2">
+          <label htmlFor="knowledge-task" className="text-sm font-medium">
+            {t("links.taskLabel")}
+          </label>
+          <Select id="knowledge-task" {...register("taskId")}>
+            <option value="">{t("links.noTask")}</option>
+            {selectedTaskIsUnavailable ? (
+              <option value={item?.taskId}>
+                {t("links.taskUnavailable")}
+              </option>
+            ) : null}
+            {tasks.map((task) => (
+              <option key={task.id} value={task.id}>
+                {task.title}
               </option>
             ))}
           </Select>
