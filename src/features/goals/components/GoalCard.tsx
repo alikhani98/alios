@@ -41,6 +41,10 @@ import { createLifeAreaFocusPath } from "../goalAreaNavigation";
 import { createGoalProjectsPath, type GoalProjectProgress } from "../goalProjectProgress";
 import { createTodayTasksPath } from "@/features/routines/routineTaskLinks";
 import type { ResourceRelationship } from "@/features/resources/resourceRelationships";
+import type {
+  GoalLearningContext,
+  LearningContextRelation,
+} from "../learningContext";
 
 type GoalCardProps = {
   goal: Goal;
@@ -50,6 +54,7 @@ type GoalCardProps = {
   linkedDecisions?: ReadonlyArray<DecisionLogEntry>;
   linkedKnowledgeItems?: ReadonlyArray<KnowledgeItem>;
   linkedResources?: ReadonlyArray<ResourceRelationship>;
+  learningContext?: GoalLearningContext;
   isProjectProgressLoading?: boolean;
   useAutoProgress?: boolean;
   isDeleting: boolean;
@@ -69,6 +74,7 @@ export function GoalCard({
   linkedDecisions = [],
   linkedKnowledgeItems = [],
   linkedResources = [],
+  learningContext,
   isProjectProgressLoading,
   useAutoProgress = false,
   isDeleting,
@@ -229,6 +235,108 @@ export function GoalCard({
               {goal.description}
             </p>
           </SoftPanel>
+
+          {learningContext ? (
+            <SoftPanel className="space-y-4 border-primary/15 bg-background/80">
+              <div className="space-y-1">
+                <p className="text-sm font-semibold">{t("goals.learningContext")}</p>
+                <p className="text-xs leading-5 text-muted-foreground">
+                  {t("goals.learningContextDescription")}
+                </p>
+              </div>
+
+              <LearningContextRelationList
+                label={t("goals.supportingResources")}
+                items={learningContext.relatedResources}
+                unavailable={t("links.resourceUnavailable")}
+                sourceLabels={{
+                  direct: t("goals.learningSourceDirect"),
+                  project: t("goals.learningSourceProject"),
+                  task: t("goals.learningSourceTask"),
+                  knowledge: t("goals.learningSourceKnowledge"),
+                }}
+                hrefPrefix="/resources/"
+              />
+              <LearningContextRelationList
+                label={t("goals.relatedProjects")}
+                items={learningContext.relatedProjects}
+                unavailable={t("links.projectUnavailable")}
+                sourceLabels={{
+                  direct: t("goals.learningSourceDirect"),
+                  project: t("goals.learningSourceProject"),
+                  task: t("goals.learningSourceTask"),
+                  knowledge: t("goals.learningSourceKnowledge"),
+                }}
+                hrefPrefix="/projects?focusId="
+              />
+              <LearningContextRelationList
+                label={t("goals.relatedTasks")}
+                items={learningContext.relatedTasks}
+                unavailable={t("links.taskUnavailable")}
+                sourceLabels={{
+                  direct: t("goals.learningSourceDirect"),
+                  project: t("goals.learningSourceProject"),
+                  task: t("goals.learningSourceTask"),
+                  knowledge: t("goals.learningSourceKnowledge"),
+                }}
+                hrefPrefix="/today?focusId="
+              />
+              <LearningContextRelationList
+                label={t("goals.relatedKnowledge")}
+                items={learningContext.relatedKnowledge}
+                unavailable={t("links.relatedKnowledgeUnavailable")}
+                sourceLabels={{
+                  direct: t("goals.learningSourceDirect"),
+                  project: t("goals.learningSourceProject"),
+                  task: t("goals.learningSourceTask"),
+                  knowledge: t("goals.learningSourceKnowledge"),
+                }}
+                hrefPrefix="/knowledge?focusId="
+              />
+
+              <div className="space-y-3 border-t border-border/70 pt-4">
+                <p className="text-sm font-semibold">{t("goals.progressSignals")}</p>
+                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                  <LearningSignal
+                    label={t("goals.goalProgressSignal")}
+                    value={`${learningContext.progressSignals.goalProgress}%`}
+                  />
+                  <LearningSignal
+                    label={t("goals.projectCompletionSignal")}
+                    value={t("goals.completionCount", {
+                      completed: learningContext.progressSignals.projectCompletion.completed,
+                      total: learningContext.progressSignals.projectCompletion.total,
+                    })}
+                    detail={formatPercent(learningContext.progressSignals.projectCompletion.percent)}
+                  />
+                  <LearningSignal
+                    label={t("goals.taskCompletionSignal")}
+                    value={t("goals.completionCount", {
+                      completed: learningContext.progressSignals.taskCompletion.completed,
+                      total: learningContext.progressSignals.taskCompletion.total,
+                    })}
+                    detail={formatPercent(learningContext.progressSignals.taskCompletion.percent)}
+                  />
+                  <LearningSignal
+                    label={t("goals.resourceProgressSignal")}
+                    value={
+                      learningContext.progressSignals.resourceProgress.averagePercent === null
+                        ? t("common.notRecorded")
+                        : `${learningContext.progressSignals.resourceProgress.averagePercent}%`
+                    }
+                    detail={t("goals.resourceProgressTracked", {
+                      tracked: learningContext.progressSignals.resourceProgress.tracked,
+                      total: learningContext.progressSignals.resourceProgress.total,
+                    })}
+                  />
+                  <LearningSignal
+                    label={t("goals.knowledgeCountSignal")}
+                    value={String(learningContext.progressSignals.knowledgeCount)}
+                  />
+                </div>
+              </div>
+            </SoftPanel>
+          ) : null}
 
           <div className="grid gap-3 lg:grid-cols-2">
             <SoftPanel className="min-w-0">
@@ -395,7 +503,7 @@ export function GoalCard({
             </SoftPanel>
           ) : null}
 
-          {linkedResources.length > 0 ? (
+          {linkedResources.length > 0 && !learningContext ? (
             <SoftPanel className="space-y-3 border-primary/15 bg-background/80">
               <p className="flex items-center gap-2 text-sm font-semibold">
                 <BookOpen className="h-4 w-4 shrink-0 text-primary" />
@@ -493,5 +601,76 @@ export function GoalCard({
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+function formatPercent(percent: number | null): string | undefined {
+  return percent === null ? undefined : `${percent}%`;
+}
+
+function LearningContextRelationList({
+  label,
+  items,
+  unavailable,
+  sourceLabels,
+  hrefPrefix,
+}: {
+  label: string;
+  items: ReadonlyArray<LearningContextRelation>;
+  unavailable: string;
+  sourceLabels: Record<LearningContextRelation["provenance"], string>;
+  hrefPrefix: string;
+}) {
+  const { t } = useI18n();
+
+  return (
+    <div className="space-y-2">
+      <p className="text-sm font-semibold">{label}</p>
+      {items.length > 0 ? (
+        <ul className="space-y-2">
+          {items.map((item) => (
+            <li key={`${label}-${item.id}`} className="flex min-w-0 flex-wrap items-center gap-2 text-sm">
+              {item.title ? (
+                <Link
+                  className="min-w-0 break-words text-primary underline-offset-4 hover:underline"
+                  to={`${hrefPrefix}${encodeURIComponent(item.id)}`}
+                >
+                  {item.title}
+                </Link>
+              ) : (
+                <span className="min-w-0 break-words text-muted-foreground">
+                  {unavailable}
+                </span>
+              )}
+              <span className="text-xs text-muted-foreground">
+                {t("goals.learningSourceLabel")}: {sourceLabels[item.provenance]}
+              </span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-sm text-muted-foreground">
+          {t("goals.learningContextEmpty")}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function LearningSignal({
+  label,
+  value,
+  detail,
+}: {
+  label: string;
+  value: string;
+  detail?: string;
+}) {
+  return (
+    <div className="rounded-xl border border-border/70 bg-muted/20 p-3">
+      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className="mt-1 text-base font-semibold tabular-nums">{value}</p>
+      {detail ? <p className="mt-1 text-xs text-muted-foreground">{detail}</p> : null}
+    </div>
   );
 }

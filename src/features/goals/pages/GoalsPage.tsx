@@ -70,6 +70,7 @@ import { useGoals } from "../hooks/useGoals";
 import {
   deriveResourcesForGoal,
 } from "@/features/resources/resourceRelationships";
+import { resolveGoalLearningContext } from "../learningContext";
 import type { GoalFormSeed, GoalFormValues } from "../types";
 
 function splitTags(value: string): string[] {
@@ -268,6 +269,22 @@ export function GoalsPage() {
   const areaParam = searchParams.get("area");
 
   const summary = useMemo(() => getGoalsSummary(entries), [entries]);
+  const learningContexts = useMemo(
+    () =>
+      new Map(
+        entries.map((goal) => [
+          goal.id,
+          resolveGoalLearningContext({
+            goal,
+            resources,
+            projects,
+            tasks,
+            knowledgeItems: linkedKnowledgeItems,
+          }),
+        ])
+      ),
+    [entries, linkedKnowledgeItems, projects, resources, tasks]
+  );
   const isProjectProgressLoading = isProjectsLoading || isTasksLoading;
   const linkedWorkLoadError =
     taskLoadError ??
@@ -992,6 +1009,7 @@ export function GoalsPage() {
                         projects,
                         tasks
                       )}
+                      learningContext={learningContexts.get(goal.id)}
                       isProjectProgressLoading={isProjectProgressLoading}
                       useAutoProgress={autoProgressGoalIds.includes(goal.id)}
                       isDeleting={deletingId === goal.id}
@@ -1083,6 +1101,7 @@ export function GoalsPage() {
                     projects,
                     tasks
                   )}
+                  learningContext={learningContexts.get(goal.id)}
                   isProjectProgressLoading={isProjectProgressLoading}
                   useAutoProgress={autoProgressGoalIds.includes(goal.id)}
                   isDeleting={deletingId === goal.id}

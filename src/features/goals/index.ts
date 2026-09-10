@@ -5,5 +5,6 @@ export * from "./goals";
 export * from "./goalAreaNavigation";
 export * from "./goalTemplates";
 export * from "./hooks/useGoals";
+export * from "./learningContext";
 export * from "./pages/GoalsPage";
 export * from "./types";
