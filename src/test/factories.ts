@@ -146,6 +146,10 @@ export const resourceInput: CreateResourceInput = {
   description: "Architecture notes for the local-first system.",
   source: "Project documentation",
   url: "https://example.com/alios",
+  author: "AliOS team",
+  format: "digital",
+  location: "Project docs",
+  startedAt: "2026-07-01",
   status: "in_progress",
   progressPercent: 40,
 };

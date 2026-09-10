@@ -10,6 +10,7 @@ import {
   lifeAreaSchema,
   manualEntrySchema,
   projectSchema,
+  resourceFormatSchema,
   resourceSchema,
   taskSchema,
   routineSchema,
@@ -207,6 +208,7 @@ describe("core domain schemas", () => {
         goalId: undefined,
         projectId: undefined,
         taskId: undefined,
+        status: "completed",
         progressPercent: 100,
       }).success
     ).toBe(true);
@@ -215,6 +217,75 @@ describe("core domain schemas", () => {
     ).toBe(false);
     expect(
       resourceSchema.safeParse({ ...resourceRecord, progressPercent: 101 }).success
+    ).toBe(false);
+  });
+
+  it("accepts Resource library metadata while keeping older resources valid", () => {
+    const {
+      author: _author,
+      format: _format,
+      location: _location,
+      startedAt: _startedAt,
+      completedAt: _completedAt,
+      ...legacyResource
+    } = resourceRecord;
+
+    expect(resourceFormatSchema.safeParse("physical").success).toBe(true);
+    expect(resourceSchema.safeParse(legacyResource).success).toBe(true);
+    expect(
+      resourceSchema.safeParse({
+        ...resourceRecord,
+        author: "James Clear",
+        format: "physical",
+        location: "Home Library",
+        startedAt: "2026-09-01",
+        completedAt: "2026-09-10",
+      }).success
+    ).toBe(true);
+  });
+
+  it("validates simple Resource progress consistency by status", () => {
+    expect(
+      resourceSchema.safeParse({
+        ...resourceRecord,
+        status: "unread",
+        progressPercent: 0,
+      }).success
+    ).toBe(true);
+    expect(
+      resourceSchema.safeParse({
+        ...resourceRecord,
+        status: "unread",
+        progressPercent: 30,
+      }).success
+    ).toBe(false);
+    expect(
+      resourceSchema.safeParse({
+        ...resourceRecord,
+        status: "in_progress",
+        progressPercent: 99,
+      }).success
+    ).toBe(true);
+    expect(
+      resourceSchema.safeParse({
+        ...resourceRecord,
+        status: "in_progress",
+        progressPercent: 100,
+      }).success
+    ).toBe(false);
+    expect(
+      resourceSchema.safeParse({
+        ...resourceRecord,
+        status: "completed",
+        progressPercent: 100,
+      }).success
+    ).toBe(true);
+    expect(
+      resourceSchema.safeParse({
+        ...resourceRecord,
+        status: "completed",
+        progressPercent: 80,
+      }).success
     ).toBe(false);
   });
 

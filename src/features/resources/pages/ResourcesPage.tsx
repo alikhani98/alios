@@ -4,7 +4,12 @@ import { useSearchParams } from "react-router-dom";
 
 import type { CreateResourceInput } from "@/core/repositories";
 import { useStorageAdapter } from "@/core/storage";
-import type { KnowledgeItem, Resource, ResourceType } from "@/shared/types";
+import type {
+  KnowledgeItem,
+  Resource,
+  ResourceFormat,
+  ResourceType,
+} from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
 import {
   Button,
@@ -20,6 +25,7 @@ import {
 import { ResourceCard } from "../components/ResourceCard";
 import { ResourceForm } from "../components/ResourceForm";
 import {
+  RESOURCE_FORMAT_OPTIONS,
   RESOURCE_TYPE_OPTIONS,
 } from "../constants";
 import { useResources } from "../hooks/useResources";
@@ -55,6 +61,7 @@ export function ResourcesPage() {
   const [query, setQuery] = useState("");
   const [appliedQuery, setAppliedQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<ResourceType | "all">("all");
+  const [formatFilter, setFormatFilter] = useState<ResourceFormat | "all">("all");
   const [actionError, setActionError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [knowledgeItems, setKnowledgeItems] = useState<KnowledgeItem[]>([]);
@@ -64,10 +71,12 @@ export function ResourcesPage() {
 
   const filteredResources = useMemo(
     () =>
-      typeFilter === "all"
-        ? resources
-        : resources.filter((resource) => resource.type === typeFilter),
-    [resources, typeFilter]
+      resources.filter(
+        (resource) =>
+          (typeFilter === "all" || resource.type === typeFilter) &&
+          (formatFilter === "all" || resource.format === formatFilter)
+      ),
+    [formatFilter, resources, typeFilter]
   );
 
   const openCreateForm = () => {
@@ -97,6 +106,7 @@ export function ResourcesPage() {
     setQuery("");
     setAppliedQuery("");
     setTypeFilter("all");
+    setFormatFilter("all");
     await loadResources();
   };
 
@@ -110,6 +120,11 @@ export function ResourcesPage() {
       description: values.description || undefined,
       source: values.source || undefined,
       url: values.url || undefined,
+      author: values.author || undefined,
+      format: values.format || undefined,
+      location: values.location || undefined,
+      startedAt: values.startedAt || undefined,
+      completedAt: values.completedAt || undefined,
       status: values.status,
       progressPercent: parseProgress(values.progressPercent),
     };
@@ -147,7 +162,8 @@ export function ResourcesPage() {
     }
   };
 
-  const hasFilters = appliedQuery.length > 0 || typeFilter !== "all";
+  const hasFilters =
+    appliedQuery.length > 0 || typeFilter !== "all" || formatFilter !== "all";
 
   useEffect(() => {
     let isCancelled = false;
@@ -223,7 +239,7 @@ export function ResourcesPage() {
       <PremiumCard>
         <CardContent className="pt-6">
           <form
-            className="grid gap-3 md:grid-cols-[1fr_12rem_auto]"
+            className="grid gap-3 md:grid-cols-[1fr_12rem_12rem_auto]"
             onSubmit={(event) => {
               event.preventDefault();
               void handleSearch();
@@ -248,6 +264,20 @@ export function ResourcesPage() {
             >
               <option value="all">{t("resources.allTypes")}</option>
               {RESOURCE_TYPE_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {t(option.labelKey)}
+                </option>
+              ))}
+            </Select>
+            <Select
+              aria-label={t("resources.formatFilterLabel")}
+              value={formatFilter}
+              onChange={(event) =>
+                setFormatFilter(event.target.value as ResourceFormat | "all")
+              }
+            >
+              <option value="all">{t("resources.allFormats")}</option>
+              {RESOURCE_FORMAT_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
                   {t(option.labelKey)}
                 </option>

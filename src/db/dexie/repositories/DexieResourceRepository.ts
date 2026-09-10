@@ -38,6 +38,9 @@ export class DexieResourceRepository
           resource.description,
           resource.source,
           resource.url,
+          resource.author,
+          resource.format,
+          resource.location,
         ].some((value) => value?.toLocaleLowerCase().includes(normalizedQuery))
       );
     });

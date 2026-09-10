@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 
 import type { KnowledgeItem, Resource } from "@/shared/types";
+import { useDateFormatter } from "@/shared/date";
 import { useI18n } from "@/shared/i18n";
 import {
   Badge,
@@ -15,6 +16,7 @@ import {
 } from "@/shared/ui";
 import { QuickAccessToggleButton } from "@/shared/quickAccess";
 import {
+  RESOURCE_FORMAT_LABEL_KEYS,
   RESOURCE_STATUS_OPTIONS,
   RESOURCE_TYPE_LABEL_KEYS,
 } from "../constants";
@@ -35,10 +37,36 @@ export function ResourceCard({
   relatedKnowledgeItems = [],
 }: ResourceCardProps) {
   const { t } = useI18n();
+  const { formatDate } = useDateFormatter();
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const statusLabel = RESOURCE_STATUS_OPTIONS.find(
     (option) => option.value === resource.status
   );
+  const metadataItems = [
+    resource.author
+      ? { label: t("resources.author"), value: resource.author }
+      : null,
+    resource.format
+      ? {
+          label: t("resources.format"),
+          value: t(RESOURCE_FORMAT_LABEL_KEYS[resource.format]),
+        }
+      : null,
+    resource.location
+      ? { label: t("resources.location"), value: resource.location }
+      : null,
+  ].filter((item): item is { label: string; value: string } => Boolean(item));
+  const dateItems = [
+    resource.startedAt
+      ? { label: t("resources.startedAt"), value: formatDate(resource.startedAt) }
+      : null,
+    resource.completedAt
+      ? {
+          label: t("resources.completedAt"),
+          value: formatDate(resource.completedAt),
+        }
+      : null,
+  ].filter((item): item is { label: string; value: string } => Boolean(item));
 
   return (
     <Card className="flex h-full min-w-0 flex-col">
@@ -56,6 +84,19 @@ export function ResourceCard({
         </div>
       </CardHeader>
       <CardContent className="min-w-0 flex-1 space-y-3">
+        {metadataItems.length > 0 ? (
+          <dl className="grid gap-2 rounded-2xl border border-border/70 bg-muted/20 p-3 text-sm">
+            {metadataItems.map((item) => (
+              <div
+                key={item.label}
+                className="grid min-w-0 gap-1 sm:grid-cols-[7rem_1fr] sm:items-start"
+              >
+                <dt className="text-muted-foreground">{item.label}</dt>
+                <dd className="min-w-0 break-words font-medium">{item.value}</dd>
+              </div>
+            ))}
+          </dl>
+        ) : null}
         {resource.description ? (
           <p className="break-words whitespace-pre-wrap text-sm leading-7 text-muted-foreground">
             {resource.description}
@@ -81,6 +122,18 @@ export function ResourceCard({
           <p className="text-sm text-muted-foreground">
             {t("resources.progressValue", { count: resource.progressPercent })}
           </p>
+        ) : null}
+        {dateItems.length > 0 ? (
+          <dl className="grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
+            {dateItems.map((item) => (
+              <div key={item.label} className="min-w-0">
+                <dt>{item.label}</dt>
+                <dd className="break-words font-medium text-foreground">
+                  {item.value}
+                </dd>
+              </div>
+            ))}
+          </dl>
         ) : null}
         {relatedKnowledgeItems.length > 0 ? (
           <div className="rounded-2xl border border-primary/15 bg-primary/5 p-3">

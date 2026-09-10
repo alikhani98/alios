@@ -163,6 +163,9 @@ describe("Dexie repositories", () => {
     expect(created.id).toMatch(/^[0-9a-f-]{36}$/i);
     expect(await storage.resources.list()).toEqual([created]);
     expect(await storage.resources.search("architecture")).toEqual([created]);
+    expect(await storage.resources.search("alios team")).toEqual([created]);
+    expect(await storage.resources.search("digital")).toEqual([created]);
+    expect(await storage.resources.search("project docs")).toEqual([created]);
     expect(await storage.resources.getById(created.id)).toEqual(created);
 
     const updated = await storage.resources.update(created.id, {

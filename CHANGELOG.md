@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased - Resource Library Metadata Foundation
+
+- Added optional Resource library metadata for author, format, location,
+  started date, and completed date.
+- Added lightweight format options, progressive form fields, metadata-aware
+  Resource cards, format filtering, and metadata search.
+- Added simple status/progress consistency validation while preserving legacy
+  Resources without metadata and older backup compatibility.
+- Kept the existing Resource table, repository, backup version, sync catalog,
+  relationships, and local-first architecture unchanged.
+
 ## Unreleased - Personalized Quick Access
 
 - Added a versioned local `alios.quickAccess` preference for a compact

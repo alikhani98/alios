@@ -164,6 +164,41 @@ describe("backup validation and migration", () => {
     expect(legacyBackup.data.knowledgeItems[0]?.resourceId).toBeUndefined();
   });
 
+  it("round-trips Resource library metadata and accepts older Resource records", () => {
+    const linkedBackup = validateAndMigrateBackupPayload({
+      app: ALIOS_BACKUP_APP,
+      backupVersion: ALIOS_BACKUP_VERSION,
+      exportedAt: "2026-07-05T08:30:00.000Z",
+      data: { resources: [resourceRecord] },
+    });
+    const {
+      author: _author,
+      format: _format,
+      location: _location,
+      startedAt: _startedAt,
+      completedAt: _completedAt,
+      ...legacyResource
+    } = resourceRecord;
+    const legacyBackup = validateAndMigrateBackupPayload({
+      app: ALIOS_BACKUP_APP,
+      backupVersion: ALIOS_BACKUP_VERSION,
+      exportedAt: "2026-07-05T08:30:00.000Z",
+      data: { resources: [legacyResource] },
+    });
+
+    expect(linkedBackup.data.resources[0]).toMatchObject({
+      author: resourceRecord.author,
+      format: resourceRecord.format,
+      location: resourceRecord.location,
+      startedAt: resourceRecord.startedAt,
+    });
+    expect(legacyBackup.data.resources[0]?.author).toBeUndefined();
+    expect(legacyBackup.data.resources[0]?.format).toBeUndefined();
+    expect(legacyBackup.data.resources[0]?.location).toBeUndefined();
+    expect(legacyBackup.data.resources[0]?.startedAt).toBeUndefined();
+    expect(legacyBackup.data.resources[0]?.completedAt).toBeUndefined();
+  });
+
   it("rejects invalid JSON before any restore write can happen", () => {
     expect(() => validateAndMigrateBackup("{")).toThrow(ValidationError);
     try {

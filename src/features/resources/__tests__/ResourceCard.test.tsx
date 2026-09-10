@@ -4,6 +4,7 @@ import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { DateDisplayProvider } from "@/shared/date";
 import { I18nProvider, LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
 import { knowledgeItemRecord, resourceRecord } from "@/test/factories";
 import { MemoryRouter } from "react-router-dom";
@@ -24,13 +25,15 @@ describe("ResourceCard", () => {
       root.render(
         <MemoryRouter initialEntries={["/resources"]}>
           <I18nProvider>
-            <ResourceCard
-              resource={resourceRecord}
-              relatedKnowledgeItems={[knowledgeItemRecord]}
-              isDeleting={false}
-              onEdit={vi.fn()}
-              onDelete={vi.fn(async () => undefined)}
-            />
+            <DateDisplayProvider>
+              <ResourceCard
+                resource={resourceRecord}
+                relatedKnowledgeItems={[knowledgeItemRecord]}
+                isDeleting={false}
+                onEdit={vi.fn()}
+                onDelete={vi.fn(async () => undefined)}
+              />
+            </DateDisplayProvider>
           </I18nProvider>
         </MemoryRouter>
       );
@@ -48,6 +51,48 @@ describe("ResourceCard", () => {
     expect(container.textContent).toContain("Document");
     expect(container.textContent).toContain("In progress");
     expect(container.textContent).toContain("40%");
+  });
+
+  it("renders optional library metadata when present", () => {
+    expect(container.textContent).toContain("Author");
+    expect(container.textContent).toContain("AliOS team");
+    expect(container.textContent).toContain("Digital");
+    expect(container.textContent).toContain("Project docs");
+    expect(container.textContent).toContain("Started");
+  });
+
+  it("does not render empty optional metadata", async () => {
+    await act(async () => {
+      root.render(
+        <MemoryRouter initialEntries={["/resources"]}>
+          <I18nProvider>
+            <DateDisplayProvider>
+              <ResourceCard
+                resource={{
+                  ...resourceRecord,
+                  author: undefined,
+                  format: undefined,
+                  location: undefined,
+                  startedAt: undefined,
+                  completedAt: undefined,
+                }}
+                relatedKnowledgeItems={[]}
+                isDeleting={false}
+                onEdit={vi.fn()}
+                onDelete={vi.fn(async () => undefined)}
+              />
+            </DateDisplayProvider>
+          </I18nProvider>
+        </MemoryRouter>
+      );
+      await Promise.resolve();
+    });
+
+    expect(container.textContent).not.toContain("Author");
+    expect(container.textContent).not.toContain("Format");
+    expect(container.textContent).not.toContain("Location");
+    expect(container.textContent).not.toContain("Started");
+    expect(container.textContent).not.toContain("Completed");
   });
 
   it("keeps edit and delete actions available", () => {
