@@ -1,4 +1,16 @@
-import { AlertCircle, BookOpen, Plus, RotateCcw, Search, X } from "lucide-react";
+import {
+  AlertCircle,
+  ArrowDownAZ,
+  ArrowDownUp,
+  BookOpen,
+  CheckCircle2,
+  Grid2X2,
+  List,
+  Plus,
+  RotateCcw,
+  Search,
+  X,
+} from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
@@ -8,6 +20,7 @@ import type {
   KnowledgeItem,
   Resource,
   ResourceFormat,
+  ResourceStatus,
   ResourceType,
 } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
@@ -18,6 +31,7 @@ import {
   CardTitle,
   EmptyState,
   Input,
+  MetricCard,
   PremiumCard,
   SectionHeader,
   Select,
@@ -26,10 +40,18 @@ import { ResourceCard } from "../components/ResourceCard";
 import { ResourceForm } from "../components/ResourceForm";
 import {
   RESOURCE_FORMAT_OPTIONS,
+  RESOURCE_STATUS_OPTIONS,
   RESOURCE_TYPE_OPTIONS,
 } from "../constants";
 import { useResources } from "../hooks/useResources";
 import type { ResourceFormValues } from "../types";
+import {
+  filterResources,
+  getResourceLibrarySummary,
+  sortResources,
+  type ResourceLibrarySort,
+} from "../resourceLibrary";
+import { useResourceViewMode } from "../resourceViewMode";
 
 function parseProgress(value: string | undefined): number | undefined {
   if (!value?.trim()) {
@@ -61,22 +83,32 @@ export function ResourcesPage() {
   const [query, setQuery] = useState("");
   const [appliedQuery, setAppliedQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<ResourceType | "all">("all");
+  const [statusFilter, setStatusFilter] = useState<ResourceStatus | "all">("all");
   const [formatFilter, setFormatFilter] = useState<ResourceFormat | "all">("all");
+  const [sort, setSort] = useState<ResourceLibrarySort>("newest");
   const [actionError, setActionError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [knowledgeItems, setKnowledgeItems] = useState<KnowledgeItem[]>([]);
   const [focusedResourceId, setFocusedResourceId] = useState<string | null>(null);
   const resourceRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const { value: viewMode, setValue: setViewMode } = useResourceViewMode();
   const focusId = searchParams.get("focusId");
 
+  const summary = useMemo(
+    () => getResourceLibrarySummary(resources),
+    [resources]
+  );
   const filteredResources = useMemo(
     () =>
-      resources.filter(
-        (resource) =>
-          (typeFilter === "all" || resource.type === typeFilter) &&
-          (formatFilter === "all" || resource.format === formatFilter)
+      sortResources(
+        filterResources(resources, {
+          type: typeFilter,
+          status: statusFilter,
+          format: formatFilter,
+        }),
+        sort
       ),
-    [formatFilter, resources, typeFilter]
+    [formatFilter, resources, sort, statusFilter, typeFilter]
   );
 
   const openCreateForm = () => {
@@ -106,6 +138,7 @@ export function ResourcesPage() {
     setQuery("");
     setAppliedQuery("");
     setTypeFilter("all");
+    setStatusFilter("all");
     setFormatFilter("all");
     await loadResources();
   };
@@ -163,7 +196,10 @@ export function ResourcesPage() {
   };
 
   const hasFilters =
-    appliedQuery.length > 0 || typeFilter !== "all" || formatFilter !== "all";
+    appliedQuery.length > 0 ||
+    typeFilter !== "all" ||
+    statusFilter !== "all" ||
+    formatFilter !== "all";
 
   useEffect(() => {
     let isCancelled = false;
@@ -236,10 +272,43 @@ export function ResourcesPage() {
         </PremiumCard>
       ) : null}
 
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+        <MetricCard
+          icon={<BookOpen className="h-5 w-5" />}
+          label={t("resources.summaryTotal")}
+          value={summary.total}
+        />
+        <MetricCard
+          icon={<BookOpen className="h-5 w-5" />}
+          label={t("resources.summaryBooks")}
+          value={summary.books}
+        />
+        <MetricCard
+          icon={<BookOpen className="h-5 w-5" />}
+          label={t("resources.summaryCourses")}
+          value={summary.courses}
+        />
+        <MetricCard
+          icon={<BookOpen className="h-5 w-5" />}
+          label={t("resources.summaryWebsites")}
+          value={summary.websites}
+        />
+        <MetricCard
+          icon={<ArrowDownUp className="h-5 w-5" />}
+          label={t("resources.summaryInProgress")}
+          value={summary.inProgress}
+        />
+        <MetricCard
+          icon={<CheckCircle2 className="h-5 w-5" />}
+          label={t("resources.summaryCompleted")}
+          value={summary.completed}
+        />
+      </div>
+
       <PremiumCard>
         <CardContent className="pt-6">
           <form
-            className="grid gap-3 md:grid-cols-[1fr_12rem_12rem_auto]"
+            className="grid gap-3 md:grid-cols-[minmax(0,1fr)_11rem_11rem_11rem_auto]"
             onSubmit={(event) => {
               event.preventDefault();
               void handleSearch();
@@ -283,6 +352,20 @@ export function ResourcesPage() {
                 </option>
               ))}
             </Select>
+            <Select
+              aria-label={t("resources.statusFilterLabel")}
+              value={statusFilter}
+              onChange={(event) =>
+                setStatusFilter(event.target.value as ResourceStatus | "all")
+              }
+            >
+              <option value="all">{t("resources.allStatuses")}</option>
+              {RESOURCE_STATUS_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {t(option.labelKey)}
+                </option>
+              ))}
+            </Select>
             <div className="flex flex-wrap gap-2">
               <Button type="submit">{t("resources.search")}</Button>
               {hasFilters ? (
@@ -293,6 +376,44 @@ export function ResourcesPage() {
               ) : null}
             </div>
           </form>
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-border/70 pt-4">
+            <Select
+              aria-label={t("resources.sortLabel")}
+              value={sort}
+              onChange={(event) => setSort(event.target.value as ResourceLibrarySort)}
+              className="w-full sm:w-56"
+            >
+              <option value="newest">{t("resources.sortNewest")}</option>
+              <option value="oldest">{t("resources.sortOldest")}</option>
+              <option value="title">{t("resources.sortTitle")}</option>
+              <option value="updated">{t("resources.sortUpdated")}</option>
+              <option value="progress">{t("resources.sortProgress")}</option>
+            </Select>
+            <div className="flex items-center gap-2" aria-label={t("resources.viewModeLabel")}>
+              <Button
+                type="button"
+                size="icon"
+                variant={viewMode === "list" ? "default" : "outline"}
+                aria-label={t("resources.listView")}
+                aria-pressed={viewMode === "list"}
+                title={t("resources.listView")}
+                onClick={() => setViewMode("list")}
+              >
+                <List className="h-4 w-4" aria-hidden="true" />
+              </Button>
+              <Button
+                type="button"
+                size="icon"
+                variant={viewMode === "grid" ? "default" : "outline"}
+                aria-label={t("resources.gridView")}
+                aria-pressed={viewMode === "grid"}
+                title={t("resources.gridView")}
+                onClick={() => setViewMode("grid")}
+              >
+                <Grid2X2 className="h-4 w-4" aria-hidden="true" />
+              </Button>
+            </div>
+          </div>
         </CardContent>
       </PremiumCard>
 
@@ -342,7 +463,13 @@ export function ResourcesPage() {
           }
         />
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div
+          className={
+            viewMode === "grid"
+              ? "grid gap-4 md:grid-cols-2 xl:grid-cols-3"
+              : "grid gap-4"
+          }
+        >
           {filteredResources.map((resource) => (
             <div
               key={resource.id}

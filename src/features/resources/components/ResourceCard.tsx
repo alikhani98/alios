@@ -73,7 +73,12 @@ export function ResourceCard({
       <CardHeader className="gap-3">
         <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
           <CardTitle className="min-w-0 break-words leading-7">
-            {resource.title}
+            <Link
+              to={`/resources/${encodeURIComponent(resource.id)}`}
+              className="underline-offset-4 hover:underline"
+            >
+              {resource.title}
+            </Link>
           </CardTitle>
           <div className="flex flex-wrap gap-2">
             <Badge variant="secondary">
@@ -177,6 +182,7 @@ export function ResourceCard({
           </>
         ) : (
           <>
+            <QuickAccessToggleButton itemType="resource" targetId={resource.id} />
             <Button type="button" size="sm" variant="outline" onClick={onEdit}>
               <Pencil className="me-2 h-4 w-4" aria-hidden="true" />
               {t("common.edit")}

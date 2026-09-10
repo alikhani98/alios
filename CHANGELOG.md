@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased - Resource Library Experience
+
+- Added a derived Resource library summary for total resources, common types,
+  in-progress items, and completed items.
+- Added lightweight type, status, and format filters plus newest, oldest,
+  title, recently updated, and progress sorting.
+- Added a local list/grid view preference and a Resource detail route with
+  derived Knowledge, Goal, Project, and Task relationships.
+- Reused the existing Resource repository, Quick Access system, backup shape,
+  and local-first storage boundaries without adding entities, tables,
+  attachments, covers, shelves, collections, OCR, AI, or sync changes.
+
 ## Unreleased - Resource Library Metadata Foundation
 
 - Added optional Resource library metadata for author, format, location,

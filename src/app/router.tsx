@@ -58,6 +58,11 @@ const ResourcesPage = lazyWithRetry(() =>
     default: module.ResourcesPage,
   }))
 );
+const ResourceDetailPage = lazyWithRetry(() =>
+  import("@/features/resources/pages/ResourceDetailPage").then((module) => ({
+    default: module.ResourceDetailPage,
+  }))
+);
 const PersonalManualPage = lazyWithRetry(() =>
   import("@/features/manual/pages/PersonalManualPage").then((module) => ({
     default: module.PersonalManualPage,
@@ -188,6 +193,14 @@ const router = createHashRouter([
         element: (
           <Suspense fallback={<RouteLoadingFallback />}>
             <ResourcesPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "resources/:resourceId",
+        element: (
+          <Suspense fallback={<RouteLoadingFallback />}>
+            <ResourceDetailPage />
           </Suspense>
         ),
       },
