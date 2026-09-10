@@ -1602,6 +1602,22 @@ Stage 173 is complete. The recommended Stage 174 is a behavior-preserving Financ
   pass. TypeScript validation passes; full-suite and production-build
   validation are recorded after this stage's final checks.
 
+## Stage 258 Resource Knowledge Connection
+
+- Added an optional source-owned `resourceId` to `KnowledgeItem` records.
+  Existing Knowledge records remain valid without the field, and legacy
+  `type="resource"` records are not migrated.
+- Added optional Resource selectors to Knowledge create/edit forms and linked
+  Resource summaries with focused navigation and non-destructive unavailable
+  handling.
+- Added derived related-Knowledge sections to Resource cards by loading
+  Knowledge through the Storage Adapter and filtering in memory. No reverse ID
+  arrays, relation table, Dexie index, cascade delete, or Resource sync were
+  added.
+- Extended schema and backup compatibility coverage for linked and legacy
+  Knowledge records. Attachments, covers, library collections, Learning Paths,
+  and AI remain deferred.
+
 ## Rules Before Modifying the Project
 
 1. Read all architecture and state references listed above.

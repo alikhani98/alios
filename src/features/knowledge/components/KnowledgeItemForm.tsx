@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
-import type { Goal, KnowledgeItem, Project, Task } from "@/shared/types";
+import type { Goal, KnowledgeItem, Project, Resource, Task } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
 import { Button, Input, Textarea, Select } from "@/shared/ui";
 import { KNOWLEDGE_TYPE_OPTIONS } from "../constants";
@@ -15,6 +15,7 @@ type KnowledgeItemFormProps = {
   projects?: ReadonlyArray<Project>;
   goals?: ReadonlyArray<Goal>;
   tasks?: ReadonlyArray<Task>;
+  resources?: ReadonlyArray<Resource>;
   isSubmitting: boolean;
   onSubmit: (values: KnowledgeItemFormValues) => Promise<void>;
   onCancel: () => void;
@@ -25,6 +26,7 @@ export function KnowledgeItemForm({
   projects = [],
   goals = [],
   tasks = [],
+  resources = [],
   isSubmitting,
   onSubmit,
   onCancel,
@@ -45,6 +47,7 @@ export function KnowledgeItemForm({
       projectId: item?.projectId ?? "",
       goalId: item?.goalId ?? "",
       taskId: item?.taskId ?? "",
+      resourceId: item?.resourceId ?? "",
     },
   });
   const selectedProjectIsUnavailable =
@@ -54,6 +57,9 @@ export function KnowledgeItemForm({
     Boolean(item?.goalId) && !goals.some((goal) => goal.id === item?.goalId);
   const selectedTaskIsUnavailable =
     Boolean(item?.taskId) && !tasks.some((task) => task.id === item?.taskId);
+  const selectedResourceIsUnavailable =
+    Boolean(item?.resourceId) &&
+    !resources.some((resource) => resource.id === item?.resourceId);
 
   return (
     <form
@@ -132,7 +138,7 @@ export function KnowledgeItemForm({
         />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <div className="grid gap-2">
           <label htmlFor="knowledge-project" className="text-sm font-medium">
             {t("links.projectLabel")}
@@ -185,6 +191,25 @@ export function KnowledgeItemForm({
             {tasks.map((task) => (
               <option key={task.id} value={task.id}>
                 {task.title}
+              </option>
+            ))}
+          </Select>
+        </div>
+
+        <div className="grid gap-2">
+          <label htmlFor="knowledge-resource" className="text-sm font-medium">
+            {t("links.resourceLabel")}
+          </label>
+          <Select id="knowledge-resource" {...register("resourceId")}>
+            <option value="">{t("links.noResource")}</option>
+            {selectedResourceIsUnavailable ? (
+              <option value={item?.resourceId}>
+                {t("links.resourceUnavailable")}
+              </option>
+            ) : null}
+            {resources.map((resource) => (
+              <option key={resource.id} value={resource.id}>
+                {resource.title}
               </option>
             ))}
           </Select>

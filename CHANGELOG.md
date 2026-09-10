@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased - Resource Knowledge Connection
+
+- Added an optional `resourceId` link from Knowledge items to Resources,
+  keeping Resource as the source-material entity and KnowledgeItem as the
+  personal-notes entity.
+- Added Resource selectors and linked-resource summaries to Knowledge forms
+  and cards, including safe unavailable-resource handling.
+- Added derived related-Knowledge lists to Resource cards without persisting
+  reverse links, adding a relation table, changing cascade behavior, or
+  enabling Resource sync.
+- Added schema and backup compatibility coverage for linked Knowledge records
+  and older records without `resourceId`.
+
 ## Unreleased - Resource Foundation
 
 - Added an independent local Resource entity for books, websites, courses,

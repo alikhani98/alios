@@ -12,6 +12,7 @@ export const knowledgeItemFormSchema = knowledgeItemSchema
     projectId: true,
     goalId: true,
     taskId: true,
+    resourceId: true,
   })
   .extend({
     summary: z.string().optional(),
@@ -19,6 +20,7 @@ export const knowledgeItemFormSchema = knowledgeItemSchema
     projectId: z.union([z.string().min(1), z.literal("")]).optional(),
     goalId: z.union([z.string().min(1), z.literal("")]).optional(),
     taskId: z.union([z.string().min(1), z.literal("")]).optional(),
+    resourceId: z.union([z.string().min(1), z.literal("")]).optional(),
   });
 
 export type KnowledgeItemFormValues = z.infer<typeof knowledgeItemFormSchema>;

@@ -141,6 +141,29 @@ describe("backup validation and migration", () => {
     expect(legacyBackup.data.tasks[0]?.projectId).toBeUndefined();
   });
 
+  it("round-trips optional Knowledge resource links and accepts older records", () => {
+    const linkedKnowledge = {
+      ...knowledgeItemRecord,
+      resourceId: resourceRecord.id,
+    };
+    const linkedBackup = validateAndMigrateBackupPayload({
+      app: ALIOS_BACKUP_APP,
+      backupVersion: ALIOS_BACKUP_VERSION,
+      exportedAt: "2026-07-05T08:30:00.000Z",
+      data: { knowledgeItems: [linkedKnowledge] },
+    });
+    const { resourceId: _resourceId, ...legacyKnowledge } = linkedKnowledge;
+    const legacyBackup = validateAndMigrateBackupPayload({
+      app: ALIOS_BACKUP_APP,
+      backupVersion: ALIOS_BACKUP_VERSION,
+      exportedAt: "2026-07-05T08:30:00.000Z",
+      data: { knowledgeItems: [legacyKnowledge] },
+    });
+
+    expect(linkedBackup.data.knowledgeItems[0]?.resourceId).toBe(resourceRecord.id);
+    expect(legacyBackup.data.knowledgeItems[0]?.resourceId).toBeUndefined();
+  });
+
   it("rejects invalid JSON before any restore write can happen", () => {
     expect(() => validateAndMigrateBackup("{")).toThrow(ValidationError);
     try {

@@ -3,7 +3,13 @@ import { StaticRouter } from "react-router-dom/server";
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { I18nProvider, LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
-import { goalRecord, knowledgeItemRecord, projectRecord, taskRecord } from "@/test/factories";
+import {
+  goalRecord,
+  knowledgeItemRecord,
+  projectRecord,
+  resourceRecord,
+  taskRecord,
+} from "@/test/factories";
 
 import { KnowledgeItemCard } from "../components/KnowledgeItemCard";
 
@@ -31,7 +37,7 @@ describe("Knowledge structural links", () => {
     localStorage.setItem(LANGUAGE_STORAGE_KEY, "en");
   });
 
-  it("renders linked Project, Goal, and Task context without affecting wikilinks", () => {
+  it("renders linked Project, Goal, Task, and Resource context without affecting wikilinks", () => {
     const markup = renderKnowledgeCard({
       item: {
         ...knowledgeItemRecord,
@@ -39,10 +45,12 @@ describe("Knowledge structural links", () => {
         projectId: projectRecord.id,
         goalId: goalRecord.id,
         taskId: taskRecord.id,
+        resourceId: resourceRecord.id,
       },
       linkedProject: projectRecord,
       linkedGoal: goalRecord,
       linkedTask: taskRecord,
+      linkedResource: resourceRecord,
     });
 
     expect(markup).toContain("Linked project");
@@ -53,22 +61,27 @@ describe("Knowledge structural links", () => {
     expect(markup).toContain("Linked task");
     expect(markup).toContain(taskRecord.title);
     expect(markup).toContain('href="/today?focusId=fixture-id"');
+    expect(markup).toContain("Linked resource");
+    expect(markup).toContain(resourceRecord.title);
+    expect(markup).toContain('href="/resources?focusId=fixture-id"');
     expect(markup).toContain("[[Testing rule]]");
   });
 
-  it("keeps orphaned Project, Goal, and Task links non-destructive", () => {
+  it("keeps orphaned Project, Goal, Task, and Resource links non-destructive", () => {
     const markup = renderKnowledgeCard({
       item: {
         ...knowledgeItemRecord,
         projectId: "deleted-project",
         goalId: "deleted-goal",
         taskId: "deleted-task",
+        resourceId: "deleted-resource",
       },
     });
 
     expect(markup).toContain("Linked project unavailable");
     expect(markup).toContain("Linked goal unavailable");
     expect(markup).toContain("Linked task unavailable");
+    expect(markup).toContain("Linked resource unavailable");
     expect(markup).toContain("Edit");
   });
 });

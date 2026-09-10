@@ -1,7 +1,8 @@
 import { ExternalLink, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
-import type { Resource } from "@/shared/types";
+import type { KnowledgeItem, Resource } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
 import {
   Badge,
@@ -22,6 +23,7 @@ type ResourceCardProps = {
   isDeleting: boolean;
   onEdit: () => void;
   onDelete: () => Promise<void>;
+  relatedKnowledgeItems?: ReadonlyArray<KnowledgeItem>;
 };
 
 export function ResourceCard({
@@ -29,6 +31,7 @@ export function ResourceCard({
   isDeleting,
   onEdit,
   onDelete,
+  relatedKnowledgeItems = [],
 }: ResourceCardProps) {
   const { t } = useI18n();
   const [confirmingDelete, setConfirmingDelete] = useState(false);
@@ -77,6 +80,23 @@ export function ResourceCard({
           <p className="text-sm text-muted-foreground">
             {t("resources.progressValue", { count: resource.progressPercent })}
           </p>
+        ) : null}
+        {relatedKnowledgeItems.length > 0 ? (
+          <div className="rounded-2xl border border-primary/15 bg-primary/5 p-3">
+            <p className="text-sm font-semibold">{t("resources.relatedKnowledge")}</p>
+            <ul className="mt-2 space-y-2">
+              {relatedKnowledgeItems.map((item) => (
+                <li key={item.id}>
+                  <Link
+                    className="text-sm text-primary underline-offset-4 hover:underline"
+                    to={`/knowledge?focusId=${encodeURIComponent(item.id)}`}
+                  >
+                    {item.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
         ) : null}
       </CardContent>
       <CardFooter className="flex flex-wrap gap-2 border-t pt-4">

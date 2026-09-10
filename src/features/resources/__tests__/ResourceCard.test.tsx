@@ -5,7 +5,8 @@ import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { I18nProvider, LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
-import { resourceRecord } from "@/test/factories";
+import { knowledgeItemRecord, resourceRecord } from "@/test/factories";
+import { MemoryRouter } from "react-router-dom";
 import { ResourceCard } from "../components/ResourceCard";
 
 describe("ResourceCard", () => {
@@ -21,14 +22,17 @@ describe("ResourceCard", () => {
 
     await act(async () => {
       root.render(
-        <I18nProvider>
-          <ResourceCard
-            resource={resourceRecord}
-            isDeleting={false}
-            onEdit={vi.fn()}
-            onDelete={vi.fn(async () => undefined)}
-          />
-        </I18nProvider>
+        <MemoryRouter initialEntries={["/resources"]}>
+          <I18nProvider>
+            <ResourceCard
+              resource={resourceRecord}
+              relatedKnowledgeItems={[knowledgeItemRecord]}
+              isDeleting={false}
+              onEdit={vi.fn()}
+              onDelete={vi.fn(async () => undefined)}
+            />
+          </I18nProvider>
+        </MemoryRouter>
       );
       await Promise.resolve();
     });
@@ -52,5 +56,11 @@ describe("ResourceCard", () => {
         (button) => button.textContent
       )
     ).toEqual(expect.arrayContaining(["Edit", "Delete"]));
+  });
+
+  it("renders derived related Knowledge without requiring reverse IDs", () => {
+    expect(container.textContent).toContain("Related Knowledge");
+    expect(container.textContent).toContain(knowledgeItemRecord.title);
+    expect(container.querySelector('a[href="/knowledge?focusId=fixture-id"]')).not.toBeNull();
   });
 });

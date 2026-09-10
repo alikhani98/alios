@@ -1,8 +1,10 @@
 import { AlertCircle, BookOpen, Plus, RotateCcw, Search, X } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 import type { CreateResourceInput } from "@/core/repositories";
-import type { Resource, ResourceType } from "@/shared/types";
+import { useStorageAdapter } from "@/core/storage";
+import type { KnowledgeItem, Resource, ResourceType } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
 import {
   Button,
@@ -35,6 +37,8 @@ function parseProgress(value: string | undefined): number | undefined {
 
 export function ResourcesPage() {
   const { t } = useI18n();
+  const [searchParams] = useSearchParams();
+  const { knowledge: knowledgeRepository } = useStorageAdapter();
   const {
     resources,
     isLoading,
@@ -53,6 +57,10 @@ export function ResourcesPage() {
   const [typeFilter, setTypeFilter] = useState<ResourceType | "all">("all");
   const [actionError, setActionError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [knowledgeItems, setKnowledgeItems] = useState<KnowledgeItem[]>([]);
+  const [focusedResourceId, setFocusedResourceId] = useState<string | null>(null);
+  const resourceRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const focusId = searchParams.get("focusId");
 
   const filteredResources = useMemo(
     () =>
@@ -140,6 +148,43 @@ export function ResourcesPage() {
   };
 
   const hasFilters = appliedQuery.length > 0 || typeFilter !== "all";
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    void knowledgeRepository.list().then((nextItems) => {
+      if (!isCancelled) {
+        setKnowledgeItems(nextItems);
+      }
+    });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [knowledgeRepository]);
+
+  useEffect(() => {
+    if (!focusId) {
+      setFocusedResourceId(null);
+      return;
+    }
+
+    const focusedResource = resources.find((resource) => resource.id === focusId);
+    if (!focusedResource) {
+      return;
+    }
+
+    setFocusedResourceId(focusId);
+    resourceRefs.current[focusId]?.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+    const timeout = window.setTimeout(() => {
+      setFocusedResourceId((current) => (current === focusId ? null : current));
+    }, 2200);
+
+    return () => window.clearTimeout(timeout);
+  }, [focusId, resources]);
 
   return (
     <section className="alios-page space-y-6">
@@ -269,13 +314,27 @@ export function ResourcesPage() {
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {filteredResources.map((resource) => (
-            <ResourceCard
+            <div
               key={resource.id}
-              resource={resource}
-              isDeleting={deletingId === resource.id}
-              onEdit={() => openEditForm(resource)}
-              onDelete={() => handleDelete(resource)}
-            />
+              ref={(node) => {
+                resourceRefs.current[resource.id] = node;
+              }}
+              className={
+                focusedResourceId === resource.id
+                  ? "rounded-2xl ring-2 ring-primary/50 ring-offset-2 ring-offset-background"
+                  : undefined
+              }
+            >
+              <ResourceCard
+                resource={resource}
+                relatedKnowledgeItems={knowledgeItems.filter(
+                  (item) => item.resourceId === resource.id
+                )}
+                isDeleting={deletingId === resource.id}
+                onEdit={() => openEditForm(resource)}
+                onDelete={() => handleDelete(resource)}
+              />
+            </div>
           ))}
         </div>
       )}

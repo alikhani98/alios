@@ -407,3 +407,20 @@ Dexie / IndexedDB in v1
 - Resource records are intentionally outside the active Supabase sync catalog
   in this stage. Attachments, covers, OCR, AI, collections, physical shelves,
   and Learning Paths remain separate future scopes.
+
+## Resource to Knowledge linking boundary
+
+- A `KnowledgeItem` may store one optional source-owned `resourceId` pointing
+  to a `Resource`. This keeps personal notes and extracted knowledge in the
+  Knowledge domain while allowing them to identify the source material they
+  came from.
+- Resource-side related Knowledge is derived at read time by loading Knowledge
+  through the Storage Adapter and filtering `resourceId` in memory. Resources
+  do not persist reverse Knowledge ID arrays, and the MVP does not introduce a
+  relation table or a new Dexie index.
+- Deleting a Resource does not cascade to Knowledge. A Knowledge card keeps the
+  stored reference and presents the Resource as unavailable until the user
+  edits or unlinks it.
+- The optional field is part of the existing Knowledge backup record shape, so
+  older records and backups without `resourceId` remain valid. Resource itself
+  remains outside the active Supabase sync catalog.

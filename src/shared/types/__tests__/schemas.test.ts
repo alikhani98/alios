@@ -11,6 +11,7 @@ import {
   manualEntrySchema,
   projectSchema,
   resourceSchema,
+  resourceSchema,
   taskSchema,
   routineSchema,
 } from "@/shared/types";
@@ -24,6 +25,7 @@ import {
   lifeAreaRecord,
   manualEntryRecord,
   projectRecord,
+  resourceRecord,
   resourceRecord,
   taskRecord,
   routineRecord,
@@ -89,6 +91,28 @@ describe("core domain schemas", () => {
     expect(journalEntrySchema.safeParse(legacyJournalEntry).success).toBe(true);
     expect(knowledgeItemSchema.safeParse(legacyKnowledgeItem).success).toBe(true);
     expect(decisionLogEntrySchema.safeParse(legacyDecisionEntry).success).toBe(true);
+  });
+
+  it("keeps Knowledge resource links optional and validates non-empty IDs", () => {
+    expect(
+      knowledgeItemSchema.safeParse({
+        ...knowledgeItemRecord,
+        resourceId: resourceRecord.id,
+      }).success
+    ).toBe(true);
+    expect(
+      knowledgeItemSchema.safeParse({
+        ...knowledgeItemRecord,
+        resourceId: "",
+      }).success
+    ).toBe(false);
+    expect(
+      knowledgeItemSchema.safeParse({
+        ...knowledgeItemRecord,
+        resourceId: undefined,
+      }).success
+    ).toBe(true);
+    expect(resourceSchema.safeParse(resourceRecord).success).toBe(true);
   });
 
   it("rejects empty structural Project, Goal, and Task links on Journal, Knowledge, and Decision records", () => {

@@ -894,3 +894,24 @@ versioned backup boundaries. The first Resource stage does not add
 attachments, cover images, OCR, AI, collections, physical shelves, Learning
 Paths, or Supabase sync. Those capabilities require separate scope and
 decisions.
+
+## ADR-084: Link Knowledge to Resources through one optional source-owned ID
+
+**Status:** Accepted (Stage 258)
+
+`KnowledgeItem` may store one optional `resourceId` pointing to the
+independent `Resource` entity. This preserves the domain boundary: a Resource
+represents source material, while a KnowledgeItem represents a user's note,
+insight, lesson, or extracted knowledge.
+
+The Resource-side related-Knowledge view is derived by reading the existing
+Knowledge repository through the Storage Adapter and filtering in memory.
+The MVP deliberately does not persist reverse ID arrays, add a
+`ResourceKnowledgeLink` relation table, add a Dexie index, or introduce
+cascade deletion. If the referenced Resource is deleted, the Knowledge
+record remains intact and its UI reports the link as unavailable.
+
+Because `resourceId` is optional, existing Knowledge records and older backups
+remain valid without migration. Resource remains outside the active Supabase
+sync catalog; syncing a Knowledge record that references a local-only Resource
+does not make that Resource remotely available.
