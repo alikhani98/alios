@@ -2,6 +2,7 @@ export * from "./dailyCheckinsRepository";
 export * from "./journalRepository";
 export * from "./inboxRepository";
 export * from "./knowledgeRepository";
+export * from "./resourceRepository";
 export * from "./manualRepository";
 export * from "./lifeAreasRepository";
 export * from "./decisionLogRepository";

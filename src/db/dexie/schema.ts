@@ -11,6 +11,7 @@ export const DEXIE_SCHEMA_VERSION_10 = 10;
 export const DEXIE_SCHEMA_VERSION_11 = 11;
 export const DEXIE_SCHEMA_VERSION_12 = 12;
 export const DEXIE_SCHEMA_VERSION_13 = 13;
+export const DEXIE_SCHEMA_VERSION_14 = 14;
 
 export const DEXIE_TABLE_NAMES = {
   dailyCheckins: "dailyCheckins",
@@ -31,6 +32,7 @@ export const DEXIE_TABLE_NAMES = {
   routines: "routines",
   weeklyPlans: "weeklyPlans",
   focusSessions: "focusSessions",
+  resources: "resources",
 } as const;
 
 export type DexieTableName =
@@ -131,4 +133,9 @@ export const DEXIE_SCHEMA_V12 = {
 export const DEXIE_SCHEMA_V13 = {
   ...DEXIE_SCHEMA_V12,
   [DEXIE_TABLE_NAMES.financeAssets]: "id, type, createdAt, updatedAt",
+} satisfies Partial<Record<DexieTableName, string>>;
+
+export const DEXIE_SCHEMA_V14 = {
+  ...DEXIE_SCHEMA_V13,
+  [DEXIE_TABLE_NAMES.resources]: "id, type, status, createdAt, updatedAt",
 } satisfies Record<DexieTableName, string>;

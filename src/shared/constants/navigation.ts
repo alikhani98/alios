@@ -122,6 +122,11 @@ export const navigationGroups: NavigationGroup[] = [
         icon: "database",
       },
       {
+        titleKey: "nav.resources",
+        href: "/resources",
+        icon: "book-open",
+      },
+      {
         titleKey: "nav.manual",
         href: "/manual",
         icon: "notebook-text",

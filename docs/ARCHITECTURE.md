@@ -392,3 +392,18 @@ Dexie / IndexedDB in v1
 
 - A pure Settings preview compares validated backup table counts with the current local BackupStorage summary before `restoreBackup` is called.
 - The comparison is read-only and does not alter the validated payload, migration logic, atomic replacement path, or backup format.
+
+## Resource domain boundary
+
+- `Resource` is an independent local-first entity for source material such as
+  books, websites, courses, documents, and videos. It does not replace
+  `KnowledgeItem`, which remains the home for notes, insights, lessons, and
+  extracted knowledge.
+- Resources use their own Zod schema, repository, Dexie table, feature UI, and
+  Storage Adapter entry. Dexie schema version 14 adds only the indexes needed
+  for identity, type, status, and timestamps.
+- The canonical backup payload includes `resources` with a default empty array,
+  so older backups restore safely without a migration of existing records.
+- Resource records are intentionally outside the active Supabase sync catalog
+  in this stage. Attachments, covers, OCR, AI, collections, physical shelves,
+  and Learning Paths remain separate future scopes.

@@ -268,6 +268,7 @@ function getTotalRecords(summary: {
   projects: number;
   journalEntries: number;
   knowledgeItems: number;
+  resources: number;
   settings: number;
   inboxItems: number;
   routines: number;
@@ -286,6 +287,7 @@ function getTotalRecords(summary: {
     summary.projects +
     summary.journalEntries +
     summary.knowledgeItems +
+    summary.resources +
     summary.settings +
     summary.inboxItems +
     summary.routines +
@@ -418,6 +420,7 @@ export function SettingsPage() {
         { label: t("settings.focusSessionsCount"), value: dataManagement.summary.focusSessions },
         { label: t("settings.journalCount"), value: dataManagement.summary.journalEntries },
         { label: t("settings.knowledgeCount"), value: dataManagement.summary.knowledgeItems },
+        { label: t("settings.resourcesCount"), value: dataManagement.summary.resources },
         { label: t("settings.checkinsCount"), value: dataManagement.summary.dailyCheckins },
         { label: t("settings.inboxCount"), value: dataManagement.summary.inboxItems },
         { label: t("settings.settingsCount"), value: dataManagement.summary.settings },

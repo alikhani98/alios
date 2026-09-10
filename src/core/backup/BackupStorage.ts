@@ -15,6 +15,7 @@ export type LocalDataSummary = {
   projects: number;
   journalEntries: number;
   knowledgeItems: number;
+  resources: number;
   settings: number;
   inboxItems: number;
   routines: number;

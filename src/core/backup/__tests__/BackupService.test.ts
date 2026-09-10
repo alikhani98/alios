@@ -18,6 +18,7 @@ import {
   lifeAreaInput,
   manualEntryInput,
   projectInput,
+  resourceInput,
   settingInput,
   taskInput,
   routineInput,
@@ -67,6 +68,7 @@ describe("BackupService with DexieBackupStorage", () => {
     const manualEntry = await storage.manual.create(manualEntryInput);
     const journalEntry = await storage.journal.create(journalEntryInput);
     const knowledgeItem = await storage.knowledge.create(knowledgeItemInput);
+    const resource = await storage.resources.create(resourceInput);
     const dailyCheckin = await storage.dailyCheckins.create(dailyCheckinInput);
     const setting = await storage.settings.create(settingInput);
     const inboxItem = await storage.inbox.create(inboxItemInput);
@@ -98,6 +100,7 @@ describe("BackupService with DexieBackupStorage", () => {
         "projects",
         "journalEntries",
         "knowledgeItems",
+        "resources",
         "settings",
         "inboxItems",
         "routines",
@@ -119,6 +122,7 @@ describe("BackupService with DexieBackupStorage", () => {
     expect(backup.data.financeAssets).toEqual([financeAsset]);
     expect(backup.data.journalEntries).toEqual([journalEntry]);
     expect(backup.data.knowledgeItems).toEqual([knowledgeItem]);
+    expect(backup.data.resources).toEqual([resource]);
     expect(backup.data.dailyCheckins).toEqual([dailyCheckin]);
     expect(backup.data.decisionLogEntries).toEqual([decisionLogEntry]);
     expect(backup.data.manualEntries).toEqual([manualEntry]);
@@ -148,6 +152,7 @@ describe("BackupService with DexieBackupStorage", () => {
       projects: 0,
       journalEntries: 0,
       knowledgeItems: 0,
+      resources: 0,
       settings: 0,
       inboxItems: 0,
       routines: 0,
@@ -206,6 +211,7 @@ describe("BackupService with DexieBackupStorage", () => {
       financeCategoryBudgets: _omittedFinanceCategoryBudgets,
       financeAssets: _omittedFinanceAssets,
       focusSessions: _omittedFocusSessions,
+      resources: _omittedResources,
       ...oldData
     } = backup.data;
     const oldBackup = service.parseBackup(JSON.stringify({ ...backup, data: oldData }));
@@ -215,6 +221,7 @@ describe("BackupService with DexieBackupStorage", () => {
     expect(oldBackup.data.financeCategoryBudgets).toEqual([]);
     expect(oldBackup.data.financeAssets).toEqual([]);
     expect(oldBackup.data.focusSessions).toEqual([]);
+    expect(oldBackup.data.resources).toEqual([]);
     expect(oldBackup.data.goals).toEqual([]);
     expect(oldBackup.data.decisionLogEntries).toEqual([]);
     expect(oldBackup.data.manualEntries).toEqual([]);

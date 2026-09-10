@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased - Resource Foundation
+
+- Added an independent local Resource entity for books, websites, courses,
+  documents, and videos without replacing or migrating KnowledgeItem records.
+- Added Resource CRUD, local search, type filtering, status/progress fields,
+  and the `/resources` route using the existing Repository and Storage Adapter
+  patterns.
+- Added Dexie schema version 14 and included Resources in backup, restore,
+  backup preview, and local-data summaries. Older backups remain compatible.
+- Kept Resources outside Supabase sync and deferred attachments, covers, OCR,
+  AI, collections, physical shelves, and Learning Paths.
+
 ## Unreleased - Content to Task Linking
 
 - Added optional `taskId` links to Journal, Decision Log, and Knowledge records using the existing one-way structural link pattern.

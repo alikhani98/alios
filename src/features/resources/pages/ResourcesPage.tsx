@@ -1,0 +1,284 @@
+import { AlertCircle, BookOpen, Plus, RotateCcw, Search, X } from "lucide-react";
+import { useMemo, useState } from "react";
+
+import type { CreateResourceInput } from "@/core/repositories";
+import type { Resource, ResourceType } from "@/shared/types";
+import { useI18n } from "@/shared/i18n";
+import {
+  Button,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  EmptyState,
+  Input,
+  PremiumCard,
+  SectionHeader,
+  Select,
+} from "@/shared/ui";
+import { ResourceCard } from "../components/ResourceCard";
+import { ResourceForm } from "../components/ResourceForm";
+import {
+  RESOURCE_TYPE_OPTIONS,
+} from "../constants";
+import { useResources } from "../hooks/useResources";
+import type { ResourceFormValues } from "../types";
+
+function parseProgress(value: string | undefined): number | undefined {
+  if (!value?.trim()) {
+    return undefined;
+  }
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed >= 0 && parsed <= 100
+    ? parsed
+    : undefined;
+}
+
+export function ResourcesPage() {
+  const { t } = useI18n();
+  const {
+    resources,
+    isLoading,
+    error,
+    loadResources,
+    createResource,
+    updateResource,
+    deleteResource,
+  } = useResources();
+  const [formOpen, setFormOpen] = useState(false);
+  const [editingResource, setEditingResource] = useState<Resource | undefined>();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
+  const [appliedQuery, setAppliedQuery] = useState("");
+  const [typeFilter, setTypeFilter] = useState<ResourceType | "all">("all");
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const filteredResources = useMemo(
+    () =>
+      typeFilter === "all"
+        ? resources
+        : resources.filter((resource) => resource.type === typeFilter),
+    [resources, typeFilter]
+  );
+
+  const openCreateForm = () => {
+    setEditingResource(undefined);
+    setFormOpen(true);
+    setActionError(null);
+  };
+
+  const openEditForm = (resource: Resource) => {
+    setEditingResource(resource);
+    setFormOpen(true);
+    setActionError(null);
+  };
+
+  const closeForm = () => {
+    setFormOpen(false);
+    setEditingResource(undefined);
+  };
+
+  const handleSearch = async () => {
+    const nextQuery = query.trim();
+    setAppliedQuery(nextQuery);
+    await loadResources(nextQuery);
+  };
+
+  const clearSearch = async () => {
+    setQuery("");
+    setAppliedQuery("");
+    setTypeFilter("all");
+    await loadResources();
+  };
+
+  const handleSubmit = async (values: ResourceFormValues) => {
+    setIsSubmitting(true);
+    setActionError(null);
+    setSuccessMessage(null);
+    const input: CreateResourceInput = {
+      title: values.title,
+      type: values.type,
+      description: values.description || undefined,
+      source: values.source || undefined,
+      url: values.url || undefined,
+      status: values.status,
+      progressPercent: parseProgress(values.progressPercent),
+    };
+
+    try {
+      if (editingResource) {
+        await updateResource(editingResource.id, input);
+        setSuccessMessage(t("resources.updated"));
+      } else {
+        await createResource(input);
+        setSuccessMessage(t("resources.created"));
+      }
+      closeForm();
+    } catch (submitError) {
+      setActionError(
+        submitError instanceof Error ? submitError.message : t("resources.saveError")
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDelete = async (resource: Resource) => {
+    setDeletingId(resource.id);
+    setActionError(null);
+    try {
+      await deleteResource(resource.id);
+      setSuccessMessage(t("resources.deleted"));
+    } catch (deleteError) {
+      setActionError(
+        deleteError instanceof Error ? deleteError.message : t("resources.deleteError")
+      );
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  const hasFilters = appliedQuery.length > 0 || typeFilter !== "all";
+
+  return (
+    <section className="alios-page space-y-6">
+      <PremiumCard className="alios-now-surface">
+        <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+          <SectionHeader
+            icon={<BookOpen className="h-5 w-5" />}
+            title={t("resources.title")}
+            description={t("resources.description")}
+          />
+          <Button type="button" onClick={openCreateForm}>
+            <Plus className="me-2 h-4 w-4" aria-hidden="true" />
+            {t("resources.new")}
+          </Button>
+        </CardContent>
+      </PremiumCard>
+
+      {formOpen ? (
+        <PremiumCard>
+          <CardHeader>
+            <CardTitle>
+              {editingResource ? t("resources.edit") : t("resources.create")}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ResourceForm
+              resource={editingResource}
+              isSubmitting={isSubmitting}
+              onSubmit={handleSubmit}
+              onCancel={closeForm}
+            />
+          </CardContent>
+        </PremiumCard>
+      ) : null}
+
+      <PremiumCard>
+        <CardContent className="pt-6">
+          <form
+            className="grid gap-3 md:grid-cols-[1fr_12rem_auto]"
+            onSubmit={(event) => {
+              event.preventDefault();
+              void handleSearch();
+            }}
+          >
+            <div className="relative">
+              <Search className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                aria-label={t("resources.searchLabel")}
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder={t("resources.searchPlaceholder")}
+                className="ps-9"
+              />
+            </div>
+            <Select
+              aria-label={t("resources.filterLabel")}
+              value={typeFilter}
+              onChange={(event) =>
+                setTypeFilter(event.target.value as ResourceType | "all")
+              }
+            >
+              <option value="all">{t("resources.allTypes")}</option>
+              {RESOURCE_TYPE_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {t(option.labelKey)}
+                </option>
+              ))}
+            </Select>
+            <div className="flex flex-wrap gap-2">
+              <Button type="submit">{t("resources.search")}</Button>
+              {hasFilters ? (
+                <Button type="button" variant="ghost" onClick={() => void clearSearch()}>
+                  <X className="me-2 h-4 w-4" aria-hidden="true" />
+                  {t("resources.clear")}
+                </Button>
+              ) : null}
+            </div>
+          </form>
+        </CardContent>
+      </PremiumCard>
+
+      {successMessage ? (
+        <div role="status" className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm">
+          {successMessage}
+        </div>
+      ) : null}
+
+      {error || actionError ? (
+        <div role="alert" className="flex flex-col gap-3 rounded-xl border border-destructive/30 bg-destructive/5 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-2 text-sm text-destructive">
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+            <span className="min-w-0 break-words">{actionError ?? error}</span>
+          </div>
+          {error ? (
+            <Button type="button" size="sm" variant="outline" onClick={() => void loadResources(appliedQuery)}>
+              <RotateCcw className="me-2 h-4 w-4" aria-hidden="true" />
+              {t("common.tryAgain")}
+            </Button>
+          ) : null}
+        </div>
+      ) : null}
+
+      {isLoading ? (
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" aria-label={t("resources.loading")}>
+          {[0, 1, 2].map((item) => (
+            <div key={item} className="h-56 animate-pulse rounded-2xl border bg-muted/60" />
+          ))}
+        </div>
+      ) : filteredResources.length === 0 ? (
+        <EmptyState
+          icon={<BookOpen className="h-6 w-6" />}
+          title={hasFilters ? t("resources.noResultsTitle") : t("resources.emptyTitle")}
+          description={hasFilters ? t("resources.noResultsDescription") : t("resources.emptyDescription")}
+          actions={
+            hasFilters ? (
+              <Button type="button" variant="outline" onClick={() => void clearSearch()}>
+                {t("resources.clear")}
+              </Button>
+            ) : (
+              <Button type="button" onClick={openCreateForm}>
+                <Plus className="me-2 h-4 w-4" aria-hidden="true" />
+                {t("resources.emptyAction")}
+              </Button>
+            )
+          }
+        />
+      ) : (
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {filteredResources.map((resource) => (
+            <ResourceCard
+              key={resource.id}
+              resource={resource}
+              isDeleting={deletingId === resource.id}
+              onEdit={() => openEditForm(resource)}
+              onDelete={() => handleDelete(resource)}
+            />
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}

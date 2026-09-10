@@ -7,6 +7,7 @@ export * from "./DexieDecisionLogRepository";
 export * from "./DexieGoalsRepository";
 export * from "./DexieLifeAreasRepository";
 export * from "./DexieKnowledgeRepository";
+export * from "./DexieResourceRepository";
 export * from "./DexieManualRepository";
 export * from "./DexieProjectsRepository";
 export * from "./DexieSettingsRepository";

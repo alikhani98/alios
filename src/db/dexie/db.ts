@@ -15,6 +15,7 @@ import type {
   KnowledgeItem,
   ManualEntry,
   Project,
+  Resource,
   Setting,
   Task,
   Routine,
@@ -35,6 +36,7 @@ import {
   DEXIE_SCHEMA_V11,
   DEXIE_SCHEMA_V12,
   DEXIE_SCHEMA_V13,
+  DEXIE_SCHEMA_V14,
   DEXIE_SCHEMA_VERSION,
   DEXIE_SCHEMA_VERSION_3,
   DEXIE_SCHEMA_VERSION_4,
@@ -47,6 +49,7 @@ import {
   DEXIE_SCHEMA_VERSION_11,
   DEXIE_SCHEMA_VERSION_12,
   DEXIE_SCHEMA_VERSION_13,
+  DEXIE_SCHEMA_VERSION_14,
 } from "./schema";
 
 export class AliosDatabase extends Dexie {
@@ -68,6 +71,7 @@ export class AliosDatabase extends Dexie {
   routines!: Table<Routine, string>;
   weeklyPlans!: Table<WeeklyPlan, string>;
   focusSessions!: Table<FocusSession, string>;
+  resources!: Table<Resource, string>;
 
   constructor() {
     super(DEXIE_DATABASE_NAME);
@@ -84,6 +88,7 @@ export class AliosDatabase extends Dexie {
     this.version(DEXIE_SCHEMA_VERSION_11).stores(DEXIE_SCHEMA_V11);
     this.version(DEXIE_SCHEMA_VERSION_12).stores(DEXIE_SCHEMA_V12);
     this.version(DEXIE_SCHEMA_VERSION_13).stores(DEXIE_SCHEMA_V13);
+    this.version(DEXIE_SCHEMA_VERSION_14).stores(DEXIE_SCHEMA_V14);
   }
 }
 

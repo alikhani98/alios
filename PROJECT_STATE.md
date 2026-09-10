@@ -1584,6 +1584,24 @@ Stage 173 is complete. The recommended Stage 174 is a behavior-preserving Financ
 - Pull request validation: configured (`.github/workflows/ci.yml`)
 - Last verified: 2026-07-26
 
+## Stage 257 Resource Foundation
+
+- Added `Resource` as an independent local-first domain for books, websites,
+  courses, documents, and videos. `KnowledgeItem` remains unchanged and no
+  existing `type="resource"` records are migrated.
+- Added the Zod model, Dexie version 14 table, repository/storage-adapter
+  boundary, local CRUD/search/filter UI at `/resources`, and advanced
+  navigation access.
+- Added Resource records to the canonical backup payload, restore validation,
+  Settings data counts, and backup preview. Older backups without
+  `resources` normalize safely to an empty collection.
+- Resource is intentionally outside the active Supabase sync catalog. Covers,
+  attachments, OCR, AI, collections, physical shelves, and Learning Paths
+  remain future work.
+- Focused schema, repository, backup, settings-preview, and ResourceCard tests
+  pass. TypeScript validation passes; full-suite and production-build
+  validation are recorded after this stage's final checks.
+
 ## Rules Before Modifying the Project
 
 1. Read all architecture and state references listed above.

@@ -15,6 +15,7 @@ export const BACKUP_TABLE_KEYS = [
   "projects",
   "journalEntries",
   "knowledgeItems",
+  "resources",
   "settings",
   "inboxItems",
   "routines",

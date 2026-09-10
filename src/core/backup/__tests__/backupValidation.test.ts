@@ -16,6 +16,7 @@ import {
   lifeAreaRecord,
   manualEntryRecord,
   projectRecord,
+  resourceRecord,
   settingRecord,
   taskRecord,
   routineRecord,
@@ -67,6 +68,7 @@ describe("backup validation and migration", () => {
     expect(migrated.data.financeCategoryBudgets).toEqual([]);
     expect(migrated.data.financeAssets).toEqual([]);
     expect(migrated.data.focusSessions).toEqual([]);
+    expect(migrated.data.resources).toEqual([]);
     expect(migrated.data.inboxItems).toEqual([]);
     expect(migrated.data.tasks).not.toBe(payload.data.tasks);
   });
@@ -97,6 +99,7 @@ describe("backup validation and migration", () => {
     expect(backup.data.financeCategoryBudgets).toEqual([]);
     expect(backup.data.financeAssets).toEqual([]);
     expect(backup.data.focusSessions).toEqual([]);
+    expect(backup.data.resources).toEqual([]);
     expect(backup.data.inboxItems).toEqual([]);
   });
 
@@ -231,6 +234,7 @@ describe("backup validation and migration", () => {
       projects: [projectRecord],
       journalEntries: [journalEntryRecord],
       knowledgeItems: [knowledgeItemRecord],
+      resources: [resourceRecord],
       settings: [settingRecord],
       inboxItems: [inboxItemRecord],
       routines: [routineRecord],
@@ -248,5 +252,6 @@ describe("backup validation and migration", () => {
     expect(normalized.routines).not.toBe(input.routines);
     expect(normalized.weeklyPlans).not.toBe(input.weeklyPlans);
     expect(normalized.focusSessions).not.toBe(input.focusSessions);
+    expect(normalized.resources).not.toBe(input.resources);
   });
 });

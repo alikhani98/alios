@@ -9,6 +9,7 @@ import type {
   ManualRepository,
   InboxRepository,
   KnowledgeRepository,
+  ResourceRepository,
   ProjectsRepository,
   SettingsRepository,
   TasksRepository,
@@ -33,5 +34,6 @@ export interface StorageAdapter {
   projects: ProjectsRepository;
   journal: JournalRepository;
   knowledge: KnowledgeRepository;
+  resources: ResourceRepository;
   settings: SettingsRepository;
 }

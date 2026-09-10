@@ -2,6 +2,7 @@ export * from "./daily-checkin";
 export * from "./journal";
 export * from "./inbox";
 export * from "./knowledge";
+export * from "./resource";
 export * from "./manual";
 export * from "./life-area";
 export * from "./finance";

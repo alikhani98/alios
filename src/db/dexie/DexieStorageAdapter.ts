@@ -11,6 +11,7 @@ import {
   DexieJournalRepository,
   DexieInboxRepository,
   DexieKnowledgeRepository,
+  DexieResourceRepository,
   DexieManualRepository,
   DexieProjectsRepository,
   DexieSettingsRepository,
@@ -35,6 +36,7 @@ export class DexieStorageAdapter implements StorageAdapter {
   readonly projects: DexieProjectsRepository;
   readonly journal: DexieJournalRepository;
   readonly knowledge: DexieKnowledgeRepository;
+  readonly resources: DexieResourceRepository;
   readonly settings: DexieSettingsRepository;
 
   constructor(readonly database: AliosDatabase = aliosDatabase) {
@@ -53,6 +55,7 @@ export class DexieStorageAdapter implements StorageAdapter {
     this.projects = new DexieProjectsRepository(database);
     this.journal = new DexieJournalRepository(database);
     this.knowledge = new DexieKnowledgeRepository(database);
+    this.resources = new DexieResourceRepository(database);
     this.settings = new DexieSettingsRepository(database);
   }
 }

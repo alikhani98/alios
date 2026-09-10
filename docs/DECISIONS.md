@@ -878,3 +878,19 @@ Reverse display remains derived at read time: Today reads the relevant local rep
 No Dexie index is required for this relationship because the approved implementation does not issue direct indexed `taskId` queries. Existing records that omit `taskId` remain valid because the field is optional.
 
 Deleting or changing a Task does not cascade to Journal, Decision Log, or Knowledge records. Source cards tolerate orphaned task links and show the linked Task as unavailable so user-authored records remain editable, unlinkable, exportable, and restorable without destructive side effects.
+
+## ADR-083: Keep Resource separate from KnowledgeItem
+
+**Status:** Accepted (Stage 257)
+
+AliOS introduces `Resource` as an independent local-first entity for source
+material: books, websites, courses, documents, and videos. `KnowledgeItem`
+continues to represent personal notes, insights, lessons, and extracted
+knowledge. Existing KnowledgeItem records, including records with the legacy
+`type="resource"` value, are left untouched and are not migrated.
+
+Resource uses the existing feature, repository, Storage Adapter, Dexie, and
+versioned backup boundaries. The first Resource stage does not add
+attachments, cover images, OCR, AI, collections, physical shelves, Learning
+Paths, or Supabase sync. Those capabilities require separate scope and
+decisions.

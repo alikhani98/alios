@@ -60,6 +60,7 @@ export function useLocalDataManagement() {
         projects: 0,
         journalEntries: 0,
         knowledgeItems: 0,
+        resources: 0,
         inboxItems: 0,
         routines: 0,
         weeklyPlans: 0,

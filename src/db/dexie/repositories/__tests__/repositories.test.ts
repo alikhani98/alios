@@ -16,6 +16,7 @@ import {
   lifeAreaInput,
   manualEntryInput,
   projectInput,
+  resourceInput,
   settingInput,
   taskInput,
   routineInput,
@@ -154,6 +155,26 @@ describe("Dexie repositories", () => {
     await storage.knowledge.delete(created.id);
     expect(await storage.knowledge.list()).toEqual([]);
     expect(await storage.knowledge.getById(created.id)).toBeUndefined();
+  });
+
+  it("supports the complete Resource CRUD lifecycle", async () => {
+    const created = await storage.resources.create(resourceInput);
+
+    expect(created.id).toMatch(/^[0-9a-f-]{36}$/i);
+    expect(await storage.resources.list()).toEqual([created]);
+    expect(await storage.resources.search("architecture")).toEqual([created]);
+    expect(await storage.resources.getById(created.id)).toEqual(created);
+
+    const updated = await storage.resources.update(created.id, {
+      title: "Updated resource",
+      progressPercent: 80,
+    });
+    expect(updated.title).toBe("Updated resource");
+    expect(updated.progressPercent).toBe(80);
+
+    await storage.resources.delete(created.id);
+    expect(await storage.resources.list()).toEqual([]);
+    expect(await storage.resources.getById(created.id)).toBeUndefined();
   });
 
   it("persists optional Knowledge project, goal, and task links without requiring them", async () => {

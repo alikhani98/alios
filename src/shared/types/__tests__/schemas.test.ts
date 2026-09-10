@@ -10,6 +10,7 @@ import {
   lifeAreaSchema,
   manualEntrySchema,
   projectSchema,
+  resourceSchema,
   taskSchema,
   routineSchema,
 } from "@/shared/types";
@@ -23,6 +24,7 @@ import {
   lifeAreaRecord,
   manualEntryRecord,
   projectRecord,
+  resourceRecord,
   taskRecord,
   routineRecord,
 } from "@/test/factories";
@@ -175,6 +177,25 @@ describe("core domain schemas", () => {
     ).toBe(false);
   });
 
+  it("accepts valid resources and keeps optional resource links safe", () => {
+    expect(resourceSchema.safeParse(resourceRecord).success).toBe(true);
+    expect(
+      resourceSchema.safeParse({
+        ...resourceRecord,
+        goalId: undefined,
+        projectId: undefined,
+        taskId: undefined,
+        progressPercent: 100,
+      }).success
+    ).toBe(true);
+    expect(
+      resourceSchema.safeParse({ ...resourceRecord, type: "unknown" }).success
+    ).toBe(false);
+    expect(
+      resourceSchema.safeParse({ ...resourceRecord, progressPercent: 101 }).success
+    ).toBe(false);
+  });
+
   it("accepts a valid routine task", () => {
     expect(
       taskSchema.safeParse({
@@ -220,6 +241,7 @@ describe("core domain schemas", () => {
     ["daily check-in", dailyCheckinSchema, dailyCheckinRecord],
     ["decision log entry", decisionLogEntrySchema, decisionLogRecord],
     ["inbox item", inboxItemSchema, inboxItemRecord],
+    ["resource", resourceSchema, resourceRecord],
   ])("accepts a valid %s", (_name, schema, value) => {
     expect(schema.safeParse(value).success).toBe(true);
   });

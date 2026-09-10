@@ -10,6 +10,7 @@ import type {
   CreateJournalEntryInput,
   CreateInboxItemInput,
   CreateKnowledgeItemInput,
+  CreateResourceInput,
   CreateLifeAreaInput,
   CreateManualEntryInput,
   CreateProjectInput,
@@ -29,6 +30,7 @@ import type {
   JournalEntry,
   InboxItem,
   KnowledgeItem,
+  Resource,
   ManualEntry,
   LifeArea,
   Project,
@@ -138,6 +140,16 @@ export const financeObligationInput: CreateFinanceObligationInput = {
   notes: "Monthly installment for the phone",
 };
 
+export const resourceInput: CreateResourceInput = {
+  title: "AliOS architecture",
+  type: "document",
+  description: "Architecture notes for the local-first system.",
+  source: "Project documentation",
+  url: "https://example.com/alios",
+  status: "in_progress",
+  progressPercent: 40,
+};
+
 export const financeCategoryBudgetInput: CreateFinanceCategoryBudgetInput = {
   category: "groceries",
   monthlyLimitAmount: 1200,
@@ -234,6 +246,10 @@ export const journalEntryRecord: JournalEntry = {
 };
 export const knowledgeItemRecord: KnowledgeItem = {
   ...knowledgeItemInput,
+  ...metadata,
+};
+export const resourceRecord: Resource = {
+  ...resourceInput,
   ...metadata,
 };
 export const dailyCheckinRecord: DailyCheckin = {
