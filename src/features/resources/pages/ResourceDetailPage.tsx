@@ -3,11 +3,6 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { useStorageAdapter } from "@/core/storage";
-import {
-  findLinkedGoalById,
-  findLinkedProjectById,
-  findLinkedTaskById,
-} from "@/shared/entityLinks";
 import { useDateFormatter } from "@/shared/date";
 import { useI18n } from "@/shared/i18n";
 import type { Goal, KnowledgeItem, Project, Resource, Task } from "@/shared/types";
@@ -27,13 +22,20 @@ import {
   RESOURCE_STATUS_OPTIONS,
   RESOURCE_TYPE_LABEL_KEYS,
 } from "../constants";
+import {
+  deriveResourceRelationshipContext,
+  type ResourceRelationship,
+} from "../resourceRelationships";
 
 type DetailState = {
   resource: Resource | null;
   knowledgeItems: KnowledgeItem[];
-  goal?: Goal;
-  project?: Project;
-  task?: Task;
+  directGoal?: Goal;
+  directProject?: Project;
+  directTask?: Task;
+  derivedGoals: ResourceRelationship[];
+  derivedProjects: ResourceRelationship[];
+  derivedTasks: ResourceRelationship[];
 };
 
 export function ResourceDetailPage() {
@@ -51,6 +53,9 @@ export function ResourceDetailPage() {
   const [state, setState] = useState<DetailState>({
     resource: null,
     knowledgeItems: [],
+    derivedGoals: [],
+    derivedProjects: [],
+    derivedTasks: [],
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -77,14 +82,29 @@ export function ResourceDetailPage() {
           return;
         }
 
+        const relationshipContext = resource
+          ? deriveResourceRelationshipContext(
+              resource,
+              knowledgeItems,
+              goals,
+              projects,
+              tasks
+            )
+          : {
+              directGoal: undefined,
+              directProject: undefined,
+              directTask: undefined,
+              derivedGoals: [],
+              derivedProjects: [],
+              derivedTasks: [],
+            };
+
         setState({
           resource: resource ?? null,
           knowledgeItems: knowledgeItems.filter(
             (item) => item.resourceId === resource?.id
           ),
-          goal: resource ? findLinkedGoalById(resource, goals) : undefined,
-          project: resource ? findLinkedProjectById(resource, projects) : undefined,
-          task: resource ? findLinkedTaskById(resource, tasks) : undefined,
+          ...relationshipContext,
         });
         setError(false);
       })
@@ -244,7 +264,10 @@ export function ResourceDetailPage() {
       {(state.knowledgeItems.length > 0 ||
         resource.goalId ||
         resource.projectId ||
-        resource.taskId) ? (
+        resource.taskId ||
+        state.derivedGoals.length > 0 ||
+        state.derivedProjects.length > 0 ||
+        state.derivedTasks.length > 0) ? (
         <PremiumCard>
           <CardHeader>
             <CardTitle>{t("resources.relatedItems")}</CardTitle>
@@ -268,40 +291,141 @@ export function ResourceDetailPage() {
               </div>
             ) : null}
             {resource.goalId || resource.projectId || resource.taskId ? (
-              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                {resource.goalId ? (
-                  <RelatedLink
-                    label={t("links.goalLabel")}
-                    title={state.goal?.title}
-                    unavailable={t("links.goalUnavailable")}
-                    href={state.goal ? `/goals?focusId=${encodeURIComponent(state.goal.id)}` : undefined}
-                    openLabel={t("links.openGoal")}
-                  />
-                ) : null}
-                {resource.projectId ? (
-                  <RelatedLink
-                    label={t("links.projectLabel")}
-                    title={state.project?.title}
-                    unavailable={t("links.projectUnavailable")}
-                    href={state.project ? `/projects?focusId=${encodeURIComponent(state.project.id)}` : undefined}
-                    openLabel={t("links.openProject")}
-                  />
-                ) : null}
-                {resource.taskId ? (
-                  <RelatedLink
-                    label={t("links.taskLabel")}
-                    title={state.task?.title}
-                    unavailable={t("links.taskUnavailable")}
-                    href={state.task ? `/today?focusId=${encodeURIComponent(state.task.id)}` : undefined}
-                    openLabel={t("links.openTask")}
-                  />
-                ) : null}
+              <div className="space-y-3">
+                <h2 className="text-sm font-semibold">
+                  {t("resources.directRelationships")}
+                </h2>
+                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                  {resource.goalId ? (
+                    <RelatedLink
+                      label={t("links.goalLabel")}
+                      title={state.directGoal?.title}
+                      unavailable={t("links.goalUnavailable")}
+                      href={
+                        state.directGoal
+                          ? `/goals?focusId=${encodeURIComponent(state.directGoal.id)}`
+                          : undefined
+                      }
+                      openLabel={t("links.openGoal")}
+                    />
+                  ) : null}
+                  {resource.projectId ? (
+                    <RelatedLink
+                      label={t("links.projectLabel")}
+                      title={state.directProject?.title}
+                      unavailable={t("links.projectUnavailable")}
+                      href={
+                        state.directProject
+                          ? `/projects?focusId=${encodeURIComponent(state.directProject.id)}`
+                          : undefined
+                      }
+                      openLabel={t("links.openProject")}
+                    />
+                  ) : null}
+                  {resource.taskId ? (
+                    <RelatedLink
+                      label={t("links.taskLabel")}
+                      title={state.directTask?.title}
+                      unavailable={t("links.taskUnavailable")}
+                      href={
+                        state.directTask
+                          ? `/today?focusId=${encodeURIComponent(state.directTask.id)}`
+                          : undefined
+                      }
+                      openLabel={t("links.openTask")}
+                    />
+                  ) : null}
+                </div>
+              </div>
+            ) : null}
+            {state.derivedGoals.length > 0 ||
+            state.derivedProjects.length > 0 ||
+            state.derivedTasks.length > 0 ? (
+              <div className="space-y-4 border-t border-border/70 pt-4">
+                <h2 className="text-sm font-semibold">
+                  {t("resources.derivedContext")}
+                </h2>
+                <DerivedRelationshipGroup
+                  label={t("resources.derivedGoals")}
+                  items={state.derivedGoals}
+                  provenanceLabel={t("resources.fromProvenance")}
+                  provenanceLabels={{
+                    direct: t("resources.provenanceDirect"),
+                    knowledge: t("resources.provenanceKnowledge"),
+                    project: t("resources.provenanceProject"),
+                    task: t("resources.provenanceTask"),
+                  }}
+                  hrefPrefix="/goals?focusId="
+                />
+                <DerivedRelationshipGroup
+                  label={t("resources.derivedProjects")}
+                  items={state.derivedProjects}
+                  provenanceLabel={t("resources.fromProvenance")}
+                  provenanceLabels={{
+                    direct: t("resources.provenanceDirect"),
+                    knowledge: t("resources.provenanceKnowledge"),
+                    project: t("resources.provenanceProject"),
+                    task: t("resources.provenanceTask"),
+                  }}
+                  hrefPrefix="/projects?focusId="
+                />
+                <DerivedRelationshipGroup
+                  label={t("resources.derivedTasks")}
+                  items={state.derivedTasks}
+                  provenanceLabel={t("resources.fromProvenance")}
+                  provenanceLabels={{
+                    direct: t("resources.provenanceDirect"),
+                    knowledge: t("resources.provenanceKnowledge"),
+                    project: t("resources.provenanceProject"),
+                    task: t("resources.provenanceTask"),
+                  }}
+                  hrefPrefix="/today?focusId="
+                />
               </div>
             ) : null}
           </CardContent>
         </PremiumCard>
       ) : null}
     </section>
+  );
+}
+
+function DerivedRelationshipGroup({
+  label,
+  items,
+  provenanceLabel,
+  provenanceLabels,
+  hrefPrefix,
+}: {
+  label: string;
+  items: ReadonlyArray<ResourceRelationship>;
+  provenanceLabel: string;
+  provenanceLabels: Record<ResourceRelationship["provenance"], string>;
+  hrefPrefix: string;
+}) {
+  if (items.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="space-y-2">
+      <h2 className="text-sm font-semibold">{label}</h2>
+      <ul className="space-y-2">
+        {items.map((item) => (
+          <li key={item.id} className="flex min-w-0 flex-wrap items-center gap-2 text-sm">
+            <Link
+              className="min-w-0 break-words text-primary underline-offset-4 hover:underline"
+              to={`${hrefPrefix}${encodeURIComponent(item.id)}`}
+            >
+              {item.title}
+            </Link>
+            <span className="text-xs text-muted-foreground">
+              {provenanceLabel}: {provenanceLabels[item.provenance]}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 

@@ -23,6 +23,9 @@ export const resourceFormSchema = z
     location: z.string().optional(),
     startedAt: z.union([dateOnlySchema, z.literal("")]).optional(),
     completedAt: z.union([dateOnlySchema, z.literal("")]).optional(),
+    goalId: z.union([z.string().min(1), z.literal("")]).optional(),
+    projectId: z.union([z.string().min(1), z.literal("")]).optional(),
+    taskId: z.union([z.string().min(1), z.literal("")]).optional(),
     status: resourceStatusSchema,
     progressPercent: z
       .string()

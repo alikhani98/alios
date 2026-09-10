@@ -1,6 +1,5 @@
 import {
   AlertCircle,
-  ArrowDownAZ,
   ArrowDownUp,
   BookOpen,
   CheckCircle2,
@@ -17,10 +16,13 @@ import { useSearchParams } from "react-router-dom";
 import type { CreateResourceInput } from "@/core/repositories";
 import { useStorageAdapter } from "@/core/storage";
 import type {
+  Goal,
   KnowledgeItem,
+  Project,
   Resource,
   ResourceFormat,
   ResourceStatus,
+  Task,
   ResourceType,
 } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
@@ -66,7 +68,12 @@ function parseProgress(value: string | undefined): number | undefined {
 export function ResourcesPage() {
   const { t } = useI18n();
   const [searchParams] = useSearchParams();
-  const { knowledge: knowledgeRepository } = useStorageAdapter();
+  const {
+    knowledge: knowledgeRepository,
+    goals: goalsRepository,
+    projects: projectsRepository,
+    tasks: tasksRepository,
+  } = useStorageAdapter();
   const {
     resources,
     isLoading,
@@ -89,6 +96,9 @@ export function ResourcesPage() {
   const [actionError, setActionError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [knowledgeItems, setKnowledgeItems] = useState<KnowledgeItem[]>([]);
+  const [goals, setGoals] = useState<Goal[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [focusedResourceId, setFocusedResourceId] = useState<string | null>(null);
   const resourceRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const { value: viewMode, setValue: setViewMode } = useResourceViewMode();
@@ -158,6 +168,9 @@ export function ResourcesPage() {
       location: values.location || undefined,
       startedAt: values.startedAt || undefined,
       completedAt: values.completedAt || undefined,
+      goalId: values.goalId || undefined,
+      projectId: values.projectId || undefined,
+      taskId: values.taskId || undefined,
       status: values.status,
       progressPercent: parseProgress(values.progressPercent),
     };
@@ -204,16 +217,24 @@ export function ResourcesPage() {
   useEffect(() => {
     let isCancelled = false;
 
-    void knowledgeRepository.list().then((nextItems) => {
+    void Promise.all([
+      knowledgeRepository.list(),
+      goalsRepository.list(),
+      projectsRepository.list(),
+      tasksRepository.list(),
+    ]).then(([nextKnowledge, nextGoals, nextProjects, nextTasks]) => {
       if (!isCancelled) {
-        setKnowledgeItems(nextItems);
+        setKnowledgeItems(nextKnowledge);
+        setGoals(nextGoals);
+        setProjects(nextProjects);
+        setTasks(nextTasks);
       }
     });
 
     return () => {
       isCancelled = true;
     };
-  }, [knowledgeRepository]);
+  }, [goalsRepository, knowledgeRepository, projectsRepository, tasksRepository]);
 
   useEffect(() => {
     if (!focusId) {
@@ -264,6 +285,9 @@ export function ResourcesPage() {
           <CardContent>
             <ResourceForm
               resource={editingResource}
+              goals={goals}
+              projects={projects}
+              tasks={tasks}
               isSubmitting={isSubmitting}
               onSubmit={handleSubmit}
               onCancel={closeForm}

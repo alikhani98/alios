@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useWatch } from "react-hook-form";
 
-import type { Resource } from "@/shared/types";
+import type { Goal, Project, Resource, Task } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
 import { Button, Input, Select, Textarea } from "@/shared/ui";
 import {
@@ -16,6 +16,9 @@ type ResourceFormProps = {
   isSubmitting: boolean;
   onSubmit: (values: ResourceFormValues) => Promise<void>;
   onCancel: () => void;
+  goals: ReadonlyArray<Goal>;
+  projects: ReadonlyArray<Project>;
+  tasks: ReadonlyArray<Task>;
 };
 
 export function ResourceForm({
@@ -23,6 +26,9 @@ export function ResourceForm({
   isSubmitting,
   onSubmit,
   onCancel,
+  goals,
+  projects,
+  tasks,
 }: ResourceFormProps) {
   const { t } = useI18n();
   const {
@@ -43,6 +49,9 @@ export function ResourceForm({
       location: resource?.location ?? "",
       startedAt: resource?.startedAt ?? "",
       completedAt: resource?.completedAt ?? "",
+      goalId: resource?.goalId ?? "",
+      projectId: resource?.projectId ?? "",
+      taskId: resource?.taskId ?? "",
       status: resource?.status ?? "unread",
       progressPercent:
         resource?.progressPercent === undefined
@@ -229,6 +238,64 @@ export function ResourceForm({
             type="date"
             {...register("completedAt")}
           />
+        </div>
+      </div>
+
+      <div className="grid gap-4 rounded-2xl border border-border/70 bg-muted/20 p-4 sm:p-5 md:grid-cols-3">
+        <div className="grid gap-2">
+          <label htmlFor="resource-goal" className="text-sm font-medium">
+            {t("resources.relatedGoal")}
+          </label>
+          <Select id="resource-goal" {...register("goalId")}>
+            <option value="">{t("resources.noRelatedGoal")}</option>
+            {resource?.goalId && !goals.some((goal) => goal.id === resource.goalId) ? (
+              <option value={resource.goalId}>
+                {resource.goalId} ({t("links.goalUnavailable")})
+              </option>
+            ) : null}
+            {goals.map((goal) => (
+              <option key={goal.id} value={goal.id}>
+                {goal.title}
+              </option>
+            ))}
+          </Select>
+        </div>
+        <div className="grid gap-2">
+          <label htmlFor="resource-project" className="text-sm font-medium">
+            {t("resources.relatedProject")}
+          </label>
+          <Select id="resource-project" {...register("projectId")}>
+            <option value="">{t("resources.noRelatedProject")}</option>
+            {resource?.projectId &&
+            !projects.some((project) => project.id === resource.projectId) ? (
+              <option value={resource.projectId}>
+                {resource.projectId} ({t("links.projectUnavailable")})
+              </option>
+            ) : null}
+            {projects.map((project) => (
+              <option key={project.id} value={project.id}>
+                {project.title}
+              </option>
+            ))}
+          </Select>
+        </div>
+        <div className="grid gap-2">
+          <label htmlFor="resource-task" className="text-sm font-medium">
+            {t("resources.relatedTask")}
+          </label>
+          <Select id="resource-task" {...register("taskId")}>
+            <option value="">{t("resources.noRelatedTask")}</option>
+            {resource?.taskId && !tasks.some((task) => task.id === resource.taskId) ? (
+              <option value={resource.taskId}>
+                {resource.taskId} ({t("links.taskUnavailable")})
+              </option>
+            ) : null}
+            {tasks.map((task) => (
+              <option key={task.id} value={task.id}>
+                {task.title}
+              </option>
+            ))}
+          </Select>
         </div>
       </div>
 

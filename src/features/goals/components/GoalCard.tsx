@@ -40,6 +40,7 @@ import {
 import { createLifeAreaFocusPath } from "../goalAreaNavigation";
 import { createGoalProjectsPath, type GoalProjectProgress } from "../goalProjectProgress";
 import { createTodayTasksPath } from "@/features/routines/routineTaskLinks";
+import type { ResourceRelationship } from "@/features/resources/resourceRelationships";
 
 type GoalCardProps = {
   goal: Goal;
@@ -48,6 +49,7 @@ type GoalCardProps = {
   linkedJournalEntries?: ReadonlyArray<JournalEntry>;
   linkedDecisions?: ReadonlyArray<DecisionLogEntry>;
   linkedKnowledgeItems?: ReadonlyArray<KnowledgeItem>;
+  linkedResources?: ReadonlyArray<ResourceRelationship>;
   isProjectProgressLoading?: boolean;
   useAutoProgress?: boolean;
   isDeleting: boolean;
@@ -66,6 +68,7 @@ export function GoalCard({
   linkedJournalEntries = [],
   linkedDecisions = [],
   linkedKnowledgeItems = [],
+  linkedResources = [],
   isProjectProgressLoading,
   useAutoProgress = false,
   isDeleting,
@@ -386,6 +389,37 @@ export function GoalCard({
                     <p className="text-xs text-muted-foreground">
                       {formatDateTime(item.updatedAt)}
                     </p>
+                  </li>
+                ))}
+              </ul>
+            </SoftPanel>
+          ) : null}
+
+          {linkedResources.length > 0 ? (
+            <SoftPanel className="space-y-3 border-primary/15 bg-background/80">
+              <p className="flex items-center gap-2 text-sm font-semibold">
+                <BookOpen className="h-4 w-4 shrink-0 text-primary" />
+                {t("resources.supportingResources")}
+              </p>
+              <ul className="space-y-2">
+                {linkedResources.map((resource) => (
+                  <li key={resource.id} className="flex min-w-0 flex-wrap items-center gap-2 text-sm">
+                    <Link
+                      className="min-w-0 break-words text-primary underline-offset-4 hover:underline"
+                      to={`/resources/${encodeURIComponent(resource.id)}`}
+                    >
+                      {resource.title}
+                    </Link>
+                    {resource.provenance !== "direct" ? (
+                      <span className="text-xs text-muted-foreground">
+                        {t("resources.fromProvenance")}:{" "}
+                        {resource.provenance === "knowledge"
+                          ? t("resources.provenanceKnowledge")
+                          : resource.provenance === "project"
+                            ? t("resources.provenanceProject")
+                            : t("resources.provenanceTask")}
+                      </span>
+                    ) : null}
                   </li>
                 ))}
               </ul>

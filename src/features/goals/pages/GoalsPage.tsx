@@ -18,7 +18,14 @@ import { useStorageAdapter } from "@/core/storage";
 import { useProjects } from "@/features/projects/hooks/useProjects";
 import { useI18n } from "@/shared/i18n";
 import { useViewDensityMode } from "@/shared/preferences/viewDensityMode";
-import type { DecisionLogEntry, Goal, JournalEntry, KnowledgeItem, Task } from "@/shared/types";
+import type {
+  DecisionLogEntry,
+  Goal,
+  JournalEntry,
+  KnowledgeItem,
+  Resource,
+  Task,
+} from "@/shared/types";
 import {
   Button,
   CollapsibleSection,
@@ -60,6 +67,9 @@ import {
   previewGoalTemplateBody,
 } from "../goalTemplates";
 import { useGoals } from "../hooks/useGoals";
+import {
+  deriveResourcesForGoal,
+} from "@/features/resources/resourceRelationships";
 import type { GoalFormSeed, GoalFormValues } from "../types";
 
 function splitTags(value: string): string[] {
@@ -200,6 +210,7 @@ export function GoalsPage() {
     journal: journalRepository,
     decisions: decisionsRepository,
     knowledge: knowledgeRepository,
+    resources: resourcesRepository,
   } = useStorageAdapter();
   const [searchParams, setSearchParams] = useSearchParams();
   const {
@@ -226,6 +237,7 @@ export function GoalsPage() {
   const [linkedJournalEntries, setLinkedJournalEntries] = useState<JournalEntry[]>([]);
   const [linkedDecisions, setLinkedDecisions] = useState<DecisionLogEntry[]>([]);
   const [linkedKnowledgeItems, setLinkedKnowledgeItems] = useState<KnowledgeItem[]>([]);
+  const [resources, setResources] = useState<Resource[]>([]);
   const [linkedContentLoadError, setLinkedContentLoadError] = useState<string | null>(null);
   const [formOpen, setFormOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<Goal | undefined>();
@@ -284,23 +296,32 @@ export function GoalsPage() {
     setLinkedContentLoadError(null);
 
     try {
-      const [journalEntries, decisionEntries, knowledgeItems] =
+      const [journalEntries, decisionEntries, knowledgeItems, resourceItems] =
         await Promise.all([
           journalRepository.list(),
           decisionsRepository.list(),
           knowledgeRepository.list(),
+          resourcesRepository.list(),
         ]);
 
       setLinkedJournalEntries(journalEntries);
       setLinkedDecisions(decisionEntries);
       setLinkedKnowledgeItems(knowledgeItems);
+      setResources(resourceItems);
     } catch {
       setLinkedJournalEntries([]);
       setLinkedDecisions([]);
       setLinkedKnowledgeItems([]);
+      setResources([]);
       setLinkedContentLoadError(t("links.relatedContentLoadError"));
     }
-  }, [decisionsRepository, journalRepository, knowledgeRepository, t]);
+  }, [
+    decisionsRepository,
+    journalRepository,
+    knowledgeRepository,
+    resourcesRepository,
+    t,
+  ]);
 
   useEffect(() => {
     void loadLinkedContent();
@@ -964,6 +985,13 @@ export function GoalsPage() {
                       linkedKnowledgeItems={linkedKnowledgeItems.filter(
                         (item) => item.goalId === goal.id
                       )}
+                      linkedResources={deriveResourcesForGoal(
+                        goal.id,
+                        resources,
+                        linkedKnowledgeItems,
+                        projects,
+                        tasks
+                      )}
                       isProjectProgressLoading={isProjectProgressLoading}
                       useAutoProgress={autoProgressGoalIds.includes(goal.id)}
                       isDeleting={deletingId === goal.id}
@@ -1047,6 +1075,13 @@ export function GoalsPage() {
                   )}
                   linkedKnowledgeItems={linkedKnowledgeItems.filter(
                     (item) => item.goalId === goal.id
+                  )}
+                  linkedResources={deriveResourcesForGoal(
+                    goal.id,
+                    resources,
+                    linkedKnowledgeItems,
+                    projects,
+                    tasks
                   )}
                   isProjectProgressLoading={isProjectProgressLoading}
                   useAutoProgress={autoProgressGoalIds.includes(goal.id)}

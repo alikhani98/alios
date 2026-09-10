@@ -11,6 +11,7 @@ import type {
   KnowledgeItem,
   Project,
   ProjectStatus,
+  Resource,
   Task,
 } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
@@ -29,6 +30,9 @@ import { ProjectCard } from "../components/ProjectCard";
 import { ProjectForm } from "../components/ProjectForm";
 import { ProjectKanbanBoard } from "../components/ProjectKanbanBoard";
 import { useProjects } from "../hooks/useProjects";
+import {
+  deriveResourcesForProject,
+} from "@/features/resources/resourceRelationships";
 import { findGoalProjectFilter, findLinkedGoal } from "../projectGoalLinks";
 import { getProjectTaskProgress } from "../projectTaskProgress";
 import { clearDueProjectReviewDate, isProjectReviewDue } from "../projectReviews";
@@ -71,6 +75,7 @@ export function ProjectsPage() {
     journal: journalRepository,
     decisions: decisionsRepository,
     knowledge: knowledgeRepository,
+    resources: resourcesRepository,
   } = useStorageAdapter();
   const [searchParams] = useSearchParams();
   const {
@@ -102,6 +107,7 @@ export function ProjectsPage() {
   const [linkedJournalEntries, setLinkedJournalEntries] = useState<JournalEntry[]>([]);
   const [linkedDecisions, setLinkedDecisions] = useState<DecisionLogEntry[]>([]);
   const [linkedKnowledgeItems, setLinkedKnowledgeItems] = useState<KnowledgeItem[]>([]);
+  const [resources, setResources] = useState<Resource[]>([]);
   const [linkedContentLoadError, setLinkedContentLoadError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"list" | "kanban">("list");
   const [draggedProjectId, setDraggedProjectId] = useState<string | null>(null);
@@ -137,23 +143,32 @@ export function ProjectsPage() {
     setLinkedContentLoadError(null);
 
     try {
-      const [journalEntries, decisionEntries, knowledgeItems] =
+      const [journalEntries, decisionEntries, knowledgeItems, resourceItems] =
         await Promise.all([
           journalRepository.list(),
           decisionsRepository.list(),
           knowledgeRepository.list(),
+          resourcesRepository.list(),
         ]);
 
       setLinkedJournalEntries(journalEntries);
       setLinkedDecisions(decisionEntries);
       setLinkedKnowledgeItems(knowledgeItems);
+      setResources(resourceItems);
     } catch {
       setLinkedJournalEntries([]);
       setLinkedDecisions([]);
       setLinkedKnowledgeItems([]);
+      setResources([]);
       setLinkedContentLoadError(t("links.relatedContentLoadError"));
     }
-  }, [decisionsRepository, journalRepository, knowledgeRepository, t]);
+  }, [
+    decisionsRepository,
+    journalRepository,
+    knowledgeRepository,
+    resourcesRepository,
+    t,
+  ]);
 
   useEffect(() => {
     void loadLinkedContent();
@@ -553,6 +568,12 @@ export function ProjectsPage() {
                 )}
                 linkedKnowledgeItems={linkedKnowledgeItems.filter(
                   (item) => item.projectId === project.id
+                )}
+                linkedResources={deriveResourcesForProject(
+                  project.id,
+                  resources,
+                  linkedKnowledgeItems,
+                  tasks
                 )}
                 taskProgress={getProjectTaskProgress(project.id, tasks)}
                 isLinkedGoalLoading={isGoalsLoading}
