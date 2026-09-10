@@ -1,5 +1,19 @@
 # Changelog
 
+## Unreleased - Personalized Quick Access
+
+- Added a versioned local `alios.quickAccess` preference for a compact
+  personal launcher without creating a Dexie entity, repository, backup
+  payload, or sync path.
+- Added a static module registry and repository-backed resolver for current
+  module routes and entity titles, with safe unavailable handling for deleted
+  or missing targets.
+- Added the compact Home launcher and Settings > Personalization management
+  with enable/disable, remove, accessible reorder controls, module additions,
+  and reset defaults.
+- Added additive pin/unpin actions to Goal, Project, Resource, Knowledge, and
+  Routine surfaces.
+
 ## Unreleased - Resource Knowledge Connection
 
 - Added an optional `resourceId` link from Knowledge items to Resources,

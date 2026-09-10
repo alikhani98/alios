@@ -17,6 +17,7 @@ import { useDateFormatter } from "@/shared/date";
 import { useI18n } from "@/shared/i18n";
 import type { DecisionLogEntry, Goal, JournalEntry, KnowledgeItem } from "@/shared/types";
 import { cn } from "@/shared/utils";
+import { QuickAccessToggleButton } from "@/shared/quickAccess";
 import {
   Badge,
   Button,
@@ -454,6 +455,7 @@ export function GoalCard({
               {t("goals.reactivate")}
             </Button>
           )}
+          <QuickAccessToggleButton itemType="goal" targetId={goal.id} />
         </div>
       </CardContent>
     </Card>

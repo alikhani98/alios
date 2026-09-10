@@ -14,6 +14,7 @@ import {
   CardTitle,
   LinkedEntitySummary,
 } from "@/shared/ui";
+import { QuickAccessToggleButton } from "@/shared/quickAccess";
 import { KNOWLEDGE_TYPE_LABEL_KEYS } from "../constants";
 
 type KnowledgeItemCardProps = {
@@ -108,7 +109,8 @@ export function KnowledgeItemCard({
               onClick={() => void onDelete()}
             >
               {isDeleting ? t("common.deleting") : t("common.confirmDelete")}
-            </Button>
+              </Button>
+            <QuickAccessToggleButton itemType="knowledge" targetId={item.id} />
             <Button
               type="button"
               size="sm"

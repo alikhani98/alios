@@ -915,3 +915,20 @@ Because `resourceId` is optional, existing Knowledge records and older backups
 remain valid without migration. Resource remains outside the active Supabase
 sync catalog; syncing a Knowledge record that references a local-only Resource
 does not make that Resource remotely available.
+
+## ADR-085: Keep Quick Access as a local personalization preference
+
+**Status:** Accepted (Stage 259)
+
+Quick Access stores a versioned local preference under
+`alios.quickAccess`. Each item contains only a stable shortcut ID, item type,
+optional entity target ID, order, and enabled state. Titles, routes, and icons
+are resolved from the static module registry or the current repository data so
+they do not become duplicated or stale persisted state.
+
+The MVP does not add a Dexie table, repository, relation table, backup payload,
+or Supabase sync behavior. Quick Access is device-local personalization, while
+the underlying Goals, Projects, Resources, Knowledge items, and Routines remain
+the authoritative domain records. Deleting a target does not cascade into the
+preference; the resolver reports the shortcut as unavailable and lets the user
+remove it.

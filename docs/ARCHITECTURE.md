@@ -424,3 +424,15 @@ Dexie / IndexedDB in v1
 - The optional field is part of the existing Knowledge backup record shape, so
   older records and backups without `resourceId` remain valid. Resource itself
   remains outside the active Supabase sync catalog.
+
+## Personalized Quick Access boundary
+
+Quick Access is a local preference rather than a domain entity. The versioned
+`alios.quickAccess` object stores only shortcut identity, optional entity
+target, order, and enabled state. It intentionally does not create a Dexie
+table, repository, relation table, backup section, or Supabase sync path.
+
+Module metadata is defined by a static registry. Entity shortcut titles and
+routes are resolved at read time through the Storage Adapter and existing
+repositories. If an entity is deleted, the preference remains non-destructive
+and the UI reports an unavailable shortcut that the user can remove.

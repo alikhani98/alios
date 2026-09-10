@@ -78,6 +78,7 @@ import { useBackupRestore } from "../hooks/useBackupRestore";
 import { useLocalDataManagement } from "../hooks/useLocalDataManagement";
 import type { BackupStatusFreshness } from "@/shared/preferences";
 import { checkForServiceWorkerUpdate, type ServiceWorkerUpdateResult } from "@/shared/pwa";
+import { QuickAccessManager } from "@/shared/quickAccess";
 
 const LazySettingsHelpCenter = lazy(() =>
   import("../components/SettingsHelpCenter").then((module) => ({
@@ -378,6 +379,7 @@ export function SettingsPage() {
   const [helpCenterOpen, setHelpCenterOpen] = useState(false);
   const [additionalPreferencesOpen, setAdditionalPreferencesOpen] =
     useState(false);
+  const [quickAccessOpen, setQuickAccessOpen] = useState(false);
   const [exportCenterOpen, setExportCenterOpen] = useState(false);
   const [advancedDeveloperOpen, setAdvancedDeveloperOpen] = useState(false);
   const [advancedLocalToolsOpen, setAdvancedLocalToolsOpen] = useState(false);
@@ -875,8 +877,22 @@ export function SettingsPage() {
       </Card>
         </div>
 
-        <CollapsibleSection
-          id="settings-additional-preferences"
+      <CollapsibleSection
+        id="settings-personalization-group"
+        title={t("settings.personalizationTitle")}
+        description={t("settings.personalizationDescription")}
+        icon={<SlidersHorizontal className="h-4 w-4" />}
+        expandLabel={t("common.expandSection")}
+        collapseLabel={t("common.collapseSection")}
+        defaultOpen={false}
+        open={quickAccessOpen}
+        onOpenChange={setQuickAccessOpen}
+      >
+        {quickAccessOpen ? <QuickAccessManager /> : null}
+      </CollapsibleSection>
+
+      <CollapsibleSection
+        id="settings-additional-preferences"
           title={t("settings.additionalPreferences")}
           description={t("settings.additionalPreferencesDescription")}
           icon={<SlidersHorizontal className="h-4 w-4" />}

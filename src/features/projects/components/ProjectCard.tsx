@@ -35,6 +35,7 @@ import {
   SoftPanel,
 } from "@/shared/ui";
 import { cn } from "@/shared/utils";
+import { QuickAccessToggleButton } from "@/shared/quickAccess";
 import {
   PROJECT_PRIORITY_LABEL_KEYS,
   PROJECT_STATUS_LABEL_KEYS,
@@ -310,7 +311,8 @@ export function ProjectCard({
               onClick={() => void onDelete()}
             >
               {isDeleting ? t("common.deleting") : t("common.confirmDelete")}
-            </Button>
+              </Button>
+            <QuickAccessToggleButton itemType="project" targetId={project.id} />
             <Button
               type="button"
               size="sm"

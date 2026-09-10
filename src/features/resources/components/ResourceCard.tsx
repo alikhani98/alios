@@ -13,6 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/shared/ui";
+import { QuickAccessToggleButton } from "@/shared/quickAccess";
 import {
   RESOURCE_STATUS_OPTIONS,
   RESOURCE_TYPE_LABEL_KEYS,
@@ -110,7 +111,8 @@ export function ResourceCard({
               onClick={() => void onDelete()}
             >
               {isDeleting ? t("common.deleting") : t("common.confirmDelete")}
-            </Button>
+              </Button>
+            <QuickAccessToggleButton itemType="resource" targetId={resource.id} />
             <Button
               type="button"
               size="sm"

@@ -22,6 +22,7 @@ import { WellnessBadmintonCard } from "@/features/wellness";
 import { useDateFormatter } from "@/shared/date";
 import { useBackupStatus } from "@/shared/hooks";
 import { useI18n, type TranslationKey } from "@/shared/i18n";
+import { QuickAccessLauncher } from "@/shared/quickAccess";
 import { getBackupAgeInDays } from "@/shared/preferences/backupStatus";
 import {
   Badge,
@@ -559,6 +560,7 @@ export function UnifiedHomePage() {
         <>
           <DailyBriefingCard data={data} />
           <ClearStartCard data={data} />
+          <QuickAccessLauncher />
           <TodayContextStrip inboxCount={data.inbox.unprocessedCount} />
           <TodayWorkspace
             today={today}

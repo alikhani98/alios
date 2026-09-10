@@ -7,6 +7,7 @@ import {
   MORNING_WARMUP_DISMISSED_DATE_STORAGE_KEY,
   MORNING_WARMUP_ENABLED_STORAGE_KEY,
   RECOVERY_MODE_ENABLED_STORAGE_KEY,
+  QUICK_ACCESS_STORAGE_KEY,
 } from "@/shared/constants/preferences";
 import { CALENDAR_DISPLAY_STORAGE_KEY } from "@/shared/date/formatDate";
 import { LOCAL_ERROR_LOG_STORAGE_KEY } from "@/shared/error/localErrorLog";
@@ -97,6 +98,12 @@ export const PREFERENCE_REGISTRY = [
     category: "account-synced",
     label: "Weekly task budget",
     notes: "Planning preference rather than device-specific runtime state.",
+  },
+  {
+    key: QUICK_ACCESS_STORAGE_KEY,
+    category: "device-local",
+    label: "Quick Access",
+    notes: "Local launcher personalization; intentionally not backed up or synced in MVP.",
   },
   {
     key: MORNING_WARMUP_ENABLED_STORAGE_KEY,

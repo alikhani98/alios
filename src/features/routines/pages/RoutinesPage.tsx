@@ -26,6 +26,7 @@ import {
   SectionHeader,
   SoftPanel,
 } from "@/shared/ui";
+import { QuickAccessToggleButton } from "@/shared/quickAccess";
 
 import {
   ROUTINE_WEEKDAY_LABEL_KEYS,
@@ -318,6 +319,7 @@ export function RoutinesPage() {
                       <Trash2 className="me-2 h-4 w-4" />
                       {deletingId === routine.id ? t("common.deleting") : t("common.delete")}
                     </Button>
+                    <QuickAccessToggleButton itemType="routine" targetId={routine.id} />
                   </div>
                 </CardContent>
               </PremiumCard>

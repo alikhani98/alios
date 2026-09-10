@@ -119,6 +119,10 @@ vi.mock("@/features/today/components/TodayWorkspace", () => ({
   ),
 }));
 
+vi.mock("@/shared/quickAccess", () => ({
+  QuickAccessLauncher: () => null,
+}));
+
 let mockedDashboardData: HomeDashboardData = dashboardData;
 let mockedBackupStatus: BackupStatusMetadata | null = null;
 let mockedBackupFreshness: BackupStatusFreshness = "fresh";
