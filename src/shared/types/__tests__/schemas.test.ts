@@ -11,7 +11,6 @@ import {
   manualEntrySchema,
   projectSchema,
   resourceSchema,
-  resourceSchema,
   taskSchema,
   routineSchema,
 } from "@/shared/types";
@@ -25,7 +24,6 @@ import {
   lifeAreaRecord,
   manualEntryRecord,
   projectRecord,
-  resourceRecord,
   resourceRecord,
   taskRecord,
   routineRecord,

@@ -28,6 +28,7 @@ const expectedNavigationHrefs = [
   "/life-areas",
   "/journal",
   "/knowledge",
+  "/resources",
   "/manual",
   "/finance",
   "/settings",

@@ -27,8 +27,8 @@ describe("quick access preferences", () => {
     ).toEqual({
       version: 1,
       items: [
-        { id: "module:today", itemType: "module", order: 0, enabled: true },
-        { id: "goal:g1", itemType: "goal", targetId: "g1", order: 1, enabled: true },
+        { id: "goal:g1", itemType: "goal", targetId: "g1", order: 0, enabled: true },
+        { id: "module:today", itemType: "module", order: 1, enabled: true },
       ],
     });
   });
