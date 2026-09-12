@@ -151,6 +151,44 @@ function buildSummary(): WeeklyReviewSummary {
         },
       ],
     },
+    reviewResurfacing: {
+      knowledgeCandidates: [
+        {
+          id: "s256-knowledge",
+          type: "knowledge",
+          title: "S256 Knowledge Review",
+          to: "/knowledge?focusId=s256-knowledge",
+          reason: "linkedActiveGoal",
+          context: {
+            type: "goal",
+            title: "S256 Goal Review",
+            to: "/goals?focusId=s256-goal",
+          },
+          sortKey: "2026-07-06T08:00:00.000Z",
+          score: 90,
+        },
+      ],
+      resourceCandidates: [],
+      existingReviewCandidates: [],
+      topCandidates: [
+        {
+          id: "s256-knowledge",
+          type: "knowledge",
+          title: "S256 Knowledge Review",
+          to: "/knowledge?focusId=s256-knowledge",
+          reason: "linkedActiveGoal",
+          context: {
+            type: "goal",
+            title: "S256 Goal Review",
+            to: "/goals?focusId=s256-goal",
+          },
+          sortKey: "2026-07-06T08:00:00.000Z",
+          score: 90,
+        },
+      ],
+      totalCandidateCount: 1,
+      hasAnyCandidates: true,
+    },
     financeSummary: {
       transactionCount: 1,
       incomeInWindow: 1000,
@@ -264,6 +302,15 @@ describe("WeeklyReviewPage density bands", () => {
     expect(markup).toContain("S256 Goal Review");
     expect(markup).toContain("S256 Life Area Review");
     expect(markup).toContain("S256 Manual Review");
+  });
+
+  it("renders compact knowledge resurfacing candidates with reasons", () => {
+    const markup = renderWeeklyReviewPage();
+
+    expect(markup).toContain("Knowledge to Revisit");
+    expect(markup).toContain("S256 Knowledge Review");
+    expect(markup).toContain("Linked to an active goal");
+    expect(markup).toContain('href="/knowledge?focusId=s256-knowledge"');
   });
 
   it("renders focus observations and suggested focus once inside the weekly signals band", () => {

@@ -41,6 +41,12 @@ import {
 import { formatFinanceAmount } from "@/features/finance/financeCalculations";
 import { createLinkedGoalPath } from "@/features/projects/projectGoalLinks";
 import { createProjectTodayTasksPath } from "@/features/projects/projectTaskProgress";
+import type {
+  ReviewResurfacingCandidate,
+  ReviewResurfacingCandidateType,
+  ReviewResurfacingContextType,
+  ReviewResurfacingReason,
+} from "@/features/review";
 import {
   GOAL_AREA_LABEL_KEYS,
   GOAL_IMPORTANCE_LABEL_KEYS,
@@ -312,6 +318,72 @@ function getReviewQueueReasonKey(item: ReviewQueueItem): TranslationKey {
   }
 }
 
+function getReviewResurfacingTypeLabelKey(
+  type: ReviewResurfacingCandidateType
+): TranslationKey {
+  switch (type) {
+    case "knowledge":
+      return "nav.knowledge";
+    case "resource":
+      return "nav.resources";
+    case "goal":
+      return "nav.goals";
+    case "project":
+      return "nav.projects";
+    case "manual":
+      return "nav.manual";
+    case "decision":
+    default:
+      return "nav.decisions";
+  }
+}
+
+function getReviewResurfacingContextLabelKey(
+  type: ReviewResurfacingContextType
+): TranslationKey {
+  switch (type) {
+    case "goal":
+      return "nav.goals";
+    case "project":
+      return "nav.projects";
+    case "resource":
+    default:
+      return "nav.resources";
+  }
+}
+
+function getReviewResurfacingReasonKey(
+  reason: ReviewResurfacingReason
+): TranslationKey {
+  switch (reason) {
+    case "linkedActiveGoal":
+      return "weeklyReview.resurfacingReasonLinkedActiveGoal";
+    case "linkedInProgressResource":
+      return "weeklyReview.resurfacingReasonLinkedInProgressResource";
+    case "olderKnowledge":
+      return "weeklyReview.resurfacingReasonOlderKnowledge";
+    case "recentLearningKnowledge":
+      return "weeklyReview.resurfacingReasonRecentLearningKnowledge";
+    case "resourceInProgress":
+      return "weeklyReview.resurfacingReasonResourceInProgress";
+    case "resourceLinkedActiveGoal":
+      return "weeklyReview.resurfacingReasonResourceLinkedActiveGoal";
+    case "resourceLinkedActiveProject":
+      return "weeklyReview.resurfacingReasonResourceLinkedActiveProject";
+    case "staleResource":
+      return "weeklyReview.resurfacingReasonStaleResource";
+    case "goalReviewDue":
+      return "weeklyReview.resurfacingReasonGoalReviewDue";
+    case "projectReviewDue":
+      return "weeklyReview.resurfacingReasonProjectReviewDue";
+    case "decisionReviewDue":
+      return "weeklyReview.resurfacingReasonDecisionReviewDue";
+    case "manualReviewDue":
+    default:
+      return "weeklyReview.resurfacingReasonManualReviewDue";
+  }
+}
+
 export function WeeklyReviewPage() {
   const { language, t } = useI18n();
   const { formatDate, formatDateTime } = useDateFormatter();
@@ -379,6 +451,15 @@ export function WeeklyReviewPage() {
   const displayedSuggestedFocus = showAllSuggestedFocus
     ? summary?.suggestedFocus ?? []
     : summary?.suggestedFocus.slice(0, insightPreviewLimit) ?? [];
+  const resurfacingPreviewLimit = isSimpleView ? 4 : 6;
+  const displayedReviewResurfacingCandidates =
+    summary?.reviewResurfacing.topCandidates.slice(0, resurfacingPreviewLimit) ??
+    [];
+  const hiddenReviewResurfacingCount = Math.max(
+    (summary?.reviewResurfacing.totalCandidateCount ?? 0) -
+      displayedReviewResurfacingCandidates.length,
+    0
+  );
   const hiddenPlanningAttentionCount = Math.max(
     (summary?.planningSummary.attentionEntries.length ?? 0) - displayedPlanningAttentionEntries.length,
     0
@@ -453,6 +534,55 @@ export function WeeklyReviewPage() {
         </Button>
         <Button asChild size="sm" variant="outline" className="w-full sm:w-auto">
           <Link to={item.to}>{t(getReviewQueueLabelKey(item))}</Link>
+        </Button>
+      </div>
+    </SoftPanel>
+  );
+
+  const renderReviewResurfacingCandidate = (
+    item: ReviewResurfacingCandidate
+  ) => (
+    <SoftPanel
+      key={`${item.type}-${item.id}-${item.reason}`}
+      className="space-y-4 bg-background/90"
+    >
+      <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0 flex-1 space-y-1">
+          <p className="min-w-0 break-words text-base font-semibold leading-7">
+            {item.title}
+          </p>
+          <p className="text-sm leading-6 text-muted-foreground">
+            {t(getReviewResurfacingReasonKey(item.reason))}
+          </p>
+        </div>
+        <div className="flex shrink-0 flex-wrap gap-2">
+          <Badge variant="secondary">
+            {t(getReviewResurfacingTypeLabelKey(item.type))}
+          </Badge>
+          <StatusChip
+            tone={
+              item.type === "knowledge" || item.type === "resource"
+                ? "primary"
+                : "warning"
+            }
+          >
+            {t("weeklyReview.revisit")}
+          </StatusChip>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-2 border-t border-border/70 pt-3 sm:flex-row sm:flex-wrap sm:items-center">
+        {item.context ? (
+          <Link
+            to={item.context.to}
+            className="min-h-10 rounded-full border border-border bg-muted px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            {t(getReviewResurfacingContextLabelKey(item.context.type))}:{" "}
+            {item.context.title}
+          </Link>
+        ) : null}
+        <Button asChild size="sm" variant="outline" className="w-full sm:w-auto">
+          <Link to={item.to}>{t("weeklyReview.openReviewCandidate")}</Link>
         </Button>
       </div>
     </SoftPanel>
@@ -770,6 +900,49 @@ export function WeeklyReviewPage() {
                   </div>
                 </PremiumCard>
               )}
+
+              <CollapsibleSection
+                id="weekly-review-knowledge-resurfacing"
+                title={t("weeklyReview.knowledgeToRevisitTitle")}
+                description={t("weeklyReview.knowledgeToRevisitDescription")}
+                icon={<Brain className="h-5 w-5" />}
+                status={
+                  <StatusChip
+                    tone={
+                      summary.reviewResurfacing.hasAnyCandidates
+                        ? "primary"
+                        : "neutral"
+                    }
+                  >
+                    {summary.reviewResurfacing.totalCandidateCount}
+                  </StatusChip>
+                }
+                defaultOpen={summary.reviewResurfacing.hasAnyCandidates}
+                contentClassName="space-y-4"
+              >
+                {displayedReviewResurfacingCandidates.length === 0 ? (
+                  <EmptyState
+                    icon={<Brain className="h-6 w-6" />}
+                    title={t("weeklyReview.knowledgeToRevisitEmptyTitle")}
+                    description={t("weeklyReview.knowledgeToRevisitEmptyDescription")}
+                  />
+                ) : (
+                  <>
+                    <div className="grid gap-3">
+                      {displayedReviewResurfacingCandidates.map((item) =>
+                        renderReviewResurfacingCandidate(item)
+                      )}
+                    </div>
+                    {hiddenReviewResurfacingCount > 0 ? (
+                      <p className="text-sm leading-7 text-muted-foreground">
+                        {t("weeklyReview.knowledgeToRevisitLimited", {
+                          count: hiddenReviewResurfacingCount,
+                        })}
+                      </p>
+                    ) : null}
+                  </>
+                )}
+              </CollapsibleSection>
 
               <CollapsibleSection
                 id="weekly-plan-editor"

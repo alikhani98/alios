@@ -19,8 +19,13 @@ import type {
   KnowledgeItem,
   ManualEntry,
   Project,
+  Resource,
   Task,
 } from "@/shared/types";
+import {
+  buildReviewResurfacingSnapshot,
+  type ReviewResurfacingSnapshot,
+} from "@/features/review";
 
 import {
   calculateMonthlyObligationEstimate,
@@ -230,6 +235,7 @@ export type WeeklyReviewSummary = {
   goalSummary: WeeklyReviewGoalSummary;
   lifeAreaSummary: WeeklyReviewLifeAreaSummary;
   manualSummary: WeeklyReviewManualSummary;
+  reviewResurfacing: ReviewResurfacingSnapshot;
   financeSummary: WeeklyReviewFinanceSummary;
   wellnessSummary: WeeklyReviewWellnessSummary;
   focusObservations: WeeklyReviewObservation[];
@@ -247,6 +253,7 @@ export type WeeklyReviewData = {
   decisionLogEntries: ReadonlyArray<DecisionLogEntry>;
   goals: ReadonlyArray<Goal>;
   lifeAreas?: ReadonlyArray<LifeAreaView>;
+  resources?: ReadonlyArray<Resource>;
   manualEntries: ReadonlyArray<ManualEntry>;
   financeTransactions: ReadonlyArray<FinanceTransaction>;
   financeObligations: ReadonlyArray<FinanceObligation>;
@@ -808,6 +815,17 @@ export function buildWeeklyReviewSummary(
     dueCount: manualDueEntries.length,
     dueEntries: manualDueEntries,
   };
+  const reviewResurfacing = buildReviewResurfacingSnapshot(
+    {
+      knowledgeItems: data.knowledgeItems,
+      resources: data.resources ?? [],
+      goals: data.goals,
+      projects: data.projects,
+      decisions: data.decisionLogEntries,
+      manualEntries: data.manualEntries,
+    },
+    referenceDate
+  );
 
   const upcomingObligations = getUpcomingObligations(
     financeObligations,
@@ -871,6 +889,7 @@ export function buildWeeklyReviewSummary(
     goalSummary,
     lifeAreaSummary,
     manualSummary,
+    reviewResurfacing,
     financeSummary,
     wellnessSummary,
     focusObservations: [],
@@ -890,6 +909,7 @@ export function buildWeeklyReviewSummary(
     summary.goalSummary.totalCount > 0 ||
     summary.lifeAreaSummary.totalCount > 0 ||
     summary.manualSummary.totalCount > 0 ||
+    (data.resources?.length ?? 0) > 0 ||
     summary.financeSummary.transactionCount > 0 ||
     summary.financeSummary.activeObligationsCount > 0 ||
     summary.wellnessSummary.checkinCountInWindow > 0;
