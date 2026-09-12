@@ -6,8 +6,10 @@ const searchResultPaths: Record<SearchResultKind, string> = {
   project: "/projects",
   goal: "/goals",
   lifeArea: "/life-areas",
+  resource: "/resources",
   journal: "/journal",
   knowledge: "/knowledge",
+  decision: "/decisions",
   manual: "/manual",
   routine: "/routines",
 };
@@ -20,6 +22,10 @@ export function buildSearchResultHref(
   kind: SearchResultKind,
   focusId: string
 ): string {
+  if (kind === "resource") {
+    return `/resources/${encodeURIComponent(focusId)}`;
+  }
+
   const searchParams = new URLSearchParams({ focusId });
   return `${getSearchResultPath(kind)}?${searchParams.toString()}`;
 }

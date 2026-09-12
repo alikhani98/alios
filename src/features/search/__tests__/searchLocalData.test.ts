@@ -8,7 +8,9 @@ import type {
   LifeArea,
   ManualEntry,
   Project,
+  Resource,
   Task,
+  DecisionLogEntry,
 } from "@/shared/types";
 
 import { filterSearchResults, searchLocalData } from "../searchLocalData";
@@ -121,6 +123,54 @@ const knowledgeItems: KnowledgeItem[] = [
     content: "Always trim queries and compare case-insensitively.",
     createdAt: "2026-07-03T11:00:00.000Z",
     updatedAt: "2026-07-05T12:00:00.000Z",
+  },
+];
+
+const resources: Resource[] = [
+  {
+    id: "resource-1",
+    title: "Atomic Habits",
+    type: "book",
+    description: "A practical habit design book.",
+    author: "James Clear",
+    format: "physical",
+    location: "Home Library",
+    status: "in_progress",
+    progressPercent: 40,
+    goalId: "goal-1",
+    createdAt: "2026-07-02T08:00:00.000Z",
+    updatedAt: "2026-07-05T13:00:00.000Z",
+  },
+  {
+    id: "resource-2",
+    title: "SQL Course",
+    type: "course",
+    description: "Database practice lessons.",
+    source: "Learning Platform",
+    url: "https://example.test/sql-course",
+    format: "online",
+    status: "unread",
+    projectId: "project-1",
+    createdAt: "2026-07-01T08:00:00.000Z",
+    updatedAt: "2026-07-04T13:00:00.000Z",
+  },
+];
+
+const decisions: DecisionLogEntry[] = [
+  {
+    id: "decision-1",
+    title: "Website migration",
+    decisionDate: "2026-07-05",
+    status: "decided",
+    context: "Choose the hosting path for launch.",
+    projectId: "project-1",
+    options: ["Static host", "Managed platform"],
+    chosenOption: "Static host",
+    reasoning: "Static hosting keeps the release lightweight.",
+    expectedOutcome: "Reliable website launch.",
+    tags: ["launch"],
+    createdAt: "2026-07-04T08:00:00.000Z",
+    updatedAt: "2026-07-05T14:00:00.000Z",
   },
 ];
 
@@ -408,6 +458,66 @@ describe("searchLocalData", () => {
     expect(results.some((result) => result.kind === "lifeArea")).toBe(true);
     expect(results.some((result) => result.kindLabelKey === "search.typeLifeArea")).toBe(true);
     expect(results.some((result) => result.href === "/life-areas?focusId=life-area-1")).toBe(true);
+  });
+
+  it("searches resources by metadata and includes derived context", () => {
+    const results = searchLocalData(
+      {
+        inboxItems: [],
+        tasks,
+        projects,
+        goals,
+        journalEntries: [],
+        knowledgeItems: [],
+        manualEntries: [],
+        resources,
+      },
+      "james"
+    );
+
+    expect(results[0]).toMatchObject({
+      id: "resource-1",
+      kind: "resource",
+      href: "/resources/resource-1",
+      matchedFieldLabelKey: "search.matchAuthor",
+      context: [
+        expect.objectContaining({
+          labelKey: "search.contextRelatedGoal",
+          title: "Improve sleep",
+          href: "/goals?focusId=goal-1",
+        }),
+      ],
+    });
+  });
+
+  it("searches decisions by reasoning and includes derived context", () => {
+    const results = searchLocalData(
+      {
+        inboxItems: [],
+        tasks,
+        projects,
+        goals,
+        journalEntries: [],
+        knowledgeItems: [],
+        manualEntries: [],
+        decisions,
+      },
+      "lightweight"
+    );
+
+    expect(results[0]).toMatchObject({
+      id: "decision-1",
+      kind: "decision",
+      href: "/decisions?focusId=decision-1",
+      matchedFieldLabelKey: "search.matchReasoning",
+      context: [
+        expect.objectContaining({
+          labelKey: "search.contextRelatedProject",
+          title: "Website launch",
+          href: "/projects?focusId=project-1",
+        }),
+      ],
+    });
   });
 
   it("narrows existing search results by content type and date range", () => {

@@ -33,8 +33,10 @@ const searchResultKindOrder: SearchResultKind[] = [
   "project",
   "goal",
   "lifeArea",
+  "resource",
   "journal",
   "knowledge",
+  "decision",
   "manual",
 ];
 
@@ -69,7 +71,28 @@ function SearchResultCard({ result }: { result: SearchResult }) {
           {result.date ? (
             <Badge variant="outline">{`${t("common.date")}: ${formatDate(result.date)}`}</Badge>
           ) : null}
+          <Badge variant="outline">
+            {t("search.matchedField")}: {t(result.matchedFieldLabelKey)}
+          </Badge>
         </div>
+        {result.context.length > 0 ? (
+          <div className="space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-normal text-muted-foreground">
+              {t("search.contextLabel")}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {result.context.map((context) => (
+                <Link
+                  key={`${context.labelKey}-${context.href}`}
+                  to={context.href}
+                  className="rounded-full border border-border bg-background px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  {t(context.labelKey)}: {context.title}
+                </Link>
+              ))}
+            </div>
+          </div>
+        ) : null}
         <Button asChild variant="outline" className="w-full justify-start sm:w-auto">
           <Link to={result.href}>
             <ArrowRight

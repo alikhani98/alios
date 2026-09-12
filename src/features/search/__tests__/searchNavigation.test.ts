@@ -11,8 +11,10 @@ describe("searchNavigation", () => {
       ["project", "item-3", "/projects?focusId=item-3"],
       ["goal", "item-3g", "/goals?focusId=item-3g"],
       ["lifeArea", "item-3l", "/life-areas?focusId=item-3l"],
+      ["resource", "item-3r", "/resources/item-3r"],
       ["journal", "item-4", "/journal?focusId=item-4"],
       ["knowledge", "item-5", "/knowledge?focusId=item-5"],
+      ["decision", "item-5d", "/decisions?focusId=item-5d"],
       ["manual", "item-6", "/manual?focusId=item-6"],
     ];
 
@@ -27,8 +29,10 @@ describe("searchNavigation", () => {
     expect(getSearchResultPath("project")).toBe("/projects");
     expect(getSearchResultPath("goal")).toBe("/goals");
     expect(getSearchResultPath("lifeArea")).toBe("/life-areas");
+    expect(getSearchResultPath("resource")).toBe("/resources");
     expect(getSearchResultPath("journal")).toBe("/journal");
     expect(getSearchResultPath("knowledge")).toBe("/knowledge");
+    expect(getSearchResultPath("decision")).toBe("/decisions");
     expect(getSearchResultPath("manual")).toBe("/manual");
   });
 });

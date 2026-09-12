@@ -1,5 +1,6 @@
 import { AlertCircle, GitBranch, Info, Plus, RotateCcw } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 import type { CreateDecisionLogEntryInput } from "@/core/repositories";
 import { useStorageAdapter } from "@/core/storage";
@@ -11,6 +12,7 @@ import {
 import type { DecisionLogEntry, Goal, Project, Task } from "@/shared/types";
 import { useI18n, type TranslationKey } from "@/shared/i18n";
 import { useViewDensityMode } from "@/shared/preferences/viewDensityMode";
+import { cn } from "@/shared/utils";
 import {
   Button,
   EmptyState,
@@ -147,6 +149,7 @@ export function DecisionLogContextualHelp({
 
 export function DecisionLogPage() {
   const { t } = useI18n();
+  const [searchParams] = useSearchParams();
   const { isSimpleView } = useViewDensityMode();
   const { projects: projectsRepository, goals: goalsRepository, tasks: tasksRepository } =
     useStorageAdapter();
@@ -176,6 +179,9 @@ export function DecisionLogPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [linkOptionsError, setLinkOptionsError] = useState<string | null>(null);
   const formRef = useRef<HTMLDivElement | null>(null);
+  const decisionRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const focusId = searchParams.get("focusId");
+  const [focusedDecisionId, setFocusedDecisionId] = useState<string | null>(null);
   const referenceDate = useMemo(() => new Date(), []);
   const hasActiveFilter = selectedFilter !== "all";
   const decisionPreviewLimit = 12;
@@ -204,6 +210,39 @@ export function DecisionLogPage() {
   useEffect(() => {
     setShowAllDecisions(false);
   }, [selectedFilter]);
+
+  useEffect(() => {
+    if (!focusId || !entries.some((entry) => entry.id === focusId)) {
+      return;
+    }
+
+    setSelectedFilter("all");
+    setShowAllDecisions(true);
+  }, [entries, focusId]);
+
+  useEffect(() => {
+    if (!focusId) {
+      return;
+    }
+
+    const node = decisionRefs.current[focusId];
+    if (!node) {
+      return;
+    }
+
+    const scrollTimer = window.setTimeout(() => {
+      node.scrollIntoView({ behavior: "smooth", block: "center" });
+      setFocusedDecisionId(focusId);
+    }, 50);
+    const clearTimer = window.setTimeout(() => {
+      setFocusedDecisionId(null);
+    }, 2800);
+
+    return () => {
+      window.clearTimeout(scrollTimer);
+      window.clearTimeout(clearTimer);
+    };
+  }, [displayedEntries.length, focusId]);
 
   useEffect(() => {
     let isCancelled = false;
@@ -644,21 +683,33 @@ export function DecisionLogPage() {
       ) : (
         <div className="grid gap-4 xl:grid-cols-2">
           {displayedEntries.map((decision) => (
-            <DecisionLogCard
+            <div
               key={decision.id}
-              decision={decision}
-              linkedProject={findLinkedProjectById(decision, projects)}
-              linkedGoal={findLinkedGoalById(decision, goals)}
-              linkedTask={findLinkedTaskById(decision, tasks)}
-              isDeleting={deletingId === decision.id}
-              onEdit={() => {
-                setEditingDecision(decision);
-                setIsEditorOpen(true);
+              ref={(node) => {
+                decisionRefs.current[decision.id] = node;
               }}
-              onDelete={() => handleDelete(decision)}
-              onMarkReviewed={() => handleMarkReviewed(decision)}
-              onArchive={() => handleArchive(decision)}
-            />
+              className={cn(
+                "rounded-[1.75rem] transition-shadow",
+                focusedDecisionId === decision.id
+                  ? "ring-2 ring-primary/50 ring-offset-2 ring-offset-background"
+                  : null
+              )}
+            >
+              <DecisionLogCard
+                decision={decision}
+                linkedProject={findLinkedProjectById(decision, projects)}
+                linkedGoal={findLinkedGoalById(decision, goals)}
+                linkedTask={findLinkedTaskById(decision, tasks)}
+                isDeleting={deletingId === decision.id}
+                onEdit={() => {
+                  setEditingDecision(decision);
+                  setIsEditorOpen(true);
+                }}
+                onDelete={() => handleDelete(decision)}
+                onMarkReviewed={() => handleMarkReviewed(decision)}
+                onArchive={() => handleArchive(decision)}
+              />
+            </div>
           ))}
         </div>
       )}
