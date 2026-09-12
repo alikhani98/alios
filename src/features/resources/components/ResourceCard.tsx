@@ -2,7 +2,7 @@ import { ExternalLink, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
-import type { KnowledgeItem, Resource } from "@/shared/types";
+import type { Goal, KnowledgeItem, Resource } from "@/shared/types";
 import { useDateFormatter } from "@/shared/date";
 import { useI18n } from "@/shared/i18n";
 import {
@@ -27,6 +27,7 @@ type ResourceCardProps = {
   onEdit: () => void;
   onDelete: () => Promise<void>;
   relatedKnowledgeItems?: ReadonlyArray<KnowledgeItem>;
+  linkedGoal?: Goal;
 };
 
 export function ResourceCard({
@@ -35,6 +36,7 @@ export function ResourceCard({
   onEdit,
   onDelete,
   relatedKnowledgeItems = [],
+  linkedGoal,
 }: ResourceCardProps) {
   const { t } = useI18n();
   const { formatDate } = useDateFormatter();
@@ -126,6 +128,11 @@ export function ResourceCard({
         {resource.progressPercent !== undefined ? (
           <p className="text-sm text-muted-foreground">
             {t("resources.progressValue", { count: resource.progressPercent })}
+          </p>
+        ) : null}
+        {linkedGoal ? (
+          <p className="break-words text-sm text-muted-foreground">
+            {t("resources.relatedGoal")}: {linkedGoal.title}
           </p>
         ) : null}
         {dateItems.length > 0 ? (

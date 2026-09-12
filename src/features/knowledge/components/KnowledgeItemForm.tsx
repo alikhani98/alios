@@ -12,6 +12,7 @@ import {
 
 type KnowledgeItemFormProps = {
   item?: KnowledgeItem;
+  initialValues?: Partial<KnowledgeItemFormValues>;
   projects?: ReadonlyArray<Project>;
   goals?: ReadonlyArray<Goal>;
   tasks?: ReadonlyArray<Task>;
@@ -23,6 +24,7 @@ type KnowledgeItemFormProps = {
 
 export function KnowledgeItemForm({
   item,
+  initialValues,
   projects = [],
   goals = [],
   tasks = [],
@@ -39,15 +41,15 @@ export function KnowledgeItemForm({
   } = useForm<KnowledgeItemFormValues>({
     resolver: zodResolver(knowledgeItemFormSchema),
     defaultValues: {
-      title: item?.title ?? "",
-      type: item?.type ?? "note",
-      summary: item?.summary ?? "",
-      content: item?.content ?? "",
-      source: item?.source ?? "",
-      projectId: item?.projectId ?? "",
-      goalId: item?.goalId ?? "",
-      taskId: item?.taskId ?? "",
-      resourceId: item?.resourceId ?? "",
+      title: item?.title ?? initialValues?.title ?? "",
+      type: item?.type ?? initialValues?.type ?? "note",
+      summary: item?.summary ?? initialValues?.summary ?? "",
+      content: item?.content ?? initialValues?.content ?? "",
+      source: item?.source ?? initialValues?.source ?? "",
+      projectId: item?.projectId ?? initialValues?.projectId ?? "",
+      goalId: item?.goalId ?? initialValues?.goalId ?? "",
+      taskId: item?.taskId ?? initialValues?.taskId ?? "",
+      resourceId: item?.resourceId ?? initialValues?.resourceId ?? "",
     },
   });
   const selectedProjectIsUnavailable =

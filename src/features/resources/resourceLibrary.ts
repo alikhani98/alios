@@ -1,9 +1,20 @@
 import type {
+  KnowledgeItem,
   Resource,
   ResourceFormat,
   ResourceStatus,
   ResourceType,
 } from "@/shared/types";
+
+export type ResourceLibraryView =
+  | "all"
+  | "books"
+  | "courses"
+  | "websites"
+  | "in_progress"
+  | "completed"
+  | "recently_added"
+  | "with_knowledge";
 
 export type ResourceLibrarySort =
   | "newest"
@@ -26,6 +37,8 @@ export type ResourceLibrarySummary = {
   inProgress: number;
   completed: number;
 };
+
+export const RESOURCE_LIBRARY_RECENT_DAYS = 30;
 
 export function getResourceLibrarySummary(
   resources: ReadonlyArray<Resource>
@@ -68,6 +81,84 @@ export function filterResources(
         filters.format === "all" ||
         resource.format === filters.format)
   );
+}
+
+export function filterResourceLibraryView(
+  resources: ReadonlyArray<Resource>,
+  view: ResourceLibraryView,
+  knowledgeItems: ReadonlyArray<KnowledgeItem> = [],
+  referenceDate = new Date()
+): Resource[] {
+  if (view === "all") {
+    return [...resources];
+  }
+
+  if (view === "books") {
+    return resources.filter((resource) => resource.type === "book");
+  }
+
+  if (view === "courses") {
+    return resources.filter((resource) => resource.type === "course");
+  }
+
+  if (view === "websites") {
+    return resources.filter((resource) => resource.type === "website");
+  }
+
+  if (view === "in_progress") {
+    return resources.filter((resource) => resource.status === "in_progress");
+  }
+
+  if (view === "completed") {
+    return resources.filter((resource) => resource.status === "completed");
+  }
+
+  if (view === "with_knowledge") {
+    const resourceIdsWithKnowledge = new Set(
+      knowledgeItems
+        .map((item) => item.resourceId)
+        .filter((id): id is string => Boolean(id))
+    );
+    return resources.filter((resource) =>
+      resourceIdsWithKnowledge.has(resource.id)
+    );
+  }
+
+  const recentCutoff = new Date(referenceDate);
+  recentCutoff.setDate(
+    recentCutoff.getDate() - RESOURCE_LIBRARY_RECENT_DAYS
+  );
+  return resources.filter(
+    (resource) => new Date(resource.createdAt) >= recentCutoff
+  );
+}
+
+export function getContinueLearningResources(
+  resources: ReadonlyArray<Resource>,
+  limit = 3
+): Resource[] {
+  const inProgress = resources
+    .filter(
+      (resource) =>
+        resource.status === "in_progress" &&
+        resource.status !== "archived" &&
+        resource.status !== "completed"
+    )
+    .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt));
+
+  if (inProgress.length > 0) {
+    return inProgress.slice(0, limit);
+  }
+
+  return resources
+    .filter(
+      (resource) =>
+        resource.status !== "archived" &&
+        resource.status !== "completed" &&
+        (resource.progressPercent ?? 0) > 0
+    )
+    .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))
+    .slice(0, limit);
 }
 
 function compareDates(left: string, right: string): number {

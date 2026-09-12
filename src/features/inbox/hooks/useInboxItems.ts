@@ -12,6 +12,7 @@ import {
   processInboxItems,
   setInboxItemProcessed,
   setInboxItemsProcessed,
+  type InboxProcessingOptions,
   type InboxProcessingTarget,
 } from "../inboxProcessing";
 
@@ -76,8 +77,12 @@ export function useInboxItems() {
   );
 
   const convertItem = useCallback(
-    async (id: string, target: InboxProcessingTarget) => {
-      const item = await processInboxItem(storage, id, target);
+    async (
+      id: string,
+      target: InboxProcessingTarget,
+      options?: InboxProcessingOptions
+    ) => {
+      const item = await processInboxItem(storage, id, target, undefined, options);
       setItems((current) =>
         sortInboxItems(current.map((entry) => (entry.id === id ? item : entry)))
       );
@@ -87,8 +92,18 @@ export function useInboxItems() {
   );
 
   const convertItems = useCallback(
-    async (ids: string[], target: InboxProcessingTarget) => {
-      const updatedItems = await processInboxItems(storage, ids, target);
+    async (
+      ids: string[],
+      target: InboxProcessingTarget,
+      options?: InboxProcessingOptions
+    ) => {
+      const updatedItems = await processInboxItems(
+        storage,
+        ids,
+        target,
+        undefined,
+        options
+      );
       const updatedById = new Map(updatedItems.map((item) => [item.id, item]));
       setItems((current) =>
         sortInboxItems(current.map((entry) => updatedById.get(entry.id) ?? entry))

@@ -115,6 +115,69 @@ describe("Inbox processing", () => {
     expect((await storage.inbox.getById(inboxItem.id))?.status).toBe("processed");
   });
 
+  it("converts an Inbox item to a Resource with URL fields", async () => {
+    const inboxItem = await storage.inbox.create({
+      content: "Read https://example.com/course before the next study block",
+      type: "link",
+    });
+
+    await processInboxItem(storage, inboxItem.id, "resource", "2026-07-05", {
+      resource: { type: "course" },
+    });
+
+    expect(await storage.resources.list()).toEqual([
+      expect.objectContaining({
+        title: "Read https://example.com/course before the next study block",
+        type: "course",
+        description: inboxItem.content,
+        source: "https://example.com/course",
+        url: "https://example.com/course",
+        status: "unread",
+      }),
+    ]);
+    expect((await storage.inbox.getById(inboxItem.id))?.status).toBe("processed");
+  });
+
+  it("converts an Inbox item to linked Knowledge without forcing links", async () => {
+    const goal = await storage.goals.create({
+      title: "Study systems",
+      description: "Build better knowledge flow.",
+      area: "learning",
+      timeframe: "quarter",
+      status: "active",
+      importance: "medium",
+      progressPercent: 10,
+      tags: [],
+    });
+    const resource = await storage.resources.create({
+      title: "Systems book",
+      type: "book",
+      status: "in_progress",
+      progressPercent: 40,
+    });
+    const inboxItem = await storage.inbox.create({
+      content: "Capture one systems insight",
+      type: "note",
+    });
+
+    await processInboxItem(storage, inboxItem.id, "knowledgeItem", "2026-07-05", {
+      knowledge: {
+        goalId: goal.id,
+        resourceId: resource.id,
+      },
+    });
+
+    expect(await storage.knowledge.list()).toEqual([
+      expect.objectContaining({
+        title: "Capture one systems insight",
+        type: "note",
+        content: inboxItem.content,
+        goalId: goal.id,
+        resourceId: resource.id,
+      }),
+    ]);
+  });
+
   it("does not mark the Inbox item processed when target creation fails", async () => {
     const inboxItem = await storage.inbox.create({ content: "Keep me pending", type: "task" });
     vi.spyOn(storage.tasks, "create").mockRejectedValueOnce(new Error("create failed"));

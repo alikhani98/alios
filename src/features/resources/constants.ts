@@ -1,5 +1,6 @@
 import type { TranslationKey } from "@/shared/i18n";
 import type { ResourceFormat, ResourceStatus, ResourceType } from "@/shared/types";
+import type { ResourceLibraryView } from "./resourceLibrary";
 
 export const RESOURCE_TYPE_OPTIONS: ReadonlyArray<{
   value: ResourceType;
@@ -32,6 +33,20 @@ export const RESOURCE_FORMAT_OPTIONS: ReadonlyArray<{
   { value: "audio", labelKey: "resources.formatAudio" },
   { value: "video", labelKey: "resources.formatVideo" },
   { value: "other", labelKey: "resources.formatOther" },
+];
+
+export const RESOURCE_LIBRARY_VIEW_OPTIONS: ReadonlyArray<{
+  value: ResourceLibraryView;
+  labelKey: TranslationKey;
+}> = [
+  { value: "all", labelKey: "resources.libraryViewAll" },
+  { value: "books", labelKey: "resources.libraryViewBooks" },
+  { value: "courses", labelKey: "resources.libraryViewCourses" },
+  { value: "websites", labelKey: "resources.libraryViewWebsites" },
+  { value: "in_progress", labelKey: "resources.libraryViewInProgress" },
+  { value: "completed", labelKey: "resources.libraryViewCompleted" },
+  { value: "recently_added", labelKey: "resources.libraryViewRecentlyAdded" },
+  { value: "with_knowledge", labelKey: "resources.libraryViewWithKnowledge" },
 ];
 
 export const RESOURCE_TYPE_LABEL_KEYS: Record<ResourceType, TranslationKey> = {

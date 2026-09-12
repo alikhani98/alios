@@ -3,7 +3,9 @@ import { AlertCircle, Archive, CheckCircle2, Circle, Inbox, ListTodo, Plus, Rota
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
+import { useStorageAdapter } from "@/core/storage";
 import { useI18n } from "@/shared/i18n";
+import type { Goal, Project, Resource, Task } from "@/shared/types";
 import { INBOX_ITEM_TYPE_VALUES } from "@/shared/types";
 import {
   Button,
@@ -97,6 +99,12 @@ export function InboxPage() {
   const { t } = useI18n();
   const [searchParams, setSearchParams] = useSearchParams();
   const {
+    goals: goalsRepository,
+    projects: projectsRepository,
+    resources: resourcesRepository,
+    tasks: tasksRepository,
+  } = useStorageAdapter();
+  const {
     items,
     isLoading,
     error,
@@ -128,6 +136,11 @@ export function InboxPage() {
   const [focusedItemId, setFocusedItemId] = useState<string | null>(null);
   const [focusMessage, setFocusMessage] = useState<string | null>(null);
   const [showAllItems, setShowAllItems] = useState(false);
+  const [goals, setGoals] = useState<Goal[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [resources, setResources] = useState<Resource[]>([]);
+  const [linkOptionsError, setLinkOptionsError] = useState<string | null>(null);
   const itemRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const processedShareTargetSignatureRef = useRef<string | null>(null);
   const focusId = searchParams.get("focusId");
@@ -159,6 +172,43 @@ export function InboxPage() {
   const selectedUnprocessedVisibleCount = selectedUnprocessedVisibleIds.length;
   const allVisibleSelected =
     visibleItemIds.length > 0 && visibleItemIds.every((id) => selectedIds.includes(id));
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    void Promise.all([
+      goalsRepository.list(),
+      projectsRepository.list(),
+      tasksRepository.list(),
+      resourcesRepository.list(),
+    ])
+      .then(([nextGoals, nextProjects, nextTasks, nextResources]) => {
+        if (isCancelled) {
+          return;
+        }
+
+        setGoals(nextGoals);
+        setProjects(nextProjects);
+        setTasks(nextTasks);
+        setResources(nextResources);
+        setLinkOptionsError(null);
+      })
+      .catch(() => {
+        if (isCancelled) {
+          return;
+        }
+
+        setGoals([]);
+        setProjects([]);
+        setTasks([]);
+        setResources([]);
+        setLinkOptionsError(t("links.loadError"));
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [goalsRepository, projectsRepository, resourcesRepository, tasksRepository, t]);
 
   useEffect(() => {
     const sharedParams = getShareTargetParams(searchParams);
@@ -432,11 +482,11 @@ export function InboxPage() {
       {message ? (
         <div role="status" className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm">{message}</div>
       ) : null}
-      {error || actionError ? (
+      {error || actionError || linkOptionsError ? (
         <div role="alert" className="flex flex-col gap-3 rounded-xl border border-destructive/30 bg-destructive/5 p-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-2 text-sm text-destructive">
             <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-            <span>{actionError ?? error}</span>
+            <span>{actionError ?? error ?? linkOptionsError}</span>
           </div>
           {error ? (
             <Button type="button" size="sm" variant="outline" onClick={() => void loadItems()}>
@@ -688,13 +738,17 @@ export function InboxPage() {
                   () => clearSnooze(item.id).then(() => undefined),
                   t("inbox.snoozeCleared")
                 )}
-                onConvert={(target) => run(
+                onConvert={(target, options) => run(
                   item.id,
-                  () => convertItem(item.id, target).then(() => undefined),
+                  () => convertItem(item.id, target, options).then(() => undefined),
                   t("inbox.conversionSuccess"),
                   t("inbox.conversionFailure")
                 )}
                 onDelete={() => run(item.id, () => deleteItem(item.id), t("inbox.deleted"))}
+                goals={goals}
+                projects={projects}
+                tasks={tasks}
+                resources={resources}
               />
             </div>
           ))}

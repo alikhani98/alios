@@ -3,9 +3,28 @@ import { format } from "date-fns";
 import { NotFoundError } from "@/core/errors";
 import type { StorageAdapter } from "@/core/storage";
 import { detectNaturalDate } from "@/shared/date";
-import type { InboxItem } from "@/shared/types";
+import type { InboxItem, ResourceType } from "@/shared/types";
 
-export type InboxProcessingTarget = "todayTask" | "journalEntry" | "knowledgeItem";
+export type InboxProcessingTarget =
+  | "todayTask"
+  | "journalEntry"
+  | "knowledgeItem"
+  | "resource";
+
+export type InboxProcessingOptions = {
+  knowledge?: {
+    goalId?: string;
+    projectId?: string;
+    taskId?: string;
+    resourceId?: string;
+  };
+  resource?: {
+    type?: ResourceType;
+    goalId?: string;
+    projectId?: string;
+    taskId?: string;
+  };
+};
 
 const TITLE_MAX_LENGTH = 60;
 const URL_PATTERN = /https?:\/\/\S+|www\.\S+/i;
@@ -44,6 +63,16 @@ function createTitle(content: string): string {
     : normalized;
 }
 
+function extractUrl(content: string): string | undefined {
+  const match = content.match(URL_PATTERN);
+  if (!match) {
+    return undefined;
+  }
+
+  const value = match[0].replace(/[),.;!?،؛؟]+$/, "");
+  return value.startsWith("www.") ? `https://${value}` : value;
+}
+
 async function getInboxItem(storage: StorageAdapter, id: string): Promise<InboxItem> {
   const item = await storage.inbox.getById(id);
   if (!item) {
@@ -56,10 +85,12 @@ export async function processInboxItem(
   storage: StorageAdapter,
   id: string,
   target: InboxProcessingTarget,
-  today = format(new Date(), "yyyy-MM-dd")
+  today = format(new Date(), "yyyy-MM-dd"),
+  options: InboxProcessingOptions = {}
 ): Promise<InboxItem> {
   const item = await getInboxItem(storage, id);
   const title = createTitle(item.content);
+  const url = extractUrl(item.content);
 
   if (target === "todayTask") {
     const suggestedDate = detectNaturalDate(item.content, new Date(`${today}T00:00:00`));
@@ -79,12 +110,28 @@ export async function processInboxItem(
       title,
       content: item.content,
     });
-  } else {
+  } else if (target === "knowledgeItem") {
     await storage.knowledge.create({
       title,
       type: item.type === "link" ? "resource" : "note",
       content: item.content,
-      source: item.type === "link" ? item.content : undefined,
+      source: url ?? (item.type === "link" ? item.content : undefined),
+      goalId: options.knowledge?.goalId,
+      projectId: options.knowledge?.projectId,
+      taskId: options.knowledge?.taskId,
+      resourceId: options.knowledge?.resourceId,
+    });
+  } else {
+    await storage.resources.create({
+      title,
+      type: options.resource?.type ?? (url ? "website" : "document"),
+      description: item.content,
+      source: url ?? undefined,
+      url,
+      status: "unread",
+      goalId: options.resource?.goalId,
+      projectId: options.resource?.projectId,
+      taskId: options.resource?.taskId,
     });
   }
 
@@ -119,12 +166,13 @@ export async function processInboxItems(
   storage: StorageAdapter,
   ids: string[],
   target: InboxProcessingTarget,
-  today = format(new Date(), "yyyy-MM-dd")
+  today = format(new Date(), "yyyy-MM-dd"),
+  options: InboxProcessingOptions = {}
 ): Promise<InboxItem[]> {
   const updatedItems: InboxItem[] = [];
 
   for (const id of ids) {
-    updatedItems.push(await processInboxItem(storage, id, target, today));
+    updatedItems.push(await processInboxItem(storage, id, target, today, options));
   }
 
   return updatedItems;

@@ -70,6 +70,8 @@ export function KnowledgePage() {
   const [focusMessage, setFocusMessage] = useState<string | null>(null);
   const [showAllItems, setShowAllItems] = useState(false);
   const [viewMode, setViewMode] = useState<"list" | "graph">("list");
+  const [initialFormValues, setInitialFormValues] =
+    useState<Partial<KnowledgeItemFormValues> | undefined>();
   const [projects, setProjects] = useState<Project[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -77,6 +79,8 @@ export function KnowledgePage() {
   const [linkOptionsError, setLinkOptionsError] = useState<string | null>(null);
   const itemRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const focusId = searchParams.get("focusId");
+  const createFromResourceId = searchParams.get("resourceId");
+  const shouldCreateFromResource = searchParams.get("create") === "1";
   const knowledgePreviewLimit = 12;
 
   const visibleItems = useMemo(
@@ -136,6 +140,7 @@ export function KnowledgePage() {
 
   const openCreateForm = () => {
     setEditingItem(undefined);
+    setInitialFormValues(undefined);
     setFormOpen(true);
     setActionError(null);
     setSuccessMessage(null);
@@ -143,6 +148,7 @@ export function KnowledgePage() {
 
   const openEditForm = (item: KnowledgeItem) => {
     setEditingItem(item);
+    setInitialFormValues(undefined);
     setFormOpen(true);
     setActionError(null);
     setSuccessMessage(null);
@@ -152,6 +158,7 @@ export function KnowledgePage() {
   const closeForm = () => {
     setFormOpen(false);
     setEditingItem(undefined);
+    setInitialFormValues(undefined);
   };
 
   const handleSearch = async () => {
@@ -261,6 +268,28 @@ export function KnowledgePage() {
     return () => window.clearTimeout(timeout);
   }, [focusId, isLoading, items, t, visibleItems]);
 
+  useEffect(() => {
+    if (!shouldCreateFromResource || !createFromResourceId || resources.length === 0) {
+      return;
+    }
+
+    const resource = resources.find((item) => item.id === createFromResourceId);
+    if (!resource) {
+      return;
+    }
+
+    setEditingItem(undefined);
+    setInitialFormValues({
+      title: t("knowledge.noteFromResourceTitle", { title: resource.title }),
+      type: "note",
+      source: resource.title,
+      resourceId: resource.id,
+    });
+    setFormOpen(true);
+    setActionError(null);
+    setSuccessMessage(null);
+  }, [createFromResourceId, resources, shouldCreateFromResource, t]);
+
   return (
     <section className="alios-page space-y-6">
       <PremiumCard className="alios-now-surface">
@@ -288,6 +317,7 @@ export function KnowledgePage() {
             <KnowledgeItemForm
               key={editingItem?.id ?? "new-item"}
               item={editingItem}
+              initialValues={initialFormValues}
               projects={projects}
               goals={goals}
               tasks={tasks}

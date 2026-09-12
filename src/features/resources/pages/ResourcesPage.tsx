@@ -11,7 +11,7 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
 import type { CreateResourceInput } from "@/core/repositories";
 import { useStorageAdapter } from "@/core/storage";
@@ -28,6 +28,7 @@ import type {
 import { useI18n } from "@/shared/i18n";
 import {
   Button,
+  Badge,
   CardContent,
   CardHeader,
   CardTitle,
@@ -42,15 +43,20 @@ import { ResourceCard } from "../components/ResourceCard";
 import { ResourceForm } from "../components/ResourceForm";
 import {
   RESOURCE_FORMAT_OPTIONS,
+  RESOURCE_LIBRARY_VIEW_OPTIONS,
   RESOURCE_STATUS_OPTIONS,
+  RESOURCE_TYPE_LABEL_KEYS,
   RESOURCE_TYPE_OPTIONS,
 } from "../constants";
 import { useResources } from "../hooks/useResources";
 import type { ResourceFormValues } from "../types";
 import {
   filterResources,
+  filterResourceLibraryView,
+  getContinueLearningResources,
   getResourceLibrarySummary,
   sortResources,
+  type ResourceLibraryView,
   type ResourceLibrarySort,
 } from "../resourceLibrary";
 import { useResourceViewMode } from "../resourceViewMode";
@@ -92,6 +98,7 @@ export function ResourcesPage() {
   const [typeFilter, setTypeFilter] = useState<ResourceType | "all">("all");
   const [statusFilter, setStatusFilter] = useState<ResourceStatus | "all">("all");
   const [formatFilter, setFormatFilter] = useState<ResourceFormat | "all">("all");
+  const [libraryView, setLibraryView] = useState<ResourceLibraryView>("all");
   const [sort, setSort] = useState<ResourceLibrarySort>("newest");
   const [actionError, setActionError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -111,14 +118,21 @@ export function ResourcesPage() {
   const filteredResources = useMemo(
     () =>
       sortResources(
-        filterResources(resources, {
-          type: typeFilter,
-          status: statusFilter,
-          format: formatFilter,
-        }),
+        filterResources(
+          filterResourceLibraryView(resources, libraryView, knowledgeItems),
+          {
+            type: typeFilter,
+            status: statusFilter,
+            format: formatFilter,
+          }
+        ),
         sort
       ),
-    [formatFilter, resources, sort, statusFilter, typeFilter]
+    [formatFilter, knowledgeItems, libraryView, resources, sort, statusFilter, typeFilter]
+  );
+  const continueLearningResources = useMemo(
+    () => getContinueLearningResources(resources, 3),
+    [resources]
   );
 
   const openCreateForm = () => {
@@ -150,6 +164,7 @@ export function ResourcesPage() {
     setTypeFilter("all");
     setStatusFilter("all");
     setFormatFilter("all");
+    setLibraryView("all");
     await loadResources();
   };
 
@@ -210,6 +225,7 @@ export function ResourcesPage() {
 
   const hasFilters =
     appliedQuery.length > 0 ||
+    libraryView !== "all" ||
     typeFilter !== "all" ||
     statusFilter !== "all" ||
     formatFilter !== "all";
@@ -329,10 +345,65 @@ export function ResourcesPage() {
         />
       </div>
 
+      {continueLearningResources.length > 0 ? (
+        <PremiumCard>
+          <CardHeader>
+            <SectionHeader
+              icon={<ArrowDownUp className="h-5 w-5" />}
+              title={t("resources.continueLearning")}
+              description={t("resources.continueLearningDescription")}
+            />
+          </CardHeader>
+          <CardContent className="grid gap-3 md:grid-cols-3">
+            {continueLearningResources.map((resource) => {
+              const linkedGoal = resource.goalId
+                ? goals.find((goal) => goal.id === resource.goalId)
+                : undefined;
+              const linkedProject = resource.projectId
+                ? projects.find((project) => project.id === resource.projectId)
+                : undefined;
+
+              return (
+                <div
+                  key={resource.id}
+                  className="min-w-0 rounded-2xl border border-border/70 bg-muted/20 p-4"
+                >
+                  <div className="flex min-w-0 items-start justify-between gap-3">
+                    <Link
+                      to={`/resources/${encodeURIComponent(resource.id)}`}
+                      className="min-w-0 break-words font-semibold underline-offset-4 hover:underline"
+                    >
+                      {resource.title}
+                    </Link>
+                    <Badge variant="secondary">
+                      {t(RESOURCE_TYPE_LABEL_KEYS[resource.type])}
+                    </Badge>
+                  </div>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    {resource.progressPercent !== undefined
+                      ? t("resources.progressValue", {
+                          count: resource.progressPercent,
+                        })
+                      : t("resources.statusInProgress")}
+                  </p>
+                  {linkedGoal || linkedProject ? (
+                    <p className="mt-2 break-words text-xs text-muted-foreground">
+                      {linkedGoal
+                        ? `${t("resources.relatedGoal")}: ${linkedGoal.title}`
+                        : `${t("resources.relatedProject")}: ${linkedProject?.title}`}
+                    </p>
+                  ) : null}
+                </div>
+              );
+            })}
+          </CardContent>
+        </PremiumCard>
+      ) : null}
+
       <PremiumCard>
         <CardContent className="pt-6">
           <form
-            className="grid gap-3 md:grid-cols-[minmax(0,1fr)_11rem_11rem_11rem_auto]"
+            className="grid gap-3 md:grid-cols-[minmax(0,1fr)_11rem_11rem_11rem_11rem_auto]"
             onSubmit={(event) => {
               event.preventDefault();
               void handleSearch();
@@ -348,6 +419,19 @@ export function ResourcesPage() {
                 className="ps-9"
               />
             </div>
+            <Select
+              aria-label={t("resources.libraryViewLabel")}
+              value={libraryView}
+              onChange={(event) =>
+                setLibraryView(event.target.value as ResourceLibraryView)
+              }
+            >
+              {RESOURCE_LIBRARY_VIEW_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {t(option.labelKey)}
+                </option>
+              ))}
+            </Select>
             <Select
               aria-label={t("resources.filterLabel")}
               value={typeFilter}
@@ -508,6 +592,11 @@ export function ResourcesPage() {
             >
               <ResourceCard
                 resource={resource}
+                linkedGoal={
+                  resource.goalId
+                    ? goals.find((goal) => goal.id === resource.goalId)
+                    : undefined
+                }
                 relatedKnowledgeItems={knowledgeItems.filter(
                   (item) => item.resourceId === resource.id
                 )}

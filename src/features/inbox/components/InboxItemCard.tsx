@@ -1,16 +1,21 @@
 import { addDays, format } from "date-fns";
-import { BookOpen, CheckCircle2, Circle, Clock3, ListTodo, Pencil, Sparkles, Trash2 } from "lucide-react";
-import { type MouseEvent, useState } from "react";
+import { BookOpen, CheckCircle2, Circle, Clock3, Library, ListTodo, Pencil, Sparkles, Trash2 } from "lucide-react";
+import { type ChangeEvent, type MouseEvent, useState } from "react";
 
 import { useDateFormatter } from "@/shared/date";
 import { useI18n } from "@/shared/i18n";
-import type { InboxItem } from "@/shared/types";
-import { Badge, Button, Card, CardContent, CardFooter, SwipeActionSurface } from "@/shared/ui";
+import type { Goal, InboxItem, Project, Resource, ResourceType, Task } from "@/shared/types";
+import { Badge, Button, Card, CardContent, CardFooter, Select, SwipeActionSurface } from "@/shared/ui";
 import { cn } from "@/shared/utils";
+import { RESOURCE_TYPE_OPTIONS } from "@/features/resources/constants";
 import { INBOX_STATUS_LABEL_KEYS, INBOX_TYPE_LABEL_KEYS } from "../constants";
 import { InboxItemForm } from "./InboxItemForm";
 import type { InboxFormValues } from "../types";
-import { suggestInboxProcessingTarget, type InboxProcessingTarget } from "../inboxProcessing";
+import {
+  suggestInboxProcessingTarget,
+  type InboxProcessingOptions,
+  type InboxProcessingTarget,
+} from "../inboxProcessing";
 
 type Props = {
   item: InboxItem;
@@ -22,8 +27,15 @@ type Props = {
   onToggleStatus: () => Promise<void>;
   onSnooze: (date: string) => Promise<void>;
   onClearSnooze: () => Promise<void>;
-  onConvert: (target: InboxProcessingTarget) => Promise<void>;
+  onConvert: (
+    target: InboxProcessingTarget,
+    options?: InboxProcessingOptions
+  ) => Promise<void>;
   onDelete: () => Promise<void>;
+  goals?: ReadonlyArray<Goal>;
+  projects?: ReadonlyArray<Project>;
+  tasks?: ReadonlyArray<Task>;
+  resources?: ReadonlyArray<Resource>;
 };
 
 function getThisWeekendDate(today = new Date()): string {
@@ -44,6 +56,10 @@ export function InboxItemCard({
   onClearSnooze,
   onConvert,
   onDelete,
+  goals = [],
+  projects = [],
+  tasks = [],
+  resources = [],
 }: Props) {
   const { t } = useI18n();
   const { formatDate } = useDateFormatter();
@@ -52,6 +68,22 @@ export function InboxItemCard({
   const [showProcessing, setShowProcessing] = useState(false);
   const [showSnooze, setShowSnooze] = useState(false);
   const [customSnoozeDate, setCustomSnoozeDate] = useState("");
+  const [knowledgeLinks, setKnowledgeLinks] = useState({
+    goalId: "",
+    projectId: "",
+    taskId: "",
+    resourceId: "",
+  });
+  const defaultResourceType =
+    item.type === "link" || /https?:\/\/\S+|www\.\S+/i.test(item.content)
+      ? "website"
+      : "document";
+  const [resourceLinks, setResourceLinks] = useState({
+    type: defaultResourceType as ResourceType,
+    goalId: "",
+    projectId: "",
+    taskId: "",
+  });
   const tomorrow = format(addDays(new Date(), 1), "yyyy-MM-dd");
   const thisWeekend = getThisWeekendDate();
   const suggestedTarget = suggestInboxProcessingTarget(item.content);
@@ -73,6 +105,42 @@ export function InboxItemCard({
 
     onSelectionChange(!isSelected);
   };
+
+  const updateKnowledgeLink =
+    (field: keyof typeof knowledgeLinks) =>
+    (event: ChangeEvent<HTMLSelectElement>) => {
+      setKnowledgeLinks((current) => ({
+        ...current,
+        [field]: event.target.value,
+      }));
+    };
+
+  const updateResourceLink =
+    (field: keyof typeof resourceLinks) =>
+    (event: ChangeEvent<HTMLSelectElement>) => {
+      setResourceLinks((current) => ({
+        ...current,
+        [field]: event.target.value,
+      }));
+    };
+
+  const getKnowledgeOptions = (): InboxProcessingOptions => ({
+    knowledge: {
+      goalId: knowledgeLinks.goalId || undefined,
+      projectId: knowledgeLinks.projectId || undefined,
+      taskId: knowledgeLinks.taskId || undefined,
+      resourceId: knowledgeLinks.resourceId || undefined,
+    },
+  });
+
+  const getResourceOptions = (): InboxProcessingOptions => ({
+    resource: {
+      type: resourceLinks.type,
+      goalId: resourceLinks.goalId || undefined,
+      projectId: resourceLinks.projectId || undefined,
+      taskId: resourceLinks.taskId || undefined,
+    },
+  });
 
   if (isEditing) {
     return (
@@ -167,16 +235,102 @@ export function InboxItemCard({
                 {t("inbox.useSuggestedProcessing")}
               </Button>
             </div>
-            <div className="grid gap-2 sm:grid-cols-3">
+            <div className="grid gap-2 sm:grid-cols-4">
             <Button type="button" size="sm" variant="outline" disabled={isBusy} onClick={() => void onConvert("todayTask")}>
               <ListTodo className="me-2 h-4 w-4" />{t("inbox.convertToTodayTask")}
             </Button>
             <Button type="button" size="sm" variant="outline" disabled={isBusy} onClick={() => void onConvert("journalEntry")}>
               <BookOpen className="me-2 h-4 w-4" />{t("inbox.convertToJournalEntry")}
             </Button>
-            <Button type="button" size="sm" variant="outline" disabled={isBusy} onClick={() => void onConvert("knowledgeItem")}>
+            <Button type="button" size="sm" variant="outline" disabled={isBusy} onClick={() => void onConvert("knowledgeItem", getKnowledgeOptions())}>
               <Sparkles className="me-2 h-4 w-4" />{t("inbox.convertToKnowledgeItem")}
             </Button>
+            <Button type="button" size="sm" variant="outline" disabled={isBusy} onClick={() => void onConvert("resource", getResourceOptions())}>
+              <Library className="me-2 h-4 w-4" />{t("inbox.convertToResource")}
+            </Button>
+            </div>
+            <div className="grid gap-3 rounded-xl border border-border/70 bg-background/80 p-3">
+              <p className="text-sm font-medium">{t("inbox.processingDetails")}</p>
+              <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+                <label className="grid gap-1 text-sm font-medium">
+                  {t("links.goalLabel")}
+                  <Select value={knowledgeLinks.goalId} onChange={updateKnowledgeLink("goalId")}>
+                    <option value="">{t("links.noGoal")}</option>
+                    {goals.map((goal) => (
+                      <option key={goal.id} value={goal.id}>{goal.title}</option>
+                    ))}
+                  </Select>
+                </label>
+                <label className="grid gap-1 text-sm font-medium">
+                  {t("links.projectLabel")}
+                  <Select value={knowledgeLinks.projectId} onChange={updateKnowledgeLink("projectId")}>
+                    <option value="">{t("links.noProject")}</option>
+                    {projects.map((project) => (
+                      <option key={project.id} value={project.id}>{project.title}</option>
+                    ))}
+                  </Select>
+                </label>
+                <label className="grid gap-1 text-sm font-medium">
+                  {t("links.taskLabel")}
+                  <Select value={knowledgeLinks.taskId} onChange={updateKnowledgeLink("taskId")}>
+                    <option value="">{t("links.noTask")}</option>
+                    {tasks.map((task) => (
+                      <option key={task.id} value={task.id}>{task.title}</option>
+                    ))}
+                  </Select>
+                </label>
+                <label className="grid gap-1 text-sm font-medium">
+                  {t("links.resourceLabel")}
+                  <Select value={knowledgeLinks.resourceId} onChange={updateKnowledgeLink("resourceId")}>
+                    <option value="">{t("links.noResource")}</option>
+                    {resources.map((resource) => (
+                      <option key={resource.id} value={resource.id}>{resource.title}</option>
+                    ))}
+                  </Select>
+                </label>
+              </div>
+              <div className="grid gap-2 border-t border-border/60 pt-3 sm:grid-cols-2 xl:grid-cols-4">
+                <label className="grid gap-1 text-sm font-medium">
+                  {t("inbox.resourceType")}
+                  <Select value={resourceLinks.type} onChange={updateResourceLink("type")}>
+                    {RESOURCE_TYPE_OPTIONS.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {t(option.labelKey)}
+                      </option>
+                    ))}
+                  </Select>
+                </label>
+                <label className="grid gap-1 text-sm font-medium">
+                  {t("links.goalLabel")}
+                  <Select value={resourceLinks.goalId} onChange={updateResourceLink("goalId")}>
+                    <option value="">{t("links.noGoal")}</option>
+                    {goals.map((goal) => (
+                      <option key={goal.id} value={goal.id}>{goal.title}</option>
+                    ))}
+                  </Select>
+                </label>
+                <label className="grid gap-1 text-sm font-medium">
+                  {t("links.projectLabel")}
+                  <Select value={resourceLinks.projectId} onChange={updateResourceLink("projectId")}>
+                    <option value="">{t("links.noProject")}</option>
+                    {projects.map((project) => (
+                      <option key={project.id} value={project.id}>{project.title}</option>
+                    ))}
+                  </Select>
+                </label>
+                <label className="grid gap-1 text-sm font-medium">
+                  {t("links.taskLabel")}
+                  <Select value={resourceLinks.taskId} onChange={updateResourceLink("taskId")}>
+                    <option value="">{t("links.noTask")}</option>
+                    {tasks.map((task) => (
+                      <option key={task.id} value={task.id}>{task.title}</option>
+                    ))}
+                  </Select>
+                </label>
+              </div>
+              <p className="text-xs leading-5 text-muted-foreground">
+                {t("inbox.processingDetailsHelp")}
+              </p>
             </div>
           </div>
         ) : null}

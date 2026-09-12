@@ -1,4 +1,4 @@
-import { ArrowLeft, BookOpen, ExternalLink } from "lucide-react";
+import { ArrowLeft, BookOpen, ExternalLink, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
@@ -207,6 +207,16 @@ export function ResourceDetailPage() {
           </div>
           <div className="flex flex-wrap gap-2">
             <QuickAccessToggleButton itemType="resource" targetId={resource.id} />
+            <Button asChild type="button" variant="outline">
+              <Link
+                to={`/knowledge?create=1&resourceId=${encodeURIComponent(
+                  resource.id
+                )}`}
+              >
+                <Plus className="me-2 h-4 w-4" aria-hidden="true" />
+                {t("resources.createKnowledgeNote")}
+              </Link>
+            </Button>
           </div>
         </CardContent>
       </PremiumCard>

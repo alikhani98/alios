@@ -117,6 +117,12 @@ describe("ResourceDetailPage", () => {
     expect(container.textContent).toContain("Source: Direct");
     expect(container.textContent).toContain("Source: Through Knowledge");
     expect(container.textContent).toContain("Add to Quick Access");
+    expect(container.textContent).toContain("Create Knowledge Note");
+    expect(
+      container.querySelector(
+        `a[href="/knowledge?create=1&resourceId=${resource.id}"]`
+      )
+    ).not.toBeNull();
   });
 
   it("renders unavailable labels for missing direct relationships", async () => {
