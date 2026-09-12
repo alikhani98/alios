@@ -6,6 +6,7 @@ import {
   CalendarCheck2,
   CalendarDays,
   FolderKanban,
+  GraduationCap,
   Inbox,
   RotateCcw,
   ShieldCheck,
@@ -50,6 +51,7 @@ import {
 import { useHomeDashboard } from "../hooks/useHomeDashboard";
 import type { HomeCollapsibleSectionId } from "../homeCollapsedSections";
 import type { HomeDashboardData } from "../types";
+import type { HomeLearningSnapshot } from "../homeLearningSnapshot";
 
 const quickLinks: ReadonlyArray<{ to: string; labelKey: TranslationKey }> = [
   { to: "/today", labelKey: "home.goToday" },
@@ -138,6 +140,123 @@ function TodayContextStrip({ inboxCount }: { inboxCount: number }) {
         </Button>
       </div>
     </CollapsibleSection>
+  );
+}
+
+function HomeLearningPanel({
+  snapshot,
+}: {
+  snapshot: HomeLearningSnapshot;
+}) {
+  const { t } = useI18n();
+
+  if (!snapshot.hasAnyData) {
+    return null;
+  }
+
+  return (
+    <Card className="alios-home-context-shelf overflow-hidden shadow-sm">
+      <CardContent className="space-y-4 p-5 sm:p-6">
+        <SectionHeader
+          title={t("home.learningKnowledgeTitle")}
+          description={t("home.learningKnowledgeDescription")}
+          icon={<GraduationCap className="h-5 w-5" aria-hidden="true" />}
+          status={
+            <Badge variant="secondary" className="font-mono tabular-nums">
+              {snapshot.activeLearningGoals.length +
+                snapshot.inProgressResources.length +
+                snapshot.recentKnowledgeItems.length}
+            </Badge>
+          }
+        />
+
+        <div className="grid gap-3 lg:grid-cols-3">
+          {snapshot.activeLearningGoals.length > 0 ? (
+            <HomeLearningList
+              title={t("home.currentlyLearning")}
+              items={snapshot.activeLearningGoals.map((goal) => ({
+                id: goal.id,
+                title: goal.title,
+                to: `/goals?${new URLSearchParams({
+                  focusId: goal.id,
+                }).toString()}`,
+              }))}
+            />
+          ) : null}
+
+          {snapshot.continueLearningResource ? (
+            <HomeLearningList
+              title={t("home.continueLearning")}
+              items={[
+                {
+                  id: snapshot.continueLearningResource.id,
+                  title: snapshot.continueLearningResource.title,
+                  meta:
+                    snapshot.continueLearningResource.progressPercent !==
+                    undefined
+                      ? t("resources.progressValue", {
+                          count:
+                            snapshot.continueLearningResource.progressPercent,
+                        })
+                      : t("resources.statusInProgress"),
+                  to: `/resources/${encodeURIComponent(
+                    snapshot.continueLearningResource.id
+                  )}`,
+                },
+              ]}
+            />
+          ) : null}
+
+          {snapshot.recentKnowledgeItems.length > 0 ? (
+            <HomeLearningList
+              title={t("home.recentLearningKnowledge")}
+              items={snapshot.recentKnowledgeItems.map((item) => ({
+                id: item.id,
+                title: item.title,
+                to: `/knowledge?${new URLSearchParams({
+                  focusId: item.id,
+                }).toString()}`,
+              }))}
+            />
+          ) : null}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function HomeLearningList({
+  title,
+  items,
+}: {
+  title: string;
+  items: ReadonlyArray<{
+    id: string;
+    title: string;
+    meta?: string;
+    to: string;
+  }>;
+}) {
+  return (
+    <div className="min-w-0 rounded-2xl border bg-background/80 p-4 shadow-sm">
+      <p className="text-sm font-semibold">{title}</p>
+      <div className="mt-3 space-y-2">
+        {items.map((item) => (
+          <Link
+            key={item.id}
+            to={item.to}
+            className="flex min-h-11 min-w-0 items-center justify-between gap-3 rounded-xl border bg-card px-3 py-2 text-sm shadow-sm transition hover:border-primary/25 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          >
+            <span className="min-w-0 truncate font-medium">{item.title}</span>
+            {item.meta ? (
+              <span className="shrink-0 text-xs text-muted-foreground">
+                {item.meta}
+              </span>
+            ) : null}
+          </Link>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -561,6 +680,7 @@ export function UnifiedHomePage() {
           <DailyBriefingCard data={data} />
           <ClearStartCard data={data} />
           <QuickAccessLauncher />
+          <HomeLearningPanel snapshot={data.learningSnapshot} />
           <TodayContextStrip inboxCount={data.inbox.unprocessedCount} />
           <TodayWorkspace
             today={today}

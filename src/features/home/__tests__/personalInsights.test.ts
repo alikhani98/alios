@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { HomeDashboardData } from "../types";
+import { buildHomeLearningSnapshot } from "../homeLearningSnapshot";
 import { buildHomePersonalMetrics } from "../personalMetrics";
 import {
   buildPersonalInsightsSnapshot,
@@ -78,6 +79,11 @@ function createHomeData(overrides: Partial<HomeDashboardData> = {}): HomeDashboa
       totalCount: 0,
       latest: undefined,
     },
+    resources: {
+      totalCount: 0,
+      inProgressCount: 0,
+      latest: undefined,
+    },
     goals: {
       totalCount: 0,
       activeCount: 0,
@@ -109,6 +115,11 @@ function createHomeData(overrides: Partial<HomeDashboardData> = {}): HomeDashboa
     inbox: {
       unprocessedCount: 0,
     },
+    learningSnapshot: buildHomeLearningSnapshot({
+      goals: [],
+      resources: [],
+      knowledgeItems: [],
+    }),
     personalMetrics: buildHomePersonalMetrics({
       tasks: [],
       journalEntries: [],

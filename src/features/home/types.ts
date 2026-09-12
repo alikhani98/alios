@@ -5,11 +5,13 @@ import type {
   KnowledgeItem,
   ManualEntry,
   Project,
+  Resource,
   Routine,
   Task,
   WeeklyPlan,
 } from "@/shared/types";
 import type { LifeAreaView } from "@/features/lifeAreas";
+import type { HomeLearningSnapshot } from "./homeLearningSnapshot";
 import type { HomePlanningFocus } from "./homePlanningFocus";
 import type { HomePersonalMetrics } from "./personalMetrics";
 import type { WeeklyPlanLink } from "@/features/weeklyReview/weeklyPlanLinks";
@@ -34,6 +36,11 @@ export type HomeDashboardData = {
   knowledge: {
     totalCount: number;
     latest?: KnowledgeItem;
+  };
+  resources: {
+    totalCount: number;
+    inProgressCount: number;
+    latest?: Resource;
   };
   goals: {
     totalCount: number;
@@ -70,6 +77,7 @@ export type HomeDashboardData = {
   planningFocus?: HomePlanningFocus;
   weeklyPlan?: WeeklyPlan;
   weeklyPlanLinks?: WeeklyPlanLink[];
+  learningSnapshot: HomeLearningSnapshot;
   personalMetrics: HomePersonalMetrics;
   isEmpty: boolean;
 };

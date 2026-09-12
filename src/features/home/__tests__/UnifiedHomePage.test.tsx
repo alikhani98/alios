@@ -8,8 +8,14 @@ import type {
   BackupStatusFreshness,
   BackupStatusMetadata,
 } from "@/shared/preferences/backupStatus";
+import {
+  goalRecord,
+  knowledgeItemRecord,
+  resourceRecord,
+} from "@/test/factories";
 import type { HomeDashboardData } from "../types";
 import { HOME_BACKUP_REMINDER_DISMISSED_UNTIL_KEY } from "../backupReminder";
+import { buildHomeLearningSnapshot } from "../homeLearningSnapshot";
 import { getDailyBriefingViewModel } from "../components/DailyBriefingCard";
 import { buildHomePersonalMetrics } from "../personalMetrics";
 
@@ -53,6 +59,10 @@ const dashboardData: HomeDashboardData = {
   knowledge: {
     totalCount: 0,
   },
+  resources: {
+    totalCount: 0,
+    inProgressCount: 0,
+  },
   goals: {
     totalCount: 1,
     activeCount: 1,
@@ -81,6 +91,11 @@ const dashboardData: HomeDashboardData = {
   inbox: {
     unprocessedCount: 2,
   },
+  learningSnapshot: buildHomeLearningSnapshot({
+    goals: [],
+    resources: [],
+    knowledgeItems: [],
+  }),
   personalMetrics: buildHomePersonalMetrics(
     {
       tasks: [todayTask],
@@ -211,6 +226,56 @@ describe("UnifiedHomePage", () => {
     expect(markup).toContain('aria-expanded="false"');
     expect(markup).toContain('id="unified-home-more-context-content" hidden="" aria-hidden="true"');
     expect(markup).toContain("Quick links");
+  });
+
+  it("shows a compact Learning & Knowledge panel after Quick Access", () => {
+    mockedDashboardData = {
+      ...dashboardData,
+      learningSnapshot: buildHomeLearningSnapshot({
+        goals: [
+          {
+            ...goalRecord,
+            id: "goal-learning",
+            title: "Become data analyst",
+            status: "active",
+            updatedAt: "2026-08-08T08:00:00.000Z",
+          },
+        ],
+        resources: [
+          {
+            ...resourceRecord,
+            id: "resource-learning",
+            title: "SQL Course",
+            status: "in_progress",
+            progressPercent: 40,
+            updatedAt: "2026-08-07T08:00:00.000Z",
+          },
+        ],
+        knowledgeItems: [
+          {
+            ...knowledgeItemRecord,
+            id: "knowledge-learning",
+            title: "Join strategy note",
+            resourceId: "resource-learning",
+            updatedAt: "2026-08-09T08:00:00.000Z",
+          },
+        ],
+      }),
+    };
+
+    const markup = renderUnifiedHome();
+
+    expect(markup).toContain("Learning &amp; Knowledge");
+    expect(markup).toContain("Currently learning");
+    expect(markup).toContain("Continue learning");
+    expect(markup).toContain("Recent Knowledge");
+    expect(markup).toContain("Become data analyst");
+    expect(markup).toContain("SQL Course");
+    expect(markup).toContain("Progress: 40%");
+    expect(markup).toContain("Join strategy note");
+    expect(markup).toContain("/goals?focusId=goal-learning");
+    expect(markup).toContain("/resources/resource-learning");
+    expect(markup).toContain("/knowledge?focusId=knowledge-learning");
   });
 
   it("shows the backup reminder when the last backup is older than seven days", () => {

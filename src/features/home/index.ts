@@ -1,6 +1,7 @@
 export * from "./hooks/useHomeDashboard";
 export * from "./hooks/useHomeDashboardLayout";
 export * from "./dashboardLayout";
+export * from "./homeLearningSnapshot";
 export * from "./personalInsights";
 export * from "./components/HomePersonalInsightsCard";
 export * from "./types";

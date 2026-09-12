@@ -9,6 +9,7 @@ import { getGoalsSummary } from "@/features/goals";
 import { getLifeAreasSummary, mergeLifeAreas } from "@/features/lifeAreas";
 import { getManualEntrySummary } from "@/features/manual";
 import { getHomePlanningFocus } from "../homePlanningFocus";
+import { buildHomeLearningSnapshot } from "../homeLearningSnapshot";
 import { buildHomePersonalMetrics } from "../personalMetrics";
 import { getWeeklyPlanWeekStart } from "@/features/weeklyReview/weeklyPlan";
 import type { HomeDashboardData } from "../types";
@@ -45,7 +46,7 @@ function byUpdatedAtDescending<T extends { updatedAt: string }>(a: T, b: T) {
 }
 
 export function useHomeDashboard() {
-  const { tasks, dailyCheckins, projects, journal, knowledge, goals, lifeAreas, manual, inbox, weeklyPlans, finance, routines } =
+  const { tasks, dailyCheckins, projects, journal, knowledge, goals, lifeAreas, manual, inbox, weeklyPlans, finance, routines, resources } =
     useStorageAdapter();
   const { t } = useI18n();
   const [data, setData] = useState<HomeDashboardData | null>(null);
@@ -72,6 +73,7 @@ export function useHomeDashboard() {
         financeTransactions,
         financeObligations,
         routineEntries,
+        resourceItems,
       ] =
         await Promise.all([
           tasks.list(),
@@ -87,6 +89,7 @@ export function useHomeDashboard() {
           finance.listTransactions(),
           finance.listObligations(),
           routines.list(),
+          resources.list(),
         ]);
 
       const todayTasks = allTasks.filter((task) => task.dueDate === today);
@@ -107,6 +110,7 @@ export function useHomeDashboard() {
         .slice(0, 3);
       const latestJournal = [...journalEntries].sort(byUpdatedAtDescending)[0];
       const latestKnowledge = [...knowledgeItems].sort(byUpdatedAtDescending)[0];
+      const latestResource = [...resourceItems].sort(byUpdatedAtDescending)[0];
       const goalSummary = getGoalsSummary(goalEntries);
       const lifeAreaViews = mergeLifeAreas(lifeAreaEntries, t);
       const lifeAreaSummary = getLifeAreasSummary(lifeAreaViews, new Date());
@@ -141,6 +145,13 @@ export function useHomeDashboard() {
         knowledge: {
           totalCount: knowledgeItems.length,
           latest: latestKnowledge,
+        },
+        resources: {
+          totalCount: resourceItems.length,
+          inProgressCount: resourceItems.filter(
+            (resource) => resource.status === "in_progress"
+          ).length,
+          latest: latestResource,
         },
         goals: {
           totalCount: goalSummary.totalCount,
@@ -179,6 +190,11 @@ export function useHomeDashboard() {
         planningFocus: getHomePlanningFocus(goalEntries, allProjects, allTasks),
         weeklyPlan,
         weeklyPlanLinks: getHomeWeeklyPlanLinks(weeklyPlan, goalEntries, allProjects, allTasks),
+        learningSnapshot: buildHomeLearningSnapshot({
+          goals: goalEntries,
+          resources: resourceItems,
+          knowledgeItems,
+        }),
         personalMetrics: buildHomePersonalMetrics({
           tasks: allTasks,
           journalEntries,
@@ -198,6 +214,7 @@ export function useHomeDashboard() {
           financeTransactions.length === 0 &&
           financeObligations.length === 0 &&
           manualEntries.length === 0 &&
+          resourceItems.length === 0 &&
           inboxItems.length === 0,
       });
     } catch {
@@ -205,7 +222,7 @@ export function useHomeDashboard() {
     } finally {
       setIsLoading(false);
     }
-  }, [dailyCheckins, finance, goals, inbox, journal, knowledge, lifeAreas, manual, projects, routines, tasks, t, weeklyPlans]);
+  }, [dailyCheckins, finance, goals, inbox, journal, knowledge, lifeAreas, manual, projects, resources, routines, tasks, t, weeklyPlans]);
 
   useEffect(() => {
     void loadDashboard();
