@@ -109,6 +109,13 @@ describe("ResourceDetailPage", () => {
     expect(container.textContent).toContain("Study chapter three");
     expect(container.textContent).toContain("Derived context");
     expect(container.textContent).toContain("From: related Knowledge");
+    expect(container.textContent).toContain("Learning context");
+    expect(container.textContent).toContain("Goals supported");
+    expect(container.textContent).toContain("Projects involved");
+    expect(container.textContent).toContain("Tasks connected");
+    expect(container.textContent).toContain("Knowledge created");
+    expect(container.textContent).toContain("Source: Direct");
+    expect(container.textContent).toContain("Source: Through Knowledge");
     expect(container.textContent).toContain("Add to Quick Access");
   });
 
@@ -142,6 +149,7 @@ describe("ResourceDetailPage", () => {
     expect(container.textContent).toContain("Linked goal unavailable");
     expect(container.textContent).toContain("Linked project unavailable");
     expect(container.textContent).toContain("Linked task unavailable");
+    expect(container.textContent).toContain("Learning context");
   });
 
   it("renders a useful empty state for a missing resource", async () => {

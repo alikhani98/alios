@@ -26,6 +26,11 @@ import {
   deriveResourceRelationshipContext,
   type ResourceRelationship,
 } from "../resourceRelationships";
+import {
+  resolveResourceLearningContext,
+  type ResourceLearningContext,
+  type ResourceLearningRelationship,
+} from "../resourceLearningContext";
 
 type DetailState = {
   resource: Resource | null;
@@ -36,6 +41,7 @@ type DetailState = {
   derivedGoals: ResourceRelationship[];
   derivedProjects: ResourceRelationship[];
   derivedTasks: ResourceRelationship[];
+  learningContext?: ResourceLearningContext;
 };
 
 export function ResourceDetailPage() {
@@ -98,6 +104,15 @@ export function ResourceDetailPage() {
               derivedProjects: [],
               derivedTasks: [],
             };
+        const learningContext = resource
+          ? resolveResourceLearningContext({
+              resource,
+              knowledgeItems,
+              goals,
+              projects,
+              tasks,
+            })
+          : undefined;
 
         setState({
           resource: resource ?? null,
@@ -105,6 +120,7 @@ export function ResourceDetailPage() {
             (item) => item.resourceId === resource?.id
           ),
           ...relationshipContext,
+          learningContext,
         });
         setError(false);
       })
@@ -386,7 +402,120 @@ export function ResourceDetailPage() {
           </CardContent>
         </PremiumCard>
       ) : null}
+      {state.learningContext &&
+      (state.learningContext.relatedGoals.length > 0 ||
+        state.learningContext.relatedProjects.length > 0 ||
+        state.learningContext.relatedTasks.length > 0 ||
+        state.learningContext.relatedKnowledge.length > 0) ? (
+        <PremiumCard>
+          <CardHeader>
+            <CardTitle>{t("resources.learningContext")}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm leading-6 text-muted-foreground">
+              {t("resources.learningContextDescription")}
+            </p>
+            <ResourceLearningGroup
+              label={t("resources.learningGoals")}
+              items={state.learningContext.relatedGoals}
+              unavailable={t("links.goalUnavailable")}
+              hrefPrefix="/goals?focusId="
+              sourceLabels={{
+                direct: t("resources.learningSourceDirect"),
+                project: t("resources.learningSourceProject"),
+                task: t("resources.learningSourceTask"),
+                knowledge: t("resources.learningSourceKnowledge"),
+              }}
+              sourcePrefix={t("resources.learningSourcePrefix")}
+            />
+            <ResourceLearningGroup
+              label={t("resources.learningProjects")}
+              items={state.learningContext.relatedProjects}
+              unavailable={t("links.projectUnavailable")}
+              hrefPrefix="/projects?focusId="
+              sourceLabels={{
+                direct: t("resources.learningSourceDirect"),
+                project: t("resources.learningSourceProject"),
+                task: t("resources.learningSourceTask"),
+                knowledge: t("resources.learningSourceKnowledge"),
+              }}
+              sourcePrefix={t("resources.learningSourcePrefix")}
+            />
+            <ResourceLearningGroup
+              label={t("resources.learningTasks")}
+              items={state.learningContext.relatedTasks}
+              unavailable={t("links.taskUnavailable")}
+              hrefPrefix="/today?focusId="
+              sourceLabels={{
+                direct: t("resources.learningSourceDirect"),
+                project: t("resources.learningSourceProject"),
+                task: t("resources.learningSourceTask"),
+                knowledge: t("resources.learningSourceKnowledge"),
+              }}
+              sourcePrefix={t("resources.learningSourcePrefix")}
+            />
+            <ResourceLearningGroup
+              label={t("resources.learningKnowledge")}
+              items={state.learningContext.relatedKnowledge}
+              unavailable={t("links.relatedKnowledgeUnavailable")}
+              hrefPrefix="/knowledge?focusId="
+              sourceLabels={{
+                direct: t("resources.learningSourceDirect"),
+                project: t("resources.learningSourceProject"),
+                task: t("resources.learningSourceTask"),
+                knowledge: t("resources.learningSourceKnowledge"),
+              }}
+              sourcePrefix={t("resources.learningSourcePrefix")}
+            />
+          </CardContent>
+        </PremiumCard>
+      ) : null}
     </section>
+  );
+}
+
+function ResourceLearningGroup({
+  label,
+  items,
+  unavailable,
+  hrefPrefix,
+  sourceLabels,
+  sourcePrefix,
+}: {
+  label: string;
+  items: ReadonlyArray<ResourceLearningRelationship>;
+  unavailable: string;
+  hrefPrefix: string;
+  sourceLabels: Record<ResourceLearningRelationship["provenance"], string>;
+  sourcePrefix: string;
+}) {
+  if (items.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="space-y-2">
+      <h2 className="text-sm font-semibold">{label}</h2>
+      <ul className="space-y-2">
+        {items.map((item) => (
+          <li key={`${label}-${item.id}`} className="flex min-w-0 flex-wrap items-center gap-2 text-sm">
+            {item.title ? (
+              <Link
+                className="min-w-0 break-words text-primary underline-offset-4 hover:underline"
+                to={`${hrefPrefix}${encodeURIComponent(item.id)}`}
+              >
+                {item.title}
+              </Link>
+            ) : (
+              <span className="text-muted-foreground">{unavailable}</span>
+            )}
+            <span className="text-xs text-muted-foreground">
+              {sourcePrefix}: {sourceLabels[item.provenance]}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 

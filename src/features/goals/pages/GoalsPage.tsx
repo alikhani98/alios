@@ -1,5 +1,6 @@
 import {
   AlertCircle,
+  BookOpen,
   CheckCircle2,
   Clock3,
   Info,
@@ -11,7 +12,7 @@ import {
   X,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
 import type { CreateGoalInput } from "@/core/repositories";
 import { useStorageAdapter } from "@/core/storage";
@@ -28,6 +29,9 @@ import type {
 } from "@/shared/types";
 import {
   Button,
+  CardContent,
+  CardHeader,
+  CardTitle,
   CollapsibleSection,
   EmptyState,
   Input,
@@ -284,6 +288,21 @@ export function GoalsPage() {
         ])
       ),
     [entries, linkedKnowledgeItems, projects, resources, tasks]
+  );
+  const learningOverview = useMemo(
+    () => ({
+      activeGoals: entries
+        .filter((goal) => goal.status === "active")
+        .slice(0, 4),
+      activeResources: resources
+        .filter((resource) => resource.status === "in_progress")
+        .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))
+        .slice(0, 4),
+      recentKnowledge: [...linkedKnowledgeItems]
+        .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))
+        .slice(0, 4),
+    }),
+    [entries, linkedKnowledgeItems, resources]
   );
   const isProjectProgressLoading = isProjectsLoading || isTasksLoading;
   const linkedWorkLoadError =
@@ -942,6 +961,11 @@ export function GoalsPage() {
         </div>
 
         <div className="space-y-6">
+          <LearningOverview
+            activeGoals={learningOverview.activeGoals}
+            activeResources={learningOverview.activeResources}
+            recentKnowledge={learningOverview.recentKnowledge}
+          />
           <CollapsibleSection
             id="goals-templates"
             title={t("goals.templatesTitle")}
@@ -1133,5 +1157,104 @@ export function GoalsPage() {
         </div>
       ) : null}
     </section>
+  );
+}
+
+function LearningOverview({
+  activeGoals,
+  activeResources,
+  recentKnowledge,
+}: {
+  activeGoals: ReadonlyArray<Goal>;
+  activeResources: ReadonlyArray<Resource>;
+  recentKnowledge: ReadonlyArray<KnowledgeItem>;
+}) {
+  const { t } = useI18n();
+  const hasContent =
+    activeGoals.length > 0 ||
+    activeResources.length > 0 ||
+    recentKnowledge.length > 0;
+
+  return (
+    <PremiumCard>
+      <CardHeader className="space-y-2">
+        <CardTitle className="flex items-center gap-2">
+          <BookOpen className="h-5 w-5 text-primary" aria-hidden="true" />
+          {t("goals.learningOverview")}
+        </CardTitle>
+        <p className="text-sm leading-6 text-muted-foreground">
+          {t("goals.learningOverviewDescription")}
+        </p>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {!hasContent ? (
+          <p className="text-sm text-muted-foreground">
+            {t("goals.learningOverviewEmpty")}
+          </p>
+        ) : (
+          <>
+            <OverviewList
+              label={t("goals.learningOverviewActiveGoals")}
+              items={activeGoals.map((goal) => ({
+                id: goal.id,
+                title: goal.title,
+                href: `/goals?focusId=${encodeURIComponent(goal.id)}`,
+              }))}
+              emptyLabel={t("goals.learningOverviewNoActiveGoals")}
+            />
+            <OverviewList
+              label={t("goals.learningOverviewActiveResources")}
+              items={activeResources.map((resource) => ({
+                id: resource.id,
+                title: resource.title,
+                href: `/resources/${encodeURIComponent(resource.id)}`,
+              }))}
+              emptyLabel={t("goals.learningOverviewNoActiveResources")}
+            />
+            <OverviewList
+              label={t("goals.learningOverviewRecentKnowledge")}
+              items={recentKnowledge.map((item) => ({
+                id: item.id,
+                title: item.title,
+                href: `/knowledge?focusId=${encodeURIComponent(item.id)}`,
+              }))}
+              emptyLabel={t("goals.learningOverviewNoRecentKnowledge")}
+            />
+          </>
+        )}
+      </CardContent>
+    </PremiumCard>
+  );
+}
+
+function OverviewList({
+  label,
+  items,
+  emptyLabel,
+}: {
+  label: string;
+  items: ReadonlyArray<{ id: string; title: string; href: string }>;
+  emptyLabel: string;
+}) {
+  return (
+    <div className="space-y-2">
+      <p className="text-sm font-semibold">{label}</p>
+      {items.length > 0 ? (
+        <ul className="space-y-1">
+          {items.map((item) => (
+            <li key={item.id}>
+              <Link
+                className="block break-words text-sm text-primary underline-offset-4 hover:underline"
+                to={item.href}
+              >
+                {item.title}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-sm text-muted-foreground">{emptyLabel}</p>
+      )}
+    </div>
   );
 }

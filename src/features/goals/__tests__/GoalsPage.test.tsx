@@ -6,6 +6,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { DateDisplayProvider } from "@/shared/date";
 import { I18nProvider, LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
+import {
+  knowledgeItemRecord,
+  resourceRecord,
+} from "@/test/factories";
 import { GoalsPage } from "../pages/GoalsPage";
 
 const pageMocks = vi.hoisted(() => {
@@ -51,6 +55,18 @@ const pageMocks = vi.hoisted(() => {
     loadProjects: vi.fn(async () => undefined),
     storage: {
       tasks: {
+        list: vi.fn(),
+      },
+      journal: {
+        list: vi.fn(),
+      },
+      decisions: {
+        list: vi.fn(),
+      },
+      knowledge: {
+        list: vi.fn(),
+      },
+      resources: {
         list: vi.fn(),
       },
     },
@@ -122,6 +138,14 @@ describe("GoalsPage storage error states", () => {
     localStorage.setItem(LANGUAGE_STORAGE_KEY, "en");
     pageMocks.storage.tasks.list.mockReset();
     pageMocks.storage.tasks.list.mockResolvedValue([]);
+    pageMocks.storage.journal.list.mockReset();
+    pageMocks.storage.journal.list.mockResolvedValue([]);
+    pageMocks.storage.decisions.list.mockReset();
+    pageMocks.storage.decisions.list.mockResolvedValue([]);
+    pageMocks.storage.knowledge.list.mockReset();
+    pageMocks.storage.knowledge.list.mockResolvedValue([]);
+    pageMocks.storage.resources.list.mockReset();
+    pageMocks.storage.resources.list.mockResolvedValue([]);
     pageMocks.projectsError = null;
     pageMocks.loadProjects.mockClear();
   });
@@ -158,6 +182,43 @@ describe("GoalsPage storage error states", () => {
       );
       expect(container.textContent).toContain("Try again");
       expect(container.textContent).not.toContain("Your goals track is ready");
+    } finally {
+      await act(async () => {
+        root.unmount();
+      });
+      container.remove();
+    }
+  });
+
+  it("renders the lightweight learning overview from derived records", async () => {
+    pageMocks.storage.resources.list.mockResolvedValueOnce([
+      {
+        ...resourceRecord,
+        id: "resource-active",
+        title: "SQL Course",
+        status: "in_progress",
+        updatedAt: "2026-07-07T08:30:00.000Z",
+      },
+    ]);
+    pageMocks.storage.knowledge.list.mockResolvedValueOnce([
+      {
+        ...knowledgeItemRecord,
+        id: "knowledge-recent",
+        title: "Join strategy note",
+        updatedAt: "2026-07-08T08:30:00.000Z",
+      },
+    ]);
+
+    const { container, root } = await renderGoalsPage();
+
+    try {
+      expect(container.textContent).toContain("Learning overview");
+      expect(container.textContent).toContain("Active goals");
+      expect(container.textContent).toContain("Active learning resources");
+      expect(container.textContent).toContain("Recent Knowledge");
+      expect(container.textContent).toContain("Improve sleep");
+      expect(container.textContent).toContain("SQL Course");
+      expect(container.textContent).toContain("Join strategy note");
     } finally {
       await act(async () => {
         root.unmount();
