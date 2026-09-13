@@ -140,9 +140,7 @@ export function getContinueLearningResources(
   const inProgress = resources
     .filter(
       (resource) =>
-        resource.status === "in_progress" &&
-        resource.status !== "archived" &&
-        resource.status !== "completed"
+        resource.status === "in_progress"
     )
     .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt));
 

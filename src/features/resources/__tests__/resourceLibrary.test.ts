@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { resourceRecord } from "@/test/factories";
+import { knowledgeItemRecord, resourceRecord } from "@/test/factories";
 import {
+  filterResourceLibraryView,
   filterResources,
+  getContinueLearningResources,
   getResourceLibrarySummary,
   sortResources,
 } from "../resourceLibrary";
@@ -63,6 +65,46 @@ describe("resource library derived views", () => {
         format: "physical",
       }).map((resource) => resource.id)
     ).toEqual(["book"]);
+  });
+
+  it("derives named library views from resource and knowledge records", () => {
+    const knowledge = {
+      ...knowledgeItemRecord,
+      id: "knowledge-for-book",
+      resourceId: "book",
+    };
+
+    expect(
+      filterResourceLibraryView(resources, "books").map((resource) => resource.id)
+    ).toEqual(["book"]);
+    expect(
+      filterResourceLibraryView(resources, "with_knowledge", [knowledge]).map(
+        (resource) => resource.id
+      )
+    ).toEqual(["book"]);
+    expect(
+      filterResourceLibraryView(
+        resources,
+        "recently_added",
+        [],
+        new Date("2026-01-10T00:00:00.000Z")
+      ).map((resource) => resource.id)
+    ).toEqual(["book", "course", "website"]);
+  });
+
+  it("prioritizes recently updated in-progress resources for Continue learning", () => {
+    expect(getContinueLearningResources(resources, 2).map((resource) => resource.id)).toEqual([
+      "book",
+    ]);
+
+    const fallbackResources = resources.map((resource) => ({
+      ...resource,
+      status: "unread" as const,
+      progressPercent: resource.id === "course" ? 20 : 0,
+    }));
+    expect(
+      getContinueLearningResources(fallbackResources).map((resource) => resource.id)
+    ).toEqual(["course"]);
   });
 
   it("sorts by title, newest, oldest, updated time, and progress", () => {
