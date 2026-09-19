@@ -133,6 +133,7 @@ describe("ResourceDetailPage", () => {
     expect(container.textContent).toContain("Source: Through Knowledge");
     expect(container.textContent).toContain("Add to Quick Access");
     expect(container.textContent).toContain("Create Knowledge Note");
+    expect(container.textContent).toContain("Add attachment");
     expect(container.textContent).toContain("Attachments");
     expect(container.textContent).toContain("atomic-habits.pdf");
     expect(container.textContent).toContain("application/pdf");

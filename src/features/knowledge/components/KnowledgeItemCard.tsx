@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 
 import type {
+  Attachment,
   Goal,
   KnowledgeItem,
   Project,
@@ -10,7 +11,9 @@ import type {
   Task,
 } from "@/shared/types";
 import {
+  AttachmentCreateControl,
   AttachmentSection,
+  type AttachmentWorkflowDependencies,
   type AttachmentOwnerContext,
 } from "@/features/attachments";
 import { useI18n } from "@/shared/i18n";
@@ -35,6 +38,8 @@ type KnowledgeItemCardProps = {
   linkedTask?: Task;
   linkedResource?: Resource;
   attachmentContext?: AttachmentOwnerContext;
+  attachmentWorkflow?: AttachmentWorkflowDependencies;
+  onAttachmentCreated?: (attachment: Attachment) => void;
   isDeleting: boolean;
   onEdit: () => void;
   onDelete: () => Promise<void>;
@@ -48,6 +53,8 @@ export function KnowledgeItemCard({
   linkedTask,
   linkedResource,
   attachmentContext,
+  attachmentWorkflow,
+  onAttachmentCreated,
   isDeleting,
   onEdit,
   onDelete,
@@ -118,6 +125,14 @@ export function KnowledgeItemCard({
       </CardContent>
 
       <CardFooter className="flex-wrap gap-2 border-t pt-4">
+        {attachmentWorkflow ? (
+          <AttachmentCreateControl
+            ownerType="knowledge"
+            ownerId={item.id}
+            dependencies={attachmentWorkflow}
+            onCreated={onAttachmentCreated}
+          />
+        ) : null}
         {confirmingDelete ? (
           <>
             <Button

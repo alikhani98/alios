@@ -4,6 +4,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { useStorageAdapter } from "@/core/storage";
 import {
+  AttachmentCreateControl,
   AttachmentSection,
   resolveResourceAttachmentContext,
   type AttachmentOwnerContext,
@@ -11,6 +12,7 @@ import {
 import { useDateFormatter } from "@/shared/date";
 import { useI18n } from "@/shared/i18n";
 import type {
+  Attachment,
   Goal,
   KnowledgeItem,
   Project,
@@ -68,6 +70,7 @@ export function ResourceDetailPage() {
     projects: projectsRepository,
     tasks: tasksRepository,
     attachments: attachmentRepository,
+    attachmentBinary,
   } = useStorageAdapter();
   const [state, setState] = useState<DetailState>({
     resource: null,
@@ -201,6 +204,16 @@ export function ResourceDetailPage() {
   const statusLabel = RESOURCE_STATUS_OPTIONS.find(
     (option) => option.value === resource.status
   );
+  const handleAttachmentCreated = (attachment: Attachment) => {
+    setState((current) => ({
+      ...current,
+      attachmentContext: resolveResourceAttachmentContext(
+        [...(current.attachmentContext?.attachments ?? []), attachment],
+        resource.id
+      ),
+    }));
+  };
+
   return (
     <section className="alios-page space-y-6">
       <PremiumCard className="alios-now-surface">
@@ -237,6 +250,15 @@ export function ResourceDetailPage() {
                 {t("resources.createKnowledgeNote")}
               </Link>
             </Button>
+            <AttachmentCreateControl
+              ownerType="resource"
+              ownerId={resource.id}
+              dependencies={{
+                attachments: attachmentRepository,
+                binaryStorage: attachmentBinary,
+              }}
+              onCreated={handleAttachmentCreated}
+            />
           </div>
         </CardContent>
       </PremiumCard>

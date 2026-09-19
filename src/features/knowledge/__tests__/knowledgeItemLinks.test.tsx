@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { DateDisplayProvider } from "@/shared/date";
 import { I18nProvider, LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
 import type { Attachment } from "@/shared/types";
+import type { AttachmentWorkflowDependencies } from "@/features/attachments";
 import {
   goalRecord,
   knowledgeItemRecord,
@@ -116,4 +117,28 @@ describe("Knowledge structural links", () => {
     expect(markup).toContain("image/png");
   });
 
+  it("renders the attachment creation action when workflow dependencies are available", () => {
+    const attachmentWorkflow: AttachmentWorkflowDependencies = {
+      attachments: {
+        create: async () => {
+          throw new Error("not called");
+        },
+        getById: async () => undefined,
+        listByOwner: async () => [],
+        delete: async () => undefined,
+      },
+      binaryStorage: {
+        save: async () => undefined,
+        retrieve: async () => undefined,
+        delete: async () => undefined,
+      },
+    };
+
+    const markup = renderKnowledgeCard({
+      attachmentWorkflow,
+    });
+
+    expect(markup).toContain("Add attachment");
+    expect(markup).toContain("Choose an attachment file");
+  });
 });

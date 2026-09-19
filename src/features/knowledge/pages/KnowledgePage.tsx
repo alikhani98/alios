@@ -52,6 +52,7 @@ export function KnowledgePage() {
     tasks: tasksRepository,
     resources: resourcesRepository,
     attachments: attachmentRepository,
+    attachmentBinary,
   } = useStorageAdapter();
   const {
     items,
@@ -541,6 +542,22 @@ export function KnowledgePage() {
                 linkedTask={findLinkedTaskById(item, tasks)}
                 linkedResource={findLinkedResourceById(item, resources)}
                 attachmentContext={attachmentContexts[item.id]}
+                attachmentWorkflow={{
+                  attachments: attachmentRepository,
+                  binaryStorage: attachmentBinary,
+                }}
+                onAttachmentCreated={(attachment) => {
+                  setAttachmentContexts((current) => ({
+                    ...current,
+                    [item.id]: resolveKnowledgeAttachmentContext(
+                      [
+                        ...(current[item.id]?.attachments ?? []),
+                        attachment,
+                      ],
+                      item.id
+                    ),
+                  }));
+                }}
                 isDeleting={deletingId === item.id}
                 onEdit={() => openEditForm(item)}
                 onDelete={() => handleDelete(item)}
