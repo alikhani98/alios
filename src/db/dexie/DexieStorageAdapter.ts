@@ -1,5 +1,6 @@
 import type { StorageAdapter } from "@/core/storage";
 import { DexieBackupStorage } from "./DexieBackupStorage";
+import { DexieAttachmentBinaryStorage } from "./DexieAttachmentBinaryStorage";
 import { aliosDatabase, type AliosDatabase } from "./db";
 import {
   DexieDailyCheckinsRepository,
@@ -18,6 +19,7 @@ import {
   DexieTasksRepository,
   DexieRoutinesRepository,
   DexieWeeklyPlansRepository,
+  DexieAttachmentRepository,
 } from "./repositories";
 
 export class DexieStorageAdapter implements StorageAdapter {
@@ -38,6 +40,8 @@ export class DexieStorageAdapter implements StorageAdapter {
   readonly knowledge: DexieKnowledgeRepository;
   readonly resources: DexieResourceRepository;
   readonly settings: DexieSettingsRepository;
+  readonly attachments: DexieAttachmentRepository;
+  readonly attachmentBinary: DexieAttachmentBinaryStorage;
 
   constructor(readonly database: AliosDatabase = aliosDatabase) {
     this.backup = new DexieBackupStorage(database);
@@ -57,6 +61,8 @@ export class DexieStorageAdapter implements StorageAdapter {
     this.knowledge = new DexieKnowledgeRepository(database);
     this.resources = new DexieResourceRepository(database);
     this.settings = new DexieSettingsRepository(database);
+    this.attachments = new DexieAttachmentRepository(database);
+    this.attachmentBinary = new DexieAttachmentBinaryStorage(database);
   }
 }
 

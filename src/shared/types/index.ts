@@ -15,3 +15,4 @@ export * from "./sync";
 export * from "./task";
 export * from "./routine";
 export * from "./weekly-plan";
+export * from "./attachment";

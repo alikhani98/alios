@@ -14,3 +14,4 @@ export * from "./settingsRepository";
 export * from "./tasksRepository";
 export * from "./routinesRepository";
 export * from "./weeklyPlansRepository";
+export * from "./attachmentRepository";

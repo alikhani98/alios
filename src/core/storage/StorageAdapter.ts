@@ -15,8 +15,10 @@ import type {
   TasksRepository,
   RoutinesRepository,
   WeeklyPlansRepository,
+  AttachmentRepository,
 } from "@/core/repositories";
 import type { BackupStorage } from "@/core/backup";
+import type { BinaryStorage } from "./BinaryStorage";
 
 export interface StorageAdapter {
   backup: BackupStorage;
@@ -36,4 +38,6 @@ export interface StorageAdapter {
   knowledge: KnowledgeRepository;
   resources: ResourceRepository;
   settings: SettingsRepository;
+  attachments: AttachmentRepository;
+  attachmentBinary: BinaryStorage;
 }

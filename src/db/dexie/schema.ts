@@ -12,6 +12,7 @@ export const DEXIE_SCHEMA_VERSION_11 = 11;
 export const DEXIE_SCHEMA_VERSION_12 = 12;
 export const DEXIE_SCHEMA_VERSION_13 = 13;
 export const DEXIE_SCHEMA_VERSION_14 = 14;
+export const DEXIE_SCHEMA_VERSION_15 = 15;
 
 export const DEXIE_TABLE_NAMES = {
   dailyCheckins: "dailyCheckins",
@@ -33,6 +34,8 @@ export const DEXIE_TABLE_NAMES = {
   weeklyPlans: "weeklyPlans",
   focusSessions: "focusSessions",
   resources: "resources",
+  attachments: "attachments",
+  attachmentBlobs: "attachmentBlobs",
 } as const;
 
 export type DexieTableName =
@@ -138,4 +141,11 @@ export const DEXIE_SCHEMA_V13 = {
 export const DEXIE_SCHEMA_V14 = {
   ...DEXIE_SCHEMA_V13,
   [DEXIE_TABLE_NAMES.resources]: "id, type, status, createdAt, updatedAt",
+} satisfies Partial<Record<DexieTableName, string>>;
+
+export const DEXIE_SCHEMA_V15 = {
+  ...DEXIE_SCHEMA_V14,
+  [DEXIE_TABLE_NAMES.attachments]:
+    "id, [ownerType+ownerId], ownerType, ownerId, createdAt, updatedAt",
+  [DEXIE_TABLE_NAMES.attachmentBlobs]: "&storageKey",
 } satisfies Record<DexieTableName, string>;

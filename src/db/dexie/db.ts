@@ -2,6 +2,7 @@ import Dexie, { type Table } from "dexie";
 
 import type {
   DailyCheckin,
+  Attachment,
   DecisionLogEntry,
   Goal,
   FinanceAsset,
@@ -37,6 +38,7 @@ import {
   DEXIE_SCHEMA_V12,
   DEXIE_SCHEMA_V13,
   DEXIE_SCHEMA_V14,
+  DEXIE_SCHEMA_V15,
   DEXIE_SCHEMA_VERSION,
   DEXIE_SCHEMA_VERSION_3,
   DEXIE_SCHEMA_VERSION_4,
@@ -50,6 +52,7 @@ import {
   DEXIE_SCHEMA_VERSION_12,
   DEXIE_SCHEMA_VERSION_13,
   DEXIE_SCHEMA_VERSION_14,
+  DEXIE_SCHEMA_VERSION_15,
 } from "./schema";
 
 export class AliosDatabase extends Dexie {
@@ -72,6 +75,8 @@ export class AliosDatabase extends Dexie {
   weeklyPlans!: Table<WeeklyPlan, string>;
   focusSessions!: Table<FocusSession, string>;
   resources!: Table<Resource, string>;
+  attachments!: Table<Attachment, string>;
+  attachmentBlobs!: Table<{ storageKey: string; blob: Blob }, string>;
 
   constructor() {
     super(DEXIE_DATABASE_NAME);
@@ -89,6 +94,7 @@ export class AliosDatabase extends Dexie {
     this.version(DEXIE_SCHEMA_VERSION_12).stores(DEXIE_SCHEMA_V12);
     this.version(DEXIE_SCHEMA_VERSION_13).stores(DEXIE_SCHEMA_V13);
     this.version(DEXIE_SCHEMA_VERSION_14).stores(DEXIE_SCHEMA_V14);
+    this.version(DEXIE_SCHEMA_VERSION_15).stores(DEXIE_SCHEMA_V15);
   }
 }
 

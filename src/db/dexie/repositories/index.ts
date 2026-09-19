@@ -14,3 +14,4 @@ export * from "./DexieSettingsRepository";
 export * from "./DexieTasksRepository";
 export * from "./DexieRoutinesRepository";
 export * from "./DexieWeeklyPlansRepository";
+export * from "./DexieAttachmentRepository";
