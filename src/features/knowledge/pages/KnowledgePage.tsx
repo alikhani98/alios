@@ -542,6 +542,10 @@ export function KnowledgePage() {
                 linkedTask={findLinkedTaskById(item, tasks)}
                 linkedResource={findLinkedResourceById(item, resources)}
                 attachmentContext={attachmentContexts[item.id]}
+                attachmentAccess={{
+                  attachments: attachmentRepository,
+                  binaryStorage: attachmentBinary,
+                }}
                 attachmentWorkflow={{
                   attachments: attachmentRepository,
                   binaryStorage: attachmentBinary,
@@ -556,6 +560,19 @@ export function KnowledgePage() {
                       ],
                       item.id
                     ),
+                  }));
+                }}
+                onAttachmentDeleted={(attachmentId) => {
+                  setAttachmentContexts((current) => ({
+                    ...current,
+                    [item.id]: current[item.id]
+                      ? {
+                          ...current[item.id],
+                          attachments: current[item.id].attachments.filter(
+                            (attachment) => attachment.id !== attachmentId
+                          ),
+                        }
+                      : current[item.id],
                   }));
                 }}
                 isDeleting={deletingId === item.id}

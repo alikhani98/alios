@@ -1,9 +1,33 @@
-import { FileText, Paperclip } from "lucide-react";
+import {
+  Download,
+  ExternalLink,
+  FileText,
+  Paperclip,
+  Trash2,
+} from "lucide-react";
+import { useState } from "react";
 
 import { useDateFormatter } from "@/shared/date";
 import { useI18n, type TranslationKey } from "@/shared/i18n";
 import type { Attachment, AttachmentKind } from "@/shared/types";
-import { Badge, Card, CardContent, CardHeader, CardTitle } from "@/shared/ui";
+import {
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/shared/ui";
+import {
+  createAttachmentObjectUrl,
+  revokeAttachmentObjectUrl,
+  type AttachmentAccessDependencies,
+} from "../attachmentAccess";
+import {
+  deleteAttachment,
+  type AttachmentWorkflowDependencies,
+} from "../attachmentWorkflow";
 
 const ATTACHMENT_KIND_LABEL_KEYS: Record<AttachmentKind, TranslationKey> = {
   document: "attachments.kind.document",
@@ -16,11 +40,26 @@ const ATTACHMENT_KIND_LABEL_KEYS: Record<AttachmentKind, TranslationKey> = {
 export type AttachmentCardProps = {
   attachment?: Attachment | null;
   ownerLabel?: string;
+  accessDependencies?: AttachmentAccessDependencies;
+  workflowDependencies?: AttachmentWorkflowDependencies;
+  onDeleted?: (attachmentId: string) => void;
 };
 
-export function AttachmentCard({ attachment, ownerLabel }: AttachmentCardProps) {
+export function AttachmentCard({
+  attachment,
+  ownerLabel,
+  accessDependencies,
+  workflowDependencies,
+  onDeleted,
+}: AttachmentCardProps) {
   const { language, t } = useI18n();
   const { formatDate } = useDateFormatter();
+  const [isAccessing, setIsAccessing] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [actionError, setActionError] = useState<
+    "access" | "delete" | null
+  >(null);
 
   if (!attachment) {
     return (
@@ -42,6 +81,90 @@ export function AttachmentCard({ attachment, ownerLabel }: AttachmentCardProps) 
       </Card>
     );
   }
+
+  const openFile = async () => {
+    if (!accessDependencies) {
+      return;
+    }
+
+    setIsAccessing(true);
+    setActionError(null);
+
+    try {
+      const objectUrl = await createAttachmentObjectUrl(
+        attachment.id,
+        accessDependencies
+      );
+      if (!objectUrl) {
+        setActionError("access");
+        return;
+      }
+
+      const openedWindow = window.open(
+        objectUrl,
+        "_blank",
+        "noopener,noreferrer"
+      );
+      window.setTimeout(() => revokeAttachmentObjectUrl(objectUrl), 60_000);
+
+      if (!openedWindow) {
+        setActionError("access");
+      }
+    } catch {
+      setActionError("access");
+    } finally {
+      setIsAccessing(false);
+    }
+  };
+
+  const downloadFile = async () => {
+    if (!accessDependencies) {
+      return;
+    }
+
+    setIsAccessing(true);
+    setActionError(null);
+
+    try {
+      const objectUrl = await createAttachmentObjectUrl(
+        attachment.id,
+        accessDependencies
+      );
+      if (!objectUrl) {
+        setActionError("access");
+        return;
+      }
+
+      const link = document.createElement("a");
+      link.href = objectUrl;
+      link.download = attachment.filename;
+      link.click();
+      window.setTimeout(() => revokeAttachmentObjectUrl(objectUrl), 1_000);
+    } catch {
+      setActionError("access");
+    } finally {
+      setIsAccessing(false);
+    }
+  };
+
+  const removeAttachment = async () => {
+    if (!workflowDependencies) {
+      return;
+    }
+
+    setIsDeleting(true);
+    setActionError(null);
+
+    try {
+      await deleteAttachment(attachment.id, workflowDependencies);
+      onDeleted?.(attachment.id);
+    } catch {
+      setActionError("delete");
+    } finally {
+      setIsDeleting(false);
+      setConfirmingDelete(false);
+    }
+  };
 
   return (
     <Card aria-label={attachment.filename}>
@@ -76,6 +199,78 @@ export function AttachmentCard({ attachment, ownerLabel }: AttachmentCardProps) 
           </p>
         ) : null}
       </CardContent>
+      {accessDependencies || workflowDependencies ? (
+        <CardFooter className="flex-wrap gap-2 border-t pt-4">
+          {accessDependencies ? (
+            <>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                disabled={isAccessing}
+                onClick={() => void openFile()}
+              >
+                <ExternalLink className="me-2 h-4 w-4" aria-hidden="true" />
+                {isAccessing ? t("attachments.working") : t("attachments.open")}
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                disabled={isAccessing}
+                onClick={() => void downloadFile()}
+              >
+                <Download className="me-2 h-4 w-4" aria-hidden="true" />
+                {t("attachments.download")}
+              </Button>
+            </>
+          ) : null}
+          {workflowDependencies ? (
+            confirmingDelete ? (
+              <>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="destructive"
+                  disabled={isDeleting}
+                  onClick={() => void removeAttachment()}
+                >
+                  <Trash2 className="me-2 h-4 w-4" aria-hidden="true" />
+                  {isDeleting
+                    ? t("attachments.deleting")
+                    : t("attachments.confirmDelete")}
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setConfirmingDelete(false)}
+                >
+                  {t("common.cancel")}
+                </Button>
+              </>
+            ) : (
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                className="text-destructive hover:text-destructive"
+                onClick={() => setConfirmingDelete(true)}
+              >
+                <Trash2 className="me-2 h-4 w-4" aria-hidden="true" />
+                {t("attachments.delete")}
+              </Button>
+            )
+          ) : null}
+          {actionError ? (
+            <p className="basis-full text-sm text-destructive" role="alert">
+              {actionError === "access"
+                ? t("attachments.accessError")
+                : t("attachments.deleteError")}
+            </p>
+          ) : null}
+        </CardFooter>
+      ) : null}
     </Card>
   );
 }

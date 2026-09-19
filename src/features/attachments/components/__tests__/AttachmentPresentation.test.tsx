@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { DateDisplayProvider } from "@/shared/date";
 import { I18nProvider, LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
 import type { Attachment } from "@/shared/types";
+import type { AttachmentWorkflowDependencies } from "../../attachmentWorkflow";
 import { AttachmentCard } from "../AttachmentCard";
 import { AttachmentSection } from "../AttachmentSection";
 
@@ -46,6 +47,34 @@ describe("Attachment presentation", () => {
     expect(markup).toContain("Owner");
     expect(markup).toContain("Atomic Habits");
     expect(markup).not.toContain("Download");
+  });
+
+  it("renders open, download, and delete actions when workflows are provided", () => {
+    const dependencies: AttachmentWorkflowDependencies = {
+      attachments: {
+        create: async () => attachment,
+        getById: async () => attachment,
+        listByOwner: async () => [attachment],
+        delete: async () => undefined,
+      },
+      binaryStorage: {
+        save: async () => undefined,
+        retrieve: async () => new Blob(["contents"]),
+        delete: async () => undefined,
+      },
+    };
+
+    const markup = renderWithProviders(
+      <AttachmentCard
+        attachment={attachment}
+        accessDependencies={dependencies}
+        workflowDependencies={dependencies}
+      />
+    );
+
+    expect(markup).toContain("Open file");
+    expect(markup).toContain("Download");
+    expect(markup).toContain("Delete attachment");
   });
 
   it("renders an unavailable state for missing metadata", () => {

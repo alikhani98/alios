@@ -10,6 +10,8 @@ import {
   PremiumCard,
 } from "@/shared/ui";
 import { AttachmentCard } from "./AttachmentCard";
+import type { AttachmentAccessDependencies } from "../attachmentAccess";
+import type { AttachmentWorkflowDependencies } from "../attachmentWorkflow";
 
 export type AttachmentSectionProps = {
   attachments?: ReadonlyArray<Attachment | null | undefined>;
@@ -20,6 +22,9 @@ export type AttachmentSectionProps = {
   ownerLabel?: string;
   showEmpty?: boolean;
   embedded?: boolean;
+  accessDependencies?: AttachmentAccessDependencies;
+  workflowDependencies?: AttachmentWorkflowDependencies;
+  onAttachmentDeleted?: (attachmentId: string) => void;
 };
 
 export function AttachmentSection({
@@ -31,6 +36,9 @@ export function AttachmentSection({
   ownerLabel,
   showEmpty = true,
   embedded = false,
+  accessDependencies,
+  workflowDependencies,
+  onAttachmentDeleted,
 }: AttachmentSectionProps) {
   const { t } = useI18n();
   const visibleAttachments = attachments.filter(
@@ -70,6 +78,9 @@ export function AttachmentSection({
               key={attachment.id}
               attachment={attachment}
               ownerLabel={ownerLabel}
+              accessDependencies={accessDependencies}
+              workflowDependencies={workflowDependencies}
+              onDeleted={onAttachmentDeleted}
             />
           ))}
         </div>
@@ -94,6 +105,9 @@ export function AttachmentSection({
               key={attachment.id}
               attachment={attachment}
               ownerLabel={ownerLabel}
+              accessDependencies={accessDependencies}
+              workflowDependencies={workflowDependencies}
+              onDeleted={onAttachmentDeleted}
             />
           ))}
         </div>

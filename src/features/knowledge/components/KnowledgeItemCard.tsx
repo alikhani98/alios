@@ -13,6 +13,7 @@ import type {
 import {
   AttachmentCreateControl,
   AttachmentSection,
+  type AttachmentAccessDependencies,
   type AttachmentWorkflowDependencies,
   type AttachmentOwnerContext,
 } from "@/features/attachments";
@@ -38,8 +39,10 @@ type KnowledgeItemCardProps = {
   linkedTask?: Task;
   linkedResource?: Resource;
   attachmentContext?: AttachmentOwnerContext;
+  attachmentAccess?: AttachmentAccessDependencies;
   attachmentWorkflow?: AttachmentWorkflowDependencies;
   onAttachmentCreated?: (attachment: Attachment) => void;
+  onAttachmentDeleted?: (attachmentId: string) => void;
   isDeleting: boolean;
   onEdit: () => void;
   onDelete: () => Promise<void>;
@@ -53,8 +56,10 @@ export function KnowledgeItemCard({
   linkedTask,
   linkedResource,
   attachmentContext,
+  attachmentAccess,
   attachmentWorkflow,
   onAttachmentCreated,
+  onAttachmentDeleted,
   isDeleting,
   onEdit,
   onDelete,
@@ -121,6 +126,9 @@ export function KnowledgeItemCard({
           ownerLabel={item.title}
           showEmpty={false}
           embedded
+          accessDependencies={attachmentAccess}
+          workflowDependencies={attachmentWorkflow}
+          onAttachmentDeleted={onAttachmentDeleted}
         />
       </CardContent>
 

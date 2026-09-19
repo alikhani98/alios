@@ -527,6 +527,27 @@ export function ResourceDetailPage() {
         attachments={state.attachmentContext?.attachments}
         description={t("attachments.sectionDescription")}
         ownerLabel={resource.title}
+        accessDependencies={{
+          attachments: attachmentRepository,
+          binaryStorage: attachmentBinary,
+        }}
+        workflowDependencies={{
+          attachments: attachmentRepository,
+          binaryStorage: attachmentBinary,
+        }}
+        onAttachmentDeleted={(attachmentId) => {
+          setState((current) => ({
+            ...current,
+            attachmentContext: current.attachmentContext
+              ? {
+                  ...current.attachmentContext,
+                  attachments: current.attachmentContext.attachments.filter(
+                    (attachment) => attachment.id !== attachmentId
+                  ),
+                }
+              : current.attachmentContext,
+          }));
+        }}
       />
     </section>
   );
