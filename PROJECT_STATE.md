@@ -14,6 +14,31 @@
   - Automated validation complete: the project-local TypeScript compiler (`.\node_modules\.bin\tsc.CMD --noEmit`), `pnpm test:run`, `pnpm build`, and `git diff --check` passed. The `pnpm exec tsc --noEmit` wrapper remains unable to resolve `tsc` in this Windows environment. Automated checks remain separate from live QA evidence and do not prove real-world behavior by themselves.
   - Real-world validation pending: no Stage 260B browser/device QA evidence has been recorded yet; only explicitly documented browser/device evidence counts as real-world validation.
 
+## Stage 271 Attachment Integrity Boundary
+
+- Stage 271 adds a derived, read-only diagnostic snapshot for metadata without
+  binary content, binary content without metadata, and storage records whose
+  availability cannot be checked.
+- Multiple attachment metadata records may intentionally share one
+  `storageKey`; this is valid shared-binary referencing when the binary exists.
+- Resource and Knowledge attachment presentation checks binary availability
+  concurrently and disclose missing or locally unavailable content without
+  loading binary data automatically.
+- Diagnostics never repair, delete, or clean up records. This stage does not
+  add repair guidance, backup/export behavior, sync behavior, search
+  integration, or Home/Review projections.
+
+## Known Limitations and Deferred Risks
+
+- If multiple attachment metadata records share one `storageKey`, deleting the
+  binary for one record can make the other record unavailable. Stage 271 treats
+  shared references as valid when the binary exists, but does not yet perform
+  reference-aware deletion or lifecycle protection. A future attachment
+  lifecycle-safety stage must address this risk.
+- Stage 271 manual QA confirmed that missing-binary unavailable states display
+  correctly in Resource and Knowledge attachment sections, and no performance
+  degradation was observed during concurrent availability checks.
+
 ## Current Content to Task Linking
 
 - Journal entries, Decision Log entries, and Knowledge items now support an optional source-owned `taskId` link in the same style as their existing optional `projectId` and `goalId` links.

@@ -54,12 +54,15 @@ describe("Attachment presentation", () => {
       attachments: {
         create: async () => attachment,
         getById: async () => attachment,
+        listAll: async () => [attachment],
         listByOwner: async () => [attachment],
         delete: async () => undefined,
       },
       binaryStorage: {
         save: async () => undefined,
         retrieve: async () => new Blob(["contents"]),
+        has: async () => true,
+        listKeys: async () => [],
         delete: async () => undefined,
       },
     };

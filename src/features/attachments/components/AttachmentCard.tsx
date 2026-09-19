@@ -43,6 +43,7 @@ export type AttachmentCardProps = {
   accessDependencies?: AttachmentAccessDependencies;
   workflowDependencies?: AttachmentWorkflowDependencies;
   onDeleted?: (attachmentId: string) => void;
+  binaryStatus?: "checking" | "available" | "missing" | "unavailable";
 };
 
 export function AttachmentCard({
@@ -51,6 +52,7 @@ export function AttachmentCard({
   accessDependencies,
   workflowDependencies,
   onDeleted,
+  binaryStatus,
 }: AttachmentCardProps) {
   const { language, t } = useI18n();
   const { formatDate } = useDateFormatter();
@@ -166,6 +168,9 @@ export function AttachmentCard({
     }
   };
 
+  const binaryUnavailable =
+    binaryStatus === "missing" || binaryStatus === "unavailable";
+
   return (
     <Card aria-label={attachment.filename}>
       <CardHeader className="gap-3 p-4 pb-2 sm:p-4 sm:pb-2">
@@ -198,6 +203,19 @@ export function AttachmentCard({
             {t("attachments.owner")}: {ownerLabel}
           </p>
         ) : null}
+        {binaryStatus === "checking" ? (
+          <p role="status">{t("attachments.checkingAvailability")}</p>
+        ) : null}
+        {binaryStatus === "missing" ? (
+          <p className="text-destructive" role="status">
+            {t("attachments.binaryMissing")}
+          </p>
+        ) : null}
+        {binaryStatus === "unavailable" ? (
+          <p className="text-destructive" role="status">
+            {t("attachments.storageUnavailable")}
+          </p>
+        ) : null}
       </CardContent>
       {accessDependencies || workflowDependencies ? (
         <CardFooter className="flex-wrap gap-2 border-t pt-4">
@@ -207,7 +225,7 @@ export function AttachmentCard({
                 type="button"
                 size="sm"
                 variant="outline"
-                disabled={isAccessing}
+                disabled={isAccessing || binaryUnavailable}
                 onClick={() => void openFile()}
               >
                 <ExternalLink className="me-2 h-4 w-4" aria-hidden="true" />
@@ -217,7 +235,7 @@ export function AttachmentCard({
                 type="button"
                 size="sm"
                 variant="ghost"
-                disabled={isAccessing}
+                disabled={isAccessing || binaryUnavailable}
                 onClick={() => void downloadFile()}
               >
                 <Download className="me-2 h-4 w-4" aria-hidden="true" />

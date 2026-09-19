@@ -1,4 +1,5 @@
 export * from "./attachmentAccess";
+export * from "./attachmentIntegrity";
 export * from "./attachmentWorkflow";
 export * from "./components/AttachmentCard";
 export * from "./components/AttachmentCreateControl";

@@ -39,6 +39,9 @@ describe("Dexie attachment foundation", () => {
     expect(await storage.attachments.getById(resourceAttachment.id)).toEqual(
       resourceAttachment
     );
+    expect(await storage.attachments.listAll()).toEqual(
+      expect.arrayContaining([resourceAttachment, knowledgeAttachment])
+    );
     expect(
       await storage.attachments.listByOwner("resource", "resource-1")
     ).toEqual([resourceAttachment]);

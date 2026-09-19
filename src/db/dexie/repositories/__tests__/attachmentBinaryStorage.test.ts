@@ -23,6 +23,7 @@ describe("Dexie attachment binary storage", () => {
     });
 
     await storage.attachmentBinary.save(storageKey, firstValue);
+    expect(await storage.attachmentBinary.has(storageKey)).toBe(true);
     expect(await (await storage.attachmentBinary.retrieve(storageKey))?.text()).toBe(
       "first"
     );
@@ -35,5 +36,22 @@ describe("Dexie attachment binary storage", () => {
     await storage.attachmentBinary.delete(storageKey);
 
     expect(await storage.attachmentBinary.retrieve(storageKey)).toBeUndefined();
+    expect(await storage.attachmentBinary.has(storageKey)).toBe(false);
+    expect(await storage.attachmentBinary.listKeys()).toEqual([]);
+  });
+
+  it("lists every stored binary key without reading binary content", async () => {
+    await storage.attachmentBinary.save(
+      "attachments/one",
+      new Blob(["one"], { type: "text/plain" })
+    );
+    await storage.attachmentBinary.save(
+      "attachments/two",
+      new Blob(["two"], { type: "text/plain" })
+    );
+
+    await expect(storage.attachmentBinary.listKeys()).resolves.toEqual(
+      expect.arrayContaining(["attachments/one", "attachments/two"])
+    );
   });
 });

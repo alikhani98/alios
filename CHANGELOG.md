@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased - Attachment Integrity Diagnostics
+
+- Added a derived, read-only attachment integrity resolver for metadata without
+  binary content, binary content without metadata, and unavailable storage
+  records.
+- Added concurrent Resource and Knowledge attachment availability checks with
+  clear unavailable-state disclosure, without automatically loading binary
+  content.
+- Documented the recovery boundary: shared `storageKey` references are valid
+  when the binary exists, and this stage performs no automatic repair, cleanup,
+  deletion, backup/export, sync, search, Home, or Review integration.
+
 ## Unreleased - Resource Library Experience
 
 - Added a derived Resource library summary for total resources, common types,

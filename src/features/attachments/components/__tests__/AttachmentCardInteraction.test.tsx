@@ -45,12 +45,15 @@ describe("AttachmentCard interactions", () => {
       attachments: {
         create: vi.fn(),
         getById: vi.fn(async () => attachment),
+        listAll: vi.fn(),
         listByOwner: vi.fn(),
         delete: vi.fn(async () => undefined),
       },
       binaryStorage: {
         save: vi.fn(),
         retrieve: vi.fn(),
+        has: vi.fn(async () => true),
+        listKeys: vi.fn(async () => []),
         delete: vi.fn(async () => undefined),
       },
     };

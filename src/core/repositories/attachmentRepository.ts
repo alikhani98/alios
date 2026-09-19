@@ -8,6 +8,7 @@ export type CreateAttachmentInput = Omit<
 export interface AttachmentRepository {
   create(input: CreateAttachmentInput): Promise<Attachment>;
   getById(id: string): Promise<Attachment | undefined>;
+  listAll(): Promise<Attachment[]>;
   listByOwner(
     ownerType: AttachmentOwnerType,
     ownerId: string

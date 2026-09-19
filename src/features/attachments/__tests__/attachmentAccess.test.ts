@@ -26,12 +26,15 @@ function createDependencies(binary?: Blob) {
   const attachments: AttachmentRepository = {
     create: vi.fn(),
     getById: vi.fn(async () => attachment),
+    listAll: vi.fn(),
     listByOwner: vi.fn(),
     delete: vi.fn(),
   };
   const binaryStorage: BinaryStorage = {
     save: vi.fn(),
     retrieve: vi.fn(async () => binary),
+    has: vi.fn(async () => Boolean(binary)),
+    listKeys: vi.fn(async () => []),
     delete: vi.fn(),
   };
 

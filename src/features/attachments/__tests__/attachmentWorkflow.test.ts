@@ -28,6 +28,7 @@ function createDependencies() {
       return attachment;
     }),
     getById: vi.fn(async (id: string) => records.get(id)),
+    listAll: vi.fn(async () => [...records.values()]),
     listByOwner: vi.fn(async (ownerType, ownerId) =>
       [...records.values()].filter(
         (attachment) =>
@@ -41,6 +42,8 @@ function createDependencies() {
   const binaryStorage: BinaryStorage = {
     save: vi.fn(async () => undefined),
     retrieve: vi.fn(async () => undefined),
+    has: vi.fn(async () => true),
+    listKeys: vi.fn(async () => []),
     delete: vi.fn(async () => undefined),
   };
 

@@ -124,13 +124,16 @@ describe("Knowledge structural links", () => {
           throw new Error("not called");
         },
         getById: async () => undefined,
+        listAll: async () => [],
         listByOwner: async () => [],
         delete: async () => undefined,
       },
-      binaryStorage: {
-        save: async () => undefined,
-        retrieve: async () => undefined,
-        delete: async () => undefined,
+        binaryStorage: {
+          save: async () => undefined,
+          retrieve: async () => undefined,
+          has: async () => true,
+          listKeys: async () => [],
+          delete: async () => undefined,
       },
     };
 

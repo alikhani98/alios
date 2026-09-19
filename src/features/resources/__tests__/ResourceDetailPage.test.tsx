@@ -22,7 +22,11 @@ const mockAdapter = vi.hoisted(() => ({
   goals: { list: vi.fn() },
   projects: { list: vi.fn() },
   tasks: { list: vi.fn() },
-  attachments: { listByOwner: vi.fn() },
+  attachments: { listByOwner: vi.fn(), listAll: vi.fn() },
+  attachmentBinary: {
+    has: vi.fn(async () => true),
+    listKeys: vi.fn(async () => []),
+  },
 }));
 
 vi.mock("@/core/storage", () => ({

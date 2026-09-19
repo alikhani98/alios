@@ -1,4 +1,5 @@
 import { Paperclip } from "lucide-react";
+import { useEffect, useState } from "react";
 
 import { useI18n } from "@/shared/i18n";
 import type { Attachment } from "@/shared/types";
@@ -44,6 +45,47 @@ export function AttachmentSection({
   const visibleAttachments = attachments.filter(
     (attachment): attachment is Attachment => Boolean(attachment)
   );
+  const attachmentSignature = visibleAttachments
+    .map((attachment) => `${attachment.id}:${attachment.storageKey}`)
+    .join("|");
+  const [binaryStatuses, setBinaryStatuses] = useState<
+    Record<string, "checking" | "available" | "missing" | "unavailable">
+  >({});
+
+  useEffect(() => {
+    if (!accessDependencies || visibleAttachments.length === 0) {
+      setBinaryStatuses({});
+      return undefined;
+    }
+
+    let isCancelled = false;
+    setBinaryStatuses(
+      Object.fromEntries(
+        visibleAttachments.map((attachment) => [attachment.id, "checking"])
+      )
+    );
+
+    void Promise.all(
+      visibleAttachments.map(async (attachment) => {
+        try {
+          const exists = await accessDependencies.binaryStorage.has(
+            attachment.storageKey
+          );
+          return [attachment.id, exists ? "available" : "missing"] as const;
+        } catch {
+          return [attachment.id, "unavailable"] as const;
+        }
+      })
+    ).then((entries) => {
+      if (!isCancelled) {
+        setBinaryStatuses(Object.fromEntries(entries));
+      }
+    });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [accessDependencies?.binaryStorage, attachmentSignature]);
 
   if (visibleAttachments.length === 0) {
     if (!showEmpty) {
@@ -81,6 +123,7 @@ export function AttachmentSection({
               accessDependencies={accessDependencies}
               workflowDependencies={workflowDependencies}
               onDeleted={onAttachmentDeleted}
+              binaryStatus={binaryStatuses[attachment.id]}
             />
           ))}
         </div>
@@ -108,6 +151,7 @@ export function AttachmentSection({
               accessDependencies={accessDependencies}
               workflowDependencies={workflowDependencies}
               onDeleted={onAttachmentDeleted}
+              binaryStatus={binaryStatuses[attachment.id]}
             />
           ))}
         </div>

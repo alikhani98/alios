@@ -27,6 +27,26 @@ export class DexieAttachmentBinaryStorage implements BinaryStorage {
     }
   }
 
+  async has(storageKey: string): Promise<boolean> {
+    try {
+      return (await this.database.attachmentBlobs.get(storageKey)) !== undefined;
+    } catch (error) {
+      throw new StorageError("Attachment content could not be checked.", {
+        cause: error,
+      });
+    }
+  }
+
+  async listKeys(): Promise<string[]> {
+    try {
+      return this.database.attachmentBlobs.toCollection().primaryKeys();
+    } catch (error) {
+      throw new StorageError("Attachment content keys could not be listed.", {
+        cause: error,
+      });
+    }
+  }
+
   async delete(storageKey: string): Promise<void> {
     try {
       await this.database.attachmentBlobs.delete(storageKey);

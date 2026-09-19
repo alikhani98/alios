@@ -37,6 +37,13 @@ export class DexieAttachmentRepository
     });
   }
 
+  async listAll(): Promise<Attachment[]> {
+    return this.execute("listing all attachments", async () => {
+      const records = await this.database.attachments.toArray();
+      return records.map((record) => attachmentSchema.parse(record));
+    });
+  }
+
   async listByOwner(
     ownerType: AttachmentOwnerType,
     ownerId: string
