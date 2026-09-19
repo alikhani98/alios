@@ -3,9 +3,20 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { useStorageAdapter } from "@/core/storage";
+import {
+  AttachmentSection,
+  resolveResourceAttachmentContext,
+  type AttachmentOwnerContext,
+} from "@/features/attachments";
 import { useDateFormatter } from "@/shared/date";
 import { useI18n } from "@/shared/i18n";
-import type { Goal, KnowledgeItem, Project, Resource, Task } from "@/shared/types";
+import type {
+  Goal,
+  KnowledgeItem,
+  Project,
+  Resource,
+  Task,
+} from "@/shared/types";
 import {
   Badge,
   Button,
@@ -42,6 +53,7 @@ type DetailState = {
   derivedProjects: ResourceRelationship[];
   derivedTasks: ResourceRelationship[];
   learningContext?: ResourceLearningContext;
+  attachmentContext?: AttachmentOwnerContext;
 };
 
 export function ResourceDetailPage() {
@@ -55,6 +67,7 @@ export function ResourceDetailPage() {
     goals: goalsRepository,
     projects: projectsRepository,
     tasks: tasksRepository,
+    attachments: attachmentRepository,
   } = useStorageAdapter();
   const [state, setState] = useState<DetailState>({
     resource: null,
@@ -62,6 +75,7 @@ export function ResourceDetailPage() {
     derivedGoals: [],
     derivedProjects: [],
     derivedTasks: [],
+    attachmentContext: undefined,
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -83,11 +97,14 @@ export function ResourceDetailPage() {
       projectsRepository.list(),
       tasksRepository.list(),
     ])
-      .then(([resource, knowledgeItems, goals, projects, tasks]) => {
+      .then(async ([resource, knowledgeItems, goals, projects, tasks]) => {
         if (isCancelled) {
           return;
         }
 
+        const attachmentMetadata = resource
+          ? await attachmentRepository.listByOwner("resource", resource.id)
+          : [];
         const relationshipContext = resource
           ? deriveResourceRelationshipContext(
               resource,
@@ -121,6 +138,9 @@ export function ResourceDetailPage() {
           ),
           ...relationshipContext,
           learningContext,
+          attachmentContext: resource
+            ? resolveResourceAttachmentContext(attachmentMetadata, resource.id)
+            : undefined,
         });
         setError(false);
       })
@@ -145,6 +165,7 @@ export function ResourceDetailPage() {
     resourceId,
     resourceRepository,
     tasksRepository,
+    attachmentRepository,
   ]);
 
   if (isLoading) {
@@ -180,7 +201,6 @@ export function ResourceDetailPage() {
   const statusLabel = RESOURCE_STATUS_OPTIONS.find(
     (option) => option.value === resource.status
   );
-
   return (
     <section className="alios-page space-y-6">
       <PremiumCard className="alios-now-surface">
@@ -480,6 +500,12 @@ export function ResourceDetailPage() {
           </CardContent>
         </PremiumCard>
       ) : null}
+
+      <AttachmentSection
+        attachments={state.attachmentContext?.attachments}
+        description={t("attachments.sectionDescription")}
+        ownerLabel={resource.title}
+      />
     </section>
   );
 }

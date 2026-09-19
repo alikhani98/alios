@@ -2,7 +2,9 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { StaticRouter } from "react-router-dom/server";
 import { beforeEach, describe, expect, it } from "vitest";
 
+import { DateDisplayProvider } from "@/shared/date";
 import { I18nProvider, LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
+import type { Attachment } from "@/shared/types";
 import {
   goalRecord,
   knowledgeItemRecord,
@@ -19,13 +21,15 @@ function renderKnowledgeCard(
   return renderToStaticMarkup(
     <StaticRouter location="/knowledge">
       <I18nProvider>
-        <KnowledgeItemCard
-          item={knowledgeItemRecord}
-          isDeleting={false}
-          onEdit={() => undefined}
-          onDelete={async () => undefined}
-          {...props}
-        />
+        <DateDisplayProvider>
+          <KnowledgeItemCard
+            item={knowledgeItemRecord}
+            isDeleting={false}
+            onEdit={() => undefined}
+            onDelete={async () => undefined}
+            {...props}
+          />
+        </DateDisplayProvider>
       </I18nProvider>
     </StaticRouter>
   );
@@ -84,4 +88,32 @@ describe("Knowledge structural links", () => {
     expect(markup).toContain("Linked resource unavailable");
     expect(markup).toContain("Edit");
   });
+
+  it("renders read-only attachment metadata when Knowledge owns attachments", () => {
+    const attachment: Attachment = {
+      id: "knowledge-attachment",
+      ownerType: "knowledge",
+      ownerId: knowledgeItemRecord.id,
+      kind: "image",
+      filename: "diagram.png",
+      mimeType: "image/png",
+      size: 1024,
+      storageKey: "attachments/knowledge-attachment",
+      createdAt: "2026-07-05T08:30:00.000Z",
+      updatedAt: "2026-07-05T08:30:00.000Z",
+    };
+
+    const markup = renderKnowledgeCard({
+      attachmentContext: {
+        ownerType: "knowledge",
+        ownerId: knowledgeItemRecord.id,
+        attachments: [attachment],
+      },
+    });
+
+    expect(markup).toContain("Attachments");
+    expect(markup).toContain("diagram.png");
+    expect(markup).toContain("image/png");
+  });
+
 });

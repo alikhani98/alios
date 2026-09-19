@@ -22,6 +22,7 @@ const mockAdapter = vi.hoisted(() => ({
   goals: { list: vi.fn() },
   projects: { list: vi.fn() },
   tasks: { list: vi.fn() },
+  attachments: { listByOwner: vi.fn() },
 }));
 
 vi.mock("@/core/storage", () => ({
@@ -82,6 +83,20 @@ describe("ResourceDetailPage", () => {
     mockAdapter.goals.list.mockResolvedValue([goal, derivedGoal]);
     mockAdapter.projects.list.mockResolvedValue([project]);
     mockAdapter.tasks.list.mockResolvedValue([task]);
+    mockAdapter.attachments.listByOwner.mockResolvedValue([
+      {
+        id: "resource-attachment",
+        ownerType: "resource",
+        ownerId: resource.id,
+        kind: "document",
+        filename: "atomic-habits.pdf",
+        mimeType: "application/pdf",
+        size: 2048,
+        storageKey: "attachments/resource-attachment",
+        createdAt: "2026-07-05T08:30:00.000Z",
+        updatedAt: "2026-07-05T08:30:00.000Z",
+      },
+    ]);
 
     await act(async () => {
       root.render(
@@ -118,6 +133,13 @@ describe("ResourceDetailPage", () => {
     expect(container.textContent).toContain("Source: Through Knowledge");
     expect(container.textContent).toContain("Add to Quick Access");
     expect(container.textContent).toContain("Create Knowledge Note");
+    expect(container.textContent).toContain("Attachments");
+    expect(container.textContent).toContain("atomic-habits.pdf");
+    expect(container.textContent).toContain("application/pdf");
+    expect(mockAdapter.attachments.listByOwner).toHaveBeenCalledWith(
+      "resource",
+      resource.id
+    );
     expect(
       container.querySelector(
         `a[href="/knowledge?create=1&resourceId=${resource.id}"]`
@@ -136,6 +158,7 @@ describe("ResourceDetailPage", () => {
     mockAdapter.goals.list.mockResolvedValue([]);
     mockAdapter.projects.list.mockResolvedValue([]);
     mockAdapter.tasks.list.mockResolvedValue([]);
+    mockAdapter.attachments.listByOwner.mockResolvedValue([]);
 
     await act(async () => {
       root.render(
@@ -156,6 +179,7 @@ describe("ResourceDetailPage", () => {
     expect(container.textContent).toContain("Linked project unavailable");
     expect(container.textContent).toContain("Linked task unavailable");
     expect(container.textContent).toContain("Learning context");
+    expect(container.textContent).toContain("No attachments yet");
   });
 
   it("renders a useful empty state for a missing resource", async () => {
@@ -164,6 +188,7 @@ describe("ResourceDetailPage", () => {
     mockAdapter.goals.list.mockResolvedValue([]);
     mockAdapter.projects.list.mockResolvedValue([]);
     mockAdapter.tasks.list.mockResolvedValue([]);
+    mockAdapter.attachments.listByOwner.mockResolvedValue([]);
 
     await act(async () => {
       root.render(

@@ -5,6 +5,10 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import type { CreateKnowledgeItemInput } from "@/core/repositories";
 import { useStorageAdapter } from "@/core/storage";
 import {
+  resolveKnowledgeAttachmentContext,
+  type AttachmentOwnerContext,
+} from "@/features/attachments";
+import {
   findLinkedGoalById,
   findLinkedProjectById,
   findLinkedResourceById,
@@ -47,6 +51,7 @@ export function KnowledgePage() {
     goals: goalsRepository,
     tasks: tasksRepository,
     resources: resourcesRepository,
+    attachments: attachmentRepository,
   } = useStorageAdapter();
   const {
     items,
@@ -76,6 +81,9 @@ export function KnowledgePage() {
   const [goals, setGoals] = useState<Goal[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [resources, setResources] = useState<Resource[]>([]);
+  const [attachmentContexts, setAttachmentContexts] = useState<
+    Record<string, AttachmentOwnerContext>
+  >({});
   const [linkOptionsError, setLinkOptionsError] = useState<string | null>(null);
   const itemRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const focusId = searchParams.get("focusId");
@@ -109,8 +117,20 @@ export function KnowledgePage() {
       goalsRepository.list(),
       tasksRepository.list(),
       resourcesRepository.list(),
+      ...items.map((item) =>
+        attachmentRepository
+          .listByOwner("knowledge", item.id)
+          .catch(() => [])
+      ),
     ])
-      .then(([nextProjects, nextGoals, nextTasks, nextResources]) => {
+      .then(
+        ([
+          nextProjects,
+          nextGoals,
+          nextTasks,
+          nextResources,
+          ...attachmentLists
+        ]) => {
         if (isCancelled) {
           return;
         }
@@ -119,8 +139,20 @@ export function KnowledgePage() {
         setGoals(nextGoals);
         setTasks(nextTasks);
         setResources(nextResources);
+        setAttachmentContexts(
+          Object.fromEntries(
+            items.map((item, index) => [
+              item.id,
+              resolveKnowledgeAttachmentContext(
+                attachmentLists[index] ?? [],
+                item.id
+              ),
+            ])
+          )
+        );
         setLinkOptionsError(null);
-      })
+        }
+      )
       .catch(() => {
         if (isCancelled) {
           return;
@@ -136,7 +168,15 @@ export function KnowledgePage() {
     return () => {
       isCancelled = true;
     };
-  }, [goalsRepository, projectsRepository, resourcesRepository, tasksRepository, t]);
+  }, [
+    attachmentRepository,
+    goalsRepository,
+    items,
+    projectsRepository,
+    resourcesRepository,
+    tasksRepository,
+    t,
+  ]);
 
   const openCreateForm = () => {
     setEditingItem(undefined);
@@ -500,6 +540,7 @@ export function KnowledgePage() {
                 linkedGoal={findLinkedGoalById(item, goals)}
                 linkedTask={findLinkedTaskById(item, tasks)}
                 linkedResource={findLinkedResourceById(item, resources)}
+                attachmentContext={attachmentContexts[item.id]}
                 isDeleting={deletingId === item.id}
                 onEdit={() => openEditForm(item)}
                 onDelete={() => handleDelete(item)}
