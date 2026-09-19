@@ -298,6 +298,7 @@ function createBackupStorageStub(input?: {
     routines: input?.routines ?? [],
     weeklyPlans: [],
     focusSessions: [],
+    attachments: [],
   };
 
   const backupStorage: BackupStorage = {
@@ -325,6 +326,7 @@ function createBackupStorageStub(input?: {
       inboxItems: data.inboxItems.length,
       routines: data.routines.length,
       weeklyPlans: data.weeklyPlans.length,
+      attachments: data.attachments.length,
     })),
     clearAll: vi.fn(async () => {
       data = {

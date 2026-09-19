@@ -20,6 +20,7 @@ import {
   taskSchema,
   routineSchema,
   weeklyPlanSchema,
+  attachmentSchema,
 } from "@/shared/types";
 import { isoDateTimeSchema } from "@/shared/utils";
 
@@ -46,6 +47,7 @@ export const aliosBackupDataSchema = z.object({
   inboxItems: z.array(inboxItemSchema).default([]),
   routines: z.array(routineSchema).default([]),
   weeklyPlans: z.array(weeklyPlanSchema).default([]),
+  attachments: z.array(attachmentSchema).default([]),
 });
 
 export const aliosBackupSchema = z.object({
@@ -56,4 +58,11 @@ export const aliosBackupSchema = z.object({
 });
 
 export type AliosBackupData = z.infer<typeof aliosBackupDataSchema>;
-export type AliosBackup = z.infer<typeof aliosBackupSchema>;
+export type AliosBackup = z.infer<typeof aliosBackupSchema> & {
+  /**
+   * Runtime-only marker. It is non-enumerable and never enters the JSON file.
+   * It preserves the distinction between old backups without attachments and
+   * current backups that intentionally contain an empty attachment array.
+   */
+  readonly attachmentMetadataIncluded?: boolean;
+};

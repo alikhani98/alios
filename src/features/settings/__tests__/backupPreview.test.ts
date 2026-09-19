@@ -81,6 +81,7 @@ describe("backup preview", () => {
       { key: "inboxItems", count: 1 },
       { key: "routines", count: 1 },
       { key: "weeklyPlans", count: 0 },
+      { key: "attachments", count: 0 },
     ]);
   });
 
@@ -95,6 +96,7 @@ describe("backup preview", () => {
       financeCategoryBudgets: 0, financeAssets: 0, projects: 0,
       focusSessions: 0, journalEntries: 0, knowledgeItems: 0, settings: 0, inboxItems: 0,
       routines: 0, weeklyPlans: 2, resources: 0,
+      attachments: 0,
     });
 
     expect(impact).toMatchObject({

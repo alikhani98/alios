@@ -1,5 +1,6 @@
 import type {
   AliosBackupData,
+  BackupRestoreOptions,
   BackupStorage,
   LocalDataSummary,
 } from "@/core/backup";
@@ -31,6 +32,7 @@ export class DexieBackupStorage implements BackupStorage {
         inboxItems,
         routines,
         weeklyPlans,
+        attachments,
       ] = await Promise.all([
         this.database.dailyCheckins.toArray(),
         this.database.tasks.toArray(),
@@ -51,6 +53,7 @@ export class DexieBackupStorage implements BackupStorage {
         this.database.inboxItems.toArray(),
         this.database.routines.toArray(),
         this.database.weeklyPlans.toArray(),
+        this.database.attachments.toArray(),
       ]);
 
       return {
@@ -73,6 +76,7 @@ export class DexieBackupStorage implements BackupStorage {
         inboxItems,
         routines,
         weeklyPlans,
+        attachments,
       };
     } catch (error) {
       throw new StorageError("AliOS data could not be exported.", {
@@ -81,7 +85,10 @@ export class DexieBackupStorage implements BackupStorage {
     }
   }
 
-  async replaceAll(data: AliosBackupData): Promise<void> {
+  async replaceAll(
+    data: AliosBackupData,
+    options: BackupRestoreOptions = {}
+  ): Promise<void> {
     const tables = [
       this.database.dailyCheckins,
       this.database.tasks,
@@ -102,6 +109,7 @@ export class DexieBackupStorage implements BackupStorage {
       this.database.inboxItems,
       this.database.routines,
       this.database.weeklyPlans,
+      ...(options.replaceAttachments ? [this.database.attachments] : []),
     ];
 
     try {
@@ -127,6 +135,9 @@ export class DexieBackupStorage implements BackupStorage {
           this.database.inboxItems.bulkPut(data.inboxItems),
           this.database.routines.bulkPut(data.routines),
           this.database.weeklyPlans.bulkPut(data.weeklyPlans),
+          ...(options.replaceAttachments
+            ? [this.database.attachments.bulkPut(data.attachments)]
+            : []),
         ]);
       });
     } catch (error) {
@@ -159,6 +170,7 @@ export class DexieBackupStorage implements BackupStorage {
         inboxItems,
         routines,
         weeklyPlans,
+        attachments,
       ] = await Promise.all([
         this.database.dailyCheckins.count(),
         this.database.tasks.count(),
@@ -179,6 +191,7 @@ export class DexieBackupStorage implements BackupStorage {
         this.database.inboxItems.count(),
         this.database.routines.count(),
         this.database.weeklyPlans.count(),
+        this.database.attachments.count(),
       ]);
 
       return {
@@ -201,6 +214,7 @@ export class DexieBackupStorage implements BackupStorage {
         inboxItems,
         routines,
         weeklyPlans,
+        attachments,
       };
     } catch (error) {
       throw new StorageError("AliOS data counts could not be loaded.", {
@@ -230,6 +244,8 @@ export class DexieBackupStorage implements BackupStorage {
       this.database.inboxItems,
       this.database.routines,
       this.database.weeklyPlans,
+      this.database.attachments,
+      this.database.attachmentBlobs,
     ];
 
     try {

@@ -20,11 +20,19 @@ export type LocalDataSummary = {
   inboxItems: number;
   routines: number;
   weeklyPlans: number;
+  attachments: number;
+};
+
+export type BackupRestoreOptions = {
+  replaceAttachments?: boolean;
 };
 
 export interface BackupStorage {
   readAll(): Promise<AliosBackupData>;
-  replaceAll(data: AliosBackupData): Promise<void>;
+  replaceAll(
+    data: AliosBackupData,
+    options?: BackupRestoreOptions
+  ): Promise<void>;
   getSummary(): Promise<LocalDataSummary>;
   clearAll(): Promise<void>;
 }

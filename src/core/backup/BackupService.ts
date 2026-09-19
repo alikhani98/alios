@@ -22,7 +22,13 @@ export class BackupService {
       data: await this.storage.readAll(),
     };
 
-    return aliosBackupSchema.parse(backup);
+    const parsed = aliosBackupSchema.parse(backup);
+    Object.defineProperty(parsed, "attachmentMetadataIncluded", {
+      configurable: true,
+      enumerable: false,
+      value: true,
+    });
+    return parsed;
   }
 
   parseBackup(content: string): AliosBackup {
@@ -39,7 +45,11 @@ export class BackupService {
     }
 
     try {
-      await this.storage.replaceAll(result.data.data);
+      await this.storage.replaceAll(result.data.data, {
+        replaceAttachments:
+          backup.attachmentMetadataIncluded ??
+          Object.prototype.hasOwnProperty.call(backup.data, "attachments"),
+      });
     } catch (error) {
       if (error instanceof StorageError) {
         throw error;

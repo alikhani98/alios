@@ -79,6 +79,7 @@ import { useLocalDataManagement } from "../hooks/useLocalDataManagement";
 import type { BackupStatusFreshness } from "@/shared/preferences";
 import { checkForServiceWorkerUpdate, type ServiceWorkerUpdateResult } from "@/shared/pwa";
 import { QuickAccessManager } from "@/shared/quickAccess";
+import { AttachmentPackageSection } from "@/features/attachments";
 
 const LazySettingsHelpCenter = lazy(() =>
   import("../components/SettingsHelpCenter").then((module) => ({
@@ -132,14 +133,18 @@ const backupTableLabelKeys = [
   "settings.manualEntriesCount",
   "settings.financeTransactionsCount",
   "settings.financeObligationsCount",
+  "settings.financeCategoryBudgetsCount",
+  "settings.financeAssetsCount",
   "settings.focusSessionsCount",
   "settings.projectsCount",
   "settings.journalCount",
   "settings.knowledgeCount",
+  "settings.resourcesCount",
   "settings.settingsCount",
   "settings.inboxCount",
   "settings.routinesCount",
   "settings.weeklyPlansCount",
+  "settings.attachmentsCount",
 ] as const;
 
 const appearanceOptions = [
@@ -265,6 +270,8 @@ function getTotalRecords(summary: {
   manualEntries: number;
   financeTransactions: number;
   financeObligations: number;
+  financeCategoryBudgets: number;
+  financeAssets: number;
   focusSessions: number;
   projects: number;
   journalEntries: number;
@@ -284,6 +291,8 @@ function getTotalRecords(summary: {
     summary.manualEntries +
     summary.financeTransactions +
     summary.financeObligations +
+    summary.financeCategoryBudgets +
+    summary.financeAssets +
     summary.focusSessions +
     summary.projects +
     summary.journalEntries +
@@ -1091,6 +1100,12 @@ export function SettingsPage() {
           </CardContent>
         </Card>
       </div>
+
+      <p className="text-sm leading-6 text-muted-foreground">
+        {t("settings.attachmentMetadataBackupNote")}
+      </p>
+
+      <AttachmentPackageSection />
 
       <StorageUsageMonitor />
 

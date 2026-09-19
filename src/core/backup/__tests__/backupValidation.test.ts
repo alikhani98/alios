@@ -70,6 +70,7 @@ describe("backup validation and migration", () => {
     expect(migrated.data.focusSessions).toEqual([]);
     expect(migrated.data.resources).toEqual([]);
     expect(migrated.data.inboxItems).toEqual([]);
+    expect(migrated.data.attachments).toEqual([]);
     expect(migrated.data.tasks).not.toBe(payload.data.tasks);
   });
 
@@ -101,6 +102,7 @@ describe("backup validation and migration", () => {
     expect(backup.data.focusSessions).toEqual([]);
     expect(backup.data.resources).toEqual([]);
     expect(backup.data.inboxItems).toEqual([]);
+    expect(backup.data.attachments).toEqual([]);
   });
 
   it("round-trips project goal links and accepts legacy unlinked projects", () => {
@@ -297,6 +299,7 @@ describe("backup validation and migration", () => {
       inboxItems: [inboxItemRecord],
       routines: [routineRecord],
       weeklyPlans: [weeklyPlanRecord],
+      attachments: [],
     };
     const snapshot = JSON.parse(JSON.stringify(input));
 

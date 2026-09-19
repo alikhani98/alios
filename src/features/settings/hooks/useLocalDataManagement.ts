@@ -65,6 +65,7 @@ export function useLocalDataManagement() {
         routines: 0,
         weeklyPlans: 0,
         settings: 0,
+        attachments: 0,
       });
       setSuccess(t("settings.clearSuccess"));
     } catch {

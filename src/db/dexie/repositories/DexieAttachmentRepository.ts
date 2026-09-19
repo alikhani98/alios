@@ -30,6 +30,12 @@ export class DexieAttachmentRepository
     });
   }
 
+  async restore(attachment: Attachment): Promise<void> {
+    return this.execute("restoring an attachment", async () => {
+      await this.database.attachments.put(attachmentSchema.parse(attachment));
+    });
+  }
+
   async getById(id: string): Promise<Attachment | undefined> {
     return this.execute("reading an attachment", async () => {
       const record = await this.database.attachments.get(id);

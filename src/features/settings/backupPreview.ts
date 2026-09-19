@@ -20,6 +20,7 @@ export const BACKUP_TABLE_KEYS = [
   "inboxItems",
   "routines",
   "weeklyPlans",
+  "attachments",
 ] as const satisfies readonly (keyof AliosBackupData)[];
 
 export type BackupTableKey = (typeof BACKUP_TABLE_KEYS)[number];
@@ -69,9 +70,15 @@ export function createBackupRestoreImpactPreview(
   backup: AliosBackup,
   currentData: LocalDataSummary
 ): BackupRestoreImpactPreview {
+  const includesAttachmentMetadata =
+    backup.attachmentMetadataIncluded ??
+    Object.prototype.hasOwnProperty.call(backup.data, "attachments");
   const tableImpacts = BACKUP_TABLE_KEYS.map((key) => {
     const currentCount = currentData[key];
-    const backupCount = backup.data[key].length;
+    const backupCount =
+      key === "attachments" && !includesAttachmentMetadata
+        ? currentData.attachments
+        : backup.data[key].length;
 
     return {
       key,

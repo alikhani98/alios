@@ -105,8 +105,10 @@ describe("BackupService with DexieBackupStorage", () => {
         "inboxItems",
         "routines",
         "weeklyPlans",
+        "attachments",
       ].sort()
     );
+    expect(backup.data.attachments).toEqual([]);
     expect(backup.data.projects).toEqual([project]);
     expect(backup.data.tasks).toEqual([task]);
     expect(backup.data.routines).toEqual([routine]);
@@ -157,6 +159,7 @@ describe("BackupService with DexieBackupStorage", () => {
       inboxItems: 0,
       routines: 0,
       weeklyPlans: 0,
+      attachments: 0,
     });
     expect(localStorage.getItem(LANGUAGE_STORAGE_KEY)).toBe("en");
 
@@ -211,6 +214,7 @@ describe("BackupService with DexieBackupStorage", () => {
       financeCategoryBudgets: _omittedFinanceCategoryBudgets,
       financeAssets: _omittedFinanceAssets,
       focusSessions: _omittedFocusSessions,
+      attachments: _omittedAttachments,
       resources: _omittedResources,
       ...oldData
     } = backup.data;
@@ -222,6 +226,7 @@ describe("BackupService with DexieBackupStorage", () => {
     expect(oldBackup.data.financeAssets).toEqual([]);
     expect(oldBackup.data.focusSessions).toEqual([]);
     expect(oldBackup.data.resources).toEqual([]);
+    expect(oldBackup.data.attachments).toEqual([]);
     expect(oldBackup.data.goals).toEqual([]);
     expect(oldBackup.data.decisionLogEntries).toEqual([]);
     expect(oldBackup.data.manualEntries).toEqual([]);
@@ -229,6 +234,65 @@ describe("BackupService with DexieBackupStorage", () => {
     await service.restoreBackup(oldBackup);
     expect(await storage.inbox.list()).toEqual([]);
     expect(await storage.projects.list()).toEqual([]);
+  });
+
+  it("preserves local attachment metadata and binaries when restoring an old backup", async () => {
+    const currentBackup = await service.createBackup();
+    const { attachments: _omittedAttachments, ...oldData } = currentBackup.data;
+    const oldBackup = service.parseBackup(
+      JSON.stringify({ ...currentBackup, data: oldData })
+    );
+
+    const localAttachment = await storage.attachments.create({
+      ownerType: "resource",
+      ownerId: "resource-1",
+      kind: "document",
+      filename: "local.pdf",
+      mimeType: "application/pdf",
+      size: 5,
+      storageKey: "attachments/local",
+    });
+    await storage.attachmentBinary.save(
+      localAttachment.storageKey,
+      new Blob(["local"])
+    );
+    expect(await storage.attachmentBinary.retrieve(localAttachment.storageKey)).toBeDefined();
+
+    await service.restoreBackup(oldBackup);
+
+    expect(await storage.attachments.getById(localAttachment.id)).toEqual(
+      localAttachment
+    );
+    expect(await storage.attachmentBinary.retrieve(localAttachment.storageKey)).toBeDefined();
+  });
+
+  it("restores attachment metadata without touching binary storage", async () => {
+    const attachment = await storage.attachments.create({
+      ownerType: "knowledge",
+      ownerId: "knowledge-1",
+      kind: "image",
+      filename: "diagram.png",
+      mimeType: "image/png",
+      size: 7,
+      storageKey: "attachments/diagram",
+    });
+    await storage.attachmentBinary.save(
+      attachment.storageKey,
+      new Blob(["diagram"])
+    );
+    const backup = await service.createBackup();
+
+    await storage.attachments.delete(attachment.id);
+    await storage.attachmentBinary.save(
+      "attachments/orphan",
+      new Blob(["orphan"])
+    );
+
+    await service.restoreBackup(backup);
+
+    expect(await storage.attachments.getById(attachment.id)).toEqual(attachment);
+    expect(await storage.attachmentBinary.retrieve(attachment.storageKey)).toBeDefined();
+    expect(await storage.attachmentBinary.retrieve("attachments/orphan")).toBeDefined();
   });
 
   it("rejects invalid JSON and structurally invalid backups", () => {

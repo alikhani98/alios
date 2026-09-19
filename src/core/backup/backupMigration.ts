@@ -20,6 +20,7 @@ import {
   taskSchema,
   routineSchema,
   weeklyPlanSchema,
+  attachmentSchema,
 } from "@/shared/types";
 
 import {
@@ -50,6 +51,7 @@ export const backupDataInputSchema = z.object({
   inboxItems: z.array(inboxItemSchema).optional(),
   routines: z.array(routineSchema).optional(),
   weeklyPlans: z.array(weeklyPlanSchema).optional(),
+  attachments: z.array(attachmentSchema).optional(),
 });
 
 export type BackupDataInput = z.infer<typeof backupDataInputSchema>;
@@ -79,6 +81,7 @@ export function normalizeBackupData(data: BackupDataInput): AliosBackupData {
     inboxItems: cloneRecords(data.inboxItems),
     routines: cloneRecords(data.routines),
     weeklyPlans: cloneRecords(data.weeklyPlans),
+    attachments: cloneRecords(data.attachments),
   };
 }
 
@@ -90,10 +93,18 @@ type BackupPayloadInput = {
 };
 
 export function migrateBackupPayload(payload: BackupPayloadInput): AliosBackup {
-  return aliosBackupSchema.parse({
+  const backup = aliosBackupSchema.parse({
     app: payload.app,
     backupVersion: payload.backupVersion,
     exportedAt: payload.exportedAt,
     data: normalizeBackupData(payload.data),
   });
+
+  Object.defineProperty(backup, "attachmentMetadataIncluded", {
+    configurable: true,
+    enumerable: false,
+    value: Object.prototype.hasOwnProperty.call(payload.data, "attachments"),
+  });
+
+  return backup;
 }

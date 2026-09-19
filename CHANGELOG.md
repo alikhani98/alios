@@ -1,5 +1,19 @@
 # Changelog
 
+## Unreleased - Attachment Backup Metadata and Binary Package
+
+- Added attachment metadata to the standard version-1 backup without adding
+  binary content to the JSON backup.
+- Preserved attachment metadata when restoring pre-attachment backups and kept
+  standard restore isolated from binary storage.
+- Added an explicit Settings package flow for exporting/importing a JSON
+  manifest and deduplicated binary bundle.
+- Added preflight conflict detection for metadata IDs, storage keys, package
+  ranges, missing binaries, and orphan package entries. Rejected imports report
+  the affected record or storage key and perform no partial mutation.
+- Deferred search, Review/Home projections, sync, cloud storage, and automatic
+  attachment repair.
+
 ## Unreleased - Attachment Integrity Diagnostics
 
 - Added a derived, read-only attachment integrity resolver for metadata without
