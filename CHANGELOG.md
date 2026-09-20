@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased - Reminders V0 Local-Only
+
+- Added a derived Home reminder panel for overdue and due-today Tasks plus
+  active unpaid Finance obligations.
+- Reused existing Task and Finance repository data without adding entities,
+  Dexie tables, migrations, backup fields, sync behavior, or a new page.
+- Added explicit local browser notification opt-in for the foreground-only
+  experience. Duplicate notifications are suppressed in memory per tab
+  session and may appear again after a reload or in a new tab.
+- Deferred server scheduling, Web Push/VAPID, Telegram, Supabase Edge
+  Functions, delivery history, and complex recurrence.
+
 ## Unreleased - Attachment Backup Metadata and Binary Package
 
 - Added attachment metadata to the standard version-1 backup without adding

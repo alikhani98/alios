@@ -15,6 +15,7 @@ import type { HomeLearningSnapshot } from "./homeLearningSnapshot";
 import type { HomePlanningFocus } from "./homePlanningFocus";
 import type { HomePersonalMetrics } from "./personalMetrics";
 import type { WeeklyPlanLink } from "@/features/weeklyReview/weeklyPlanLinks";
+import type { LocalReminderSnapshot } from "@/features/reminders";
 
 export type HomeDashboardData = {
   tasks: Task[];
@@ -78,6 +79,7 @@ export type HomeDashboardData = {
   weeklyPlan?: WeeklyPlan;
   weeklyPlanLinks?: WeeklyPlanLink[];
   learningSnapshot: HomeLearningSnapshot;
+  reminderSnapshot: LocalReminderSnapshot;
   personalMetrics: HomePersonalMetrics;
   isEmpty: boolean;
 };

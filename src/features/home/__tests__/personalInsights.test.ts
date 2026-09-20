@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import type { HomeDashboardData } from "../types";
 import { buildHomeLearningSnapshot } from "../homeLearningSnapshot";
 import { buildHomePersonalMetrics } from "../personalMetrics";
+import { buildLocalReminderSnapshot } from "@/features/reminders";
 import {
   buildPersonalInsightsSnapshot,
   calculateCompletionPercentage,
@@ -120,6 +121,7 @@ function createHomeData(overrides: Partial<HomeDashboardData> = {}): HomeDashboa
       resources: [],
       knowledgeItems: [],
     }),
+    reminderSnapshot: buildLocalReminderSnapshot([], [], new Date("2026-07-08T08:00:00.000Z")),
     personalMetrics: buildHomePersonalMetrics({
       tasks: [],
       journalEntries: [],

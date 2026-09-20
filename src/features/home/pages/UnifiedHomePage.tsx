@@ -18,6 +18,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { format, isValid, parseISO } from "date-fns";
 
 import { TodayWorkspace } from "@/features/today/components/TodayWorkspace";
+import { LocalReminderPanel } from "@/features/reminders";
 import { RoutineTemplatesCard, type RoutineTemplateId } from "@/features/routines";
 import { WellnessBadmintonCard } from "@/features/wellness";
 import { useDateFormatter } from "@/shared/date";
@@ -680,6 +681,7 @@ export function UnifiedHomePage() {
           <DailyBriefingCard data={data} />
           <ClearStartCard data={data} />
           <QuickAccessLauncher />
+          <LocalReminderPanel snapshot={data.reminderSnapshot} />
           <HomeLearningPanel snapshot={data.learningSnapshot} />
           <TodayContextStrip inboxCount={data.inbox.unprocessedCount} />
           <TodayWorkspace

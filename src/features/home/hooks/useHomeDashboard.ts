@@ -12,6 +12,7 @@ import { getHomePlanningFocus } from "../homePlanningFocus";
 import { buildHomeLearningSnapshot } from "../homeLearningSnapshot";
 import { buildHomePersonalMetrics } from "../personalMetrics";
 import { getWeeklyPlanWeekStart } from "@/features/weeklyReview/weeklyPlan";
+import { buildLocalReminderSnapshot } from "@/features/reminders";
 import type { HomeDashboardData } from "../types";
 
 function getHomeWeeklyPlanLinks(
@@ -195,6 +196,11 @@ export function useHomeDashboard() {
           resources: resourceItems,
           knowledgeItems,
         }),
+        reminderSnapshot: buildLocalReminderSnapshot(
+          allTasks,
+          financeObligations,
+          new Date()
+        ),
         personalMetrics: buildHomePersonalMetrics({
           tasks: allTasks,
           journalEntries,

@@ -18,6 +18,7 @@ import { HOME_BACKUP_REMINDER_DISMISSED_UNTIL_KEY } from "../backupReminder";
 import { buildHomeLearningSnapshot } from "../homeLearningSnapshot";
 import { getDailyBriefingViewModel } from "../components/DailyBriefingCard";
 import { buildHomePersonalMetrics } from "../personalMetrics";
+import { buildLocalReminderSnapshot } from "@/features/reminders";
 
 const todayTask = {
   id: "home-task-1",
@@ -96,6 +97,11 @@ const dashboardData: HomeDashboardData = {
     resources: [],
     knowledgeItems: [],
   }),
+  reminderSnapshot: buildLocalReminderSnapshot(
+    [overdueTask],
+    [],
+    new Date("2026-08-09T08:00:00.000Z")
+  ),
   personalMetrics: buildHomePersonalMetrics(
     {
       tasks: [todayTask],
