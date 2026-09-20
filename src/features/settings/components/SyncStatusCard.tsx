@@ -26,6 +26,7 @@ import {
   SoftPanel,
   StatusChip,
 } from "@/shared/ui";
+import { TelegramReminderSettings } from "@/features/reminders";
 
 import { EmailAccountAuthForm } from "./EmailAccountAuthForm";
 
@@ -485,6 +486,8 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
             </p>
           ) : null}
         </SoftPanel>
+
+        <TelegramReminderSettings />
 
         <CollapsibleSection
           id="account-sync-advanced-panel-loader"

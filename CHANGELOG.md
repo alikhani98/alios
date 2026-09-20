@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased - Telegram Reminder Settings
+
+- Added authenticated Telegram reminder preference storage and RLS migration
+  for per-user settings.
+- Added a Supabase Edge Function boundary for preference reads/upserts,
+  Telegram `getChat` validation, and manual test-send feedback without exposing
+  the bot token to the client.
+- Added Account & Sync controls for channel, enablement, Chat ID, timezone,
+  morning time, save, and test send.
+- Deferred scheduled delivery, Web Push/VAPID, Telegram cron jobs, delivery
+  history, sync changes, and backup changes.
+
 ## Unreleased - Reminders V0 Local-Only
 
 - Added a derived Home reminder panel for overdue and due-today Tasks plus
