@@ -28,6 +28,91 @@ function createRequest(body: unknown, token = "token") {
 }
 
 describe("reminder-settings Edge Function core", () => {
+  it("answers allowed-origin CORS preflight requests", async () => {
+    const response = await handleReminderSettingsRequest(
+      new Request("https://example.test/reminder-settings", {
+        method: "OPTIONS",
+        headers: { origin: "http://localhost:5173" },
+      }),
+      {
+        supabaseUrl: "https://example.supabase.co",
+        supabaseAnonKey: "anon",
+        fetch: vi.fn(),
+      }
+    );
+
+    expect(response.status).toBe(204);
+    expect(response.headers.get("Access-Control-Allow-Origin")).toBe(
+      "http://localhost:5173"
+    );
+    expect(response.headers.get("Access-Control-Allow-Headers")).toContain(
+      "authorization"
+    );
+    expect(response.headers.get("Access-Control-Allow-Methods")).toBe(
+      "POST, OPTIONS"
+    );
+  });
+
+  it("adds CORS headers to successful and error responses", async () => {
+    const successResponse = await handleReminderSettingsRequest(
+      new Request("https://example.test/reminder-settings", {
+        method: "POST",
+        headers: {
+          origin: "https://alikhani98.github.io",
+          authorization: "Bearer token",
+        },
+        body: JSON.stringify({ action: "get" }),
+      }),
+      {
+        supabaseUrl: "https://example.supabase.co",
+        supabaseAnonKey: "anon",
+        fetch: vi.fn<typeof fetch>().mockResolvedValueOnce(
+          jsonResponse({ id: "user-1" })
+        ).mockResolvedValueOnce(jsonResponse([])),
+      }
+    );
+
+    expect(successResponse.headers.get("Access-Control-Allow-Origin")).toBe(
+      "https://alikhani98.github.io"
+    );
+
+    const errorResponse = await handleReminderSettingsRequest(
+      new Request("https://example.test/reminder-settings", {
+        method: "POST",
+        headers: { origin: "http://localhost:5173" },
+        body: JSON.stringify({ action: "get" }),
+      }),
+      {
+        supabaseUrl: "https://example.supabase.co",
+        supabaseAnonKey: "anon",
+        fetch: vi.fn(),
+      }
+    );
+
+    expect(errorResponse.headers.get("Access-Control-Allow-Origin")).toBe(
+      "http://localhost:5173"
+    );
+  });
+
+  it("does not allow an unapproved browser origin", async () => {
+    const response = await handleReminderSettingsRequest(
+      new Request("https://example.test/reminder-settings", {
+        method: "POST",
+        headers: {
+          origin: "https://malicious.example",
+        },
+        body: JSON.stringify({ action: "get" }),
+      }),
+      {
+        supabaseUrl: "https://example.supabase.co",
+        supabaseAnonKey: "anon",
+        fetch: vi.fn(),
+      }
+    );
+
+    expect(response.headers.get("Access-Control-Allow-Origin")).toBeNull();
+  });
+
   it("validates Telegram preference input", () => {
     expect(() =>
       validatePreferenceInput({

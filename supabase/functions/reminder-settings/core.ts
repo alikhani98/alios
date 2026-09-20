@@ -1,3 +1,5 @@
+import { createCorsHeaders } from "../_shared/cors.ts";
+
 export type ReminderPreferenceRow = Readonly<{
   user_id: string;
   enabled: boolean;
@@ -39,12 +41,17 @@ export type ReminderSettingsDependencies = Readonly<{
 const telegramChatIdPattern = /^-?[0-9]+$/;
 const timePattern = /^([01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?$/;
 
-function jsonResponse(status: number, result: ReminderSettingsResult): Response {
+function jsonResponse(
+  status: number,
+  result: ReminderSettingsResult,
+  origin: string | null
+): Response {
+  const headers = createCorsHeaders(origin);
+  headers.set("content-type", "application/json");
+
   return new Response(JSON.stringify(result), {
     status,
-    headers: {
-      "content-type": "application/json",
-    },
+    headers,
   });
 }
 
@@ -273,12 +280,19 @@ export async function handleReminderSettingsRequest(
   request: Request,
   deps: ReminderSettingsDependencies
 ): Promise<Response> {
+  const origin = request.headers.get("origin");
+
+  if (request.method === "OPTIONS") {
+    const headers = createCorsHeaders(origin);
+    return new Response(null, { status: 204, headers });
+  }
+
   if (request.method !== "POST") {
     return jsonResponse(405, {
       ok: false,
       code: "method_not_allowed",
       message: "Reminder settings only accepts POST requests.",
-    });
+    }, origin);
   }
 
   const accessToken = normalizeBearerToken(request.headers.get("authorization"));
@@ -287,7 +301,7 @@ export async function handleReminderSettingsRequest(
       ok: false,
       code: "unauthenticated",
       message: "Sign in before configuring Telegram reminders.",
-    });
+    }, origin);
   }
 
   let action: ReminderSettingsAction;
@@ -298,7 +312,7 @@ export async function handleReminderSettingsRequest(
       ok: false,
       code: "invalid_json",
       message: "Reminder settings request was not valid JSON.",
-    });
+    }, origin);
   }
 
   try {
@@ -310,7 +324,7 @@ export async function handleReminderSettingsRequest(
         ok: true,
         message: "Telegram reminder settings loaded.",
         preference,
-      });
+      }, origin);
     }
 
     if (action.action === "save") {
@@ -324,7 +338,7 @@ export async function handleReminderSettingsRequest(
         ok: true,
         message: "Telegram reminder settings saved.",
         preference,
-      });
+      }, origin);
     }
 
     if (action.action === "test") {
@@ -332,14 +346,14 @@ export async function handleReminderSettingsRequest(
       return jsonResponse(200, {
         ok: true,
         message: "Telegram test message sent successfully.",
-      });
+      }, origin);
     }
 
     return jsonResponse(400, {
       ok: false,
       code: "unknown_action",
       message: "Reminder settings action is not supported.",
-    });
+    }, origin);
   } catch (error) {
     return jsonResponse(400, {
       ok: false,
@@ -348,6 +362,6 @@ export async function handleReminderSettingsRequest(
         error instanceof Error
           ? error.message
           : "AliOS could not complete the reminder settings request.",
-    });
+    }, origin);
   }
 }
