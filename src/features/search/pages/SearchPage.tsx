@@ -34,6 +34,7 @@ const searchResultKindOrder: SearchResultKind[] = [
   "goal",
   "lifeArea",
   "resource",
+  "attachment",
   "journal",
   "knowledge",
   "decision",
@@ -82,28 +83,43 @@ function SearchResultCard({ result }: { result: SearchResult }) {
             </p>
             <div className="flex flex-wrap gap-2">
               {result.context.map((context) => (
-                <Link
-                  key={`${context.labelKey}-${context.href}`}
-                  to={context.href}
-                  className="rounded-full border border-border bg-background px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                >
-                  {t(context.labelKey)}: {context.title}
-                </Link>
+                context.href ? (
+                  <Link
+                    key={`${context.labelKey}-${context.href}`}
+                    to={context.href}
+                    className="rounded-full border border-border bg-background px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    {t(context.labelKey)}: {context.title}
+                  </Link>
+                ) : (
+                  <span
+                    key={`${context.labelKey}-unavailable`}
+                    className="rounded-full border border-dashed border-border bg-muted/40 px-3 py-1.5 text-xs font-medium text-muted-foreground"
+                  >
+                    {t(context.labelKey)}: {context.title || t("search.contextUnavailable")}
+                  </span>
+                )
               ))}
             </div>
           </div>
         ) : null}
-        <Button asChild variant="outline" className="w-full justify-start sm:w-auto">
-          <Link to={result.href}>
-            <ArrowRight
-              className={cn(
-                "me-2 h-4 w-4",
-                direction === "rtl" ? "rotate-180" : null
-              )}
-            />
-            {t("search.openModule")}
-          </Link>
-        </Button>
+        {result.href ? (
+          <Button asChild variant="outline" className="w-full justify-start sm:w-auto">
+            <Link to={result.href}>
+              <ArrowRight
+                className={cn(
+                  "me-2 h-4 w-4",
+                  direction === "rtl" ? "rotate-180" : null
+                )}
+              />
+              {t("search.openModule")}
+            </Link>
+          </Button>
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            {t("search.navigationUnavailable")}
+          </p>
+        )}
       </CardContent>
     </PremiumCard>
   );

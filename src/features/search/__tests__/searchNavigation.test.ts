@@ -35,4 +35,10 @@ describe("searchNavigation", () => {
     expect(getSearchResultPath("decision")).toBe("/decisions");
     expect(getSearchResultPath("manual")).toBe("/manual");
   });
+
+  it("does not invent a standalone attachment destination", () => {
+    expect(() => buildSearchResultHref("attachment", "attachment-1")).toThrow(
+      "Attachment results navigate through their owner."
+    );
+  });
 });

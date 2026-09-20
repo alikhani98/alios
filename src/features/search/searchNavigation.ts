@@ -1,6 +1,8 @@
 import type { SearchResultKind } from "./searchLocalData";
 
-const searchResultPaths: Record<SearchResultKind, string> = {
+type NavigableSearchResultKind = Exclude<SearchResultKind, "attachment">;
+
+const searchResultPaths: Record<NavigableSearchResultKind, string> = {
   inbox: "/inbox",
   task: "/today",
   project: "/projects",
@@ -14,7 +16,7 @@ const searchResultPaths: Record<SearchResultKind, string> = {
   routine: "/routines",
 };
 
-export function getSearchResultPath(kind: SearchResultKind): string {
+export function getSearchResultPath(kind: NavigableSearchResultKind): string {
   return searchResultPaths[kind];
 }
 
@@ -24,6 +26,10 @@ export function buildSearchResultHref(
 ): string {
   if (kind === "resource") {
     return `/resources/${encodeURIComponent(focusId)}`;
+  }
+
+  if (kind === "attachment") {
+    throw new Error("Attachment results navigate through their owner.");
   }
 
   const searchParams = new URLSearchParams({ focusId });

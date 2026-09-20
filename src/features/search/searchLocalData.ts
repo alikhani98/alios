@@ -33,6 +33,7 @@ import {
 } from "@/features/today/constants";
 import type { TranslationKey } from "@/shared/i18n";
 import type {
+  Attachment,
   InboxItem,
   Goal,
   JournalEntry,
@@ -55,6 +56,7 @@ export type SearchResultKind =
   | "goal"
   | "lifeArea"
   | "resource"
+  | "attachment"
   | "journal"
   | "knowledge"
   | "decision"
@@ -70,6 +72,7 @@ export type SearchMatchedField =
   | "author"
   | "url"
   | "location"
+  | "filename"
   | "status"
   | "type"
   | "priority"
@@ -90,7 +93,7 @@ export type SearchResultFacet = {
 export type SearchResultContext = {
   labelKey: TranslationKey;
   title: string;
-  href: string;
+  href?: string;
 };
 
 export type SearchResult = {
@@ -101,7 +104,7 @@ export type SearchResult = {
   snippet: string;
   matchedFieldLabelKey: TranslationKey;
   date?: string;
-  href: string;
+  href?: string;
   context: SearchResultContext[];
   facets: SearchResultFacet[];
   sortKey: string;
@@ -126,6 +129,7 @@ export type SearchLocalDataInput = {
   routines?: Routine[];
   resources?: Resource[];
   decisions?: DecisionLogEntry[];
+  attachments?: Attachment[];
 };
 
 const kindLabelKeys: Record<SearchResultKind, TranslationKey> = {
@@ -135,6 +139,7 @@ const kindLabelKeys: Record<SearchResultKind, TranslationKey> = {
   goal: "search.typeGoal",
   lifeArea: "search.typeLifeArea",
   resource: "search.typeResource",
+  attachment: "search.typeAttachment",
   journal: "search.typeJournal",
   knowledge: "search.typeKnowledge",
   decision: "search.typeDecision",
@@ -151,6 +156,7 @@ const matchedFieldLabelKeys: Record<SearchMatchedField, TranslationKey> = {
   author: "search.matchAuthor",
   url: "search.matchUrl",
   location: "search.matchLocation",
+  filename: "search.matchFilename",
   status: "search.matchStatus",
   type: "search.matchType",
   priority: "search.matchPriority",
@@ -188,6 +194,7 @@ type EntityLookups = {
   projects: Map<string, Project>;
   tasks: Map<string, Task>;
   resources: Map<string, Resource>;
+  knowledge: Map<string, KnowledgeItem>;
 };
 
 function normalize(value: string): string {
@@ -273,6 +280,16 @@ function scoreField(field: SearchableField, query: string): number {
       return 800;
     }
     return 650;
+  }
+
+  if (field.kind === "filename") {
+    if (normalizedSource === query) {
+      return 900;
+    }
+    if (normalizedSource.startsWith(query)) {
+      return 720;
+    }
+    return 580;
   }
 
   const baseScore = getFieldBaseScore(field.kind);
@@ -377,11 +394,12 @@ function buildResult(args: {
   title: string;
   snippetSource: string;
   fields: SearchableField[];
-  href: string;
+  href?: string;
   facets: SearchResultFacet[];
   context?: SearchResultContext[];
   sortKey: string;
   date?: string;
+  titleFieldKind?: SearchMatchedField;
   query: string;
 }): SearchResult | null {
   const normalizedQuery = normalize(args.query);
@@ -389,7 +407,10 @@ function buildResult(args: {
     return null;
   }
 
-  const searchable = [createField("title", args.title), ...args.fields];
+  const searchable = [
+    createField(args.titleFieldKind ?? "title", args.title),
+    ...args.fields,
+  ];
   const bestMatch = findBestMatch(searchable, normalizedQuery);
   if (!bestMatch) {
     return null;
@@ -429,6 +450,7 @@ export function searchLocalData(
     projects: new Map(data.projects.map((item) => [item.id, item])),
     tasks: new Map(data.tasks.map((item) => [item.id, item])),
     resources: new Map((data.resources ?? []).map((item) => [item.id, item])),
+    knowledge: new Map(data.knowledgeItems.map((item) => [item.id, item])),
   };
 
   for (const item of data.inboxItems) {
@@ -669,6 +691,55 @@ export function searchLocalData(
       facets,
       sortKey: item.updatedAt,
       date: item.updatedAt,
+      query: normalizedQuery,
+    });
+    if (result) results.push(result);
+  }
+
+  const seenAttachmentIds = new Set<string>();
+  for (const item of data.attachments ?? []) {
+    if (seenAttachmentIds.has(item.id)) {
+      continue;
+    }
+    seenAttachmentIds.add(item.id);
+
+    const owner =
+      item.ownerType === "resource"
+        ? lookups.resources.get(item.ownerId)
+        : lookups.knowledge.get(item.ownerId);
+    const ownerContextLabelKey =
+      item.ownerType === "resource"
+        ? "search.contextOwnerResource"
+        : "search.contextOwnerKnowledge";
+    const ownerHref = owner
+      ? buildSearchResultHref(
+          item.ownerType === "resource" ? "resource" : "knowledge",
+          owner.id
+        )
+      : undefined;
+
+    const result = buildResult({
+      id: item.id,
+      kind: "attachment",
+      title: item.filename,
+      titleFieldKind: "filename",
+      snippetSource: item.mimeType || `${item.size} bytes`,
+      fields: [
+        createField("context", owner?.title),
+        createField("type", item.kind),
+        createField("type", item.mimeType),
+      ],
+      href: ownerHref,
+      context: [
+        {
+          labelKey: ownerContextLabelKey,
+          title: owner?.title ?? "",
+          href: ownerHref,
+        },
+      ],
+      facets: [],
+      sortKey: item.updatedAt,
+      date: item.createdAt,
       query: normalizedQuery,
     });
     if (result) results.push(result);

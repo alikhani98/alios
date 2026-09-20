@@ -18,6 +18,7 @@ export function useGlobalSearch() {
     routines,
     resources,
     decisions,
+    attachments,
   } = useStorageAdapter();
   const { t } = useI18n();
   const [data, setData] = useState<SearchLocalDataInput | null>(null);
@@ -41,6 +42,7 @@ export function useGlobalSearch() {
         routineEntries,
         resourceEntries,
         decisionEntries,
+        attachmentEntries,
       ] =
         await Promise.all([
           inbox.list(),
@@ -54,6 +56,7 @@ export function useGlobalSearch() {
           routines.list(),
           resources.list(),
           decisions.list(),
+          attachments.listAll(),
         ]);
 
       setData({
@@ -68,6 +71,7 @@ export function useGlobalSearch() {
         routines: routineEntries,
         resources: resourceEntries,
         decisions: decisionEntries,
+        attachments: attachmentEntries,
       });
     } catch {
       setHasError(true);
@@ -87,6 +91,7 @@ export function useGlobalSearch() {
     routines,
     t,
     tasks,
+    attachments,
   ]);
 
   useEffect(() => {

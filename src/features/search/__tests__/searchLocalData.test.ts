@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type {
+  Attachment,
   Goal,
   InboxItem,
   JournalEntry,
@@ -153,6 +154,33 @@ const resources: Resource[] = [
     projectId: "project-1",
     createdAt: "2026-07-01T08:00:00.000Z",
     updatedAt: "2026-07-04T13:00:00.000Z",
+  },
+];
+
+const attachments: Attachment[] = [
+  {
+    id: "attachment-resource-1",
+    ownerType: "resource",
+    ownerId: "resource-1",
+    kind: "document",
+    filename: "atomic-habits-notes.pdf",
+    mimeType: "application/pdf",
+    size: 2048,
+    storageKey: "attachments/shared",
+    createdAt: "2026-07-05T14:00:00.000Z",
+    updatedAt: "2026-07-05T14:00:00.000Z",
+  },
+  {
+    id: "attachment-knowledge-1",
+    ownerType: "knowledge",
+    ownerId: "knowledge-1",
+    kind: "image",
+    filename: "atomic-habits-diagram.png",
+    mimeType: "image/png",
+    size: 1024,
+    storageKey: "attachments/shared",
+    createdAt: "2026-07-05T15:00:00.000Z",
+    updatedAt: "2026-07-05T15:00:00.000Z",
   },
 ];
 
@@ -518,6 +546,131 @@ describe("searchLocalData", () => {
         }),
       ],
     });
+  });
+
+  it("searches attachment filenames and navigates through the owner", () => {
+    const results = searchLocalData(
+      {
+        inboxItems: [],
+        tasks: [],
+        projects: [],
+        goals: [],
+        journalEntries: [],
+        knowledgeItems,
+        manualEntries: [],
+        resources,
+        attachments,
+      },
+      "atomic-habits-notes"
+    );
+
+    expect(results[0]).toMatchObject({
+      id: "attachment-resource-1",
+      kind: "attachment",
+      title: "atomic-habits-notes.pdf",
+      snippet: "application/pdf",
+      matchedFieldLabelKey: "search.matchFilename",
+      href: "/resources/resource-1",
+      context: [
+        {
+          labelKey: "search.contextOwnerResource",
+          title: "Atomic Habits",
+          href: "/resources/resource-1",
+        },
+      ],
+    });
+  });
+
+  it("searches attachment owner context and keeps shared storage references separate", () => {
+    const duplicateId = { ...attachments[0] };
+    const results = searchLocalData(
+      {
+        inboxItems: [],
+        tasks: [],
+        projects: [],
+        goals: [],
+        journalEntries: [],
+        knowledgeItems,
+        manualEntries: [],
+        resources,
+        attachments: [...attachments, duplicateId],
+      },
+      "atomic"
+    );
+
+    expect(results.filter((result) => result.kind === "attachment")).toHaveLength(2);
+    expect(
+      results.find((result) => result.id === "attachment-knowledge-1")
+    ).toMatchObject({
+      href: "/knowledge?focusId=knowledge-1",
+      context: [
+        {
+          labelKey: "search.contextOwnerKnowledge",
+          title: "Search checklist",
+          href: "/knowledge?focusId=knowledge-1",
+        },
+      ],
+    });
+  });
+
+  it("shows unavailable attachment owners without a broken navigation link", () => {
+    const results = searchLocalData(
+      {
+        inboxItems: [],
+        tasks: [],
+        projects: [],
+        goals: [],
+        journalEntries: [],
+        knowledgeItems: [],
+        manualEntries: [],
+        resources: [],
+        attachments: [
+          {
+            ...attachments[0],
+            id: "attachment-missing-owner",
+            ownerId: "deleted-resource",
+          },
+        ],
+      },
+      "atomic-habits-notes"
+    );
+
+    expect(results[0]).toMatchObject({
+      kind: "attachment",
+      href: undefined,
+      context: [
+        {
+          labelKey: "search.contextOwnerResource",
+          title: "",
+          href: undefined,
+        },
+      ],
+    });
+  });
+
+  it("ranks exact entity titles above exact attachment filenames", () => {
+    const results = searchLocalData(
+      {
+        inboxItems: [],
+        tasks: [
+          {
+            ...tasks[0],
+            id: "task-exact",
+            title: "atomic-habits-notes.pdf",
+          },
+        ],
+        projects: [],
+        goals: [],
+        journalEntries: [],
+        knowledgeItems: [],
+        manualEntries: [],
+        attachments: [attachments[0]],
+      },
+      "atomic-habits-notes.pdf"
+    );
+
+    expect(results[0]).toMatchObject({ kind: "task", id: "task-exact" });
+    expect(results.some((result) => result.kind === "attachment")).toBe(true);
   });
 
   it("narrows existing search results by content type and date range", () => {
