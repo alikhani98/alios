@@ -51,14 +51,20 @@ export async function processMorningReminders(
     }
 
     const success = await sendTelegramReminder(batch, deps);
+
     if (success) {
       sent++;
+
+      await updateLastSentDate(
+        user.user_id,
+        getTodayInTimezone(user.timezone),
+        deps
+      );
     } else {
       failed++;
     }
 
     await logDelivery(user, batch, success, deps);
-    await updateLastSentDate(user.user_id, getTodayInTimezone(user.timezone), deps);
   }
 
   return {
@@ -245,8 +251,8 @@ async function fetchFinanceObligations(
     .map((obligation) => ({
       id: obligation.id as string,
       title: obligation.title as string,
-      obligation_date: (obligation.dueDate as string | undefined) ?? 
-                       (obligation.dueDay !== undefined ? `day ${obligation.dueDay}` : undefined),
+      obligation_date: (obligation.dueDate as string | undefined) ??
+        (obligation.dueDay !== undefined ? `day ${obligation.dueDay}` : undefined),
     }));
 }
 
@@ -258,21 +264,53 @@ async function sendTelegramReminder(
 
   if (batch.task_due.length > 0) {
     lines.push("📋 *Tasks Due/Overdue*:");
-    for (const task of batch.task_due) {
+
+    const sortedTasks = [...batch.task_due].sort((a, b) => {
+      const dateA = a.due_date ?? "9999-12-31";
+      const dateB = b.due_date ?? "9999-12-31";
+      return dateA.localeCompare(dateB);
+    });
+
+    const maxTasks = 5;
+    const visibleTasks = sortedTasks.slice(0, maxTasks);
+    const remainingTasks = sortedTasks.length - maxTasks;
+
+    for (const task of visibleTasks) {
       const dueLabel = task.due_date ? ` (due: ${task.due_date})` : "";
       lines.push(`• ${task.title}${dueLabel}`);
     }
+
+    if (remainingTasks > 0) {
+      lines.push(`+ ${remainingTasks} more overdue tasks`);
+    }
+
     lines.push("");
   }
 
   if (batch.finance_obligation.length > 0) {
     lines.push("💰 *Finance Obligations*:");
-    for (const obligation of batch.finance_obligation) {
-      const dateLabel = obligation.obligation_date ? ` (${obligation.obligation_date})` : "";
+
+    const sortedFinance = [...batch.finance_obligation].sort((a, b) => {
+      const dateA = a.obligation_date ?? "9999-12-31";
+      const dateB = b.obligation_date ?? "9999-12-31";
+      return dateA.localeCompare(dateB);
+    });
+
+    const maxFinance = 5;
+    const visibleFinance = sortedFinance.slice(0, maxFinance);
+    const remainingFinance = sortedFinance.length - maxFinance;
+
+    for (const obligation of visibleFinance) {
+      const dateLabel = obligation.obligation_date
+        ? ` (${obligation.obligation_date})`
+        : "";
       lines.push(`• ${obligation.title}${dateLabel}`);
     }
-  }
 
+    if (remainingFinance > 0) {
+      lines.push(`+ ${remainingFinance} more finance obligations`);
+    }
+  }
   const message = lines.join("\n");
 
   const telegramResponse = await deps.fetch(
@@ -288,7 +326,13 @@ async function sendTelegramReminder(
     }
   );
 
-  return telegramResponse.ok;
+  const telegramResult = await telegramResponse.json();
+
+  if (!telegramResult.ok) {
+    console.error("Telegram API error:", telegramResult);
+  }
+
+  return telegramResult.ok === true;
 }
 
 async function logDelivery(
