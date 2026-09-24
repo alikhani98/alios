@@ -344,6 +344,8 @@ export const messagesEn = {
   "settings.localAiStageNote": "This is a safe connection check for Version 2. Prompting, summarization, and any optional local-data access will be separate, explicit stages.",
   "settings.accountSyncTitle": "Account & Sync",
   "settings.accountSyncDescription": "AliOS stays local-first even when this device connects account sign-in and Supabase-backed sync. Preferences, tasks, routines, projects, goals, Finance, and Personal Manual records can sync in this stage after explicit opt-in.",
+  "settings.reminderSettingsTitle": "Reminders",
+  "settings.reminderSettingsDescription": "Receive Task due/overdue and Finance obligation reminders via Telegram. This stage saves settings and sends test messages only.",
   "settings.advancedSyncDetailsTitle": "Advanced sync details",
   "settings.advancedSyncDetailsDescription": "Open device history, privacy scope, conflict review, and recovery guidance only when you need deeper sync context.",
   "settings.accountCurrentStateLabel": "Current state",

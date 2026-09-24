@@ -1,5 +1,6 @@
 import {
   AlertCircle,
+  Bell,
   CalendarDays,
   Clock3,
   Download,
@@ -64,6 +65,7 @@ import {
 import {
   WELLNESS_BADMINTON_ROUTINE_ENABLED_STORAGE_KEY,
 } from "@/features/wellness";
+import { TelegramReminderSettings } from "@/features/reminders";
 import { RecoveryModeSection } from "../components/RecoveryModeSection";
 import { LocalErrorLogSection } from "../components/LocalErrorLogSection";
 import { SyncStatusCard } from "../components/SyncStatusCard";
@@ -560,6 +562,18 @@ export function SettingsPage() {
         defaultOpen
       >
         <SyncStatusCard onGoToBackupRestore={() => scrollToSection("settings-backup-restore")} />
+      </CollapsibleSection>
+
+      <CollapsibleSection
+        id="settings-reminder-settings-group"
+        icon={<Bell className="h-4 w-4" />}
+        title={t("settings.reminderSettingsTitle")}
+        description={t("settings.reminderSettingsDescription")}
+        expandLabel={t("common.expandSection")}
+        collapseLabel={t("common.collapseSection")}
+        defaultOpen={false}
+      >
+        <TelegramReminderSettings />
       </CollapsibleSection>
 
       <CollapsibleSection
