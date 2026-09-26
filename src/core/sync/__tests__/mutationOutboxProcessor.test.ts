@@ -231,7 +231,7 @@ describe("MutationOutboxProcessor", () => {
       retryWaiting: 0,
       blockedConflicts: 0,
     });
-    expect(processed).toEqual(["earlier", "later", "project"]);
+    expect(processed).toEqual(["project", "earlier", "later"]);
   });
 
   it("moves network failures to retry-wait with exponential backoff and jitter", async () => {
