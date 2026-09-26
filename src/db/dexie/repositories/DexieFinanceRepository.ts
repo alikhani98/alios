@@ -22,13 +22,17 @@ import {
 import { notifyUserDataSyncTrigger } from "@/core/sync";
 import type { AliosDatabase } from "../db";
 import { DexieRepositoryBase } from "./DexieRepositoryBase";
+import { DexieMutationOutboxRepository } from "./DexieMutationOutboxRepository";
 
 export class DexieFinanceRepository
   extends DexieRepositoryBase
   implements FinanceRepository
 {
+  private readonly mutationOutbox: DexieMutationOutboxRepository;
+
   constructor(database: AliosDatabase) {
     super(database);
+    this.mutationOutbox = new DexieMutationOutboxRepository(database);
   }
 
   async listTransactions(): Promise<FinanceTransaction[]> {
@@ -50,18 +54,31 @@ export class DexieFinanceRepository
   async createTransaction(
     input: CreateFinanceTransactionInput
   ): Promise<FinanceTransaction> {
-    return this.execute("creating a finance transaction", async () => {
-      const transaction = financeTransactionSchema.parse({
-        ...input,
-        ...this.createMetadata(),
-      });
-      await this.database.financeTransactions.add(transaction);
-      notifyUserDataSyncTrigger({
-        entity: "financeTransactions",
-        operation: "create",
-      });
-      return transaction;
-    });
+    return this.execute("creating a finance transaction", () =>
+      this.database.transaction(
+        "rw",
+        this.database.financeTransactions,
+        this.database.mutationOutbox,
+        async () => {
+          const transaction = financeTransactionSchema.parse({
+            ...input,
+            ...this.createMetadata(),
+          });
+          await this.database.financeTransactions.add(transaction);
+          await this.mutationOutbox.enqueue({
+            entity: "financeTransactions",
+            operation: "create",
+            recordId: transaction.id,
+            payload: transaction,
+          });
+          notifyUserDataSyncTrigger({
+            entity: "financeTransactions",
+            operation: "create",
+          });
+          return transaction;
+        }
+      )
+    );
   }
 
   async updateTransaction(
@@ -69,43 +86,65 @@ export class DexieFinanceRepository
     input: UpdateFinanceTransactionInput
   ): Promise<FinanceTransaction> {
     return this.execute("updating a finance transaction", () =>
-      this.database.transaction("rw", this.database.financeTransactions, async () => {
-        const current = this.requireEntity(
-          "Finance transaction",
-          id,
-          await this.database.financeTransactions.get(id)
-        );
-        const transaction = financeTransactionSchema.parse({
-          ...current,
-          ...input,
-          id: current.id,
-          createdAt: current.createdAt,
-          updatedAt: new Date().toISOString(),
-        });
-        await this.database.financeTransactions.put(transaction);
-        notifyUserDataSyncTrigger({
-          entity: "financeTransactions",
-          operation: "update",
-        });
-        return transaction;
-      })
+      this.database.transaction(
+        "rw",
+        this.database.financeTransactions,
+        this.database.mutationOutbox,
+        async () => {
+          const current = this.requireEntity(
+            "Finance transaction",
+            id,
+            await this.database.financeTransactions.get(id)
+          );
+          const transaction = financeTransactionSchema.parse({
+            ...current,
+            ...input,
+            id: current.id,
+            createdAt: current.createdAt,
+            updatedAt: new Date().toISOString(),
+          });
+          await this.database.financeTransactions.put(transaction);
+          await this.mutationOutbox.enqueue({
+            entity: "financeTransactions",
+            operation: "update",
+            recordId: transaction.id,
+            payload: transaction,
+          });
+          notifyUserDataSyncTrigger({
+            entity: "financeTransactions",
+            operation: "update",
+          });
+          return transaction;
+        }
+      )
     );
   }
 
   async deleteTransaction(id: string): Promise<void> {
     return this.execute("deleting a finance transaction", () =>
-      this.database.transaction("rw", this.database.financeTransactions, async () => {
-        this.requireEntity(
-          "Finance transaction",
-          id,
-          await this.database.financeTransactions.get(id)
-        );
-        await this.database.financeTransactions.delete(id);
-        notifyUserDataSyncTrigger({
-          entity: "financeTransactions",
-          operation: "delete",
-        });
-      })
+      this.database.transaction(
+        "rw",
+        this.database.financeTransactions,
+        this.database.mutationOutbox,
+        async () => {
+          const current = this.requireEntity(
+            "Finance transaction",
+            id,
+            await this.database.financeTransactions.get(id)
+          );
+          await this.database.financeTransactions.delete(id);
+          await this.mutationOutbox.enqueue({
+            entity: "financeTransactions",
+            operation: "delete",
+            recordId: current.id,
+            payload: current,
+          });
+          notifyUserDataSyncTrigger({
+            entity: "financeTransactions",
+            operation: "delete",
+          });
+        }
+      )
     );
   }
 
@@ -128,18 +167,31 @@ export class DexieFinanceRepository
   async createObligation(
     input: CreateFinanceObligationInput
   ): Promise<FinanceObligation> {
-    return this.execute("creating a finance obligation", async () => {
-      const obligation = financeObligationSchema.parse({
-        ...input,
-        ...this.createMetadata(),
-      });
-      await this.database.financeObligations.add(obligation);
-      notifyUserDataSyncTrigger({
-        entity: "financeObligations",
-        operation: "create",
-      });
-      return obligation;
-    });
+    return this.execute("creating a finance obligation", () =>
+      this.database.transaction(
+        "rw",
+        this.database.financeObligations,
+        this.database.mutationOutbox,
+        async () => {
+          const obligation = financeObligationSchema.parse({
+            ...input,
+            ...this.createMetadata(),
+          });
+          await this.database.financeObligations.add(obligation);
+          await this.mutationOutbox.enqueue({
+            entity: "financeObligations",
+            operation: "create",
+            recordId: obligation.id,
+            payload: obligation,
+          });
+          notifyUserDataSyncTrigger({
+            entity: "financeObligations",
+            operation: "create",
+          });
+          return obligation;
+        }
+      )
+    );
   }
 
   async updateObligation(
@@ -147,43 +199,65 @@ export class DexieFinanceRepository
     input: UpdateFinanceObligationInput
   ): Promise<FinanceObligation> {
     return this.execute("updating a finance obligation", () =>
-      this.database.transaction("rw", this.database.financeObligations, async () => {
-        const current = this.requireEntity(
-          "Finance obligation",
-          id,
-          await this.database.financeObligations.get(id)
-        );
-        const obligation = financeObligationSchema.parse({
-          ...current,
-          ...input,
-          id: current.id,
-          createdAt: current.createdAt,
-          updatedAt: new Date().toISOString(),
-        });
-        await this.database.financeObligations.put(obligation);
-        notifyUserDataSyncTrigger({
-          entity: "financeObligations",
-          operation: "update",
-        });
-        return obligation;
-      })
+      this.database.transaction(
+        "rw",
+        this.database.financeObligations,
+        this.database.mutationOutbox,
+        async () => {
+          const current = this.requireEntity(
+            "Finance obligation",
+            id,
+            await this.database.financeObligations.get(id)
+          );
+          const obligation = financeObligationSchema.parse({
+            ...current,
+            ...input,
+            id: current.id,
+            createdAt: current.createdAt,
+            updatedAt: new Date().toISOString(),
+          });
+          await this.database.financeObligations.put(obligation);
+          await this.mutationOutbox.enqueue({
+            entity: "financeObligations",
+            operation: "update",
+            recordId: obligation.id,
+            payload: obligation,
+          });
+          notifyUserDataSyncTrigger({
+            entity: "financeObligations",
+            operation: "update",
+          });
+          return obligation;
+        }
+      )
     );
   }
 
   async deleteObligation(id: string): Promise<void> {
     return this.execute("deleting a finance obligation", () =>
-      this.database.transaction("rw", this.database.financeObligations, async () => {
-        this.requireEntity(
-          "Finance obligation",
-          id,
-          await this.database.financeObligations.get(id)
-        );
-        await this.database.financeObligations.delete(id);
-        notifyUserDataSyncTrigger({
-          entity: "financeObligations",
-          operation: "delete",
-        });
-      })
+      this.database.transaction(
+        "rw",
+        this.database.financeObligations,
+        this.database.mutationOutbox,
+        async () => {
+          const current = this.requireEntity(
+            "Finance obligation",
+            id,
+            await this.database.financeObligations.get(id)
+          );
+          await this.database.financeObligations.delete(id);
+          await this.mutationOutbox.enqueue({
+            entity: "financeObligations",
+            operation: "delete",
+            recordId: current.id,
+            payload: current,
+          });
+          notifyUserDataSyncTrigger({
+            entity: "financeObligations",
+            operation: "delete",
+          });
+        }
+      )
     );
   }
 

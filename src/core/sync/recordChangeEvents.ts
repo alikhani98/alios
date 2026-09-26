@@ -2,6 +2,7 @@ export const USER_DATA_SYNC_TRIGGER_EVENT = "alios:user-data-sync-trigger";
 
 export type UserDataSyncTriggerEntity =
   | "tasks"
+  | "routines"
   | "projects"
   | "goals"
   | "financeTransactions"

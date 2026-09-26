@@ -10,13 +10,17 @@ import { taskSchema, type Task } from "@/shared/types";
 import { getNextTaskRecurrenceDate } from "@/shared/task-recurrence";
 import type { AliosDatabase } from "../db";
 import { DexieRepositoryBase } from "./DexieRepositoryBase";
+import { DexieMutationOutboxRepository } from "./DexieMutationOutboxRepository";
 
 export class DexieTasksRepository
   extends DexieRepositoryBase
   implements TasksRepository
 {
+  private readonly mutationOutbox: DexieMutationOutboxRepository;
+
   constructor(database: AliosDatabase) {
     super(database);
+    this.mutationOutbox = new DexieMutationOutboxRepository(database);
   }
 
   async list(): Promise<Task[]> {
@@ -34,90 +38,148 @@ export class DexieTasksRepository
   }
 
   async create(input: CreateTaskInput): Promise<Task> {
-    return this.execute("creating a task", async () => {
-      const metadata = this.createMetadata();
-      const task = taskSchema.parse({
-        ...input,
-        ...metadata,
-        recurrenceSeriesId: input.recurrence ? metadata.id : undefined,
-      });
-      await this.database.tasks.add(task);
-      notifyUserDataSyncTrigger({ entity: "tasks", operation: "create" });
-      return task;
-    });
+    return this.execute("creating a task", () =>
+      this.database.transaction(
+        "rw",
+        this.database.tasks,
+        this.database.mutationOutbox,
+        async () => {
+          const metadata = this.createMetadata();
+          const task = taskSchema.parse({
+            ...input,
+            ...metadata,
+            recurrenceSeriesId: input.recurrence ? metadata.id : undefined,
+          });
+          await this.database.tasks.add(task);
+          await this.mutationOutbox.enqueue({
+            entity: "tasks",
+            operation: "create",
+            recordId: task.id,
+            payload: task,
+          });
+          notifyUserDataSyncTrigger({ entity: "tasks", operation: "create" });
+          return task;
+        }
+      )
+    );
   }
 
   async createFromRoutine(input: CreateRoutineTaskInput): Promise<CreateRoutineTaskResult> {
     return this.execute("creating a task from a routine", () =>
-      this.database.transaction("rw", this.database.tasks, async () => {
-        const existing = await this.database.tasks
-          .where("[routineId+dueDate]")
-          .equals([input.routineId, input.dueDate])
-          .first();
-        if (existing) return { task: taskSchema.parse(existing), created: false };
-        const task = taskSchema.parse({ ...input, ...this.createMetadata() });
-        await this.database.tasks.add(task);
-        notifyUserDataSyncTrigger({ entity: "tasks", operation: "create" });
-        return { task, created: true };
-      })
+      this.database.transaction(
+        "rw",
+        this.database.tasks,
+        this.database.mutationOutbox,
+        async () => {
+          const existing = await this.database.tasks
+            .where("[routineId+dueDate]")
+            .equals([input.routineId, input.dueDate])
+            .first();
+          if (existing) {
+            return { task: taskSchema.parse(existing), created: false };
+          }
+          const task = taskSchema.parse({ ...input, ...this.createMetadata() });
+          await this.database.tasks.add(task);
+          await this.mutationOutbox.enqueue({
+            entity: "tasks",
+            operation: "create",
+            recordId: task.id,
+            payload: task,
+          });
+          notifyUserDataSyncTrigger({ entity: "tasks", operation: "create" });
+          return { task, created: true };
+        }
+      )
     );
   }
 
   async update(id: string, input: UpdateTaskInput): Promise<Task> {
     return this.execute("updating a task", () =>
-      this.database.transaction("rw", this.database.tasks, async () => {
-        const current = this.requireEntity(
-          "Task",
-          id,
-          await this.database.tasks.get(id)
-        );
-        const task = taskSchema.parse({
-          ...current,
-          ...input,
-          id: current.id,
-          createdAt: current.createdAt,
-          updatedAt: new Date().toISOString(),
-        });
-        await this.database.tasks.put(task);
-        const nextDueDate =
-          current.status !== "done" && input.status === "done"
-            ? getNextTaskRecurrenceDate(task)
-            : undefined;
+      this.database.transaction(
+        "rw",
+        this.database.tasks,
+        this.database.mutationOutbox,
+        async () => {
+          const current = this.requireEntity(
+            "Task",
+            id,
+            await this.database.tasks.get(id)
+          );
+          const task = taskSchema.parse({
+            ...current,
+            ...input,
+            id: current.id,
+            createdAt: current.createdAt,
+            updatedAt: new Date().toISOString(),
+          });
+          await this.database.tasks.put(task);
+          const nextDueDate =
+            current.status !== "done" && input.status === "done"
+              ? getNextTaskRecurrenceDate(task)
+              : undefined;
 
-        if (nextDueDate && task.recurrence) {
-          const recurrenceSeriesId = task.recurrenceSeriesId ?? task.id;
-          const existingNextTask = await this.database.tasks
-            .where("[recurrenceSeriesId+dueDate]")
-            .equals([recurrenceSeriesId, nextDueDate])
-            .first();
+          if (nextDueDate && task.recurrence) {
+            const recurrenceSeriesId = task.recurrenceSeriesId ?? task.id;
+            const existingNextTask = await this.database.tasks
+              .where("[recurrenceSeriesId+dueDate]")
+              .equals([recurrenceSeriesId, nextDueDate])
+              .first();
 
-          if (!existingNextTask) {
-            const metadata = this.createMetadata();
-            const nextTask = taskSchema.parse({
-              ...task,
-              ...metadata,
-              status: "todo",
-              isMit: false,
-              dueDate: nextDueDate,
-              recurrenceSeriesId,
-              completedAt: undefined,
-            });
-            await this.database.tasks.add(nextTask);
+            if (!existingNextTask) {
+              const metadata = this.createMetadata();
+              const nextTask = taskSchema.parse({
+                ...task,
+                ...metadata,
+                status: "todo",
+                isMit: false,
+                dueDate: nextDueDate,
+                recurrenceSeriesId,
+                completedAt: undefined,
+              });
+              await this.database.tasks.add(nextTask);
+              await this.mutationOutbox.enqueue({
+                entity: "tasks",
+                operation: "create",
+                recordId: nextTask.id,
+                payload: nextTask,
+              });
+            }
           }
+          await this.mutationOutbox.enqueue({
+            entity: "tasks",
+            operation: "update",
+            recordId: task.id,
+            payload: task,
+          });
+          notifyUserDataSyncTrigger({ entity: "tasks", operation: "update" });
+          return task;
         }
-        notifyUserDataSyncTrigger({ entity: "tasks", operation: "update" });
-        return task;
-      })
+      )
     );
   }
 
   async delete(id: string): Promise<void> {
     return this.execute("deleting a task", () =>
-      this.database.transaction("rw", this.database.tasks, async () => {
-        this.requireEntity("Task", id, await this.database.tasks.get(id));
-        await this.database.tasks.delete(id);
-        notifyUserDataSyncTrigger({ entity: "tasks", operation: "delete" });
-      })
+      this.database.transaction(
+        "rw",
+        this.database.tasks,
+        this.database.mutationOutbox,
+        async () => {
+          const current = this.requireEntity(
+            "Task",
+            id,
+            await this.database.tasks.get(id)
+          );
+          await this.database.tasks.delete(id);
+          await this.mutationOutbox.enqueue({
+            entity: "tasks",
+            operation: "delete",
+            recordId: current.id,
+            payload: current,
+          });
+          notifyUserDataSyncTrigger({ entity: "tasks", operation: "delete" });
+        }
+      )
     );
   }
 }

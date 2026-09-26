@@ -7,13 +7,17 @@ import { notifyUserDataSyncTrigger } from "@/core/sync";
 import { projectSchema, type Project } from "@/shared/types";
 import type { AliosDatabase } from "../db";
 import { DexieRepositoryBase } from "./DexieRepositoryBase";
+import { DexieMutationOutboxRepository } from "./DexieMutationOutboxRepository";
 
 export class DexieProjectsRepository
   extends DexieRepositoryBase
   implements ProjectsRepository
 {
+  private readonly mutationOutbox: DexieMutationOutboxRepository;
+
   constructor(database: AliosDatabase) {
     super(database);
+    this.mutationOutbox = new DexieMutationOutboxRepository(database);
   }
 
   async list(): Promise<Project[]> {
@@ -31,43 +35,85 @@ export class DexieProjectsRepository
   }
 
   async create(input: CreateProjectInput): Promise<Project> {
-    return this.execute("creating a project", async () => {
-      const project = projectSchema.parse({ ...input, ...this.createMetadata() });
-      await this.database.projects.add(project);
-      notifyUserDataSyncTrigger({ entity: "projects", operation: "create" });
-      return project;
-    });
+    return this.execute("creating a project", () =>
+      this.database.transaction(
+        "rw",
+        this.database.projects,
+        this.database.mutationOutbox,
+        async () => {
+          const project = projectSchema.parse({
+            ...input,
+            ...this.createMetadata(),
+          });
+          await this.database.projects.add(project);
+          await this.mutationOutbox.enqueue({
+            entity: "projects",
+            operation: "create",
+            recordId: project.id,
+            payload: project,
+          });
+          notifyUserDataSyncTrigger({ entity: "projects", operation: "create" });
+          return project;
+        }
+      )
+    );
   }
 
   async update(id: string, input: UpdateProjectInput): Promise<Project> {
     return this.execute("updating a project", () =>
-      this.database.transaction("rw", this.database.projects, async () => {
-        const current = this.requireEntity(
-          "Project",
-          id,
-          await this.database.projects.get(id)
-        );
-        const project = projectSchema.parse({
-          ...current,
-          ...input,
-          id: current.id,
-          createdAt: current.createdAt,
-          updatedAt: new Date().toISOString(),
-        });
-        await this.database.projects.put(project);
-        notifyUserDataSyncTrigger({ entity: "projects", operation: "update" });
-        return project;
-      })
+      this.database.transaction(
+        "rw",
+        this.database.projects,
+        this.database.mutationOutbox,
+        async () => {
+          const current = this.requireEntity(
+            "Project",
+            id,
+            await this.database.projects.get(id)
+          );
+          const project = projectSchema.parse({
+            ...current,
+            ...input,
+            id: current.id,
+            createdAt: current.createdAt,
+            updatedAt: new Date().toISOString(),
+          });
+          await this.database.projects.put(project);
+          await this.mutationOutbox.enqueue({
+            entity: "projects",
+            operation: "update",
+            recordId: project.id,
+            payload: project,
+          });
+          notifyUserDataSyncTrigger({ entity: "projects", operation: "update" });
+          return project;
+        }
+      )
     );
   }
 
   async delete(id: string): Promise<void> {
     return this.execute("deleting a project", () =>
-      this.database.transaction("rw", this.database.projects, async () => {
-        this.requireEntity("Project", id, await this.database.projects.get(id));
-        await this.database.projects.delete(id);
-        notifyUserDataSyncTrigger({ entity: "projects", operation: "delete" });
-      })
+      this.database.transaction(
+        "rw",
+        this.database.projects,
+        this.database.mutationOutbox,
+        async () => {
+          const current = this.requireEntity(
+            "Project",
+            id,
+            await this.database.projects.get(id)
+          );
+          await this.database.projects.delete(id);
+          await this.mutationOutbox.enqueue({
+            entity: "projects",
+            operation: "delete",
+            recordId: current.id,
+            payload: current,
+          });
+          notifyUserDataSyncTrigger({ entity: "projects", operation: "delete" });
+        }
+      )
     );
   }
 

@@ -1,5 +1,6 @@
 import Dexie, { type Table } from "dexie";
 
+import type { MutationOutboxEntry } from "@/core/sync/mutationOutbox";
 import type {
   DailyCheckin,
   Attachment,
@@ -39,6 +40,7 @@ import {
   DEXIE_SCHEMA_V13,
   DEXIE_SCHEMA_V14,
   DEXIE_SCHEMA_V15,
+  DEXIE_SCHEMA_V16,
   DEXIE_SCHEMA_VERSION,
   DEXIE_SCHEMA_VERSION_3,
   DEXIE_SCHEMA_VERSION_4,
@@ -53,6 +55,7 @@ import {
   DEXIE_SCHEMA_VERSION_13,
   DEXIE_SCHEMA_VERSION_14,
   DEXIE_SCHEMA_VERSION_15,
+  DEXIE_SCHEMA_VERSION_16,
 } from "./schema";
 
 export class AliosDatabase extends Dexie {
@@ -77,6 +80,7 @@ export class AliosDatabase extends Dexie {
   resources!: Table<Resource, string>;
   attachments!: Table<Attachment, string>;
   attachmentBlobs!: Table<{ storageKey: string; blob: Blob }, string>;
+  mutationOutbox!: Table<MutationOutboxEntry, string>;
 
   constructor() {
     super(DEXIE_DATABASE_NAME);
@@ -95,6 +99,7 @@ export class AliosDatabase extends Dexie {
     this.version(DEXIE_SCHEMA_VERSION_13).stores(DEXIE_SCHEMA_V13);
     this.version(DEXIE_SCHEMA_VERSION_14).stores(DEXIE_SCHEMA_V14);
     this.version(DEXIE_SCHEMA_VERSION_15).stores(DEXIE_SCHEMA_V15);
+    this.version(DEXIE_SCHEMA_VERSION_16).stores(DEXIE_SCHEMA_V16);
   }
 }
 

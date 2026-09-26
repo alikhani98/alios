@@ -1,4 +1,5 @@
 export * from "./LocalOnlySyncProvider";
+export * from "./mutationOutbox";
 export * from "./SupabasePreferenceSyncProvider";
 export * from "./optionalSyncConsent";
 export * from "./profileContract";
