@@ -32,9 +32,46 @@ export type EnqueueMutationOutboxInput = Readonly<
     Partial<Pick<MutationOutboxEntry, "payload" | "deletedAt">>
 >;
 
+export type MutationOutboxProcessResult = Readonly<{
+  acknowledged: number;
+  retryWaiting: number;
+  blockedConflicts: number;
+}>;
+
+export class MutationOutboxConflictError extends Error {
+  readonly name = "MutationOutboxConflictError";
+
+  constructor(message = "The mutation needs conflict review.") {
+    super(message);
+  }
+}
+
 export interface MutationOutboxRepository {
   enqueue(input: EnqueueMutationOutboxInput): Promise<MutationOutboxEntry>;
   list(): Promise<MutationOutboxEntry[]>;
   listPending(): Promise<MutationOutboxEntry[]>;
   getById(id: string): Promise<MutationOutboxEntry | undefined>;
+  recoverExpiredProcessing(
+    now: string,
+    leaseTimeoutMs: number
+  ): Promise<number>;
+  listReady(now: string): Promise<MutationOutboxEntry[]>;
+  claim(
+    id: string,
+    now: string,
+    leaseTimeoutMs: number
+  ): Promise<MutationOutboxEntry | undefined>;
+  acknowledge(id: string, now: string): Promise<void>;
+  markRetryWait(
+    id: string,
+    input: Readonly<{
+      now: string;
+      nextAttemptAt: string;
+      error: string;
+    }>
+  ): Promise<void>;
+  markBlockedConflict(
+    id: string,
+    input: Readonly<{ now: string; error: string }>
+  ): Promise<void>;
 }

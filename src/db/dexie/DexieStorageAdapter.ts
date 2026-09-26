@@ -20,10 +20,12 @@ import {
   DexieRoutinesRepository,
   DexieWeeklyPlansRepository,
   DexieAttachmentRepository,
+  DexieMutationOutboxRepository,
 } from "./repositories";
 
 export class DexieStorageAdapter implements StorageAdapter {
   readonly backup: DexieBackupStorage;
+  readonly mutationOutbox: DexieMutationOutboxRepository;
   readonly inbox: DexieInboxRepository;
   readonly dailyCheckins: DexieDailyCheckinsRepository;
   readonly tasks: DexieTasksRepository;
@@ -45,6 +47,7 @@ export class DexieStorageAdapter implements StorageAdapter {
 
   constructor(readonly database: AliosDatabase = aliosDatabase) {
     this.backup = new DexieBackupStorage(database);
+    this.mutationOutbox = new DexieMutationOutboxRepository(database);
     this.inbox = new DexieInboxRepository(database);
     this.dailyCheckins = new DexieDailyCheckinsRepository(database);
     this.tasks = new DexieTasksRepository(database);

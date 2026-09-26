@@ -1,5 +1,6 @@
 export * from "./LocalOnlySyncProvider";
 export * from "./mutationOutbox";
+export * from "./mutationOutboxProcessor";
 export * from "./SupabasePreferenceSyncProvider";
 export * from "./optionalSyncConsent";
 export * from "./profileContract";

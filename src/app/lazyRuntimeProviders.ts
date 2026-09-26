@@ -30,6 +30,7 @@ import type {
   SyncStateSubscription,
   SyncStatus,
 } from "@/core/sync/types";
+import type { MutationOutboxRepository } from "@/core/sync/mutationOutbox";
 import type { StorageAdapter } from "@/core/storage";
 
 type ActivatableSyncProvider = SyncProvider &
@@ -324,6 +325,7 @@ export class LazySupabaseSyncProvider implements ActivatableSyncProvider {
       authProvider: Pick<AuthProvider, "getCurrentSession" | "subscribe">;
       idTokenProvider?: Pick<LazyGoogleAuthProvider, "getIdToken">;
       backupStorage: StorageAdapter["backup"];
+      mutationOutboxRepository?: MutationOutboxRepository;
     }>
   ) {}
 
@@ -336,6 +338,7 @@ export class LazySupabaseSyncProvider implements ActivatableSyncProvider {
           authProvider: this.dependencies.authProvider,
           idTokenProvider: this.dependencies.idTokenProvider,
           backupStorage: this.dependencies.backupStorage,
+          mutationOutboxRepository: this.dependencies.mutationOutboxRepository,
         });
         this.loadedProvider = provider;
         if (this.activeRequested) {

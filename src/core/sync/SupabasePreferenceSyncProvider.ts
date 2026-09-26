@@ -46,9 +46,18 @@ import {
 } from "./supabaseSyncConfig";
 import {
   createSupabaseBrowserClient,
+  createSupabaseRecordTombstonePayload,
+  isSupabaseRecordTombstone,
   type SupabaseRecordRow,
   type SupabaseSession,
 } from "./supabaseClient";
+import {
+  MutationOutboxConflictError,
+  type MutationOutboxEntry,
+  type MutationOutboxProcessResult,
+  type MutationOutboxRepository,
+} from "./mutationOutbox";
+import { MutationOutboxProcessor } from "./mutationOutboxProcessor";
 import type {
   SyncDiagnosticEntry,
   SyncDeviceIdentity,
@@ -180,6 +189,17 @@ type SupabaseRecordsFacade = Readonly<{
     data: ReadonlyArray<SupabaseRecordRow>;
     error: Error | null;
   }>;
+  tombstone?: (input: {
+    table: string;
+    userId: string;
+    entity: string;
+    recordId: string;
+    deletedAt: string;
+    previousRecord?: Readonly<Record<string, unknown>>;
+  }) => Promise<{
+    data: ReadonlyArray<SupabaseRecordRow>;
+    error: Error | null;
+  }>;
 }>;
 
 type SupabaseClientFacade = Readonly<{
@@ -196,6 +216,7 @@ type SyncProviderDependencies = Readonly<{
   runtime?: GoogleAuthRuntime;
   idTokenProvider?: Pick<GoogleAuthRuntime, "getIdToken">;
   backupStorage?: BackupStorage;
+  mutationOutboxRepository?: MutationOutboxRepository;
 }>;
 
 type SyncAuthSessionSource = Readonly<{
@@ -721,7 +742,10 @@ function applyEntityRecordMap(
   }
 }
 
-function parseRemoteRecord(entity: SyncEntity, payload: Record<string, unknown>) {
+function parseRemoteRecord(
+  entity: SyncEntity,
+  payload: Readonly<Record<string, unknown>>
+) {
   switch (entity) {
     case "tasks":
       return taskSchema.parse(payload);
@@ -737,6 +761,26 @@ function parseRemoteRecord(entity: SyncEntity, payload: Record<string, unknown>)
       return financeTransactionSchema.parse(payload);
     case "financeObligations":
       return financeObligationSchema.parse(payload);
+  }
+}
+
+function parseTombstonePreviousRecord(
+  entity: SyncEntity,
+  payload: Readonly<Record<string, unknown>>
+): SyncableRecord | undefined {
+  if (!isSupabaseRecordTombstone(payload)) {
+    return undefined;
+  }
+
+  const previousRecord = payload.previousRecord;
+  if (!previousRecord) {
+    return undefined;
+  }
+
+  try {
+    return parseRemoteRecord(entity, previousRecord);
+  } catch {
+    return undefined;
   }
 }
 
@@ -757,6 +801,49 @@ function toRemoteRow(
     has_conflict: Boolean(record.sync?.conflictAt),
     conflict_reason: record.sync?.conflictReason,
   };
+}
+
+function toRemoteTombstoneRow(
+  entity: SyncEntity,
+  recordId: string,
+  deletedAt: string,
+  ownerUserId: string,
+  previousRecord?: Readonly<Record<string, unknown>>
+): SupabaseRecordRow {
+  return {
+    user_id: ownerUserId,
+    entity,
+    record_id: recordId,
+    payload: createSupabaseRecordTombstonePayload(
+      deletedAt,
+      previousRecord
+    ) as Record<string, unknown>,
+    updated_at: deletedAt,
+    created_at:
+      typeof previousRecord?.createdAt === "string"
+        ? previousRecord.createdAt
+        : deletedAt,
+    last_synced_at: deletedAt,
+    has_conflict: false,
+  };
+}
+
+function replaceRemoteRows(
+  remoteRows: SupabaseRecordRow[],
+  replacements: ReadonlyArray<SupabaseRecordRow>
+) {
+  replacements.forEach((replacement) => {
+    for (let index = remoteRows.length - 1; index >= 0; index -= 1) {
+      const existing = remoteRows[index];
+      if (
+        existing.entity === replacement.entity &&
+        existing.record_id === replacement.record_id
+      ) {
+        remoteRows.splice(index, 1);
+      }
+    }
+    remoteRows.push(replacement);
+  });
 }
 
 function getConflictRecordTitle(record: SyncableRecord): string {
@@ -876,10 +963,20 @@ function mergeEntityRecords(
   const localRecords = getEntityRecordMap(localData, entity);
   const nextRecords = new Map(localRecords);
   const remoteRecords = new Map(
-    remoteRows.map((row) => [
-      row.record_id,
-      parseRemoteRecord(entity, row.payload),
-    ])
+    remoteRows
+      .filter((row) => !isSupabaseRecordTombstone(row.payload))
+      .map((row) => [
+        row.record_id,
+        parseRemoteRecord(entity, row.payload),
+      ])
+  );
+  const remoteTombstones = new Map(
+    remoteRows
+      .filter((row) => isSupabaseRecordTombstone(row.payload))
+      .map((row) => [
+        row.record_id,
+        row,
+      ])
   );
   const uploadedRows: SupabaseRecordRow[] = [];
   let changedLocalRecords = 0;
@@ -889,11 +986,43 @@ function mergeEntityRecords(
   const allRecordIds = new Set([
     ...localRecords.keys(),
     ...remoteRecords.keys(),
+    ...remoteTombstones.keys(),
   ]);
 
   allRecordIds.forEach((recordId) => {
     const localRecord = localRecords.get(recordId);
     const remoteRecord = remoteRecords.get(recordId);
+    const remoteTombstone = remoteTombstones.get(recordId);
+
+    if (remoteTombstone) {
+      if (!localRecord) {
+        return;
+      }
+
+      if (isRecordDirty(localRecord)) {
+        const previousRecord = parseTombstonePreviousRecord(
+          entity,
+          remoteTombstone.payload
+        );
+        if (previousRecord) {
+          const conflictedRecord = withConflictMetadata(
+            localRecord,
+            ownerUserId,
+            syncAt
+          );
+          nextRecords.set(recordId, conflictedRecord);
+          if (!recordsMatch(localRecord, conflictedRecord)) {
+            changedLocalRecords += 1;
+          }
+        }
+        conflictCount += 1;
+        return;
+      }
+
+      nextRecords.delete(recordId);
+      changedLocalRecords += 1;
+      return;
+    }
 
     if (localRecord && !remoteRecord) {
       const syncedLocalRecord = withSyncedMetadata(
@@ -1005,6 +1134,7 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
   private readonly idTokenProvider: Pick<GoogleAuthRuntime, "getIdToken"> | null;
   private readonly client: SupabaseClientFacade | null;
   private readonly backupStorage: BackupStorage | null;
+  private readonly mutationOutboxRepository: MutationOutboxRepository | null;
   private readonly listeners = new Set<SyncStateListener>();
   private authSessionSubscription: AuthSessionSubscription | null = null;
   private preferenceChangeListener: (() => void) | null = null;
@@ -1030,6 +1160,8 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
       dependencies.createClient?.() ??
       createSupabaseClientFromConfiguration();
     this.backupStorage = dependencies.backupStorage ?? null;
+    this.mutationOutboxRepository =
+      dependencies.mutationOutboxRepository ?? null;
   }
 
   activate() {
@@ -1232,7 +1364,17 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
       );
     }
 
-    const remoteRecord = parseRemoteRecord(input.entity, remoteRow.payload);
+    const remoteTombstone = isSupabaseRecordTombstone(remoteRow.payload)
+      ? remoteRow.payload
+      : undefined;
+    const remoteRecord = remoteTombstone
+      ? parseTombstonePreviousRecord(input.entity, remoteRow.payload)
+      : parseRemoteRecord(input.entity, remoteRow.payload);
+    if (!remoteRecord) {
+      throw new Error(
+        "AliOS could not load the previous record version for this tombstone conflict."
+      );
+    }
     const resolvedRecord =
       input.resolution === "keep-local"
         ? withSyncedMetadata(
@@ -1248,7 +1390,11 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
             remoteRecord.sync?.lastSyncedByDeviceId ?? context.device.deviceId
           );
 
-    entityRecords.set(input.recordId, resolvedRecord);
+    if (input.resolution === "keep-remote" && remoteTombstone) {
+      entityRecords.delete(input.recordId);
+    } else {
+      entityRecords.set(input.recordId, resolvedRecord);
+    }
     applyEntityRecordMap(context.localData, input.entity, entityRecords);
 
     const client = this.client;
@@ -1256,16 +1402,33 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
       throw new Error("AliOS sync is unavailable on this device.");
     }
 
-    const upsertResult = await client.records.upsert({
-      table: SUPABASE_SYNC_RECORDS_TABLE,
-      rows: [toRemoteRow(input.entity, resolvedRecord, context.ownerUserId)],
-    });
+    const upsertResult =
+      input.resolution === "keep-remote" && remoteTombstone
+        ? client.records.tombstone
+          ? await client.records.tombstone({
+              table: SUPABASE_SYNC_RECORDS_TABLE,
+              userId: context.ownerUserId,
+              entity: input.entity,
+              recordId: input.recordId,
+              deletedAt: remoteTombstone.deletedAt,
+              previousRecord: remoteTombstone.previousRecord,
+            })
+          : await client.records.upsert({
+              table: SUPABASE_SYNC_RECORDS_TABLE,
+              rows: [remoteRow],
+            })
+        : await client.records.upsert({
+            table: SUPABASE_SYNC_RECORDS_TABLE,
+            rows: [toRemoteRow(input.entity, resolvedRecord, context.ownerUserId)],
+          });
 
     if (upsertResult.error) {
       throw upsertResult.error;
     }
 
-    await this.backupStorage?.replaceAll(context.localData);
+    await this.backupStorage?.replaceAll(context.localData, {
+      preserveMutationOutbox: true,
+    });
 
     const remainingConflicts = await this.loadConflictBundles();
     this.conflictSnapshot = remainingConflicts.map((bundle) => bundle.conflict);
@@ -1407,10 +1570,17 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
       const localRecords = getEntityRecordMap(context.localData, entity);
       const remoteRows = context.remoteRows.filter((row) => row.entity === entity);
       const remoteRecords = new Map(
-        remoteRows.map((row) => [
-          row.record_id,
-          parseRemoteRecord(entity, row.payload),
-        ])
+        remoteRows
+          .filter((row) => !isSupabaseRecordTombstone(row.payload))
+          .map((row) => [
+            row.record_id,
+            parseRemoteRecord(entity, row.payload),
+          ])
+      );
+      const remoteTombstones = new Map(
+        remoteRows
+          .filter((row) => isSupabaseRecordTombstone(row.payload))
+          .map((row) => [row.record_id, row])
       );
 
       localRecords.forEach((localRecord, recordId) => {
@@ -1418,7 +1588,14 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
           return;
         }
 
-        const remoteRecord = remoteRecords.get(recordId);
+        const remoteRecord =
+          remoteRecords.get(recordId) ??
+          (remoteTombstones.has(recordId)
+            ? parseTombstonePreviousRecord(
+                entity,
+                remoteTombstones.get(recordId)?.payload ?? {}
+              )
+            : undefined);
         if (!remoteRecord) {
           return;
         }
@@ -1462,6 +1639,117 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
       SUPABASE_SYNC_DIAGNOSTICS_STORAGE_KEY,
       nextEntries
     );
+  }
+
+  private async processMutationOutboxEntry(
+    entry: MutationOutboxEntry,
+    localData: AliosBackupData,
+    remoteRows: SupabaseRecordRow[],
+    ownerUserId: string,
+    syncAt: string,
+    deviceId: string
+  ) {
+    const client = this.client;
+    if (!client) {
+      throw new Error("AliOS sync is unavailable on this device.");
+    }
+
+    const currentEntityRows = remoteRows.filter(
+      (row) => row.entity === entry.entity
+    );
+
+    if (entry.operation === "delete") {
+      const deletedAt = entry.deletedAt ?? syncAt;
+      const previousRecord = entry.payload;
+      const currentRemoteRow = currentEntityRows.find(
+        (row) => row.record_id === entry.recordId
+      );
+      if (
+        currentRemoteRow &&
+        !isSupabaseRecordTombstone(currentRemoteRow.payload) &&
+        previousRecord
+      ) {
+        const currentRemoteRecord = parseRemoteRecord(
+          entry.entity,
+          currentRemoteRow.payload
+        );
+        const deletedRecord = parseRemoteRecord(entry.entity, previousRecord);
+        if (!recordsMatch(currentRemoteRecord, deletedRecord)) {
+          throw new MutationOutboxConflictError(
+            `The deleted ${entry.entity} record changed remotely and needs conflict review.`
+          );
+        }
+      }
+
+      const tombstoneRow = toRemoteTombstoneRow(
+        entry.entity,
+        entry.recordId,
+        deletedAt,
+        ownerUserId,
+        previousRecord
+      );
+      const mergeRows = [
+        ...currentEntityRows.filter((row) => row.record_id !== entry.recordId),
+        tombstoneRow,
+      ];
+      const outcome = mergeEntityRecords(
+        entry.entity,
+        localData,
+        mergeRows,
+        ownerUserId,
+        syncAt,
+        deviceId
+      );
+      if (outcome.conflictCount > 0) {
+        throw new MutationOutboxConflictError(
+          `The deleted ${entry.entity} record needs conflict review.`
+        );
+      }
+
+      const tombstoneResult = client.records.tombstone
+        ? await client.records.tombstone({
+            table: SUPABASE_SYNC_RECORDS_TABLE,
+            userId: ownerUserId,
+            entity: entry.entity,
+            recordId: entry.recordId,
+            deletedAt,
+            previousRecord,
+          })
+        : await client.records.upsert({
+            table: SUPABASE_SYNC_RECORDS_TABLE,
+            rows: [tombstoneRow],
+          });
+      if (tombstoneResult.error) {
+        throw tombstoneResult.error;
+      }
+
+      replaceRemoteRows(remoteRows, [tombstoneRow]);
+      return;
+    }
+
+    const outcome = mergeEntityRecords(
+      entry.entity,
+      localData,
+      currentEntityRows,
+      ownerUserId,
+      syncAt,
+      deviceId
+    );
+    if (outcome.conflictCount > 0) {
+      throw new MutationOutboxConflictError(
+        `The ${entry.entity} record needs conflict review.`
+      );
+    }
+
+    const upsertResult = await client.records.upsert({
+      table: SUPABASE_SYNC_RECORDS_TABLE,
+      rows: outcome.uploadedRows,
+    });
+    if (upsertResult.error) {
+      throw upsertResult.error;
+    }
+
+    replaceRemoteRows(remoteRows, outcome.uploadedRows);
   }
 
   private async runSync(): Promise<SyncResult> {
@@ -1557,6 +1845,11 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
       let staleLocalCount = 0;
       let staleRemoteCount = 0;
       let manualPreparation = createEmptyManualPreparationStatus();
+      let mutationOutboxResult: MutationOutboxProcessResult = {
+        acknowledged: 0,
+        retryWaiting: 0,
+        blockedConflicts: 0,
+      };
 
       if (this.backupStorage) {
         const localData = await this.backupStorage.readAll();
@@ -1571,12 +1864,30 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
           throw remoteRecordsResult.error;
         }
 
+        const remoteRows = [...remoteRecordsResult.data];
+        if (this.mutationOutboxRepository) {
+          const mutationOutboxProcessor = new MutationOutboxProcessor({
+            repository: this.mutationOutboxRepository,
+            now: this.now,
+            processEntry: (entry) =>
+              this.processMutationOutboxEntry(
+                entry,
+                localData,
+                remoteRows,
+                connectedSession.user.id,
+                syncAt,
+                device.deviceId
+              ),
+          });
+          mutationOutboxResult =
+            await mutationOutboxProcessor.processPending();
+          conflictCount += mutationOutboxResult.blockedConflicts;
+        }
+
         const uploadedRows: SupabaseRecordRow[] = [];
 
         USER_DATA_SCOPES.forEach((entity) => {
-          const entityRows = remoteRecordsResult.data.filter(
-            (row) => row.entity === entity
-          );
+          const entityRows = remoteRows.filter((row) => row.entity === entity);
           const outcome = mergeEntityRecords(
             entity,
             localData,
@@ -1593,8 +1904,14 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
           uploadedRows.push(...outcome.uploadedRows);
         });
 
-        if (localUserDataChanges > 0 || conflictCount > 0) {
-          await this.backupStorage.replaceAll(localData);
+        if (
+          localUserDataChanges > 0 ||
+          conflictCount > 0 ||
+          mutationOutboxResult.acknowledged > 0
+        ) {
+          await this.backupStorage.replaceAll(localData, {
+            preserveMutationOutbox: true,
+          });
         }
 
         const upsertResult = await this.client.records.upsert({
@@ -1704,7 +2021,11 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
         conflictCount,
         staleLocalCount,
         staleRemoteCount,
-        failureReason: conflictCount > 0 ? detail : undefined,
+        failureReason:
+          conflictCount > 0 ||
+          mutationOutboxResult.retryWaiting > 0
+            ? detail
+            : undefined,
       });
 
       return {

@@ -18,10 +18,12 @@ import type {
   AttachmentRepository,
 } from "@/core/repositories";
 import type { BackupStorage } from "@/core/backup";
+import type { MutationOutboxRepository } from "@/core/sync/mutationOutbox";
 import type { BinaryStorage } from "./BinaryStorage";
 
 export interface StorageAdapter {
   backup: BackupStorage;
+  mutationOutbox?: MutationOutboxRepository;
   inbox: InboxRepository;
   dailyCheckins: DailyCheckinsRepository;
   tasks: TasksRepository;

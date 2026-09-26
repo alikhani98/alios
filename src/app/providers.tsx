@@ -195,6 +195,7 @@ export function AppProviders({
           ? lazyGoogleAuthProvider
           : undefined,
       backupStorage: bootstrapState.adapter.backup,
+      mutationOutboxRepository: bootstrapState.adapter.mutationOutbox,
     });
   }, [authProvider, authSessionSource, bootstrapState, syncProvider]);
 

@@ -109,6 +109,9 @@ export class DexieBackupStorage implements BackupStorage {
       this.database.inboxItems,
       this.database.routines,
       this.database.weeklyPlans,
+      ...(options.preserveMutationOutbox
+        ? []
+        : [this.database.mutationOutbox]),
       ...(options.replaceAttachments ? [this.database.attachments] : []),
     ];
 
@@ -246,6 +249,7 @@ export class DexieBackupStorage implements BackupStorage {
       this.database.weeklyPlans,
       this.database.attachments,
       this.database.attachmentBlobs,
+      this.database.mutationOutbox,
     ];
 
     try {

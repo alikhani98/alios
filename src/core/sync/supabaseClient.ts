@@ -23,6 +23,31 @@ export type SupabaseRecordRow = Readonly<{
   conflict_reason?: string;
 }>;
 
+export const SUPABASE_TOMBSTONE_MARKER = "__aliosTombstone";
+
+export type SupabaseRecordTombstonePayload = Readonly<{
+  [SUPABASE_TOMBSTONE_MARKER]: true;
+  deletedAt: string;
+  previousRecord?: Readonly<Record<string, unknown>>;
+}>;
+
+export function isSupabaseRecordTombstone(
+  payload: Readonly<Record<string, unknown>>
+): payload is SupabaseRecordTombstonePayload {
+  return payload[SUPABASE_TOMBSTONE_MARKER] === true;
+}
+
+export function createSupabaseRecordTombstonePayload(
+  deletedAt: string,
+  previousRecord?: Readonly<Record<string, unknown>>
+): SupabaseRecordTombstonePayload {
+  return {
+    [SUPABASE_TOMBSTONE_MARKER]: true,
+    deletedAt,
+    ...(previousRecord ? { previousRecord } : {}),
+  };
+}
+
 export type SupabaseBrowserClient = Readonly<{
   auth: {
     getSession: () => Promise<{
@@ -84,6 +109,17 @@ export type SupabaseBrowserClient = Readonly<{
     upsert: (input: {
       table: string;
       rows: ReadonlyArray<SupabaseRecordRow>;
+    }) => Promise<{
+      data: ReadonlyArray<SupabaseRecordRow>;
+      error: Error | null;
+    }>;
+    tombstone?: (input: {
+      table: string;
+      userId: string;
+      entity: string;
+      recordId: string;
+      deletedAt: string;
+      previousRecord?: Readonly<Record<string, unknown>>;
     }) => Promise<{
       data: ReadonlyArray<SupabaseRecordRow>;
       error: Error | null;
@@ -971,6 +1007,37 @@ export function createSupabaseBrowserClient(
             error: toError(error, "Supabase record upsert failed."),
           };
         }
+      },
+
+      async tombstone({
+        table,
+        userId,
+        entity,
+        recordId,
+        deletedAt,
+        previousRecord,
+      }) {
+        const tombstoneRow: SupabaseRecordRow = {
+          user_id: userId,
+          entity,
+          record_id: recordId,
+          payload: createSupabaseRecordTombstonePayload(
+            deletedAt,
+            previousRecord
+          ) as Record<string, unknown>,
+          updated_at: deletedAt,
+          created_at:
+            typeof previousRecord?.createdAt === "string"
+              ? previousRecord.createdAt
+              : deletedAt,
+          last_synced_at: deletedAt,
+          has_conflict: false,
+        };
+
+        return this.upsert({
+          table,
+          rows: [tombstoneRow],
+        });
       },
     },
   };

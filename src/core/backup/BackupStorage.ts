@@ -25,6 +25,7 @@ export type LocalDataSummary = {
 
 export type BackupRestoreOptions = {
   replaceAttachments?: boolean;
+  preserveMutationOutbox?: boolean;
 };
 
 export interface BackupStorage {
