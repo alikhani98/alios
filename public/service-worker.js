@@ -31,6 +31,123 @@ self.addEventListener("activate", (event) => {
   );
 });
 
+function isRecord(value) {
+  return typeof value === "object" && value !== null;
+}
+
+function parsePushPayload(value) {
+  if (!isRecord(value) || typeof value.title !== "string" || value.title.trim() === "") {
+    return null;
+  }
+
+  const optionalFields = ["body", "url", "taskId", "focusId"];
+  for (const field of optionalFields) {
+    if (
+      value[field] !== undefined &&
+      (typeof value[field] !== "string" || value[field].trim() === "")
+    ) {
+      return null;
+    }
+  }
+
+  if (value.version !== undefined && typeof value.version !== "number") {
+    return null;
+  }
+
+  return {
+    ...(typeof value.version === "number" ? { version: value.version } : {}),
+    title: value.title.trim(),
+    ...(typeof value.body === "string" ? { body: value.body } : {}),
+    ...(typeof value.url === "string" ? { url: value.url } : {}),
+    ...(typeof value.taskId === "string" ? { taskId: value.taskId } : {}),
+    ...(typeof value.focusId === "string" ? { focusId: value.focusId } : {}),
+  };
+}
+
+function getNotificationUrl(payload) {
+  const scopeUrl = new URL(self.registration.scope);
+  const focusId = payload.focusId || payload.taskId;
+
+  if (payload.url) {
+    if (payload.url.startsWith("#")) {
+      return new URL(`./${payload.url}`, scopeUrl).href;
+    }
+
+    if (payload.url.startsWith("/#/")) {
+      return new URL(`.${payload.url}`, scopeUrl).href;
+    }
+
+    const resolvedUrl = new URL(payload.url, scopeUrl);
+    return resolvedUrl.origin === self.location.origin
+      ? resolvedUrl.href
+      : scopeUrl.href;
+  }
+
+  if (focusId) {
+    const query = new URLSearchParams({ focusId });
+    return new URL(`./#/today?${query.toString()}`, scopeUrl).href;
+  }
+
+  return new URL("./#/", scopeUrl).href;
+}
+
+self.addEventListener("push", (event) => {
+  event.waitUntil(
+    (async () => {
+      if (!event.data) {
+        return;
+      }
+
+      let rawPayload;
+      try {
+        rawPayload = event.data.json();
+      } catch {
+        return;
+      }
+
+      const payload = parsePushPayload(rawPayload);
+      if (!payload) {
+        return;
+      }
+
+      const notificationOptions = {
+        body: payload.body,
+        data: {
+          url: getNotificationUrl(payload),
+          taskId: payload.taskId,
+          focusId: payload.focusId,
+        },
+      };
+
+      await self.registration.showNotification(
+        payload.title,
+        notificationOptions
+      );
+    })()
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const scopeUrl = new URL(self.registration.scope);
+  const targetUrl =
+    event.notification.data?.url ?? new URL("./#/", scopeUrl).href;
+
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(
+      (clientList) => {
+        for (const client of clientList) {
+          if ("focus" in client && client.url.startsWith(self.location.origin)) {
+            return client.navigate(targetUrl).then(() => client.focus());
+          }
+        }
+
+        return self.clients.openWindow(targetUrl);
+      }
+    )
+  );
+});
+
 self.addEventListener("fetch", (event) => {
   const { request } = event;
 
