@@ -1,4 +1,5 @@
 import { processMorningReminders } from "./core.ts";
+import { createWebPushSender } from "./webPushSender.ts";
 
 declare const Deno: {
   env: {
@@ -9,10 +10,21 @@ declare const Deno: {
 
 Deno.serve(async (_request) => {
   try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
+    const supabaseServiceKey =
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+
     const result = await processMorningReminders({
-      supabaseUrl: Deno.env.get("SUPABASE_URL") ?? "",
-      supabaseServiceKey: Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      supabaseUrl,
+      supabaseServiceKey,
       telegramBotToken: Deno.env.get("TELEGRAM_BOT_TOKEN") ?? "",
+      sendWebPush: createWebPushSender({
+        supabaseUrl,
+        supabaseServiceKey,
+        vapidKeysJson: Deno.env.get("VAPID_KEYS_JSON"),
+        vapidSubject: Deno.env.get("VAPID_SUBJECT"),
+        fetch,
+      }),
       fetch,
     });
 

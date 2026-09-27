@@ -1,3 +1,9 @@
+import {
+  emptyDeliveryResult,
+  type DeliveryResult,
+  type WebPushNotificationPayload,
+} from "./deliveryTypes.ts";
+
 export type ReminderUser = Readonly<{
   user_id: string;
   telegram_chat_id: string;
@@ -25,6 +31,10 @@ export type MorningRemindersDependencies = Readonly<{
   supabaseServiceKey: string;
   telegramBotToken: string;
   fetch: typeof fetch;
+  sendWebPush?: (
+    userId: string,
+    payload: WebPushNotificationPayload
+  ) => Promise<DeliveryResult>;
 }>;
 
 export type MorningRemindersResult = Readonly<{
@@ -33,6 +43,8 @@ export type MorningRemindersResult = Readonly<{
   processed: number;
   sent: number;
   failed: number;
+  telegram: DeliveryResult;
+  web_push: DeliveryResult;
 }>;
 
 export async function processMorningReminders(
@@ -42,6 +54,7 @@ export async function processMorningReminders(
 
   let sent = 0;
   let failed = 0;
+  let webPushDelivery = emptyDeliveryResult();
 
   for (const user of eligibleUsers) {
     const batch = await collectReminderItemsForUser(user, deps);
@@ -65,6 +78,16 @@ export async function processMorningReminders(
     }
 
     await logDelivery(user, batch, success, deps);
+
+    if (deps.sendWebPush) {
+      const result = await sendWebPushForBatch(user.user_id, batch, deps);
+      webPushDelivery = mergeDeliveryResults(webPushDelivery, result);
+      try {
+        await logWebPushDelivery(user, batch, result, deps);
+      } catch (error) {
+        console.warn("Failed to log Web Push delivery:", error);
+      }
+    }
   }
 
   return {
@@ -73,6 +96,79 @@ export async function processMorningReminders(
     processed: eligibleUsers.length,
     sent,
     failed,
+    telegram: {
+      successCount: sent,
+      failureCount: failed,
+      removedCount: 0,
+      errors: [],
+    },
+    web_push: webPushDelivery,
+  };
+}
+
+function buildWebPushPayload(
+  batch: ReminderBatch
+): WebPushNotificationPayload {
+  const summary: string[] = [];
+
+  if (batch.task_due.length > 0) {
+    summary.push(
+      `${batch.task_due.length} task${
+        batch.task_due.length === 1 ? "" : "s"
+      } due or overdue`
+    );
+  }
+
+  if (batch.finance_obligation.length > 0) {
+    summary.push(
+      `${batch.finance_obligation.length} finance obligation${
+        batch.finance_obligation.length === 1 ? "" : "s"
+      } due`
+    );
+  }
+
+  return {
+    version: 1,
+    title: "Your Morning Reminders",
+    body: summary.join(" · "),
+    url: "/#/today",
+  };
+}
+
+async function sendWebPushForBatch(
+  userId: string,
+  batch: ReminderBatch,
+  deps: MorningRemindersDependencies
+): Promise<DeliveryResult> {
+  if (!deps.sendWebPush) {
+    return emptyDeliveryResult();
+  }
+
+  try {
+    return await deps.sendWebPush(userId, buildWebPushPayload(batch));
+  } catch (error) {
+    return {
+      successCount: 0,
+      failureCount: 1,
+      removedCount: 0,
+      errors: [
+        error instanceof Error
+          ? error.message
+          : "Web Push delivery failed.",
+      ],
+    };
+  }
+}
+
+function mergeDeliveryResults(
+  current: DeliveryResult,
+  next: DeliveryResult
+): DeliveryResult {
+  return {
+    successCount: current.successCount + next.successCount,
+    failureCount: current.failureCount + next.failureCount,
+    removedCount: current.removedCount + next.removedCount,
+    errors: [...current.errors, ...next.errors],
   };
 }
 
@@ -368,6 +464,59 @@ async function logDelivery(
         local_date: getTodayInTimezone(user.timezone),
         status: success ? "sent" : "failed",
         error_message: success ? null : "Telegram API request failed",
+      }),
+    });
+  }
+}
+
+async function logWebPushDelivery(
+  user: ReminderUser,
+  batch: ReminderBatch,
+  result: DeliveryResult,
+  deps: MorningRemindersDependencies
+): Promise<void> {
+  if (
+    result.successCount === 0 &&
+    result.failureCount === 0 &&
+    result.removedCount === 0
+  ) {
+    return;
+  }
+
+  const categories: Array<{ category: string; count: number }> = [];
+  if (batch.task_due.length > 0) {
+    categories.push({ category: "task_due", count: batch.task_due.length });
+  }
+  if (batch.finance_obligation.length > 0) {
+    categories.push({
+      category: "finance_obligation",
+      count: batch.finance_obligation.length,
+    });
+  }
+
+  for (const { category, count } of categories) {
+    await deps.fetch(`${deps.supabaseUrl}/rest/v1/reminder_delivery_log`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${deps.supabaseServiceKey}`,
+        apikey: deps.supabaseServiceKey,
+        "Content-Type": "application/json",
+        Prefer: "return=minimal",
+      },
+      body: JSON.stringify({
+        user_id: user.user_id,
+        channel: "web_push",
+        category,
+        item_count: count,
+        local_date: getTodayInTimezone(user.timezone),
+        status: result.successCount > 0 ? "sent" : "failed",
+        error_message:
+          result.errors.length > 0 ? result.errors.join("; ") : null,
+        metadata: {
+          success_count: result.successCount,
+          failure_count: result.failureCount,
+          removed_count: result.removedCount,
+        },
       }),
     });
   }
