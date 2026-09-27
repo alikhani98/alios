@@ -3,6 +3,13 @@ import {
   type DeliveryResult,
   type WebPushNotificationPayload,
 } from "./deliveryTypes.ts";
+import {
+  claimReminderDelivery,
+  completeReminderDelivery,
+  failReminderDelivery,
+  findRetryableDeliveryUsers,
+  type DeliveryClaim,
+} from "./deliveryState.ts";
 
 export type ReminderUser = Readonly<{
   user_id: string;
@@ -37,6 +44,12 @@ export type MorningRemindersDependencies = Readonly<{
   ) => Promise<DeliveryResult>;
 }>;
 
+type ChannelDeliveryOutcome = Readonly<{
+  success: boolean;
+  retryable: boolean;
+  error?: string;
+}>;
+
 export type MorningRemindersResult = Readonly<{
   ok: boolean;
   message: string;
@@ -50,7 +63,8 @@ export type MorningRemindersResult = Readonly<{
 export async function processMorningReminders(
   deps: MorningRemindersDependencies
 ): Promise<MorningRemindersResult> {
-  const eligibleUsers = await fetchEligibleUsers(deps);
+  const now = new Date();
+  const eligibleUsers = await fetchEligibleUsers(deps, now);
 
   let sent = 0;
   let failed = 0;
@@ -63,29 +77,72 @@ export async function processMorningReminders(
       continue;
     }
 
-    const success = await sendTelegramReminder(batch, deps);
+    const localDate = getTodayInTimezone(user.timezone);
+    const telegramClaim = await claimReminderDeliveryForChannel(
+      user.user_id,
+      "telegram",
+      localDate,
+      now,
+      deps
+    );
 
-    if (success) {
-      sent++;
+    if (telegramClaim?.claimed) {
+      const telegramOutcome = await sendTelegramReminder(batch, deps);
 
-      await updateLastSentDate(
-        user.user_id,
-        getTodayInTimezone(user.timezone),
-        deps
-      );
-    } else {
-      failed++;
+      if (telegramOutcome.success) {
+        sent++;
+        try {
+          await updateLastSentDate(user.user_id, localDate, deps);
+        } catch (error) {
+          console.warn("Failed to update reminder last-sent date:", error);
+        }
+        await completeClaim(telegramClaim, now, deps);
+      } else {
+        failed++;
+        await failClaim(telegramClaim, telegramOutcome, now, deps);
+      }
+
+      try {
+        await logDelivery(user, batch, telegramOutcome.success, deps);
+      } catch (error) {
+        console.warn("Failed to log Telegram delivery:", error);
+      }
     }
 
-    await logDelivery(user, batch, success, deps);
-
     if (deps.sendWebPush) {
-      const result = await sendWebPushForBatch(user.user_id, batch, deps);
-      webPushDelivery = mergeDeliveryResults(webPushDelivery, result);
-      try {
-        await logWebPushDelivery(user, batch, result, deps);
-      } catch (error) {
-        console.warn("Failed to log Web Push delivery:", error);
+      const webPushClaim = await claimReminderDeliveryForChannel(
+        user.user_id,
+        "web_push",
+        localDate,
+        now,
+        deps
+      );
+
+      if (webPushClaim?.claimed) {
+        const result = await sendWebPushForBatch(user.user_id, batch, deps);
+        webPushDelivery = mergeDeliveryResults(webPushDelivery, result);
+
+        if (result.successCount > 0 || result.failureCount === 0) {
+          await completeClaim(webPushClaim, now, deps);
+        } else {
+          await failClaim(
+            webPushClaim,
+            {
+              retryable: result.removedCount === 0,
+              error:
+                result.errors.join("; ") ||
+                "Web Push delivery failed.",
+            },
+            now,
+            deps
+          );
+        }
+
+        try {
+          await logWebPushDelivery(user, batch, result, deps);
+        } catch (error) {
+          console.warn("Failed to log Web Push delivery:", error);
+        }
       }
     }
   }
@@ -173,7 +230,8 @@ function mergeDeliveryResults(
 }
 
 async function fetchEligibleUsers(
-  deps: MorningRemindersDependencies
+  deps: MorningRemindersDependencies,
+  now: Date
 ): Promise<ReminderUser[]> {
   const response = await deps.fetch(`${deps.supabaseUrl}/rest/v1/reminder_preferences`, {
     method: "GET",
@@ -197,7 +255,7 @@ async function fetchEligibleUsers(
     last_sent_local_date: string | null;
   }> = await response.json();
 
-  const now = new Date();
+  const retryableUsers = await findRetryableDeliveryUsers(now, deps);
   const eligible: ReminderUser[] = [];
 
   for (const user of allUsers) {
@@ -207,7 +265,9 @@ async function fetchEligibleUsers(
 
     const localToday = getTodayInTimezone(user.timezone);
 
-    if (user.last_sent_local_date === localToday) {
+    const hasDueRetry = retryableUsers.has(`${user.user_id}:${localToday}`);
+
+    if (user.last_sent_local_date === localToday && !hasDueRetry) {
       continue;
     }
 
@@ -230,6 +290,47 @@ async function fetchEligibleUsers(
   }
 
   return eligible;
+}
+
+async function claimReminderDeliveryForChannel(
+  userId: string,
+  channel: "telegram" | "web_push",
+  localDate: string,
+  now: Date,
+  deps: MorningRemindersDependencies
+): Promise<DeliveryClaim | null> {
+  const claim = await claimReminderDelivery(
+    userId,
+    channel,
+    localDate,
+    now,
+    deps
+  );
+
+  return claim.claimed ? claim : null;
+}
+
+async function completeClaim(
+  claim: DeliveryClaim,
+  now: Date,
+  deps: MorningRemindersDependencies
+): Promise<void> {
+  const completed = await completeReminderDelivery(claim, now, deps);
+  if (!completed) {
+    console.warn("Reminder delivery lease was no longer active on completion.");
+  }
+}
+
+async function failClaim(
+  claim: DeliveryClaim,
+  failure: { retryable: boolean; error: string },
+  now: Date,
+  deps: MorningRemindersDependencies
+): Promise<void> {
+  const failed = await failReminderDelivery(claim, failure, now, deps);
+  if (!failed) {
+    console.warn("Reminder delivery lease was no longer active on failure.");
+  }
 }
 
 async function collectReminderItemsForUser(
@@ -355,7 +456,7 @@ async function fetchFinanceObligations(
 async function sendTelegramReminder(
   batch: ReminderBatch,
   deps: MorningRemindersDependencies
-): Promise<boolean> {
+): Promise<ChannelDeliveryOutcome> {
   const lines: string[] = ["🔔 *Your Morning Reminders*\n"];
 
   if (batch.task_due.length > 0) {
@@ -409,26 +510,52 @@ async function sendTelegramReminder(
   }
   const message = lines.join("\n");
 
-  const telegramResponse = await deps.fetch(
-    `https://api.telegram.org/bot${deps.telegramBotToken}/sendMessage`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        chat_id: batch.telegram_chat_id,
-        text: message,
-        parse_mode: "Markdown",
-      }),
+  try {
+    const telegramResponse = await deps.fetch(
+      `https://api.telegram.org/bot${deps.telegramBotToken}/sendMessage`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: batch.telegram_chat_id,
+          text: message,
+          parse_mode: "Markdown",
+        }),
+      }
+    );
+
+    const telegramResult = await telegramResponse.json();
+
+    if (!telegramResult.ok) {
+      console.error("Telegram API error:", telegramResult);
+      const errorCode =
+        typeof telegramResult.error_code === "number"
+          ? telegramResult.error_code
+          : telegramResponse.status;
+      return {
+        success: false,
+        retryable: errorCode === 429 || errorCode >= 500,
+        error:
+          typeof telegramResult.description === "string"
+            ? telegramResult.description
+            : "Telegram API request failed",
+      };
     }
-  );
 
-  const telegramResult = await telegramResponse.json();
-
-  if (!telegramResult.ok) {
-    console.error("Telegram API error:", telegramResult);
+    return {
+      success: true,
+      retryable: false,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      retryable: true,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Telegram API request failed",
+    };
   }
-
-  return telegramResult.ok === true;
 }
 
 async function logDelivery(

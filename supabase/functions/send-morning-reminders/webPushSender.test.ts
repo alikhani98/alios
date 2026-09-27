@@ -50,7 +50,8 @@ describe("Web Push sender", () => {
   it("sends a notification to a stored subscription", async () => {
     const fetchMock = vi
       .fn<typeof fetch>()
-      .mockResolvedValueOnce(jsonResponse([firstSubscription]));
+      .mockResolvedValueOnce(jsonResponse([firstSubscription]))
+      .mockResolvedValueOnce(new Response(null, { status: 204 }));
     const sendMock = vi.fn().mockResolvedValue({ ok: true, status: 201 });
 
     const result = await sendWebPushNotifications(
@@ -72,6 +73,12 @@ describe("Web Push sender", () => {
     expect(new URL(String(fetchMock.mock.calls[0]?.[0])).searchParams.get("user_id")).toBe(
       "eq.user-1"
     );
+    expect(fetchMock.mock.calls[1]?.[1]?.method).toBe("PATCH");
+    expect(JSON.parse(String(fetchMock.mock.calls[1]?.[1]?.body))).toMatchObject({
+      consecutive_failures: 0,
+      last_failure_at: null,
+      last_error: null,
+    });
   });
 
   it("processes multiple subscriptions independently", async () => {
@@ -85,7 +92,9 @@ describe("Web Push sender", () => {
       .fn<typeof fetch>()
       .mockResolvedValueOnce(
         jsonResponse([firstSubscription, secondSubscription])
-      );
+      )
+      .mockResolvedValueOnce(new Response(null, { status: 204 }))
+      .mockResolvedValueOnce(new Response(null, { status: 204 }));
     const sendMock = vi
       .fn()
       .mockResolvedValueOnce({ ok: true, status: 201 })
@@ -108,7 +117,7 @@ describe("Web Push sender", () => {
       errors: ["Push service unavailable"],
     });
     expect(sendMock).toHaveBeenCalledTimes(2);
-    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock).toHaveBeenCalledTimes(3);
   });
 
   it.each([404, 410])(
@@ -143,4 +152,38 @@ describe("Web Push sender", () => {
     expect(options?.method).toBe("DELETE");
     }
   );
+
+  it("records temporary failures without deleting the subscription", async () => {
+    const subscription = {
+      ...firstSubscription,
+      consecutive_failures: 2,
+    };
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(jsonResponse([subscription]))
+      .mockResolvedValueOnce(new Response(null, { status: 204 }));
+    const sendMock = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 503,
+      error: "Push service unavailable",
+    });
+
+    const result = await sendWebPushNotifications(
+      "user-1",
+      payload,
+      createDependencies(fetchMock, sendMock)
+    );
+
+    expect(result.failureCount).toBe(1);
+    expect(result.removedCount).toBe(0);
+    const [url, options] = fetchMock.mock.calls[1] ?? [];
+    expect(options?.method).toBe("PATCH");
+    expect(new URL(String(url)).searchParams.get("endpoint")).toBe(
+      `eq.${subscription.endpoint}`
+    );
+    expect(JSON.parse(String(options?.body))).toMatchObject({
+      consecutive_failures: 3,
+      last_error: "Push service unavailable",
+    });
+  });
 });

@@ -40,14 +40,33 @@ function dueTask() {
   };
 }
 
+function claimedDelivery(channel: "telegram" | "web_push") {
+  return {
+    claimed: true,
+    attempt_id: `${channel}-attempt`,
+    attempt_count: 1,
+    lease_token: `${channel}-lease`,
+    status: "processing",
+    retryable: true,
+    next_attempt_at: null,
+    last_error: null,
+  };
+}
+
 function createFetchMock() {
   return vi
     .fn<typeof fetch>()
     .mockResolvedValueOnce(jsonResponse([eligiblePreference()]))
+    .mockResolvedValueOnce(jsonResponse([]))
     .mockResolvedValueOnce(jsonResponse([dueTask()]))
     .mockResolvedValueOnce(jsonResponse([]))
+    .mockResolvedValueOnce(jsonResponse([claimedDelivery("telegram")]))
     .mockResolvedValueOnce(jsonResponse({ ok: true }))
     .mockResolvedValueOnce(new Response(null, { status: 204 }))
+    .mockResolvedValueOnce(jsonResponse(true))
+    .mockResolvedValueOnce(new Response(null, { status: 201 }))
+    .mockResolvedValueOnce(jsonResponse([claimedDelivery("web_push")]))
+    .mockResolvedValueOnce(jsonResponse(true))
     .mockResolvedValueOnce(new Response(null, { status: 201 }));
 }
 
@@ -70,9 +89,11 @@ describe("send-morning-reminders delivery flow", () => {
       failureCount: 0,
       removedCount: 0,
     });
-    expect(String(fetchMock.mock.calls[3]?.[0])).toContain(
-      "api.telegram.org"
-    );
+    expect(
+      fetchMock.mock.calls.some(([url]) =>
+        String(url).includes("api.telegram.org")
+      )
+    ).toBe(true);
     expect(
       fetchMock.mock.calls.some(([url]) =>
         String(url).includes("push_subscriptions")

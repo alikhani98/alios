@@ -5,10 +5,12 @@ import {
 } from "./deliveryTypes.ts";
 
 export type StoredPushSubscription = Readonly<{
+  id?: string;
   endpoint: string;
   p256dh: string;
   auth: string;
   user_agent: string | null;
+  consecutive_failures?: number;
 }>;
 
 export type WebPushAttemptResult = Readonly<{
@@ -41,7 +43,7 @@ async function loadSubscriptions(
   deps: WebPushSenderCoreDependencies
 ): Promise<StoredPushSubscription[]> {
   const query = new URLSearchParams({
-    select: "endpoint,p256dh,auth,user_agent",
+    select: "id,endpoint,p256dh,auth,user_agent,consecutive_failures",
     user_id: `eq.${userId}`,
   });
   const response = await deps.fetch(
@@ -60,6 +62,36 @@ async function loadSubscriptions(
 
   const rows = (await response.json()) as StoredPushSubscription[] | null;
   return Array.isArray(rows) ? rows : [];
+}
+
+async function updateSubscriptionLifecycle(
+  userId: string,
+  subscription: StoredPushSubscription,
+  update: Readonly<Record<string, unknown>>,
+  deps: WebPushSenderCoreDependencies
+): Promise<void> {
+  const query = new URLSearchParams({
+    user_id: `eq.${userId}`,
+    endpoint: `eq.${subscription.endpoint}`,
+  });
+  const response = await deps.fetch(
+    `${deps.supabaseUrl}/rest/v1/push_subscriptions?${query.toString()}`,
+    {
+      method: "PATCH",
+      headers: {
+        ...serviceRoleHeaders(deps),
+        "Content-Type": "application/json",
+        Prefer: "return=minimal",
+      },
+      body: JSON.stringify(update),
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to update Web Push subscription lifecycle: ${response.statusText}`
+    );
+  }
 }
 
 async function removeSubscription(
@@ -137,6 +169,25 @@ export async function sendWebPushNotifications(
 
     if (attempt.ok) {
       successCount++;
+      try {
+        await updateSubscriptionLifecycle(
+          userId,
+          subscription,
+          {
+            last_used_at: new Date().toISOString(),
+            last_failure_at: null,
+            consecutive_failures: 0,
+            last_error: null,
+          },
+          deps
+        );
+      } catch (error) {
+        errors.push(
+          error instanceof Error
+            ? error.message
+            : "Failed to update Web Push subscription usage."
+        );
+      }
       continue;
     }
 
@@ -156,6 +207,29 @@ export async function sendWebPushNotifications(
     }
 
     failureCount++;
+    try {
+      await updateSubscriptionLifecycle(
+        userId,
+        subscription,
+        {
+          last_failure_at: new Date().toISOString(),
+          consecutive_failures:
+            (subscription.consecutive_failures ?? 0) + 1,
+          last_error:
+            attempt.error ??
+            `Web Push delivery failed with status ${
+              attempt.status ?? "unknown"
+            }.`,
+        },
+        deps
+      );
+    } catch (error) {
+      errors.push(
+        error instanceof Error
+          ? error.message
+          : "Failed to update Web Push subscription failure state."
+      );
+    }
     errors.push(
       attempt.error ??
         `Web Push delivery failed with status ${attempt.status ?? "unknown"}.`
