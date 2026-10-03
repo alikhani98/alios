@@ -1,9 +1,11 @@
 import { createCorsHeaders } from "../_shared/cors.ts";
 
+type ReminderPreferenceChannel = "telegram" | "web_push";
+
 export type ReminderPreferenceRow = Readonly<{
   user_id: string;
   enabled: boolean;
-  channel: "telegram";
+  channel: ReminderPreferenceChannel;
   telegram_chat_id: string | null;
   timezone: string;
   morning_time: string;
@@ -13,8 +15,16 @@ export type ReminderPreferenceRow = Readonly<{
 
 export type ReminderPreferenceInput = Readonly<{
   enabled: boolean;
-  channel: "telegram";
+  channel?: string | null;
   telegramChatId?: string | null;
+  timezone: string;
+  morningTime: string;
+}>;
+
+type ValidatedReminderPreferenceInput = Readonly<{
+  enabled: boolean;
+  channel: ReminderPreferenceChannel;
+  telegramChatId: string | null;
   timezone: string;
   morningTime: string;
 }>;
@@ -93,8 +103,9 @@ export function normalizeMorningTime(value: string): string {
 
 export function validatePreferenceInput(
   input: ReminderPreferenceInput
-): ReminderPreferenceInput {
-  if (input.channel !== "telegram") {
+): ValidatedReminderPreferenceInput {
+  const channel = input.channel ?? "telegram";
+  if (channel !== "telegram" && channel !== "web_push") {
     throw new Error("Telegram is the only supported reminder channel.");
   }
 
@@ -104,13 +115,13 @@ export function validatePreferenceInput(
   }
 
   const telegramChatId = input.telegramChatId?.trim() || null;
-  if (input.enabled && !telegramChatId) {
+  if (channel === "telegram" && input.enabled && !telegramChatId) {
     throw new Error("Telegram chat ID is required when reminders are enabled.");
   }
 
   return {
     enabled: input.enabled,
-    channel: "telegram",
+    channel,
     telegramChatId: telegramChatId
       ? validateTelegramChatId(telegramChatId)
       : null,
@@ -183,7 +194,7 @@ async function upsertPreference(
   const row = {
     user_id: userId,
     enabled: preference.enabled,
-    channel: "telegram",
+    channel: preference.channel,
     telegram_chat_id: preference.telegramChatId,
     timezone: preference.timezone,
     morning_time: preference.morningTime,

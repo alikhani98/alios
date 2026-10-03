@@ -13,7 +13,8 @@ import {
 
 export type ReminderUser = Readonly<{
   user_id: string;
-  telegram_chat_id: string;
+  channel: "telegram" | "web_push";
+  telegram_chat_id: string | null;
   timezone: string;
   morning_time: string;
   last_sent_local_date: string | null;
@@ -28,7 +29,7 @@ export type ReminderItem = Readonly<{
 
 export type ReminderBatch = Readonly<{
   user_id: string;
-  telegram_chat_id: string;
+  telegram_chat_id: string | null;
   task_due: ReminderItem[];
   finance_obligation: ReminderItem[];
 }>;
@@ -233,7 +234,11 @@ async function fetchEligibleUsers(
   deps: MorningRemindersDependencies,
   now: Date
 ): Promise<ReminderUser[]> {
-  const response = await deps.fetch(`${deps.supabaseUrl}/rest/v1/reminder_preferences`, {
+  const query = new URLSearchParams({
+    select:
+      "user_id,enabled,channel,telegram_chat_id,timezone,morning_time,last_sent_local_date",
+  });
+  const response = await deps.fetch(`${deps.supabaseUrl}/rest/v1/reminder_preferences?${query.toString()}`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${deps.supabaseServiceKey}`,
@@ -249,6 +254,7 @@ async function fetchEligibleUsers(
   const allUsers: Array<{
     user_id: string;
     enabled: boolean;
+    channel: "telegram" | "web_push";
     telegram_chat_id: string | null;
     timezone: string;
     morning_time: string;
@@ -259,7 +265,18 @@ async function fetchEligibleUsers(
   const eligible: ReminderUser[] = [];
 
   for (const user of allUsers) {
-    if (!user.enabled || !user.telegram_chat_id) {
+    if (!user.enabled) {
+      continue;
+    }
+
+    const needsTelegram = user.channel === "telegram";
+    const needsWebPush = user.channel === "web_push";
+
+    if (!needsTelegram && !needsWebPush) {
+      continue;
+    }
+
+    if (needsTelegram && !user.telegram_chat_id) {
       continue;
     }
 
@@ -281,6 +298,7 @@ async function fetchEligibleUsers(
     if (isTimeToSend) {
       eligible.push({
         user_id: user.user_id,
+        channel: user.channel,
         telegram_chat_id: user.telegram_chat_id,
         timezone: user.timezone,
         morning_time: user.morning_time,
