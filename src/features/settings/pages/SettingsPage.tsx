@@ -62,6 +62,7 @@ import {
   SoftPanel,
   StatusChip,
 } from "@/shared/ui";
+import { lazyWithRetry } from "@/shared/runtime/lazyWithRetry";
 import {
   WELLNESS_BADMINTON_ROUTINE_ENABLED_STORAGE_KEY,
 } from "@/features/wellness";
@@ -80,7 +81,6 @@ import { useBackupRestore } from "../hooks/useBackupRestore";
 import { useLocalDataManagement } from "../hooks/useLocalDataManagement";
 import type { BackupStatusFreshness } from "@/shared/preferences";
 import { checkForServiceWorkerUpdate, type ServiceWorkerUpdateResult } from "@/shared/pwa";
-import { QuickAccessManager } from "@/shared/quickAccess";
 import { AttachmentPackageSection } from "@/features/attachments";
 
 const LazySettingsHelpCenter = lazy(() =>
@@ -101,6 +101,11 @@ const LazyWeeklyTaskBudgetSection = lazy(() =>
 const LazyLocalAiSetupCard = lazy(() =>
   import("@/features/localAi/components/LocalAiSetupCard").then((module) => ({
     default: module.LocalAiSetupCard,
+  }))
+);
+const LazyQuickAccessManager = lazyWithRetry(() =>
+  import("@/shared/quickAccess/QuickAccessManager").then((module) => ({
+    default: module.QuickAccessManager,
   }))
 );
 
@@ -911,7 +916,11 @@ export function SettingsPage() {
         open={quickAccessOpen}
         onOpenChange={setQuickAccessOpen}
       >
-        {quickAccessOpen ? <QuickAccessManager /> : null}
+        {quickAccessOpen ? (
+          <Suspense fallback={<RouteLoadingFallback />}>
+            <LazyQuickAccessManager />
+          </Suspense>
+        ) : null}
       </CollapsibleSection>
 
       <CollapsibleSection
