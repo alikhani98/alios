@@ -9,7 +9,7 @@ import {
 } from "@/shared/entityLinks";
 import { useI18n } from "@/shared/i18n";
 import type { Goal, Project, Resource, Task } from "@/shared/types";
-import { cn } from "@/shared/utils";
+import { cn } from "@/shared/utils/cn";
 import { Button } from "./button";
 
 type LinkedEntitySummaryProps = {

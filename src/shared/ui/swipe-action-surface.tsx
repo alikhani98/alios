@@ -6,7 +6,7 @@ import {
 } from "react";
 
 import { useI18n } from "@/shared/i18n";
-import { cn } from "@/shared/utils";
+import { cn } from "@/shared/utils/cn";
 
 type SwipeActionSurfaceProps = {
   children: ReactNode;
