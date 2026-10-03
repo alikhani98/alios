@@ -129,8 +129,6 @@ export const messagesFa: Record<TranslationKey, string> = {
   "reminders.channelSelector.webPush": "وب‌پوش",
   "settings.telegramReminderTitle": "یادآورهای تلگرام",
   "settings.telegramReminderDescription": "همین حالا یک پیام آزمایشی تلگرام بفرستید. ارسال زمان‌بندی‌شده صبحگاهی هنوز بخشی از این مرحله نیست.",
-  "settings.telegramReminderChannel": "کانال",
-  "settings.telegramReminderChannelTelegram": "تلگرام",
   "settings.telegramReminderEnable": "فعال‌سازی یادآورهای تلگرام",
   "settings.telegramReminderChatId": "Chat ID تلگرام",
   "settings.telegramReminderChatIdHelp": "ابتدا Bot را باز کنید، سپس Chat ID عددی را اینجا وارد کنید. Bot token فقط در Supabase secrets می‌ماند.",

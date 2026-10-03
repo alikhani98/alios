@@ -142,8 +142,6 @@ export const messagesEn = {
   "reminders.channelSelector.webPush": "Web Push",
   "settings.telegramReminderTitle": "Telegram reminders",
   "settings.telegramReminderDescription": "Send a test Telegram reminder now. Scheduled morning delivery is not part of this stage yet.",
-  "settings.telegramReminderChannel": "Channel",
-  "settings.telegramReminderChannelTelegram": "Telegram",
   "settings.telegramReminderEnable": "Enable Telegram reminders",
   "settings.telegramReminderChatId": "Telegram Chat ID",
   "settings.telegramReminderChatIdHelp": "Open your bot first, then paste the numeric chat ID here. The bot token stays only in Supabase secrets.",
