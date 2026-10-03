@@ -22,6 +22,7 @@ function eligiblePreference() {
   return {
     user_id: "user-1",
     enabled: true,
+    channel: "telegram",
     telegram_chat_id: "12345",
     timezone: "UTC",
     morning_time: "00:00:00",
