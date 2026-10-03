@@ -51,13 +51,22 @@ function callbackUpdate(data: string, chatId = 12345) {
   };
 }
 
-function createFetchMock(authorized = true) {
-  return vi.fn<typeof fetch>().mockImplementation((url, options) => {
+function createFetchMock(
+  authorized = true,
+  todayTasks: ReadonlyArray<Record<string, unknown>> = []
+) {
+  return vi.fn<typeof fetch>().mockImplementation((url) => {
     const urlText = String(url);
 
     if (urlText.includes("reminder_preferences")) {
       return Promise.resolve(
-        jsonResponse(authorized ? [{ user_id: "user-1" }] : [])
+        jsonResponse(authorized ? [{ user_id: "user-1", timezone: "UTC" }] : [])
+      );
+    }
+
+    if (urlText.includes("alios_sync_records")) {
+      return Promise.resolve(
+        jsonResponse(todayTasks.map((payload) => ({ payload })))
       );
     }
 
@@ -73,6 +82,23 @@ function telegramMessages(fetchMock: ReturnType<typeof createFetchMock>) {
   return fetchMock.mock.calls.filter(([url]) =>
     String(url).includes("/sendMessage")
   );
+}
+
+function firstTelegramMessageBody(
+  fetchMock: ReturnType<typeof createFetchMock>
+): string {
+  return String(telegramMessages(fetchMock)[0]?.[1]?.body);
+}
+
+function taskPayload(input: Partial<Record<string, unknown>>) {
+  return {
+    title: "Task",
+    status: "todo",
+    priority: "medium",
+    isMit: false,
+    dueDate: "2026-10-03",
+    ...input,
+  };
 }
 
 describe("telegram-bot Edge Function core", () => {
@@ -114,8 +140,8 @@ describe("telegram-bot Edge Function core", () => {
     expect(fetchMock.mock.calls[0]?.[0]?.toString()).toContain(
       "telegram_chat_id=eq.12345"
     );
-    expect(String(telegramMessages(fetchMock)[0]?.[1]?.body)).toContain(
-      "در دست ساخت"
+    expect(firstTelegramMessageBody(fetchMock)).toContain(
+      "امروز وظیفه‌ای باقی نمانده"
     );
   });
 
@@ -152,12 +178,102 @@ describe("telegram-bot Edge Function core", () => {
     );
   });
 
-  it("replies to the today callback with the stub message", async () => {
+  it("replies to /today with an empty-state message when no tasks remain", async () => {
     const fetchMock = createFetchMock(true);
+
+    await handleTelegramUpdate(createRequest(messageUpdate("/today")), deps(fetchMock));
+
+    expect(firstTelegramMessageBody(fetchMock)).toContain(
+      "✅ امروز وظیفه‌ای باقی نمانده!"
+    );
+  });
+
+  it("formats an MIT high-priority task with a star", async () => {
+    const fetchMock = createFetchMock(true, [
+      taskPayload({ title: "Focus task", priority: "high", isMit: true }),
+    ]);
+
+    await handleTelegramUpdate(createRequest(messageUpdate("/today")), deps(fetchMock));
+
+    expect(firstTelegramMessageBody(fetchMock)).toContain("⭐ Focus task");
+  });
+
+  it("formats a high-priority non-MIT task with a red marker", async () => {
+    const fetchMock = createFetchMock(true, [
+      taskPayload({ title: "Urgent task", priority: "high", isMit: false }),
+    ]);
+
+    await handleTelegramUpdate(createRequest(messageUpdate("/today")), deps(fetchMock));
+
+    expect(firstTelegramMessageBody(fetchMock)).toContain("🔴 Urgent task");
+  });
+
+  it("formats a medium-priority task with a yellow marker", async () => {
+    const fetchMock = createFetchMock(true, [
+      taskPayload({ title: "Medium task", priority: "medium" }),
+    ]);
+
+    await handleTelegramUpdate(createRequest(messageUpdate("/today")), deps(fetchMock));
+
+    expect(firstTelegramMessageBody(fetchMock)).toContain("🟡 Medium task");
+  });
+
+  it("marks doing tasks as in progress", async () => {
+    const fetchMock = createFetchMock(true, [
+      taskPayload({ title: "Active task", status: "doing" }),
+    ]);
+
+    await handleTelegramUpdate(createRequest(messageUpdate("/today")), deps(fetchMock));
+
+    expect(firstTelegramMessageBody(fetchMock)).toContain("_(در جریان)_");
+  });
+
+  it("uses the same today handler for callback_query updates", async () => {
+    const fetchMock = createFetchMock(true, [
+      taskPayload({ title: "Callback task", priority: "low" }),
+    ]);
 
     await handleTelegramUpdate(createRequest(callbackUpdate("today")), deps(fetchMock));
 
-    expect(String(telegramMessages(fetchMock)[0]?.[1]?.body)).toContain(
+    expect(firstTelegramMessageBody(fetchMock)).toContain("⚪ Callback task");
+  });
+
+  it("replies with a Farsi error when today's tasks cannot be fetched", async () => {
+    const fetchMock = vi.fn<typeof fetch>().mockImplementation((url) => {
+      const urlText = String(url);
+
+      if (urlText.includes("reminder_preferences")) {
+        return Promise.resolve(jsonResponse([{ user_id: "user-1", timezone: "UTC" }]));
+      }
+
+      if (urlText.includes("alios_sync_records")) {
+        return Promise.resolve(jsonResponse({ message: "failure" }, 500));
+      }
+
+      if (urlText.includes("api.telegram.org")) {
+        return Promise.resolve(jsonResponse({ ok: true, result: {} }));
+      }
+
+      return Promise.resolve(jsonResponse({ ok: true }));
+    });
+
+    await handleTelegramUpdate(createRequest(messageUpdate("/today")), deps(fetchMock));
+
+    expect(
+      String(
+        fetchMock.mock.calls.find(([url]) =>
+          String(url).includes("/sendMessage")
+        )?.[1]?.body
+      )
+    ).toContain("خطا در دریافت وظایف");
+  });
+
+  it("replies to the inbox and goals callbacks with the stub message", async () => {
+    const fetchMock = createFetchMock(true);
+
+    await handleTelegramUpdate(createRequest(callbackUpdate("inbox")), deps(fetchMock));
+
+    expect(firstTelegramMessageBody(fetchMock)).toContain(
       "در دست ساخت"
     );
   });

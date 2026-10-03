@@ -1,3 +1,5 @@
+import { fetchTodayTasks, type TodayTask } from "./dataAccess.ts";
+
 export interface TelegramBotDeps {
   supabaseUrl: string;
   supabaseServiceKey: string;
@@ -30,6 +32,12 @@ type TelegramUpdate = Readonly<{
 
 type ReminderPreferenceAuthRow = Readonly<{
   user_id: string;
+  timezone?: string | null;
+}>;
+
+type AuthorizedChat = Readonly<{
+  userId: string;
+  timezone: string;
 }>;
 
 const unauthorizedMessage = "⛔ دسترسی مجاز نیست.";
@@ -60,19 +68,19 @@ export async function handleTelegramUpdate(
     return jsonResponse({ ok: true, dropped: true });
   }
 
-  const authorized = await isAuthorizedChat(chatId, deps);
-  if (!authorized) {
+  const authorizedChat = await authorizeChat(chatId, deps);
+  if (!authorizedChat) {
     await sendTelegramMessage(chatId, unauthorizedMessage, deps);
     return jsonResponse({ ok: true, blocked: true });
   }
 
   if (update.message?.text) {
-    await routeTextCommand(chatId, update.message.text, deps);
+    await routeTextCommand(chatId, update.message.text, authorizedChat, deps);
     return jsonResponse({ ok: true });
   }
 
   if (update.callback_query?.data) {
-    await routeCallbackQuery(chatId, update.callback_query, deps);
+    await routeCallbackQuery(chatId, update.callback_query, authorizedChat, deps);
     return jsonResponse({ ok: true });
   }
 
@@ -90,12 +98,12 @@ function extractChatId(update: TelegramUpdate): string | null {
   return String(chatId);
 }
 
-async function isAuthorizedChat(
+async function authorizeChat(
   chatId: string,
   deps: TelegramBotDeps
-): Promise<boolean> {
+): Promise<AuthorizedChat | null> {
   const query = new URLSearchParams({
-    select: "user_id",
+    select: "user_id,timezone",
     telegram_chat_id: `eq.${chatId}`,
     enabled: "is.true",
     limit: "1",
@@ -114,16 +122,25 @@ async function isAuthorizedChat(
   );
 
   if (!response.ok) {
-    return false;
+    return null;
   }
 
   const rows = (await response.json()) as ReminderPreferenceAuthRow[];
-  return rows.length > 0;
+  const row = rows[0];
+  if (!row) {
+    return null;
+  }
+
+  return {
+    userId: row.user_id,
+    timezone: row.timezone?.trim() || "UTC",
+  };
 }
 
 async function routeTextCommand(
   chatId: string,
   text: string,
+  authorizedChat: AuthorizedChat,
   deps: TelegramBotDeps
 ): Promise<void> {
   const command = text.trim().split(/\s+/, 1)[0];
@@ -134,6 +151,8 @@ async function routeTextCommand(
       await sendMenu(chatId, deps);
       return;
     case "/today":
+      await sendToday(chatId, authorizedChat, deps);
+      return;
     case "/inbox":
     case "/goals":
       await sendTelegramMessage(chatId, buildingMessage, deps);
@@ -146,11 +165,14 @@ async function routeTextCommand(
 async function routeCallbackQuery(
   chatId: string,
   callbackQuery: TelegramCallbackQuery,
+  authorizedChat: AuthorizedChat,
   deps: TelegramBotDeps
 ): Promise<void> {
   try {
     switch (callbackQuery.data) {
       case "today":
+        await sendToday(chatId, authorizedChat, deps);
+        return;
       case "inbox":
       case "goals":
         await sendTelegramMessage(chatId, buildingMessage, deps);
@@ -163,6 +185,59 @@ async function routeCallbackQuery(
       await answerCallbackQuery(callbackQuery.id, deps);
     }
   }
+}
+
+async function sendToday(
+  chatId: string,
+  authorizedChat: AuthorizedChat,
+  deps: TelegramBotDeps
+): Promise<void> {
+  try {
+    const todayTasks = await fetchTodayTasks(
+      authorizedChat.userId,
+      getTodayInTimezone(authorizedChat.timezone),
+      deps
+    );
+    await sendTelegramMessage(chatId, formatTodayTasksMessage(todayTasks), deps);
+  } catch (error) {
+    await sendTelegramMessage(
+      chatId,
+      error instanceof Error ? error.message : "خطا در دریافت وظایف",
+      deps
+    );
+  }
+}
+
+function formatTodayTasksMessage(tasks: TodayTask[]): string {
+  if (tasks.length === 0) {
+    return "✅ امروز وظیفه‌ای باقی نمانده!";
+  }
+
+  const lines = tasks.map((task) => {
+    const prefix =
+      task.isMit && task.priority === "high"
+        ? "⭐"
+        : task.priority === "high"
+          ? "🔴"
+          : task.priority === "medium"
+            ? "🟡"
+            : "⚪";
+    const suffix = task.status === "doing" ? " _(در جریان)_" : "";
+    return `${prefix} ${task.title}${suffix}`;
+  });
+
+  return `📋 وظایف امروز:\n\n${lines.join("\n")}`;
+}
+
+function getTodayInTimezone(timezone: string): string {
+  const formatter = new Intl.DateTimeFormat("en-CA", {
+    timeZone: timezone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+
+  return formatter.format(new Date());
 }
 
 export async function sendMenu(
