@@ -15,6 +15,11 @@ const TodayPage = lazyWithRetry(() =>
     default: module.TodayPage,
   }))
 );
+const TodayWidgetPage = lazyWithRetry(() =>
+  import("@/features/today/pages/TodayWidgetPage").then((module) => ({
+    default: module.TodayWidgetPage,
+  }))
+);
 const CalendarPage = lazyWithRetry(() =>
   import("@/features/calendar/pages/CalendarPage").then((module) => ({
     default: module.CalendarPage,
@@ -100,6 +105,14 @@ const DecisionLogPage = lazyWithRetry(() =>
 );
 
 const router = createHashRouter([
+  {
+    path: "/today-widget",
+    element: (
+      <Suspense fallback={<RouteLoadingFallback />}>
+        <TodayWidgetPage />
+      </Suspense>
+    ),
+  },
   {
     path: "/",
     element: <AppShell />,
