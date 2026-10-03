@@ -620,6 +620,7 @@ export const messagesEn = {
   "settings.syncConflictEntityFinanceTransactions": "Finance transactions",
   "settings.syncConflictEntityFinanceObligations": "Finance obligations",
   "settings.syncConflictEntityManualEntries": "Personal Manual entries",
+  "sync.conflictEntity.inboxItems": "Inbox",
   "settings.syncConflictDetectedAt": "Conflict detected at {value}",
   "settings.syncConflictLocalVersionLabel": "Local device version",
   "settings.syncConflictRemoteVersionLabel": "Synced version",

@@ -10,6 +10,7 @@ export type SyncScope =
   | "finance"
   | "manual";
 export type SyncConflictEntity =
+  | "inboxItems"
   | "tasks"
   | "routines"
   | "projects"

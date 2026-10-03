@@ -420,6 +420,8 @@ function getCategoryTone(category: SyncCategoryStatus): SyncCategoryTone {
 
 function getConflictEntityLabelKey(entity: SyncConflictEntity): TranslationKey {
   switch (entity) {
+    case "inboxItems":
+      return "sync.conflictEntity.inboxItems";
     case "tasks":
       return "settings.syncConflictEntityTasks";
     case "routines":
@@ -811,6 +813,7 @@ export function SyncStatusAdvancedPanel({
         return counts;
       },
       {
+        inboxItems: 0,
         tasks: 0,
         routines: 0,
         projects: 0,
@@ -1718,6 +1721,7 @@ export function SyncStatusAdvancedPanel({
               {hasConflictIssue ? (
                 <div className="flex flex-wrap gap-2">
                   {(conflictEntityCounts.tasks > 0 ||
+                    conflictEntityCounts.inboxItems > 0 ||
                     conflictEntityCounts.projects > 0 ||
                     conflictEntityCounts.goals > 0 ||
                     conflictEntityCounts.financeTransactions > 0 ||
@@ -1725,6 +1729,7 @@ export function SyncStatusAdvancedPanel({
                     conflictEntityCounts.manualEntries > 0
                     ? (
                         [
+                          "inboxItems",
                           "tasks",
                           "projects",
                           "goals",
@@ -1737,6 +1742,7 @@ export function SyncStatusAdvancedPanel({
                       )
                     : (
                         [
+                          "inboxItems",
                           "tasks",
                           "projects",
                           "goals",

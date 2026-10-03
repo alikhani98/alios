@@ -511,6 +511,7 @@ export const messagesFa: Record<TranslationKey, string> = {
   "settings.syncConflictEntityFinanceTransactions": "تراکنش‌های مالی",
   "settings.syncConflictEntityFinanceObligations": "تعهدهای مالی",
   "settings.syncConflictEntityManualEntries": "ورودی‌های دفترچهٔ شخصی",
+  "sync.conflictEntity.inboxItems": "صندوق ورودی",
   "settings.syncConflictDetectedAt": "تعارض در {value} شناسایی شد",
   "settings.syncConflictLocalVersionLabel": "نسخهٔ محلی دستگاه",
   "settings.syncConflictRemoteVersionLabel": "نسخهٔ همگام‌شده",

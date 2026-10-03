@@ -13,6 +13,7 @@ import {
   financeObligationSchema,
   financeTransactionSchema,
   goalSchema,
+  inboxItemSchema,
   manualEntrySchema,
   projectSchema,
   routineSchema,
@@ -20,6 +21,7 @@ import {
   type FinanceObligation,
   type FinanceTransaction,
   type Goal,
+  type InboxItem,
   type ManualEntry,
   type Project,
   type RecordSyncMetadata,
@@ -92,6 +94,7 @@ const SYNCED_PREFERENCE_KEYS = [
 ] as const;
 
 const USER_DATA_SCOPES = [
+  "inboxItems",
   "tasks",
   "routines",
   "projects",
@@ -99,7 +102,7 @@ const USER_DATA_SCOPES = [
   "financeTransactions",
   "financeObligations",
   "manualEntries",
-] as const;
+] as const satisfies ReadonlyArray<SyncConflictEntity>;
 const SUPABASE_SYNC_DIAGNOSTICS_STORAGE_KEY = "alios.sync.diagnostics";
 const SUPABASE_SYNC_ENABLED_STORAGE_KEY = "alios.sync.enabled";
 const MAX_SYNC_DIAGNOSTIC_ENTRIES = 20;
@@ -116,8 +119,9 @@ const FULL_SYNC_SCOPES = [
 
 type SyncedPreferenceKey = (typeof SYNCED_PREFERENCE_KEYS)[number];
 type SyncedPreferencePayload = Partial<Record<SyncedPreferenceKey, string>>;
-type SyncEntity = (typeof USER_DATA_SCOPES)[number];
+type SyncEntity = SyncConflictEntity;
 type SyncableRecord =
+  | InboxItem
   | Task
   | Routine
   | Project
@@ -136,6 +140,10 @@ type SyncMetadataRecord = Readonly<{
   categoryStatuses?: ReadonlyArray<SyncCategoryStatus>;
   manualPreparation?: ManualPreparationStatus;
 }>;
+
+type SyncableRecordWithMetadata = SyncableRecord & {
+  sync?: RecordSyncMetadata;
+};
 
 type SupabaseSyncUserMetadata = Readonly<{
   alios_preferences?: SyncedPreferencePayload;
@@ -557,10 +565,16 @@ function buildConnectedDevices(
 }
 
 function cloneRecord<TRecord extends SyncableRecord>(record: TRecord): TRecord {
+  const sync = (record as SyncableRecordWithMetadata).sync;
+
   return {
     ...record,
-    sync: record.sync ? { ...record.sync } : undefined,
+    sync: sync ? { ...sync } : undefined,
   } as TRecord;
+}
+
+function getRecordSync(record: SyncableRecord): RecordSyncMetadata | undefined {
+  return (record as SyncableRecordWithMetadata).sync;
 }
 
 function normalizeSyncMetadata(
@@ -585,7 +599,7 @@ function withSyncedMetadata<TRecord extends SyncableRecord>(
   return {
     ...cloneRecord(record),
     sync: {
-      ...normalizeSyncMetadata(record.sync, ownerUserId),
+      ...normalizeSyncMetadata(getRecordSync(record), ownerUserId),
       ownerUserId,
       lastSyncedAt: syncAt,
       lastSyncedByDeviceId: deviceId,
@@ -603,7 +617,7 @@ function withConflictMetadata<TRecord extends SyncableRecord>(
   return {
     ...cloneRecord(record),
     sync: {
-      ...normalizeSyncMetadata(record.sync, ownerUserId),
+      ...normalizeSyncMetadata(getRecordSync(record), ownerUserId),
       ownerUserId,
       conflictAt,
       conflictReason: "diverged-updates",
@@ -612,22 +626,25 @@ function withConflictMetadata<TRecord extends SyncableRecord>(
 }
 
 function isRecordDirty(record: SyncableRecord) {
+  const sync = getRecordSync(record);
+
   return (
-    !record.sync?.lastSyncedAt || record.updatedAt > record.sync.lastSyncedAt
+    !sync?.lastSyncedAt || record.updatedAt > sync.lastSyncedAt
   );
 }
 
 function stripEphemeralSyncFields(record: SyncableRecord) {
   const next = cloneRecord(record);
+  const nextWithMetadata = next as SyncableRecordWithMetadata;
 
-  if (!next.sync) {
+  if (!nextWithMetadata.sync) {
     return next;
   }
 
-  next.sync = {
-    ownerUserId: next.sync.ownerUserId,
-    lastSyncedAt: next.sync.lastSyncedAt,
-    lastSyncedByDeviceId: next.sync.lastSyncedByDeviceId,
+  nextWithMetadata.sync = {
+    ownerUserId: nextWithMetadata.sync.ownerUserId,
+    lastSyncedAt: nextWithMetadata.sync.lastSyncedAt,
+    lastSyncedByDeviceId: nextWithMetadata.sync.lastSyncedByDeviceId,
   };
 
   return next;
@@ -642,6 +659,12 @@ function recordsMatch(left: SyncableRecord, right: SyncableRecord) {
 
 function getTaskMap(data: AliosBackupData): RecordMap<Task> {
   return new Map(data.tasks.map((record) => [record.id, cloneRecord(record)]));
+}
+
+function getInboxItemMap(data: AliosBackupData): RecordMap<InboxItem> {
+  return new Map(
+    data.inboxItems.map((record) => [record.id, cloneRecord(record)])
+  );
 }
 
 function getRoutineMap(data: AliosBackupData): RecordMap<Routine> {
@@ -691,6 +714,8 @@ function getEntityRecordMap(
   entity: SyncEntity
 ): RecordMap<SyncableRecord> {
   switch (entity) {
+    case "inboxItems":
+      return getInboxItemMap(data);
     case "tasks":
       return getTaskMap(data);
     case "routines":
@@ -714,6 +739,9 @@ function applyEntityRecordMap(
   records: RecordMap<SyncableRecord>
 ) {
   switch (entity) {
+    case "inboxItems":
+      data.inboxItems = toSortedValues(records as RecordMap<InboxItem>);
+      break;
     case "tasks":
       data.tasks = toSortedValues(records as RecordMap<Task>);
       break;
@@ -747,6 +775,8 @@ function parseRemoteRecord(
   payload: Readonly<Record<string, unknown>>
 ) {
   switch (entity) {
+    case "inboxItems":
+      return inboxItemSchema.parse(payload);
     case "tasks":
       return taskSchema.parse(payload);
     case "routines":
@@ -796,10 +826,10 @@ function toRemoteRow(
     payload: record as unknown as Record<string, unknown>,
     updated_at: record.updatedAt,
     created_at: record.createdAt,
-    last_synced_at: record.sync?.lastSyncedAt,
-    last_synced_by_device_id: record.sync?.lastSyncedByDeviceId,
-    has_conflict: Boolean(record.sync?.conflictAt),
-    conflict_reason: record.sync?.conflictReason,
+    last_synced_at: getRecordSync(record)?.lastSyncedAt,
+    last_synced_by_device_id: getRecordSync(record)?.lastSyncedByDeviceId,
+    has_conflict: Boolean(getRecordSync(record)?.conflictAt),
+    conflict_reason: getRecordSync(record)?.conflictReason,
   };
 }
 
@@ -847,6 +877,10 @@ function replaceRemoteRows(
 }
 
 function getConflictRecordTitle(record: SyncableRecord): string {
+  if ("content" in record) {
+    return record.content;
+  }
+
   return record.title;
 }
 
@@ -854,7 +888,7 @@ function getRemoteDeviceLabel(
   remoteRecord: SyncableRecord,
   localDeviceId: string
 ): string {
-  const remoteDeviceId = remoteRecord.sync?.lastSyncedByDeviceId;
+  const remoteDeviceId = getRecordSync(remoteRecord)?.lastSyncedByDeviceId;
 
   if (!remoteDeviceId) {
     return "Synced version";
@@ -874,15 +908,15 @@ function createConflictRecord(
     entity,
     recordId: localRecord.id,
     title: getConflictRecordTitle(localRecord),
-    conflictAt: localRecord.sync?.conflictAt ?? remoteRecord.updatedAt,
-    conflictReason: localRecord.sync?.conflictReason,
+    conflictAt: getRecordSync(localRecord)?.conflictAt ?? remoteRecord.updatedAt,
+    conflictReason: getRecordSync(localRecord)?.conflictReason,
     localUpdatedAt: localRecord.updatedAt,
-    localLastSyncedAt: localRecord.sync?.lastSyncedAt,
+    localLastSyncedAt: getRecordSync(localRecord)?.lastSyncedAt,
     localDeviceId,
     localDeviceLabel,
     remoteUpdatedAt: remoteRecord.updatedAt,
-    remoteLastSyncedAt: remoteRecord.sync?.lastSyncedAt,
-    remoteDeviceId: remoteRecord.sync?.lastSyncedByDeviceId,
+    remoteLastSyncedAt: getRecordSync(remoteRecord)?.lastSyncedAt,
+    remoteDeviceId: getRecordSync(remoteRecord)?.lastSyncedByDeviceId,
     remoteDeviceLabel: getRemoteDeviceLabel(remoteRecord, localDeviceId),
   };
 }
@@ -1048,7 +1082,7 @@ function mergeEntityRecords(
         remoteRecord,
         ownerUserId,
         syncAt,
-        remoteRecord.sync?.lastSyncedByDeviceId ?? deviceId
+        getRecordSync(remoteRecord)?.lastSyncedByDeviceId ?? deviceId
       );
       nextRecords.set(recordId, syncedRemoteRecord);
       changedLocalRecords += 1;
@@ -1107,7 +1141,7 @@ function mergeEntityRecords(
       remoteRecord,
       ownerUserId,
       syncAt,
-      remoteRecord.sync?.lastSyncedByDeviceId ?? deviceId
+      getRecordSync(remoteRecord)?.lastSyncedByDeviceId ?? deviceId
     );
     nextRecords.set(recordId, syncedRemoteRecord);
     changedLocalRecords += 1;
@@ -1387,7 +1421,8 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
             remoteRecord,
             context.ownerUserId,
             syncAt,
-            remoteRecord.sync?.lastSyncedByDeviceId ?? context.device.deviceId
+            getRecordSync(remoteRecord)?.lastSyncedByDeviceId ??
+              context.device.deviceId
           );
 
     if (input.resolution === "keep-remote" && remoteTombstone) {
@@ -1584,7 +1619,7 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
       );
 
       localRecords.forEach((localRecord, recordId) => {
-        if (!localRecord.sync?.conflictAt) {
+        if (!getRecordSync(localRecord)?.conflictAt) {
           return;
         }
 
