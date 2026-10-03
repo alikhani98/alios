@@ -66,7 +66,10 @@ import { lazyWithRetry } from "@/shared/runtime/lazyWithRetry";
 import {
   WELLNESS_BADMINTON_ROUTINE_ENABLED_STORAGE_KEY,
 } from "@/features/wellness";
-import { TelegramReminderSettings } from "@/features/reminders";
+import {
+  TelegramReminderSettings,
+  WebPushReminderSettings,
+} from "@/features/reminders";
 import { RecoveryModeSection } from "../components/RecoveryModeSection";
 import { LocalErrorLogSection } from "../components/LocalErrorLogSection";
 import { SyncStatusCard } from "../components/SyncStatusCard";
@@ -578,7 +581,10 @@ export function SettingsPage() {
         collapseLabel={t("common.collapseSection")}
         defaultOpen={false}
       >
-        <TelegramReminderSettings />
+        <div className="space-y-4">
+          <TelegramReminderSettings />
+          <WebPushReminderSettings />
+        </div>
       </CollapsibleSection>
 
       <CollapsibleSection
