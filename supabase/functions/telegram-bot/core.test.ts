@@ -53,7 +53,8 @@ function callbackUpdate(data: string, chatId = 12345) {
 
 function createFetchMock(
   authorized = true,
-  todayTasks: ReadonlyArray<Record<string, unknown>> = []
+  todayTasks: ReadonlyArray<Record<string, unknown>> = [],
+  inboxItems: ReadonlyArray<Record<string, unknown>> = []
 ) {
   return vi.fn<typeof fetch>().mockImplementation((url) => {
     const urlText = String(url);
@@ -65,6 +66,12 @@ function createFetchMock(
     }
 
     if (urlText.includes("alios_sync_records")) {
+      if (urlText.includes("entity=eq.inboxItems")) {
+        return Promise.resolve(
+          jsonResponse(inboxItems.map((payload) => ({ payload })))
+        );
+      }
+
       return Promise.resolve(
         jsonResponse(todayTasks.map((payload) => ({ payload })))
       );
@@ -97,6 +104,17 @@ function taskPayload(input: Partial<Record<string, unknown>>) {
     priority: "medium",
     isMit: false,
     dueDate: "2026-10-03",
+    ...input,
+  };
+}
+
+function inboxPayload(input: Partial<Record<string, unknown>>) {
+  return {
+    content: "Inbox item",
+    type: "note",
+    status: "unprocessed",
+    createdAt: "2026-10-03T00:00:00.000Z",
+    updatedAt: "2026-10-03T00:00:00.000Z",
     ...input,
   };
 }
@@ -268,14 +286,127 @@ describe("telegram-bot Edge Function core", () => {
     ).toContain("خطا در دریافت وظایف");
   });
 
-  it("replies to the inbox and goals callbacks with the stub message", async () => {
+  it("replies to /inbox with an empty-state message when the inbox is empty", async () => {
     const fetchMock = createFetchMock(true);
+
+    await handleTelegramUpdate(createRequest(messageUpdate("/inbox")), deps(fetchMock));
+
+    expect(firstTelegramMessageBody(fetchMock)).toContain(
+      "✅ صندوق ورودی خالی است!"
+    );
+  });
+
+  it("formats task inbox items with a checkbox marker", async () => {
+    const fetchMock = createFetchMock(true, [], [
+      inboxPayload({ content: "Task inbox item", type: "task" }),
+    ]);
+
+    await handleTelegramUpdate(createRequest(messageUpdate("/inbox")), deps(fetchMock));
+
+    expect(firstTelegramMessageBody(fetchMock)).toContain("☑️ Task inbox item");
+  });
+
+  it("formats idea inbox items with a lightbulb marker", async () => {
+    const fetchMock = createFetchMock(true, [], [
+      inboxPayload({ content: "Idea inbox item", type: "idea" }),
+    ]);
+
+    await handleTelegramUpdate(createRequest(messageUpdate("/inbox")), deps(fetchMock));
+
+    expect(firstTelegramMessageBody(fetchMock)).toContain("💡 Idea inbox item");
+  });
+
+  it("formats link inbox items with a link marker", async () => {
+    const fetchMock = createFetchMock(true, [], [
+      inboxPayload({ content: "Link inbox item", type: "link" }),
+    ]);
+
+    await handleTelegramUpdate(createRequest(messageUpdate("/inbox")), deps(fetchMock));
+
+    expect(firstTelegramMessageBody(fetchMock)).toContain("🔗 Link inbox item");
+  });
+
+  it("formats note inbox items with a note marker", async () => {
+    const fetchMock = createFetchMock(true, [], [
+      inboxPayload({ content: "Note inbox item", type: "note" }),
+    ]);
+
+    await handleTelegramUpdate(createRequest(messageUpdate("/inbox")), deps(fetchMock));
+
+    expect(firstTelegramMessageBody(fetchMock)).toContain("📝 Note inbox item");
+  });
+
+  it("formats other inbox items with a bullet marker", async () => {
+    const fetchMock = createFetchMock(true, [], [
+      inboxPayload({ content: "Other inbox item", type: "other" }),
+    ]);
+
+    await handleTelegramUpdate(createRequest(messageUpdate("/inbox")), deps(fetchMock));
+
+    expect(firstTelegramMessageBody(fetchMock)).toContain("• Other inbox item");
+  });
+
+  it("adds a more-items note when more than ten inbox items are returned", async () => {
+    const fetchMock = createFetchMock(
+      true,
+      [],
+      Array.from({ length: 11 }, (_, index) =>
+        inboxPayload({ content: `Inbox item ${index + 1}`, type: "task" })
+      )
+    );
+
+    await handleTelegramUpdate(createRequest(messageUpdate("/inbox")), deps(fetchMock));
+
+    const body = firstTelegramMessageBody(fetchMock);
+    expect(body).toContain("و موارد بیشتر");
+    expect(body).toContain("Inbox item 10");
+    expect(body).not.toContain("Inbox item 11");
+  });
+
+  it("uses the same inbox handler for callback_query updates", async () => {
+    const fetchMock = createFetchMock(true, [], [
+      inboxPayload({ content: "Callback inbox item", type: "note" }),
+    ]);
 
     await handleTelegramUpdate(createRequest(callbackUpdate("inbox")), deps(fetchMock));
 
     expect(firstTelegramMessageBody(fetchMock)).toContain(
-      "در دست ساخت"
+      "📝 Callback inbox item"
     );
+  });
+
+  it("replies with a Farsi error when inbox items cannot be fetched", async () => {
+    const fetchMock = vi.fn<typeof fetch>().mockImplementation((url) => {
+      const urlText = String(url);
+
+      if (urlText.includes("reminder_preferences")) {
+        return Promise.resolve(jsonResponse([{ user_id: "user-1", timezone: "UTC" }]));
+      }
+
+      if (urlText.includes("alios_sync_records")) {
+        return Promise.resolve(jsonResponse({ message: "failure" }, 500));
+      }
+
+      if (urlText.includes("api.telegram.org")) {
+        return Promise.resolve(jsonResponse({ ok: true, result: {} }));
+      }
+
+      return Promise.resolve(jsonResponse({ ok: true }));
+    });
+
+    await handleTelegramUpdate(createRequest(messageUpdate("/inbox")), deps(fetchMock));
+
+    expect(firstTelegramMessageBody(fetchMock)).toContain(
+      "خطا در دریافت صندوق ورودی"
+    );
+  });
+
+  it("replies to the goals callback with the stub message", async () => {
+    const fetchMock = createFetchMock(true);
+
+    await handleTelegramUpdate(createRequest(callbackUpdate("goals")), deps(fetchMock));
+
+    expect(firstTelegramMessageBody(fetchMock)).toContain("در دست ساخت");
   });
 
   it("always answers callback_query updates after routing", async () => {

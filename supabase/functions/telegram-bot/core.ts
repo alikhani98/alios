@@ -1,4 +1,9 @@
-import { fetchTodayTasks, type TodayTask } from "./dataAccess.ts";
+import {
+  fetchTodayTasks,
+  fetchUnprocessedInboxItems,
+  type InboxItem,
+  type TodayTask,
+} from "./dataAccess.ts";
 
 export interface TelegramBotDeps {
   supabaseUrl: string;
@@ -154,6 +159,8 @@ async function routeTextCommand(
       await sendToday(chatId, authorizedChat, deps);
       return;
     case "/inbox":
+      await sendInbox(chatId, authorizedChat, deps);
+      return;
     case "/goals":
       await sendTelegramMessage(chatId, buildingMessage, deps);
       return;
@@ -174,6 +181,8 @@ async function routeCallbackQuery(
         await sendToday(chatId, authorizedChat, deps);
         return;
       case "inbox":
+        await sendInbox(chatId, authorizedChat, deps);
+        return;
       case "goals":
         await sendTelegramMessage(chatId, buildingMessage, deps);
         return;
@@ -206,6 +215,57 @@ async function sendToday(
       deps
     );
   }
+}
+
+async function sendInbox(
+  chatId: string,
+  authorizedChat: AuthorizedChat,
+  deps: TelegramBotDeps
+): Promise<void> {
+  try {
+    const inboxItems = await fetchUnprocessedInboxItems(
+      authorizedChat.userId,
+      deps
+    );
+    await sendTelegramMessage(chatId, formatInboxItemsMessage(inboxItems), deps);
+  } catch (error) {
+    await sendTelegramMessage(
+      chatId,
+      error instanceof Error ? error.message : "خطا در دریافت صندوق ورودی",
+      deps
+    );
+  }
+}
+
+function formatInboxItemsMessage(items: InboxItem[]): string {
+  if (items.length === 0) {
+    return "✅ صندوق ورودی خالی است!";
+  }
+
+  const visibleItems = items.slice(0, 10);
+  const hasMoreItems = getInboxTotalUnprocessed(items) > visibleItems.length;
+  const lines = visibleItems.map((item) => {
+    const prefix =
+      item.type === "task"
+        ? "☑️"
+        : item.type === "idea"
+          ? "💡"
+          : item.type === "link"
+            ? "🔗"
+            : item.type === "note"
+              ? "📝"
+              : "•";
+    return `${prefix} ${item.content}`;
+  });
+
+  return `📥 صندوق ورودی:\n\n${lines.join("\n")}${
+    hasMoreItems ? "\n_... و موارد بیشتر_" : ""
+  }`;
+}
+
+function getInboxTotalUnprocessed(items: InboxItem[]): number {
+  const metadata = items as InboxItem[] & { totalUnprocessed?: number };
+  return metadata.totalUnprocessed ?? items.length;
 }
 
 function formatTodayTasksMessage(tasks: TodayTask[]): string {
