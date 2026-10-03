@@ -2,6 +2,7 @@ import { SUPABASE_AUTH_STORAGE_KEY } from "@/core/auth/supabaseAuthConfig";
 import { getSupabaseSyncConfiguration } from "@/core/sync";
 
 import type {
+  ReminderDeliveryChannel,
   TelegramReminderPreference,
   TelegramReminderPreferenceInput,
 } from "./telegramReminderSettings";
@@ -24,6 +25,12 @@ type ReminderSettingsResponse = Readonly<{
   message?: string;
   preference?: ReminderPreferenceRow | null;
 }>;
+
+function toReminderChannel(
+  channel: string | null | undefined
+): ReminderDeliveryChannel {
+  return channel === "web_push" ? "web_push" : "telegram";
+}
 
 function readAccessToken(): string | null {
   if (typeof window === "undefined") {
@@ -55,7 +62,7 @@ function toPreference(
 
   return {
     enabled: row.enabled === true,
-    channel: "telegram",
+    channel: toReminderChannel(row.channel),
     telegramChatId: row.telegram_chat_id ?? "",
     timezone: row.timezone ?? defaultTelegramReminderPreference.timezone,
     morningTime: (row.morning_time ?? "08:00").slice(0, 5),
