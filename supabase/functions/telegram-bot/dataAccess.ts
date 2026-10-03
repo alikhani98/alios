@@ -10,6 +10,12 @@ export interface InboxItem {
   type: "note" | "task" | "idea" | "link" | "other";
 }
 
+export interface ActiveGoal {
+  title: string;
+  progressPercent: number;
+  keyResults?: Array<{ title: string; progressPercent: number }>;
+}
+
 type TodayTaskRow = Readonly<{
   payload?: Readonly<Record<string, unknown>>;
 }>;
@@ -114,6 +120,45 @@ export async function fetchUnprocessedInboxItems(
   return items;
 }
 
+export async function fetchActiveGoals(
+  userId: string,
+  deps: DataAccessDeps
+): Promise<ActiveGoal[]> {
+  const query = new URLSearchParams({
+    select: "payload",
+    user_id: `eq.${userId}`,
+    entity: "eq.goals",
+    "payload->>status": "eq.active",
+    order: "created_at.asc",
+  });
+
+  const response = await deps.fetch(
+    `${deps.supabaseUrl}/rest/v1/alios_sync_records?${query.toString()}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${deps.supabaseServiceKey}`,
+        apikey: deps.supabaseServiceKey,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("خطا در دریافت اهداف");
+  }
+
+  const rows = (await response.json()) as TodayTaskRow[];
+  return rows
+    .map((row) => row.payload)
+    .filter(isActiveGoalPayload)
+    .map((payload) => ({
+      title: payload.title,
+      progressPercent: payload.progressPercent,
+      keyResults: payload.keyResults,
+    }));
+}
+
 function isTodayTaskPayload(
   payload: Readonly<Record<string, unknown>> | undefined
 ): payload is TodayTask {
@@ -137,6 +182,29 @@ function isInboxItemPayload(
       payload.type === "idea" ||
       payload.type === "link" ||
       payload.type === "other")
+  );
+}
+
+function isActiveGoalPayload(
+  payload: Readonly<Record<string, unknown>> | undefined
+): payload is ActiveGoal {
+  return (
+    typeof payload?.title === "string" &&
+    typeof payload.progressPercent === "number" &&
+    (payload.keyResults === undefined ||
+      (Array.isArray(payload.keyResults) &&
+        payload.keyResults.every(isGoalKeyResultPayload)))
+  );
+}
+
+function isGoalKeyResultPayload(
+  value: unknown
+): value is { title: string; progressPercent: number } {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    typeof (value as { title?: unknown }).title === "string" &&
+    typeof (value as { progressPercent?: unknown }).progressPercent === "number"
   );
 }
 

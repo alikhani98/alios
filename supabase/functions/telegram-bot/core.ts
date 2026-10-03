@@ -1,6 +1,8 @@
 import {
+  fetchActiveGoals,
   fetchTodayTasks,
   fetchUnprocessedInboxItems,
+  type ActiveGoal,
   type InboxItem,
   type TodayTask,
 } from "./dataAccess.ts";
@@ -46,7 +48,6 @@ type AuthorizedChat = Readonly<{
 }>;
 
 const unauthorizedMessage = "⛔ دسترسی مجاز نیست.";
-const buildingMessage = "در دست ساخت 🔧";
 const unknownCommandMessage = "دستور شناخته نشد. /menu";
 const menuMessage = "AliOS — چه اطلاعاتی می‌خواهید؟";
 
@@ -162,7 +163,7 @@ async function routeTextCommand(
       await sendInbox(chatId, authorizedChat, deps);
       return;
     case "/goals":
-      await sendTelegramMessage(chatId, buildingMessage, deps);
+      await sendGoals(chatId, authorizedChat, deps);
       return;
     default:
       await sendTelegramMessage(chatId, unknownCommandMessage, deps);
@@ -184,7 +185,7 @@ async function routeCallbackQuery(
         await sendInbox(chatId, authorizedChat, deps);
         return;
       case "goals":
-        await sendTelegramMessage(chatId, buildingMessage, deps);
+        await sendGoals(chatId, authorizedChat, deps);
         return;
       default:
         await sendTelegramMessage(chatId, unknownCommandMessage, deps);
@@ -215,6 +216,50 @@ async function sendToday(
       deps
     );
   }
+}
+
+async function sendGoals(
+  chatId: string,
+  authorizedChat: AuthorizedChat,
+  deps: TelegramBotDeps
+): Promise<void> {
+  try {
+    const goals = await fetchActiveGoals(authorizedChat.userId, deps);
+    await sendTelegramMessage(chatId, formatActiveGoalsMessage(goals), deps);
+  } catch (error) {
+    await sendTelegramMessage(
+      chatId,
+      error instanceof Error ? error.message : "خطا در دریافت اهداف",
+      deps
+    );
+  }
+}
+
+function formatActiveGoalsMessage(goals: ActiveGoal[]): string {
+  if (goals.length === 0) {
+    return "🎯 هیچ هدف فعالی وجود ندارد.";
+  }
+
+  const goalBlocks = goals.map((goal) => {
+    const keyResultLines =
+      goal.keyResults
+        ?.map((keyResult) => `  • ${keyResult.title}: ${keyResult.progressPercent}٪`)
+        .join("\n") ?? "";
+    const progressLine = `${buildProgressBar(goal.progressPercent)} ${goal.progressPercent}٪`;
+
+    return [goal.title, progressLine, keyResultLines]
+      .filter((line) => line.length > 0)
+      .join("\n");
+  });
+
+  return `🎯 اهداف فعال:\n\n${goalBlocks.join("\n\n")}`;
+}
+
+function buildProgressBar(progressPercent: number): string {
+  const filledCount = Math.round(
+    Math.min(100, Math.max(0, progressPercent)) / 10
+  );
+  return `${"█".repeat(filledCount)}${"░".repeat(10 - filledCount)}`;
 }
 
 async function sendInbox(

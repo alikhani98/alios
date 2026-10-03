@@ -54,7 +54,8 @@ function callbackUpdate(data: string, chatId = 12345) {
 function createFetchMock(
   authorized = true,
   todayTasks: ReadonlyArray<Record<string, unknown>> = [],
-  inboxItems: ReadonlyArray<Record<string, unknown>> = []
+  inboxItems: ReadonlyArray<Record<string, unknown>> = [],
+  goals: ReadonlyArray<Record<string, unknown>> = []
 ) {
   return vi.fn<typeof fetch>().mockImplementation((url) => {
     const urlText = String(url);
@@ -69,6 +70,12 @@ function createFetchMock(
       if (urlText.includes("entity=eq.inboxItems")) {
         return Promise.resolve(
           jsonResponse(inboxItems.map((payload) => ({ payload })))
+        );
+      }
+
+      if (urlText.includes("entity=eq.goals")) {
+        return Promise.resolve(
+          jsonResponse(goals.map((payload) => ({ payload })))
         );
       }
 
@@ -113,6 +120,17 @@ function inboxPayload(input: Partial<Record<string, unknown>>) {
     content: "Inbox item",
     type: "note",
     status: "unprocessed",
+    createdAt: "2026-10-03T00:00:00.000Z",
+    updatedAt: "2026-10-03T00:00:00.000Z",
+    ...input,
+  };
+}
+
+function goalPayload(input: Partial<Record<string, unknown>>) {
+  return {
+    title: "Goal",
+    status: "active",
+    progressPercent: 0,
     createdAt: "2026-10-03T00:00:00.000Z",
     updatedAt: "2026-10-03T00:00:00.000Z",
     ...input,
@@ -401,12 +419,115 @@ describe("telegram-bot Edge Function core", () => {
     );
   });
 
-  it("replies to the goals callback with the stub message", async () => {
+  it("replies to /goals with an empty-state message when no active goals exist", async () => {
     const fetchMock = createFetchMock(true);
+
+    await handleTelegramUpdate(createRequest(messageUpdate("/goals")), deps(fetchMock));
+
+    expect(firstTelegramMessageBody(fetchMock)).toContain(
+      "🎯 هیچ هدف فعالی وجود ندارد."
+    );
+  });
+
+  it("formats a 0 percent goal with an empty progress bar", async () => {
+    const fetchMock = createFetchMock(true, [], [], [
+      goalPayload({ title: "Zero goal", progressPercent: 0 }),
+    ]);
+
+    await handleTelegramUpdate(createRequest(messageUpdate("/goals")), deps(fetchMock));
+
+    expect(firstTelegramMessageBody(fetchMock)).toContain(
+      "Zero goal\\n░░░░░░░░░░ 0٪"
+    );
+  });
+
+  it("formats a 100 percent goal with a full progress bar", async () => {
+    const fetchMock = createFetchMock(true, [], [], [
+      goalPayload({ title: "Full goal", progressPercent: 100 }),
+    ]);
+
+    await handleTelegramUpdate(createRequest(messageUpdate("/goals")), deps(fetchMock));
+
+    expect(firstTelegramMessageBody(fetchMock)).toContain(
+      "Full goal\\n██████████ 100٪"
+    );
+  });
+
+  it("formats a 50 percent goal with a half progress bar", async () => {
+    const fetchMock = createFetchMock(true, [], [], [
+      goalPayload({ title: "Half goal", progressPercent: 50 }),
+    ]);
+
+    await handleTelegramUpdate(createRequest(messageUpdate("/goals")), deps(fetchMock));
+
+    expect(firstTelegramMessageBody(fetchMock)).toContain(
+      "Half goal\\n█████░░░░░ 50٪"
+    );
+  });
+
+  it("includes key result titles in the goals message", async () => {
+    const fetchMock = createFetchMock(true, [], [], [
+      goalPayload({
+        title: "Goal with KRs",
+        progressPercent: 30,
+        keyResults: [
+          { title: "First KR", progressPercent: 25 },
+          { title: "Second KR", progressPercent: 40 },
+        ],
+      }),
+    ]);
+
+    await handleTelegramUpdate(createRequest(messageUpdate("/goals")), deps(fetchMock));
+
+    const body = firstTelegramMessageBody(fetchMock);
+    expect(body).toContain("  • First KR: 25٪");
+    expect(body).toContain("  • Second KR: 40٪");
+  });
+
+  it("omits key result bullet lines when a goal has no key results", async () => {
+    const fetchMock = createFetchMock(true, [], [], [
+      goalPayload({ title: "No KR goal", progressPercent: 20 }),
+    ]);
+
+    await handleTelegramUpdate(createRequest(messageUpdate("/goals")), deps(fetchMock));
+
+    expect(firstTelegramMessageBody(fetchMock)).not.toContain("  • ");
+  });
+
+  it("replies with a Farsi error when active goals cannot be fetched", async () => {
+    const fetchMock = vi.fn<typeof fetch>().mockImplementation((url) => {
+      const urlText = String(url);
+
+      if (urlText.includes("reminder_preferences")) {
+        return Promise.resolve(jsonResponse([{ user_id: "user-1", timezone: "UTC" }]));
+      }
+
+      if (urlText.includes("alios_sync_records")) {
+        return Promise.resolve(jsonResponse({ message: "failure" }, 500));
+      }
+
+      if (urlText.includes("api.telegram.org")) {
+        return Promise.resolve(jsonResponse({ ok: true, result: {} }));
+      }
+
+      return Promise.resolve(jsonResponse({ ok: true }));
+    });
+
+    await handleTelegramUpdate(createRequest(messageUpdate("/goals")), deps(fetchMock));
+
+    expect(firstTelegramMessageBody(fetchMock)).toContain("خطا در دریافت اهداف");
+  });
+
+  it("uses the same goals handler for callback_query updates", async () => {
+    const fetchMock = createFetchMock(true, [], [], [
+      goalPayload({ title: "Callback goal", progressPercent: 50 }),
+    ]);
 
     await handleTelegramUpdate(createRequest(callbackUpdate("goals")), deps(fetchMock));
 
-    expect(firstTelegramMessageBody(fetchMock)).toContain("در دست ساخت");
+    expect(firstTelegramMessageBody(fetchMock)).toContain(
+      "Callback goal\\n█████░░░░░ 50٪"
+    );
   });
 
   it("always answers callback_query updates after routing", async () => {
