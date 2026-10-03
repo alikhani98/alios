@@ -217,13 +217,6 @@ export function TelegramReminderSettings() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <label className="space-y-2">
-          <span className="text-sm font-medium">
-            {t("settings.telegramReminderChannel")}
-          </span>
-          <Input value={t("settings.telegramReminderChannelTelegram")} disabled />
-        </label>
-
         <label className="flex min-h-11 items-center gap-3 rounded-xl border bg-background/80 px-3 py-2">
           <input
             type="checkbox"
