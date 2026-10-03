@@ -1,4 +1,5 @@
 import {
+  createInboxItem,
   fetchActiveGoals,
   fetchTodayTasks,
   fetchUnprocessedInboxItems,
@@ -165,6 +166,12 @@ async function routeTextCommand(
     case "/goals":
       await sendGoals(chatId, authorizedChat, deps);
       return;
+    case "/add":
+      await sendAddTask(chatId, text, authorizedChat, deps);
+      return;
+    case "/note":
+      await sendNote(chatId, text, authorizedChat, deps);
+      return;
     default:
       await sendTelegramMessage(chatId, unknownCommandMessage, deps);
   }
@@ -186,6 +193,20 @@ async function routeCallbackQuery(
         return;
       case "goals":
         await sendGoals(chatId, authorizedChat, deps);
+        return;
+      case "add_task":
+        await sendTelegramMessage(
+          chatId,
+          "برای افزودن task بنویسید:\n/add متن task\nمثال: /add خرید نان !high",
+          deps
+        );
+        return;
+      case "add_note":
+        await sendTelegramMessage(
+          chatId,
+          "برای افزودن یادداشت بنویسید:\n/note متن یادداشت\nمثال: /note ایده جالب",
+          deps
+        );
         return;
       default:
         await sendTelegramMessage(chatId, unknownCommandMessage, deps);
@@ -216,6 +237,95 @@ async function sendToday(
       deps
     );
   }
+}
+
+async function sendAddTask(
+  chatId: string,
+  text: string,
+  authorizedChat: AuthorizedChat,
+  deps: TelegramBotDeps
+): Promise<void> {
+  const parsed = parseAddCommand(text);
+  if (!parsed) {
+    await sendTelegramMessage(
+      chatId,
+      "لطفاً متن task را وارد کنید.\nمثال: /add خرید نان !high",
+      deps
+    );
+    return;
+  }
+
+  try {
+    await createInboxItem(
+      authorizedChat.userId,
+      { content: parsed.content, type: "task", priority: parsed.priority },
+      deps
+    );
+
+    const priorityLine =
+      parsed.priority === "high"
+        ? "\n🔴 اولویت: بالا"
+        : parsed.priority === "low"
+          ? "\n⚪ اولویت: پایین"
+          : "";
+    await sendTelegramMessage(
+      chatId,
+      `✅ task اضافه شد!\n📝 ${parsed.content}${priorityLine}`,
+      deps
+    );
+  } catch {
+    await sendTelegramMessage(chatId, "خطا در ذخیره‌سازی", deps);
+  }
+}
+
+async function sendNote(
+  chatId: string,
+  text: string,
+  authorizedChat: AuthorizedChat,
+  deps: TelegramBotDeps
+): Promise<void> {
+  const parsed = parseAddCommand(text);
+  if (!parsed) {
+    await sendTelegramMessage(
+      chatId,
+      "لطفاً متن یادداشت را وارد کنید.\nمثال: /note ایده جالب",
+      deps
+    );
+    return;
+  }
+
+  try {
+    await createInboxItem(
+      authorizedChat.userId,
+      { content: parsed.content, type: "note" },
+      deps
+    );
+    await sendTelegramMessage(
+      chatId,
+      `✅ یادداشت اضافه شد!\n📝 ${parsed.content}`,
+      deps
+    );
+  } catch {
+    await sendTelegramMessage(chatId, "خطا در ذخیره‌سازی", deps);
+  }
+}
+
+function parseAddCommand(
+  text: string
+): { content: string; priority: "high" | "medium" | "low" } | null {
+  const contentWithFlags = text
+    .trim()
+    .replace(/^\/(?:add|note)\b/i, "")
+    .trim();
+  const hasHighPriority = /(^|\s)!high(?=\s|$)/i.test(contentWithFlags);
+  const hasLowPriority = /(^|\s)!low(?=\s|$)/i.test(contentWithFlags);
+  const priority = hasHighPriority ? "high" : hasLowPriority ? "low" : "medium";
+  const content = contentWithFlags
+    .replace(/(^|\s)!(?:high|low)(?=\s|$)/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  return content.length > 0 ? { content, priority } : null;
 }
 
 async function sendGoals(
@@ -356,6 +466,10 @@ export async function sendMenu(
         { text: "📥 Inbox", callback_data: "inbox" },
       ],
       [{ text: "🎯 Goals", callback_data: "goals" }],
+      [
+        { text: "➕ افزودن task", callback_data: "add_task" },
+        { text: "📝 یادداشت", callback_data: "add_note" },
+      ],
     ],
   });
 }

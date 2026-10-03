@@ -57,7 +57,7 @@ function createFetchMock(
   inboxItems: ReadonlyArray<Record<string, unknown>> = [],
   goals: ReadonlyArray<Record<string, unknown>> = []
 ) {
-  return vi.fn<typeof fetch>().mockImplementation((url) => {
+  return vi.fn<typeof fetch>().mockImplementation((url, init) => {
     const urlText = String(url);
 
     if (urlText.includes("reminder_preferences")) {
@@ -67,6 +67,10 @@ function createFetchMock(
     }
 
     if (urlText.includes("alios_sync_records")) {
+      if (init?.method === "POST") {
+        return Promise.resolve(jsonResponse(null, 201));
+      }
+
       if (urlText.includes("entity=eq.inboxItems")) {
         return Promise.resolve(
           jsonResponse(inboxItems.map((payload) => ({ payload })))
@@ -102,6 +106,26 @@ function firstTelegramMessageBody(
   fetchMock: ReturnType<typeof createFetchMock>
 ): string {
   return String(telegramMessages(fetchMock)[0]?.[1]?.body);
+}
+
+function aliosSyncRecordWrites(fetchMock: ReturnType<typeof createFetchMock>) {
+  return fetchMock.mock.calls.filter(
+    ([url, init]) =>
+      String(url).includes("alios_sync_records") && init?.method === "POST"
+  );
+}
+
+function firstAliosSyncRecordWriteBody(
+  fetchMock: ReturnType<typeof createFetchMock>
+) {
+  return JSON.parse(String(aliosSyncRecordWrites(fetchMock)[0]?.[1]?.body)) as {
+    user_id: string;
+    entity: string;
+    record_id: string;
+    payload: Record<string, unknown>;
+    updated_at: string;
+    created_at: string;
+  };
 }
 
 function taskPayload(input: Partial<Record<string, unknown>>) {
@@ -192,6 +216,10 @@ describe("telegram-bot Edge Function core", () => {
     expect(body).toContain("today");
     expect(body).toContain("inbox");
     expect(body).toContain("goals");
+    expect(body).toContain("add_task");
+    expect(body).toContain("add_note");
+    expect(body).toContain("➕ افزودن task");
+    expect(body).toContain("📝 یادداشت");
   });
 
   it("routes /menu to the Telegram menu", async () => {
@@ -211,6 +239,145 @@ describe("telegram-bot Edge Function core", () => {
 
     expect(String(telegramMessages(fetchMock)[0]?.[1]?.body)).toContain(
       "دستور شناخته نشد"
+    );
+  });
+
+  it("creates a task inbox item from /add with content", async () => {
+    const fetchMock = createFetchMock(true);
+
+    await handleTelegramUpdate(createRequest(messageUpdate("/add خرید نان")), deps(fetchMock));
+
+    const body = firstAliosSyncRecordWriteBody(fetchMock);
+    expect(body.user_id).toBe("user-1");
+    expect(body.entity).toBe("inboxItems");
+    expect(body.record_id).toBe(body.payload.id);
+    expect(body.payload.content).toBe("خرید نان");
+    expect(body.payload.type).toBe("task");
+    expect(body.payload.status).toBe("unprocessed");
+    expect(body.payload.priority).toBe("medium");
+    expect(firstTelegramMessageBody(fetchMock)).toContain("✅ task اضافه شد!");
+  });
+
+  it("creates a high-priority task and removes the !high flag", async () => {
+    const fetchMock = createFetchMock(true);
+
+    await handleTelegramUpdate(
+      createRequest(messageUpdate("/add خرید نان !high")),
+      deps(fetchMock)
+    );
+
+    const body = firstAliosSyncRecordWriteBody(fetchMock);
+    expect(body.payload.content).toBe("خرید نان");
+    expect(body.payload.priority).toBe("high");
+    expect(firstTelegramMessageBody(fetchMock)).toContain("🔴 اولویت: بالا");
+  });
+
+  it("creates a low-priority task and removes the !low flag", async () => {
+    const fetchMock = createFetchMock(true);
+
+    await handleTelegramUpdate(
+      createRequest(messageUpdate("/add خرید نان !low")),
+      deps(fetchMock)
+    );
+
+    const body = firstAliosSyncRecordWriteBody(fetchMock);
+    expect(body.payload.content).toBe("خرید نان");
+    expect(body.payload.priority).toBe("low");
+    expect(firstTelegramMessageBody(fetchMock)).toContain("⚪ اولویت: پایین");
+  });
+
+  it("replies with instructions for an empty /add command without creating an item", async () => {
+    const fetchMock = createFetchMock(true);
+
+    await handleTelegramUpdate(createRequest(messageUpdate("/add !high")), deps(fetchMock));
+
+    expect(aliosSyncRecordWrites(fetchMock)).toHaveLength(0);
+    expect(firstTelegramMessageBody(fetchMock)).toContain(
+      "لطفاً متن task را وارد کنید."
+    );
+  });
+
+  it("creates a note inbox item from /note with content", async () => {
+    const fetchMock = createFetchMock(true);
+
+    await handleTelegramUpdate(
+      createRequest(messageUpdate("/note ایده جالب")),
+      deps(fetchMock)
+    );
+
+    const body = firstAliosSyncRecordWriteBody(fetchMock);
+    expect(body.payload.content).toBe("ایده جالب");
+    expect(body.payload.type).toBe("note");
+    expect(body.payload.priority).toBeUndefined();
+    expect(firstTelegramMessageBody(fetchMock)).toContain(
+      "✅ یادداشت اضافه شد!"
+    );
+  });
+
+  it("replies with instructions for an empty /note command without creating an item", async () => {
+    const fetchMock = createFetchMock(true);
+
+    await handleTelegramUpdate(createRequest(messageUpdate("/note")), deps(fetchMock));
+
+    expect(aliosSyncRecordWrites(fetchMock)).toHaveLength(0);
+    expect(firstTelegramMessageBody(fetchMock)).toContain(
+      "لطفاً متن یادداشت را وارد کنید."
+    );
+  });
+
+  it("replies with a Farsi error when an inbox item cannot be created", async () => {
+    const fetchMock = vi.fn<typeof fetch>().mockImplementation((url, init) => {
+      const urlText = String(url);
+
+      if (urlText.includes("reminder_preferences")) {
+        return Promise.resolve(jsonResponse([{ user_id: "user-1", timezone: "UTC" }]));
+      }
+
+      if (urlText.includes("alios_sync_records") && init?.method === "POST") {
+        return Promise.resolve(jsonResponse({ message: "failure" }, 500));
+      }
+
+      if (urlText.includes("api.telegram.org")) {
+        return Promise.resolve(jsonResponse({ ok: true, result: {} }));
+      }
+
+      return Promise.resolve(jsonResponse({ ok: true }));
+    });
+
+    await handleTelegramUpdate(createRequest(messageUpdate("/add خرید نان")), deps(fetchMock));
+
+    expect(
+      String(
+        fetchMock.mock.calls.find(([url]) =>
+          String(url).includes("/sendMessage")
+        )?.[1]?.body
+      )
+    ).toContain("خطا در ذخیره‌سازی");
+  });
+
+  it("replies with add-task instructions for the add_task callback", async () => {
+    const fetchMock = createFetchMock(true);
+
+    await handleTelegramUpdate(createRequest(callbackUpdate("add_task")), deps(fetchMock));
+
+    expect(firstTelegramMessageBody(fetchMock)).toContain(
+      "برای افزودن task بنویسید:"
+    );
+    expect(firstTelegramMessageBody(fetchMock)).toContain(
+      "مثال: /add خرید نان !high"
+    );
+  });
+
+  it("replies with add-note instructions for the add_note callback", async () => {
+    const fetchMock = createFetchMock(true);
+
+    await handleTelegramUpdate(createRequest(callbackUpdate("add_note")), deps(fetchMock));
+
+    expect(firstTelegramMessageBody(fetchMock)).toContain(
+      "برای افزودن یادداشت بنویسید:"
+    );
+    expect(firstTelegramMessageBody(fetchMock)).toContain(
+      "مثال: /note ایده جالب"
     );
   });
 

@@ -159,6 +159,54 @@ export async function fetchActiveGoals(
     }));
 }
 
+export async function createInboxItem(
+  userId: string,
+  item: {
+    content: string;
+    type: "task" | "note";
+    priority?: "high" | "medium" | "low";
+  },
+  deps: DataAccessDeps
+): Promise<void> {
+  const id = crypto.randomUUID();
+  const createdAt = new Date().toISOString();
+  const updatedAt = createdAt;
+  const payload = {
+    id,
+    content: item.content,
+    type: item.type,
+    status: "unprocessed",
+    createdAt,
+    updatedAt,
+    ...(item.priority ? { priority: item.priority } : {}),
+  };
+
+  const response = await deps.fetch(
+    `${deps.supabaseUrl}/rest/v1/alios_sync_records?on_conflict=user_id,entity,record_id`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${deps.supabaseServiceKey}`,
+        apikey: deps.supabaseServiceKey,
+        "Content-Type": "application/json",
+        Prefer: "resolution=merge-duplicates,return=minimal",
+      },
+      body: JSON.stringify({
+        user_id: userId,
+        entity: "inboxItems",
+        record_id: id,
+        payload,
+        updated_at: updatedAt,
+        created_at: createdAt,
+      }),
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("خطا در ذخیره‌سازی");
+  }
+}
+
 function isTodayTaskPayload(
   payload: Readonly<Record<string, unknown>> | undefined
 ): payload is TodayTask {
