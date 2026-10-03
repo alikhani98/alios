@@ -1,6 +1,8 @@
+export type ReminderDeliveryChannel = "telegram" | "web_push";
+
 export type TelegramReminderPreference = Readonly<{
   enabled: boolean;
-  channel: "telegram";
+  channel: ReminderDeliveryChannel;
   telegramChatId: string;
   timezone: string;
   morningTime: string;
@@ -9,7 +11,7 @@ export type TelegramReminderPreference = Readonly<{
 
 export type TelegramReminderPreferenceInput = Readonly<{
   enabled: boolean;
-  channel: "telegram";
+  channel: ReminderDeliveryChannel;
   telegramChatId: string;
   timezone: string;
   morningTime: string;
@@ -50,12 +52,12 @@ export function isValidReminderTimeZone(value: string): boolean {
 export function validateTelegramReminderPreference(
   input: TelegramReminderPreferenceInput
 ): string | null {
-  if (input.channel !== "telegram") {
+  if (input.channel !== "telegram" && input.channel !== "web_push") {
     return "settings.telegramReminderChannelValidation";
   }
 
   const chatId = input.telegramChatId.trim();
-  if (input.enabled && chatId.length === 0) {
+  if (input.enabled && input.channel === "telegram" && chatId.length === 0) {
     return "settings.telegramReminderChatIdRequired";
   }
 
@@ -79,7 +81,7 @@ export function normalizeTelegramReminderPreference(
 ): TelegramReminderPreferenceInput {
   return {
     enabled: input.enabled,
-    channel: "telegram",
+    channel: input.channel,
     telegramChatId: input.telegramChatId.trim(),
     timezone: input.timezone.trim() || "UTC",
     morningTime: input.morningTime,

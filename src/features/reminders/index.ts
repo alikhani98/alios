@@ -1,5 +1,6 @@
 export * from "./localReminderResolver";
 export * from "./components/LocalReminderPanel";
+export * from "./components/ReminderChannelSelector";
 export * from "./components/TelegramReminderSettings";
 export * from "./components/WebPushReminderSettings";
 export * from "./telegramReminderSettings";
