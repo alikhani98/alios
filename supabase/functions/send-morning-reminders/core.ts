@@ -25,6 +25,7 @@ export type ReminderItem = Readonly<{
   title: string;
   due_date?: string;
   obligation_date?: string;
+  type?: "weekly_review";
 }>;
 
 export type ReminderBatch = Readonly<{
@@ -32,6 +33,7 @@ export type ReminderBatch = Readonly<{
   telegram_chat_id: string | null;
   task_due: ReminderItem[];
   finance_obligation: ReminderItem[];
+  weekly_review: ReminderItem[];
 }>;
 
 export type MorningRemindersDependencies = Readonly<{
@@ -74,7 +76,11 @@ export async function processMorningReminders(
   for (const user of eligibleUsers) {
     const batch = await collectReminderItemsForUser(user, deps);
 
-    if (batch.task_due.length === 0 && batch.finance_obligation.length === 0) {
+    if (
+      batch.task_due.length === 0 &&
+      batch.finance_obligation.length === 0 &&
+      batch.weekly_review.length === 0
+    ) {
       continue;
     }
 
@@ -183,6 +189,10 @@ function buildWebPushPayload(
         batch.finance_obligation.length === 1 ? "" : "s"
       } due`
     );
+  }
+
+  if (batch.weekly_review.length > 0) {
+    summary.push("weekly review reminder");
   }
 
   return {
@@ -357,12 +367,22 @@ async function collectReminderItemsForUser(
 ): Promise<ReminderBatch> {
   const taskDue = await fetchDueTasks(user.user_id, user.timezone, deps);
   const financeObligation = await fetchFinanceObligations(user.user_id, user.timezone, deps);
+  const weeklyReviewReminder = isLocalFriday(user.timezone)
+    ? [
+        {
+          id: "weekly-review",
+          title: "weeklyReview",
+          type: "weekly_review" as const,
+        },
+      ]
+    : [];
 
   return {
     user_id: user.user_id,
     telegram_chat_id: user.telegram_chat_id,
     task_due: taskDue,
     finance_obligation: financeObligation,
+    weekly_review: weeklyReviewReminder,
   };
 }
 
@@ -537,6 +557,13 @@ async function sendTelegramReminder(
       lines.push(`${remainingFinance} تعهد مالی دیگر +`);
     }
   }
+
+  if (batch.weekly_review.length > 0) {
+    lines.push("");
+    lines.push("📋 مرور هفتگی:");
+    lines.push("• وقت مرور هفته است! AliOS را باز کنید.");
+  }
+
   const message = lines.join("\n");
 
   try {
@@ -593,14 +620,18 @@ async function logDelivery(
   success: boolean,
   deps: MorningRemindersDependencies
 ): Promise<void> {
-  const totalItems = batch.task_due.length + batch.finance_obligation.length;
-
   const categories: Array<{ category: string; count: number }> = [];
   if (batch.task_due.length > 0) {
     categories.push({ category: "task_due", count: batch.task_due.length });
   }
   if (batch.finance_obligation.length > 0) {
     categories.push({ category: "finance_obligation", count: batch.finance_obligation.length });
+  }
+  if (batch.weekly_review.length > 0) {
+    categories.push({
+      category: "weekly_review",
+      count: batch.weekly_review.length,
+    });
   }
 
   for (const { category, count } of categories) {
@@ -647,6 +678,12 @@ async function logWebPushDelivery(
     categories.push({
       category: "finance_obligation",
       count: batch.finance_obligation.length,
+    });
+  }
+  if (batch.weekly_review.length > 0) {
+    categories.push({
+      category: "weekly_review",
+      count: batch.weekly_review.length,
     });
   }
 
@@ -703,6 +740,15 @@ function getTodayInTimezone(timezone: string): string {
   });
 
   return formatter.format(new Date());
+}
+
+function isLocalFriday(timezone: string): boolean {
+  const now = new Date();
+  const localDateStr = now.toLocaleDateString("en-US", {
+    timeZone: timezone,
+    weekday: "long",
+  });
+  return localDateStr === "Friday";
 }
 
 function parseDateOnlyParts(

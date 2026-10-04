@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { processMorningReminders } from "./core";
 
@@ -71,8 +71,31 @@ function createFetchMock() {
     .mockResolvedValueOnce(new Response(null, { status: 201 }));
 }
 
+function createWeeklyReviewFetchMock(timezone = "Asia/Tehran") {
+  return vi
+    .fn<typeof fetch>()
+    .mockResolvedValueOnce(
+      jsonResponse([{ ...eligiblePreference(), timezone }])
+    )
+    .mockResolvedValueOnce(jsonResponse([]))
+    .mockResolvedValueOnce(jsonResponse([]))
+    .mockResolvedValueOnce(jsonResponse([]))
+    .mockResolvedValueOnce(jsonResponse([claimedDelivery("telegram")]))
+    .mockResolvedValueOnce(jsonResponse({ ok: true }))
+    .mockResolvedValueOnce(new Response(null, { status: 204 }))
+    .mockResolvedValueOnce(jsonResponse(true))
+    .mockResolvedValueOnce(new Response(null, { status: 201 }));
+}
+
 describe("send-morning-reminders delivery flow", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it("keeps the existing Telegram delivery flow when Web Push is not configured", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-10-03T08:00:00Z"));
+
     const fetchMock = createFetchMock();
 
     const result = await processMorningReminders(
@@ -103,6 +126,9 @@ describe("send-morning-reminders delivery flow", () => {
   });
 
   it("aggregates Web Push separately and logs it without changing Telegram success", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-10-03T08:00:00Z"));
+
     const fetchMock = createFetchMock();
     const sendWebPush = vi.fn().mockResolvedValue({
       successCount: 2,
@@ -150,6 +176,58 @@ describe("send-morning-reminders delivery flow", () => {
     );
     expect(String(webPushLogCall?.[1]?.body)).toContain(
       '"removed_count":1'
+    );
+  });
+
+  it("includes a weekly review reminder on Friday in the user's timezone", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-10-01T21:00:00Z"));
+
+    const fetchMock = createWeeklyReviewFetchMock();
+
+    const result = await processMorningReminders(baseDependencies(fetchMock));
+
+    expect(result.sent).toBe(1);
+
+    const weeklyReviewLogCall = fetchMock.mock.calls.find(([url, options]) =>
+      String(url).includes("reminder_delivery_log") &&
+      String(options?.body).includes('"category":"weekly_review"')
+    );
+    expect(weeklyReviewLogCall).toBeDefined();
+  });
+
+  it("does not include a weekly review reminder on non-Friday in the user's timezone", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-10-02T21:00:00Z"));
+
+    const fetchMock = createWeeklyReviewFetchMock();
+
+    const result = await processMorningReminders(baseDependencies(fetchMock));
+
+    expect(result.sent).toBe(0);
+    expect(
+      fetchMock.mock.calls.some(([url]) =>
+        String(url).includes("api.telegram.org")
+      )
+    ).toBe(false);
+  });
+
+  it("renders the weekly review section in the Telegram message on Friday", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-10-01T21:00:00Z"));
+
+    const fetchMock = createWeeklyReviewFetchMock();
+
+    await processMorningReminders(baseDependencies(fetchMock));
+
+    const telegramCall = fetchMock.mock.calls.find(([url]) =>
+      String(url).includes("api.telegram.org")
+    );
+    const telegramBody = JSON.parse(String(telegramCall?.[1]?.body));
+
+    expect(telegramBody.text).toContain("📋 مرور هفتگی:");
+    expect(telegramBody.text).toContain(
+      "• وقت مرور هفته است! AliOS را باز کنید."
     );
   });
 });
