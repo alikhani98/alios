@@ -51,6 +51,22 @@ type AuthorizedChat = Readonly<{
 const unauthorizedMessage = "⛔ دسترسی مجاز نیست.";
 const unknownCommandMessage = "دستور شناخته نشد. /menu";
 const menuMessage = "AliOS — چه اطلاعاتی می‌خواهید؟";
+const helpMessage = `🤖 دستورهای AliOS Bot:
+
+📖 *مشاهده*
+/today — وظایف امروز
+/inbox — صندوق ورودی
+/goals — اهداف فعال
+/menu — منوی اصلی
+
+✏️ *افزودن*
+/add متن — افزودن task جدید
+/add متن !high — با اولویت بالا
+/add متن !low — با اولویت پایین
+/note متن — افزودن یادداشت
+
+❓ *راهنما*
+/help — نمایش این راهنما`;
 
 export async function handleTelegramUpdate(
   request: Request,
@@ -157,6 +173,9 @@ async function routeTextCommand(
     case "/menu":
       await sendMenu(chatId, deps);
       return;
+    case "/help":
+      await sendHelp(chatId, deps);
+      return;
     case "/today":
       await sendToday(chatId, authorizedChat, deps);
       return;
@@ -193,6 +212,9 @@ async function routeCallbackQuery(
         return;
       case "goals":
         await sendGoals(chatId, authorizedChat, deps);
+        return;
+      case "help":
+        await sendHelp(chatId, deps);
         return;
       case "add_task":
         await sendTelegramMessage(
@@ -470,8 +492,13 @@ export async function sendMenu(
         { text: "➕ افزودن task", callback_data: "add_task" },
         { text: "📝 یادداشت", callback_data: "add_note" },
       ],
+      [{ text: "❓ راهنما", callback_data: "help" }],
     ],
   });
+}
+
+async function sendHelp(chatId: string, deps: TelegramBotDeps): Promise<void> {
+  await sendTelegramMessage(chatId, helpMessage, deps);
 }
 
 async function sendTelegramMessage(
