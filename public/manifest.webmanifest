@@ -22,7 +22,7 @@
     }
   ],
   "share_target": {
-    "action": "/#/inbox",
+    "action": "./#/inbox",
     "method": "GET",
     "params": {
       "title": "title",
