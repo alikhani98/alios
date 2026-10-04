@@ -52,6 +52,7 @@ import { FinanceAssetCard } from "../components/FinanceAssetCard";
 import { FinanceAssetForm } from "../components/FinanceAssetForm";
 import { FinanceCategoryBudgetForm } from "../components/FinanceCategoryBudgetForm";
 import { FinanceCsvImportSection } from "../components/FinanceCsvImportSection";
+import { FinanceForecastCard } from "../components/FinanceForecastCard";
 import { FinanceTransactionCard } from "../components/FinanceTransactionCard";
 import { FinanceTransactionForm } from "../components/FinanceTransactionForm";
 import {
@@ -1363,6 +1364,12 @@ export function FinancePage() {
           </SoftPanel>
         </div>
       </CollapsibleSection>
+
+      <FinanceForecastCard
+        transactions={transactions}
+        obligations={obligations}
+        formatAmount={formatAmount}
+      />
 
       <CollapsibleSection
         id={FINANCE_SECTION_ANCHORS.review}
