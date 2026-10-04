@@ -1393,6 +1393,8 @@ export const messagesFa: Record<TranslationKey, string> = {
   "home.loading": "در حال بارگذاری داشبورد",
   "home.loadError": "بارگذاری داده‌های داشبورد ممکن نشد.",
   "home.emptyTitle": "داشبورد شما آماده است",
+  "home.emptySubtitle": "از کجا شروع کنیم؟",
+  "home.emptyAction": "شروع کن",
   "home.emptyDescription": "اولین کار، پروژه، روزنوشت، مورد دانشی یا بررسی روزانه را اضافه کنید تا خلاصه‌ای کاربردی اینجا ببینید.",
   "home.emptyNote": "از صندوق ورودی، مالی، یا تصمیم‌ها شروع کنید.",
   "home.todayOverview": "نمای کلی امروز",

@@ -1240,6 +1240,8 @@ export const messagesEn = {
   "home.loading": "Loading dashboard",
   "home.loadError": "The dashboard data could not be loaded.",
   "home.emptyTitle": "Your dashboard is ready",
+  "home.emptySubtitle": "Where should we start?",
+  "home.emptyAction": "Start",
   "home.emptyDescription": "Add your first task, project, journal entry, knowledge item, or daily check-in to see a useful overview here.",
   "home.emptyNote": "Start with Inbox, Finance, or Decisions.",
   "home.todayOverview": "Today overview",

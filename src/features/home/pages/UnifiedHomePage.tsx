@@ -32,6 +32,7 @@ import {
   Card,
   CardContent,
   CollapsibleSection,
+  EmptyState,
   MetricCard,
   SectionHeader,
   SoftPanel,
@@ -678,6 +679,18 @@ export function UnifiedHomePage() {
         </div>
       ) : data ? (
         <>
+          {data.isEmpty ? (
+            <EmptyState
+              icon={<Target className="h-6 w-6" aria-hidden="true" />}
+              title={t("home.emptyTitle")}
+              description={t("home.emptySubtitle")}
+              actions={
+                <Button asChild>
+                  <Link to="/today">{t("home.emptyAction")}</Link>
+                </Button>
+              }
+            />
+          ) : null}
           <DailyBriefingCard data={data} />
           <ClearStartCard data={data} />
           <QuickAccessLauncher />
