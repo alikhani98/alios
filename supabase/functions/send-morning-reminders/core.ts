@@ -421,7 +421,8 @@ async function fetchFinanceObligations(
   deps: MorningRemindersDependencies
 ): Promise<ReminderItem[]> {
   const localToday = getTodayInTimezone(timezone);
-  const todayDayOfMonth = new Date(localToday).getDate();
+  const reminderWindowEnd = addDaysToDateOnly(localToday, 3);
+  const upcomingDueDays = getUpcomingDueDays(localToday, 3);
 
   const response = await deps.fetch(
     `${deps.supabaseUrl}/rest/v1/alios_sync_records?user_id=eq.${userId}&entity=eq.financeObligations&select=payload`,
@@ -448,16 +449,26 @@ async function fetchFinanceObligations(
       const status = obligation.status as string | undefined;
       const dueDate = obligation.dueDate as string | undefined;
       const dueDay = obligation.dueDay as number | undefined;
+      const paidAmount = obligation.paidAmount as number | undefined;
+      const totalAmount = obligation.totalAmount as number | undefined;
 
       if (status !== "active") {
         return false;
       }
 
-      if (dueDate && dueDate <= localToday) {
+      if (
+        typeof paidAmount === "number" &&
+        typeof totalAmount === "number" &&
+        paidAmount >= totalAmount
+      ) {
+        return false;
+      }
+
+      if (dueDate && dueDate >= localToday && dueDate <= reminderWindowEnd) {
         return true;
       }
 
-      if (dueDay !== undefined && dueDay <= todayDayOfMonth) {
+      if (dueDay !== undefined && upcomingDueDays.has(dueDay)) {
         return true;
       }
 
@@ -467,7 +478,7 @@ async function fetchFinanceObligations(
       id: obligation.id as string,
       title: obligation.title as string,
       obligation_date: (obligation.dueDate as string | undefined) ??
-        (obligation.dueDay !== undefined ? `day ${obligation.dueDay}` : undefined),
+        (obligation.dueDay !== undefined ? `روز ${obligation.dueDay} ماه` : undefined),
     }));
 }
 
@@ -503,7 +514,7 @@ async function sendTelegramReminder(
   }
 
   if (batch.finance_obligation.length > 0) {
-    lines.push("💰 *Finance Obligations*:");
+    lines.push("💰 *تعهدات مالی*:");
 
     const sortedFinance = [...batch.finance_obligation].sort((a, b) => {
       const dateA = a.obligation_date ?? "9999-12-31";
@@ -523,7 +534,7 @@ async function sendTelegramReminder(
     }
 
     if (remainingFinance > 0) {
-      lines.push(`+ ${remainingFinance} more finance obligations`);
+      lines.push(`${remainingFinance} تعهد مالی دیگر +`);
     }
   }
   const message = lines.join("\n");
@@ -692,6 +703,47 @@ function getTodayInTimezone(timezone: string): string {
   });
 
   return formatter.format(new Date());
+}
+
+function parseDateOnlyParts(
+  value: string
+): { year: number; month: number; day: number } | null {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (!match) {
+    return null;
+  }
+
+  return {
+    year: Number(match[1]),
+    month: Number(match[2]),
+    day: Number(match[3]),
+  };
+}
+
+function addDaysToDateOnly(value: string, daysToAdd: number): string {
+  const parts = parseDateOnlyParts(value);
+  if (!parts) {
+    return value;
+  }
+
+  const date = new Date(Date.UTC(parts.year, parts.month - 1, parts.day + daysToAdd));
+  return date.toISOString().slice(0, 10);
+}
+
+function getUpcomingDueDays(localToday: string, daysAhead: number): Set<number> {
+  const parts = parseDateOnlyParts(localToday);
+  const dueDays = new Set<number>();
+
+  if (!parts) {
+    return dueDays;
+  }
+
+  for (let offset = 0; offset <= daysAhead; offset++) {
+    const date = new Date(Date.UTC(parts.year, parts.month - 1, parts.day + offset));
+    dueDays.add(date.getUTCDate());
+  }
+
+  return dueDays;
 }
 
 function getLocalTimeInTimezone(
