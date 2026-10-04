@@ -1,4 +1,4 @@
-import { AlertCircle, CalendarDays, CheckCircle2, CheckSquare2, Clock3, Plus, Repeat2, RotateCcw, Sparkles, Target } from "lucide-react";
+import { AlertCircle, CalendarDays, CheckCircle2, CheckSquare2, Clock3, ExternalLink, Plus, Repeat2, RotateCcw, Sparkles, Target } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -578,6 +578,22 @@ export function TodayWorkspace({
                 eyebrow={t("home.dailyPlan")}
                 icon={<CalendarDays className="h-5 w-5" />}
                 title={t("today.title")}
+                status={
+                  <Button
+                    asChild
+                    size="icon"
+                    variant="ghost"
+                    className="h-9 w-9 text-muted-foreground hover:text-foreground"
+                  >
+                    <a
+                      href="/#/today-widget"
+                      aria-label={t("today.widgetLink")}
+                      title={t("today.widgetLink")}
+                    >
+                      <ExternalLink className="h-4 w-4" aria-hidden="true" />
+                    </a>
+                  </Button>
+                }
                 description={t("today.description")}
               />
               <div className="grid gap-3 sm:grid-cols-3">

@@ -1761,6 +1761,7 @@ export const messagesEn = {
   "knowledge.template": "Template",
   "today.title": "Today",
   "today.description": "Record today’s state and keep the day’s work focused.",
+  "today.widgetLink": "Today Widget",
   "todayWidget.routines": "Routines",
   "todayWidget.tasks": "Tasks",
   "todayWidget.emptyState": "All done for today! ✅",

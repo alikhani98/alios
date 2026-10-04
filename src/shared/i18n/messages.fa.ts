@@ -1772,6 +1772,7 @@ export const messagesFa: Record<TranslationKey, string> = {
   "knowledge.template": "الگو",
   "today.title": "امروز",
   "today.description": "وضعیت امروز را ثبت کنید و کار روز را متمرکز نگه دارید.",
+  "today.widgetLink": "ویجت امروز",
   "todayWidget.routines": "روتین‌ها",
   "todayWidget.tasks": "وظایف",
   "todayWidget.emptyState": "✅ امروز همه چیز تموم شده!",
