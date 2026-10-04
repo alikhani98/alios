@@ -446,20 +446,6 @@ function getConflictResolutionActionKey(
   return `${conflict.entity}:${conflict.recordId}:${resolution}`;
 }
 
-function getConflictConfirmationMessage(
-  t: (key: TranslationKey, values?: Record<string, string | number>) => string,
-  conflict: SyncConflictRecord,
-  resolution: SyncConflictResolutionChoice
-) {
-  return resolution === "keep-local"
-    ? t("settings.syncConflictConfirmKeepLocal", {
-        title: conflict.title,
-      })
-    : t("settings.syncConflictConfirmKeepRemote", {
-        title: conflict.title,
-      });
-}
-
 function getSyncHealthSummary(runtimeState: AccountRuntimeState): Readonly<{
   labelKey: TranslationKey;
   descriptionKey: TranslationKey;
@@ -695,6 +681,10 @@ export function SyncStatusAdvancedPanel({
     error: null,
     pendingActionKey: null,
   }));
+  const [confirmingConflict, setConfirmingConflict] = useState<{
+    recordId: string;
+    choice: SyncConflictResolutionChoice;
+  } | null>(null);
   const futureActionsDescriptionId = "account-sync-future-actions-description";
   const currentState = getRuntimeSyncState(runtimeState);
   const syncHealth = getSyncHealthSummary(runtimeState);
@@ -976,6 +966,7 @@ export function SyncStatusAdvancedPanel({
       error: null,
       pendingActionKey: null,
     }));
+    setConfirmingConflict(null);
   }, [hasConflictIssue]);
 
   const loadConflictRecords = async () => {
@@ -1023,20 +1014,6 @@ export function SyncStatusAdvancedPanel({
     conflict: SyncConflictRecord,
     resolution: SyncConflictResolutionChoice
   ) => {
-    const confirmationMessage = getConflictConfirmationMessage(
-      t,
-      conflict,
-      resolution
-    );
-
-    if (
-      typeof window !== "undefined" &&
-      typeof window.confirm === "function" &&
-      !window.confirm(confirmationMessage)
-    ) {
-      return;
-    }
-
     const pendingActionKey = getConflictResolutionActionKey(conflict, resolution);
     setConflictReview((current) => ({
       ...current,
@@ -1798,6 +1775,8 @@ export function SyncStatusAdvancedPanel({
                         conflict,
                         "keep-remote"
                       );
+                      const isConfirmingConflict =
+                        confirmingConflict?.recordId === conflict.recordId;
 
                       return (
                         <SoftPanel
@@ -1892,36 +1871,84 @@ export function SyncStatusAdvancedPanel({
                             </SoftPanel>
                           </div>
 
-                          <div className="flex flex-col gap-3 sm:flex-row">
-                            <Button
-                              type="button"
-                              variant="outline"
-                              className="min-h-11 w-full justify-start sm:w-auto"
-                              disabled={conflictReview.pendingActionKey !== null}
-                              onClick={() => {
-                                void handleResolveConflict(conflict, "keep-local");
-                              }}
-                            >
-                              <LaptopMinimal className="me-2 h-4 w-4" />
-                              {conflictReview.pendingActionKey === keepLocalActionKey
-                                ? t("settings.syncConflictPendingKeepLocal")
-                                : t("settings.syncConflictKeepLocalAction")}
-                            </Button>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              className="min-h-11 w-full justify-start sm:w-auto"
-                              disabled={conflictReview.pendingActionKey !== null}
-                              onClick={() => {
-                                void handleResolveConflict(conflict, "keep-remote");
-                              }}
-                            >
-                              <Smartphone className="me-2 h-4 w-4" />
-                              {conflictReview.pendingActionKey === keepRemoteActionKey
-                                ? t("settings.syncConflictPendingKeepRemote")
-                                : t("settings.syncConflictKeepRemoteAction")}
-                            </Button>
-                          </div>
+                          {isConfirmingConflict && confirmingConflict ? (
+                            <SoftPanel className="space-y-3 border-destructive/25 bg-destructive/10">
+                              <div className="space-y-1">
+                                <p className="text-sm font-semibold text-foreground">
+                                  {t("settings.syncConflictConfirmTitle")}
+                                </p>
+                                <p className="text-sm leading-6 text-muted-foreground">
+                                  {t("settings.syncConflictConfirmBody")}
+                                </p>
+                              </div>
+                              <div className="flex flex-col gap-3 sm:flex-row">
+                                <Button
+                                  type="button"
+                                  className="min-h-11 w-full justify-start sm:w-auto"
+                                  disabled={conflictReview.pendingActionKey !== null}
+                                  onClick={() => {
+                                    void (async () => {
+                                      await handleResolveConflict(
+                                        conflict,
+                                        confirmingConflict.choice
+                                      );
+                                      setConfirmingConflict(null);
+                                    })();
+                                  }}
+                                >
+                                  {t("settings.syncConflictConfirmProceed")}
+                                </Button>
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  className="min-h-11 w-full justify-start sm:w-auto"
+                                  disabled={conflictReview.pendingActionKey !== null}
+                                  onClick={() => {
+                                    setConfirmingConflict(null);
+                                  }}
+                                >
+                                  {t("settings.syncConflictConfirmCancel")}
+                                </Button>
+                              </div>
+                            </SoftPanel>
+                          ) : (
+                            <div className="flex flex-col gap-3 sm:flex-row">
+                              <Button
+                                type="button"
+                                variant="outline"
+                                className="min-h-11 w-full justify-start sm:w-auto"
+                                disabled={conflictReview.pendingActionKey !== null}
+                                onClick={() => {
+                                  setConfirmingConflict({
+                                    recordId: conflict.recordId,
+                                    choice: "keep-local",
+                                  });
+                                }}
+                              >
+                                <LaptopMinimal className="me-2 h-4 w-4" />
+                                {conflictReview.pendingActionKey === keepLocalActionKey
+                                  ? t("settings.syncConflictPendingKeepLocal")
+                                  : t("settings.syncConflictKeepLocalAction")}
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                className="min-h-11 w-full justify-start sm:w-auto"
+                                disabled={conflictReview.pendingActionKey !== null}
+                                onClick={() => {
+                                  setConfirmingConflict({
+                                    recordId: conflict.recordId,
+                                    choice: "keep-remote",
+                                  });
+                                }}
+                              >
+                                <Smartphone className="me-2 h-4 w-4" />
+                                {conflictReview.pendingActionKey === keepRemoteActionKey
+                                  ? t("settings.syncConflictPendingKeepRemote")
+                                  : t("settings.syncConflictKeepRemoteAction")}
+                              </Button>
+                            </div>
+                          )}
                         </SoftPanel>
                       );
                     })}
