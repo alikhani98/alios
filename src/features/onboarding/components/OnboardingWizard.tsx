@@ -28,7 +28,9 @@ import {
 } from "../onboardingSeed";
 import {
   isOnboardingCompleted,
+  isOnboardingDismissed,
   markOnboardingCompleted,
+  markOnboardingDismissed,
   ONBOARDING_COMPLETED_STORAGE_KEY,
 } from "../onboardingStorage";
 
@@ -121,7 +123,7 @@ export function OnboardingWizard() {
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    setOpen(!isOnboardingCompleted());
+    setOpen(!isOnboardingCompleted() && !isOnboardingDismissed());
   }, []);
 
   useEffect(() => {
@@ -477,7 +479,14 @@ export function OnboardingWizard() {
             <Button
               type="button"
               variant="outline"
-              onClick={step === 0 ? () => setOpen(false) : goBack}
+              onClick={
+                step === 0
+                  ? () => {
+                      markOnboardingDismissed();
+                      setOpen(false);
+                    }
+                  : goBack
+              }
               disabled={isCompleting}
             >
               {step === 0 ? t("onboarding.later") : t("onboarding.back")}
