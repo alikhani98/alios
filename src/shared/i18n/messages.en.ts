@@ -1906,6 +1906,7 @@ export const messagesEn = {
   "settings.personalizationDescription": "Choose the shortcuts that make AliOS feel like your own daily workspace.",
   "quickAccess.title": "Quick Access",
   "quickAccess.description": "Keep the pages and items you use most within reach. This launcher stays local to this device.",
+  "quickAccess.todayWidget": "Today Widget",
   "quickAccess.add": "Add to Quick Access",
   "quickAccess.remove": "Remove from Quick Access",
   "quickAccess.enabled": "Enabled",

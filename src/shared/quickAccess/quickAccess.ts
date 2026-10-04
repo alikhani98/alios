@@ -4,6 +4,7 @@ import {
   House,
   Inbox,
   Landmark,
+  LayoutDashboard,
   Search,
   Target,
   Timer,
@@ -49,6 +50,7 @@ export type QuickAccessPreference = {
 export type QuickAccessModuleId =
   | "home"
   | "today"
+  | "today-widget"
   | "inbox"
   | "calendar"
   | "focus"
@@ -68,6 +70,12 @@ export type QuickAccessModule = {
 export const QUICK_ACCESS_MODULES: ReadonlyArray<QuickAccessModule> = [
   { id: "home", labelKey: "nav.home", route: "/", icon: House },
   { id: "today", labelKey: "nav.today", route: "/today", icon: Target },
+  {
+    id: "today-widget",
+    labelKey: "quickAccess.todayWidget",
+    route: "/today-widget",
+    icon: LayoutDashboard,
+  },
   { id: "inbox", labelKey: "nav.inbox", route: "/inbox", icon: Inbox },
   { id: "calendar", labelKey: "nav.calendar", route: "/calendar", icon: CalendarDays },
   { id: "focus", labelKey: "nav.focus", route: "/focus", icon: Timer },

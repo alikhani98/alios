@@ -1907,6 +1907,7 @@ export const messagesFa: Record<TranslationKey, string> = {
   "settings.personalizationDescription": "میانبرهایی را انتخاب کنید که AliOS را به فضای کاری روزانه‌ی خودتان نزدیک‌تر می‌کند.",
   "quickAccess.title": "دسترسی سریع",
   "quickAccess.description": "صفحه‌ها و مواردی را که بیشتر استفاده می‌کنید در دسترس نگه دارید. این لانچر فقط روی همین دستگاه محلی است.",
+  "quickAccess.todayWidget": "ویجت امروز",
   "quickAccess.add": "افزودن به دسترسی سریع",
   "quickAccess.remove": "حذف از دسترسی سریع",
   "quickAccess.enabled": "فعال",
