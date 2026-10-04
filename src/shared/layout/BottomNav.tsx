@@ -11,6 +11,7 @@ import { navigationIcons } from "./navigation-icons";
 type BottomNavProps = {
   onOpenMenu: () => void;
   menuOpen?: boolean;
+  conflictCount?: number;
 };
 
 const primaryTabs: NavItem[] = [
@@ -36,8 +37,16 @@ const primaryTabs: NavItem[] = [
   },
 ];
 
-export function BottomNav({ onOpenMenu, menuOpen = false }: BottomNavProps) {
+export function BottomNav({
+  onOpenMenu,
+  menuOpen = false,
+  conflictCount = 0,
+}: BottomNavProps) {
   const { t } = useI18n();
+  const hasSyncConflicts = conflictCount > 0;
+  const menuAriaLabel = hasSyncConflicts
+    ? `${t("shell.openMenu")} - ${t("settings.syncStatusConflict")}`
+    : t("shell.openMenu");
 
   return (
     <nav
@@ -92,7 +101,7 @@ export function BottomNav({ onOpenMenu, menuOpen = false }: BottomNavProps) {
               ? "text-primary"
               : "text-muted-foreground hover:bg-accent/70 hover:text-foreground"
           )}
-          aria-label={t("shell.openMenu")}
+          aria-label={menuAriaLabel}
           aria-expanded={menuOpen}
           onClick={onOpenMenu}
         >
@@ -103,6 +112,12 @@ export function BottomNav({ onOpenMenu, menuOpen = false }: BottomNavProps) {
             )}
             aria-hidden="true"
           />
+          {hasSyncConflicts ? (
+            <span
+              className="absolute end-1 top-1 h-2 w-2 rounded-full bg-[#B23A48]"
+              aria-hidden="true"
+            />
+          ) : null}
           <Menu className="mt-1 h-5 w-5 shrink-0" aria-hidden="true" />
           <span className="max-w-full truncate">{t("nav.menu")}</span>
         </button>

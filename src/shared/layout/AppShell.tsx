@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 
+import { useAccountRuntimeState } from "@/core/account";
 import { getNavigationItemByPath } from "@/shared/constants/navigation";
 import { OnboardingWizard } from "@/features/onboarding/components/OnboardingWizard";
 import { usePersistentBoolean } from "@/shared/hooks/usePersistentBoolean";
@@ -37,6 +38,8 @@ export function AppShell() {
   const { t } = useI18n();
   const location = useLocation();
   const currentNavigationItem = getNavigationItemByPath(location.pathname);
+  const { syncStatus } = useAccountRuntimeState();
+  const conflictCount = syncStatus.conflictCount ?? 0;
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const closeMobileSidebar = useCallback(() => {
@@ -190,6 +193,7 @@ export function AppShell() {
           <BottomNav
             menuOpen={mobileSidebarOpen}
             onOpenMenu={() => setMobileSidebarOpen(true)}
+            conflictCount={conflictCount}
           />
           <CommandPalette
             open={commandPaletteOpen}
