@@ -183,7 +183,8 @@ self.addEventListener("fetch", (event) => {
       fetch(request)
         .then((response) => {
           if (response.ok) {
-            void caches.open(CACHE_NAME).then((cache) => cache.put(indexUrl, response.clone()));
+            const responseForCache = response.clone();
+            void caches.open(CACHE_NAME).then((cache) => cache.put(indexUrl, responseForCache));
           }
 
           return response;
@@ -199,7 +200,8 @@ self.addEventListener("fetch", (event) => {
         cachedResponse ??
         fetch(request).then((response) => {
           if (response.ok && requestUrl.pathname !== new URL("service-worker.js", scopeUrl).pathname) {
-            void caches.open(CACHE_NAME).then((cache) => cache.put(request, response.clone()));
+            const responseForCache = response.clone();
+            void caches.open(CACHE_NAME).then((cache) => cache.put(request, responseForCache));
           }
 
           return response;
