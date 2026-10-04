@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
+    "build": "tsc --noEmit && vite build && node scripts/generate-precache-manifest.mjs",
     "preview": "vite preview",
     "test": "vitest",
     "test:run": "vitest run",

@@ -12,7 +12,24 @@ const shellUrls = [
 ];
 
 self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(shellUrls)));
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(async (cache) => {
+      await cache.addAll(shellUrls);
+
+      try {
+        const manifestUrl = new URL("precache-manifest.json", scopeUrl).href;
+        const response = await fetch(manifestUrl);
+        if (response.ok) {
+          const manifest = await response.json();
+          if (Array.isArray(manifest.chunks)) {
+            await cache.addAll(manifest.chunks);
+          }
+        }
+      } catch {
+        // Runtime caching still covers chunks after first successful request.
+      }
+    })
+  );
 });
 
 self.addEventListener("activate", (event) => {
