@@ -1871,6 +1871,13 @@ export function SyncStatusAdvancedPanel({
                             </SoftPanel>
                           </div>
 
+                          {/* TODO: Replace this fallback with a field-level diff table when SyncConflictRecord includes local and remote payloads. */}
+                          <SoftPanel className="alios-surface-muted border-dashed">
+                            <p className="text-sm leading-6 text-muted-foreground">
+                              {t("settings.syncConflictDiffUnavailable")}
+                            </p>
+                          </SoftPanel>
+
                           {isConfirmingConflict && confirmingConflict ? (
                             <SoftPanel className="space-y-3 border-destructive/25 bg-destructive/10">
                               <div className="space-y-1">
