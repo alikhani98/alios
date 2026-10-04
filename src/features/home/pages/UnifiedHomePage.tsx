@@ -17,12 +17,18 @@ import { type ReactNode, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { format, isValid, parseISO } from "date-fns";
 
+import {
+  isOnboardingCompleted,
+  isOnboardingDismissed,
+} from "@/features/onboarding/onboardingStorage";
 import { TodayWorkspace } from "@/features/today/components/TodayWorkspace";
 import { LocalReminderPanel } from "@/features/reminders";
 import { RoutineTemplatesCard, type RoutineTemplateId } from "@/features/routines";
 import { WellnessBadmintonCard } from "@/features/wellness";
 import { useDateFormatter } from "@/shared/date";
+import { DISPLAY_NAME_STORAGE_KEY } from "@/shared/constants/preferences";
 import { useBackupStatus } from "@/shared/hooks";
+import { usePersistentString } from "@/shared/hooks/usePersistentString";
 import { useI18n, type TranslationKey } from "@/shared/i18n";
 import { QuickAccessLauncher } from "@/shared/quickAccess";
 import { getBackupAgeInDays } from "@/shared/preferences/backupStatus";
@@ -32,7 +38,6 @@ import {
   Card,
   CardContent,
   CollapsibleSection,
-  EmptyState,
   MetricCard,
   SectionHeader,
   SoftPanel,
@@ -45,6 +50,7 @@ import { HomeCalendarCard } from "../components/HomeCalendarCard";
 import { HomeManualCard } from "../components/HomeManualCard";
 import { HomePersonalMetricsCard } from "../components/HomePersonalMetricsCard";
 import { HomePersonalInsightsCard } from "../components/HomePersonalInsightsCard";
+import { WelcomeCard } from "../components/WelcomeCard";
 import {
   readHomeBackupReminderDismissedUntil,
   shouldShowHomeBackupReminder,
@@ -583,8 +589,17 @@ export function UnifiedHomePage() {
   const { t } = useI18n();
   const { freshness: backupFreshness, status: backupStatus } = useBackupStatus();
   const { data, isLoading, hasError, loadDashboard } = useHomeDashboard();
+  const { value: displayName } = usePersistentString({
+    key: DISPLAY_NAME_STORAGE_KEY,
+    defaultValue: "",
+  });
   const [searchParams] = useSearchParams();
   const today = getRequestedToday(searchParams);
+  const onboardingState = isOnboardingCompleted()
+    ? "completed"
+    : isOnboardingDismissed()
+      ? "dismissed"
+      : "pending";
   const [selectedRoutineTemplateId, setSelectedRoutineTemplateId] =
     useState<RoutineTemplateId | null>(null);
   const [backupReminderDismissedUntil, setBackupReminderDismissedUntil] =
@@ -680,15 +695,9 @@ export function UnifiedHomePage() {
       ) : data ? (
         <>
           {data.isEmpty ? (
-            <EmptyState
-              icon={<Target className="h-6 w-6" aria-hidden="true" />}
-              title={t("home.emptyTitle")}
-              description={t("home.emptySubtitle")}
-              actions={
-                <Button asChild>
-                  <Link to="/today">{t("home.emptyAction")}</Link>
-                </Button>
-              }
+            <WelcomeCard
+              key={onboardingState}
+              displayName={displayName}
             />
           ) : null}
           <DailyBriefingCard data={data} />
