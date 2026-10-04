@@ -63,6 +63,7 @@ import {
 } from "@/features/manual/constants";
 
 import { useWeeklyReview } from "../hooks/useWeeklyReview";
+import { WeeklyAISummaryCard } from "../components/WeeklyAISummaryCard";
 import { WeeklyPlanForm } from "../components/WeeklyPlanForm";
 import { WeeklyPlanLinks } from "../components/WeeklyPlanLinks";
 import { WeeklyPlanningDashboard } from "../components/WeeklyPlanningDashboard";
@@ -834,6 +835,8 @@ export function WeeklyReviewPage() {
               }
             />
           )}
+
+          <WeeklyAISummaryCard summary={summary} />
 
           <div className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)]">
             <div className="space-y-6">
