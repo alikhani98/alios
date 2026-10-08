@@ -1,4 +1,4 @@
-import { AlertCircle, CalendarDays, CheckCircle2, CheckSquare2, Clock3, ExternalLink, Plus, Repeat2, RotateCcw, Sparkles, Target } from "lucide-react";
+import { AlertCircle, CheckCircle2, CheckSquare2, Clock3, Plus, Repeat2, RotateCcw, Sparkles, Target } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -136,7 +136,6 @@ export interface TodayWorkspaceProps {
   focusId: string | null;
   goalId: string | null;
   hideEmptyTaskState?: boolean;
-  hideHero?: boolean;
   hideTaskSummaryHeader?: boolean;
   projectId: string | null;
   routineId: string | null;
@@ -147,7 +146,6 @@ export function TodayWorkspace({
   focusId,
   goalId,
   hideEmptyTaskState = false,
-  hideHero = false,
   hideTaskSummaryHeader = false,
   projectId,
   routineId,
@@ -310,11 +308,9 @@ export function TodayWorkspace({
   ).length;
   const completedTaskCount = orderedVisibleTasks.filter((task) => task.status === "done").length;
   const deferredTaskCount = orderedVisibleTasks.filter((task) => task.status === "deferred").length;
-  const completionRate = visibleTasks.length > 0
-    ? Math.round((completedTaskCount / visibleTasks.length) * 100)
-    : 0;
   const visibleOpenTasks = displayedTasks.filter((task) => task.status !== "done");
   const visibleCompletedTasks = orderedVisibleTasks.filter((task) => task.status === "done");
+  const shouldShowDailyCheckin = new Date().getHours() >= 17;
   const linkedContentForTask = (task: Task) => ({
     journalEntries: linkedJournalEntries.filter((entry) => entry.taskId === task.id),
     decisions: linkedDecisions.filter((decision) => decision.taskId === task.id),
@@ -570,85 +566,6 @@ export function TodayWorkspace({
 
   return (
     <section className="alios-page space-y-6">
-      {hideHero ? null : (
-        <PremiumCard className="alios-now-surface alios-primary-surface">
-          <CardContent className="grid gap-5 p-5 sm:p-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)]">
-            <div className="space-y-5">
-              <SectionHeader
-                eyebrow={t("home.dailyPlan")}
-                icon={<CalendarDays className="h-5 w-5" />}
-                title={t("today.title")}
-                status={
-                  <Button
-                    asChild
-                    size="icon"
-                    variant="ghost"
-                    className="h-9 w-9 text-muted-foreground hover:text-foreground"
-                  >
-                    <a
-                      href="/#/today-widget"
-                      aria-label={t("today.widgetLink")}
-                      title={t("today.widgetLink")}
-                    >
-                      <ExternalLink className="h-4 w-4" aria-hidden="true" />
-                    </a>
-                  </Button>
-                }
-                description={t("today.description")}
-              />
-              <div className="grid gap-3 sm:grid-cols-3">
-                <SoftPanel className="gap-2 border-alios-saffron/25 bg-background/85">
-                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                    {t("home.taskDate")}
-                  </p>
-                  <p className="text-lg font-semibold leading-8">{formatDate(today)}</p>
-                </SoftPanel>
-                <SoftPanel className="gap-2 border-alios-saffron/25 bg-background/85">
-                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                    {t("today.tasks")}
-                  </p>
-                  <p className="text-lg font-semibold tabular-nums">{activeTaskCount}</p>
-                  <p className="text-sm text-muted-foreground">{t("common.active")}</p>
-                </SoftPanel>
-                <SoftPanel className="gap-2 border-alios-saffron/25 bg-background/85">
-                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                    {t("common.completed")}
-                  </p>
-                  <p className="text-lg font-semibold tabular-nums">{completionRate}%</p>
-                  <p className="text-sm text-muted-foreground">
-                    {completedTaskCount} / {visibleTasks.length || 0}
-                  </p>
-                </SoftPanel>
-              </div>
-            </div>
-            <SoftPanel className="space-y-4 alios-thread-accent">
-              <div className="flex items-start gap-3">
-                <span className="alios-icon-primary">
-                  {mitTask ? <Target className="h-5 w-5" aria-hidden="true" /> : <Sparkles className="h-5 w-5" aria-hidden="true" />}
-                </span>
-                <div className="min-w-0 space-y-1">
-                  <p className="text-sm font-medium text-muted-foreground">
-                    {mitTask ? t("today.mit") : t("today.tasks")}
-                  </p>
-                  <p className="break-words text-xl font-semibold leading-8">
-                    {mitTask ? mitTask.title : t("today.noTasks")}
-                  </p>
-                  {mitTask ? (
-                    <p className="text-sm leading-6 text-muted-foreground">
-                      {t("today.tasksDescription")}
-                    </p>
-                  ) : null}
-                </div>
-              </div>
-              <Button type="button" className="w-full" onClick={openCreateTask}>
-                <Plus className="me-2 h-4 w-4" />
-                {t("today.newTask")}
-              </Button>
-            </SoftPanel>
-          </CardContent>
-        </PremiumCard>
-      )}
-
       {projectId ? (
         <div
           role="status"
@@ -1041,26 +958,28 @@ export function TodayWorkspace({
               ) : null}
           </CollapsibleSection>
 
-          <CollapsibleSection
-            id="today-daily-checkin"
-            title={t("today.checkin")}
-            icon={<Sparkles className="h-5 w-5" />}
-            defaultOpen={false}
-            expandLabel={t("common.expandSection")}
-            collapseLabel={t("common.collapseSection")}
-            className="border-border/70 bg-card/95"
-          >
-              {isLoading ? (
-                <div className="alios-surface-muted h-72 animate-pulse bg-muted/60" />
-              ) : (
-                <DailyCheckinForm
-                  key={checkin?.updatedAt ?? "new-checkin"}
-                  checkin={checkin}
-                  isSubmitting={isCheckinSubmitting}
-                  onSubmit={handleCheckinSubmit}
-                />
-              )}
-          </CollapsibleSection>
+          {shouldShowDailyCheckin ? (
+            <CollapsibleSection
+              id="today-daily-checkin"
+              title={t("today.checkin")}
+              icon={<Sparkles className="h-5 w-5" />}
+              defaultOpen={false}
+              expandLabel={t("common.expandSection")}
+              collapseLabel={t("common.collapseSection")}
+              className="border-border/70 bg-card/95"
+            >
+                {isLoading ? (
+                  <div className="alios-surface-muted h-72 animate-pulse bg-muted/60" />
+                ) : (
+                  <DailyCheckinForm
+                    key={checkin?.updatedAt ?? "new-checkin"}
+                    checkin={checkin}
+                    isSubmitting={isCheckinSubmitting}
+                    onSubmit={handleCheckinSubmit}
+                  />
+                )}
+            </CollapsibleSection>
+          ) : null}
 
           {(reviewDueProjects.length > 0 || plannedTaskOutsideToday || deferredTaskCount > 0) ? (
             <CollapsibleSection

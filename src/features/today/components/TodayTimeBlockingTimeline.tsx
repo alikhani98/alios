@@ -98,6 +98,9 @@ export function TodayTimeBlockingTimeline({
     { length: TIMELINE_END_HOUR - TIMELINE_START_HOUR + 1 },
     (_value, index) => TIMELINE_START_HOUR + index
   );
+  const scheduledHours = hours.filter((hour) =>
+    scheduledTasks.some((task) => getTaskHour(task) === hour)
+  );
 
   const handleDrop = (hour: number) => {
     const draggedTask = scheduledTasks.find((task) => task.id === draggedTaskId);
@@ -141,7 +144,7 @@ export function TodayTimeBlockingTimeline({
         </p>
       ) : (
         <div className="space-y-2">
-          {hours.map((hour) => {
+          {scheduledHours.map((hour) => {
             const hourTasks = scheduledTasks.filter((task) => getTaskHour(task) === hour);
             const hourLabel = `${String(hour).padStart(2, "0")}:00`;
 
