@@ -86,7 +86,7 @@ export function WeeklyAISummaryCard({ summary }: WeeklyAISummaryCardProps) {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <CardTitle className="flex items-center gap-2 leading-8">
             <Sparkles className="h-5 w-5 text-alios-herb" aria-hidden="true" />
-            <span>✨ {t("weeklyReview.aiSummary.title")}</span>
+            <span>{t("weeklyReview.aiSummary.title")}</span>
           </CardTitle>
         </div>
       </CardHeader>

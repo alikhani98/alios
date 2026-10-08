@@ -122,7 +122,6 @@ export function WeeklyPlanningDashboard({
             <div className="space-y-1">
               <p className="text-sm font-semibold">{t("weeklyReview.openTasks")}</p>
               <p className="text-2xl font-semibold tabular-nums">{execution.open}</p>
-              <p className="text-sm text-muted-foreground">{t("weeklyReview.localOnlyNote")}</p>
             </div>
           </SoftPanel>
 

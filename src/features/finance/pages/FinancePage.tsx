@@ -1673,7 +1673,7 @@ export function FinancePage() {
                 description={t("finance.assetsEmptyDescription")}
               />
             ) : (
-              <div className="grid gap-4 xl:grid-cols-2">
+              <div className="grid gap-4">
                 {assets.map((asset) => (
                   <FinanceAssetCard
                     key={asset.id}
