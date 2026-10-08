@@ -786,6 +786,7 @@ export const messagesFa: Record<TranslationKey, string> = {
   "goals.updatedAtLabel": "زمان به‌روزرسانی",
   "goals.reviewDueSection": "هدف‌های نیازمند مرور",
   "goals.reviewDueSectionDescription": "هدف‌های فعالی که الان به یک مرور آرام نیاز دارند.",
+  "goals.finishedSection": "تمام‌شده و آرشیو",
   "goals.markReviewed": "علامت‌گذاری به‌عنوان بررسی‌شده",
   "goals.markCompleted": "علامت‌گذاری به‌عنوان تکمیل‌شده",
   "goals.reactivate": "فعال‌سازی دوباره",

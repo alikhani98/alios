@@ -250,7 +250,7 @@ export function GoalsPage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [statusFilter, setStatusFilter] = useState<GoalFilter["status"]>("all");
+  const [statusFilter, setStatusFilter] = useState<GoalFilter["status"]>("active");
   const [areaFilter, setAreaFilter] = useState<GoalFilter["area"]>(() =>
     parseGoalAreaSearchParam(searchParams.get("area"))
   );
@@ -644,6 +644,60 @@ export function GoalsPage() {
   const activeGoals = filteredEntries.filter((goal) => goal.status === "active");
   const completedGoals = filteredEntries.filter((goal) => goal.status === "completed");
   const primaryGoal = filteredEntries.find((goal) => goal.status === "active") ?? filteredEntries[0];
+  const shouldGroupGoalsByStatus = statusFilter === "all";
+  const activeListGoals = shouldGroupGoalsByStatus
+    ? displayedGoals.filter((goal) => goal.status === "active" || goal.status === "paused")
+    : displayedGoals;
+  const finishedListGoals = shouldGroupGoalsByStatus
+    ? displayedGoals.filter((goal) => goal.status === "completed" || goal.status === "archived")
+    : [];
+  const finishedGoalsDefaultOpen =
+    shouldGroupGoalsByStatus &&
+    (filteredEntries.every((goal) => goal.status === "completed" || goal.status === "archived") ||
+      finishedListGoals.some((goal) => goal.id === focusId));
+
+  const renderGoalCard = (goal: Goal) => {
+    const projectProgress = getGoalProjectProgress(goal.id, projects, tasks);
+
+    return (
+      <div
+        key={goal.id}
+        ref={(node) => {
+          goalRefs.current[goal.id] = node;
+        }}
+        className={cn(
+          "min-w-0 scroll-mt-6 rounded-[1.75rem] transition-shadow",
+          focusedGoalId === goal.id ? "ring-2 ring-primary/20" : null
+        )}
+      >
+        <GoalCard
+          goal={goal}
+          isReviewDue={isGoalReviewDue(goal)}
+          projectProgress={projectProgress}
+          linkedJournalEntries={linkedJournalEntries.filter((entry) => entry.goalId === goal.id)}
+          linkedDecisions={linkedDecisions.filter((decision) => decision.goalId === goal.id)}
+          linkedKnowledgeItems={linkedKnowledgeItems.filter((item) => item.goalId === goal.id)}
+          linkedResources={deriveResourcesForGoal(
+            goal.id,
+            resources,
+            linkedKnowledgeItems,
+            projects,
+            tasks
+          )}
+          learningContext={learningContexts.get(goal.id)}
+          isProjectProgressLoading={isProjectProgressLoading}
+          useAutoProgress={autoProgressGoalIds.includes(goal.id)}
+          isDeleting={deletingId === goal.id}
+          onAutoProgressChange={(enabled) => handleAutoProgressChange(goal.id, enabled)}
+          onEdit={() => openEditForm(goal)}
+          onDelete={() => void handleDelete(goal)}
+          onMarkReviewed={() => void handleMarkReviewed(goal)}
+          onMarkCompleted={() => void handleMarkCompleted(goal)}
+          onReactivate={() => void handleReactivate(goal)}
+        />
+      </div>
+    );
+  };
 
   return (
     <section className="alios-page space-y-6">
@@ -1056,7 +1110,7 @@ export function GoalsPage() {
 
       {isLoading ? (
         <div
-          className="grid min-w-0 gap-4 xl:grid-cols-2"
+          className="grid min-w-0 gap-4"
           aria-label={t("goals.loading")}
         >
           {[0, 1, 2].map((item) => (
@@ -1089,59 +1143,26 @@ export function GoalsPage() {
             )
           }
         />
-      ) : (
-        <div className="grid min-w-0 gap-4 xl:grid-cols-2">
-          {displayedGoals.map((goal) => {
-            const projectProgress = getGoalProjectProgress(goal.id, projects, tasks);
-
-            return (
-              <div
-                key={goal.id}
-                ref={(node) => {
-                  goalRefs.current[goal.id] = node;
-                }}
-                className={cn(
-                  "min-w-0 scroll-mt-6 rounded-[1.75rem] transition-shadow",
-                  focusedGoalId === goal.id ? "ring-2 ring-primary/20" : null
-                )}
-              >
-                <GoalCard
-                  goal={goal}
-                  isReviewDue={isGoalReviewDue(goal)}
-                  projectProgress={projectProgress}
-                  linkedJournalEntries={linkedJournalEntries.filter(
-                    (entry) => entry.goalId === goal.id
-                  )}
-                  linkedDecisions={linkedDecisions.filter(
-                    (decision) => decision.goalId === goal.id
-                  )}
-                  linkedKnowledgeItems={linkedKnowledgeItems.filter(
-                    (item) => item.goalId === goal.id
-                  )}
-                  linkedResources={deriveResourcesForGoal(
-                    goal.id,
-                    resources,
-                    linkedKnowledgeItems,
-                    projects,
-                    tasks
-                  )}
-                  learningContext={learningContexts.get(goal.id)}
-                  isProjectProgressLoading={isProjectProgressLoading}
-                  useAutoProgress={autoProgressGoalIds.includes(goal.id)}
-                  isDeleting={deletingId === goal.id}
-                  onAutoProgressChange={(enabled) =>
-                    handleAutoProgressChange(goal.id, enabled)
-                  }
-                  onEdit={() => openEditForm(goal)}
-                  onDelete={() => void handleDelete(goal)}
-                  onMarkReviewed={() => void handleMarkReviewed(goal)}
-                  onMarkCompleted={() => void handleMarkCompleted(goal)}
-                  onReactivate={() => void handleReactivate(goal)}
-                />
-              </div>
-            );
-          })}
+      ) : shouldGroupGoalsByStatus ? (
+        <div className="space-y-4">
+          {activeListGoals.length > 0 ? (
+            <div className="grid min-w-0 gap-4">{activeListGoals.map(renderGoalCard)}</div>
+          ) : null}
+          {finishedListGoals.length > 0 ? (
+            <CollapsibleSection
+              id="goals-finished"
+              title={t("goals.finishedSection")}
+              expandLabel={t("common.expandSection")}
+              collapseLabel={t("common.collapseSection")}
+              defaultOpen={finishedGoalsDefaultOpen}
+              contentClassName="grid min-w-0 gap-4"
+            >
+              {finishedListGoals.map(renderGoalCard)}
+            </CollapsibleSection>
+          ) : null}
         </div>
+      ) : (
+        <div className="grid min-w-0 gap-4">{displayedGoals.map(renderGoalCard)}</div>
       )}
       {filteredEntries.length > goalPreviewLimit && !focusRequiresAllGoals ? (
         <div className="flex justify-start">

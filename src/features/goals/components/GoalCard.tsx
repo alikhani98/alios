@@ -7,10 +7,12 @@ import {
   FolderKanban,
   GitBranch,
   ListChecks,
+  MoreHorizontal,
   RotateCcw,
   Target,
   Trash2,
 } from "lucide-react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 import { useDateFormatter } from "@/shared/date";
@@ -87,6 +89,7 @@ export function GoalCard({
 }: GoalCardProps) {
   const { t } = useI18n();
   const { formatDateTime, formatDate } = useDateFormatter();
+  const [showOverflowActions, setShowOverflowActions] = useState(false);
   const autoProgressPercent =
     !isProjectProgressLoading && projectProgress?.completionPercent !== null
       ? projectProgress?.completionPercent
@@ -536,12 +539,6 @@ export function GoalCard({
         </CollapsibleSection>
 
         <div className="flex flex-col gap-2 border-t border-border/70 pt-4 sm:flex-row sm:flex-wrap">
-          <Button size="sm" className="w-full sm:w-auto" asChild>
-            <Link to={createLifeAreaFocusPath(goal.area)}>
-              <Compass className="me-2 h-4 w-4" />
-              {t("goals.openLifeArea")}
-            </Link>
-          </Button>
           <Button
             type="button"
             size="sm"
@@ -563,41 +560,79 @@ export function GoalCard({
             <Trash2 className="me-2 h-4 w-4" />
             {t("common.delete")}
           </Button>
-          {goal.status === "active" && isReviewDue ? (
+          <div className="relative">
             <Button
               type="button"
               size="sm"
               variant="outline"
               className="w-full sm:w-auto"
-              onClick={onMarkReviewed}
+              aria-label={t("command.quickActions")}
+              aria-expanded={showOverflowActions}
+              onClick={() => setShowOverflowActions((current) => !current)}
             >
-              <Clock3 className="me-2 h-4 w-4" />
-              {t("goals.markReviewed")}
+              <MoreHorizontal className="h-4 w-4" />
             </Button>
-          ) : null}
-          {goal.status !== "completed" ? (
-            <Button
-              type="button"
-              size="sm"
-              className="w-full sm:w-auto"
-              onClick={onMarkCompleted}
+            <div
+              className="mt-2 grid min-w-56 gap-1 rounded-xl border border-border/70 bg-popover p-2 text-popover-foreground shadow-aliosFloating"
+              hidden={!showOverflowActions}
+              aria-hidden={!showOverflowActions}
             >
-              <CheckCircle2 className="me-2 h-4 w-4" />
-              {t("goals.markCompleted")}
-            </Button>
-          ) : (
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              className="w-full sm:w-auto"
-              onClick={onReactivate}
-            >
-              <RotateCcw className="me-2 h-4 w-4" />
-              {t("goals.reactivate")}
-            </Button>
-          )}
-          <QuickAccessToggleButton itemType="goal" targetId={goal.id} />
+              <Button size="sm" variant="ghost" className="justify-start" asChild>
+                <Link
+                  to={createLifeAreaFocusPath(goal.area)}
+                  onClick={() => setShowOverflowActions(false)}
+                >
+                  <Compass className="me-2 h-4 w-4" />
+                  {t("goals.openLifeArea")}
+                </Link>
+              </Button>
+              {goal.status === "active" && isReviewDue ? (
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  className="justify-start"
+                  onClick={() => {
+                    setShowOverflowActions(false);
+                    onMarkReviewed();
+                  }}
+                >
+                  <Clock3 className="me-2 h-4 w-4" />
+                  {t("goals.markReviewed")}
+                </Button>
+              ) : null}
+              {goal.status !== "completed" ? (
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  className="justify-start"
+                  onClick={() => {
+                    setShowOverflowActions(false);
+                    onMarkCompleted();
+                  }}
+                >
+                  <CheckCircle2 className="me-2 h-4 w-4" />
+                  {t("goals.markCompleted")}
+                </Button>
+              ) : (
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  className="justify-start"
+                  onClick={() => {
+                    setShowOverflowActions(false);
+                    onReactivate();
+                  }}
+                >
+                  <RotateCcw className="me-2 h-4 w-4" />
+                  {t("goals.reactivate")}
+                </Button>
+              )}
+              <QuickAccessToggleButton itemType="goal" targetId={goal.id} />
+            </div>
+          </div>
         </div>
       </CardContent>
     </Card>

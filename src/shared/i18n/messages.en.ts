@@ -802,6 +802,7 @@ export const messagesEn = {
   "goals.updatedAtLabel": "Updated at",
   "goals.reviewDueSection": "Goals due for review",
   "goals.reviewDueSectionDescription": "Active goals that need a calm review right now.",
+  "goals.finishedSection": "Completed & Archived",
   "goals.markReviewed": "Mark reviewed",
   "goals.markCompleted": "Mark completed",
   "goals.reactivate": "Reactivate",
