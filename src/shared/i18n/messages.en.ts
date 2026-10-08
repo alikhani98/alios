@@ -2395,7 +2395,7 @@ export const messagesEn = {
   "inbox.selectedCount": "{count} selected",
   "inbox.unprocessedSelectedCount": "{count} unprocessed",
   "inbox.batchProcess": "Batch process",
-  "inbox.bulkSelectToolbar": "Inbox selection",
+  "inbox.bulkSelectToolbar": "Select Multiple",
   "inbox.bulkSelectHelp": "Select items with the checkboxes or tap a card to include it in the batch.",
   "inbox.bulkSelectInactiveHelp": "Use batch selection to process, archive, or delete several captured items at once.",
   "inbox.enterBulkSelect": "Select",

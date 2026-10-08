@@ -131,7 +131,7 @@ export function InboxPage() {
   const [message, setMessage] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<InboxStatusFilter>("all");
+  const [statusFilter, setStatusFilter] = useState<InboxStatusFilter>("unprocessed");
   const [typeFilter, setTypeFilter] = useState<InboxTypeFilter>("all");
   const [focusedItemId, setFocusedItemId] = useState<string | null>(null);
   const [focusMessage, setFocusMessage] = useState<string | null>(null);
@@ -695,7 +695,7 @@ export function InboxPage() {
             </div>
           </CardContent>
         </Card>
-        <div className={cn("grid gap-4 md:grid-cols-2", isBulkSelectMode ? "pb-44" : undefined)}>
+        <div className={cn("grid gap-4", isBulkSelectMode ? "pb-44" : undefined)}>
           {displayedItems.map((item) => (
             <div
               key={item.id}

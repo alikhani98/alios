@@ -2139,7 +2139,7 @@ export const messagesFa: Record<TranslationKey, string> = {
   "inbox.selectedCount": "{count} مورد انتخاب شده",
   "inbox.unprocessedSelectedCount": "{count} بررسی‌نشده",
   "inbox.batchProcess": "پردازش دسته‌ای",
-  "inbox.bulkSelectToolbar": "انتخاب صندوق ورودی",
+  "inbox.bulkSelectToolbar": "انتخاب چندگانه",
   "inbox.bulkSelectHelp": "با چک‌باکس‌ها انتخاب کنید یا روی کارت بزنید تا در عملیات گروهی قرار بگیرد.",
   "inbox.bulkSelectInactiveHelp": "برای پردازش، آرشیو یا حذف چند مورد ثبت‌شده به‌صورت هم‌زمان از انتخاب گروهی استفاده کنید.",
   "inbox.enterBulkSelect": "انتخاب",

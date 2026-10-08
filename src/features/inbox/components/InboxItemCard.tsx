@@ -67,6 +67,7 @@ export function InboxItemCard({
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [showProcessing, setShowProcessing] = useState(false);
   const [showSnooze, setShowSnooze] = useState(false);
+  const [showOverflowActions, setShowOverflowActions] = useState(false);
   const [customSnoozeDate, setCustomSnoozeDate] = useState("");
   const [knowledgeLinks, setKnowledgeLinks] = useState({
     goalId: "",
@@ -335,7 +336,7 @@ export function InboxItemCard({
           </div>
         ) : null}
       </CardContent>
-      <CardFooter className="flex-wrap gap-2 border-t pt-4">
+      <CardFooter className="relative flex-wrap gap-2 border-t pt-4">
         {confirmingDelete ? <>
           <Button type="button" size="sm" variant="destructive" disabled={isBusy} onClick={() => void onDelete()}>{isBusy ? t("common.deleting") : t("common.confirmDelete")}</Button>
           <Button type="button" size="sm" variant="ghost" onClick={() => setConfirmingDelete(false)}>{t("common.cancel")}</Button>
@@ -345,17 +346,64 @@ export function InboxItemCard({
               {t("inbox.processInbox")}
             </Button>
           ) : null}
-          <Button type="button" size="sm" variant="outline" disabled={isBusy} onClick={() => void onToggleStatus()}>
-            {item.status === "unprocessed" ? <CheckCircle2 className="me-2 h-4 w-4" /> : <Circle className="me-2 h-4 w-4" />}
-            {item.status === "unprocessed" ? t("inbox.markProcessed") : t("inbox.markUnprocessed")}
-          </Button>
-          {item.status === "unprocessed" ? (
-            <Button type="button" size="sm" variant="outline" disabled={isBusy} onClick={() => setShowSnooze((current) => !current)}>
-              <Clock3 className="me-2 h-4 w-4" />{t("inbox.snooze")}
-            </Button>
-          ) : null}
-          <Button type="button" size="sm" variant="outline" onClick={() => setIsEditing(true)}><Pencil className="me-2 h-4 w-4" />{t("common.edit")}</Button>
           <Button type="button" size="sm" variant="ghost" className="text-destructive hover:text-destructive" onClick={() => setConfirmingDelete(true)}><Trash2 className="me-2 h-4 w-4" />{t("common.delete")}</Button>
+          <div className="relative">
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              aria-label={t("command.quickActions")}
+              aria-expanded={showOverflowActions}
+              onClick={() => setShowOverflowActions((current) => !current)}
+            >
+              ...
+            </Button>
+            {showOverflowActions ? (
+              <div className="absolute bottom-full end-0 z-20 mb-2 grid min-w-56 gap-1 rounded-xl border bg-popover p-2 text-popover-foreground shadow-aliosFloating">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  className="justify-start"
+                  disabled={isBusy}
+                  onClick={() => {
+                    setShowOverflowActions(false);
+                    void onToggleStatus();
+                  }}
+                >
+                  {item.status === "unprocessed" ? <CheckCircle2 className="me-2 h-4 w-4" /> : <Circle className="me-2 h-4 w-4" />}
+                  {item.status === "unprocessed" ? t("inbox.markProcessed") : t("inbox.markUnprocessed")}
+                </Button>
+                {item.status === "unprocessed" ? (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    className="justify-start"
+                    disabled={isBusy}
+                    onClick={() => {
+                      setShowOverflowActions(false);
+                      setShowSnooze((current) => !current);
+                    }}
+                  >
+                    <Clock3 className="me-2 h-4 w-4" />{t("inbox.snooze")}
+                  </Button>
+                ) : null}
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  className="justify-start"
+                  onClick={() => {
+                    setShowOverflowActions(false);
+                    setIsEditing(true);
+                  }}
+                >
+                  <Pencil className="me-2 h-4 w-4" />{t("common.edit")}
+                </Button>
+              </div>
+            ) : null}
+          </div>
         </>}
       </CardFooter>
     </Card>

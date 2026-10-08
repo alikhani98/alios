@@ -148,9 +148,8 @@ describe("Inbox disclosure density", () => {
 
     expect(markup).toContain("Process a captured idea");
     expect(markup).toContain("Process Inbox");
-    expect(markup).toContain("Snooze");
     expect(markup).toContain("Delete");
-    expect(markup).toContain("Edit");
+    expect(markup).toContain("Quick actions");
     expect(markup).toContain("md:hidden");
   });
 
