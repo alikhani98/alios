@@ -2,6 +2,7 @@ import {
   AlertCircle,
   Flame,
   ListChecks,
+  MoreHorizontal,
   Pencil,
   Plus,
   Repeat2,
@@ -21,6 +22,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  CollapsibleSection,
   EmptyState,
   PremiumCard,
   SectionHeader,
@@ -37,6 +39,135 @@ import { useRoutines } from "../hooks/useRoutines";
 import { createRoutineTodayTasksPath } from "../routineTaskLinks";
 import { getRoutineTaskProgress } from "../routineTaskProgress";
 import { getRoutineCurrentStreak } from "../routineStreak";
+
+type RoutineCardProps = {
+  routine: Routine;
+  tasks: Task[];
+  isTasksLoading: boolean;
+  isFocused: boolean;
+  deletingId: string | null;
+  onEdit: (routine: Routine) => void;
+  onDelete: (routine: Routine) => void;
+};
+
+function RoutineCard({
+  routine,
+  tasks,
+  isTasksLoading,
+  isFocused,
+  deletingId,
+  onEdit,
+  onDelete,
+}: RoutineCardProps) {
+  const { t } = useI18n();
+  const [showOverflowActions, setShowOverflowActions] = useState(false);
+  const progress = getRoutineTaskProgress(routine.id, tasks);
+  const streak = getRoutineCurrentStreak(routine, tasks);
+
+  return (
+    <PremiumCard
+      className={isFocused ? "ring-2 ring-primary ring-offset-2" : undefined}
+    >
+      <CardHeader>
+        <div className="flex min-w-0 flex-wrap items-start justify-between gap-2">
+          <CardTitle className="min-w-0 break-words">{routine.title}</CardTitle>
+          <div className="flex flex-wrap gap-2">
+            <Badge variant={routine.isActive ? "secondary" : "outline"}>
+              {routine.isActive ? t("routines.active") : t("routines.paused")}
+            </Badge>
+            <Badge variant="outline">
+              {t(TASK_PRIORITY_LABEL_KEYS[routine.priority])}
+            </Badge>
+            {streak > 0 ? (
+              <Badge
+                variant="outline"
+                className="border-alios-saffron/50 bg-alios-saffron/10 text-alios-caspian dark:text-alios-paper"
+              >
+                <Flame className="me-1 h-3.5 w-3.5 text-alios-saffron" />
+                {t("routines.currentStreak", { count: streak })}
+              </Badge>
+            ) : null}
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {routine.description ? (
+          <p className="break-words whitespace-pre-wrap text-sm text-muted-foreground">
+            {routine.description}
+          </p>
+        ) : null}
+        <p className="break-words text-sm text-muted-foreground">
+          {routine.weekdays
+            .map((day) => t(ROUTINE_WEEKDAY_LABEL_KEYS[day]))
+            .join("، ")}
+        </p>
+
+        <SoftPanel className="space-y-3">
+          <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0 space-y-1">
+              <p className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                <ListChecks className="h-4 w-4 shrink-0 text-primary" />
+                {t("routines.taskProgress")}
+              </p>
+              <p className="text-sm font-medium">
+                {isTasksLoading
+                  ? t("common.loading")
+                  : progress.total === 0
+                    ? t("routines.notStartedYet")
+                    : t("routines.taskProgressSimple", progress)}
+              </p>
+            </div>
+            <Button asChild size="sm" variant="outline" className="w-full shrink-0 sm:w-auto">
+              <Link to={createRoutineTodayTasksPath(routine.id)}>
+                {t("routines.openTodayTasks")}
+              </Link>
+            </Button>
+          </div>
+        </SoftPanel>
+
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Button
+            variant="ghost"
+            className="text-destructive hover:text-destructive"
+            disabled={deletingId === routine.id}
+            onClick={() => onDelete(routine)}
+          >
+            <Trash2 className="me-2 h-4 w-4" />
+            {deletingId === routine.id ? t("common.deleting") : t("common.delete")}
+          </Button>
+          <div className="relative">
+            <Button
+              type="button"
+              variant="outline"
+              aria-label={t("command.quickActions")}
+              aria-expanded={showOverflowActions}
+              onClick={() => setShowOverflowActions((current) => !current)}
+            >
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+            {showOverflowActions ? (
+              <div className="absolute end-0 z-20 mt-2 grid min-w-56 gap-1 rounded-xl border bg-popover p-2 text-popover-foreground shadow-aliosFloating">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="justify-start"
+                  onClick={() => {
+                    setShowOverflowActions(false);
+                    onEdit(routine);
+                  }}
+                >
+                  <Pencil className="me-2 h-4 w-4" />
+                  {t("common.edit")}
+                </Button>
+                <QuickAccessToggleButton itemType="routine" targetId={routine.id} />
+              </div>
+            ) : null}
+          </div>
+        </div>
+      </CardContent>
+    </PremiumCard>
+  );
+}
 
 export function RoutinesPage() {
   const { t } = useI18n();
@@ -63,10 +194,15 @@ export function RoutinesPage() {
   const [message, setMessage] = useState<string | null>(null);
   const [showAllRoutines, setShowAllRoutines] = useState(false);
   const routinePreviewLimit = 6;
-  const focusRequiresAllRoutines = entries.findIndex((routine) => routine.id === focusId) >= routinePreviewLimit;
+  const activeRoutines = entries.filter((routine) => routine.isActive);
+  const pausedRoutines = entries.filter((routine) => !routine.isActive);
+  const orderedRoutines = [...activeRoutines, ...pausedRoutines];
+  const focusRequiresAllRoutines = orderedRoutines.findIndex((routine) => routine.id === focusId) >= routinePreviewLimit;
   const displayedRoutines = showAllRoutines || focusRequiresAllRoutines
-    ? entries
-    : entries.slice(0, routinePreviewLimit);
+    ? orderedRoutines
+    : orderedRoutines.slice(0, routinePreviewLimit);
+  const displayedActiveRoutines = displayedRoutines.filter((routine) => routine.isActive);
+  const displayedPausedRoutines = displayedRoutines.filter((routine) => !routine.isActive);
   const hiddenRoutineCount = Math.max(entries.length - displayedRoutines.length, 0);
 
   const loadRoutineTasks = async () => {
@@ -158,6 +294,9 @@ export function RoutinesPage() {
               </Button>
             }
           />
+          <p className="mt-3 text-xs leading-6 text-muted-foreground">
+            {t("routines.progressNote")}
+          </p>
         </CardContent>
       </PremiumCard>
 
@@ -231,100 +370,58 @@ export function RoutinesPage() {
           }
         />
       ) : (
-        <div className="grid gap-4 xl:grid-cols-2">
-          {displayedRoutines.map((routine) => {
-            const progress = getRoutineTaskProgress(routine.id, tasks);
-            const streak = getRoutineCurrentStreak(routine, tasks);
+        <div className="space-y-4">
+          {displayedActiveRoutines.length > 0 ? (
+            <div className="grid gap-4 xl:grid-cols-2">
+              {displayedActiveRoutines.map((routine) => (
+                <RoutineCard
+                  key={routine.id}
+                  routine={routine}
+                  tasks={tasks}
+                  isTasksLoading={isTasksLoading}
+                  isFocused={focusId === routine.id}
+                  deletingId={deletingId}
+                  onEdit={(targetRoutine) => {
+                    setEditing(targetRoutine);
+                    setFormOpen(true);
+                    setActionError(null);
+                    setMessage(null);
+                  }}
+                  onDelete={(targetRoutine) => void remove(targetRoutine)}
+                />
+              ))}
+            </div>
+          ) : null}
 
-            return (
-              <PremiumCard
-                key={routine.id}
-                className={focusId === routine.id ? "ring-2 ring-primary ring-offset-2" : undefined}
-              >
-                <CardHeader>
-                  <div className="flex min-w-0 flex-wrap items-start justify-between gap-2">
-                    <CardTitle className="min-w-0 break-words">{routine.title}</CardTitle>
-                    <div className="flex flex-wrap gap-2">
-                      <Badge variant={routine.isActive ? "secondary" : "outline"}>
-                        {routine.isActive ? t("routines.active") : t("routines.paused")}
-                      </Badge>
-                      <Badge variant="outline">
-                        {t(TASK_PRIORITY_LABEL_KEYS[routine.priority])}
-                      </Badge>
-                      <Badge
-                        variant="outline"
-                        className="border-alios-saffron/50 bg-alios-saffron/10 text-alios-caspian dark:text-alios-paper"
-                      >
-                        <Flame className="me-1 h-3.5 w-3.5 text-alios-saffron" />
-                        {t("routines.currentStreak", { count: streak })}
-                      </Badge>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {routine.description ? (
-                    <p className="break-words whitespace-pre-wrap text-sm text-muted-foreground">
-                      {routine.description}
-                    </p>
-                  ) : null}
-                  <p className="break-words text-sm text-muted-foreground">
-                    {routine.weekdays
-                      .map((day) => t(ROUTINE_WEEKDAY_LABEL_KEYS[day]))
-                      .join("، ")}
-                  </p>
-
-                  <SoftPanel className="space-y-3">
-                    <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                      <div className="min-w-0 space-y-1">
-                        <p className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-                          <ListChecks className="h-4 w-4 shrink-0 text-primary" />
-                          {t("routines.taskProgress")}
-                        </p>
-                        <p className="text-sm font-medium">
-                          {isTasksLoading
-                            ? t("common.loading")
-                            : t("routines.taskProgressValue", progress)}
-                        </p>
-                      </div>
-                      <Button asChild size="sm" variant="outline" className="w-full shrink-0 sm:w-auto">
-                        <Link to={createRoutineTodayTasksPath(routine.id)}>
-                          {t("routines.openTodayTasks")}
-                        </Link>
-                      </Button>
-                    </div>
-                    <p className="text-xs leading-6 text-muted-foreground">
-                      {t("routines.progressNote")}
-                    </p>
-                  </SoftPanel>
-
-                  <div className="flex flex-col gap-2 sm:flex-row">
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        setEditing(routine);
-                        setFormOpen(true);
-                        setActionError(null);
-                        setMessage(null);
-                      }}
-                    >
-                      <Pencil className="me-2 h-4 w-4" />
-                      {t("common.edit")}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      className="text-destructive hover:text-destructive"
-                      disabled={deletingId === routine.id}
-                      onClick={() => void remove(routine)}
-                    >
-                      <Trash2 className="me-2 h-4 w-4" />
-                      {deletingId === routine.id ? t("common.deleting") : t("common.delete")}
-                    </Button>
-                    <QuickAccessToggleButton itemType="routine" targetId={routine.id} />
-                  </div>
-                </CardContent>
-              </PremiumCard>
-            );
-          })}
+          {displayedPausedRoutines.length > 0 ? (
+            <CollapsibleSection
+              id="routines-paused"
+              title={t("routines.pausedSection")}
+              status={<Badge variant="outline">{displayedPausedRoutines.length}</Badge>}
+              defaultOpen={activeRoutines.length === 0 || displayedPausedRoutines.some((routine) => routine.id === focusId)}
+              expandLabel={t("common.expandSection")}
+              collapseLabel={t("common.collapseSection")}
+              contentClassName="grid gap-4 xl:grid-cols-2"
+            >
+              {displayedPausedRoutines.map((routine) => (
+                <RoutineCard
+                  key={routine.id}
+                  routine={routine}
+                  tasks={tasks}
+                  isTasksLoading={isTasksLoading}
+                  isFocused={focusId === routine.id}
+                  deletingId={deletingId}
+                  onEdit={(targetRoutine) => {
+                    setEditing(targetRoutine);
+                    setFormOpen(true);
+                    setActionError(null);
+                    setMessage(null);
+                  }}
+                  onDelete={(targetRoutine) => void remove(targetRoutine)}
+                />
+              ))}
+            </CollapsibleSection>
+          ) : null}
         </div>
       )}
       {entries.length > routinePreviewLimit && !focusRequiresAllRoutines ? (
