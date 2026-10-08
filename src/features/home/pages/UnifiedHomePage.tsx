@@ -5,23 +5,24 @@ import {
   Brain,
   CalendarCheck2,
   CalendarDays,
+  CheckCircle2,
   FolderKanban,
   GraduationCap,
   Inbox,
+  ListTodo,
   RotateCcw,
   ShieldCheck,
   Target,
   X,
 } from "lucide-react";
 import { type ReactNode, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
-import { format, isValid, parseISO } from "date-fns";
+import { Link } from "react-router-dom";
+import { addDays, format } from "date-fns";
 
 import {
   isOnboardingCompleted,
   isOnboardingDismissed,
 } from "@/features/onboarding/onboardingStorage";
-import { TodayWorkspace } from "@/features/today/components/TodayWorkspace";
 import { LocalReminderPanel } from "@/features/reminders";
 import { RoutineTemplatesCard, type RoutineTemplateId } from "@/features/routines";
 import { WellnessBadmintonCard } from "@/features/wellness";
@@ -30,8 +31,8 @@ import { DISPLAY_NAME_STORAGE_KEY } from "@/shared/constants/preferences";
 import { useBackupStatus } from "@/shared/hooks";
 import { usePersistentString } from "@/shared/hooks/usePersistentString";
 import { useI18n, type TranslationKey } from "@/shared/i18n";
-import { QuickAccessLauncher } from "@/shared/quickAccess";
 import { getBackupAgeInDays } from "@/shared/preferences/backupStatus";
+import type { Task } from "@/shared/types";
 import {
   Badge,
   Button,
@@ -74,13 +75,41 @@ const quickLinks: ReadonlyArray<{ to: string; labelKey: TranslationKey }> = [
   { to: "/settings", labelKey: "home.goSettings" },
 ];
 
-function getRequestedToday(searchParams: URLSearchParams) {
-  const requestedDate = searchParams.get("date");
-  const requestedDateValue = requestedDate ? parseISO(requestedDate) : undefined;
+const taskPriorityRank: Record<Task["priority"], number> = {
+  high: 0,
+  medium: 1,
+  low: 2,
+};
 
-  return requestedDate && requestedDateValue && isValid(requestedDateValue)
-    ? format(requestedDateValue, "yyyy-MM-dd")
-    : format(new Date(), "yyyy-MM-dd");
+function isActiveTask(task: Task): boolean {
+  return task.status === "todo" || task.status === "doing";
+}
+
+function compareDecisionTasks(left: Task, right: Task): number {
+  const leftTime = left.scheduledStartTime ?? "99:99";
+  const rightTime = right.scheduledStartTime ?? "99:99";
+  const scheduledTimeOrder = leftTime.localeCompare(rightTime);
+
+  if (scheduledTimeOrder !== 0) {
+    return scheduledTimeOrder;
+  }
+
+  const priorityOrder =
+    taskPriorityRank[left.priority] - taskPriorityRank[right.priority];
+
+  if (priorityOrder !== 0) {
+    return priorityOrder;
+  }
+
+  return left.createdAt.localeCompare(right.createdAt);
+}
+
+function createTodayTaskFocusPath(task: Task): string {
+  const searchParams = new URLSearchParams({ focusId: task.id });
+  if (task.dueDate) {
+    searchParams.set("date", task.dueDate);
+  }
+  return `/today?${searchParams.toString()}`;
 }
 
 function SummaryCard({
@@ -103,51 +132,130 @@ function OverviewPanel({ children }: { children: ReactNode }) {
   );
 }
 
-function TodayContextStrip({ inboxCount }: { inboxCount: number }) {
+function TodaySummaryBar({
+  data,
+  today,
+}: {
+  data: HomeDashboardData;
+  today: Date;
+}) {
   const { t } = useI18n();
+  const { formatDate } = useDateFormatter();
+  const remainingTaskCount = data.today.tasks.filter(isActiveTask).length;
 
   return (
-    <CollapsibleSection
-      id="unified-home-today-context"
-      title={t("home.todayContextTitle")}
-      description={t("home.todayContextDescription")}
-      icon={<CalendarDays className="h-5 w-5" aria-hidden="true" />}
-      defaultOpen={false}
-      expandLabel={t("common.expandSection")}
-      collapseLabel={t("common.collapseSection")}
-      status={
-        <span className="flex flex-wrap items-center justify-end gap-2">
-          <StatusChip tone={inboxCount > 0 ? "warning" : "neutral"} className="alios-home-thread-marker">
-            <span className="font-mono tabular-nums">{inboxCount}</span> {t("nav.inbox")}
-          </StatusChip>
-          <Badge variant="outline" className="alios-home-thread-marker">
-            {t("weeklyReview.title")}
-          </Badge>
+    <SoftPanel className="alios-home-context-shelf grid gap-3 border-alios-herb/25 bg-background/90 p-4 shadow-sm md:grid-cols-3">
+      <div className="flex items-center gap-2 text-sm font-medium">
+        <CheckCircle2 className="h-4 w-4 text-alios-herb" aria-hidden="true" />
+        <span>
+          {t("home.todaySummaryCompleted", {
+            count: data.today.completedTaskCount,
+          })}
         </span>
-      }
-      className="alios-home-thread-continuation alios-home-context-shelf overflow-hidden shadow-sm"
-    >
-      <div className="grid gap-2 sm:grid-cols-3 md:flex md:justify-end">
-        <Button asChild variant="outline" className="w-full md:w-auto">
-          <Link to="/calendar">
-            {t("nav.calendar")}
-            <ArrowUpLeft className="ms-2 h-4 w-4" aria-hidden="true" />
-          </Link>
-        </Button>
-        <Button asChild variant="outline" className="alios-home-thread-marker w-full md:w-auto">
-          <Link to="/inbox">
-            {t("nav.inbox")}
-            <ArrowUpLeft className="ms-2 h-4 w-4" aria-hidden="true" />
-          </Link>
-        </Button>
-        <Button asChild variant="outline" className="alios-home-thread-marker w-full md:w-auto">
-          <Link to="/weekly-review">
-            {t("weeklyReview.title")}
-            <ArrowUpLeft className="ms-2 h-4 w-4" aria-hidden="true" />
-          </Link>
-        </Button>
       </div>
-    </CollapsibleSection>
+      <div className="flex items-center gap-2 text-sm font-medium">
+        <RotateCcw className="h-4 w-4 text-alios-saffron" aria-hidden="true" />
+        <span>
+          {t("home.todaySummaryRemaining", {
+            count: remainingTaskCount,
+          })}
+        </span>
+      </div>
+      <div className="flex items-center gap-2 text-sm font-medium md:justify-end">
+        <CalendarDays className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+        <span>{formatDate(today)}</span>
+      </div>
+    </SoftPanel>
+  );
+}
+
+function TodayPreviewCard({ data }: { data: HomeDashboardData }) {
+  const { t } = useI18n();
+  const activeTasks = [...data.today.tasks]
+    .filter(isActiveTask)
+    .sort(compareDecisionTasks);
+  const previewTasks = activeTasks.slice(0, 3);
+
+  return (
+    <Card className="alios-home-context-shelf overflow-hidden shadow-sm">
+      <CardContent className="space-y-4 p-5 sm:p-6">
+        <SectionHeader
+          title={t("home.todayPreviewTitle", { count: activeTasks.length })}
+          icon={<ListTodo className="h-5 w-5" aria-hidden="true" />}
+        />
+
+        {previewTasks.length > 0 ? (
+          <div className="space-y-2">
+            {previewTasks.map((task) => (
+              <Link
+                key={task.id}
+                to={createTodayTaskFocusPath(task)}
+                className="flex min-h-12 min-w-0 items-center justify-between gap-3 rounded-2xl border bg-background/80 px-4 py-3 text-sm shadow-sm transition hover:border-primary/25 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
+                <span className="min-w-0 truncate font-medium">{task.title}</span>
+                {task.scheduledStartTime ? (
+                  <span className="shrink-0 text-xs text-muted-foreground">
+                    {task.scheduledStartTime}
+                  </span>
+                ) : null}
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <p className="rounded-2xl border bg-background/80 p-4 text-sm text-muted-foreground">
+            {t("home.todayPreviewEmpty")}
+          </p>
+        )}
+
+        <Button asChild variant="outline" className="w-full justify-center">
+          <Link to="/today">
+            {t("home.viewAllTodayTasks")}
+            <ArrowUpLeft className="ms-2 h-4 w-4" aria-hidden="true" />
+          </Link>
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
+
+function TomorrowCard({
+  data,
+  tomorrow,
+}: {
+  data: HomeDashboardData;
+  tomorrow: Date;
+}) {
+  const { t } = useI18n();
+  const { formatDate } = useDateFormatter();
+  const tomorrowKey = format(tomorrow, "yyyy-MM-dd");
+  const tomorrowTask = data.tasks
+    .filter((task) => isActiveTask(task) && task.dueDate === tomorrowKey)
+    .sort(compareDecisionTasks)[0];
+  const tomorrowPath = tomorrowTask
+    ? createTodayTaskFocusPath(tomorrowTask)
+    : `/today?${new URLSearchParams({ date: tomorrowKey }).toString()}`;
+
+  return (
+    <Card className="alios-home-context-shelf overflow-hidden shadow-sm">
+      <CardContent className="space-y-4 p-5 sm:p-6">
+        <SectionHeader
+          title={t("home.importantTomorrow")}
+          description={formatDate(tomorrow)}
+          icon={<CalendarDays className="h-5 w-5" aria-hidden="true" />}
+        />
+
+        <p className="rounded-2xl border bg-background/80 p-4 text-sm font-medium leading-6">
+          {tomorrowTask?.title ?? t("home.tomorrowEmpty")}
+        </p>
+
+        <Button asChild variant="outline" className="w-full justify-center">
+          <Link to={tomorrowPath}>
+            {t("home.openTomorrowTask")}
+            <ArrowUpLeft className="ms-2 h-4 w-4" aria-hidden="true" />
+          </Link>
+        </Button>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -593,8 +701,8 @@ export function UnifiedHomePage() {
     key: DISPLAY_NAME_STORAGE_KEY,
     defaultValue: "",
   });
-  const [searchParams] = useSearchParams();
-  const today = getRequestedToday(searchParams);
+  const today = new Date();
+  const tomorrow = addDays(today, 1);
   const onboardingState = isOnboardingCompleted()
     ? "completed"
     : isOnboardingDismissed()
@@ -617,6 +725,8 @@ export function UnifiedHomePage() {
     backupAgeInDays === null
       ? t("home.backupReminderNever")
       : t("home.backupReminderDaysAgo", { count: backupAgeInDays });
+  const showEveningBriefing =
+    today.getHours() >= 18 && (data?.today.tasks.length ?? 0) > 0;
 
   if (!data && !isLoading && !hasError) {
     return null;
@@ -645,48 +755,6 @@ export function UnifiedHomePage() {
         </div>
       ) : null}
 
-      {showBackupReminder ? (
-        <SoftPanel className="flex flex-col gap-3 border-alios-saffron/30 bg-gradient-to-l from-alios-saffron/10 via-background to-background p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:gap-5">
-          <div className="flex min-w-0 items-start gap-3">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-alios-saffron/30 bg-alios-saffron/15 text-alios-caspian dark:text-alios-paper">
-              <ShieldCheck className="h-5 w-5" aria-hidden="true" />
-            </span>
-            <div className="min-w-0 space-y-1">
-              <div className="flex flex-wrap items-center gap-2">
-                <p className="font-semibold leading-6">{t("home.backupReminderTitle")}</p>
-                <StatusChip>
-                  {t(
-                    backupFreshness === "never"
-                      ? "settings.backupStatusNever"
-                      : "settings.backupStatusOverdue"
-                  )}
-                </StatusChip>
-              </div>
-              <p className="text-sm leading-6 text-muted-foreground">
-                {backupReminderBody}
-              </p>
-            </div>
-          </div>
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-            <Button asChild variant="outline" size="sm" className="w-full shrink-0 sm:w-auto">
-              <Link to="/settings#settings-backup-restore">{t("home.backupReminderAction")}</Link>
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="w-full shrink-0 sm:w-auto"
-              onClick={() => {
-                setBackupReminderDismissedUntil(writeHomeBackupReminderDismissal());
-              }}
-            >
-              <X className="me-2 h-4 w-4" aria-hidden="true" />
-              {t("home.backupReminderDismiss")}
-            </Button>
-          </div>
-        </SoftPanel>
-      ) : null}
-
       {isLoading ? (
         <div className="space-y-4" aria-label={t("home.loading")}>
           <div className="h-72 animate-pulse rounded-[2rem] border border-alios-saffron/20 bg-gradient-to-br from-alios-paper via-muted/55 to-muted/70 shadow-sm dark:from-alios-night" />
@@ -694,28 +762,62 @@ export function UnifiedHomePage() {
         </div>
       ) : data ? (
         <>
+          <ClearStartCard data={data} />
+          {showBackupReminder ? (
+            <SoftPanel className="flex flex-col gap-3 border-alios-saffron/30 bg-gradient-to-l from-alios-saffron/10 via-background to-background p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:gap-5">
+              <div className="flex min-w-0 items-start gap-3">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-alios-saffron/30 bg-alios-saffron/15 text-alios-caspian dark:text-alios-paper">
+                  <ShieldCheck className="h-5 w-5" aria-hidden="true" />
+                </span>
+                <div className="min-w-0 space-y-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="font-semibold leading-6">{t("home.backupReminderTitle")}</p>
+                    <StatusChip>
+                      {t(
+                        backupFreshness === "never"
+                          ? "settings.backupStatusNever"
+                          : "settings.backupStatusOverdue"
+                      )}
+                    </StatusChip>
+                  </div>
+                  <p className="text-sm leading-6 text-muted-foreground">
+                    {backupReminderBody}
+                  </p>
+                </div>
+              </div>
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                <Button asChild variant="outline" size="sm" className="w-full shrink-0 sm:w-auto">
+                  <Link to="/settings#settings-backup-restore">{t("home.backupReminderAction")}</Link>
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="w-full shrink-0 sm:w-auto"
+                  onClick={() => {
+                    setBackupReminderDismissedUntil(writeHomeBackupReminderDismissal());
+                  }}
+                >
+                  <X className="me-2 h-4 w-4" aria-hidden="true" />
+                  {t("home.backupReminderDismiss")}
+                </Button>
+              </div>
+            </SoftPanel>
+          ) : null}
           {data.isEmpty ? (
             <WelcomeCard
               key={onboardingState}
               displayName={displayName}
             />
           ) : null}
-          <DailyBriefingCard data={data} />
-          <ClearStartCard data={data} />
-          <QuickAccessLauncher />
-          <LocalReminderPanel snapshot={data.reminderSnapshot} />
+          <TodaySummaryBar data={data} today={today} />
+          <div className="grid gap-5 xl:grid-cols-2">
+            <TodayPreviewCard data={data} />
+            <LocalReminderPanel snapshot={data.reminderSnapshot} />
+          </div>
+          <TomorrowCard data={data} tomorrow={tomorrow} />
           <HomeLearningPanel snapshot={data.learningSnapshot} />
-          <TodayContextStrip inboxCount={data.inbox.unprocessedCount} />
-          <TodayWorkspace
-            today={today}
-            focusId={searchParams.get("focusId")}
-            goalId={searchParams.get("goalId")}
-            hideEmptyTaskState
-            hideHero
-            hideTaskSummaryHeader
-            projectId={searchParams.get("projectId")}
-            routineId={searchParams.get("routineId")}
-          />
+          {showEveningBriefing ? <DailyBriefingCard data={data} /> : null}
           <MoreContext
             data={data}
             selectedRoutineTemplateId={selectedRoutineTemplateId}

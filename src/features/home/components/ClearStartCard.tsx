@@ -1,4 +1,4 @@
-import { ArrowUpLeft, CheckSquare2, Inbox, Plus, Repeat2, Sparkles, Target } from "lucide-react";
+import { ArrowUpLeft, CheckSquare2, Plus, Sparkles, Target } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { useI18n } from "@/shared/i18n";
@@ -9,7 +9,6 @@ import {
   PremiumCard,
   SectionHeader,
   SoftPanel,
-  StatusChip,
 } from "@/shared/ui";
 
 import type { HomeDashboardData } from "../types";
@@ -18,24 +17,6 @@ function findCurrentFocus(data: HomeDashboardData): Task | undefined {
   return data.today.mitTask
     ?? data.today.tasks.find((task) => task.status === "doing")
     ?? data.today.tasks.find((task) => task.status === "todo");
-}
-
-function findUrgentTask(data: HomeDashboardData): Task | undefined {
-  const today = new Date().toISOString().slice(0, 10);
-
-  return data.tasks
-    .filter(
-      (task) =>
-        (task.status === "todo" || task.status === "doing") &&
-        task.dueDate &&
-        task.dueDate <= today
-    )
-    .sort((first, second) => {
-      const dateComparison = (first.dueDate ?? "").localeCompare(second.dueDate ?? "");
-      return dateComparison === 0
-        ? second.updatedAt.localeCompare(first.updatedAt)
-        : dateComparison;
-    })[0];
 }
 
 function createTodayTaskFocusPath(task: Task): string {
@@ -53,100 +34,20 @@ export function ClearStartCard({
 }) {
   const { t } = useI18n();
   const currentFocus = findCurrentFocus(data);
-  const urgentTask = currentFocus ? undefined : findUrgentTask(data);
-  const activeTaskCount = data.today.tasks.filter(
-    (task) => task.status === "todo" || task.status === "doing"
-  ).length;
-  const inboxBacklogCount = data.inbox.unprocessedCount;
-  const suggestedInboxBatchCount = Math.min(3, inboxBacklogCount);
-  const routineSuggestion = activeTaskCount === 0 && !urgentTask && inboxBacklogCount === 0
-    ? data.routineSuggestion
-    : undefined;
-  const shouldStartWithInbox = activeTaskCount === 0 && !urgentTask && inboxBacklogCount > 0;
-  const shouldStartWithRoutine = Boolean(routineSuggestion);
-  const shouldShowFriendlyTaskEmptyState =
-    activeTaskCount === 0 &&
-    !currentFocus &&
-    !urgentTask &&
-    !shouldStartWithInbox &&
-    !shouldStartWithRoutine;
-  const suggestedTask = currentFocus ?? urgentTask;
-  const primaryActionHref = shouldStartWithInbox
-    ? "/inbox"
-    : routineSuggestion
-      ? `/today?${new URLSearchParams({ routineId: routineSuggestion.id }).toString()}`
-      : suggestedTask
-        ? createTodayTaskFocusPath(suggestedTask)
-        : "/today";
-  const primaryActionLabel = shouldStartWithInbox
-    ? t("home.clearStartProcessInbox")
-    : routineSuggestion
-      ? t("home.clearStartAddRoutine")
-    : t("home.clearStartAddTask");
-  const primaryActionIcon = shouldStartWithInbox ? (
-    <Inbox className="me-2 h-4 w-4" aria-hidden="true" />
-  ) : routineSuggestion ? (
-    <Repeat2 className="me-2 h-4 w-4" aria-hidden="true" />
-  ) : (
-    <Plus className="me-2 h-4 w-4" aria-hidden="true" />
-  );
-  const emptyActionTitle = shouldStartWithInbox
-    ? t("home.clearStartInboxBacklogTitle", {
-        count: inboxBacklogCount,
-      })
-    : routineSuggestion
-      ? t("home.clearStartRoutineTitle", { title: routineSuggestion.title })
-      : t("today.noTasks");
-  const emptyActionDescription = shouldStartWithInbox
-    ? t("home.clearStartInboxBacklogDescription", {
-        count: suggestedInboxBatchCount,
-      })
-    : routineSuggestion
-      ? t("home.clearStartRoutineDescription")
-      : t("today.noTasksDescription");
 
   return (
     <PremiumCard className="alios-home-now-surface alios-primary-surface">
-      <CardContent className="relative z-10 grid gap-5 p-5 ps-12 sm:p-6 sm:ps-14 xl:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)]">
-        <div className="space-y-5">
+      <CardContent className="relative z-10 grid gap-5 p-5 sm:p-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(18rem,0.9fr)]">
+        <div className="space-y-4">
           <SectionHeader
-            eyebrow={t("home.title")}
             icon={<Sparkles className="h-5 w-5" aria-hidden="true" />}
             title={t("home.clearStartTitle")}
-            description={t("home.clearStartDescription")}
+            description={t("home.clearStartSubtitle")}
           />
-
-          <div className="grid gap-3 sm:grid-cols-2">
-            <SoftPanel className="gap-2 border-border/70 bg-background/90">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                {t("home.todayTasks")}
-              </p>
-              {shouldShowFriendlyTaskEmptyState ? (
-                <p className="break-words text-sm font-medium leading-7 text-alios-caspian dark:text-alios-paper">
-                  {t("home.todayTasksFriendlyEmpty")}
-                </p>
-              ) : (
-                <>
-                  <p className="font-mono text-2xl font-semibold tabular-nums">{activeTaskCount}</p>
-                  <p className="text-sm text-muted-foreground">{t("common.active")}</p>
-                </>
-              )}
-            </SoftPanel>
-
-            <SoftPanel className="alios-home-thread-anchor gap-2 border-alios-herb/30 bg-background/90">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                {t("home.unprocessedInbox")}
-              </p>
-              <p className="font-mono text-2xl font-semibold tabular-nums">
-                {inboxBacklogCount}
-              </p>
-              <p className="text-sm text-muted-foreground">{t("inbox.unprocessed")}</p>
-            </SoftPanel>
-          </div>
         </div>
 
-        <SoftPanel className="alios-home-thread-panel flex h-full flex-col justify-between gap-5">
-          <div className="alios-home-thread-anchor alios-home-thread-item flex items-start gap-3">
+        <SoftPanel className="alios-home-thread-panel flex h-full flex-col justify-between gap-5 border-alios-herb/30 bg-background/90">
+          <div className="alios-home-thread-item flex items-start gap-3">
             <span className="alios-icon-primary alios-home-thread-node flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl">
               {currentFocus ? (
                 <Target className="h-5 w-5" aria-hidden="true" />
@@ -156,61 +57,39 @@ export function ClearStartCard({
             </span>
             <div className="min-w-0 space-y-1">
               <p className="text-sm font-medium text-muted-foreground">
-                {suggestedTask
-                  ? urgentTask
-                    ? t("home.clearStartUrgentLabel")
-                    : t("home.clearStartFocusLabel")
+                {currentFocus
+                  ? t("home.clearStartFocusLabel")
                   : t("home.clearStartEmptyLabel")}
               </p>
               <p className="break-words text-xl font-semibold leading-8">
-                {suggestedTask?.title ?? emptyActionTitle}
-              </p>
-              <p className="text-sm leading-6 text-muted-foreground">
-                {suggestedTask
-                  ? urgentTask
-                    ? t("home.clearStartUrgentDescription")
-                    : t("today.tasksDescription")
-                  : emptyActionDescription}
+                {currentFocus?.title ?? t("home.clearStartNoTaskBody")}
               </p>
             </div>
           </div>
 
-          <div className="grid gap-2">
-            <Button asChild className="alios-home-thread-item w-full">
-              <Link to={primaryActionHref}>
-                {primaryActionIcon}
-                {primaryActionLabel}
-              </Link>
-            </Button>
+          {currentFocus ? (
             <div className="grid gap-2 sm:grid-cols-2">
-              <Button asChild variant="outline" className="alios-home-thread-item w-full border-alios-herb/35">
-                <Link to="/inbox">
-                  <Inbox className="me-2 h-4 w-4" aria-hidden="true" />
-                  {t("inbox.captureItem")}
-                </Link>
-              </Button>
-              <Button asChild variant="ghost" className="alios-home-thread-anchor alios-home-thread-item w-full text-primary hover:bg-primary/10">
-                <Link to="/weekly-review">
-                  {t("weeklyReview.title")}
+              <Button asChild className="alios-home-thread-item w-full">
+                <Link to={createTodayTaskFocusPath(currentFocus)}>
+                  <Target className="me-2 h-4 w-4" aria-hidden="true" />
+                  {t("home.clearStartStartTask")}
                   <ArrowUpLeft className="ms-2 h-4 w-4" aria-hidden="true" />
                 </Link>
               </Button>
+              <Button asChild variant="outline" className="alios-home-thread-item w-full">
+                <Link to="/today">
+                  {t("home.clearStartOtherOptions")}
+                </Link>
+              </Button>
             </div>
-          </div>
-
-          <StatusChip tone={activeTaskCount > 0 || urgentTask ? "primary" : shouldStartWithInbox ? "warning" : shouldStartWithRoutine ? "success" : "neutral"} className="alios-home-thread-item w-fit">
-            {shouldStartWithInbox ? (
-              t("home.clearStartInboxBacklogStatus", { count: suggestedInboxBatchCount })
-            ) : routineSuggestion ? (
-              t("home.clearStartRoutineStatus")
-            ) : urgentTask ? (
-              t("home.clearStartUrgentStatus")
-            ) : (
-              <>
-                <span className="font-mono tabular-nums">{activeTaskCount}</span> {t("common.active")}
-              </>
-            )}
-          </StatusChip>
+          ) : (
+            <Button asChild className="alios-home-thread-item w-full sm:w-fit">
+              <Link to="/today">
+                <Plus className="me-2 h-4 w-4" aria-hidden="true" />
+                {t("home.clearStartDefineTodayTask")}
+              </Link>
+            </Button>
+          )}
         </SoftPanel>
       </CardContent>
     </PremiumCard>
