@@ -6,6 +6,7 @@ import {
   Clock3,
   GitBranch,
   ListChecks,
+  MoreHorizontal,
   Pencil,
   Target,
   Trash2,
@@ -78,6 +79,9 @@ export function ProjectCard({
   const { t } = useI18n();
   const { formatDate, formatDateTime } = useDateFormatter();
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [showOverflowActions, setShowOverflowActions] = useState(false);
+  const canMarkReviewed =
+    project.status === "active" && isReviewDue && onMarkReviewed;
 
   return (
     <Card className="flex h-full min-w-0 flex-col overflow-hidden">
@@ -138,7 +142,9 @@ export function ProjectCard({
                   {t("projects.taskProgress")}
                 </p>
                 <p className="break-words text-sm font-medium">
-                  {t("projects.taskProgressValue", taskProgress)}
+                  {taskProgress.total === 0
+                    ? t("projects.notStartedYet")
+                    : t("projects.taskProgressValue", taskProgress)}
                 </p>
               </div>
               <Button asChild size="sm" variant="outline" className="w-full shrink-0 sm:w-auto">
@@ -324,18 +330,6 @@ export function ProjectCard({
       <CardFooter className="flex flex-col gap-2 border-t pt-4 sm:flex-row sm:flex-wrap">
         {confirmingDelete ? (
           <>
-            {project.status === "active" && isReviewDue && onMarkReviewed ? (
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                className="w-full sm:w-auto"
-                onClick={() => void onMarkReviewed()}
-              >
-                <Clock3 className="me-2 h-4 w-4" />
-                {t("goals.markReviewed")}
-              </Button>
-            ) : null}
             <Button
               type="button"
               size="sm"
@@ -345,8 +339,7 @@ export function ProjectCard({
               onClick={() => void onDelete()}
             >
               {isDeleting ? t("common.deleting") : t("common.confirmDelete")}
-              </Button>
-            <QuickAccessToggleButton itemType="project" targetId={project.id} />
+            </Button>
             <Button
               type="button"
               size="sm"
@@ -381,6 +374,38 @@ export function ProjectCard({
             </Button>
           </>
         )}
+        <div className="relative">
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            aria-label={t("command.quickActions")}
+            aria-expanded={showOverflowActions}
+            onClick={() => setShowOverflowActions((current) => !current)}
+          >
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+          {showOverflowActions ? (
+            <div className="mt-2 grid min-w-56 gap-1 rounded-xl border bg-popover p-2 text-popover-foreground shadow-aliosFloating">
+              {canMarkReviewed ? (
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  className="justify-start"
+                  onClick={() => {
+                    setShowOverflowActions(false);
+                    void onMarkReviewed?.();
+                  }}
+                >
+                  <Clock3 className="me-2 h-4 w-4" />
+                  {t("goals.markReviewed")}
+                </Button>
+              ) : null}
+              <QuickAccessToggleButton itemType="project" targetId={project.id} />
+            </div>
+          ) : null}
+        </div>
       </CardFooter>
     </Card>
   );

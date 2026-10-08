@@ -21,6 +21,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  CollapsibleSection,
   EmptyState,
   PremiumCard,
   SectionHeader,
@@ -66,6 +67,14 @@ function parseMilestones(value: string | undefined): Project["milestones"] {
       };
     })
     .filter((milestone) => milestone.title.length > 0);
+}
+
+function isActiveListProject(project: Project): boolean {
+  return ["active", "waiting", "later"].includes(project.status);
+}
+
+function isFinishedListProject(project: Project): boolean {
+  return ["completed", "archived"].includes(project.status);
 }
 
 export function ProjectsPage() {
@@ -119,10 +128,18 @@ export function ProjectsPage() {
     ? projects.filter((project) => project.goalId === goalId)
     : projects;
   const projectPreviewLimit = 12;
-  const focusRequiresAllProjects = visibleProjects.findIndex((project) => project.id === focusId) >= projectPreviewLimit;
+  const activeListProjects = visibleProjects.filter(isActiveListProject);
+  const finishedListProjects = visibleProjects.filter(isFinishedListProject);
+  const orderedListProjects = [...activeListProjects, ...finishedListProjects];
+  const focusRequiresAllProjects = orderedListProjects.findIndex((project) => project.id === focusId) >= projectPreviewLimit;
   const displayedProjects = showAllProjects || focusRequiresAllProjects
-    ? visibleProjects
-    : visibleProjects.slice(0, projectPreviewLimit);
+    ? orderedListProjects
+    : orderedListProjects.slice(0, projectPreviewLimit);
+  const displayedActiveListProjects = displayedProjects.filter(isActiveListProject);
+  const displayedFinishedListProjects = displayedProjects.filter(isFinishedListProject);
+  const shouldOpenFinishedProjects =
+    activeListProjects.length === 0 ||
+    displayedFinishedListProjects.some((project) => project.id === focusId);
   const hiddenProjectCount = Math.max(visibleProjects.length - displayedProjects.length, 0);
   const loadLinkedTasks = useCallback(async () => {
     setTaskLoadError(null);
@@ -322,6 +339,48 @@ export function ProjectsPage() {
 
     return () => window.clearTimeout(timeout);
   }, [focusId, isLoading, projects, t]);
+
+  const renderProjectCard = (project: Project) => (
+    <div
+      key={project.id}
+      ref={(node) => {
+        projectRefs.current[project.id] = node;
+      }}
+      className={cn(
+        "scroll-mt-24 rounded-2xl transition-[transform,box-shadow,border-color] duration-200 ease-out motion-reduce:transition-none motion-reduce:transform-none",
+        focusedProjectId === project.id
+          ? "ring-2 ring-primary/50 ring-offset-2 ring-offset-background shadow-lg shadow-primary/10"
+          : null
+      )}
+    >
+      <ProjectCard
+        project={project}
+        linkedGoal={findLinkedGoal(project, goals)}
+        linkedJournalEntries={linkedJournalEntries.filter(
+          (entry) => entry.projectId === project.id
+        )}
+        linkedDecisions={linkedDecisions.filter(
+          (decision) => decision.projectId === project.id
+        )}
+        linkedKnowledgeItems={linkedKnowledgeItems.filter(
+          (item) => item.projectId === project.id
+        )}
+        linkedResources={deriveResourcesForProject(
+          project.id,
+          resources,
+          linkedKnowledgeItems,
+          tasks
+        )}
+        taskProgress={getProjectTaskProgress(project.id, tasks)}
+        isLinkedGoalLoading={isGoalsLoading}
+        isReviewDue={isProjectReviewDue(project)}
+        isDeleting={deletingId === project.id}
+        onEdit={() => openEditForm(project)}
+        onDelete={() => handleDelete(project)}
+        onMarkReviewed={() => handleMarkReviewed(project)}
+      />
+    </div>
+  );
 
   return (
     <section className="alios-page space-y-6">
@@ -543,48 +602,24 @@ export function ProjectsPage() {
           projects={visibleProjects}
         />
       ) : (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {displayedProjects.map((project) => (
-            <div
-              key={project.id}
-              ref={(node) => {
-                projectRefs.current[project.id] = node;
-              }}
-              className={cn(
-                "scroll-mt-24 rounded-2xl transition-[transform,box-shadow,border-color] duration-200 ease-out motion-reduce:transition-none motion-reduce:transform-none",
-                focusedProjectId === project.id
-                  ? "ring-2 ring-primary/50 ring-offset-2 ring-offset-background shadow-lg shadow-primary/10"
-                  : null
-              )}
-            >
-              <ProjectCard
-                project={project}
-                linkedGoal={findLinkedGoal(project, goals)}
-                linkedJournalEntries={linkedJournalEntries.filter(
-                  (entry) => entry.projectId === project.id
-                )}
-                linkedDecisions={linkedDecisions.filter(
-                  (decision) => decision.projectId === project.id
-                )}
-                linkedKnowledgeItems={linkedKnowledgeItems.filter(
-                  (item) => item.projectId === project.id
-                )}
-                linkedResources={deriveResourcesForProject(
-                  project.id,
-                  resources,
-                  linkedKnowledgeItems,
-                  tasks
-                )}
-                taskProgress={getProjectTaskProgress(project.id, tasks)}
-                isLinkedGoalLoading={isGoalsLoading}
-                isReviewDue={isProjectReviewDue(project)}
-                isDeleting={deletingId === project.id}
-                onEdit={() => openEditForm(project)}
-                onDelete={() => handleDelete(project)}
-                onMarkReviewed={() => handleMarkReviewed(project)}
-              />
+        <div className="space-y-4">
+          {displayedActiveListProjects.length > 0 ? (
+            <div className="grid gap-4">
+              {displayedActiveListProjects.map(renderProjectCard)}
             </div>
-          ))}
+          ) : null}
+          {displayedFinishedListProjects.length > 0 ? (
+            <CollapsibleSection
+              id="projects-finished"
+              title={t("projects.finishedSection")}
+              expandLabel={t("common.expandSection")}
+              collapseLabel={t("common.collapseSection")}
+              defaultOpen={shouldOpenFinishedProjects}
+              contentClassName="grid gap-4"
+            >
+              {displayedFinishedListProjects.map(renderProjectCard)}
+            </CollapsibleSection>
+          ) : null}
         </div>
       )}
       {visibleProjects.length > projectPreviewLimit && !focusRequiresAllProjects ? (
