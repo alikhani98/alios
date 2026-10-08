@@ -1,4 +1,4 @@
-import { ExternalLink, Link2, Pencil, Trash2 } from "lucide-react";
+import { ExternalLink, Link2, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -66,6 +66,7 @@ export function KnowledgeItemCard({
 }: KnowledgeItemCardProps) {
   const { t } = useI18n();
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [showOverflowActions, setShowOverflowActions] = useState(false);
 
   return (
     <Card className="flex h-full flex-col">
@@ -133,14 +134,6 @@ export function KnowledgeItemCard({
       </CardContent>
 
       <CardFooter className="flex-wrap gap-2 border-t pt-4">
-        {attachmentWorkflow ? (
-          <AttachmentCreateControl
-            ownerType="knowledge"
-            ownerId={item.id}
-            dependencies={attachmentWorkflow}
-            onCreated={onAttachmentCreated}
-          />
-        ) : null}
         {confirmingDelete ? (
           <>
             <Button
@@ -152,7 +145,6 @@ export function KnowledgeItemCard({
             >
               {isDeleting ? t("common.deleting") : t("common.confirmDelete")}
               </Button>
-            <QuickAccessToggleButton itemType="knowledge" targetId={item.id} />
             <Button
               type="button"
               size="sm"
@@ -180,6 +172,36 @@ export function KnowledgeItemCard({
             </Button>
           </>
         )}
+        <div className="relative">
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            aria-label={t("command.quickActions")}
+            aria-expanded={showOverflowActions}
+            onClick={() => setShowOverflowActions((current) => !current)}
+          >
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+          <div
+            className="mt-2 grid min-w-56 gap-1 rounded-xl border border-border/70 bg-popover p-2 text-popover-foreground shadow-aliosFloating"
+            hidden={!showOverflowActions}
+            aria-hidden={!showOverflowActions}
+          >
+            {attachmentWorkflow ? (
+              <AttachmentCreateControl
+                ownerType="knowledge"
+                ownerId={item.id}
+                dependencies={attachmentWorkflow}
+                onCreated={(attachment) => {
+                  setShowOverflowActions(false);
+                  onAttachmentCreated?.(attachment);
+                }}
+              />
+            ) : null}
+            <QuickAccessToggleButton itemType="knowledge" targetId={item.id} />
+          </div>
+        </div>
       </CardFooter>
     </Card>
   );

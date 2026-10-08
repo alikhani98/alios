@@ -460,7 +460,7 @@ export function KnowledgePage() {
       ) : null}
 
       {isLoading ? (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" aria-label={t("knowledge.loading")}>
+        <div className="grid gap-4" aria-label={t("knowledge.loading")}>
           {[0, 1, 2].map((item) => (
             <div
               key={item}
@@ -520,7 +520,7 @@ export function KnowledgePage() {
               onSelectNode={focusKnowledgeItem}
             />
           ) : (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-4">
           {displayedItems.map((item) => (
             <div
               key={item.id}
