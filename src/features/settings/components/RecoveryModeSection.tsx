@@ -82,9 +82,6 @@ export function RecoveryModeSection({
         >
           {enabled ? (
             <SoftPanel className="space-y-3 alios-surface-card">
-              <p className="text-sm leading-7 text-muted-foreground">
-                {t("recovery.actions")}
-              </p>
               <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                 <Button
                   type="button"
@@ -119,9 +116,6 @@ export function RecoveryModeSection({
             <SoftPanel className="alios-surface-card">
               <p className="text-sm leading-7 text-muted-foreground">
                 {t("recovery.sectionHint")}
-              </p>
-              <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                {t("recovery.actions")}
               </p>
             </SoftPanel>
           )}

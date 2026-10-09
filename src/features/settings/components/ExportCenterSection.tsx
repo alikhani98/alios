@@ -1,14 +1,12 @@
 import { Download } from "lucide-react";
 
 import {
-  Badge,
   Button,
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-  SoftPanel,
 } from "@/shared/ui";
 import { useI18n } from "@/shared/i18n";
 import { useExportCenter } from "../hooks/useExportCenter";
@@ -132,31 +130,6 @@ export function ExportCenterSection({ id }: ExportCenterSectionProps) {
           />
         </div>
 
-        <SoftPanel className="alios-surface-muted">
-          <p className="text-sm leading-7 text-muted-foreground">
-            {t("settings.exportCenterNote")}
-          </p>
-          <p className="mt-2 text-xs leading-5 text-muted-foreground">
-            {t("settings.exportEmptyNote")}
-          </p>
-          <p className="text-xs leading-5 text-muted-foreground">
-            {t("settings.exportCenterBackupNote")}
-          </p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <Badge variant="secondary">{t("settings.exportFinanceCsv")}</Badge>
-            <Badge variant="secondary">
-              {t("settings.exportDecisionLogMarkdown")}
-            </Badge>
-            <Badge variant="secondary">{t("settings.exportGoalsMarkdown")}</Badge>
-            <Badge variant="secondary">{t("settings.exportLifeAreasMarkdown")}</Badge>
-            <Badge variant="secondary">{t("settings.exportJournalMarkdown")}</Badge>
-            <Badge variant="secondary">
-              {t("settings.exportKnowledgeMarkdown")}
-            </Badge>
-            <Badge variant="secondary">{t("settings.exportManualMarkdown")}</Badge>
-          </div>
-        </SoftPanel>
-
         {exportCenter.success ? (
           <div
             role="status"
@@ -178,4 +151,3 @@ export function ExportCenterSection({ id }: ExportCenterSectionProps) {
     </Card>
   );
 }
-

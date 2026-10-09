@@ -284,7 +284,7 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <CloudOff className="h-5 w-5 text-primary" />
-          {t("settings.accountSyncTitle")}
+          {t("settings.accountSyncSnapshotLabel")}
         </CardTitle>
         <CardDescription>{t("settings.accountSyncDescription")}</CardDescription>
       </CardHeader>

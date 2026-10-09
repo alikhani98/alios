@@ -264,7 +264,7 @@ describe("SyncStatusCard", () => {
   it("renders the polished account and sync foundation with grouped states, disabled actions, and accessibility labels", async () => {
     const markup = await renderCardToStaticMarkup();
 
-    expect(markup).toContain("Account &amp; Sync");
+    expect(markup).toContain("Account and sync snapshot");
     expect(markup).toContain('aria-label="Account and sync snapshot"');
     expect(markup).toContain("Local only");
     expect(markup).toContain("Sync health");
@@ -859,7 +859,7 @@ describe("SyncStatusCard", () => {
         await Promise.resolve();
       });
 
-      expect(container.textContent).toContain("Account & Sync");
+      expect(container.textContent).toContain("Account and sync snapshot");
       expect(container.textContent).toContain("Sync available");
       expect(renderCount).toBeLessThan(10);
       expect(syncProvider.maxActiveSubscriptions).toBe(1);

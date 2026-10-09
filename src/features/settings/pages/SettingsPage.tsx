@@ -636,7 +636,7 @@ export function SettingsPage() {
             </SoftPanel>
             <SoftPanel className="alios-surface-muted">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                {t("settings.accountSyncTitle")}
+                {t("settings.localFirst")}
               </p>
               <div className="mt-2">
                 <StatusChip tone="neutral">
@@ -774,7 +774,6 @@ export function SettingsPage() {
           title={t("settings.dataSummary")}
           description={t("settings.dataSummaryDescription")}
           icon={<ShieldCheck className="h-4 w-4" />}
-          status={<StatusChip tone="neutral">{t("settings.localFirst")}</StatusChip>}
           expandLabel={t("common.expandSection")}
           collapseLabel={t("common.collapseSection")}
           defaultOpen={false}
@@ -1209,7 +1208,6 @@ export function SettingsPage() {
         icon={<FileJson className="h-4 w-4" />}
         title={t("settings.backupExportGroupTitle")}
         description={t("settings.backupExportGroupDescription")}
-        status={<StatusChip tone="neutral">{t("settings.localFirst")}</StatusChip>}
         expandLabel={t("common.expandSection")}
         collapseLabel={t("common.collapseSection")}
         defaultOpen
@@ -1520,70 +1518,63 @@ export function SettingsPage() {
       </CollapsibleSection>
 
       <section className="space-y-4">
-        <SectionHeader
-          icon={<HardDrive className="h-5 w-5" />}
-          title={t("settings.dangerZone")}
-          description={t("settings.dangerDescription")}
-          status={<StatusChip tone="danger">{t("settings.clearAll")}</StatusChip>}
-        />
-
-      <Card className="border-destructive/40">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-destructive">
-            <HardDrive className="h-5 w-5" />
-            {t("settings.dangerZone")}
-          </CardTitle>
-          <CardDescription>{t("settings.dangerDescription")}</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-sm leading-7 text-muted-foreground">
-            {t("settings.clearWarning")}
-          </p>
-          {dataManagement.isConfirmingClear ? (
-            <SoftPanel className="alios-status-danger">
-              <h3 className="font-semibold text-destructive">
-                {t("settings.clearConfirmTitle")}
-              </h3>
-              <p className="mt-2 text-sm leading-7 text-muted-foreground">
-                {t("settings.clearConfirmDescription")}
-              </p>
-              <div className="mt-4 flex flex-wrap gap-3">
+        <Card className="border-destructive/40">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-destructive">
+              <HardDrive className="h-5 w-5" />
+              {t("settings.dangerZone")}
+            </CardTitle>
+            <CardDescription>{t("settings.dangerDescription")}</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm leading-7 text-muted-foreground">
+              {t("settings.clearWarning")}
+            </p>
+            {dataManagement.isConfirmingClear ? (
+              <SoftPanel className="alios-status-danger">
+                <h3 className="font-semibold text-destructive">
+                  {t("settings.clearConfirmTitle")}
+                </h3>
+                <p className="mt-2 text-sm leading-7 text-muted-foreground">
+                  {t("settings.clearConfirmDescription")}
+                </p>
+                <div className="mt-4 flex flex-wrap gap-3">
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    className="w-full sm:w-auto"
+                    disabled={dataManagement.isClearing}
+                    onClick={() => void dataManagement.confirmClear()}
+                  >
+                    <Trash2 className="me-2 h-4 w-4" />
+                    {dataManagement.isClearing
+                      ? t("settings.clearing")
+                      : t("settings.clearConfirmAction")}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full sm:w-auto"
+                    disabled={dataManagement.isClearing}
+                    onClick={dataManagement.cancelClear}
+                  >
+                    {t("common.cancel")}
+                  </Button>
+                </div>
+              </SoftPanel>
+            ) : (
               <Button
                 type="button"
                 variant="destructive"
                 className="w-full sm:w-auto"
-                disabled={dataManagement.isClearing}
-                onClick={() => void dataManagement.confirmClear()}
+                onClick={dataManagement.requestClear}
               >
                 <Trash2 className="me-2 h-4 w-4" />
-                  {dataManagement.isClearing
-                    ? t("settings.clearing")
-                    : t("settings.clearConfirmAction")}
-                </Button>
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full sm:w-auto"
-                disabled={dataManagement.isClearing}
-                onClick={dataManagement.cancelClear}
-              >
-                {t("common.cancel")}
-                </Button>
-              </div>
-            </SoftPanel>
-          ) : (
-            <Button
-              type="button"
-              variant="destructive"
-              className="w-full sm:w-auto"
-              onClick={dataManagement.requestClear}
-            >
-              <Trash2 className="me-2 h-4 w-4" />
-              {t("settings.clearAll")}
-            </Button>
-          )}
-        </CardContent>
-      </Card>
+                {t("settings.clearAll")}
+              </Button>
+            )}
+          </CardContent>
+        </Card>
       </section>
     </section>
   );
