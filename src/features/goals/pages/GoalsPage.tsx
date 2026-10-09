@@ -19,6 +19,7 @@ import { useStorageAdapter } from "@/core/storage";
 import { useProjects } from "@/features/projects/hooks/useProjects";
 import { useI18n } from "@/shared/i18n";
 import { useViewDensityMode } from "@/shared/preferences/viewDensityMode";
+import { aliosListItemMotion, aliosStaggerDelay } from "@/shared/ui/motion";
 import type {
   DecisionLogEntry,
   Goal,
@@ -656,7 +657,7 @@ export function GoalsPage() {
     (filteredEntries.every((goal) => goal.status === "completed" || goal.status === "archived") ||
       finishedListGoals.some((goal) => goal.id === focusId));
 
-  const renderGoalCard = (goal: Goal) => {
+  const renderGoalCard = (goal: Goal, index: number) => {
     const projectProgress = getGoalProjectProgress(goal.id, projects, tasks);
 
     return (
@@ -667,6 +668,9 @@ export function GoalsPage() {
         }}
         className={cn(
           "min-w-0 scroll-mt-6 rounded-[1.75rem] transition-shadow",
+          aliosListItemMotion,
+          aliosStaggerDelay(index),
+          "motion-reduce:animate-none motion-reduce:opacity-100",
           focusedGoalId === goal.id ? "ring-2 ring-primary/20" : null
         )}
       >

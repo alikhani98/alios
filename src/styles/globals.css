@@ -50,6 +50,32 @@
   }
 }
 
+@layer utilities {
+  .animate-alios-fade-up {
+    animation: alios-fade-up 220ms ease-out;
+  }
+
+  .animation-delay-0 {
+    animation-delay: 0ms;
+  }
+
+  .animation-delay-75 {
+    animation-delay: 75ms;
+  }
+
+  .animation-delay-150 {
+    animation-delay: 150ms;
+  }
+
+  .animation-delay-225 {
+    animation-delay: 225ms;
+  }
+
+  .animation-delay-300 {
+    animation-delay: 300ms;
+  }
+}
+
 @layer base {
   :root {
     --alios-caspian-ink: #172033;
@@ -428,6 +454,7 @@
   }
 
   .alios-page-transition,
+  .animate-alios-fade-up,
   .animate-pulse,
   .animate-spin,
   .alios-home-now-surface::before {

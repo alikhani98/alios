@@ -19,3 +19,16 @@ export const aliosSectionMotion =
 export const aliosSubtleOutlineMotion =
   "transition-[background-color,border-color,box-shadow,color,opacity] duration-200 ease-out motion-reduce:transition-none";
 
+export const aliosListItemMotion =
+  "animate-alios-fade-up opacity-0 [animation-fill-mode:forwards]";
+
+export function aliosStaggerDelay(index: number): string {
+  const delays = [
+    "animation-delay-0",
+    "animation-delay-75",
+    "animation-delay-150",
+    "animation-delay-225",
+    "animation-delay-300",
+  ];
+  return delays[Math.min(index, delays.length - 1)];
+}

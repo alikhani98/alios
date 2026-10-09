@@ -15,6 +15,7 @@ import type {
   Task,
 } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
+import { aliosListItemMotion, aliosStaggerDelay } from "@/shared/ui/motion";
 import {
   Button,
   Card,
@@ -340,7 +341,7 @@ export function ProjectsPage() {
     return () => window.clearTimeout(timeout);
   }, [focusId, isLoading, projects, t]);
 
-  const renderProjectCard = (project: Project) => (
+  const renderProjectCard = (project: Project, index: number) => (
     <div
       key={project.id}
       ref={(node) => {
@@ -348,6 +349,9 @@ export function ProjectsPage() {
       }}
       className={cn(
         "scroll-mt-24 rounded-2xl transition-[transform,box-shadow,border-color] duration-200 ease-out motion-reduce:transition-none motion-reduce:transform-none",
+        aliosListItemMotion,
+        aliosStaggerDelay(index),
+        "motion-reduce:animate-none motion-reduce:opacity-100",
         focusedProjectId === project.id
           ? "ring-2 ring-primary/50 ring-offset-2 ring-offset-background shadow-lg shadow-primary/10"
           : null

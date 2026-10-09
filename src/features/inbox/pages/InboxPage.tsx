@@ -5,6 +5,7 @@ import { useSearchParams } from "react-router-dom";
 
 import { useStorageAdapter } from "@/core/storage";
 import { useI18n } from "@/shared/i18n";
+import { aliosListItemMotion, aliosStaggerDelay } from "@/shared/ui/motion";
 import type { Goal, Project, Resource, Task } from "@/shared/types";
 import { INBOX_ITEM_TYPE_VALUES } from "@/shared/types";
 import {
@@ -710,7 +711,7 @@ export function InboxPage() {
           </CardContent>
         </Card>
         <div className={cn("grid gap-4", isBulkSelectMode ? "pb-44" : undefined)}>
-          {displayedItems.map((item) => (
+          {displayedItems.map((item, index) => (
             <div
               key={item.id}
               ref={(node) => {
@@ -718,6 +719,13 @@ export function InboxPage() {
               }}
               className={cn(
                 "scroll-mt-24 rounded-2xl transition-[transform,box-shadow,border-color] duration-200 ease-out motion-reduce:transition-none motion-reduce:transform-none",
+                !isBulkSelectMode
+                  ? [
+                      aliosListItemMotion,
+                      aliosStaggerDelay(index),
+                      "motion-reduce:animate-none motion-reduce:opacity-100",
+                    ]
+                  : null,
                 focusedItemId === item.id
                   ? "ring-2 ring-primary/50 ring-offset-2 ring-offset-background shadow-lg shadow-primary/10"
                   : null

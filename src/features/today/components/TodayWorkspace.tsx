@@ -18,6 +18,7 @@ import { useI18n } from "@/shared/i18n";
 import { useDateFormatter } from "@/shared/date";
 import { readStoredViewDensityMode } from "@/shared/preferences/viewDensityMode";
 import { getPreferenceStorage, writeStoredPreference } from "@/shared/preferences/storage";
+import { aliosListItemMotion, aliosStaggerDelay } from "@/shared/ui/motion";
 import {
   Button,
   Card,
@@ -800,7 +801,7 @@ export function TodayWorkspace({
                   </div>
                 </SoftPanel>
               ) : null}
-              {visibleOpenTasks.map((task) => (
+              {visibleOpenTasks.map((task, index) => (
                 <div
                   key={task.id}
                   ref={(node) => {
@@ -808,6 +809,9 @@ export function TodayWorkspace({
                   }}
                   className={cn(
                     "scroll-mt-24 rounded-2xl transition-[transform,box-shadow,border-color] duration-200 ease-out motion-reduce:transition-none motion-reduce:transform-none",
+                    aliosListItemMotion,
+                    aliosStaggerDelay(index),
+                    "motion-reduce:animate-none motion-reduce:opacity-100",
                     focusedTaskId === task.id
                       ? "ring-2 ring-primary/50 ring-offset-2 ring-offset-background shadow-lg shadow-primary/10"
                       : null
@@ -846,7 +850,7 @@ export function TodayWorkspace({
                   contentClassName="space-y-3"
                   className="border-border/70 bg-card/95"
                 >
-                  {visibleCompletedTasks.map((task) => (
+                  {visibleCompletedTasks.map((task, index) => (
                     <div
                       key={task.id}
                       ref={(node) => {
@@ -854,6 +858,9 @@ export function TodayWorkspace({
                       }}
                       className={cn(
                         "scroll-mt-24 rounded-2xl transition-[transform,box-shadow,border-color] duration-200 ease-out motion-reduce:transition-none motion-reduce:transform-none",
+                        aliosListItemMotion,
+                        aliosStaggerDelay(index),
+                        "motion-reduce:animate-none motion-reduce:opacity-100",
                         focusedTaskId === task.id
                           ? "ring-2 ring-primary/50 ring-offset-2 ring-offset-background shadow-lg shadow-primary/10"
                           : null
