@@ -93,6 +93,9 @@ export function CommandPalette({ open, onOpen, onClose }: CommandPaletteProps) {
       navigation: visibleCommands.filter(
         (command) => command.category === "navigation"
       ),
+      create: visibleCommands.filter(
+        (command) => command.category === "create"
+      ),
       quickActions: visibleCommands.filter(
         (command) => command.category === "quickActions"
       ),
@@ -354,6 +357,11 @@ export function CommandPalette({ open, onOpen, onClose }: CommandPaletteProps) {
                 t("command.navigation"),
                 groupedCommands.navigation,
                 t("command.noNavigationResults")
+              )}
+              {renderGroup(
+                t("command.create"),
+                groupedCommands.create,
+                t("command.noCreateResults")
               )}
               {renderGroup(
                 t("command.quickActions"),

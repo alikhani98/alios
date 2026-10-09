@@ -44,7 +44,7 @@ import type { KnowledgeItemFormValues } from "../types";
 export function KnowledgePage() {
   const { direction, t } = useI18n();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const {
     knowledge: knowledgeRepository,
     projects: projectsRepository,
@@ -90,6 +90,7 @@ export function KnowledgePage() {
   const focusId = searchParams.get("focusId");
   const createFromResourceId = searchParams.get("resourceId");
   const shouldCreateFromResource = searchParams.get("create") === "1";
+  const shouldCreateNew = searchParams.get("action") === "new";
   const knowledgePreviewLimit = 12;
 
   const visibleItems = useMemo(
@@ -310,26 +311,51 @@ export function KnowledgePage() {
   }, [focusId, isLoading, items, t, visibleItems]);
 
   useEffect(() => {
-    if (!shouldCreateFromResource || !createFromResourceId || resources.length === 0) {
+    if (!shouldCreateNew && !shouldCreateFromResource) {
       return;
     }
 
-    const resource = resources.find((item) => item.id === createFromResourceId);
-    if (!resource) {
-      return;
+    if (shouldCreateFromResource && createFromResourceId) {
+      if (resources.length === 0) {
+        return;
+      }
+
+      const resource = resources.find((item) => item.id === createFromResourceId);
+      if (!resource) {
+        return;
+      }
+
+      setInitialFormValues({
+        title: t("knowledge.noteFromResourceTitle", { title: resource.title }),
+        type: "note",
+        source: resource.title,
+        resourceId: resource.id,
+      });
+    } else {
+      setInitialFormValues(undefined);
     }
 
     setEditingItem(undefined);
-    setInitialFormValues({
-      title: t("knowledge.noteFromResourceTitle", { title: resource.title }),
-      type: "note",
-      source: resource.title,
-      resourceId: resource.id,
-    });
     setFormOpen(true);
     setActionError(null);
     setSuccessMessage(null);
-  }, [createFromResourceId, resources, shouldCreateFromResource, t]);
+
+    const nextSearchParams = new URLSearchParams(searchParams);
+    nextSearchParams.delete("action");
+    nextSearchParams.delete("create");
+    if (shouldCreateFromResource) {
+      nextSearchParams.delete("resourceId");
+    }
+    setSearchParams(nextSearchParams, { replace: true });
+  }, [
+    createFromResourceId,
+    resources,
+    searchParams,
+    setSearchParams,
+    shouldCreateFromResource,
+    shouldCreateNew,
+    t,
+  ]);
 
   return (
     <section className="alios-page space-y-6">

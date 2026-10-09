@@ -29,7 +29,7 @@ import type { JournalEntryFormValues } from "../types";
 
 export function JournalPage() {
   const { t } = useI18n();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { projects: projectsRepository, goals: goalsRepository, tasks: tasksRepository } =
     useStorageAdapter();
   const {
@@ -113,6 +113,18 @@ export function JournalPage() {
     setActionError(null);
     setSuccessMessage(null);
   };
+
+  useEffect(() => {
+    if (searchParams.get("action") !== "new") {
+      return;
+    }
+
+    openCreateForm();
+
+    const nextSearchParams = new URLSearchParams(searchParams);
+    nextSearchParams.delete("action");
+    setSearchParams(nextSearchParams, { replace: true });
+  }, [searchParams, setSearchParams]);
 
   const openEditForm = (entry: JournalEntry) => {
     setEditingEntry(entry);

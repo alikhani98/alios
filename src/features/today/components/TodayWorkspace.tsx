@@ -1,6 +1,6 @@
 import { AlertCircle, CheckCircle2, CheckSquare2, Clock3, Plus, Repeat2, RotateCcw, Sparkles, Target } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
 import type { UpdateTaskInput } from "@/core/repositories";
 import { useStorageAdapter } from "@/core/storage";
@@ -152,6 +152,7 @@ export function TodayWorkspace({
   today,
 }: TodayWorkspaceProps) {
   const { t } = useI18n();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { formatDate } = useDateFormatter();
   const isSimpleView = useSimpleViewMode();
   const {
@@ -370,6 +371,18 @@ export function TodayWorkspace({
     setActionError(null);
     setSuccessMessage(null);
   };
+
+  useEffect(() => {
+    if (searchParams.get("action") !== "new") {
+      return;
+    }
+
+    openCreateTask();
+
+    const nextSearchParams = new URLSearchParams(searchParams);
+    nextSearchParams.delete("action");
+    setSearchParams(nextSearchParams, { replace: true });
+  }, [searchParams, setSearchParams]);
 
   const openEditTask = (task: Task) => {
     setEditingTask(task);

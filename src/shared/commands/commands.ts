@@ -1,6 +1,6 @@
 import type { TranslationKey } from "@/shared/i18n";
 
-export type CommandCategory = "navigation" | "quickActions";
+export type CommandCategory = "navigation" | "create" | "quickActions";
 
 export type CommandIconName =
   | "archive"
@@ -107,11 +107,56 @@ export const appCommands: AppCommand[] = [
     icon: "wallet",
   },
   {
+    id: "nav-weekly-review",
+    category: "navigation",
+    labelKey: "nav.weeklyReview",
+    href: "/weekly-review",
+    icon: "calendar-range",
+  },
+  {
+    id: "nav-decisions",
+    category: "navigation",
+    labelKey: "nav.decisions",
+    href: "/decisions",
+    icon: "target",
+  },
+  {
+    id: "nav-resources",
+    category: "navigation",
+    labelKey: "nav.resources",
+    href: "/resources",
+    icon: "book-open",
+  },
+  {
+    id: "create-project",
+    category: "create",
+    labelKey: "command.newProject",
+    descriptionKey: "command.newProjectDescription",
+    href: "/projects?action=new",
+    icon: "folder-kanban",
+  },
+  {
+    id: "create-goal",
+    category: "create",
+    labelKey: "command.newGoal",
+    descriptionKey: "command.newGoalDescription",
+    href: "/goals?action=new",
+    icon: "target",
+  },
+  {
+    id: "create-finance-transaction",
+    category: "create",
+    labelKey: "command.newFinanceTransaction",
+    descriptionKey: "command.newFinanceTransactionDescription",
+    href: "/finance?action=new",
+    icon: "wallet",
+  },
+  {
     id: "quick-inbox-capture",
     category: "quickActions",
     labelKey: "command.quickCaptureInbox",
     descriptionKey: "command.quickCaptureInboxDescription",
-    href: "/inbox",
+    href: "/inbox?action=new",
     icon: "inbox",
   },
   {
@@ -119,7 +164,7 @@ export const appCommands: AppCommand[] = [
     category: "quickActions",
     labelKey: "command.newTodayTask",
     descriptionKey: "command.newTodayTaskDescription",
-    href: "/today",
+    href: "/today?action=new",
     icon: "plus",
   },
   {
@@ -135,7 +180,7 @@ export const appCommands: AppCommand[] = [
     category: "quickActions",
     labelKey: "command.newJournalEntry",
     descriptionKey: "command.newJournalEntryDescription",
-    href: "/journal",
+    href: "/journal?action=new",
     icon: "book-open",
   },
   {
@@ -143,7 +188,7 @@ export const appCommands: AppCommand[] = [
     category: "quickActions",
     labelKey: "command.newKnowledgeItem",
     descriptionKey: "command.newKnowledgeItemDescription",
-    href: "/knowledge",
+    href: "/knowledge?action=new",
     icon: "notebook-text",
   },
   {

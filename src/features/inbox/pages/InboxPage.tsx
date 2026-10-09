@@ -211,6 +211,20 @@ export function InboxPage() {
   }, [goalsRepository, projectsRepository, resourcesRepository, tasksRepository, t]);
 
   useEffect(() => {
+    if (searchParams.get("action") !== "new") {
+      return;
+    }
+
+    document
+      .getElementById("inbox-quick-capture")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+
+    const nextSearchParams = new URLSearchParams(searchParams);
+    nextSearchParams.delete("action");
+    setSearchParams(nextSearchParams, { replace: true });
+  }, [searchParams, setSearchParams]);
+
+  useEffect(() => {
     const sharedParams = getShareTargetParams(searchParams);
 
     if (!sharedParams) {
