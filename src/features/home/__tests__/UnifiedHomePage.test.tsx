@@ -203,30 +203,28 @@ describe("UnifiedHomePage", () => {
     vi.useRealTimers();
   });
 
-  it("renders the clear start card and prepared Today workspace without route wiring", () => {
+  it("renders the decision-layer home sections without embedding Today workspace", () => {
     const markup = renderUnifiedHome("/?date=2026-08-09&focusId=home-task-1");
 
-    expect(markup).toContain("Morning briefing");
-    expect(markup).toContain("Today has 1 active task(s)");
     expect(markup).toContain("What should I do now?");
+    expect(markup).toContain("Your next step is here.");
+    expect(markup).toContain("Current focus");
     expect(markup).toContain("Review the unified Home workspace");
-    expect(markup).toContain("Add task");
-    expect(markup).toContain("Capture item");
-    expect(markup).toContain("Weekly Review");
-    expect(markup).toContain("Today workspace for 2026-08-09 focused on home-task-1");
-    expect(markup).toContain("without hero");
-    expect(markup).toContain("without task summary");
-    expect(markup).toContain("without empty task state");
+    expect(markup).toContain("Start task");
+    expect(markup).toContain("Other options");
+    expect(markup).toContain("0 task(s) done");
+    expect(markup).toContain("1 task(s) remaining");
+    expect(markup).toContain("Today’s tasks (1)");
+    expect(markup).toContain("See all today’s tasks");
+    expect(markup).toContain("Important task tomorrow");
+    expect(markup).toContain("More sections");
+    expect(markup).not.toContain("Today workspace for 2026-08-09");
+    expect(markup).not.toContain("Morning briefing");
   });
 
-  it("keeps context direct while More Context starts collapsed", () => {
+  it("keeps More sections collapsed by default", () => {
     const markup = renderUnifiedHome();
 
-    expect(markup).toContain("Today context");
-    expect(markup).toContain("Calendar");
-    expect(markup).toContain("Inbox");
-    expect(markup).toContain('id="unified-home-today-context"');
-    expect(markup).toContain('id="unified-home-today-context-content" hidden="" aria-hidden="true"');
     expect(markup).toContain("More sections");
     expect(markup).toContain('id="unified-home-more-context"');
     expect(markup).toContain('aria-expanded="false"');
@@ -338,7 +336,7 @@ describe("UnifiedHomePage", () => {
     expect(visibleMarkup).toContain("Last backup was 11 day(s) ago");
   });
 
-  it("guides a no-task day toward a small inbox-processing step", () => {
+  it("shows the empty clear-start state when no task is set for today", () => {
     mockedDashboardData = {
       ...dashboardData,
       tasks: [],
@@ -354,13 +352,14 @@ describe("UnifiedHomePage", () => {
 
     const markup = renderUnifiedHome();
 
-    expect(markup).toContain("Your inbox has 32 item(s) waiting");
-    expect(markup).toContain("Start small: process 3 item(s)");
-    expect(markup).toContain("Process inbox");
-    expect(markup).toContain("Start with 3 inbox item(s)");
+    expect(markup).toContain("Next action");
+    expect(markup).toContain("No task is set for today yet");
+    expect(markup).toContain("Define today’s task");
+    expect(markup).toContain("Today’s tasks (0)");
+    expect(markup).not.toContain("Your inbox has 32 item(s) waiting");
   });
 
-  it("suggests the most urgent dated task before the inbox backlog", () => {
+  it("does not promote overdue backlog tasks into the clear-start card", () => {
     mockedDashboardData = {
       ...dashboardData,
       tasks: [overdueTask],
@@ -376,13 +375,13 @@ describe("UnifiedHomePage", () => {
 
     const markup = renderUnifiedHome();
 
-    expect(markup).toContain("Needs attention");
-    expect(markup).toContain("Send the overdue document");
-    expect(markup).toContain("Start with the dated task");
+    expect(markup).toContain("No task is set for today yet");
+    expect(markup).toContain("Define today’s task");
+    expect(markup).not.toContain("Send the overdue document");
     expect(markup).not.toContain("Your inbox has 32 item(s) waiting");
   });
 
-  it("suggests an active routine when there are no tasks or inbox backlog", () => {
+  it("does not promote routine suggestions into the clear-start card", () => {
     mockedDashboardData = {
       ...dashboardData,
       tasks: [],
@@ -407,13 +406,13 @@ describe("UnifiedHomePage", () => {
 
     const markup = renderUnifiedHome();
 
-    expect(markup).toContain("Keep Morning review moving today");
-    expect(markup).toContain("This active routine is scheduled for today");
-    expect(markup).toContain("Open routine");
-    expect(markup).toContain("Routine ready");
+    expect(markup).toContain("No task is set for today yet");
+    expect(markup).toContain("Define today’s task");
+    expect(markup).not.toContain("Keep Morning review moving today");
+    expect(markup).not.toContain("Routine ready");
   });
 
-  it("uses a friendlier task stat when there is no more specific next action", () => {
+  it("keeps the no-task home state focused on defining today’s task", () => {
     mockedDashboardData = {
       ...dashboardData,
       tasks: [],
@@ -429,7 +428,8 @@ describe("UnifiedHomePage", () => {
 
     const markup = renderUnifiedHome();
 
-    expect(markup).toContain("No task for today? Start from the inbox");
+    expect(markup).toContain("No task is set for today yet");
+    expect(markup).toContain("Define today’s task");
     expect(markup).not.toContain("Your inbox has 32 item(s) waiting");
     expect(markup).not.toContain("Keep Morning review moving today");
   });

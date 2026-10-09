@@ -36,7 +36,7 @@ describe("LocalReminderPanel", () => {
           title: "Pay installment",
           totalAmount: 500,
           paidAmount: 0,
-          dueDate: "2026-09-19",
+          dueDate: "2026-09-20",
           status: "active",
           createdAt: "2026-09-01T08:00:00.000Z",
           updatedAt: "2026-09-19T08:00:00.000Z",
@@ -57,7 +57,7 @@ describe("LocalReminderPanel", () => {
     expect(markup).toContain("Pay installment");
     expect(markup).toContain('href="/today?focusId=task-1"');
     expect(markup).toContain('href="/finance#finance-obligations"');
-    expect(markup).toContain("Notifications work only while AliOS is open");
+    expect(markup).toContain("Due today");
   });
 
   it("does not render an empty panel", () => {
