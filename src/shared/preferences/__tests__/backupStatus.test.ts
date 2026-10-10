@@ -14,33 +14,38 @@ type BackupFreshnessCase = Readonly<{
   expected: ReturnType<typeof getBackupFreshness>;
 }>;
 
+const backupFreshnessCases: BackupFreshnessCase[] = [
+  { label: "never", value: null, expected: "never" },
+  {
+    label: "fresh",
+    value: "2026-07-10T09:00:00",
+    expected: "fresh",
+  },
+  {
+    label: "dueSoon",
+    value: "2026-07-02T09:00:00",
+    expected: "dueSoon",
+  },
+  {
+    label: "overdue",
+    value: "2026-06-26T09:00:00",
+    expected: "overdue",
+  },
+];
+
 describe("backup status helpers", () => {
   afterEach(() => {
     vi.unstubAllGlobals();
   });
 
-  it.each([
-    { label: "never", value: null, expected: "never" },
-    {
-      label: "fresh",
-      value: "2026-07-10T09:00:00",
-      expected: "fresh",
-    },
-    {
-      label: "dueSoon",
-      value: "2026-07-02T09:00:00",
-      expected: "dueSoon",
-    },
-    {
-      label: "overdue",
-      value: "2026-06-26T09:00:00",
-      expected: "overdue",
-    },
-  ])("classifies $label backups correctly", ({ value, expected }: BackupFreshnessCase) => {
-    expect(getBackupFreshness(value, new Date("2026-07-10T12:00:00"))).toBe(
-      expected
-    );
-  });
+  it.each(backupFreshnessCases)(
+    "classifies $label backups correctly",
+    ({ value, expected }) => {
+      expect(getBackupFreshness(value, new Date("2026-07-10T12:00:00"))).toBe(
+        expected
+      );
+    }
+  );
 
   it("normalizes stored backup metadata and rejects malformed values", () => {
     const backupStatus = createBackupStatusMetadata(

@@ -267,6 +267,30 @@ function createSupabaseClientHarness(
   return { client, session };
 }
 
+function createMockTask(overrides: Partial<Task> = {}): Task {
+  return {
+    id: "task-1",
+    title: "Local task",
+    description: undefined,
+    status: "todo",
+    priority: "medium",
+    dueDate: undefined,
+    isMit: false,
+    projectId: undefined,
+    routineId: undefined,
+    scheduledStartTime: undefined,
+    estimatedMinutes: undefined,
+    recurrence: undefined,
+    recurrenceSeriesId: undefined,
+    createdAt: "2026-07-27T08:00:00.000Z",
+    updatedAt: "2026-07-28T08:00:00.000Z",
+    completedAt: undefined,
+    completedMinimum: undefined,
+    sync: undefined,
+    ...overrides,
+  };
+}
+
 function createBackupStorageStub(input?: {
   tasks?: Task[];
   routines?: Routine[];
@@ -278,7 +302,7 @@ function createBackupStorageStub(input?: {
   financeCategoryBudgets?: FinanceCategoryBudget[];
   financeAssets?: FinanceAsset[];
 }) {
-  let data = {
+  let data: AliosBackupData = {
     dailyCheckins: [],
     tasks: input?.tasks ?? [],
     goals: input?.goals ?? [],
@@ -977,15 +1001,7 @@ describe("SupabasePreferenceSyncProvider", () => {
     const harness = createSupabaseClientHarness();
     const backupHarness = createBackupStorageStub({
       tasks: [
-        {
-          id: "task-1",
-          title: "Local task",
-          status: "todo",
-          priority: "medium",
-          isMit: false,
-          createdAt: "2026-07-27T08:00:00.000Z",
-          updatedAt: "2026-07-28T08:00:00.000Z",
-        },
+        createMockTask(),
       ],
       routines: [
         {
@@ -1321,15 +1337,7 @@ describe("SupabasePreferenceSyncProvider", () => {
     });
     const backupHarness = createBackupStorageStub({
       tasks: [
-        {
-          id: "task-1",
-          title: "Local task",
-          status: "todo",
-          priority: "medium",
-          isMit: false,
-          createdAt: "2026-07-27T08:00:00.000Z",
-          updatedAt: "2026-07-28T08:00:00.000Z",
-        },
+        createMockTask(),
       ],
     });
 
@@ -1474,20 +1482,15 @@ describe("SupabasePreferenceSyncProvider", () => {
           user_id: "supabase-user-1",
           entity: "tasks",
           record_id: "task-1",
-          payload: {
-            id: "task-1",
+          payload: createMockTask({
             title: "Remote task title",
-            status: "todo",
-            priority: "medium",
-            isMit: false,
-            createdAt: "2026-07-27T08:00:00.000Z",
             updatedAt: "2026-07-28T10:00:00.000Z",
             sync: {
               ownerUserId: "supabase-user-1",
               lastSyncedAt: "2026-07-28T09:00:00.000Z",
               lastSyncedByDeviceId: "remote-device",
             },
-          },
+          }),
           updated_at: "2026-07-28T10:00:00.000Z",
           created_at: "2026-07-27T08:00:00.000Z",
           last_synced_at: "2026-07-28T09:00:00.000Z",
@@ -1525,20 +1528,14 @@ describe("SupabasePreferenceSyncProvider", () => {
 
     const backupHarness = createBackupStorageStub({
       tasks: [
-        {
-          id: "task-1",
+        createMockTask({
           title: "Local stale task",
-          status: "todo",
-          priority: "medium",
-          isMit: false,
-          createdAt: "2026-07-27T08:00:00.000Z",
-          updatedAt: "2026-07-28T08:00:00.000Z",
           sync: {
             ownerUserId: "supabase-user-1",
             lastSyncedAt: "2026-07-28T09:00:00.000Z",
             lastSyncedByDeviceId: "local-device",
           },
-        },
+        }),
       ],
       projects: [
         {
