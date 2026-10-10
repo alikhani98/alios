@@ -36,6 +36,18 @@ const RoutinesPage = lazyWithRetry(() =>
 const ExperimentsPage = lazyWithRetry(() =>
   import("@/features/experiments/pages/ExperimentsPage")
 );
+const CommitmentPage = lazyWithRetry(() =>
+  import("@/features/commitment/pages/CommitmentPage")
+);
+const UrgePage = lazyWithRetry(() =>
+  import("@/features/urge/pages/UrgePage")
+);
+const RecoveryPage = lazyWithRetry(() =>
+  import("@/features/recovery/pages/RecoveryPage")
+);
+const MoneyPage = lazyWithRetry(() =>
+  import("@/features/money/pages/MoneyPage")
+);
 const IfThenPage = lazyWithRetry(() =>
   import("@/features/ifthen/components/IfThenPage").then((module) => ({
     default: module.IfThenPage,
@@ -176,6 +188,38 @@ const router = createHashRouter([
         element: (
           <Suspense fallback={<RouteLoadingFallback />}>
             <ExperimentsPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "commitment",
+        element: (
+          <Suspense fallback={<RouteLoadingFallback />}>
+            <CommitmentPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "urge",
+        element: (
+          <Suspense fallback={<RouteLoadingFallback />}>
+            <UrgePage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "recovery",
+        element: (
+          <Suspense fallback={<RouteLoadingFallback />}>
+            <RecoveryPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "money",
+        element: (
+          <Suspense fallback={<RouteLoadingFallback />}>
+            <MoneyPage />
           </Suspense>
         ),
       },

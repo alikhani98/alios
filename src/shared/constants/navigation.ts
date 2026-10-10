@@ -101,6 +101,26 @@ export const navigationGroups: NavigationGroup[] = [
         icon: "flask-conical",
       },
       {
+        titleKey: "nav.commitment",
+        href: "/commitment",
+        icon: "calendar-check",
+      },
+      {
+        titleKey: "nav.urge",
+        href: "/urge",
+        icon: "activity",
+      },
+      {
+        titleKey: "nav.recovery",
+        href: "/recovery",
+        icon: "repeat",
+      },
+      {
+        titleKey: "nav.money",
+        href: "/money",
+        icon: "wallet",
+      },
+      {
         titleKey: "nav.patterns",
         href: "/patterns",
         icon: "activity",
