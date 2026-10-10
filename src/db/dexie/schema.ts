@@ -16,6 +16,7 @@ export const DEXIE_SCHEMA_VERSION_15 = 15;
 export const DEXIE_SCHEMA_VERSION_16 = 16;
 export const DEXIE_SCHEMA_VERSION_17 = 17;
 export const DEXIE_SCHEMA_VERSION_18 = 18;
+export const DEXIE_SCHEMA_VERSION_19 = 19;
 
 export const DEXIE_TABLE_NAMES = {
   dailyCheckins: "dailyCheckins",
@@ -193,6 +194,15 @@ export const DEXIE_SCHEMA_V18 = {
   [DEXIE_TABLE_NAMES.ifThenPlans]: "id, isActive, createdAt, updatedAt",
   [DEXIE_TABLE_NAMES.moneyPauses]: "id, decision, createdAt, reviewAt",
   [DEXIE_TABLE_NAMES.therapyNotes]: "id, date, createdAt, updatedAt",
+} satisfies Partial<
+  Record<
+    DexieTableName | typeof DEXIE_MUTATION_OUTBOX_TABLE_NAME,
+    string
+  >
+>;
+
+export const DEXIE_SCHEMA_V19 = {
+  ...DEXIE_SCHEMA_V18,
 } satisfies Partial<
   Record<
     DexieTableName | typeof DEXIE_MUTATION_OUTBOX_TABLE_NAME,

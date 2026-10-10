@@ -50,6 +50,7 @@ import {
   DEXIE_SCHEMA_V16,
   DEXIE_SCHEMA_V17,
   DEXIE_SCHEMA_V18,
+  DEXIE_SCHEMA_V19,
   DEXIE_SCHEMA_VERSION,
   DEXIE_SCHEMA_VERSION_3,
   DEXIE_SCHEMA_VERSION_4,
@@ -67,6 +68,7 @@ import {
   DEXIE_SCHEMA_VERSION_16,
   DEXIE_SCHEMA_VERSION_17,
   DEXIE_SCHEMA_VERSION_18,
+  DEXIE_SCHEMA_VERSION_19,
 } from "./schema";
 
 export class AliosDatabase extends Dexie {
@@ -120,6 +122,13 @@ export class AliosDatabase extends Dexie {
     this.version(DEXIE_SCHEMA_VERSION_16).stores(DEXIE_SCHEMA_V16);
     this.version(DEXIE_SCHEMA_VERSION_17).stores(DEXIE_SCHEMA_V17);
     this.version(DEXIE_SCHEMA_VERSION_18).stores(DEXIE_SCHEMA_V18);
+    this.version(DEXIE_SCHEMA_VERSION_19)
+      .stores(DEXIE_SCHEMA_V19)
+      .upgrade(async (tx) => {
+        await tx.table("tasks").where("status").equals("pending").modify({
+          status: "todo",
+        });
+      });
   }
 }
 

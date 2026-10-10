@@ -6,10 +6,10 @@ and implementation evidence at the requested HEAD.
 
 ## Current HEAD and Stage
 
-- Required/current HEAD: `165c45e` (`feat: wire OpenRouter AI provider and settings card`).
+- Required/current HEAD: `e32b106` (`fix: suppress noisy sync notifications and align test assertions`) as of 2026-10-10.
 - Branch observed: `main` tracking `origin/main`.
-- Current working tree before this file was already dirty in several `src/*` files and `supabase/.temp/cli-latest`; preserve those changes.
-- Current recovery-track stage: post Stage 13, plus recovery/merge commits up to OpenRouter settings.
+- Current working tree before this file was already dirty in `supabase/.temp/cli-latest`; preserve that change.
+- Current recovery-track stage: post Stage 13, plus recovery/merge commits up to account sync notification/test fixes.
 - Older `PROJECT_STATE.md` contains much broader historical status, including Stage 273A Telegram Reminder Configuration; do not assume that older snapshot alone describes this HEAD.
 
 ## Completed Stages 1-13, Verified from Current Log
@@ -39,11 +39,17 @@ and implementation evidence at the requested HEAD.
 - `3e6c4ec`: merged behavior features from backup: If/Then, Commitment, Money, Patterns, Recovery, Therapy, Urge.
 - `21b6fe6`: added pages/routes for Commitment, Urge, Recovery, Money.
 - `165c45e`: wired OpenRouter AI provider and Settings card.
+- `c4f9cdb`: added this architect state handoff snapshot.
+- `2c290ed`: resolved CI type and i18n build errors.
+- `f2bc9a9`: merged minimum routines and recovery context additions into Home, Today, Weekly Review, routine/task types.
+- `07e1960`: fixed backup status and Supabase preference sync test type errors.
+- `7153601`: suppressed noisy account runtime sync notifications by comparing UI-driving runtime fields.
+- `e32b106`: aligned Settings sync status test assertions with the current local-only/signed-out UI.
 
 ## Active Routes and Features
 
-- `/`: unified Home dashboard / decision layer.
-- `/today`: Today execution workspace; query links include date, focusId, goalId, projectId, routineId.
+- `/`: unified Home dashboard / decision layer, including empty-dashboard guidance and minimum-routine/recovery context signals.
+- `/today`: Today execution workspace; query links include date, focusId, goalId, projectId, routineId; minimum routine/recovery context data is surfaced from local records.
 - `/today-widget`: standalone Today widget route outside `AppShell`.
 - `/inbox`: capture, share-target intake, processing, bulk triage.
 - `/projects`: local projects, planning links, review lifecycle.
@@ -59,7 +65,7 @@ and implementation evidence at the requested HEAD.
 - `/ifthen`: If/Then behavior module.
 - `/patterns`: weekly patterns module.
 - `/therapy`: therapy bridge module.
-- `/weekly-review`: derived review, planning, and AI summary surface.
+- `/weekly-review`: derived review, planning, AI summary, and minimum-routine/recovery context surface.
 - `/decisions`: decision log.
 - `/goals`: goals track.
 - `/life-areas`: life-area overview and links.
@@ -68,7 +74,7 @@ and implementation evidence at the requested HEAD.
 - `/resources`, `/resources/:resourceId`: resource library and detail view.
 - `/manual`: personal manual.
 - `/finance`: finance transactions, obligations, monthly plan, charts.
-- `/settings`: local preferences, backup/restore, account/sync, local AI/OpenRouter settings, safety surfaces.
+- `/settings`: local preferences, backup/restore, account/sync, local AI/OpenRouter settings, safety surfaces; sync status notifications are filtered to reduce redundant re-renders.
 
 ## Key Architecture Decisions
 
@@ -87,16 +93,17 @@ and implementation evidence at the requested HEAD.
 
 - Current HEAD includes `OpenRouterAIProvider` and Settings OpenRouter fields. This conflicts with the older AliOS 1.0 rule in `AGENTS.md` / `docs/ARCHITECTURE.md` that says no direct hosted-AI integration in v1.0 unless separately approved through the AIProvider boundary.
 - `PROJECT_STATE.md` is stale/mixed for this HEAD: it records Stage 273A and many older validated stages, while the current log shows a recovery-track Stage 1-13 plus follow-up commits.
-- Current CI build failures are not diagnosed in this session because agents must not run `pnpm test`, `pnpm exec tsc --noEmit`, or `pnpm build`. Treat failing CI as unresolved until Sadegh checks the GitHub job log.
+- CI type/i18n/test assertion issues addressed in `2c290ed`, `07e1960`, and `e32b106`, but latest CI status is unverified here because agents must not run `pnpm test`, `pnpm exec tsc --noEmit`, or `pnpm build`.
+- Previous Settings sync status flashing loop was addressed in `7153601`; verify manually in Settings because automated validation was not run by the agent.
 - Known local validation note from `PROJECT_STATE.md`: `pnpm exec tsc --noEmit` previously failed to resolve `tsc` in one Windows environment, while `.\node_modules\.bin\tsc.CMD --noEmit` was recorded as the working local path.
-- Dirty working tree exists before this file; do not revert or normalize unrelated edits.
+- Dirty working tree exists before this file in `supabase/.temp/cli-latest`; do not revert or normalize unrelated edits.
 
 ## Pending Work / Next Stages
 
 - Resolve the AI architecture conflict: either formally approve OpenRouter as an additive AIProvider-backed stage or remove/disable hosted provider wiring for v1.0.
-- Investigate current CI failure logs before changing implementation.
+- Inspect the latest GitHub CI result after Sadegh reruns validation; only investigate logs if failures remain.
 - Align `PROJECT_STATE.md`, roadmap, and architecture docs only after implementation reality and Sadegh validation are confirmed.
-- Continue recovery-track hardening around behavior modules, Settings AI boundary, and route-level QA.
+- Continue recovery-track hardening around behavior modules, minimum routines/recovery context, Settings AI boundary, and route-level QA.
 - Keep attachment/reminder/sync/Telegram work out of scope unless explicitly re-approved for this branch.
 
 ## Manual Validation for Sadegh
