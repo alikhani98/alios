@@ -11,6 +11,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/shared/ui";
+import { aliosListItemMotion, aliosStaggerDelay } from "@/shared/ui/motion";
+import { cn } from "@/shared/utils";
 
 type MoneyPauseReviewCardProps = {
   refreshKey?: number;
@@ -88,10 +90,14 @@ export function MoneyPauseReviewCard({
         {isLoading ? (
           <div className="h-24 animate-pulse rounded-2xl border bg-muted/60" />
         ) : (
-          items.map((item) => (
+          items.map((item, index) => (
             <div
               key={item.id}
-              className="grid gap-3 rounded-2xl border bg-background/80 p-3 shadow-sm lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center"
+              className={cn(
+                "grid gap-3 rounded-2xl border bg-background/80 p-3 shadow-sm lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center",
+                aliosListItemMotion,
+                aliosStaggerDelay(index)
+              )}
             >
               <div className="min-w-0 space-y-1">
                 <p className="break-words font-semibold">

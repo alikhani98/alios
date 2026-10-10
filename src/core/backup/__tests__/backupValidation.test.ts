@@ -12,6 +12,7 @@ import {
   financeTransactionRecord,
   focusSessionRecord,
   ifThenPlanRecord,
+  moneyPauseRecord,
   urgeEntryRecord,
   therapyNoteRecord,
   inboxItemRecord,
@@ -71,6 +72,7 @@ describe("backup validation and migration", () => {
     expect(migrated.data.experiments).toEqual([]);
     expect(migrated.data.experimentLogs).toEqual([]);
     expect(migrated.data.ifThenPlans).toEqual([]);
+    expect(migrated.data.moneyPauses).toEqual([]);
     expect(migrated.data.therapyNotes).toEqual([]);
     expect(migrated.data.manualEntries).toEqual([]);
     expect(migrated.data.financeTransactions).toEqual([]);
@@ -109,6 +111,7 @@ describe("backup validation and migration", () => {
     expect(backup.data.experiments).toEqual([]);
     expect(backup.data.experimentLogs).toEqual([]);
     expect(backup.data.ifThenPlans).toEqual([]);
+    expect(backup.data.moneyPauses).toEqual([]);
     expect(backup.data.therapyNotes).toEqual([]);
     expect(backup.data.manualEntries).toEqual([]);
     expect(backup.data.financeTransactions).toEqual([]);
@@ -306,6 +309,7 @@ describe("backup validation and migration", () => {
       experiments: [],
       experimentLogs: [],
       ifThenPlans: [ifThenPlanRecord],
+      moneyPauses: [moneyPauseRecord],
       therapyNotes: [therapyNoteRecord],
       manualEntries: [manualEntryRecord],
       financeTransactions: [financeTransactionRecord],
@@ -338,6 +342,7 @@ describe("backup validation and migration", () => {
     expect(normalized.weeklyPlans).not.toBe(input.weeklyPlans);
     expect(normalized.focusSessions).not.toBe(input.focusSessions);
     expect(normalized.ifThenPlans).not.toBe(input.ifThenPlans);
+    expect(normalized.moneyPauses).not.toBe(input.moneyPauses);
     expect(normalized.therapyNotes).not.toBe(input.therapyNotes);
     expect(normalized.resources).not.toBe(input.resources);
   });

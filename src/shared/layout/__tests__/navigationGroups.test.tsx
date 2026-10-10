@@ -23,8 +23,6 @@ const expectedNavigationHrefs = [
   "/search",
   "/routines",
   "/experiments",
-  "/recovery",
-  "/money",
   "/patterns",
   "/ifthen",
   "/therapy",

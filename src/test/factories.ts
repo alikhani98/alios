@@ -17,6 +17,7 @@ import type {
   CreateResourceInput,
   CreateLifeAreaInput,
   CreateManualEntryInput,
+  AddMoneyPauseInput,
   CreateProjectInput,
   CreateSettingInput,
   CreateTaskInput,
@@ -40,6 +41,8 @@ import type {
   KnowledgeItem,
   Resource,
   ManualEntry,
+  MoneyPause,
+  MoneyPauseCurrency,
   LifeArea,
   Project,
   Setting,
@@ -214,6 +217,13 @@ export const therapyNoteInput: AddTherapyNoteInput = {
   content: "A useful moment to discuss in therapy.",
 };
 
+export const moneyPauseInput: AddMoneyPauseInput = {
+  item: "Noise-canceling headphones",
+  amount: 12000000,
+  currency: "IRR",
+  reason: "excitement",
+};
+
 export const decisionLogInput: CreateDecisionLogEntryInput = {
   title: "Choose release focus",
   decisionDate: "2026-07-05",
@@ -342,6 +352,13 @@ export const urgeEntryRecord: UrgeEntry = {
 export const therapyNoteRecord: TherapyNote = {
   ...therapyNoteInput,
   ...metadata,
+};
+export const moneyPauseRecord: MoneyPause = {
+  ...moneyPauseInput,
+  id: "fixture-id",
+  currency: "IRR" as MoneyPauseCurrency,
+  createdAt: timestamp,
+  reviewAt: "2026-07-06T08:30:00.000Z",
 };
 export const decisionLogRecord: DecisionLogEntry = {
   ...decisionLogInput,

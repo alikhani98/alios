@@ -21,6 +21,7 @@ export const DEXIE_SCHEMA_VERSION_20 = 20;
 export const DEXIE_SCHEMA_VERSION_21 = 21;
 export const DEXIE_SCHEMA_VERSION_22 = 22;
 export const DEXIE_SCHEMA_VERSION_23 = 23;
+export const DEXIE_SCHEMA_VERSION_24 = 24;
 
 export const DEXIE_TABLE_NAMES = {
   dailyCheckins: "dailyCheckins",
@@ -243,6 +244,15 @@ export const DEXIE_SCHEMA_V22 = {
 
 export const DEXIE_SCHEMA_V23 = {
   ...DEXIE_SCHEMA_V22,
+} satisfies Partial<
+  Record<
+    DexieTableName | typeof DEXIE_MUTATION_OUTBOX_TABLE_NAME,
+    string
+  >
+>;
+
+export const DEXIE_SCHEMA_V24 = {
+  ...DEXIE_SCHEMA_V23,
 } satisfies Partial<
   Record<
     DexieTableName | typeof DEXIE_MUTATION_OUTBOX_TABLE_NAME,
