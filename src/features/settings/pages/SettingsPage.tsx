@@ -116,6 +116,11 @@ const LazyLocalAiSetupCard = lazy(() =>
     default: module.LocalAiSetupCard,
   }))
 );
+const LazyAISettingsCard = lazy(() =>
+  import("../components/AISettingsCard").then((module) => ({
+    default: module.AISettingsCard,
+  }))
+);
 const LazyQuickAccessManager = lazyWithRetry(() =>
   import("@/shared/quickAccess/QuickAccessManager").then((module) => ({
     default: module.QuickAccessManager,
@@ -1437,6 +1442,11 @@ export function SettingsPage() {
             {advancedLocalToolsOpen ? (
               <Suspense fallback={<RouteLoadingFallback />}>
                 <LazyLocalAiSetupCard />
+              </Suspense>
+            ) : null}
+            {advancedLocalToolsOpen ? (
+              <Suspense fallback={<RouteLoadingFallback />}>
+                <LazyAISettingsCard />
               </Suspense>
             ) : null}
           </div>

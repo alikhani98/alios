@@ -2780,6 +2780,7 @@ export const messagesEn = {
   "settings.aiOllamaSettingsNote": "Ollama settings are available in the local tools section.",
   "settings.aiTestConnection": "Test Connection",
   "settings.aiTestSuccess": "Connection successful",
+  "settings.aiTestUnconfigured": "No provider configured",
   "settings.aiTestError": "Connection failed",
   "home.emptyState": "Nothing has been recorded today",
   "home.emptyStateCta": "Define today’s important work",

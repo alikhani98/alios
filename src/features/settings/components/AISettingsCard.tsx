@@ -44,7 +44,7 @@ function normalizeProvider(value: string): AISettingsProvider {
 }
 
 export function AISettingsCard() {
-  const { language, t } = useI18n();
+  const { t } = useI18n();
   const { value: storedProvider, setValue: setStoredProvider } =
     usePersistentString({
       key: AI_PROVIDER_STORAGE_KEY,
@@ -181,9 +181,7 @@ export function AISettingsCard() {
               {connectionStatus === "success"
                 ? t("settings.aiTestSuccess")
                 : connectionStatus === "unconfigured"
-                  ? language === "fa"
-                    ? "❌ هیچ provider پیکربندی نشده"
-                    : "❌ No provider configured"
+                  ? t("settings.aiTestUnconfigured")
                 : t("settings.aiTestError")}
             </p>
           ) : null}

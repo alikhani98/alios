@@ -17,5 +17,8 @@ export const MORNING_WARMUP_DISMISSED_DATE_STORAGE_KEY =
 export const BACKUP_STATUS_STORAGE_KEY = "alios.backup.status";
 export const LOCAL_AI_OLLAMA_BASE_URL_STORAGE_KEY =
   "alios.localAi.ollama.baseUrl";
+export const AI_PROVIDER_STORAGE_KEY = "alios.ai.provider";
+export const AI_OPENROUTER_API_KEY_STORAGE_KEY = "alios.ai.openRouter.apiKey";
+export const AI_OPENROUTER_MODEL_STORAGE_KEY = "alios.ai.openRouter.model";
 export const LOCAL_PREFERENCE_CHANGE_EVENT = "alios-local-preference-change";
 export const QUICK_ACCESS_STORAGE_KEY = "alios.quickAccess";

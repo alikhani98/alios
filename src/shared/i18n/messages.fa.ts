@@ -2776,6 +2776,7 @@ export const messagesFa: Record<TranslationKey, string> = {
   "settings.aiOllamaSettingsNote": "تنظیمات Ollama در بخش ابزارهای محلی موجود است",
   "settings.aiTestConnection": "تست اتصال",
   "settings.aiTestSuccess": "✅ اتصال برقرار است",
+  "settings.aiTestUnconfigured": "هیچ provider پیکربندی نشده است",
   "settings.aiTestError": "❌ خطا در اتصال",
   "nav.urge": "Urge Tracker",
   "nav.ifthen": "طرح‌های اگر-آنگاه 🔀",
