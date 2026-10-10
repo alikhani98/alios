@@ -13,16 +13,19 @@ import {
   EmptyState,
   SectionHeader,
 } from "@/shared/ui";
+import { aliosListItemMotion, aliosStaggerDelay } from "@/shared/ui/motion";
 import { cn } from "@/shared/utils";
 import { IfThenForm } from "./IfThenForm";
 
 function PlanRow({
   plan,
+  index,
   isBusy,
   onToggle,
   onDelete,
 }: {
   plan: IfThenPlan;
+  index: number;
   isBusy: boolean;
   onToggle: (plan: IfThenPlan) => void;
   onDelete: (plan: IfThenPlan) => void;
@@ -33,6 +36,9 @@ function PlanRow({
     <div
       className={cn(
         "alios-surface-muted flex min-w-0 items-start justify-between gap-3 p-3",
+        aliosListItemMotion,
+        aliosStaggerDelay(index),
+        "motion-reduce:animate-none motion-reduce:opacity-100",
         plan.isActive ? null : "opacity-70"
       )}
     >
@@ -91,10 +97,11 @@ function PlanList({
           </Badge>
         </div>
         {plans.length > 0 ? (
-          plans.map((plan) => (
+          plans.map((plan, index) => (
             <PlanRow
               key={plan.id}
               plan={plan}
+              index={index}
               isBusy={busyPlanId === plan.id}
               onToggle={onToggle}
               onDelete={onDelete}

@@ -325,6 +325,7 @@ function createBackupStorageStub(input?: {
     attachments: [],
     experiments: [],
     experimentLogs: [],
+    ifThenPlans: [],
   };
 
   const backupStorage: BackupStorage = {

@@ -7,6 +7,7 @@ import type {
   CreateFinanceObligationInput,
   CreateFinanceTransactionInput,
   CreateFocusSessionInput,
+  AddIfThenPlanInput,
   CreateJournalEntryInput,
   CreateInboxItemInput,
   CreateKnowledgeItemInput,
@@ -27,6 +28,7 @@ import type {
   FinanceObligation,
   FinanceTransaction,
   FocusSession,
+  IfThenPlan,
   JournalEntry,
   InboxItem,
   KnowledgeItem,
@@ -175,6 +177,12 @@ export const focusSessionInput: CreateFocusSessionInput = {
   interrupted: false,
 };
 
+export const ifThenPlanInput: AddIfThenPlanInput = {
+  ifTrigger: "If I open social media before work",
+  thenAction: "Then I close it and start the first task for 10 minutes",
+  linkedUrgeType: "social_media",
+};
+
 export const decisionLogInput: CreateDecisionLogEntryInput = {
   title: "Choose release focus",
   decisionDate: "2026-07-05",
@@ -285,6 +293,11 @@ export const financeAssetRecord: FinanceAsset = {
 export const focusSessionRecord: FocusSession = {
   ...focusSessionInput,
   id: "fixture-id",
+};
+export const ifThenPlanRecord: IfThenPlan = {
+  ...ifThenPlanInput,
+  isActive: true,
+  ...metadata,
 };
 export const decisionLogRecord: DecisionLogEntry = {
   ...decisionLogInput,

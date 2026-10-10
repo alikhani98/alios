@@ -12,6 +12,7 @@ import {
   financeObligationInput,
   financeTransactionInput,
   focusSessionInput,
+  ifThenPlanInput,
   journalEntryInput,
   inboxItemInput,
   knowledgeItemInput,
@@ -78,6 +79,8 @@ describe("BackupService with DexieBackupStorage", () => {
       ...focusSessionInput,
       taskId: task.id,
     });
+    await storage.ifThenPlans.addPlan(ifThenPlanInput);
+    const [ifThenPlan] = await storage.ifThenPlans.getAllPlans();
 
     const backup = await service.createBackup();
 
@@ -93,6 +96,7 @@ describe("BackupService with DexieBackupStorage", () => {
         "decisionLogEntries",
         "experiments",
         "experimentLogs",
+        "ifThenPlans",
         "manualEntries",
         "financeTransactions",
         "financeObligations",
@@ -113,6 +117,7 @@ describe("BackupService with DexieBackupStorage", () => {
     expect(backup.data.attachments).toEqual([]);
     expect(backup.data.experiments).toEqual([]);
     expect(backup.data.experimentLogs).toEqual([]);
+    expect(backup.data.ifThenPlans).toEqual([ifThenPlan]);
     expect(backup.data.projects).toEqual([project]);
     expect(backup.data.tasks).toEqual([task]);
     expect(backup.data.routines).toEqual([routine]);
@@ -175,6 +180,7 @@ describe("BackupService with DexieBackupStorage", () => {
     expect(await storage.routines.list()).toEqual([routine]);
     expect(await storage.weeklyPlans.getByWeekStart(weeklyPlan.weekStart)).toEqual(weeklyPlan);
     expect(await storage.focusSessions.list()).toEqual([focusSession]);
+    expect(await storage.ifThenPlans.getAllPlans()).toEqual([ifThenPlan]);
     expect(await storage.finance.getTransactionById(financeTransaction.id)).toEqual(
       financeTransaction
     );
@@ -218,6 +224,7 @@ describe("BackupService with DexieBackupStorage", () => {
       financeCategoryBudgets: _omittedFinanceCategoryBudgets,
       financeAssets: _omittedFinanceAssets,
       focusSessions: _omittedFocusSessions,
+      ifThenPlans: _omittedIfThenPlans,
       attachments: _omittedAttachments,
       resources: _omittedResources,
       ...oldData
@@ -229,6 +236,7 @@ describe("BackupService with DexieBackupStorage", () => {
     expect(oldBackup.data.financeCategoryBudgets).toEqual([]);
     expect(oldBackup.data.financeAssets).toEqual([]);
     expect(oldBackup.data.focusSessions).toEqual([]);
+    expect(oldBackup.data.ifThenPlans).toEqual([]);
     expect(oldBackup.data.resources).toEqual([]);
     expect(oldBackup.data.attachments).toEqual([]);
     expect(oldBackup.data.experiments).toEqual([]);

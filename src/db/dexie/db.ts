@@ -51,6 +51,7 @@ import {
   DEXIE_SCHEMA_V17,
   DEXIE_SCHEMA_V18,
   DEXIE_SCHEMA_V19,
+  DEXIE_SCHEMA_V20,
   DEXIE_SCHEMA_VERSION,
   DEXIE_SCHEMA_VERSION_3,
   DEXIE_SCHEMA_VERSION_4,
@@ -69,6 +70,7 @@ import {
   DEXIE_SCHEMA_VERSION_17,
   DEXIE_SCHEMA_VERSION_18,
   DEXIE_SCHEMA_VERSION_19,
+  DEXIE_SCHEMA_VERSION_20,
 } from "./schema";
 
 export class AliosDatabase extends Dexie {
@@ -129,6 +131,7 @@ export class AliosDatabase extends Dexie {
           status: "todo",
         });
       });
+    this.version(DEXIE_SCHEMA_VERSION_20).stores(DEXIE_SCHEMA_V20);
   }
 }
 
