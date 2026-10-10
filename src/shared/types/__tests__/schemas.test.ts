@@ -30,6 +30,10 @@ import {
   routineRecord,
 } from "@/test/factories";
 
+type SchemaLike = Readonly<{
+  safeParse(value: unknown): Readonly<{ success: boolean }>;
+}>;
+
 describe("core domain schemas", () => {
   it("keeps legacy projects without a goal link valid", () => {
     const { goalId: _goalId, ...legacyProject } = projectRecord;
@@ -335,7 +339,7 @@ describe("core domain schemas", () => {
     ["decision log entry", decisionLogEntrySchema, decisionLogRecord],
     ["inbox item", inboxItemSchema, inboxItemRecord],
     ["resource", resourceSchema, resourceRecord],
-  ])("accepts a valid %s", (_name, schema, value) => {
+  ])("accepts a valid %s", (_name: string, schema: SchemaLike, value: unknown) => {
     expect(schema.safeParse(value).success).toBe(true);
   });
 
@@ -349,7 +353,7 @@ describe("core domain schemas", () => {
     ["manual entry", manualEntrySchema, { ...manualEntryRecord, category: "unknown" }],
     ["daily check-in", dailyCheckinSchema, { ...dailyCheckinRecord, date: "05/07/2026" }],
     ["decision log entry", decisionLogEntrySchema, { ...decisionLogRecord, status: "maybe" }],
-  ])("rejects an invalid %s", (_name, schema, value) => {
+  ])("rejects an invalid %s", (_name: string, schema: SchemaLike, value: unknown) => {
     expect(schema.safeParse(value).success).toBe(false);
   });
 
@@ -357,7 +361,7 @@ describe("core domain schemas", () => {
     ["empty content", { ...inboxItemRecord, content: "   " }],
     ["invalid type", { ...inboxItemRecord, type: "event" }],
     ["invalid status", { ...inboxItemRecord, status: "archived" }],
-  ])("rejects an inbox item with %s", (_name, value) => {
+  ])("rejects an inbox item with %s", (_name: string, value: unknown) => {
     expect(inboxItemSchema.safeParse(value).success).toBe(false);
   });
 

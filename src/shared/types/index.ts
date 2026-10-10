@@ -8,6 +8,7 @@ export * from "./life-area";
 export * from "./finance";
 export * from "./focus-session";
 export * from "./decision-log";
+export * from "./experiment";
 export * from "./goal";
 export * from "./project";
 export * from "./setting";

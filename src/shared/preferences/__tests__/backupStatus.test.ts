@@ -8,6 +8,12 @@ import {
   writeStoredBackupStatus,
 } from "../backupStatus";
 
+type BackupFreshnessCase = Readonly<{
+  label: string;
+  value: string | null;
+  expected: ReturnType<typeof getBackupFreshness>;
+}>;
+
 describe("backup status helpers", () => {
   afterEach(() => {
     vi.unstubAllGlobals();
@@ -30,7 +36,7 @@ describe("backup status helpers", () => {
       value: "2026-06-26T09:00:00",
       expected: "overdue",
     },
-  ])("classifies $label backups correctly", ({ value, expected }) => {
+  ])("classifies $label backups correctly", ({ value, expected }: BackupFreshnessCase) => {
     expect(getBackupFreshness(value, new Date("2026-07-10T12:00:00"))).toBe(
       expected
     );

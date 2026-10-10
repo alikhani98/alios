@@ -6,6 +6,7 @@ export * from "./resourceRepository";
 export * from "./manualRepository";
 export * from "./lifeAreasRepository";
 export * from "./decisionLogRepository";
+export * from "./experimentRepository";
 export * from "./goalsRepository";
 export * from "./financeRepository";
 export * from "./focusSessionsRepository";

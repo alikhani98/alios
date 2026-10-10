@@ -92,6 +92,11 @@ export const navigationGroups: NavigationGroup[] = [
         icon: "repeat",
       },
       {
+        titleKey: "nav.experiments",
+        href: "/experiments",
+        icon: "target",
+      },
+      {
         titleKey: "nav.weeklyReview",
         href: "/weekly-review",
         icon: "calendar-range",

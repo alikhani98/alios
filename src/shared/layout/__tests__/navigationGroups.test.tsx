@@ -29,6 +29,7 @@ const expectedNavigationHrefs = [
   "/journal",
   "/knowledge",
   "/resources",
+  "/experiments",
   "/manual",
   "/finance",
   "/settings",

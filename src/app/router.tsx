@@ -33,6 +33,9 @@ const FocusPage = lazyWithRetry(() =>
 const RoutinesPage = lazyWithRetry(() =>
   import("@/features/routines/pages/RoutinesPage").then((module) => ({ default: module.RoutinesPage }))
 );
+const ExperimentsPage = lazyWithRetry(() =>
+  import("@/features/experiments/pages/ExperimentsPage")
+);
 const ProjectsPage = lazyWithRetry(() =>
   import("@/features/projects/pages/ProjectsPage").then((module) => ({
     default: module.ProjectsPage,
@@ -152,6 +155,14 @@ const router = createHashRouter([
       {
         path: "routines",
         element: <Suspense fallback={<RouteLoadingFallback />}><RoutinesPage /></Suspense>,
+      },
+      {
+        path: "experiments",
+        element: (
+          <Suspense fallback={<RouteLoadingFallback />}>
+            <ExperimentsPage />
+          </Suspense>
+        ),
       },
       {
         path: "inbox",

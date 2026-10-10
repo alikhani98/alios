@@ -5,6 +5,8 @@ import type {
   DailyCheckin,
   Attachment,
   DecisionLogEntry,
+  Experiment,
+  ExperimentLog,
   Goal,
   FinanceAsset,
   FinanceObligation,
@@ -41,6 +43,7 @@ import {
   DEXIE_SCHEMA_V14,
   DEXIE_SCHEMA_V15,
   DEXIE_SCHEMA_V16,
+  DEXIE_SCHEMA_V17,
   DEXIE_SCHEMA_VERSION,
   DEXIE_SCHEMA_VERSION_3,
   DEXIE_SCHEMA_VERSION_4,
@@ -56,6 +59,7 @@ import {
   DEXIE_SCHEMA_VERSION_14,
   DEXIE_SCHEMA_VERSION_15,
   DEXIE_SCHEMA_VERSION_16,
+  DEXIE_SCHEMA_VERSION_17,
 } from "./schema";
 
 export class AliosDatabase extends Dexie {
@@ -78,6 +82,8 @@ export class AliosDatabase extends Dexie {
   weeklyPlans!: Table<WeeklyPlan, string>;
   focusSessions!: Table<FocusSession, string>;
   resources!: Table<Resource, string>;
+  experiments!: Table<Experiment, string>;
+  experimentLogs!: Table<ExperimentLog, string>;
   attachments!: Table<Attachment, string>;
   attachmentBlobs!: Table<{ storageKey: string; blob: Blob }, string>;
   mutationOutbox!: Table<MutationOutboxEntry, string>;
@@ -100,6 +106,7 @@ export class AliosDatabase extends Dexie {
     this.version(DEXIE_SCHEMA_VERSION_14).stores(DEXIE_SCHEMA_V14);
     this.version(DEXIE_SCHEMA_VERSION_15).stores(DEXIE_SCHEMA_V15);
     this.version(DEXIE_SCHEMA_VERSION_16).stores(DEXIE_SCHEMA_V16);
+    this.version(DEXIE_SCHEMA_VERSION_17).stores(DEXIE_SCHEMA_V17);
   }
 }
 

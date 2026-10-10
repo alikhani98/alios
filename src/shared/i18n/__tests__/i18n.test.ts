@@ -582,7 +582,7 @@ describe("i18n utilities", () => {
     "weeklyReview.manualLastUpdated",
     "weeklyReview.manualMarkReviewed",
     "weeklyReview.openManual",
-  ] as const)("defines %s in both message catalogs", (key) => {
+  ] as const)("defines %s in both message catalogs", (key: keyof typeof messagesEn) => {
     expect(messagesEn[key]).toBeTruthy();
     expect(messagesFa[key]).toBeTruthy();
   });
@@ -590,11 +590,11 @@ describe("i18n utilities", () => {
   it("does not fall back to English for any Life Areas message", () => {
     const lifeAreaKeys = (
       Object.keys(messagesEn) as Array<keyof typeof messagesEn>
-    ).filter((key) => key.startsWith("lifeAreas."));
+    ).filter((key: keyof typeof messagesEn) => key.startsWith("lifeAreas."));
 
     expect(lifeAreaKeys.length).toBeGreaterThan(0);
     expect(
-      lifeAreaKeys.filter((key) => messagesFa[key] === messagesEn[key])
+      lifeAreaKeys.filter((key: keyof typeof messagesEn) => messagesFa[key] === messagesEn[key])
     ).toEqual([]);
   });
 

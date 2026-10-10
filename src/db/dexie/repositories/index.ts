@@ -4,6 +4,7 @@ export * from "./DexieInboxRepository";
 export * from "./DexieFinanceRepository";
 export * from "./DexieFocusSessionsRepository";
 export * from "./DexieDecisionLogRepository";
+export * from "./DexieExperimentsRepository";
 export * from "./DexieGoalsRepository";
 export * from "./DexieLifeAreasRepository";
 export * from "./DexieKnowledgeRepository";

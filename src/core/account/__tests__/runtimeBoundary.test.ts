@@ -58,7 +58,7 @@ function createSubscriptionTrackingAuthProvider(session: AuthSession) {
     login: async () => ({ session }),
     logout: async () => undefined,
     refreshSession: async () => session,
-    subscribe: vi.fn((listener) => {
+    subscribe: vi.fn((listener: (nextSession: AuthSession) => void) => {
       listeners.add(listener);
       activeSubscriptions += 1;
       maxActiveSubscriptions = Math.max(
@@ -281,7 +281,7 @@ describe("account runtime boundary", () => {
       login: async () => ({ session: currentSession }),
       logout: async () => undefined,
       refreshSession: async () => currentSession,
-      subscribe: vi.fn((listener) => {
+      subscribe: vi.fn((listener: (nextSession: AuthSession) => void) => {
         listeners.add(listener);
         listener(currentSession);
 

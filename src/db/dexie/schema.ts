@@ -14,6 +14,7 @@ export const DEXIE_SCHEMA_VERSION_13 = 13;
 export const DEXIE_SCHEMA_VERSION_14 = 14;
 export const DEXIE_SCHEMA_VERSION_15 = 15;
 export const DEXIE_SCHEMA_VERSION_16 = 16;
+export const DEXIE_SCHEMA_VERSION_17 = 17;
 
 export const DEXIE_TABLE_NAMES = {
   dailyCheckins: "dailyCheckins",
@@ -35,6 +36,8 @@ export const DEXIE_TABLE_NAMES = {
   weeklyPlans: "weeklyPlans",
   focusSessions: "focusSessions",
   resources: "resources",
+  experiments: "experiments",
+  experimentLogs: "experimentLogs",
   attachments: "attachments",
   attachmentBlobs: "attachmentBlobs",
 } as const;
@@ -151,13 +154,27 @@ export const DEXIE_SCHEMA_V15 = {
   [DEXIE_TABLE_NAMES.attachments]:
     "id, [ownerType+ownerId], ownerType, ownerId, createdAt, updatedAt",
   [DEXIE_TABLE_NAMES.attachmentBlobs]: "&storageKey",
-} satisfies Record<DexieTableName, string>;
+} satisfies Partial<Record<DexieTableName, string>>;
 
 export const DEXIE_SCHEMA_V16 = {
   ...DEXIE_SCHEMA_V15,
   [DEXIE_MUTATION_OUTBOX_TABLE_NAME]:
     "id, status, nextAttemptAt, createdAt, [status+nextAttemptAt], [entity+recordId]",
-} satisfies Record<
-  DexieTableName | typeof DEXIE_MUTATION_OUTBOX_TABLE_NAME,
-  string
+} satisfies Partial<
+  Record<
+    DexieTableName | typeof DEXIE_MUTATION_OUTBOX_TABLE_NAME,
+    string
+  >
+>;
+
+export const DEXIE_SCHEMA_V17 = {
+  ...DEXIE_SCHEMA_V16,
+  [DEXIE_TABLE_NAMES.experiments]: "id, status, createdAt, updatedAt",
+  [DEXIE_TABLE_NAMES.experimentLogs]:
+    "id, experimentId, date, [experimentId+date], createdAt",
+} satisfies Partial<
+  Record<
+    DexieTableName | typeof DEXIE_MUTATION_OUTBOX_TABLE_NAME,
+    string
+  >
 >;

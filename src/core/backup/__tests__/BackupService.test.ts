@@ -91,6 +91,8 @@ describe("BackupService with DexieBackupStorage", () => {
         "goals",
         "lifeAreas",
         "decisionLogEntries",
+        "experiments",
+        "experimentLogs",
         "manualEntries",
         "financeTransactions",
         "financeObligations",
@@ -109,6 +111,8 @@ describe("BackupService with DexieBackupStorage", () => {
       ].sort()
     );
     expect(backup.data.attachments).toEqual([]);
+    expect(backup.data.experiments).toEqual([]);
+    expect(backup.data.experimentLogs).toEqual([]);
     expect(backup.data.projects).toEqual([project]);
     expect(backup.data.tasks).toEqual([task]);
     expect(backup.data.routines).toEqual([routine]);
@@ -227,6 +231,8 @@ describe("BackupService with DexieBackupStorage", () => {
     expect(oldBackup.data.focusSessions).toEqual([]);
     expect(oldBackup.data.resources).toEqual([]);
     expect(oldBackup.data.attachments).toEqual([]);
+    expect(oldBackup.data.experiments).toEqual([]);
+    expect(oldBackup.data.experimentLogs).toEqual([]);
     expect(oldBackup.data.goals).toEqual([]);
     expect(oldBackup.data.decisionLogEntries).toEqual([]);
     expect(oldBackup.data.manualEntries).toEqual([]);

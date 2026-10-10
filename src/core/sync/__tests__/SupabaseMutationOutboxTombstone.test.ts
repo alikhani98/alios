@@ -75,11 +75,13 @@ function createBackupStorage(): BackupStorage {
     routines: [],
     weeklyPlans: [],
     attachments: [],
+    experiments: [],
+    experimentLogs: [],
   } as AliosBackupData;
 
   return {
     readAll: vi.fn(async () => structuredClone(data)),
-    replaceAll: vi.fn(async (nextData) => {
+    replaceAll: vi.fn(async (nextData: AliosBackupData) => {
       data = structuredClone(nextData);
     }),
     getSummary: vi.fn(async () => ({} as never)),
@@ -310,7 +312,7 @@ describe("Supabase mutation outbox tombstones", () => {
 
   it.each(otherEntityCases)(
     "propagates a $entity delete tombstone without reapplying the missing local record",
-    async ({ entity, record }) => {
+    async ({ entity, record }: TombstoneCase) => {
       const deletedAt = "2026-09-26T10:00:00.000Z";
       const remoteRows = [createRemoteRow(entity, record)];
       const client = createClient({ remoteRows });

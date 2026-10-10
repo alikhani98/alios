@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { BackupStorage } from "@/core/backup";
+import type { AliosBackupData, BackupStorage } from "@/core/backup";
 import type { AuthProvider, AuthSession } from "@/core/auth";
 import type { GoogleAuthRuntime } from "@/core/auth/googleAuthRuntime";
 import {
@@ -299,11 +299,13 @@ function createBackupStorageStub(input?: {
     weeklyPlans: [],
     focusSessions: [],
     attachments: [],
+    experiments: [],
+    experimentLogs: [],
   };
 
   const backupStorage: BackupStorage = {
     readAll: vi.fn(async () => structuredClone(data)),
-    replaceAll: vi.fn(async (nextData) => {
+    replaceAll: vi.fn(async (nextData: AliosBackupData) => {
       data = structuredClone(nextData);
     }),
     getSummary: vi.fn(async () => ({
@@ -327,6 +329,8 @@ function createBackupStorageStub(input?: {
       routines: data.routines.length,
       weeklyPlans: data.weeklyPlans.length,
       attachments: data.attachments.length,
+      experiments: data.experiments.length,
+      experimentLogs: data.experimentLogs.length,
     })),
     clearAll: vi.fn(async () => {
       data = {
@@ -341,6 +345,8 @@ function createBackupStorageStub(input?: {
         financeCategoryBudgets: [],
         financeAssets: [],
         focusSessions: [],
+        experiments: [],
+        experimentLogs: [],
       };
     }),
   };

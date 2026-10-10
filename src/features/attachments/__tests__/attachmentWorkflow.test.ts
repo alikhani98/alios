@@ -29,7 +29,7 @@ function createDependencies() {
     }),
     getById: vi.fn(async (id: string) => records.get(id)),
     listAll: vi.fn(async () => [...records.values()]),
-    listByOwner: vi.fn(async (ownerType, ownerId) =>
+    listByOwner: vi.fn(async (ownerType: Attachment["ownerType"], ownerId: string) =>
       [...records.values()].filter(
         (attachment) =>
           attachment.ownerType === ownerType && attachment.ownerId === ownerId

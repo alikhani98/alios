@@ -42,24 +42,24 @@ function createDependencies(
     restore(attachment: Attachment): Promise<void>;
   } = {
     create: vi.fn(),
-    getById: vi.fn(async (id) => metadata.get(id)),
+    getById: vi.fn(async (id: string) => metadata.get(id)),
     listAll: vi.fn(async () => [...metadata.values()]),
     listByOwner: vi.fn(),
-    delete: vi.fn(async (id) => {
+    delete: vi.fn(async (id: string) => {
       metadata.delete(id);
     }),
-    restore: vi.fn(async (attachment) => {
+    restore: vi.fn(async (attachment: Attachment) => {
       metadata.set(attachment.id, attachment);
     }),
   };
   const binaryStorage: BinaryStorage = {
-    save: vi.fn(async (storageKey, value) => {
+    save: vi.fn(async (storageKey: string, value: Blob) => {
       binaries.set(storageKey, value);
     }),
-    retrieve: vi.fn(async (storageKey) => binaries.get(storageKey)),
-    has: vi.fn(async (storageKey) => binaries.has(storageKey)),
+    retrieve: vi.fn(async (storageKey: string) => binaries.get(storageKey)),
+    has: vi.fn(async (storageKey: string) => binaries.has(storageKey)),
     listKeys: vi.fn(async () => [...binaries.keys()]),
-    delete: vi.fn(async (storageKey) => {
+    delete: vi.fn(async (storageKey: string) => {
       binaries.delete(storageKey);
     }),
   };

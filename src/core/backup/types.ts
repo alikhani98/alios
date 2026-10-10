@@ -3,6 +3,8 @@ import { z } from "zod";
 import {
   dailyCheckinSchema,
   decisionLogEntrySchema,
+  experimentLogSchema,
+  experimentSchema,
   goalSchema,
   financeCategoryBudgetSchema,
   financeAssetSchema,
@@ -33,6 +35,8 @@ export const aliosBackupDataSchema = z.object({
   goals: z.array(goalSchema).default([]),
   lifeAreas: z.array(lifeAreaSchema).default([]),
   decisionLogEntries: z.array(decisionLogEntrySchema).default([]),
+  experiments: z.array(experimentSchema).default([]),
+  experimentLogs: z.array(experimentLogSchema).default([]),
   manualEntries: z.array(manualEntrySchema).default([]),
   financeTransactions: z.array(financeTransactionSchema).default([]),
   financeObligations: z.array(financeObligationSchema).default([]),

@@ -1,6 +1,7 @@
 import type {
   DailyCheckinsRepository,
   DecisionLogRepository,
+  ExperimentRepository,
   GoalsRepository,
   FinanceRepository,
   FocusSessionsRepository,
@@ -30,6 +31,7 @@ export interface StorageAdapter {
   routines: RoutinesRepository;
   weeklyPlans: WeeklyPlansRepository;
   decisions: DecisionLogRepository;
+  experiments: ExperimentRepository;
   goals: GoalsRepository;
   finance: FinanceRepository;
   focusSessions: FocusSessionsRepository;
