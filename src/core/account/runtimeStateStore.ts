@@ -74,7 +74,12 @@ class DefaultAccountRuntimeStateStore implements AccountRuntimeStateStore {
   }
 
   private setState(nextState: AccountRuntimeState) {
-    if (Object.is(this.state, nextState)) {
+    const previousState = this.state;
+
+    if (
+      Object.is(previousState, nextState) ||
+      areUiDrivingFieldsEqual(previousState, nextState)
+    ) {
       return;
     }
 
@@ -83,6 +88,19 @@ class DefaultAccountRuntimeStateStore implements AccountRuntimeStateStore {
       listener(this.state);
     });
   }
+}
+
+function areUiDrivingFieldsEqual(
+  previousState: AccountRuntimeState,
+  nextState: AccountRuntimeState
+) {
+  return (
+    previousState.syncStatus.mode === nextState.syncStatus.mode &&
+    previousState.syncStatus.detail === nextState.syncStatus.detail &&
+    previousState.syncStatus.lastSyncedAt ===
+      nextState.syncStatus.lastSyncedAt &&
+    previousState.authSession.user?.userId === nextState.authSession.user?.userId
+  );
 }
 
 export function createAccountRuntimeStateStore(
