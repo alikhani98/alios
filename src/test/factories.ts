@@ -8,6 +8,7 @@ import type {
   CreateFinanceTransactionInput,
   CreateFocusSessionInput,
   AddIfThenPlanInput,
+  AddTherapyNoteInput,
   CreateJournalEntryInput,
   CreateInboxItemInput,
   CreateKnowledgeItemInput,
@@ -29,6 +30,7 @@ import type {
   FinanceTransaction,
   FocusSession,
   IfThenPlan,
+  TherapyNote,
   JournalEntry,
   InboxItem,
   KnowledgeItem,
@@ -183,6 +185,12 @@ export const ifThenPlanInput: AddIfThenPlanInput = {
   linkedUrgeType: "social_media",
 };
 
+export const therapyNoteInput: AddTherapyNoteInput = {
+  date: "2026-07-05",
+  category: "event",
+  content: "A useful moment to discuss in therapy.",
+};
+
 export const decisionLogInput: CreateDecisionLogEntryInput = {
   title: "Choose release focus",
   decisionDate: "2026-07-05",
@@ -297,6 +305,10 @@ export const focusSessionRecord: FocusSession = {
 export const ifThenPlanRecord: IfThenPlan = {
   ...ifThenPlanInput,
   isActive: true,
+  ...metadata,
+};
+export const therapyNoteRecord: TherapyNote = {
+  ...therapyNoteInput,
   ...metadata,
 };
 export const decisionLogRecord: DecisionLogEntry = {

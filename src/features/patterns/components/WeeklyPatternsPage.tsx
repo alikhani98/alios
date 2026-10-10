@@ -2,7 +2,6 @@ import { RefreshCcw } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useStorageAdapter } from "@/core/storage";
-import { URGE_TYPES } from "@/features/urge/components/UrgeQuickForm";
 import { useI18n, type TranslationKey } from "@/shared/i18n";
 import { getLocalDateKey } from "@/shared/preferences/routineNudges";
 import type { DailyCommitment, Routine, Task, UrgeEntry } from "@/shared/types";
@@ -13,6 +12,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/shared/ui";
+import { aliosListItemMotion, aliosStaggerDelay } from "@/shared/ui/motion";
+import { cn } from "@/shared/utils";
 
 import {
   commitmentByHour,
@@ -25,6 +26,17 @@ import {
 
 const REPORT_DAYS = 14;
 const MAX_INSIGHTS = 5;
+
+const URGE_TYPES = [
+  { value: "cigarette", labelKey: "urge.typeCigarette" },
+  { value: "social_media", labelKey: "urge.typeSocialMedia" },
+  { value: "procrastination", labelKey: "urge.typeProcrastination" },
+  { value: "impulse_buy", labelKey: "urge.typeImpulseBuy" },
+  { value: "other", labelKey: "urge.typeOther" },
+] as const satisfies ReadonlyArray<{
+  value: string;
+  labelKey: TranslationKey;
+}>;
 
 type RoutinePattern = {
   routineId: string;
@@ -258,7 +270,14 @@ function InsightSection({
       </CardHeader>
       <CardContent className="space-y-3 text-sm leading-7 text-muted-foreground">
         {insights.length > 0 ? (
-          insights.map((insight) => <p key={insight.id}>{insight.text}</p>)
+          insights.map((insight, index) => (
+            <p
+              key={insight.id}
+              className={cn(aliosListItemMotion, aliosStaggerDelay(index))}
+            >
+              {insight.text}
+            </p>
+          ))
         ) : (
           <p>{fallback}</p>
         )}

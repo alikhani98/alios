@@ -17,6 +17,8 @@ import {
   EmptyState,
   SectionHeader,
 } from "@/shared/ui";
+import { aliosListItemMotion, aliosStaggerDelay } from "@/shared/ui/motion";
+import { cn } from "@/shared/utils";
 import {
   THERAPY_NO_PROVIDER_ERROR,
   useTherapySummary,
@@ -226,10 +228,14 @@ export function TherapyBridgePage() {
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-3">
-                      {categoryNotes.map((note) => (
+                      {categoryNotes.map((note, noteIndex) => (
                         <article
                           key={note.id}
-                          className="rounded-2xl border border-border/70 bg-background p-4"
+                          className={cn(
+                            "rounded-2xl border border-border/70 bg-background p-4",
+                            aliosListItemMotion,
+                            aliosStaggerDelay(noteIndex)
+                          )}
                         >
                           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                             <div className="min-w-0 space-y-2">

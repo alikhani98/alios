@@ -326,6 +326,7 @@ function createBackupStorageStub(input?: {
     experiments: [],
     experimentLogs: [],
     ifThenPlans: [],
+    therapyNotes: [],
   };
 
   const backupStorage: BackupStorage = {
@@ -372,6 +373,7 @@ function createBackupStorageStub(input?: {
         focusSessions: [],
         experiments: [],
         experimentLogs: [],
+        therapyNotes: [],
       };
     }),
   };

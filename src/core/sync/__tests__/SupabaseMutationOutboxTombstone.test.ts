@@ -78,6 +78,7 @@ function createBackupStorage(): BackupStorage {
     experiments: [],
     experimentLogs: [],
     ifThenPlans: [],
+    therapyNotes: [],
   } as AliosBackupData;
 
   return {
