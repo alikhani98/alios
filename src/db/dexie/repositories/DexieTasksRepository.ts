@@ -135,6 +135,7 @@ export class DexieTasksRepository
                 dueDate: nextDueDate,
                 recurrenceSeriesId,
                 completedAt: undefined,
+                completedMinimum: undefined,
               });
               await this.database.tasks.add(nextTask);
               await this.mutationOutbox.enqueue({

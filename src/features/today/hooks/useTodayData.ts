@@ -126,6 +126,7 @@ export function useTodayData(today: string) {
       updateTask(id, {
         status,
         completedAt: status === "done" ? new Date().toISOString() : undefined,
+        completedMinimum: status === "done" ? undefined : false,
       }),
     [updateTask]
   );

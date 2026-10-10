@@ -1,5 +1,5 @@
 import { AlertCircle, CheckCircle2, CheckSquare2, Clock3, Plus, Repeat2, RotateCcw, Sparkles, Target } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 
 import type { UpdateTaskInput } from "@/core/repositories";
@@ -8,6 +8,7 @@ import { useProjects } from "@/features/projects/hooks/useProjects";
 import { useRoutines } from "@/features/routines/hooks/useRoutines";
 import type {
   DecisionLogEntry,
+  DailyCommitment,
   JournalEntry,
   KnowledgeItem,
   Project,
@@ -55,6 +56,12 @@ import { clearDueProjectReviewDate, isProjectReviewDue } from "@/features/projec
 
 export const TODAY_COMPLETED_TASKS_OPEN_STORAGE_KEY =
   "alios.today.completedTasks.open";
+
+const RecoveryCard = lazy(() =>
+  import("@/features/recovery/components/RecoveryCard").then((module) => ({
+    default: module.RecoveryCard,
+  }))
+);
 
 export function getDefaultCompletedTasksOpen(completedTaskCount: number) {
   return completedTaskCount <= 3;
@@ -137,6 +144,7 @@ export interface TodayWorkspaceProps {
   focusId: string | null;
   goalId: string | null;
   hideEmptyTaskState?: boolean;
+  hideRecoveryCard?: boolean;
   hideTaskSummaryHeader?: boolean;
   projectId: string | null;
   routineId: string | null;
@@ -147,6 +155,7 @@ export function TodayWorkspace({
   focusId,
   goalId,
   hideEmptyTaskState = false,
+  hideRecoveryCard = false,
   hideTaskSummaryHeader = false,
   projectId,
   routineId,
@@ -160,6 +169,7 @@ export function TodayWorkspace({
     journal: journalRepository,
     decisions: decisionsRepository,
     knowledge: knowledgeRepository,
+    dailyCommitments: dailyCommitmentsRepository,
   } = useStorageAdapter();
   const {
     tasks,
@@ -211,6 +221,8 @@ export function TodayWorkspace({
   const [linkedJournalEntries, setLinkedJournalEntries] = useState<JournalEntry[]>([]);
   const [linkedDecisions, setLinkedDecisions] = useState<DecisionLogEntry[]>([]);
   const [linkedKnowledgeItems, setLinkedKnowledgeItems] = useState<KnowledgeItem[]>([]);
+  const [dailyCommitment, setDailyCommitment] =
+    useState<DailyCommitment | undefined>();
   const [linkedContentError, setLinkedContentError] = useState<string | null>(null);
   const taskRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const plannedTaskRef = useRef<HTMLDivElement | null>(null);
@@ -356,6 +368,27 @@ export function TodayWorkspace({
       isCancelled = true;
     };
   }, [decisionsRepository, journalRepository, knowledgeRepository, t]);
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    void dailyCommitmentsRepository
+      .getCommitmentByDate(today)
+      .then((commitment) => {
+        if (!isCancelled) {
+          setDailyCommitment(commitment);
+        }
+      })
+      .catch(() => {
+        if (!isCancelled) {
+          setDailyCommitment(undefined);
+        }
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [dailyCommitmentsRepository, today]);
 
   const handleCompletedTasksOpenChange = (open: boolean) => {
     setCompletedTasksOpen(open);
@@ -512,9 +545,30 @@ export function TodayWorkspace({
   const handleAddRoutine = async (routine: (typeof routines)[number]) => {
     setBusyRoutineId(routine.id);
     setActionError(null);
+    setSuccessMessage(null);
     try {
       await createRoutineTask(createRoutineTaskInput(routine, today));
       setSuccessMessage(t("routines.addedToToday"));
+    } catch (caught) {
+      showError(caught, t("today.taskSaveError"));
+    } finally {
+      setBusyRoutineId(null);
+    }
+  };
+
+  const handleCompleteMinimumRoutine = async (routine: (typeof routines)[number]) => {
+    setBusyRoutineId(routine.id);
+    setActionError(null);
+    setSuccessMessage(null);
+    try {
+      const result = await createRoutineTask(createRoutineTaskInput(routine, today));
+      await updateTask(result.task.id, {
+        status: "done",
+        completedAt: new Date().toISOString(),
+        completedMinimum: true,
+      });
+      await Promise.all([loadToday(), loadTodayWeeklyPlan()]);
+      setSuccessMessage(t("routine.minimumCompleted"));
     } catch (caught) {
       showError(caught, t("today.taskSaveError"));
     } finally {
@@ -679,6 +733,12 @@ export function TodayWorkspace({
           {focusMessage}
         </div>
       ) : null}
+
+      {hideRecoveryCard ? null : (
+        <Suspense fallback={null}>
+          <RecoveryCard today={today} onAddTask={openCreateTask} />
+        </Suspense>
+      )}
 
       {hideTaskSummaryHeader ? null : (
         <PremiumCard className="border-border/70 bg-card/95">
@@ -900,6 +960,31 @@ export function TodayWorkspace({
         </div>
 
         <div className="space-y-6">
+          {dailyCommitment ? (
+            <SoftPanel className="border-primary/15 bg-primary/5">
+              <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div className="min-w-0 space-y-1">
+                  <p className="text-sm font-semibold">
+                    {t("commitment.cardTitle")}
+                  </p>
+                  <p className="break-words text-sm leading-6 text-muted-foreground">
+                    {dailyCommitment.title}
+                  </p>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="font-mono text-sm tabular-nums text-muted-foreground">
+                    {dailyCommitment.plannedStartTime}
+                  </span>
+                  <StatusChip tone={dailyCommitment.didStart ? "success" : "neutral"}>
+                    {dailyCommitment.didStart
+                      ? t("commitment.statusStarted")
+                      : t("commitment.statusNotStarted")}
+                  </StatusChip>
+                </div>
+              </div>
+            </SoftPanel>
+          ) : null}
+
           <TodayTimeBlockingTimeline
             tasks={orderedVisibleTasks}
             onTaskScheduleChange={handleScheduleTask}
@@ -940,6 +1025,23 @@ export function TodayWorkspace({
                       >
                         <div className="min-w-0">
                           <p className="break-words font-medium">{routine.title}</p>
+                          {routine.minimumVersion ? (
+                            <div className="mt-2 flex min-w-0 flex-col gap-2 rounded-xl border border-primary/15 bg-primary/5 p-2 sm:flex-row sm:items-center sm:justify-between">
+                              <p className="min-w-0 break-words text-sm leading-6 text-muted-foreground">
+                                {t("routine.minimumPrompt")} {routine.minimumVersion}
+                              </p>
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="outline"
+                                className="w-full shrink-0 sm:w-auto"
+                                disabled={busyRoutineId === routine.id}
+                                onClick={() => void handleCompleteMinimumRoutine(routine)}
+                              >
+                                {t("routine.doMinimum")}
+                              </Button>
+                            </div>
+                          ) : null}
                           {routine.description ? (
                             <p className="mt-1 line-clamp-2 break-words text-sm leading-6 text-muted-foreground">
                               {routine.description}

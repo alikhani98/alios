@@ -15,7 +15,7 @@ import {
   Target,
   X,
 } from "lucide-react";
-import { type ReactNode, useState } from "react";
+import { lazy, Suspense, type ReactNode, useState } from "react";
 import { Link } from "react-router-dom";
 import { addDays, format } from "date-fns";
 
@@ -61,6 +61,44 @@ import { useHomeDashboard } from "../hooks/useHomeDashboard";
 import type { HomeCollapsibleSectionId } from "../homeCollapsedSections";
 import type { HomeDashboardData } from "../types";
 import type { HomeLearningSnapshot } from "../homeLearningSnapshot";
+
+const DailyCommitmentCard = lazy(() =>
+  import("@/features/commitment/components/DailyCommitmentCard").then(
+    (module) => ({
+      default: module.DailyCommitmentCard,
+    })
+  )
+);
+
+const IfThenContextCard = lazy(() =>
+  import("@/features/ifthen/components/IfThenContextCard").then((module) => ({
+    default: module.IfThenContextCard,
+  }))
+);
+
+const MoneyPauseButton = lazy(() =>
+  import("@/features/money/components/MoneyPauseButton").then((module) => ({
+    default: module.MoneyPauseButton,
+  }))
+);
+
+const MoneyPauseReviewCard = lazy(() =>
+  import("@/features/money/components/MoneyPauseReviewCard").then((module) => ({
+    default: module.MoneyPauseReviewCard,
+  }))
+);
+
+const UrgeLogButton = lazy(() =>
+  import("@/features/urge/components/UrgeLogButton").then((module) => ({
+    default: module.UrgeLogButton,
+  }))
+);
+
+const UrgeTodayList = lazy(() =>
+  import("@/features/urge/components/UrgeTodayList").then((module) => ({
+    default: module.UrgeTodayList,
+  }))
+);
 
 const quickLinks: ReadonlyArray<{ to: string; labelKey: TranslationKey }> = [
   { to: "/today", labelKey: "home.goToday" },
@@ -712,6 +750,8 @@ export function UnifiedHomePage() {
     useState<RoutineTemplateId | null>(null);
   const [backupReminderDismissedUntil, setBackupReminderDismissedUntil] =
     useState(() => readHomeBackupReminderDismissedUntil());
+  const [urgeRefreshKey, setUrgeRefreshKey] = useState(0);
+  const [moneyPauseRefreshKey, setMoneyPauseRefreshKey] = useState(0);
 
   const showBackupReminder =
     !isLoading &&
@@ -810,6 +850,42 @@ export function UnifiedHomePage() {
               displayName={displayName}
             />
           ) : null}
+          <Suspense
+            fallback={
+              <div
+                className="h-32 animate-pulse rounded-[1.5rem] border bg-muted/60"
+                aria-label={t("home.loading")}
+              />
+            }
+          >
+            <DailyCommitmentCard />
+          </Suspense>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <Suspense fallback={null}>
+              <UrgeLogButton
+                variant="inline"
+                onSaved={() => setUrgeRefreshKey((current) => current + 1)}
+              />
+            </Suspense>
+            <Suspense fallback={null}>
+              <MoneyPauseButton
+                variant="inline"
+                onSaved={() => setMoneyPauseRefreshKey((current) => current + 1)}
+              />
+            </Suspense>
+          </div>
+          <Suspense fallback={null}>
+            <IfThenContextCard refreshKey={urgeRefreshKey} />
+          </Suspense>
+          <Suspense fallback={null}>
+            <MoneyPauseReviewCard
+              refreshKey={moneyPauseRefreshKey}
+              onChanged={() => setMoneyPauseRefreshKey((current) => current + 1)}
+            />
+          </Suspense>
+          <Suspense fallback={null}>
+            <UrgeTodayList refreshKey={urgeRefreshKey} />
+          </Suspense>
           <TodaySummaryBar data={data} today={today} />
           <div className="grid gap-5 xl:grid-cols-2">
             <TodayPreviewCard data={data} />

@@ -10,6 +10,8 @@ export const routineSchema = z.object({
   id: z.string().min(1),
   title: z.string().trim().min(1),
   description: z.string().optional(),
+  minimumVersion: z.string().trim().min(1).optional(),
+  minimumMinutes: z.number().int().min(1).max(720).optional(),
   weekdays: z.array(routineWeekdaySchema).min(1),
   priority: z.enum(TASK_PRIORITY_VALUES),
   isActive: z.boolean(),

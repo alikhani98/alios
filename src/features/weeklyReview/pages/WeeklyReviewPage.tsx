@@ -517,6 +517,9 @@ export function WeeklyReviewPage() {
       <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
         <div className="min-w-0 space-y-1">
           <p className="min-w-0 break-words text-base font-semibold leading-7">{item.title}</p>
+          <p className="text-sm text-muted-foreground">
+            {t("weeklyReview.localOnlyNote")}
+          </p>
         </div>
         <div className="flex shrink-0 flex-wrap gap-2">
           <Badge variant="secondary">{t(getReviewQueueLabelKey(item))}</Badge>
@@ -765,6 +768,9 @@ export function WeeklyReviewPage() {
                   {t("weeklyReview.needsReview")}
                 </p>
                 <p className="text-lg font-semibold tabular-nums">{reviewQueue.length}</p>
+                <p className="text-sm text-muted-foreground">
+                  {t("weeklyReview.localOnlyNote")}
+                </p>
               </SoftPanel>
               <SoftPanel className="gap-2 border-alios-saffron/25 bg-background/85">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
@@ -852,6 +858,7 @@ export function WeeklyReviewPage() {
                     <SectionHeader
                       icon={<Clock3 className="h-5 w-5" />}
                       title={t("weeklyReview.needsReview")}
+                      description={t("weeklyReview.localOnlyNote")}
                       status={<StatusChip tone="warning">{reviewQueue.length}</StatusChip>}
                     />
                     {renderReviewQueueItem(firstReviewQueueItem)}
@@ -862,6 +869,7 @@ export function WeeklyReviewPage() {
                   <CollapsibleSection
                     id="weekly-review-queue-details"
                     title={t("weeklyReview.needsReview")}
+                    description={t("weeklyReview.localOnlyNote")}
                     icon={<Clock3 className="h-5 w-5" />}
                     status={<StatusChip tone="neutral">{remainingReviewQueueItems.length}</StatusChip>}
                     defaultOpen={false}
@@ -893,6 +901,7 @@ export function WeeklyReviewPage() {
                     <SectionHeader
                       icon={<Clock3 className="h-5 w-5" />}
                       title={t("weeklyReview.needsReview")}
+                      description={t("weeklyReview.localOnlyNote")}
                       status={<StatusChip tone="neutral">0</StatusChip>}
                     />
                   </div>
@@ -1048,6 +1057,7 @@ export function WeeklyReviewPage() {
                     <SoftPanel key={`${suggestion.kind}-${index}`} className="space-y-3 alios-surface-muted">
                       <div className="flex flex-wrap items-center gap-2">
                         <StatusChip tone="primary">{t("weeklyReview.nextFocusLabel")}</StatusChip>
+                        <StatusChip tone="neutral">{t("weeklyReview.localOnlyNote")}</StatusChip>
                       </div>
                       <p className="text-sm leading-7 text-muted-foreground">
                         {t(getFocusMessageKey(suggestion))}
