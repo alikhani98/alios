@@ -60,7 +60,14 @@ export function usePersistentBoolean({
 
   useEffect(() => {
     try {
-      window.localStorage.setItem(key, String(value));
+      const serializedValue = String(value);
+      const storedValue = window.localStorage.getItem(key);
+
+      if (storedValue === serializedValue) {
+        return;
+      }
+
+      window.localStorage.setItem(key, serializedValue);
       window.dispatchEvent(new Event(LOCAL_PREFERENCE_CHANGE_EVENT));
     } catch {
       // Keep the boolean in memory if storage is unavailable.
