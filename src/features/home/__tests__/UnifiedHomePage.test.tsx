@@ -216,7 +216,7 @@ describe("UnifiedHomePage", () => {
     expect(markup).toContain("1 task(s) remaining");
     expect(markup).toContain("Today’s tasks (1)");
     expect(markup).toContain("See all today’s tasks");
-    expect(markup).toContain("Important task tomorrow");
+    expect(markup).toContain("No priority set for tomorrow");
     expect(markup).toContain("More sections");
     expect(markup).not.toContain("Today workspace for 2026-08-09");
     expect(markup).not.toContain("Morning briefing");

@@ -1102,6 +1102,8 @@ export const messagesEn = {
   "home.attentionReview": "Review",
   "home.importantTomorrow": "Important task tomorrow",
   "home.tomorrowEmpty": "No important task is set for tomorrow yet.",
+  "home.tomorrowEmptyCompact": "No priority set for tomorrow",
+  "home.tomorrowEmptyAction": "Set one",
   "home.openTomorrowTask": "Open tomorrow",
   "home.todayContextTitle": "Today context",
   "home.todayContextDescription": "Jump to Calendar or Inbox without leaving the daily workspace.",

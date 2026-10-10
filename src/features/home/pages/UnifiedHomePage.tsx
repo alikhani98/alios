@@ -269,9 +269,22 @@ function TomorrowCard({
   const tomorrowTask = data.tasks
     .filter((task) => isActiveTask(task) && task.dueDate === tomorrowKey)
     .sort(compareDecisionTasks)[0];
-  const tomorrowPath = tomorrowTask
-    ? createTodayTaskFocusPath(tomorrowTask)
-    : `/today?${new URLSearchParams({ date: tomorrowKey }).toString()}`;
+
+  if (!tomorrowTask) {
+    return (
+      <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+        <span>{t("home.tomorrowEmptyCompact")}</span>
+        <Link
+          to="/today"
+          className="font-medium text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        >
+          {t("home.tomorrowEmptyAction")}
+        </Link>
+      </div>
+    );
+  }
+
+  const tomorrowPath = createTodayTaskFocusPath(tomorrowTask);
 
   return (
     <Card className="alios-home-context-shelf overflow-hidden shadow-sm">
@@ -283,7 +296,7 @@ function TomorrowCard({
         />
 
         <p className="rounded-2xl border bg-background/80 p-4 text-sm font-medium leading-6">
-          {tomorrowTask?.title ?? t("home.tomorrowEmpty")}
+          {tomorrowTask.title}
         </p>
 
         <Button asChild variant="outline" className="w-full justify-center">
@@ -536,6 +549,10 @@ function ProjectsOverview({
 }) {
   const { t } = useI18n();
 
+  if (data.projects.recent.length === 0) {
+    return null;
+  }
+
   return (
     <CollapsibleSection
       id="unified-home-projectsOverview"
@@ -551,23 +568,19 @@ function ProjectsOverview({
     >
       <OverviewPanel>
         <p className="text-sm font-medium">{t("home.recentProjects")}</p>
-        {data.projects.recent.length ? (
-          <div className="space-y-3">
-            {data.projects.recent.map((project) => (
-              <div
-                key={project.id}
-                className="flex items-center justify-between gap-4 rounded-3xl border bg-background/90 px-4 py-3 shadow-sm"
-              >
-                <span className="min-w-0 truncate text-sm font-medium">{project.title}</span>
-                <span className="shrink-0 text-xs text-muted-foreground">
-                  {t("home.updated", { date: formatDate(project.updatedAt) })}
-                </span>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-sm text-muted-foreground">{t("home.noRecentProjects")}</p>
-        )}
+        <div className="space-y-3">
+          {data.projects.recent.map((project) => (
+            <div
+              key={project.id}
+              className="flex items-center justify-between gap-4 rounded-3xl border bg-background/90 px-4 py-3 shadow-sm"
+            >
+              <span className="min-w-0 truncate text-sm font-medium">{project.title}</span>
+              <span className="shrink-0 text-xs text-muted-foreground">
+                {t("home.updated", { date: formatDate(project.updatedAt) })}
+              </span>
+            </div>
+          ))}
+        </div>
       </OverviewPanel>
     </CollapsibleSection>
   );
@@ -581,6 +594,10 @@ function JournalOverview({
   formatDate: (value: string | Date) => string;
 }) {
   const { t } = useI18n();
+
+  if (!data.journal.latest) {
+    return null;
+  }
 
   return (
     <CollapsibleSection
@@ -597,16 +614,12 @@ function JournalOverview({
     >
       <OverviewPanel>
         <p className="text-sm font-medium">{t("home.latestJournal")}</p>
-        {data.journal.latest ? (
-          <div className="rounded-3xl border bg-background/90 p-4 shadow-sm">
-            <p className="font-medium">{data.journal.latest.title}</p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {formatDate(data.journal.latest.date)}
-            </p>
-          </div>
-        ) : (
-          <p className="text-sm text-muted-foreground">{t("home.noJournal")}</p>
-        )}
+        <div className="rounded-3xl border bg-background/90 p-4 shadow-sm">
+          <p className="font-medium">{data.journal.latest.title}</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {formatDate(data.journal.latest.date)}
+          </p>
+        </div>
       </OverviewPanel>
     </CollapsibleSection>
   );
@@ -620,6 +633,10 @@ function KnowledgeOverview({
   formatDate: (value: string | Date) => string;
 }) {
   const { t } = useI18n();
+
+  if (!data.knowledge.latest) {
+    return null;
+  }
 
   return (
     <CollapsibleSection
@@ -636,16 +653,12 @@ function KnowledgeOverview({
     >
       <OverviewPanel>
         <p className="text-sm font-medium">{t("home.latestKnowledge")}</p>
-        {data.knowledge.latest ? (
-          <div className="rounded-3xl border bg-background/90 p-4 shadow-sm">
-            <p className="font-medium">{data.knowledge.latest.title}</p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {t("home.updated", { date: formatDate(data.knowledge.latest.updatedAt) })}
-            </p>
-          </div>
-        ) : (
-          <p className="text-sm text-muted-foreground">{t("home.noKnowledge")}</p>
-        )}
+        <div className="rounded-3xl border bg-background/90 p-4 shadow-sm">
+          <p className="font-medium">{data.knowledge.latest.title}</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {t("home.updated", { date: formatDate(data.knowledge.latest.updatedAt) })}
+          </p>
+        </div>
       </OverviewPanel>
     </CollapsibleSection>
   );
@@ -850,6 +863,11 @@ export function UnifiedHomePage() {
               displayName={displayName}
             />
           ) : null}
+          <div className="grid gap-5 xl:grid-cols-2">
+            <TodayPreviewCard data={data} />
+            <LocalReminderPanel snapshot={data.reminderSnapshot} />
+          </div>
+          <TodaySummaryBar data={data} today={today} />
           <Suspense
             fallback={
               <div
@@ -886,11 +904,6 @@ export function UnifiedHomePage() {
           <Suspense fallback={null}>
             <UrgeTodayList refreshKey={urgeRefreshKey} />
           </Suspense>
-          <TodaySummaryBar data={data} today={today} />
-          <div className="grid gap-5 xl:grid-cols-2">
-            <TodayPreviewCard data={data} />
-            <LocalReminderPanel snapshot={data.reminderSnapshot} />
-          </div>
           <TomorrowCard data={data} tomorrow={tomorrow} />
           <HomeLearningPanel snapshot={data.learningSnapshot} />
           {showEveningBriefing ? <DailyBriefingCard data={data} /> : null}

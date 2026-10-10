@@ -1339,6 +1339,8 @@ export const messagesFa: Record<TranslationKey, string> = {
   "home.attentionReview": "بررسی کن",
   "home.importantTomorrow": "کار مهم فردا",
   "home.tomorrowEmpty": "هنوز کار مهمی برای فردا مشخص نشده.",
+  "home.tomorrowEmptyCompact": "کار مهمی برای فردا تعریف نشده",
+  "home.tomorrowEmptyAction": "تعریف کن",
   "home.openTomorrowTask": "باز کردن کار فردا",
   "home.todayContextTitle": "بافت امروز",
   "home.todayContextDescription": "بدون خروج از فضای کار روزانه به تقویم یا صندوق ورودی بروید.",
