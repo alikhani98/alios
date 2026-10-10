@@ -320,25 +320,22 @@ describe("SyncStatusCard", () => {
 
     const markup = await renderAdvancedPanelToStaticMarkup(boundary, authProvider);
 
-    expect(markup).toContain("Signed out");
+    expect(markup).toContain("No online account. Not signed in.");
     expect(markup).toContain("Google sign-in");
     expect(markup).toContain("This device");
     expect(markup).toContain("Never synced");
-    expect(markup).toContain("Preparing sync");
-    expect(markup).toContain("Connected devices");
-    expect(markup).toContain("1 device(s)");
+    expect(markup).toContain("Local only");
+    expect(markup).toContain("Advanced sync details");
+    expect(markup).toContain("Synced categories");
     expect(markup).toContain(
-      "Sign in with Google on this device to attach a real account identity to AliOS without uploading your records or enabling sync."
+      "Google sign-in and sync controls become available when this device can use them. Any remaining disabled actions stay visible so the account surface keeps a stable structure without pretending unsupported paths already work."
     );
     expect(markup).toContain(
-      "Only clearly listed sync categories may leave this device, and only after the user reviews that scope."
-    );
-    expect(markup).toContain(
-      "Decisions, backups, recovery data, and every unsynced category remain available on this device even when sync is connected."
+      "Until you connect sync, these categories stay only on this device and remain available through backup/export flows."
     );
     expect(markup).toContain("Google sign-in");
-    expect(markup).toContain("Sign in");
-    expect(markup).toContain("Enable sync - Sign in first");
+    expect(markup).toContain("Sign in - Coming later");
+    expect(markup).toContain("Enable sync - Coming later");
     expect(markup).not.toContain("Retry sync");
   });
 
