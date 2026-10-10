@@ -37,6 +37,7 @@ export const taskBaseSchema = z.object({
   createdAt: isoDateTimeSchema,
   updatedAt: isoDateTimeSchema,
   completedAt: isoDateTimeSchema.optional(),
+  completedMinimum: z.boolean().optional(),
   sync: recordSyncMetadataSchema.optional(),
 });
 
