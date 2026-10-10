@@ -6,6 +6,8 @@ import { useI18n, type TranslationKey } from "@/shared/i18n";
 import { getLocalDateKey } from "@/shared/preferences/routineNudges";
 import type { UrgeAction, UrgeEntry } from "@/shared/types";
 import { Button, CollapsibleSection } from "@/shared/ui";
+import { aliosListItemMotion, aliosStaggerDelay } from "@/shared/ui/motion";
+import { cn } from "@/shared/utils";
 
 import { URGE_TYPES } from "./UrgeQuickForm";
 
@@ -27,11 +29,17 @@ function getUrgeTypeLabel(
   return preset ? t(preset.labelKey) : value;
 }
 
-function UrgeEntryRow({ entry }: { entry: UrgeEntry }) {
+function UrgeEntryRow({ entry, index }: { entry: UrgeEntry; index: number }) {
   const { t } = useI18n();
 
   return (
-    <div className="min-w-0 rounded-2xl border bg-background/80 px-3 py-2 text-sm leading-6 text-foreground shadow-sm">
+    <div
+      className={cn(
+        "min-w-0 rounded-2xl border bg-background/80 px-3 py-2 text-sm leading-6 text-foreground shadow-sm",
+        aliosListItemMotion,
+        aliosStaggerDelay(index)
+      )}
+    >
       <span className="break-words">{getUrgeTypeLabel(entry.urgeType, t)}</span>
       <span className="px-1 text-muted-foreground">·</span>
       <span className="font-mono tabular-nums">{entry.intensity}/10</span>
@@ -84,8 +92,8 @@ export function UrgeTodayList({ refreshKey = 0 }: UrgeTodayListProps) {
         <div className="h-20 animate-pulse rounded-2xl border bg-muted/60" />
       ) : entries.length > 0 ? (
         <div className="space-y-2">
-          {entries.map((entry) => (
-            <UrgeEntryRow key={entry.id} entry={entry} />
+          {entries.map((entry, index) => (
+            <UrgeEntryRow key={entry.id} entry={entry} index={index} />
           ))}
         </div>
       ) : (

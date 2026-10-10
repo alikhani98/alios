@@ -53,6 +53,8 @@ import {
   DEXIE_SCHEMA_V19,
   DEXIE_SCHEMA_V20,
   DEXIE_SCHEMA_V21,
+  DEXIE_SCHEMA_V22,
+  DEXIE_SCHEMA_V23,
   DEXIE_SCHEMA_VERSION,
   DEXIE_SCHEMA_VERSION_3,
   DEXIE_SCHEMA_VERSION_4,
@@ -73,6 +75,8 @@ import {
   DEXIE_SCHEMA_VERSION_19,
   DEXIE_SCHEMA_VERSION_20,
   DEXIE_SCHEMA_VERSION_21,
+  DEXIE_SCHEMA_VERSION_22,
+  DEXIE_SCHEMA_VERSION_23,
 } from "./schema";
 
 export class AliosDatabase extends Dexie {
@@ -135,6 +139,8 @@ export class AliosDatabase extends Dexie {
       });
     this.version(DEXIE_SCHEMA_VERSION_20).stores(DEXIE_SCHEMA_V20);
     this.version(DEXIE_SCHEMA_VERSION_21).stores(DEXIE_SCHEMA_V21);
+    this.version(DEXIE_SCHEMA_VERSION_22).stores(DEXIE_SCHEMA_V22);
+    this.version(DEXIE_SCHEMA_VERSION_23).stores(DEXIE_SCHEMA_V23);
   }
 }
 

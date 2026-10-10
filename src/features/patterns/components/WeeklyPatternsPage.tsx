@@ -2,6 +2,7 @@ import { RefreshCcw } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useStorageAdapter } from "@/core/storage";
+import { URGE_TYPES } from "@/features/urge";
 import { useI18n, type TranslationKey } from "@/shared/i18n";
 import { getLocalDateKey } from "@/shared/preferences/routineNudges";
 import type { DailyCommitment, Routine, Task, UrgeEntry } from "@/shared/types";
@@ -26,17 +27,6 @@ import {
 
 const REPORT_DAYS = 14;
 const MAX_INSIGHTS = 5;
-
-const URGE_TYPES = [
-  { value: "cigarette", labelKey: "urge.typeCigarette" },
-  { value: "social_media", labelKey: "urge.typeSocialMedia" },
-  { value: "procrastination", labelKey: "urge.typeProcrastination" },
-  { value: "impulse_buy", labelKey: "urge.typeImpulseBuy" },
-  { value: "other", labelKey: "urge.typeOther" },
-] as const satisfies ReadonlyArray<{
-  value: string;
-  labelKey: TranslationKey;
-}>;
 
 type RoutinePattern = {
   routineId: string;

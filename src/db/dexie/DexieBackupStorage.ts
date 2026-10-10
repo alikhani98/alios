@@ -14,6 +14,8 @@ export class DexieBackupStorage implements BackupStorage {
     try {
       const [
         dailyCheckins,
+        dailyCommitments,
+        urgeEntries,
         tasks,
         goals,
         lifeAreas,
@@ -39,6 +41,8 @@ export class DexieBackupStorage implements BackupStorage {
         attachments,
       ] = await Promise.all([
         this.database.dailyCheckins.toArray(),
+        this.database.dailyCommitments.toArray(),
+        this.database.urgeEntries.toArray(),
         this.database.tasks.toArray(),
         this.database.goals.toArray(),
         this.database.lifeAreas.toArray(),
@@ -66,6 +70,8 @@ export class DexieBackupStorage implements BackupStorage {
 
       return {
         dailyCheckins,
+        dailyCommitments,
+        urgeEntries,
         tasks,
         goals,
         lifeAreas,
@@ -103,6 +109,8 @@ export class DexieBackupStorage implements BackupStorage {
   ): Promise<void> {
     const tables = [
       this.database.dailyCheckins,
+      this.database.dailyCommitments,
+      this.database.urgeEntries,
       this.database.tasks,
       this.database.goals,
       this.database.lifeAreas,
@@ -136,6 +144,8 @@ export class DexieBackupStorage implements BackupStorage {
         await Promise.all(tables.map((table) => table.clear()));
         await Promise.all([
           this.database.dailyCheckins.bulkPut(data.dailyCheckins),
+          this.database.dailyCommitments.bulkPut(data.dailyCommitments),
+          this.database.urgeEntries.bulkPut(data.urgeEntries),
           this.database.tasks.bulkPut(data.tasks),
           this.database.goals.bulkPut(data.goals),
           this.database.lifeAreas.bulkPut(data.lifeAreas),
@@ -249,6 +259,8 @@ export class DexieBackupStorage implements BackupStorage {
   async clearAll(): Promise<void> {
     const tables = [
       this.database.dailyCheckins,
+      this.database.dailyCommitments,
+      this.database.urgeEntries,
       this.database.tasks,
       this.database.goals,
       this.database.lifeAreas,

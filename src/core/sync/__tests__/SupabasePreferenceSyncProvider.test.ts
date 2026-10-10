@@ -304,6 +304,8 @@ function createBackupStorageStub(input?: {
 }) {
   let data: AliosBackupData = {
     dailyCheckins: [],
+    dailyCommitments: [],
+    urgeEntries: [],
     tasks: input?.tasks ?? [],
     goals: input?.goals ?? [],
     lifeAreas: [],
@@ -362,6 +364,8 @@ function createBackupStorageStub(input?: {
       data = {
         ...data,
         tasks: [],
+        dailyCommitments: [],
+        urgeEntries: [],
         routines: [],
         projects: [],
         goals: [],

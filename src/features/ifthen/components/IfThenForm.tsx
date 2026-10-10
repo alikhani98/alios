@@ -2,19 +2,9 @@ import { X } from "lucide-react";
 import { useState, type FormEvent } from "react";
 
 import type { AddIfThenPlanInput } from "@/core/repositories";
-import { useI18n, type TranslationKey } from "@/shared/i18n";
+import { URGE_TYPES } from "@/features/urge";
+import { useI18n } from "@/shared/i18n";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Select } from "@/shared/ui";
-
-const IF_THEN_URGE_TYPES = [
-  { value: "cigarette", labelKey: "urge.typeCigarette" },
-  { value: "social_media", labelKey: "urge.typeSocialMedia" },
-  { value: "procrastination", labelKey: "urge.typeProcrastination" },
-  { value: "impulse_buy", labelKey: "urge.typeImpulseBuy" },
-  { value: "other", labelKey: "urge.typeOther" },
-] as const satisfies ReadonlyArray<{
-  value: string;
-  labelKey: TranslationKey;
-}>;
 
 type IfThenFormProps = {
   open: boolean;
@@ -116,7 +106,7 @@ export function IfThenForm({
                 onChange={(event) => setLinkedUrgeType(event.target.value)}
               >
                 <option value="">{t("ifthen.noLinkedUrge")}</option>
-                {IF_THEN_URGE_TYPES.map((urgeType) => (
+                {URGE_TYPES.map((urgeType) => (
                   <option key={urgeType.value} value={urgeType.value}>
                     {t(urgeType.labelKey)}
                   </option>

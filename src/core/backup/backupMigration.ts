@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import {
   dailyCheckinSchema,
+  dailyCommitmentSchema,
   decisionLogEntrySchema,
   experimentLogSchema,
   experimentSchema,
@@ -23,6 +24,7 @@ import {
   settingSchema,
   taskSchema,
   routineSchema,
+  urgeEntrySchema,
   weeklyPlanSchema,
   attachmentSchema,
 } from "@/shared/types";
@@ -37,6 +39,8 @@ import {
 
 export const backupDataInputSchema = z.object({
   dailyCheckins: z.array(dailyCheckinSchema).optional(),
+  dailyCommitments: z.array(dailyCommitmentSchema).optional(),
+  urgeEntries: z.array(urgeEntrySchema).optional(),
   tasks: z.array(taskSchema).optional(),
   goals: z.array(goalSchema).optional(),
   lifeAreas: z.array(lifeAreaSchema).optional(),
@@ -71,6 +75,8 @@ function cloneRecords<T>(records: readonly T[] | undefined): T[] {
 export function normalizeBackupData(data: BackupDataInput): AliosBackupData {
   return {
     dailyCheckins: cloneRecords(data.dailyCheckins),
+    dailyCommitments: cloneRecords(data.dailyCommitments),
+    urgeEntries: cloneRecords(data.urgeEntries),
     tasks: cloneRecords(data.tasks),
     goals: cloneRecords(data.goals),
     lifeAreas: cloneRecords(data.lifeAreas),

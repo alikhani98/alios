@@ -1,5 +1,6 @@
 import type {
   CreateDailyCheckinInput,
+  UpsertDailyCommitmentInput,
   CreateDecisionLogEntryInput,
   CreateGoalInput,
   CreateFinanceAssetInput,
@@ -9,6 +10,7 @@ import type {
   CreateFocusSessionInput,
   AddIfThenPlanInput,
   AddTherapyNoteInput,
+  AddUrgeEntryInput,
   CreateJournalEntryInput,
   CreateInboxItemInput,
   CreateKnowledgeItemInput,
@@ -22,6 +24,7 @@ import type {
 } from "@/core/repositories";
 import type {
   DailyCheckin,
+  DailyCommitment,
   DecisionLogEntry,
   Goal,
   FinanceAsset,
@@ -31,6 +34,7 @@ import type {
   FocusSession,
   IfThenPlan,
   TherapyNote,
+  UrgeEntry,
   JournalEntry,
   InboxItem,
   KnowledgeItem,
@@ -111,6 +115,14 @@ export const dailyCheckinInput: CreateDailyCheckinInput = {
   notes: "Ready to test.",
 };
 
+export const dailyCommitmentInput: UpsertDailyCommitmentInput = {
+  date: "2026-07-05",
+  title: "Start the first meaningful task",
+  plannedStartTime: "08:30",
+  minimumVersion: "Open the project and work for five minutes",
+  didStart: false,
+};
+
 export const settingInput: CreateSettingInput = {
   key: "testing.enabled",
   value: true,
@@ -183,6 +195,17 @@ export const ifThenPlanInput: AddIfThenPlanInput = {
   ifTrigger: "If I open social media before work",
   thenAction: "Then I close it and start the first task for 10 minutes",
   linkedUrgeType: "social_media",
+};
+
+export const urgeEntryInput: AddUrgeEntryInput = {
+  date: "2026-07-05",
+  time: "21:00",
+  urgeType: "social_media",
+  intensity: 7,
+  feeling: "bored",
+  action: "resisted",
+  delayedTenMin: false,
+  note: "Closed the app and returned to the task.",
 };
 
 export const therapyNoteInput: AddTherapyNoteInput = {
@@ -276,6 +299,10 @@ export const dailyCheckinRecord: DailyCheckin = {
   ...dailyCheckinInput,
   ...metadata,
 };
+export const dailyCommitmentRecord: DailyCommitment = {
+  ...dailyCommitmentInput,
+  ...metadata,
+};
 export const settingRecord: Setting = { ...settingInput, ...metadata };
 export const inboxItemRecord: InboxItem = {
   ...inboxItemInput,
@@ -306,6 +333,11 @@ export const ifThenPlanRecord: IfThenPlan = {
   ...ifThenPlanInput,
   isActive: true,
   ...metadata,
+};
+export const urgeEntryRecord: UrgeEntry = {
+  ...urgeEntryInput,
+  id: "fixture-id",
+  createdAt: timestamp,
 };
 export const therapyNoteRecord: TherapyNote = {
   ...therapyNoteInput,

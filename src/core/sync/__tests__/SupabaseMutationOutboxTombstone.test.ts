@@ -56,6 +56,8 @@ function createAuthProvider(): AuthProvider {
 function createBackupStorage(): BackupStorage {
   let data = {
     dailyCheckins: [],
+    dailyCommitments: [],
+    urgeEntries: [],
     tasks: [],
     goals: [],
     lifeAreas: [],

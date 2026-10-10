@@ -5,6 +5,7 @@ import type { AliosDatabase, DexieStorageAdapter } from "@/db/dexie";
 import { LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
 import {
   dailyCheckinInput,
+  dailyCommitmentInput,
   decisionLogInput,
   goalInput,
   financeAssetInput,
@@ -13,6 +14,7 @@ import {
   financeTransactionInput,
   focusSessionInput,
   ifThenPlanInput,
+  urgeEntryInput,
   therapyNoteInput,
   journalEntryInput,
   inboxItemInput,
@@ -72,6 +74,14 @@ describe("BackupService with DexieBackupStorage", () => {
     const knowledgeItem = await storage.knowledge.create(knowledgeItemInput);
     const resource = await storage.resources.create(resourceInput);
     const dailyCheckin = await storage.dailyCheckins.create(dailyCheckinInput);
+    await storage.dailyCommitments.upsertCommitment(dailyCommitmentInput);
+    const dailyCommitment = await storage.dailyCommitments.getCommitmentByDate(
+      dailyCommitmentInput.date
+    );
+    await storage.urgeEntries.addEntry(urgeEntryInput);
+    const [urgeEntry] = await storage.urgeEntries.getEntriesByDate(
+      urgeEntryInput.date
+    );
     const setting = await storage.settings.create(settingInput);
     const inboxItem = await storage.inbox.create(inboxItemInput);
     const routine = await storage.routines.create(routineInput);
@@ -96,6 +106,8 @@ describe("BackupService with DexieBackupStorage", () => {
     expect(Object.keys(backup.data).sort()).toEqual(
       [
         "dailyCheckins",
+        "dailyCommitments",
+        "urgeEntries",
         "tasks",
         "goals",
         "lifeAreas",
@@ -143,6 +155,8 @@ describe("BackupService with DexieBackupStorage", () => {
     expect(backup.data.knowledgeItems).toEqual([knowledgeItem]);
     expect(backup.data.resources).toEqual([resource]);
     expect(backup.data.dailyCheckins).toEqual([dailyCheckin]);
+    expect(backup.data.dailyCommitments).toEqual([dailyCommitment]);
+    expect(backup.data.urgeEntries).toEqual([urgeEntry]);
     expect(backup.data.decisionLogEntries).toEqual([decisionLogEntry]);
     expect(backup.data.manualEntries).toEqual([manualEntry]);
     expect(backup.data.settings).toEqual([setting]);
@@ -216,6 +230,14 @@ describe("BackupService with DexieBackupStorage", () => {
     expect(await storage.dailyCheckins.getByDate(dailyCheckin.date)).toEqual(
       dailyCheckin
     );
+    expect(
+      await storage.dailyCommitments.getCommitmentByDate(
+        dailyCommitmentInput.date
+      )
+    ).toEqual(dailyCommitment);
+    expect(await storage.urgeEntries.getEntriesByDate(urgeEntryInput.date)).toEqual(
+      [urgeEntry]
+    );
     expect(await storage.settings.getByKey(setting.key)).toEqual(setting);
     expect(await storage.inbox.getById(inboxItem.id)).toEqual(inboxItem);
 
@@ -239,6 +261,8 @@ describe("BackupService with DexieBackupStorage", () => {
       financeAssets: _omittedFinanceAssets,
       focusSessions: _omittedFocusSessions,
       ifThenPlans: _omittedIfThenPlans,
+      dailyCommitments: _omittedDailyCommitments,
+      urgeEntries: _omittedUrgeEntries,
       therapyNotes: _omittedTherapyNotes,
       attachments: _omittedAttachments,
       resources: _omittedResources,
@@ -252,6 +276,8 @@ describe("BackupService with DexieBackupStorage", () => {
     expect(oldBackup.data.financeAssets).toEqual([]);
     expect(oldBackup.data.focusSessions).toEqual([]);
     expect(oldBackup.data.ifThenPlans).toEqual([]);
+    expect(oldBackup.data.dailyCommitments).toEqual([]);
+    expect(oldBackup.data.urgeEntries).toEqual([]);
     expect(oldBackup.data.therapyNotes).toEqual([]);
     expect(oldBackup.data.resources).toEqual([]);
     expect(oldBackup.data.attachments).toEqual([]);

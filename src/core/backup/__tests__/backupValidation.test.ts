@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { ValidationError } from "@/core/errors";
 import {
   dailyCheckinRecord,
+  dailyCommitmentRecord,
   decisionLogRecord,
   goalRecord,
   financeAssetRecord,
@@ -11,6 +12,7 @@ import {
   financeTransactionRecord,
   focusSessionRecord,
   ifThenPlanRecord,
+  urgeEntryRecord,
   therapyNoteRecord,
   inboxItemRecord,
   journalEntryRecord,
@@ -60,6 +62,8 @@ describe("backup validation and migration", () => {
 
     expect(payload).toEqual(snapshot);
     expect(migrated.data.dailyCheckins).toEqual([dailyCheckinRecord]);
+    expect(migrated.data.dailyCommitments).toEqual([]);
+    expect(migrated.data.urgeEntries).toEqual([]);
     expect(migrated.data.tasks).toEqual([taskRecord]);
     expect(migrated.data.goals).toEqual([goalRecord]);
     expect(migrated.data.decisionLogEntries).toEqual([decisionLogRecord]);
@@ -98,6 +102,8 @@ describe("backup validation and migration", () => {
     });
 
     expect(backup.data.decisionLogEntries).toEqual([decisionLogRecord]);
+    expect(backup.data.dailyCommitments).toEqual([]);
+    expect(backup.data.urgeEntries).toEqual([]);
     expect(backup.data.goals).toEqual([goalRecord]);
     expect(backup.data.lifeAreas).toEqual([]);
     expect(backup.data.experiments).toEqual([]);
@@ -291,6 +297,8 @@ describe("backup validation and migration", () => {
   it("keeps normalized arrays stable when called with already-valid data", () => {
     const input = {
       dailyCheckins: [dailyCheckinRecord],
+      dailyCommitments: [dailyCommitmentRecord],
+      urgeEntries: [urgeEntryRecord],
       tasks: [taskRecord],
       goals: [goalRecord],
       decisionLogEntries: [decisionLogRecord],
@@ -321,6 +329,8 @@ describe("backup validation and migration", () => {
 
     expect(input).toEqual(snapshot);
     expect(normalized).toEqual(input);
+    expect(normalized.dailyCommitments).not.toBe(input.dailyCommitments);
+    expect(normalized.urgeEntries).not.toBe(input.urgeEntries);
     expect(normalized.tasks).not.toBe(input.tasks);
     expect(normalized.goals).not.toBe(input.goals);
     expect(normalized.inboxItems).not.toBe(input.inboxItems);

@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import {
   dailyCheckinSchema,
+  dailyCommitmentSchema,
   decisionLogEntrySchema,
   experimentLogSchema,
   experimentSchema,
@@ -23,6 +24,7 @@ import {
   settingSchema,
   taskSchema,
   routineSchema,
+  urgeEntrySchema,
   weeklyPlanSchema,
   attachmentSchema,
 } from "@/shared/types";
@@ -33,6 +35,8 @@ export const ALIOS_BACKUP_VERSION = 1 as const;
 
 export const aliosBackupDataSchema = z.object({
   dailyCheckins: z.array(dailyCheckinSchema),
+  dailyCommitments: z.array(dailyCommitmentSchema).default([]),
+  urgeEntries: z.array(urgeEntrySchema).default([]),
   tasks: z.array(taskSchema),
   goals: z.array(goalSchema).default([]),
   lifeAreas: z.array(lifeAreaSchema).default([]),
