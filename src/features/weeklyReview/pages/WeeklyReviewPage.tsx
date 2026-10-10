@@ -41,12 +41,6 @@ import {
 import { formatFinanceAmount } from "@/features/finance/financeCalculations";
 import { createLinkedGoalPath } from "@/features/projects/projectGoalLinks";
 import { createProjectTodayTasksPath } from "@/features/projects/projectTaskProgress";
-import type {
-  ReviewResurfacingCandidate,
-  ReviewResurfacingCandidateType,
-  ReviewResurfacingContextType,
-  ReviewResurfacingReason,
-} from "@/features/review";
 import {
   GOAL_AREA_LABEL_KEYS,
   GOAL_IMPORTANCE_LABEL_KEYS,
@@ -76,6 +70,12 @@ import type {
   WeeklyReviewObservation,
   WeeklyReviewSummary,
 } from "../weeklyReviewCalculations";
+import type {
+  ReviewResurfacingCandidate,
+  ReviewResurfacingCandidateType,
+  ReviewResurfacingContextType,
+  ReviewResurfacingReason,
+} from "../reviewResurfacing";
 
 type ReviewQueueItem = {
   id: string;

@@ -25,7 +25,7 @@ import type {
 import {
   buildReviewResurfacingSnapshot,
   type ReviewResurfacingSnapshot,
-} from "@/features/review";
+} from "./reviewResurfacing";
 
 import {
   calculateMonthlyObligationEstimate,
