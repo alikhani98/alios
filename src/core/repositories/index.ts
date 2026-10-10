@@ -1,4 +1,6 @@
 export * from "./dailyCheckinsRepository";
+export * from "./dailyCommitmentsRepository";
+export * from "./urgeRepository";
 export * from "./journalRepository";
 export * from "./inboxRepository";
 export * from "./knowledgeRepository";
@@ -7,6 +9,9 @@ export * from "./manualRepository";
 export * from "./lifeAreasRepository";
 export * from "./decisionLogRepository";
 export * from "./experimentRepository";
+export * from "./ifThenRepository";
+export * from "./moneyPauseRepository";
+export * from "./therapyNoteRepository";
 export * from "./goalsRepository";
 export * from "./financeRepository";
 export * from "./focusSessionsRepository";

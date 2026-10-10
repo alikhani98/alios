@@ -36,6 +36,21 @@ const RoutinesPage = lazyWithRetry(() =>
 const ExperimentsPage = lazyWithRetry(() =>
   import("@/features/experiments/pages/ExperimentsPage")
 );
+const IfThenPage = lazyWithRetry(() =>
+  import("@/features/ifthen/components/IfThenPage").then((module) => ({
+    default: module.IfThenPage,
+  }))
+);
+const WeeklyPatternsPage = lazyWithRetry(() =>
+  import("@/features/patterns/components/WeeklyPatternsPage").then((module) => ({
+    default: module.WeeklyPatternsPage,
+  }))
+);
+const TherapyBridgePage = lazyWithRetry(() =>
+  import("@/features/therapy/components/TherapyBridgePage").then((module) => ({
+    default: module.TherapyBridgePage,
+  }))
+);
 const ProjectsPage = lazyWithRetry(() =>
   import("@/features/projects/pages/ProjectsPage").then((module) => ({
     default: module.ProjectsPage,
@@ -161,6 +176,30 @@ const router = createHashRouter([
         element: (
           <Suspense fallback={<RouteLoadingFallback />}>
             <ExperimentsPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "ifthen",
+        element: (
+          <Suspense fallback={<RouteLoadingFallback />}>
+            <IfThenPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "patterns",
+        element: (
+          <Suspense fallback={<RouteLoadingFallback />}>
+            <WeeklyPatternsPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: "therapy",
+        element: (
+          <Suspense fallback={<RouteLoadingFallback />}>
+            <TherapyBridgePage />
           </Suspense>
         ),
       },

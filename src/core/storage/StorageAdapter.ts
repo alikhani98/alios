@@ -1,7 +1,12 @@
 import type {
   DailyCheckinsRepository,
+  DailyCommitmentsRepository,
   DecisionLogRepository,
   ExperimentRepository,
+  IfThenRepository,
+  MoneyPauseRepository,
+  TherapyNoteRepository,
+  UrgeRepository,
   GoalsRepository,
   FinanceRepository,
   FocusSessionsRepository,
@@ -27,11 +32,16 @@ export interface StorageAdapter {
   mutationOutbox?: MutationOutboxRepository;
   inbox: InboxRepository;
   dailyCheckins: DailyCheckinsRepository;
+  dailyCommitments: DailyCommitmentsRepository;
+  urgeEntries: UrgeRepository;
   tasks: TasksRepository;
   routines: RoutinesRepository;
   weeklyPlans: WeeklyPlansRepository;
   decisions: DecisionLogRepository;
   experiments: ExperimentRepository;
+  ifThenPlans: IfThenRepository;
+  moneyPauses: MoneyPauseRepository;
+  therapyNotes: TherapyNoteRepository;
   goals: GoalsRepository;
   finance: FinanceRepository;
   focusSessions: FocusSessionsRepository;

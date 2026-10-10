@@ -15,9 +15,12 @@ export const DEXIE_SCHEMA_VERSION_14 = 14;
 export const DEXIE_SCHEMA_VERSION_15 = 15;
 export const DEXIE_SCHEMA_VERSION_16 = 16;
 export const DEXIE_SCHEMA_VERSION_17 = 17;
+export const DEXIE_SCHEMA_VERSION_18 = 18;
 
 export const DEXIE_TABLE_NAMES = {
   dailyCheckins: "dailyCheckins",
+  dailyCommitments: "dailyCommitments",
+  urgeEntries: "urgeEntries",
   tasks: "tasks",
   projects: "projects",
   journalEntries: "journalEntries",
@@ -38,6 +41,9 @@ export const DEXIE_TABLE_NAMES = {
   resources: "resources",
   experiments: "experiments",
   experimentLogs: "experimentLogs",
+  ifThenPlans: "ifThenPlans",
+  moneyPauses: "moneyPauses",
+  therapyNotes: "therapyNotes",
   attachments: "attachments",
   attachmentBlobs: "attachmentBlobs",
 } as const;
@@ -172,6 +178,21 @@ export const DEXIE_SCHEMA_V17 = {
   [DEXIE_TABLE_NAMES.experiments]: "id, status, createdAt, updatedAt",
   [DEXIE_TABLE_NAMES.experimentLogs]:
     "id, experimentId, date, [experimentId+date], createdAt",
+} satisfies Partial<
+  Record<
+    DexieTableName | typeof DEXIE_MUTATION_OUTBOX_TABLE_NAME,
+    string
+  >
+>;
+
+export const DEXIE_SCHEMA_V18 = {
+  ...DEXIE_SCHEMA_V17,
+  [DEXIE_TABLE_NAMES.dailyCommitments]:
+    "id, &date, createdAt, updatedAt",
+  [DEXIE_TABLE_NAMES.urgeEntries]: "id, date, createdAt",
+  [DEXIE_TABLE_NAMES.ifThenPlans]: "id, isActive, createdAt, updatedAt",
+  [DEXIE_TABLE_NAMES.moneyPauses]: "id, decision, createdAt, reviewAt",
+  [DEXIE_TABLE_NAMES.therapyNotes]: "id, date, createdAt, updatedAt",
 } satisfies Partial<
   Record<
     DexieTableName | typeof DEXIE_MUTATION_OUTBOX_TABLE_NAME,

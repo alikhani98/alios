@@ -4,8 +4,13 @@ import { DexieAttachmentBinaryStorage } from "./DexieAttachmentBinaryStorage";
 import { aliosDatabase, type AliosDatabase } from "./db";
 import {
   DexieDailyCheckinsRepository,
+  DexieDailyCommitmentsRepository,
   DexieDecisionLogRepository,
   DexieExperimentsRepository,
+  DexieIfThenRepository,
+  DexieMoneyPauseRepository,
+  DexieTherapyNoteRepository,
+  DexieUrgeRepository,
   DexieGoalsRepository,
   DexieLifeAreasRepository,
   DexieFinanceRepository,
@@ -29,11 +34,16 @@ export class DexieStorageAdapter implements StorageAdapter {
   readonly mutationOutbox: DexieMutationOutboxRepository;
   readonly inbox: DexieInboxRepository;
   readonly dailyCheckins: DexieDailyCheckinsRepository;
+  readonly dailyCommitments: DexieDailyCommitmentsRepository;
+  readonly urgeEntries: DexieUrgeRepository;
   readonly tasks: DexieTasksRepository;
   readonly routines: DexieRoutinesRepository;
   readonly weeklyPlans: DexieWeeklyPlansRepository;
   readonly decisions: DexieDecisionLogRepository;
   readonly experiments: DexieExperimentsRepository;
+  readonly ifThenPlans: DexieIfThenRepository;
+  readonly moneyPauses: DexieMoneyPauseRepository;
+  readonly therapyNotes: DexieTherapyNoteRepository;
   readonly goals: DexieGoalsRepository;
   readonly finance: DexieFinanceRepository;
   readonly focusSessions: DexieFocusSessionsRepository;
@@ -52,11 +62,16 @@ export class DexieStorageAdapter implements StorageAdapter {
     this.mutationOutbox = new DexieMutationOutboxRepository(database);
     this.inbox = new DexieInboxRepository(database);
     this.dailyCheckins = new DexieDailyCheckinsRepository(database);
+    this.dailyCommitments = new DexieDailyCommitmentsRepository(database);
+    this.urgeEntries = new DexieUrgeRepository(database);
     this.tasks = new DexieTasksRepository(database);
     this.routines = new DexieRoutinesRepository(database);
     this.weeklyPlans = new DexieWeeklyPlansRepository(database);
     this.decisions = new DexieDecisionLogRepository(database);
     this.experiments = new DexieExperimentsRepository(database);
+    this.ifThenPlans = new DexieIfThenRepository(database);
+    this.moneyPauses = new DexieMoneyPauseRepository(database);
+    this.therapyNotes = new DexieTherapyNoteRepository(database);
     this.goals = new DexieGoalsRepository(database);
     this.finance = new DexieFinanceRepository(database);
     this.focusSessions = new DexieFocusSessionsRepository(database);

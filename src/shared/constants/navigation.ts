@@ -6,6 +6,7 @@ import {
 
 export type NavIconName =
   | "home"
+  | "brain"
   | "search"
   | "calendar-check"
   | "calendar-range"
@@ -18,6 +19,9 @@ export type NavIconName =
   | "compass"
   | "book-open"
   | "notebook-text"
+  | "flask-conical"
+  | "shuffle"
+  | "activity"
   | "wallet"
   | "database"
   | "settings";
@@ -94,7 +98,22 @@ export const navigationGroups: NavigationGroup[] = [
       {
         titleKey: "nav.experiments",
         href: "/experiments",
-        icon: "target",
+        icon: "flask-conical",
+      },
+      {
+        titleKey: "nav.patterns",
+        href: "/patterns",
+        icon: "activity",
+      },
+      {
+        titleKey: "nav.ifthen",
+        href: "/ifthen",
+        icon: "shuffle",
+      },
+      {
+        titleKey: "nav.therapy",
+        href: "/therapy",
+        icon: "brain",
       },
       {
         titleKey: "nav.weeklyReview",

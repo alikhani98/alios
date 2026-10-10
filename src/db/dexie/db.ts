@@ -3,10 +3,15 @@ import Dexie, { type Table } from "dexie";
 import type { MutationOutboxEntry } from "@/core/sync/mutationOutbox";
 import type {
   DailyCheckin,
+  DailyCommitment,
   Attachment,
   DecisionLogEntry,
   Experiment,
   ExperimentLog,
+  IfThenPlan,
+  MoneyPause,
+  TherapyNote,
+  UrgeEntry,
   Goal,
   FinanceAsset,
   FinanceObligation,
@@ -44,6 +49,7 @@ import {
   DEXIE_SCHEMA_V15,
   DEXIE_SCHEMA_V16,
   DEXIE_SCHEMA_V17,
+  DEXIE_SCHEMA_V18,
   DEXIE_SCHEMA_VERSION,
   DEXIE_SCHEMA_VERSION_3,
   DEXIE_SCHEMA_VERSION_4,
@@ -60,10 +66,13 @@ import {
   DEXIE_SCHEMA_VERSION_15,
   DEXIE_SCHEMA_VERSION_16,
   DEXIE_SCHEMA_VERSION_17,
+  DEXIE_SCHEMA_VERSION_18,
 } from "./schema";
 
 export class AliosDatabase extends Dexie {
   dailyCheckins!: Table<DailyCheckin, string>;
+  dailyCommitments!: Table<DailyCommitment, string>;
+  urgeEntries!: Table<UrgeEntry, string>;
   tasks!: Table<Task, string>;
   projects!: Table<Project, string>;
   journalEntries!: Table<JournalEntry, string>;
@@ -84,6 +93,9 @@ export class AliosDatabase extends Dexie {
   resources!: Table<Resource, string>;
   experiments!: Table<Experiment, string>;
   experimentLogs!: Table<ExperimentLog, string>;
+  ifThenPlans!: Table<IfThenPlan, string>;
+  moneyPauses!: Table<MoneyPause, string>;
+  therapyNotes!: Table<TherapyNote, string>;
   attachments!: Table<Attachment, string>;
   attachmentBlobs!: Table<{ storageKey: string; blob: Blob }, string>;
   mutationOutbox!: Table<MutationOutboxEntry, string>;
@@ -107,6 +119,7 @@ export class AliosDatabase extends Dexie {
     this.version(DEXIE_SCHEMA_VERSION_15).stores(DEXIE_SCHEMA_V15);
     this.version(DEXIE_SCHEMA_VERSION_16).stores(DEXIE_SCHEMA_V16);
     this.version(DEXIE_SCHEMA_VERSION_17).stores(DEXIE_SCHEMA_V17);
+    this.version(DEXIE_SCHEMA_VERSION_18).stores(DEXIE_SCHEMA_V18);
   }
 }
 
