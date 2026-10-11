@@ -5,7 +5,6 @@ import {
   Brain,
   CalendarCheck2,
   CalendarDays,
-  CheckCircle2,
   FolderKanban,
   GraduationCap,
   Inbox,
@@ -51,6 +50,7 @@ import { HomeCalendarCard } from "../components/HomeCalendarCard";
 import { HomeManualCard } from "../components/HomeManualCard";
 import { HomePersonalMetricsCard } from "../components/HomePersonalMetricsCard";
 import { HomePersonalInsightsCard } from "../components/HomePersonalInsightsCard";
+import { TodaySummaryBar } from "../components/TodaySummaryBar";
 import { WelcomeCard } from "../components/WelcomeCard";
 import {
   readHomeBackupReminderDismissedUntil,
@@ -167,43 +167,6 @@ function OverviewPanel({ children }: { children: ReactNode }) {
     <Card className="alios-home-context-shelf overflow-hidden shadow-md">
       <CardContent className="space-y-4 p-5 sm:p-6">{children}</CardContent>
     </Card>
-  );
-}
-
-function TodaySummaryBar({
-  data,
-  today,
-}: {
-  data: HomeDashboardData;
-  today: Date;
-}) {
-  const { t } = useI18n();
-  const { formatDate } = useDateFormatter();
-  const remainingTaskCount = data.today.tasks.filter(isActiveTask).length;
-
-  return (
-    <SoftPanel className="alios-home-context-shelf grid gap-3 border-alios-herb/25 bg-background/90 p-4 shadow-sm md:grid-cols-3">
-      <div className="flex items-center gap-2 text-sm font-medium">
-        <CheckCircle2 className="h-4 w-4 text-alios-herb" aria-hidden="true" />
-        <span>
-          {t("home.todaySummaryCompleted", {
-            count: data.today.completedTaskCount,
-          })}
-        </span>
-      </div>
-      <div className="flex items-center gap-2 text-sm font-medium">
-        <RotateCcw className="h-4 w-4 text-alios-saffron" aria-hidden="true" />
-        <span>
-          {t("home.todaySummaryRemaining", {
-            count: remainingTaskCount,
-          })}
-        </span>
-      </div>
-      <div className="flex items-center gap-2 text-sm font-medium md:justify-end">
-        <CalendarDays className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
-        <span>{formatDate(today)}</span>
-      </div>
-    </SoftPanel>
   );
 }
 

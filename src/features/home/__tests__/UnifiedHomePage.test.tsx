@@ -213,7 +213,7 @@ describe("UnifiedHomePage", () => {
     expect(markup).toContain("Start Focus");
     expect(markup).toContain("Other options");
     expect(markup).toContain("0 task(s) done");
-    expect(markup).toContain("1 task(s) remaining");
+    expect(markup).toContain("Needs attention");
     expect(markup).toContain("Today’s tasks (1)");
     expect(markup).toContain("See all today’s tasks");
     expect(markup).toContain("No priority set for tomorrow");
