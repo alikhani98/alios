@@ -81,13 +81,32 @@ export function ClearStartCard({
                   ? t("home.clearStartFocusLabel")
                   : t("home.clearStartEmptyLabel")}
               </p>
-              <p className="break-words text-xl font-semibold leading-8">
+              <p
+                className={
+                  currentFocus
+                    ? "break-words text-lg font-semibold leading-snug"
+                    : "break-words text-base font-medium leading-7"
+                }
+              >
                 {currentFocus?.title ?? t("home.clearStartNoTaskBody")}
               </p>
               {currentFocus ? (
-                <div className="flex flex-wrap gap-2 pt-2 text-xs font-medium text-muted-foreground">
-                  <span className="inline-flex min-h-8 items-center gap-1.5 rounded-full border border-border/70 bg-background/80 px-3">
-                    <Target className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+                <div className="mt-2 flex flex-wrap gap-2 text-xs font-medium text-muted-foreground">
+                  <span
+                    className={
+                      currentFocus.isMit
+                        ? "inline-flex min-h-8 items-center gap-1.5 rounded-full border border-border/70 bg-alios-saffron/10 px-3 text-sm text-alios-saffron"
+                        : "inline-flex min-h-8 items-center gap-1.5 rounded-full border border-border/70 bg-background/80 px-3 text-sm"
+                    }
+                  >
+                    <Target
+                      className={
+                        currentFocus.isMit
+                          ? "h-3.5 w-3.5 text-alios-saffron"
+                          : "h-3.5 w-3.5 text-primary"
+                      }
+                      aria-hidden="true"
+                    />
                     {t(getFocusReasonKey(currentFocus))}
                   </span>
                   {typeof currentFocus.estimatedMinutes === "number" &&
@@ -114,7 +133,7 @@ export function ClearStartCard({
 
           {currentFocus ? (
             <div className="grid gap-2 sm:grid-cols-2">
-              <Button asChild className="alios-home-thread-item w-full">
+              <Button asChild className="alios-home-thread-item w-full sm:w-auto">
                 <Link to={createFocusTaskPath(currentFocus)}>
                   <Target className="me-2 h-4 w-4" aria-hidden="true" />
                   {t("home.clearStartFocusSession")}
