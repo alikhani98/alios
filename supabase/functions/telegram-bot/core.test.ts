@@ -45,6 +45,7 @@ function callbackUpdate(data: string, chatId = 12345) {
       id: "callback-1",
       data,
       message: {
+        message_id: 987,
         chat: { id: chatId },
       },
     },
@@ -71,6 +72,10 @@ function createFetchMock(
         return Promise.resolve(jsonResponse(null, 201));
       }
 
+      if (init?.method === "PATCH") {
+        return Promise.resolve(jsonResponse(null));
+      }
+
       if (urlText.includes("entity=eq.inboxItems")) {
         return Promise.resolve(
           jsonResponse(inboxItems.map((payload) => ({ payload })))
@@ -84,7 +89,17 @@ function createFetchMock(
       }
 
       return Promise.resolve(
-        jsonResponse(todayTasks.map((payload) => ({ payload })))
+        jsonResponse(
+          todayTasks.map((payload, index) => ({
+            record_id:
+              typeof payload.id === "string" ? payload.id : `task-${index + 1}`,
+            payload,
+            created_at:
+              typeof payload.createdAt === "string"
+                ? payload.createdAt
+                : "2026-10-03T00:00:00.000Z",
+          }))
+        )
       );
     }
 
@@ -115,6 +130,13 @@ function aliosSyncRecordWrites(fetchMock: ReturnType<typeof createFetchMock>) {
   );
 }
 
+function aliosSyncRecordPatches(fetchMock: ReturnType<typeof createFetchMock>) {
+  return fetchMock.mock.calls.filter(
+    ([url, init]) =>
+      String(url).includes("alios_sync_records") && init?.method === "PATCH"
+  );
+}
+
 function firstAliosSyncRecordWriteBody(
   fetchMock: ReturnType<typeof createFetchMock>
 ) {
@@ -128,8 +150,18 @@ function firstAliosSyncRecordWriteBody(
   };
 }
 
+function todayInUtc() {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "UTC",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+}
+
 function taskPayload(input: Partial<Record<string, unknown>>) {
   return {
+    id: "task-1",
     title: "Task",
     status: "todo",
     priority: "medium",
@@ -218,8 +250,11 @@ describe("telegram-bot Edge Function core", () => {
     expect(body).toContain("goals");
     expect(body).toContain("add_task");
     expect(body).toContain("add_note");
+    expect(body).toContain("add_idea");
+    expect(body).toContain("done_tasks");
     expect(body).toContain("➕ افزودن task");
     expect(body).toContain("📝 یادداشت");
+    expect(body).toContain("💡 ایده");
   });
 
   it("routes /menu to the Telegram menu", async () => {
@@ -242,20 +277,21 @@ describe("telegram-bot Edge Function core", () => {
     );
   });
 
-  it("creates a task inbox item from /add with content", async () => {
+  it("creates a today task from /add with content", async () => {
     const fetchMock = createFetchMock(true);
 
     await handleTelegramUpdate(createRequest(messageUpdate("/add خرید نان")), deps(fetchMock));
 
     const body = firstAliosSyncRecordWriteBody(fetchMock);
     expect(body.user_id).toBe("user-1");
-    expect(body.entity).toBe("inboxItems");
+    expect(body.entity).toBe("tasks");
     expect(body.record_id).toBe(body.payload.id);
-    expect(body.payload.content).toBe("خرید نان");
-    expect(body.payload.type).toBe("task");
-    expect(body.payload.status).toBe("unprocessed");
+    expect(body.payload.title).toBe("خرید نان");
+    expect(body.payload.status).toBe("todo");
     expect(body.payload.priority).toBe("medium");
-    expect(firstTelegramMessageBody(fetchMock)).toContain("✅ task اضافه شد!");
+    expect(body.payload.dueDate).toBe(todayInUtc());
+    expect(body.payload.isMit).toBe(false);
+    expect(firstTelegramMessageBody(fetchMock)).toContain("✅ Task added: خرید نان");
   });
 
   it("creates a high-priority task and removes the !high flag", async () => {
@@ -267,9 +303,9 @@ describe("telegram-bot Edge Function core", () => {
     );
 
     const body = firstAliosSyncRecordWriteBody(fetchMock);
-    expect(body.payload.content).toBe("خرید نان");
+    expect(body.payload.title).toBe("خرید نان");
     expect(body.payload.priority).toBe("high");
-    expect(firstTelegramMessageBody(fetchMock)).toContain("🔴 اولویت: بالا");
+    expect(firstTelegramMessageBody(fetchMock)).toContain("✅ Task added: خرید نان");
   });
 
   it("creates a low-priority task and removes the !low flag", async () => {
@@ -281,9 +317,9 @@ describe("telegram-bot Edge Function core", () => {
     );
 
     const body = firstAliosSyncRecordWriteBody(fetchMock);
-    expect(body.payload.content).toBe("خرید نان");
+    expect(body.payload.title).toBe("خرید نان");
     expect(body.payload.priority).toBe("low");
-    expect(firstTelegramMessageBody(fetchMock)).toContain("⚪ اولویت: پایین");
+    expect(firstTelegramMessageBody(fetchMock)).toContain("✅ Task added: خرید نان");
   });
 
   it("replies with instructions for an empty /add command without creating an item", async () => {
@@ -310,7 +346,26 @@ describe("telegram-bot Edge Function core", () => {
     expect(body.payload.type).toBe("note");
     expect(body.payload.priority).toBeUndefined();
     expect(firstTelegramMessageBody(fetchMock)).toContain(
-      "✅ یادداشت اضافه شد!"
+      "📝 Added to inbox: ایده جالب"
+    );
+  });
+
+  it("creates an idea inbox item from /idea with content", async () => {
+    const fetchMock = createFetchMock(true);
+
+    await handleTelegramUpdate(
+      createRequest(messageUpdate("/idea داشبورد آرام‌تر")),
+      deps(fetchMock)
+    );
+
+    const body = firstAliosSyncRecordWriteBody(fetchMock);
+    expect(body.entity).toBe("inboxItems");
+    expect(body.payload.content).toBe("داشبورد آرام‌تر");
+    expect(body.payload.type).toBe("idea");
+    expect(body.payload.status).toBe("unprocessed");
+    expect(body.payload.priority).toBeUndefined();
+    expect(firstTelegramMessageBody(fetchMock)).toContain(
+      "💡 Idea saved: داشبورد آرام‌تر"
     );
   });
 
@@ -325,7 +380,18 @@ describe("telegram-bot Edge Function core", () => {
     );
   });
 
-  it("replies with a Farsi error when an inbox item cannot be created", async () => {
+  it("replies with instructions for an empty /idea command without creating an item", async () => {
+    const fetchMock = createFetchMock(true);
+
+    await handleTelegramUpdate(createRequest(messageUpdate("/idea")), deps(fetchMock));
+
+    expect(aliosSyncRecordWrites(fetchMock)).toHaveLength(0);
+    expect(firstTelegramMessageBody(fetchMock)).toContain(
+      "لطفاً متن ایده را وارد کنید."
+    );
+  });
+
+  it("replies with a Farsi error when a sync record cannot be created", async () => {
     const fetchMock = vi.fn<typeof fetch>().mockImplementation((url, init) => {
       const urlText = String(url);
 
@@ -379,6 +445,72 @@ describe("telegram-bot Edge Function core", () => {
     expect(firstTelegramMessageBody(fetchMock)).toContain(
       "مثال: /note ایده جالب"
     );
+  });
+
+  it("replies with add-idea instructions for the add_idea callback", async () => {
+    const fetchMock = createFetchMock(true);
+
+    await handleTelegramUpdate(createRequest(callbackUpdate("add_idea")), deps(fetchMock));
+
+    expect(firstTelegramMessageBody(fetchMock)).toContain(
+      "برای ذخیره ایده بنویسید:"
+    );
+    expect(firstTelegramMessageBody(fetchMock)).toContain(
+      "مثال: /idea ساخت داشبورد آرام‌تر"
+    );
+  });
+
+  it("replies to /done with an empty-state message when no tasks are pending", async () => {
+    const fetchMock = createFetchMock(true);
+
+    await handleTelegramUpdate(createRequest(messageUpdate("/done")), deps(fetchMock));
+
+    expect(firstTelegramMessageBody(fetchMock)).toContain(
+      "✅ No pending tasks for today"
+    );
+  });
+
+  it("lists pending today tasks with inline done buttons", async () => {
+    const fetchMock = createFetchMock(true, [
+      taskPayload({ id: "task-1", title: "First task" }),
+      taskPayload({ id: "task-2", title: "Second task" }),
+    ]);
+
+    await handleTelegramUpdate(createRequest(messageUpdate("/done")), deps(fetchMock));
+
+    const body = firstTelegramMessageBody(fetchMock);
+    expect(body).toContain("1. First task");
+    expect(body).toContain("2. Second task");
+    expect(body).toContain("✓ First task");
+    expect(body).toContain("done:task-1");
+    expect(body).toContain("✓ Second task");
+    expect(body).toContain("done:task-2");
+  });
+
+  it("marks a task done from a done callback and edits the Telegram message", async () => {
+    const fetchMock = createFetchMock(true, [
+      taskPayload({ id: "task-1", title: "Finish report" }),
+    ]);
+
+    await handleTelegramUpdate(createRequest(callbackUpdate("done:task-1")), deps(fetchMock));
+
+    const patches = aliosSyncRecordPatches(fetchMock);
+    expect(patches).toHaveLength(1);
+    expect(String(patches[0]?.[0])).toContain("record_id=eq.task-1");
+
+    const patchBody = JSON.parse(String(patches[0]?.[1]?.body)) as {
+      payload: Record<string, unknown>;
+      updated_at: string;
+    };
+    expect(patchBody.payload.status).toBe("done");
+    expect(patchBody.payload.completedAt).toBe(patchBody.updated_at);
+    expect(patchBody.payload.updatedAt).toBe(patchBody.updated_at);
+
+    const editCall = fetchMock.mock.calls.find(([url]) =>
+      String(url).includes("/editMessageText")
+    );
+    expect(String(editCall?.[1]?.body)).toContain("✅ Done: Finish report");
+    expect(String(editCall?.[1]?.body)).toContain('"message_id":987');
   });
 
   it("replies to /today with an empty-state message when no tasks remain", async () => {

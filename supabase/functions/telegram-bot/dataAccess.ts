@@ -5,6 +5,10 @@ export interface TodayTask {
   isMit: boolean;
 }
 
+export interface PendingTodayTask extends TodayTask {
+  id: string;
+}
+
 export interface InboxItem {
   content: string;
   type: "note" | "task" | "idea" | "link" | "other";
@@ -17,6 +21,7 @@ export interface ActiveGoal {
 }
 
 type TodayTaskRow = Readonly<{
+  record_id?: string;
   payload?: Readonly<Record<string, unknown>>;
 }>;
 
@@ -64,6 +69,61 @@ export async function fetchTodayTasks(
     .map((row) => row.payload)
     .filter(isTodayTaskPayload)
     .map((payload) => ({
+      title: payload.title,
+      status: payload.status,
+      priority: payload.priority,
+      isMit: payload.isMit,
+    }));
+}
+
+export async function fetchPendingTodayTasks(
+  userId: string,
+  todayDate: string,
+  deps: DataAccessDeps
+): Promise<PendingTodayTask[]> {
+  const query = new URLSearchParams({
+    select: "record_id,payload",
+    user_id: `eq.${userId}`,
+    entity: "eq.tasks",
+    "payload->>dueDate": `eq.${todayDate}`,
+    "payload->>status": "in.(todo,doing)",
+    order: "created_at.asc",
+    limit: "10",
+  });
+
+  const response = await deps.fetch(
+    `${deps.supabaseUrl}/rest/v1/alios_sync_records?${query.toString()}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${deps.supabaseServiceKey}`,
+        apikey: deps.supabaseServiceKey,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("خطا در دریافت وظایف");
+  }
+
+  const rows = (await response.json()) as TodayTaskRow[];
+  return rows
+    .flatMap((row) =>
+      typeof row.record_id === "string"
+        ? [{ recordId: row.record_id, payload: row.payload }]
+        : []
+    )
+    .filter(
+      (
+        row
+      ): row is {
+        recordId: string;
+        payload: TodayTask;
+      } => isTodayTaskPayload(row.payload)
+    )
+    .map(({ recordId, payload }) => ({
+      id: recordId,
       title: payload.title,
       status: payload.status,
       priority: payload.priority,
@@ -163,7 +223,7 @@ export async function createInboxItem(
   userId: string,
   item: {
     content: string;
-    type: "task" | "note";
+    type: "task" | "note" | "idea";
     priority?: "high" | "medium" | "low";
   },
   deps: DataAccessDeps
@@ -207,6 +267,129 @@ export async function createInboxItem(
   }
 }
 
+export async function createTodayTask(
+  userId: string,
+  task: {
+    title: string;
+    priority: "high" | "medium" | "low";
+    dueDate: string;
+  },
+  deps: DataAccessDeps
+): Promise<void> {
+  const id = crypto.randomUUID();
+  const createdAt = new Date().toISOString();
+  const updatedAt = createdAt;
+  const payload = {
+    id,
+    title: task.title,
+    status: "todo",
+    priority: task.priority,
+    dueDate: task.dueDate,
+    isMit: false,
+    createdAt,
+    updatedAt,
+  };
+
+  const response = await deps.fetch(
+    `${deps.supabaseUrl}/rest/v1/alios_sync_records?on_conflict=user_id,entity,record_id`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${deps.supabaseServiceKey}`,
+        apikey: deps.supabaseServiceKey,
+        "Content-Type": "application/json",
+        Prefer: "resolution=merge-duplicates,return=minimal",
+      },
+      body: JSON.stringify({
+        user_id: userId,
+        entity: "tasks",
+        record_id: id,
+        payload,
+        updated_at: updatedAt,
+        created_at: createdAt,
+      }),
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("خطا در ذخیره‌سازی");
+  }
+}
+
+export async function markTodayTaskDone(
+  userId: string,
+  recordId: string,
+  deps: DataAccessDeps
+): Promise<{ title: string } | null> {
+  const query = new URLSearchParams({
+    select: "record_id,payload,created_at",
+    user_id: `eq.${userId}`,
+    entity: "eq.tasks",
+    record_id: `eq.${recordId}`,
+    limit: "1",
+  });
+
+  const readResponse = await deps.fetch(
+    `${deps.supabaseUrl}/rest/v1/alios_sync_records?${query.toString()}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${deps.supabaseServiceKey}`,
+        apikey: deps.supabaseServiceKey,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  if (!readResponse.ok) {
+    throw new Error("خطا در دریافت وظیفه");
+  }
+
+  const rows = (await readResponse.json()) as Array<
+    TodayTaskRow & { created_at?: string }
+  >;
+  const row = rows[0];
+  if (!row?.payload || !isTaskPayload(row.payload)) {
+    return null;
+  }
+
+  const completedAt = new Date().toISOString();
+  const payload = {
+    ...row.payload,
+    status: "done",
+    completedAt,
+    updatedAt: completedAt,
+  };
+
+  const updateQuery = new URLSearchParams({
+    user_id: `eq.${userId}`,
+    entity: "eq.tasks",
+    record_id: `eq.${recordId}`,
+  });
+  const updateResponse = await deps.fetch(
+    `${deps.supabaseUrl}/rest/v1/alios_sync_records?${updateQuery.toString()}`,
+    {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${deps.supabaseServiceKey}`,
+        apikey: deps.supabaseServiceKey,
+        "Content-Type": "application/json",
+        Prefer: "return=minimal",
+      },
+      body: JSON.stringify({
+        payload,
+        updated_at: completedAt,
+      }),
+    }
+  );
+
+  if (!updateResponse.ok) {
+    throw new Error("خطا در به‌روزرسانی وظیفه");
+  }
+
+  return { title: row.payload.title };
+}
+
 function isTodayTaskPayload(
   payload: Readonly<Record<string, unknown>> | undefined
 ): payload is TodayTask {
@@ -218,6 +401,12 @@ function isTodayTaskPayload(
       payload.priority === "high") &&
     typeof payload.isMit === "boolean"
   );
+}
+
+function isTaskPayload(
+  payload: Readonly<Record<string, unknown>> | undefined
+): payload is Readonly<Record<string, unknown>> & { title: string } {
+  return typeof payload?.title === "string";
 }
 
 function isInboxItemPayload(

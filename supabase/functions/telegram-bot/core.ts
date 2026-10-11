@@ -1,10 +1,14 @@
 import {
   createInboxItem,
+  createTodayTask,
   fetchActiveGoals,
+  fetchPendingTodayTasks,
   fetchTodayTasks,
   fetchUnprocessedInboxItems,
+  markTodayTaskDone,
   type ActiveGoal,
   type InboxItem,
+  type PendingTodayTask,
   type TodayTask,
 } from "./dataAccess.ts";
 
@@ -29,6 +33,7 @@ type TelegramCallbackQuery = Readonly<{
   id?: string;
   data?: string;
   message?: Readonly<{
+    message_id?: number;
     chat?: TelegramChat;
   }>;
 }>;
@@ -64,6 +69,8 @@ const helpMessage = `🤖 دستورهای AliOS Bot:
 /add متن !high — با اولویت بالا
 /add متن !low — با اولویت پایین
 /note متن — افزودن یادداشت
+/idea متن — ذخیره ایده
+/done — انجام‌شده کردن وظایف امروز
 
 ❓ *راهنما*
 /help — نمایش این راهنما`;
@@ -191,6 +198,12 @@ async function routeTextCommand(
     case "/note":
       await sendNote(chatId, text, authorizedChat, deps);
       return;
+    case "/idea":
+      await sendIdea(chatId, text, authorizedChat, deps);
+      return;
+    case "/done":
+      await sendDoneTaskChoices(chatId, authorizedChat, deps);
+      return;
     default:
       await sendTelegramMessage(chatId, unknownCommandMessage, deps);
   }
@@ -203,6 +216,11 @@ async function routeCallbackQuery(
   deps: TelegramBotDeps
 ): Promise<void> {
   try {
+    if (callbackQuery.data?.startsWith("done:")) {
+      await completeTaskFromCallback(chatId, callbackQuery, authorizedChat, deps);
+      return;
+    }
+
     switch (callbackQuery.data) {
       case "today":
         await sendToday(chatId, authorizedChat, deps);
@@ -212,6 +230,9 @@ async function routeCallbackQuery(
         return;
       case "goals":
         await sendGoals(chatId, authorizedChat, deps);
+        return;
+      case "done_tasks":
+        await sendDoneTaskChoices(chatId, authorizedChat, deps);
         return;
       case "help":
         await sendHelp(chatId, deps);
@@ -227,6 +248,13 @@ async function routeCallbackQuery(
         await sendTelegramMessage(
           chatId,
           "برای افزودن یادداشت بنویسید:\n/note متن یادداشت\nمثال: /note ایده جالب",
+          deps
+        );
+        return;
+      case "add_idea":
+        await sendTelegramMessage(
+          chatId,
+          "برای ذخیره ایده بنویسید:\n/idea متن ایده\nمثال: /idea ساخت داشبورد آرام‌تر",
           deps
         );
         return;
@@ -278,23 +306,16 @@ async function sendAddTask(
   }
 
   try {
-    await createInboxItem(
+    await createTodayTask(
       authorizedChat.userId,
-      { content: parsed.content, type: "task", priority: parsed.priority },
+      {
+        title: parsed.content,
+        priority: parsed.priority,
+        dueDate: getTodayInTimezone(authorizedChat.timezone),
+      },
       deps
     );
-
-    const priorityLine =
-      parsed.priority === "high"
-        ? "\n🔴 اولویت: بالا"
-        : parsed.priority === "low"
-          ? "\n⚪ اولویت: پایین"
-          : "";
-    await sendTelegramMessage(
-      chatId,
-      `✅ task اضافه شد!\n📝 ${parsed.content}${priorityLine}`,
-      deps
-    );
+    await sendTelegramMessage(chatId, `✅ Task added: ${parsed.content}`, deps);
   } catch {
     await sendTelegramMessage(chatId, "خطا در ذخیره‌سازی", deps);
   }
@@ -324,9 +345,37 @@ async function sendNote(
     );
     await sendTelegramMessage(
       chatId,
-      `✅ یادداشت اضافه شد!\n📝 ${parsed.content}`,
+      `📝 Added to inbox: ${parsed.content}`,
       deps
     );
+  } catch {
+    await sendTelegramMessage(chatId, "خطا در ذخیره‌سازی", deps);
+  }
+}
+
+async function sendIdea(
+  chatId: string,
+  text: string,
+  authorizedChat: AuthorizedChat,
+  deps: TelegramBotDeps
+): Promise<void> {
+  const parsed = parseAddCommand(text);
+  if (!parsed) {
+    await sendTelegramMessage(
+      chatId,
+      "لطفاً متن ایده را وارد کنید.\nمثال: /idea ساخت داشبورد آرام‌تر",
+      deps
+    );
+    return;
+  }
+
+  try {
+    await createInboxItem(
+      authorizedChat.userId,
+      { content: parsed.content, type: "idea" },
+      deps
+    );
+    await sendTelegramMessage(chatId, `💡 Idea saved: ${parsed.content}`, deps);
   } catch {
     await sendTelegramMessage(chatId, "خطا در ذخیره‌سازی", deps);
   }
@@ -337,7 +386,7 @@ function parseAddCommand(
 ): { content: string; priority: "high" | "medium" | "low" } | null {
   const contentWithFlags = text
     .trim()
-    .replace(/^\/(?:add|note)\b/i, "")
+    .replace(/^\/(?:add|note|idea)\b/i, "")
     .trim();
   const hasHighPriority = /(^|\s)!high(?=\s|$)/i.test(contentWithFlags);
   const hasLowPriority = /(^|\s)!low(?=\s|$)/i.test(contentWithFlags);
@@ -348,6 +397,74 @@ function parseAddCommand(
     .trim();
 
   return content.length > 0 ? { content, priority } : null;
+}
+
+async function sendDoneTaskChoices(
+  chatId: string,
+  authorizedChat: AuthorizedChat,
+  deps: TelegramBotDeps
+): Promise<void> {
+  try {
+    const tasks = await fetchPendingTodayTasks(
+      authorizedChat.userId,
+      getTodayInTimezone(authorizedChat.timezone),
+      deps
+    );
+
+    if (tasks.length === 0) {
+      await sendTelegramMessage(chatId, "✅ No pending tasks for today", deps);
+      return;
+    }
+
+    await sendTelegramMessage(chatId, formatDoneTaskChoicesMessage(tasks), deps, {
+      inline_keyboard: tasks.map((task) => [
+        { text: `✓ ${task.title}`, callback_data: `done:${task.id}` },
+      ]),
+    });
+  } catch (error) {
+    await sendTelegramMessage(
+      chatId,
+      error instanceof Error ? error.message : "خطا در دریافت وظایف",
+      deps
+    );
+  }
+}
+
+async function completeTaskFromCallback(
+  chatId: string,
+  callbackQuery: TelegramCallbackQuery,
+  authorizedChat: AuthorizedChat,
+  deps: TelegramBotDeps
+): Promise<void> {
+  const recordId = callbackQuery.data?.slice("done:".length).trim();
+  if (!recordId) {
+    await sendTelegramMessage(chatId, unknownCommandMessage, deps);
+    return;
+  }
+
+  try {
+    const completedTask = await markTodayTaskDone(
+      authorizedChat.userId,
+      recordId,
+      deps
+    );
+    const text = completedTask
+      ? `✅ Done: ${completedTask.title}`
+      : "✅ Task already updated";
+    const messageId = callbackQuery.message?.message_id;
+
+    if (typeof messageId === "number") {
+      await editTelegramMessage(chatId, messageId, text, deps);
+    } else {
+      await sendTelegramMessage(chatId, text, deps);
+    }
+  } catch (error) {
+    await sendTelegramMessage(
+      chatId,
+      error instanceof Error ? error.message : "خطا در به‌روزرسانی وظیفه",
+      deps
+    );
+  }
 }
 
 async function sendGoals(
@@ -466,6 +583,11 @@ function formatTodayTasksMessage(tasks: TodayTask[]): string {
   return `📋 وظایف امروز:\n\n${lines.join("\n")}`;
 }
 
+function formatDoneTaskChoicesMessage(tasks: PendingTodayTask[]): string {
+  const lines = tasks.map((task, index) => `${index + 1}. ${task.title}`);
+  return `Select a task to mark done:\n\n${lines.join("\n")}`;
+}
+
 function getTodayInTimezone(timezone: string): string {
   const formatter = new Intl.DateTimeFormat("en-CA", {
     timeZone: timezone,
@@ -487,11 +609,15 @@ export async function sendMenu(
         { text: "📋 Today", callback_data: "today" },
         { text: "📥 Inbox", callback_data: "inbox" },
       ],
-      [{ text: "🎯 Goals", callback_data: "goals" }],
+      [
+        { text: "🎯 Goals", callback_data: "goals" },
+        { text: "✅ Done", callback_data: "done_tasks" },
+      ],
       [
         { text: "➕ افزودن task", callback_data: "add_task" },
         { text: "📝 یادداشت", callback_data: "add_note" },
       ],
+      [{ text: "💡 ایده", callback_data: "add_idea" }],
       [{ text: "❓ راهنما", callback_data: "help" }],
     ],
   });
@@ -535,6 +661,23 @@ async function answerCallbackQuery(
       body: JSON.stringify({ callback_query_id: callbackQueryId }),
     }
   );
+}
+
+async function editTelegramMessage(
+  chatId: string,
+  messageId: number,
+  text: string,
+  deps: TelegramBotDeps
+): Promise<void> {
+  await deps.fetch(`https://api.telegram.org/bot${deps.botToken}/editMessageText`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      chat_id: chatId,
+      message_id: messageId,
+      text,
+    }),
+  });
 }
 
 function jsonResponse(payload: unknown): Response {
