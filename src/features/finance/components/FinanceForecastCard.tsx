@@ -13,9 +13,11 @@ export interface FinanceForecastCardProps {
 
 type ForecastSummary = Readonly<{
   hasData: boolean;
+  incomeForecast: number;
   variableForecast: number;
   fixedForecast: number;
   total: number;
+  projectedBalance: number;
 }>;
 
 function toSafeAmount(value: number): number {
@@ -34,27 +36,45 @@ export function FinanceForecastCard({
       format(subMonths(currentMonthStart, index + 1), "yyyy-MM")
     );
     const expenseByMonth = new Map(monthKeys.map((monthKey) => [monthKey, 0]));
+    const incomeByMonth = new Map(monthKeys.map((monthKey) => [monthKey, 0]));
 
     for (const transaction of transactions) {
-      if (transaction.type !== "expense") {
-        continue;
-      }
-
       const monthKey = transaction.occurredAt.slice(0, 7);
-      if (!expenseByMonth.has(monthKey)) {
+      if (!expenseByMonth.has(monthKey) || !incomeByMonth.has(monthKey)) {
         continue;
       }
 
-      expenseByMonth.set(
-        monthKey,
-        (expenseByMonth.get(monthKey) ?? 0) + toSafeAmount(transaction.amount)
-      );
+      if (transaction.type === "expense") {
+        expenseByMonth.set(
+          monthKey,
+          (expenseByMonth.get(monthKey) ?? 0) + toSafeAmount(transaction.amount)
+        );
+      }
+
+      if (transaction.type === "income") {
+        incomeByMonth.set(
+          monthKey,
+          (incomeByMonth.get(monthKey) ?? 0) + toSafeAmount(transaction.amount)
+        );
+      }
     }
 
-    const monthValues = monthKeys.map((monthKey) => expenseByMonth.get(monthKey) ?? 0);
-    const hasData = monthValues.some((amount) => amount > 0);
+    const expenseMonthValues = monthKeys.map(
+      (monthKey) => expenseByMonth.get(monthKey) ?? 0
+    );
+    const incomeMonthValues = monthKeys.map(
+      (monthKey) => incomeByMonth.get(monthKey) ?? 0
+    );
+    const hasIncomeData = incomeMonthValues.some((amount) => amount > 0);
+    const hasExpenseData = expenseMonthValues.some((amount) => amount > 0);
+    const incomeForecast =
+      hasIncomeData
+        ? incomeMonthValues.reduce((total, amount) => total + amount, 0) /
+          monthKeys.length
+        : 0;
     const variableForecast =
-      monthValues.reduce((total, amount) => total + amount, 0) / monthKeys.length;
+      expenseMonthValues.reduce((total, amount) => total + amount, 0) /
+      monthKeys.length;
     const fixedForecast = obligations
       .filter(
         (obligation) =>
@@ -65,14 +85,25 @@ export function FinanceForecastCard({
         (total, obligation) => total + toSafeAmount(obligation.monthlyAmount ?? 0),
         0
       );
+    const total = variableForecast + fixedForecast;
+    const projectedBalance = incomeForecast - total;
+    const hasData = hasExpenseData || hasIncomeData || fixedForecast > 0;
 
     return {
       hasData,
+      incomeForecast,
       variableForecast,
       fixedForecast,
-      total: variableForecast + fixedForecast,
+      total,
+      projectedBalance,
     };
   }, [obligations, transactions]);
+  const projectedBalanceTone =
+    forecast.projectedBalance > 0
+      ? "text-emerald-600 dark:text-emerald-400"
+      : forecast.projectedBalance < 0
+        ? "text-destructive"
+        : "text-foreground";
 
   return (
     <SoftPanel className="space-y-4 border-alios-saffron/25 bg-background/85">
@@ -112,8 +143,28 @@ export function FinanceForecastCard({
               {formatAmount(forecast.total)}
             </span>
           </div>
+          <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
+            <span className="text-muted-foreground">
+              {t("finance.forecast.income")}
+            </span>
+            <span className="font-medium tabular-nums">
+              {formatAmount(forecast.incomeForecast)}
+            </span>
+          </div>
+          <div className="rounded-2xl border border-border/70 bg-background/70 px-4 py-3">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <span className="font-semibold">
+                {t("finance.forecast.projectedBalance")}
+              </span>
+              <span
+                className={`text-xl font-bold tabular-nums ${projectedBalanceTone}`}
+              >
+                {formatAmount(forecast.projectedBalance)}
+              </span>
+            </div>
+          </div>
           <p className="text-xs leading-6 text-muted-foreground">
-            {t("finance.forecast.basis")}
+            {t("finance.forecast.nextMonthBasis")}
           </p>
         </div>
       )}
