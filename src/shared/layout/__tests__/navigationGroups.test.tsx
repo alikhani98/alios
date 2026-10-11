@@ -68,22 +68,18 @@ describe("navigation groups", () => {
     expect(mainNavigation.map((item) => item.href)).toEqual(groupedHrefs);
   });
 
-  it("keeps core destinations visible and advanced destinations collapsed by default", () => {
-    const directGroup = navigationGroups.find((group) => group.id === "direct");
-    const advancedGroup = navigationGroups.find((group) => group.id === "advanced");
+  it("keeps executive destinations visible and planning destinations open by default", () => {
+    const executiveGroup = navigationGroups.find((group) => group.id === "executive");
+    const planningGroup = navigationGroups.find((group) => group.id === "planning");
 
-    expect(directGroup?.items.map((item) => item.href)).toEqual([
+    expect(executiveGroup?.items.map((item) => item.href)).toEqual([
       "/",
       "/today",
       "/inbox",
-      "/projects",
-      "/calendar",
       "/focus",
-      "/search",
     ]);
-    expect(advancedGroup?.items.map((item) => item.href)).toContain("/goals");
-    expect(advancedGroup?.items.map((item) => item.href)).toContain("/finance");
-    expect(advancedGroup?.items.map((item) => item.href)).toContain("/settings");
+    expect(planningGroup).toBeDefined();
+    expect(planningGroup?.items.map((item) => item.href)).toContain("/projects");
 
     act(() => {
       root.render(
@@ -98,49 +94,46 @@ describe("navigation groups", () => {
     expect(container.querySelector('a[href="/"]')).not.toBeNull();
     expect(container.querySelector('a[href="/today"]')).not.toBeNull();
     expect(container.querySelector('a[href="/inbox"]')).not.toBeNull();
-    expect(container.querySelector('a[href="/projects"]')).not.toBeNull();
-    expect(container.querySelector('a[href="/calendar"]')).not.toBeNull();
     expect(container.querySelector('a[href="/focus"]')).not.toBeNull();
-    expect(container.querySelector('a[href="/search"]')).not.toBeNull();
-    expect(container.querySelector('a[href="/goals"]')).toBeNull();
-    expect(container.querySelector('a[href="/journal"]')).toBeNull();
-    expect(container.querySelector('a[href="/finance"]')).toBeNull();
-  });
-
-  it("toggles advanced destinations without changing core destinations", () => {
-    act(() => {
-      root.render(
-        <MemoryRouter>
-          <I18nProvider>
-            <NavigationGroupList />
-          </I18nProvider>
-        </MemoryRouter>
-      );
-    });
-
-    const advancedToggle = Array.from(
-      container.querySelectorAll("button")
-    ).find((button) => button.textContent?.includes("More"));
-
-    expect(advancedToggle).toBeDefined();
-    expect(advancedToggle?.getAttribute("aria-expanded")).toBe("false");
-
-    act(() => {
-      advancedToggle?.click();
-    });
-
-    expect(advancedToggle?.getAttribute("aria-expanded")).toBe("true");
-    expect(container.querySelector('a[href="/goals"]')).not.toBeNull();
-    expect(container.querySelector('a[href="/life-areas"]')).not.toBeNull();
-    expect(container.querySelector('a[href="/journal"]')).not.toBeNull();
-    expect(container.querySelector('a[href="/finance"]')).not.toBeNull();
-    expect(container.querySelector('a[href="/"]')).not.toBeNull();
     expect(container.querySelector('a[href="/projects"]')).not.toBeNull();
     expect(container.querySelector('a[href="/calendar"]')).not.toBeNull();
+    expect(container.querySelector('a[href="/goals"]')).not.toBeNull();
+    expect(container.querySelector('a[href="/finance"]')).not.toBeNull();
+    expect(container.querySelector('a[href="/journal"]')).toBeNull();
+    expect(container.querySelector('a[href="/search"]')).toBeNull();
   });
 
-  it("restores the advanced navigation group from localStorage", () => {
-    localStorage.setItem(NAVIGATION_GROUPS_STORAGE_KEY, '["advanced"]');
+  it("toggles planning destinations without changing executive destinations", () => {
+    act(() => {
+      root.render(
+        <MemoryRouter>
+          <I18nProvider>
+            <NavigationGroupList />
+          </I18nProvider>
+        </MemoryRouter>
+      );
+    });
+
+    const planningToggle = Array.from(
+      container.querySelectorAll("button")
+    ).find((button) => button.textContent?.includes("Planning"));
+
+    expect(planningToggle).toBeDefined();
+    expect(planningToggle?.getAttribute("aria-expanded")).toBe("true");
+
+    act(() => {
+      planningToggle?.click();
+    });
+
+    expect(planningToggle?.getAttribute("aria-expanded")).toBe("false");
+    expect(container.querySelector('a[href="/goals"]')).toBeNull();
+    expect(container.querySelector('a[href="/finance"]')).toBeNull();
+    expect(container.querySelector('a[href="/"]')).not.toBeNull();
+    expect(container.querySelector('a[href="/focus"]')).not.toBeNull();
+  });
+
+  it("restores a collapsible navigation group from localStorage", () => {
+    localStorage.setItem(NAVIGATION_GROUPS_STORAGE_KEY, '["reflection"]');
 
     act(() => {
       root.render(
@@ -152,19 +145,19 @@ describe("navigation groups", () => {
       );
     });
 
-    const advancedToggle = Array.from(
+    const reflectionToggle = Array.from(
       container.querySelectorAll("button")
-    ).find((button) => button.textContent?.includes("More"));
+    ).find((button) => button.textContent?.includes("Reflection"));
 
-    expect(advancedToggle?.getAttribute("aria-expanded")).toBe("true");
-    expect(container.querySelector('a[href="/goals"]')).not.toBeNull();
-    expect(container.querySelector('a[href="/settings"]')).not.toBeNull();
+    expect(reflectionToggle?.getAttribute("aria-expanded")).toBe("true");
+    expect(container.querySelector('a[href="/weekly-review"]')).not.toBeNull();
+    expect(container.querySelector('a[href="/journal"]')).not.toBeNull();
   });
 
-  it("auto-expands advanced navigation for direct visits to advanced routes", () => {
+  it("auto-expands reflection navigation for direct visits to reflection routes", () => {
     act(() => {
       root.render(
-        <MemoryRouter initialEntries={["/goals"]}>
+        <MemoryRouter initialEntries={["/weekly-review"]}>
           <I18nProvider>
             <NavigationGroupList />
           </I18nProvider>
@@ -172,14 +165,14 @@ describe("navigation groups", () => {
       );
     });
 
-    const advancedToggle = Array.from(
+    const reflectionToggle = Array.from(
       container.querySelectorAll("button")
-    ).find((button) => button.textContent?.includes("More"));
+    ).find((button) => button.textContent?.includes("Reflection"));
 
-    expect(advancedToggle?.getAttribute("aria-expanded")).toBe("true");
-    expect(container.querySelector('a[href="/goals"]')).not.toBeNull();
+    expect(reflectionToggle?.getAttribute("aria-expanded")).toBe("true");
+    expect(container.querySelector('a[href="/weekly-review"]')).not.toBeNull();
     expect(localStorage.getItem(NAVIGATION_GROUPS_STORAGE_KEY)).toBe(
-      '["advanced"]'
+      '["planning","reflection"]'
     );
   });
 });

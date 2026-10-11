@@ -47,7 +47,7 @@ export function NavigationGroupList({
   const { openGroupIds, setGroupOpen } = useOpenNavigationGroups();
   const activeGroup = navigationGroups.find(
     (group) =>
-      group.id !== "direct" &&
+      group.collapsible !== false &&
       group.items.some((item) => item.href === location.pathname)
   );
 
@@ -60,23 +60,34 @@ export function NavigationGroupList({
   return (
     <>
       {navigationGroups.map((group) => {
-        const isDirectGroup = group.id === "direct";
-        const isOpen = isDirectGroup || openGroupIds.includes(group.id);
+        const isCollapsible = group.collapsible !== false;
+        const isOpen = !isCollapsible || openGroupIds.includes(group.id);
         const panelId = `nav-group-${group.id}`;
         const title = group.titleKey ? t(group.titleKey) : undefined;
 
-        if (isDirectGroup) {
+        if (!isCollapsible) {
           return (
-            <div key={group.id} className="grid gap-1.5">
-              {group.items.map((item) => (
-                <NavigationLink
-                  key={item.href}
-                  item={item}
-                  collapsed={collapsed}
-                  onNavigate={onNavigate}
-                />
-              ))}
-            </div>
+            <section key={group.id} className="grid gap-1.5" aria-label={title}>
+              <p
+                className={cn(
+                  "flex min-h-10 items-center rounded-2xl px-3 text-xs font-semibold text-muted-foreground",
+                  collapsed && "sr-only"
+                )}
+                title={collapsed ? title : undefined}
+              >
+                {title}
+              </p>
+              <div className="grid gap-1.5">
+                {group.items.map((item) => (
+                  <NavigationLink
+                    key={item.href}
+                    item={item}
+                    collapsed={collapsed}
+                    onNavigate={onNavigate}
+                  />
+                ))}
+              </div>
+            </section>
           );
         }
 

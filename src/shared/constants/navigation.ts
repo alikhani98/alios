@@ -33,8 +33,10 @@ export type NavItem = {
 };
 
 export const navigationGroupIds = [
-  "direct",
-  "advanced",
+  "executive",
+  "planning",
+  "reflection",
+  "system",
 ] as const;
 
 export type NavigationGroupId = (typeof navigationGroupIds)[number];
@@ -42,12 +44,15 @@ export type NavigationGroupId = (typeof navigationGroupIds)[number];
 export type NavigationGroup = {
   id: NavigationGroupId;
   titleKey?: TranslationKey;
+  collapsible?: boolean;
   items: NavItem[];
 };
 
 export const navigationGroups: NavigationGroup[] = [
   {
-    id: "direct",
+    id: "executive",
+    titleKey: "nav.groupExecutive",
+    collapsible: false,
     items: [
       {
         titleKey: "nav.home",
@@ -65,65 +70,21 @@ export const navigationGroups: NavigationGroup[] = [
         icon: "inbox",
       },
       {
-        titleKey: "nav.projects",
-        href: "/projects",
-        icon: "folder-kanban",
-      },
-      {
-        titleKey: "nav.calendar",
-        href: "/calendar",
-        icon: "calendar-range",
-      },
-      {
         titleKey: "nav.focus",
         href: "/focus",
         icon: "timer",
       },
-      {
-        titleKey: "nav.search",
-        href: "/search",
-        icon: "search",
-      },
     ],
   },
   {
-    id: "advanced",
-    titleKey: "nav.groupAdvanced",
+    id: "planning",
+    titleKey: "nav.groupPlanning",
+    collapsible: true,
     items: [
       {
-        titleKey: "nav.routines",
-        href: "/routines",
-        icon: "repeat",
-      },
-      {
-        titleKey: "nav.experiments",
-        href: "/experiments",
-        icon: "flask-conical",
-      },
-      {
-        titleKey: "nav.patterns",
-        href: "/patterns",
-        icon: "activity",
-      },
-      {
-        titleKey: "nav.ifthen",
-        href: "/ifthen",
-        icon: "shuffle",
-      },
-      {
-        titleKey: "nav.therapy",
-        href: "/therapy",
-        icon: "brain",
-      },
-      {
-        titleKey: "nav.weeklyReview",
-        href: "/weekly-review",
-        icon: "calendar-range",
-      },
-      {
-        titleKey: "nav.decisions",
-        href: "/decisions",
-        icon: "git-branch",
+        titleKey: "nav.projects",
+        href: "/projects",
+        icon: "folder-kanban",
       },
       {
         titleKey: "nav.goals",
@@ -131,15 +92,74 @@ export const navigationGroups: NavigationGroup[] = [
         icon: "target",
       },
       {
-        titleKey: "nav.lifeAreas",
-        href: "/life-areas",
-        icon: "compass",
+        titleKey: "nav.calendar",
+        href: "/calendar",
+        icon: "calendar-range",
+      },
+      {
+        titleKey: "nav.routines",
+        href: "/routines",
+        icon: "repeat",
+      },
+      {
+        titleKey: "nav.ifthen",
+        href: "/ifthen",
+        icon: "shuffle",
+      },
+      {
+        titleKey: "nav.decisions",
+        href: "/decisions",
+        icon: "git-branch",
+      },
+      {
+        titleKey: "nav.finance",
+        href: "/finance",
+        icon: "wallet",
+      },
+    ],
+  },
+  {
+    id: "reflection",
+    titleKey: "nav.groupReflection",
+    collapsible: true,
+    items: [
+      {
+        titleKey: "nav.weeklyReview",
+        href: "/weekly-review",
+        icon: "calendar-range",
       },
       {
         titleKey: "nav.journal",
         href: "/journal",
         icon: "book-open",
       },
+      {
+        titleKey: "nav.lifeAreas",
+        href: "/life-areas",
+        icon: "compass",
+      },
+      {
+        titleKey: "nav.patterns",
+        href: "/patterns",
+        icon: "activity",
+      },
+      {
+        titleKey: "nav.experiments",
+        href: "/experiments",
+        icon: "flask-conical",
+      },
+      {
+        titleKey: "nav.therapy",
+        href: "/therapy",
+        icon: "brain",
+      },
+    ],
+  },
+  {
+    id: "system",
+    titleKey: "nav.groupSystem",
+    collapsible: true,
+    items: [
       {
         titleKey: "nav.knowledge",
         href: "/knowledge",
@@ -156,14 +176,14 @@ export const navigationGroups: NavigationGroup[] = [
         icon: "notebook-text",
       },
       {
-        titleKey: "nav.finance",
-        href: "/finance",
-        icon: "wallet",
-      },
-      {
         titleKey: "nav.settings",
         href: "/settings",
         icon: "settings",
+      },
+      {
+        titleKey: "nav.search",
+        href: "/search",
+        icon: "search",
       },
     ],
   },
@@ -173,7 +193,7 @@ export const mainNavigation: NavItem[] = navigationGroups.flatMap(
   (group) => group.items
 );
 
-export const defaultOpenNavigationGroupIds: NavigationGroupId[] = [];
+export const defaultOpenNavigationGroupIds: NavigationGroupId[] = ["planning"];
 
 export const NAVIGATION_GROUPS_STORAGE_KEY = "alios.navigation.openGroups";
 
@@ -206,7 +226,9 @@ export function normalizeNavigationGroupIds(
   for (const entry of value) {
     if (
       isNavigationGroupId(entry) &&
-      entry !== "direct" &&
+      navigationGroups.some(
+        (group) => group.id === entry && group.collapsible !== false
+      ) &&
       !result.includes(entry)
     ) {
       result.push(entry);
