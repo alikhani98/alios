@@ -1910,6 +1910,8 @@ export const messagesEn = {
   "todayWidget.tasks": "Tasks",
   "todayWidget.emptyState": "All done for today! ✅",
   "todayWidget.progress": "{done} of {total} done",
+  "todayWidget.openApp": "Open AliOS",
+  "todayWidget.remainingTasks": "more tasks",
   "today.checkin": "Daily Check-in",
   "today.tasks": "Today’s tasks",
   "today.tasksDescription": "Choose one MIT and keep every task’s status current.",

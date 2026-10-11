@@ -1921,6 +1921,8 @@ export const messagesFa: Record<TranslationKey, string> = {
   "todayWidget.tasks": "وظایف",
   "todayWidget.emptyState": "✅ امروز همه چیز تموم شده!",
   "todayWidget.progress": "{done} از {total} انجام شد",
+  "todayWidget.openApp": "باز کردن AliOS",
+  "todayWidget.remainingTasks": "تسک دیگر",
   "today.checkin": "بررسی روزانه",
   "today.tasks": "کارهای امروز",
   "today.tasksDescription": "یک کار مهم را انتخاب کنید و وضعیت همه کارها را به‌روز نگه دارید.",

@@ -1,12 +1,9 @@
 import { format } from "date-fns";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-import { useRoutines } from "@/features/routines/hooks/useRoutines";
-import { getRoutineSuggestions } from "@/features/today/routineSuggestions";
 import { formatDisplayDate } from "@/shared/date";
 import { useI18n, type TranslationKey } from "@/shared/i18n";
 import type { Task } from "@/shared/types";
-import { cn } from "@/shared/utils";
 import { useTodayData } from "../hooks/useTodayData";
 
 function getWeekdayLabelKey(weekday: number): TranslationKey {
@@ -28,27 +25,28 @@ function getWeekdayLabelKey(weekday: number): TranslationKey {
   }
 }
 
-function orderWidgetTasks(tasks: Task[]): Task[] {
-  const rank = (task: Task) => {
-    if (task.isMit) return 0;
-    if (task.status === "doing") return 1;
-    if (task.status === "todo") return 2;
-    if (task.status === "deferred") return 3;
-    if (task.status === "done") return 4;
-    return 5;
-  };
+function getClockLabel(date: Date): string {
+  return new Intl.DateTimeFormat("fa-IR", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(date);
+}
 
-  return [...tasks].sort((left, right) => {
-    const rankDiff = rank(left) - rank(right);
-    if (rankDiff !== 0) return rankDiff;
+function getTopPriorityTask(tasks: Task[]): Task | undefined {
+  const openTasks = tasks.filter(
+    (task) => task.status === "todo" || task.status === "doing"
+  );
 
-    if (left.priority !== right.priority) {
-      const priorityOrder = { high: 0, medium: 1, low: 2 };
-      return priorityOrder[left.priority] - priorityOrder[right.priority];
-    }
+  return (
+    openTasks.find((task) => task.isMit) ??
+    openTasks.find((task) => task.status === "doing") ??
+    openTasks.find((task) => task.status === "todo")
+  );
+}
 
-    return left.createdAt.localeCompare(right.createdAt);
-  });
+function formatCount(value: number): string {
+  return new Intl.NumberFormat("fa-IR").format(value);
 }
 
 export function TodayWidgetPage() {
@@ -60,30 +58,28 @@ export function TodayWidgetPage() {
     calendar: "jalali",
   })}`;
   const { tasks, isLoading, updateTaskStatus } = useTodayData(today);
-  const { entries: routines, isLoading: isRoutinesLoading } = useRoutines();
   const [busyTaskId, setBusyTaskId] = useState<string | null>(null);
+  const [clockLabel, setClockLabel] = useState(() => getClockLabel(new Date()));
 
-  const orderedTasks = useMemo(() => orderWidgetTasks(tasks), [tasks]);
-  const routineSuggestions = useMemo(
-    () => getRoutineSuggestions(routines, tasks, today, new Date().getDay()),
-    [routines, tasks, today]
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setClockLabel(getClockLabel(new Date()));
+    }, 60_000);
+
+    return () => window.clearInterval(intervalId);
+  }, []);
+
+  const mainTask = useMemo(() => getTopPriorityTask(tasks), [tasks]);
+  const remainingOpenCount = Math.max(
+    0,
+    tasks.filter((task) => task.status === "todo" || task.status === "doing")
+      .length - (mainTask ? 1 : 0)
   );
-  const doneCount = orderedTasks.filter((task) => task.status === "done").length;
-  const totalCount = orderedTasks.length;
-  const hasTasks = orderedTasks.length > 0;
-  const hasRoutines = routineSuggestions.length > 0;
-  const isInitialLoading = isLoading || isRoutinesLoading;
-  const progressMessage = t("todayWidget.progress", {
-    done: doneCount,
-    total: totalCount,
-  });
-  const doneCountText = String(doneCount);
-  const doneCountIndex = progressMessage.indexOf(doneCountText);
 
-  const toggleTask = async (task: Task) => {
+  const markDone = async (task: Task) => {
     setBusyTaskId(task.id);
     try {
-      await updateTaskStatus(task.id, task.status === "done" ? "todo" : "done");
+      await updateTaskStatus(task.id, "done");
     } finally {
       setBusyTaskId(null);
     }
@@ -93,101 +89,53 @@ export function TodayWidgetPage() {
     <main
       dir="rtl"
       className="min-h-screen bg-[#101820] p-4 font-sans text-white"
-      aria-busy={isInitialLoading}
+      aria-busy={isLoading}
     >
-      <div className="mx-auto flex min-h-[calc(100vh-2rem)] max-w-md flex-col gap-5">
-        <p className="text-xs font-semibold leading-6 text-[#E7A928]">
-          {dateLabel}
-        </p>
+      <div className="mx-auto flex min-h-[calc(100vh-2rem)] max-w-md flex-col gap-6">
+        <header className="space-y-3 pt-8 text-center">
+          <p className="text-6xl font-semibold tabular-nums leading-none tracking-normal text-white">
+            {clockLabel}
+          </p>
+          <p className="text-xs font-semibold leading-6 text-[#E7A928]">
+            {dateLabel}
+          </p>
+        </header>
 
-        {!isInitialLoading && !hasTasks && !hasRoutines ? (
-          <div className="flex flex-1 items-center justify-center text-center text-sm font-medium text-white/85">
-            {t("todayWidget.emptyState")}
-          </div>
-        ) : (
-          <div className="flex flex-1 flex-col gap-5">
-            {hasTasks ? (
-              <section className="space-y-3">
-                <h1 className="text-sm font-semibold text-white">
-                  {t("todayWidget.tasks")}
-                </h1>
-                <div className="space-y-2">
-                  {orderedTasks.map((task) => {
-                    const isDone = task.status === "done";
-                    const prefix = task.isMit
-                      ? "⭐"
-                      : task.priority === "high" && !isDone
-                        ? "🔴"
-                        : "";
+        <section className="flex flex-1 items-center">
+          {mainTask ? (
+            <div className="w-full rounded-3xl border border-white/10 bg-[#172033] p-5 shadow-sm">
+              <p className="break-words text-center text-2xl font-semibold leading-10 text-white">
+                {mainTask.title}
+              </p>
+              <button
+                type="button"
+                disabled={busyTaskId === mainTask.id}
+                onClick={() => void markDone(mainTask)}
+                aria-label={`انجام شد: ${mainTask.title}`}
+                className="mt-5 flex min-h-12 w-full items-center justify-center rounded-2xl bg-[#E7A928] px-4 text-lg font-bold text-[#101820] transition hover:bg-[#f0bd4b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white disabled:cursor-wait disabled:opacity-60"
+              >
+                ✓
+              </button>
+            </div>
+          ) : !isLoading ? (
+            <div className="w-full text-center text-sm font-medium leading-6 text-white/85">
+              {t("todayWidget.emptyState")}
+            </div>
+          ) : null}
+        </section>
 
-                    return (
-                      <button
-                        key={task.id}
-                        type="button"
-                        disabled={busyTaskId === task.id}
-                        onClick={() => void toggleTask(task)}
-                        className="flex min-h-11 w-full items-center gap-3 rounded-xl bg-[#172033] px-3 py-2 text-start text-sm leading-6 text-white transition hover:bg-[#1f2b44] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E7A928] disabled:cursor-wait disabled:opacity-60"
-                      >
-                        <span
-                          className={cn(
-                            "grid h-6 w-6 shrink-0 place-items-center rounded-full border text-xs font-bold",
-                            isDone
-                              ? "border-[#5F8D6A] bg-[#5F8D6A] text-[#101820]"
-                              : "border-[#E7A928] text-[#E7A928]"
-                          )}
-                          aria-hidden="true"
-                        >
-                          {isDone ? "✓" : "○"}
-                        </span>
-                        <span
-                          className={cn(
-                            "min-w-0 flex-1 break-words",
-                            isDone && "text-white/45 line-through"
-                          )}
-                        >
-                          {prefix ? `${prefix} ` : ""}
-                          {task.title}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </section>
-            ) : null}
-
-            {hasRoutines ? (
-              <section className="space-y-3">
-                <h2 className="text-sm font-semibold text-white">
-                  {t("todayWidget.routines")}
-                </h2>
-                <div className="space-y-2">
-                  {routineSuggestions.map((routine) => (
-                    <div
-                      key={routine.id}
-                      className="rounded-xl bg-[#172033] px-3 py-2 text-sm leading-6 text-white/85"
-                    >
-                      {routine.title}
-                    </div>
-                  ))}
-                </div>
-              </section>
-            ) : null}
-          </div>
-        )}
-
-        {hasTasks ? (
-          <footer className="text-center text-xs font-semibold text-white/55">
-            {doneCountIndex >= 0 ? (
-              <>
-                {progressMessage.slice(0, doneCountIndex)}
-                <span className="text-[#5F8D6A]">{doneCountText}</span>
-                {progressMessage.slice(doneCountIndex + doneCountText.length)}
-              </>
-            ) : (
-              progressMessage
-            )}
-          </footer>
+        {mainTask ? (
+          <p className="text-center text-sm font-semibold text-white/55">
+            {formatCount(remainingOpenCount)} {t("todayWidget.remainingTasks")}
+          </p>
         ) : null}
+
+        <a
+          href="/"
+          className="flex min-h-12 w-full items-center justify-center rounded-2xl bg-white px-4 text-sm font-bold text-[#101820] transition hover:bg-white/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E7A928]"
+        >
+          {t("todayWidget.openApp")}
+        </a>
       </div>
     </main>
   );
