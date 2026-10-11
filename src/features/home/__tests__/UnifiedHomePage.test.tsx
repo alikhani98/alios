@@ -210,7 +210,7 @@ describe("UnifiedHomePage", () => {
     expect(markup).toContain("Your next step is here.");
     expect(markup).toContain("Current focus");
     expect(markup).toContain("Review the unified Home workspace");
-    expect(markup).toContain("Start task");
+    expect(markup).toContain("Start Focus");
     expect(markup).toContain("Other options");
     expect(markup).toContain("0 task(s) done");
     expect(markup).toContain("1 task(s) remaining");

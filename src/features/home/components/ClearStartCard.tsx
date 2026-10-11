@@ -1,4 +1,12 @@
-import { ArrowUpLeft, CheckSquare2, Plus, Sparkles, Target } from "lucide-react";
+import {
+  ArrowUpLeft,
+  CheckSquare2,
+  Clock3,
+  FolderKanban,
+  Plus,
+  Sparkles,
+  Target,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { useI18n } from "@/shared/i18n";
@@ -19,12 +27,20 @@ function findCurrentFocus(data: HomeDashboardData): Task | undefined {
     ?? data.today.tasks.find((task) => task.status === "todo");
 }
 
-function createTodayTaskFocusPath(task: Task): string {
-  const searchParams = new URLSearchParams({ focusId: task.id });
-  if (task.dueDate) {
-    searchParams.set("date", task.dueDate);
+function createFocusTaskPath(task: Task): string {
+  return `/focus?${new URLSearchParams({ taskId: task.id }).toString()}`;
+}
+
+function getFocusReasonKey(task: Task) {
+  if (task.isMit) {
+    return "home.clearStartReasonMIT" as const;
   }
-  return `/today?${searchParams.toString()}`;
+
+  if (task.priority === "high") {
+    return "home.clearStartReasonHighPriority" as const;
+  }
+
+  return "home.clearStartReasonDueToday" as const;
 }
 
 export function ClearStartCard({
@@ -34,6 +50,10 @@ export function ClearStartCard({
 }) {
   const { t } = useI18n();
   const currentFocus = findCurrentFocus(data);
+  const currentFocusProject =
+    currentFocus?.projectId
+      ? data.projects.recent.find((project) => project.id === currentFocus.projectId)
+      : undefined;
 
   return (
     <PremiumCard className="alios-home-now-surface alios-primary-surface">
@@ -64,15 +84,40 @@ export function ClearStartCard({
               <p className="break-words text-xl font-semibold leading-8">
                 {currentFocus?.title ?? t("home.clearStartNoTaskBody")}
               </p>
+              {currentFocus ? (
+                <div className="flex flex-wrap gap-2 pt-2 text-xs font-medium text-muted-foreground">
+                  <span className="inline-flex min-h-8 items-center gap-1.5 rounded-full border border-border/70 bg-background/80 px-3">
+                    <Target className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+                    {t(getFocusReasonKey(currentFocus))}
+                  </span>
+                  {typeof currentFocus.estimatedMinutes === "number" &&
+                  currentFocus.estimatedMinutes > 0 ? (
+                    <span className="inline-flex min-h-8 items-center gap-1.5 rounded-full border border-border/70 bg-background/80 px-3">
+                      <Clock3 className="h-3.5 w-3.5" aria-hidden="true" />
+                      {t("home.clearStartMinutes", {
+                        n: currentFocus.estimatedMinutes,
+                      })}
+                    </span>
+                  ) : null}
+                  {currentFocusProject ? (
+                    <span className="inline-flex min-h-8 min-w-0 items-center gap-1.5 rounded-full border border-border/70 bg-background/80 px-3">
+                      <FolderKanban className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                      <span className="min-w-0 truncate">
+                        {currentFocusProject.title}
+                      </span>
+                    </span>
+                  ) : null}
+                </div>
+              ) : null}
             </div>
           </div>
 
           {currentFocus ? (
             <div className="grid gap-2 sm:grid-cols-2">
               <Button asChild className="alios-home-thread-item w-full">
-                <Link to={createTodayTaskFocusPath(currentFocus)}>
+                <Link to={createFocusTaskPath(currentFocus)}>
                   <Target className="me-2 h-4 w-4" aria-hidden="true" />
-                  {t("home.clearStartStartTask")}
+                  {t("home.clearStartFocusSession")}
                   <ArrowUpLeft className="ms-2 h-4 w-4" aria-hidden="true" />
                 </Link>
               </Button>
