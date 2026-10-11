@@ -826,48 +826,56 @@ export function UnifiedHomePage() {
               displayName={displayName}
             />
           ) : null}
-          <div className="grid gap-5 xl:grid-cols-2">
-            <TodayPreviewCard data={data} />
-            <LocalReminderPanel snapshot={data.reminderSnapshot} />
-          </div>
           <TodaySummaryBar data={data} today={today} />
-          <Suspense
-            fallback={
-              <div
-                className="h-32 animate-pulse rounded-[1.5rem] border bg-muted/60"
-                aria-label={t("home.loading")}
-              />
-            }
-          >
-            <DailyCommitmentCard />
-          </Suspense>
-          <div className="grid gap-2 sm:grid-cols-2">
-            <Suspense fallback={null}>
-              <UrgeLogButton
-                variant="inline"
-                onSaved={() => setUrgeRefreshKey((current) => current + 1)}
-              />
-            </Suspense>
-            <Suspense fallback={null}>
-              <MoneyPauseButton
-                variant="inline"
-                onSaved={() => setMoneyPauseRefreshKey((current) => current + 1)}
-              />
-            </Suspense>
+          <div className="grid gap-5 lg:grid-cols-3 lg:items-start">
+            <div className="space-y-4 lg:col-span-1">
+              <TodayPreviewCard data={data} />
+              <LocalReminderPanel snapshot={data.reminderSnapshot} />
+            </div>
+            <div className="space-y-4 lg:col-span-1">
+              <Suspense
+                fallback={
+                  <div
+                    className="h-32 animate-pulse rounded-[1.5rem] border bg-muted/60"
+                    aria-label={t("home.loading")}
+                  />
+                }
+              >
+                <DailyCommitmentCard />
+              </Suspense>
+              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
+                <Suspense fallback={null}>
+                  <UrgeLogButton
+                    variant="inline"
+                    onSaved={() => setUrgeRefreshKey((current) => current + 1)}
+                  />
+                </Suspense>
+                <Suspense fallback={null}>
+                  <MoneyPauseButton
+                    variant="inline"
+                    onSaved={() =>
+                      setMoneyPauseRefreshKey((current) => current + 1)
+                    }
+                  />
+                </Suspense>
+              </div>
+              <Suspense fallback={null}>
+                <IfThenContextCard refreshKey={urgeRefreshKey} />
+              </Suspense>
+              <Suspense fallback={null}>
+                <MoneyPauseReviewCard
+                  refreshKey={moneyPauseRefreshKey}
+                  onChanged={() => setMoneyPauseRefreshKey((current) => current + 1)}
+                />
+              </Suspense>
+              <Suspense fallback={null}>
+                <UrgeTodayList refreshKey={urgeRefreshKey} />
+              </Suspense>
+            </div>
+            <div className="space-y-4 lg:col-span-1">
+              <TomorrowCard data={data} tomorrow={tomorrow} />
+            </div>
           </div>
-          <Suspense fallback={null}>
-            <IfThenContextCard refreshKey={urgeRefreshKey} />
-          </Suspense>
-          <Suspense fallback={null}>
-            <MoneyPauseReviewCard
-              refreshKey={moneyPauseRefreshKey}
-              onChanged={() => setMoneyPauseRefreshKey((current) => current + 1)}
-            />
-          </Suspense>
-          <Suspense fallback={null}>
-            <UrgeTodayList refreshKey={urgeRefreshKey} />
-          </Suspense>
-          <TomorrowCard data={data} tomorrow={tomorrow} />
           <HomeLearningPanel snapshot={data.learningSnapshot} />
           {showEveningBriefing ? <DailyBriefingCard data={data} /> : null}
           <MoreContext
