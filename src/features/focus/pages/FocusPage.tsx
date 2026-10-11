@@ -142,6 +142,16 @@ function getPhaseLabelKey(timerState: FocusTimerState) {
     : ("focus.phaseWork" as const);
 }
 
+type FocusNotificationPermission = NotificationPermission | "unsupported";
+
+function getNotificationPermission(): FocusNotificationPermission {
+  if (typeof window === "undefined" || !("Notification" in window)) {
+    return "unsupported";
+  }
+
+  return Notification.permission;
+}
+
 export function FocusPage() {
   const { t } = useI18n();
   const [searchParams] = useSearchParams();
@@ -156,6 +166,8 @@ export function FocusPage() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [notificationPermission, setNotificationPermission] =
+    useState<FocusNotificationPermission>(() => getNotificationPermission());
   const selectedTaskIdRef = useRef(selectedTaskId);
   const completionInFlightRef = useRef(false);
 
@@ -341,10 +353,18 @@ export function FocusPage() {
     }
   };
 
-  const isNotificationReady =
-    typeof window !== "undefined" &&
-    "Notification" in window &&
-    Notification.permission === "granted";
+  const handleRequestNotificationPermission = async () => {
+    if (typeof window === "undefined" || !("Notification" in window)) {
+      setNotificationPermission("unsupported");
+      return;
+    }
+
+    const permission = await Notification.requestPermission();
+    setNotificationPermission(permission);
+  };
+
+  const isNotificationReady = notificationPermission === "granted";
+  const canRequestNotificationPermission = notificationPermission === "default";
   const notificationLabel = isNotificationReady
     ? t("focus.notificationReady")
     : t("focus.notificationUnavailable");
@@ -367,27 +387,6 @@ export function FocusPage() {
           <StatusChip tone="warning">{t("focus.tabOpenOnly")}</StatusChip>
         </div>
       </section>
-
-      <div className="grid gap-4 md:grid-cols-3">
-        <MetricCard
-          icon={<Timer className="h-5 w-5" aria-hidden="true" />}
-          label={t("focus.todaySessions")}
-          value={stats.todaySessions}
-          description={t("focus.todaySessionsDescription")}
-        />
-        <MetricCard
-          icon={<Coffee className="h-5 w-5" aria-hidden="true" />}
-          label={t("focus.todayMinutes")}
-          value={stats.todayMinutes}
-          description={t("focus.todayMinutesDescription")}
-        />
-        <MetricCard
-          icon={<Timer className="h-5 w-5" aria-hidden="true" />}
-          label={t("focus.weekSessions")}
-          value={stats.weekSessions}
-          description={t("focus.weekSessionsDescription")}
-        />
-      </div>
 
       <Card className="overflow-hidden">
         <CardHeader className="border-b border-border/70 bg-card">
@@ -525,15 +524,28 @@ export function FocusPage() {
                 </p>
               </SoftPanel>
 
-              <SoftPanel className="flex items-start gap-3">
-                {isNotificationReady ? (
-                  <Bell className="mt-1 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
-                ) : (
-                  <BellOff className="mt-1 h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
-                )}
-                <p className="text-sm leading-7 text-muted-foreground">
-                  {notificationLabel}
-                </p>
+              <SoftPanel className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div className="flex items-start gap-3">
+                  {isNotificationReady ? (
+                    <Bell className="mt-1 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                  ) : (
+                    <BellOff className="mt-1 h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                  )}
+                  <p className="text-sm leading-7 text-muted-foreground">
+                    {notificationLabel}
+                  </p>
+                </div>
+                {canRequestNotificationPermission ? (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleRequestNotificationPermission}
+                    className="w-full sm:w-auto"
+                  >
+                    {t("focus.requestNotificationPermission")}
+                  </Button>
+                ) : null}
               </SoftPanel>
             </div>
           </div>
@@ -549,34 +561,81 @@ export function FocusPage() {
             </p>
           ) : null}
 
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {sessions.slice(0, 6).map((session) => (
-              <div
-                key={session.id}
-                className={cn(
-                  "rounded-2xl border border-border/70 bg-card px-4 py-3 text-sm",
-                  session.interrupted && "border-alios-saffron/40 bg-alios-saffron/10"
-                )}
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <span className="font-semibold">
-                    {session.mode === "pomodoro"
-                      ? t("focus.modePomodoro")
-                      : t("focus.modeFree")}
-                  </span>
-                  <span className="font-mono tabular-nums">
-                    {Math.round(session.durationMinutes)} {t("focus.minutesShort")}
-                  </span>
+          <div className="space-y-3">
+            <h2 className="text-lg font-semibold">{t("focus.recentSessions")}</h2>
+            {sessions.length === 0 && !isLoading ? (
+              <p className="rounded-2xl border border-dashed border-border/70 bg-muted/35 px-4 py-3 text-sm leading-7 text-muted-foreground">
+                {t("focus.noSessions")}
+              </p>
+            ) : null}
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {sessions.slice(0, 6).map((session) => (
+                <div
+                  key={session.id}
+                  className={cn(
+                    "rounded-2xl border border-border/70 bg-card px-4 py-3 text-sm",
+                    session.interrupted && "border-alios-saffron/40 bg-alios-saffron/10"
+                  )}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="font-semibold">
+                      {session.mode === "pomodoro"
+                        ? t("focus.modePomodoro")
+                        : t("focus.modeFree")}
+                    </span>
+                    <span className="font-mono tabular-nums">
+                      {Math.round(session.durationMinutes)} {t("focus.minutesShort")}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-xs leading-6 text-muted-foreground">
+                    {format(parseISO(session.startedAt), "yyyy-MM-dd HH:mm")}
+                    {session.interrupted ? ` · ${t("focus.interrupted")}` : ""}
+                  </p>
                 </div>
-                <p className="mt-1 text-xs leading-6 text-muted-foreground">
-                  {format(parseISO(session.startedAt), "yyyy-MM-dd HH:mm")}
-                  {session.interrupted ? ` · ${t("focus.interrupted")}` : ""}
-                </p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </CardContent>
       </Card>
+
+      <div className="grid gap-4 md:grid-cols-3">
+        {isLoading ? (
+          Array.from({ length: 3 }).map((_, index) => (
+            <div
+              key={index}
+              className="min-h-[8.5rem] rounded-2xl border border-border/70 bg-card p-5 shadow-sm"
+            >
+              <div className="animate-pulse space-y-4">
+                <div className="h-5 w-10 rounded-full bg-muted" />
+                <div className="h-4 w-2/3 rounded-full bg-muted" />
+                <div className="h-8 w-16 rounded-full bg-muted" />
+                <div className="h-3 w-full rounded-full bg-muted" />
+              </div>
+            </div>
+          ))
+        ) : (
+          <>
+            <MetricCard
+              icon={<Timer className="h-5 w-5" aria-hidden="true" />}
+              label={t("focus.todaySessions")}
+              value={stats.todaySessions}
+              description={t("focus.todaySessionsDescription")}
+            />
+            <MetricCard
+              icon={<Coffee className="h-5 w-5" aria-hidden="true" />}
+              label={t("focus.todayMinutes")}
+              value={stats.todayMinutes}
+              description={t("focus.todayMinutesDescription")}
+            />
+            <MetricCard
+              icon={<Timer className="h-5 w-5" aria-hidden="true" />}
+              label={t("focus.weekSessions")}
+              value={stats.weekSessions}
+              description={t("focus.weekSessionsDescription")}
+            />
+          </>
+        )}
+      </div>
     </div>
   );
 }
