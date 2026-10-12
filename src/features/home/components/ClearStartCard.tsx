@@ -56,8 +56,17 @@ export function ClearStartCard({
       : undefined;
 
   return (
-    <PremiumCard className="alios-home-now-surface alios-primary-surface">
-      <CardContent className="relative z-10 grid gap-5 p-5 sm:p-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(18rem,0.9fr)]">
+    <PremiumCard className="alios-home-now-surface alios-primary-surface relative overflow-hidden">
+      <CardContent className="relative p-0">
+        <div
+          className="pointer-events-none absolute inset-0 z-0 opacity-[0.07]"
+          aria-hidden="true"
+          style={{
+            background:
+              "radial-gradient(ellipse at 85% 15%, var(--alios-saffron) 0%, transparent 60%), radial-gradient(ellipse at 15% 85%, var(--alios-herb) 0%, transparent 50%)",
+          }}
+        />
+        <div className="relative z-10 grid gap-5 p-5 sm:p-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(18rem,0.9fr)]">
         <div className="space-y-4">
           <SectionHeader
             icon={<Sparkles className="h-5 w-5" aria-hidden="true" />}
@@ -155,6 +164,7 @@ export function ClearStartCard({
             </Button>
           )}
         </SoftPanel>
+        </div>
       </CardContent>
     </PremiumCard>
   );

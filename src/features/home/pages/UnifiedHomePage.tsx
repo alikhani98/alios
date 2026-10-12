@@ -5,10 +5,12 @@ import {
   Brain,
   CalendarCheck2,
   CalendarDays,
+  Clock3,
   FolderKanban,
   GraduationCap,
   Inbox,
   ListTodo,
+  Plus,
   RotateCcw,
   ShieldCheck,
   Target,
@@ -99,6 +101,64 @@ const UrgeTodayList = lazy(() =>
     default: module.UrgeTodayList,
   }))
 );
+
+function HomeHeader({
+  displayName,
+  today,
+}: {
+  displayName: string;
+  today: Date;
+}) {
+  const hour = today.getHours();
+  const greeting =
+    hour < 12 ? "صبح بخیر" : hour < 17 ? "بعدازظهر بخیر" : "شب بخیر";
+  const formattedDate = new Intl.DateTimeFormat("fa-IR", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  }).format(today);
+
+  return (
+    <div className="flex items-center justify-between px-1 pb-1 pt-2">
+      <div className="space-y-0.5">
+        <p className="text-xs font-medium text-muted-foreground">
+          {greeting}
+          {displayName ? ` ${displayName}` : ""}
+        </p>
+        <p className="text-lg font-bold tracking-tight">خانه</p>
+      </div>
+      <div className="text-xs font-medium text-muted-foreground tabular-nums">
+        {formattedDate}
+      </div>
+    </div>
+  );
+}
+
+function HomeQuickBar() {
+  const itemClassName =
+    "flex shrink-0 items-center gap-1.5 rounded-2xl border bg-background/80 px-3 py-2 text-xs font-medium shadow-sm transition hover:bg-accent";
+
+  return (
+    <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+      <Link to="/today?action=add" className={itemClassName}>
+        <Plus className="h-4 w-4" aria-hidden="true" />
+        ثبت کار
+      </Link>
+      <Link to="/focus" className={itemClassName}>
+        <Clock3 className="h-4 w-4" aria-hidden="true" />
+        تمرکز
+      </Link>
+      <Link to="/inbox?action=add" className={itemClassName}>
+        <Inbox className="h-4 w-4" aria-hidden="true" />
+        یادداشت
+      </Link>
+      <Link to="/weekly-review" className={itemClassName}>
+        <CalendarCheck2 className="h-4 w-4" aria-hidden="true" />
+        مرور هفته
+      </Link>
+    </div>
+  );
+}
 
 const quickLinks: ReadonlyArray<{ to: string; labelKey: TranslationKey }> = [
   { to: "/today", labelKey: "home.goToday" },
@@ -816,6 +876,10 @@ export function UnifiedHomePage() {
         </div>
       ) : data ? (
         <>
+          <div className="order-0 lg:hidden">
+            <HomeHeader displayName={displayName} today={today} />
+            <HomeQuickBar />
+          </div>
           <div className="order-1 rounded-[2rem] shadow-lg shadow-alios-caspian/10 lg:order-1">
             <ClearStartCard data={data} />
           </div>
