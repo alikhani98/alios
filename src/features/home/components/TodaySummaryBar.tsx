@@ -105,21 +105,21 @@ export function TodaySummaryBar({ data, today }: TodaySummaryBarProps) {
   ];
 
   return (
-    <SoftPanel className="alios-home-context-shelf grid grid-cols-2 gap-2 border-alios-herb/25 bg-background/90 p-2 shadow-sm md:grid-cols-4">
+    <SoftPanel className="alios-home-context-shelf grid grid-cols-4 gap-2 border-alios-herb/25 bg-background/90 p-2 shadow-sm">
       {metrics.map(({ icon: Icon, labelKey, labelValues, to, tone, value }) => (
         <Link
           key={labelKey}
           to={to}
-          className="flex min-h-20 min-w-0 items-center gap-3 rounded-2xl border bg-card/80 px-3 py-3 text-start shadow-sm transition hover:border-primary/25 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          className="flex min-h-16 min-w-0 items-center gap-2 rounded-2xl border bg-card/80 px-2 py-2 text-start shadow-sm transition hover:border-primary/25 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border bg-background/80">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border bg-background/80">
             <Icon className={getIconClassName(tone)} aria-hidden="true" />
           </span>
           <span className="min-w-0 space-y-0.5">
-            <span className="block truncate text-2xl font-semibold tabular-nums tracking-tight">
+            <span className="block truncate text-lg font-semibold tabular-nums tracking-tight">
               {value}
             </span>
-            <span className="block truncate text-xs font-medium leading-5 text-muted-foreground">
+            <span className="block truncate text-[10px] font-medium leading-5 text-muted-foreground">
               {t(labelKey, labelValues)}
             </span>
           </span>

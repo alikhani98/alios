@@ -234,17 +234,7 @@ function TomorrowCard({
     .sort(compareDecisionTasks)[0];
 
   if (!tomorrowTask) {
-    return (
-      <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-        <span>{t("home.tomorrowEmptyCompact")}</span>
-        <Link
-          to="/today"
-          className="font-medium text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-        >
-          {t("home.tomorrowEmptyAction")}
-        </Link>
-      </div>
-    );
+    return null;
   }
 
   const tomorrowPath = createTodayTaskFocusPath(tomorrowTask);
@@ -392,10 +382,18 @@ function HomeLearningList({
 
 function MoreContext({
   data,
+  urgeRefreshKey,
+  setUrgeRefreshKey,
+  moneyPauseRefreshKey,
+  setMoneyPauseRefreshKey,
   selectedRoutineTemplateId,
   setSelectedRoutineTemplateId,
 }: {
   data: HomeDashboardData;
+  urgeRefreshKey: number;
+  setUrgeRefreshKey: (updater: (current: number) => number) => void;
+  moneyPauseRefreshKey: number;
+  setMoneyPauseRefreshKey: (updater: (current: number) => number) => void;
   selectedRoutineTemplateId: RoutineTemplateId | null;
   setSelectedRoutineTemplateId: (templateId: RoutineTemplateId | null) => void;
 }) {
@@ -440,6 +438,46 @@ function MoreContext({
       contentClassName="space-y-5"
     >
       <div className="grid min-w-0 gap-5 xl:grid-cols-12 xl:items-start">
+        <div className="min-w-0 space-y-4 xl:col-span-12">
+          <Suspense
+            fallback={
+              <div
+                className="h-32 animate-pulse rounded-[1.5rem] border bg-muted/60"
+                aria-label={t("home.loading")}
+              />
+            }
+          >
+            <DailyCommitmentCard />
+          </Suspense>
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
+            <Suspense fallback={null}>
+              <UrgeLogButton
+                variant="inline"
+                onSaved={() => setUrgeRefreshKey((current) => current + 1)}
+              />
+            </Suspense>
+            <Suspense fallback={null}>
+              <MoneyPauseButton
+                variant="inline"
+                onSaved={() =>
+                  setMoneyPauseRefreshKey((current) => current + 1)
+                }
+              />
+            </Suspense>
+          </div>
+          <Suspense fallback={null}>
+            <IfThenContextCard refreshKey={urgeRefreshKey} />
+          </Suspense>
+          <Suspense fallback={null}>
+            <MoneyPauseReviewCard
+              refreshKey={moneyPauseRefreshKey}
+              onChanged={() => setMoneyPauseRefreshKey((current) => current + 1)}
+            />
+          </Suspense>
+          <Suspense fallback={null}>
+            <UrgeTodayList refreshKey={urgeRefreshKey} />
+          </Suspense>
+        </div>
         <div className="min-w-0 xl:col-span-6">
           <ProjectsOverview data={data} formatDate={formatDate} />
         </div>
@@ -749,7 +787,7 @@ export function UnifiedHomePage() {
   }
 
   return (
-    <section className="alios-page alios-home-page space-y-5 lg:space-y-6">
+    <section className="alios-page alios-home-page flex flex-col gap-5 lg:gap-6">
       {hasError ? (
         <div
           role="alert"
@@ -778,111 +816,91 @@ export function UnifiedHomePage() {
         </div>
       ) : data ? (
         <>
-          <ClearStartCard data={data} />
-          {showBackupReminder ? (
-            <SoftPanel className="flex flex-col gap-3 border-alios-saffron/30 bg-gradient-to-l from-alios-saffron/10 via-background to-background p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:gap-5">
-              <div className="flex min-w-0 items-start gap-3">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-alios-saffron/30 bg-alios-saffron/15 text-alios-caspian dark:text-alios-paper">
-                  <ShieldCheck className="h-5 w-5" aria-hidden="true" />
-                </span>
-                <div className="min-w-0 space-y-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <p className="font-semibold leading-6">{t("home.backupReminderTitle")}</p>
-                    <StatusChip>
-                      {t(
-                        backupFreshness === "never"
-                          ? "settings.backupStatusNever"
-                          : "settings.backupStatusOverdue"
-                      )}
-                    </StatusChip>
-                  </div>
-                  <p className="text-sm leading-6 text-muted-foreground">
-                    {backupReminderBody}
-                  </p>
-                </div>
-              </div>
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                <Button asChild variant="outline" size="sm" className="w-full shrink-0 sm:w-auto">
-                  <Link to="/settings#settings-backup-restore">{t("home.backupReminderAction")}</Link>
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="w-full shrink-0 sm:w-auto"
-                  onClick={() => {
-                    setBackupReminderDismissedUntil(writeHomeBackupReminderDismissal());
-                  }}
-                >
-                  <X className="me-2 h-4 w-4" aria-hidden="true" />
-                  {t("home.backupReminderDismiss")}
-                </Button>
-              </div>
-            </SoftPanel>
-          ) : null}
-          {data.isEmpty ? (
-            <WelcomeCard
-              key={onboardingState}
-              displayName={displayName}
-            />
-          ) : null}
-          <TodaySummaryBar data={data} today={today} />
-          <div className="grid gap-5 lg:grid-cols-3 lg:items-start">
-            <div className="space-y-4 lg:col-span-1">
+          <div className="order-1 rounded-[2rem] shadow-lg shadow-alios-caspian/10 lg:order-1">
+            <ClearStartCard data={data} />
+          </div>
+          <div className="order-2 lg:order-4 [&>.alios-home-context-shelf]:grid-cols-4 [&>.alios-home-context-shelf]:gap-1.5 [&>.alios-home-context-shelf]:overflow-hidden sm:[&>.alios-home-context-shelf]:gap-2">
+            <TodaySummaryBar data={data} today={today} />
+          </div>
+          <div className="order-3 grid gap-5 lg:order-5 lg:grid-cols-3 lg:items-start">
+            <div className="space-y-4 lg:col-span-1 lg:col-start-1 lg:row-start-1">
               <TodayPreviewCard data={data} />
               <LocalReminderPanel snapshot={data.reminderSnapshot} />
             </div>
-            <div className="space-y-4 lg:col-span-1">
-              <Suspense
-                fallback={
-                  <div
-                    className="h-32 animate-pulse rounded-[1.5rem] border bg-muted/60"
-                    aria-label={t("home.loading")}
-                  />
-                }
-              >
-                <DailyCommitmentCard />
-              </Suspense>
-              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
-                <Suspense fallback={null}>
-                  <UrgeLogButton
-                    variant="inline"
-                    onSaved={() => setUrgeRefreshKey((current) => current + 1)}
-                  />
-                </Suspense>
-                <Suspense fallback={null}>
-                  <MoneyPauseButton
-                    variant="inline"
-                    onSaved={() =>
-                      setMoneyPauseRefreshKey((current) => current + 1)
-                    }
-                  />
-                </Suspense>
-              </div>
-              <Suspense fallback={null}>
-                <IfThenContextCard refreshKey={urgeRefreshKey} />
-              </Suspense>
-              <Suspense fallback={null}>
-                <MoneyPauseReviewCard
-                  refreshKey={moneyPauseRefreshKey}
-                  onChanged={() => setMoneyPauseRefreshKey((current) => current + 1)}
-                />
-              </Suspense>
-              <Suspense fallback={null}>
-                <UrgeTodayList refreshKey={urgeRefreshKey} />
-              </Suspense>
-            </div>
-            <div className="space-y-4 lg:col-span-1">
+            <div className="space-y-4 lg:col-span-1 lg:col-start-3 lg:row-start-1">
               <TomorrowCard data={data} tomorrow={tomorrow} />
             </div>
+            <div className="lg:col-span-3 lg:col-start-1 lg:row-start-2">
+              <HomeLearningPanel snapshot={data.learningSnapshot} />
+            </div>
           </div>
-          <HomeLearningPanel snapshot={data.learningSnapshot} />
-          {showEveningBriefing ? <DailyBriefingCard data={data} /> : null}
-          <MoreContext
-            data={data}
-            selectedRoutineTemplateId={selectedRoutineTemplateId}
-            setSelectedRoutineTemplateId={setSelectedRoutineTemplateId}
-          />
+          <div className="order-5 lg:order-9">
+            <MoreContext
+              data={data}
+              urgeRefreshKey={urgeRefreshKey}
+              setUrgeRefreshKey={setUrgeRefreshKey}
+              moneyPauseRefreshKey={moneyPauseRefreshKey}
+              setMoneyPauseRefreshKey={setMoneyPauseRefreshKey}
+              selectedRoutineTemplateId={selectedRoutineTemplateId}
+              setSelectedRoutineTemplateId={setSelectedRoutineTemplateId}
+            />
+          </div>
+          {showEveningBriefing ? (
+            <div className="order-6 lg:order-7">
+              <DailyBriefingCard data={data} />
+            </div>
+          ) : null}
+          {data.isEmpty ? (
+            <div className="order-7 lg:order-3">
+              <WelcomeCard
+                key={onboardingState}
+                displayName={displayName}
+              />
+            </div>
+          ) : null}
+          {showBackupReminder ? (
+            <div className="order-8 lg:order-2">
+              <SoftPanel className="flex flex-col gap-3 border-alios-saffron/30 bg-gradient-to-l from-alios-saffron/10 via-background to-background p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:gap-5">
+                <div className="flex min-w-0 items-start gap-3">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-alios-saffron/30 bg-alios-saffron/15 text-alios-caspian dark:text-alios-paper">
+                    <ShieldCheck className="h-5 w-5" aria-hidden="true" />
+                  </span>
+                  <div className="min-w-0 space-y-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="font-semibold leading-6">{t("home.backupReminderTitle")}</p>
+                      <StatusChip>
+                        {t(
+                          backupFreshness === "never"
+                            ? "settings.backupStatusNever"
+                            : "settings.backupStatusOverdue"
+                        )}
+                      </StatusChip>
+                    </div>
+                    <p className="text-sm leading-6 text-muted-foreground">
+                      {backupReminderBody}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                  <Button asChild variant="outline" size="sm" className="w-full shrink-0 sm:w-auto">
+                    <Link to="/settings#settings-backup-restore">{t("home.backupReminderAction")}</Link>
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="w-full shrink-0 sm:w-auto"
+                    onClick={() => {
+                      setBackupReminderDismissedUntil(writeHomeBackupReminderDismissal());
+                    }}
+                  >
+                    <X className="me-2 h-4 w-4" aria-hidden="true" />
+                    {t("home.backupReminderDismiss")}
+                  </Button>
+                </div>
+              </SoftPanel>
+            </div>
+          ) : null}
         </>
       ) : null}
     </section>
