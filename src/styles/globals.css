@@ -227,19 +227,39 @@
   }
 
   .alios-shell-background {
+    background-color: hsl(var(--background));
     background-image:
-      radial-gradient(ellipse at 20% 0%, color-mix(in srgb, var(--alios-saffron-thread) 9%, transparent) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 0%, color-mix(in srgb, var(--alios-herb-glass) 6%, transparent) 0%, transparent 40%),
-      radial-gradient(ellipse at 50% 100%, color-mix(in srgb, var(--alios-morning-paper) 40%, transparent) 0%, transparent 60%),
-      linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--muted) / 0.08) 100%);
+      radial-gradient(ellipse 80% 40% at 70% -10%,
+        color-mix(in srgb, var(--alios-saffron-thread) 13%, transparent),
+        transparent 70%),
+      radial-gradient(ellipse 60% 30% at 10% 20%,
+        color-mix(in srgb, var(--alios-herb-glass) 8%, transparent),
+        transparent 60%),
+      radial-gradient(ellipse 50% 40% at 90% 80%,
+        color-mix(in srgb, var(--alios-herb-glass) 5%, transparent),
+        transparent 60%),
+      linear-gradient(160deg,
+        color-mix(in srgb, var(--alios-morning-paper) 30%, hsl(var(--background))) 0%,
+        hsl(var(--background)) 40%,
+        color-mix(in srgb, var(--alios-morning-paper) 15%, hsl(var(--background))) 100%);
   }
 
   .dark .alios-shell-background {
+    background-color: hsl(240 12% 5%);
     background-image:
-      radial-gradient(ellipse at 20% 0%, color-mix(in srgb, var(--alios-saffron-thread) 11%, transparent) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 0%, color-mix(in srgb, var(--alios-herb-glass) 8%, transparent) 0%, transparent 40%),
-      radial-gradient(ellipse at 50% 100%, color-mix(in srgb, var(--alios-night-garden) 60%, transparent) 0%, transparent 60%),
-      linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--background)) 100%);
+      radial-gradient(ellipse 80% 40% at 70% -10%,
+        color-mix(in srgb, var(--alios-saffron-thread) 16%, transparent),
+        transparent 70%),
+      radial-gradient(ellipse 60% 30% at 10% 20%,
+        color-mix(in srgb, var(--alios-herb-glass) 10%, transparent),
+        transparent 60%),
+      radial-gradient(ellipse 50% 40% at 90% 80%,
+        color-mix(in srgb, var(--alios-saffron-thread) 7%, transparent),
+        transparent 60%),
+      linear-gradient(160deg,
+        hsl(240 14% 8%) 0%,
+        hsl(240 12% 5%) 50%,
+        hsl(240 10% 7%) 100%);
   }
 }
 
@@ -270,28 +290,88 @@
   }
 
   .alios-surface-card {
-    @apply rounded-surface border border-border/60 bg-card/95 text-card-foreground backdrop-blur-sm;
-    box-shadow: var(--alios-shadow-card);
-    transition: box-shadow var(--alios-transition-base), border-color var(--alios-transition-base);
+    @apply rounded-surface text-card-foreground;
+    background: color-mix(in srgb, hsl(var(--background)) 94%, hsl(var(--card)));
+    border: 1px solid color-mix(in srgb, hsl(var(--border)) 55%, transparent);
+    box-shadow:
+      0 1px 0 0 color-mix(in srgb, white 60%, transparent) inset,
+      var(--alios-shadow-raised);
+    backdrop-filter: var(--alios-blur-sm);
+    -webkit-backdrop-filter: var(--alios-blur-sm);
+    transition: box-shadow var(--alios-transition-base), border-color var(--alios-transition-base), transform var(--alios-transition-base);
   }
 
   .alios-surface-card:hover {
-    box-shadow: var(--alios-shadow-raised);
-    border-color: hsl(var(--border) / 0.8);
+    border-color: color-mix(in srgb, hsl(var(--border)) 80%, transparent);
+    box-shadow:
+      0 1px 0 0 color-mix(in srgb, white 60%, transparent) inset,
+      var(--alios-shadow-floating);
+  }
+
+  .dark .alios-surface-card {
+    background: color-mix(in srgb, hsl(240 12% 9%) 90%, hsl(var(--card)));
+    border: 1px solid color-mix(in srgb, white 7%, transparent);
+    box-shadow:
+      0 1px 0 0 color-mix(in srgb, white 6%, transparent) inset,
+      var(--alios-shadow-raised);
+  }
+
+  .dark .alios-surface-card:hover {
+    border-color: color-mix(in srgb, white 12%, transparent);
+    box-shadow:
+      0 1px 0 0 color-mix(in srgb, white 7%, transparent) inset,
+      var(--alios-shadow-floating);
   }
 
   .alios-surface-elevated {
-    @apply rounded-surface border border-alios-caspian/10 bg-gradient-to-br from-background via-background to-alios-saffron/[0.04] text-card-foreground backdrop-blur-sm;
-    box-shadow: var(--alios-shadow-raised);
-    transition: box-shadow var(--alios-transition-base);
+    @apply rounded-surface text-card-foreground;
+    background: linear-gradient(145deg,
+      color-mix(in srgb, hsl(var(--background)) 96%, hsl(var(--card))) 0%,
+      color-mix(in srgb, hsl(var(--background)) 98%, var(--alios-saffron-thread)) 100%);
+    border: 1px solid color-mix(in srgb, var(--alios-saffron-thread) 18%, hsl(var(--border)));
+    box-shadow:
+      0 1px 0 0 color-mix(in srgb, white 70%, transparent) inset,
+      var(--alios-shadow-floating);
+    backdrop-filter: var(--alios-blur-sm);
+    -webkit-backdrop-filter: var(--alios-blur-sm);
+    transition: box-shadow var(--alios-transition-base), transform var(--alios-transition-base);
   }
 
   .alios-surface-elevated:hover {
-    box-shadow: var(--alios-shadow-floating);
+    box-shadow:
+      0 1px 0 0 color-mix(in srgb, white 70%, transparent) inset,
+      0 24px 48px -8px color-mix(in srgb, var(--alios-saffron-thread) 16%, rgb(15 23 42 / 0.16)),
+      0 8px 20px -4px rgb(15 23 42 / 0.10),
+      0 0 0 1px color-mix(in srgb, var(--alios-saffron-thread) 20%, transparent);
+  }
+
+  .dark .alios-surface-elevated {
+    background: linear-gradient(145deg,
+      hsl(240 12% 10%) 0%,
+      color-mix(in srgb, hsl(240 12% 10%) 92%, var(--alios-saffron-thread)) 100%);
+    border: 1px solid color-mix(in srgb, var(--alios-saffron-thread) 22%, hsl(var(--border)));
+    box-shadow:
+      0 1px 0 0 color-mix(in srgb, white 8%, transparent) inset,
+      var(--alios-shadow-floating);
   }
 
   .alios-surface-soft {
-    @apply rounded-section border border-border/70 bg-background/95 shadow-sm backdrop-blur-sm;
+    @apply rounded-section text-card-foreground;
+    background: color-mix(in srgb, hsl(var(--background)) 92%, hsl(var(--card)));
+    border: 1px solid color-mix(in srgb, hsl(var(--border)) 50%, transparent);
+    box-shadow:
+      0 1px 0 0 color-mix(in srgb, white 55%, transparent) inset,
+      var(--alios-shadow-raised);
+    backdrop-filter: var(--alios-blur-sm);
+    -webkit-backdrop-filter: var(--alios-blur-sm);
+  }
+
+  .dark .alios-surface-soft {
+    background: color-mix(in srgb, hsl(240 12% 8%) 88%, hsl(var(--card)));
+    border: 1px solid color-mix(in srgb, white 6%, transparent);
+    box-shadow:
+      0 1px 0 0 color-mix(in srgb, white 5%, transparent) inset,
+      var(--alios-shadow-raised);
   }
 
   .alios-surface-muted {
@@ -501,24 +581,34 @@
   }
 
   .alios-home-context-shelf {
-    border-color: color-mix(in srgb, var(--alios-caspian-ink) 8%, hsl(var(--border)));
-    background: color-mix(in srgb, hsl(var(--card)) 97%, hsl(var(--background)));
-    box-shadow: var(--alios-shadow-card);
-    transition: box-shadow var(--alios-transition-base), transform var(--alios-transition-base);
+    background: color-mix(in srgb, hsl(var(--background)) 93%, hsl(var(--card)));
+    border-color: color-mix(in srgb, hsl(var(--border)) 52%, transparent);
+    box-shadow:
+      0 1px 0 0 color-mix(in srgb, white 58%, transparent) inset,
+      var(--alios-shadow-raised);
+    transition: box-shadow var(--alios-transition-base), border-color var(--alios-transition-base);
   }
 
   .alios-home-context-shelf:hover {
-    box-shadow: var(--alios-shadow-raised);
+    border-color: color-mix(in srgb, hsl(var(--border)) 75%, transparent);
+    box-shadow:
+      0 1px 0 0 color-mix(in srgb, white 58%, transparent) inset,
+      var(--alios-shadow-floating);
   }
 
   .dark .alios-home-context-shelf {
-    border-color: color-mix(in srgb, var(--alios-saffron-thread) 14%, hsl(var(--border)));
-    background: color-mix(in srgb, hsl(var(--card)) 92%, var(--alios-night-garden));
-    box-shadow: var(--alios-shadow-card);
+    background: color-mix(in srgb, hsl(240 12% 9%) 88%, hsl(var(--card)));
+    border-color: color-mix(in srgb, var(--alios-saffron-thread) 16%, color-mix(in srgb, white 7%, transparent));
+    box-shadow:
+      0 1px 0 0 color-mix(in srgb, white 6%, transparent) inset,
+      var(--alios-shadow-raised);
   }
 
   .dark .alios-home-context-shelf:hover {
-    box-shadow: var(--alios-shadow-raised);
+    border-color: color-mix(in srgb, var(--alios-saffron-thread) 24%, color-mix(in srgb, white 10%, transparent));
+    box-shadow:
+      0 1px 0 0 color-mix(in srgb, white 7%, transparent) inset,
+      var(--alios-shadow-floating);
   }
 
   /* Glass morphism surface */

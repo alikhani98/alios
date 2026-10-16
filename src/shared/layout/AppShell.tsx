@@ -143,14 +143,17 @@ export function AppShell() {
   }, [setRecoveryModeEnabled]);
 
   return (
-    <div className="relative min-h-screen bg-muted/20 text-foreground alios-shell-background">
+    <div className="relative min-h-screen text-foreground alios-shell-background">
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:fixed focus:start-3 focus:top-3 focus:z-[90] focus:rounded-2xl focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-primary-foreground focus:shadow-aliosFloating"
       >
         {t("shell.skipToMain")}
       </a>
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,hsl(var(--background)/0.18),transparent_18%,transparent_78%,hsl(var(--background)/0.18))] dark:bg-[linear-gradient(to_bottom,hsl(var(--background)/0.3),transparent_18%,transparent_78%,hsl(var(--background)/0.3))]" />
+      <div
+        className="pointer-events-none absolute inset-0 overflow-hidden bg-[linear-gradient(160deg,transparent,hsl(var(--background)/0.08),transparent)]"
+        aria-hidden="true"
+      />
       <div className="relative flex min-h-screen min-w-0">
         <Sidebar
           collapsed={sidebarCollapsed}
@@ -174,6 +177,7 @@ export function AppShell() {
             id="main-content"
             tabIndex={-1}
             className="min-w-0 flex-1 overflow-x-hidden px-3 pb-[calc(5.75rem+env(safe-area-inset-bottom))] pt-3 sm:px-4 sm:pb-[calc(6rem+env(safe-area-inset-bottom))] sm:pt-4 md:pb-[calc(1.25rem+env(safe-area-inset-bottom))] lg:px-6 lg:pb-[calc(1.75rem+env(safe-area-inset-bottom))] xl:px-8"
+            style={{ isolation: "isolate" }}
           >
             <div
               key={location.pathname}
