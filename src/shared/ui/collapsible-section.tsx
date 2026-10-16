@@ -69,7 +69,7 @@ export function CollapsibleSection({
       <button
         type="button"
         className={cn(
-          "alios-collapsible-trigger flex w-full flex-col items-start justify-between gap-3 p-5 text-start sm:flex-row sm:items-start sm:gap-4 sm:p-6",
+          "alios-collapsible-trigger flex w-full flex-col items-start justify-between gap-3 p-5 text-start transition-colors duration-200 hover:bg-accent/30 motion-reduce:transition-none sm:flex-row sm:items-start sm:gap-4 sm:p-6",
           aliosFocusRing,
           "focus-visible:-m-px focus-visible:rounded-[1.65rem]"
         )}
@@ -79,7 +79,7 @@ export function CollapsibleSection({
       >
         <span className="flex w-full min-w-0 items-start gap-3 text-start sm:w-auto">
           {icon ? (
-            <span className="alios-icon-primary mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl">
+            <span className="alios-icon-primary mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl shadow-sm ring-1 ring-primary/10">
               {icon}
             </span>
           ) : null}
@@ -100,7 +100,7 @@ export function CollapsibleSection({
           <span className="sr-only">{isOpen ? collapseLabel : expandLabel}</span>
           <ChevronDown
             className={cn(
-              "h-5 w-5 shrink-0 text-muted-foreground transition-transform duration-200 ease-out motion-reduce:transition-none",
+              "h-5 w-5 shrink-0 text-muted-foreground transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] motion-reduce:transition-none",
               isOpen && "rotate-180"
             )}
             aria-hidden="true"
@@ -113,7 +113,7 @@ export function CollapsibleSection({
         hidden={!isOpen}
         aria-hidden={!isOpen}
         className={cn(
-          "alios-collapsible-content border-t border-border/70 px-5 py-5 sm:px-6",
+          "alios-collapsible-content border-t border-border/50 px-5 py-5 sm:px-6",
           contentClassName
         )}
       >

@@ -33,7 +33,8 @@ export function PremiumCard({ className, ...props }: PremiumCardProps) {
     <Card
       className={cn(
         "alios-surface-elevated overflow-hidden",
-        "hover:border-alios-saffron/30 hover:shadow-lg",
+        "hover:border-alios-saffron/25 hover:shadow-lg",
+        "transition-[box-shadow,border-color,transform] duration-200 ease-out motion-reduce:transition-none",
         className
       )}
       {...props}
@@ -47,9 +48,10 @@ export function SoftPanel({ className, ...props }: SoftPanelProps) {
   return (
     <div
       className={cn(
-        "alios-surface-soft p-4 sm:p-4.5",
+        "alios-surface-soft p-4 sm:p-5",
         aliosSubtleOutlineMotion,
-        "hover:border-border/90 hover:bg-background",
+        "hover:border-border/80 hover:bg-background/95",
+        "transition-[border-color,background-color,box-shadow] duration-200 ease-out motion-reduce:transition-none",
         className
       )}
       {...props}
@@ -92,7 +94,7 @@ export function SectionHeader({
         ) : null}
         <div className="flex flex-wrap items-center gap-2">
           {icon ? <span className="text-primary">{icon}</span> : null}
-          <h3 className="break-words text-xl font-semibold tracking-tight sm:text-[1.4rem]">
+          <h3 className="break-words text-xl font-bold tracking-tight sm:text-[1.35rem]">
             {title}
           </h3>
           {status ? <div className="shrink-0">{status}</div> : null}
@@ -148,9 +150,9 @@ export function MiniProgressBar({ value, className, label }: MiniProgressBarProp
           <span className="tabular-nums">{Math.round(safeValue)}%</span>
         </div>
       ) : null}
-      <div className="h-2 overflow-hidden rounded-full bg-muted">
+      <div className="h-1.5 overflow-hidden rounded-full bg-muted/80">
         <div
-          className="h-full rounded-full bg-alios-saffron transition-[width] duration-300 ease-out motion-reduce:transition-none"
+          className="h-full rounded-full bg-gradient-to-r from-alios-saffron to-alios-herb transition-[width] duration-500 ease-out motion-reduce:transition-none"
           style={{ width: `${safeValue}%` }}
         />
       </div>
@@ -179,7 +181,7 @@ export function MetricCard({
     <PremiumCard className={cn("h-full min-h-40", className)}>
       <CardContent className="flex h-full flex-col justify-between gap-5 p-5 sm:p-6">
         <div className="flex items-center justify-between gap-3">
-          <div className="alios-icon-primary flex h-12 w-12 items-center justify-center rounded-[1.15rem] shadow-sm">
+          <div className="alios-icon-primary flex h-12 w-12 items-center justify-center rounded-[1.15rem] shadow-sm ring-1 ring-primary/10">
             {icon}
           </div>
           {status ? <div className="shrink-0">{status}</div> : null}

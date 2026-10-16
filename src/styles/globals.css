@@ -50,7 +50,22 @@
   }
 }
 
+@keyframes alios-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(0.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
 @layer utilities {
+  .animate-alios-scale-in {
+    animation: alios-scale-in 260ms cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+  }
+
   .animate-alios-fade-up {
     animation: alios-fade-up 220ms ease-out;
   }
@@ -73,6 +88,31 @@
 
   .animation-delay-300 {
     animation-delay: 300ms;
+  }
+
+  .animate-alios-fade-up-1 {
+    animation: alios-fade-up 260ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 60ms both;
+  }
+
+  .animate-alios-fade-up-2 {
+    animation: alios-fade-up 260ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 120ms both;
+  }
+
+  .animate-alios-fade-up-3 {
+    animation: alios-fade-up 260ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 180ms both;
+  }
+
+  .animate-alios-fade-up-4 {
+    animation: alios-fade-up 260ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 240ms both;
+  }
+
+  .scrollbar-none {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
   }
 }
 
@@ -180,20 +220,26 @@
   body {
     @apply min-w-0 bg-background text-foreground antialiased;
     font-family: Vazirmatn, system-ui, sans-serif;
+    font-feature-settings: "kern" 1, "liga" 1;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   .alios-shell-background {
     background-image:
-      radial-gradient(circle at top left, hsl(var(--primary) / 0.12), transparent 28%),
-      radial-gradient(circle at top right, hsl(var(--secondary) / 0.24), transparent 24%),
-      linear-gradient(to bottom, hsl(var(--background)), hsl(var(--muted) / 0.16));
+      radial-gradient(ellipse at 20% 0%, color-mix(in srgb, var(--alios-saffron-thread) 9%, transparent) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 0%, color-mix(in srgb, var(--alios-herb-glass) 6%, transparent) 0%, transparent 40%),
+      radial-gradient(ellipse at 50% 100%, color-mix(in srgb, var(--alios-morning-paper) 40%, transparent) 0%, transparent 60%),
+      linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--muted) / 0.08) 100%);
   }
 
   .dark .alios-shell-background {
     background-image:
-      radial-gradient(circle at top left, hsl(var(--primary) / 0.18), transparent 26%),
-      radial-gradient(circle at top right, hsl(var(--secondary) / 0.12), transparent 22%),
-      linear-gradient(to bottom, hsl(var(--background)), hsl(var(--background)));
+      radial-gradient(ellipse at 20% 0%, color-mix(in srgb, var(--alios-saffron-thread) 11%, transparent) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 0%, color-mix(in srgb, var(--alios-herb-glass) 8%, transparent) 0%, transparent 40%),
+      radial-gradient(ellipse at 50% 100%, color-mix(in srgb, var(--alios-night-garden) 60%, transparent) 0%, transparent 60%),
+      linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--background)) 100%);
   }
 }
 
@@ -204,6 +250,7 @@
 
   .alios-page {
     @apply mx-auto w-full max-w-[96rem] px-4 py-5 sm:px-6 sm:py-7 lg:px-8 lg:py-9 2xl:px-10;
+    animation: alios-fade-up 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
   }
 
   .alios-page-header {
@@ -223,11 +270,24 @@
   }
 
   .alios-surface-card {
-    @apply rounded-surface border border-border/80 bg-card/95 text-card-foreground shadow-sm backdrop-blur-sm;
+    @apply rounded-surface border border-border/60 bg-card/95 text-card-foreground backdrop-blur-sm;
+    box-shadow: var(--alios-shadow-card);
+    transition: box-shadow var(--alios-transition-base), border-color var(--alios-transition-base);
+  }
+
+  .alios-surface-card:hover {
+    box-shadow: var(--alios-shadow-raised);
+    border-color: hsl(var(--border) / 0.8);
   }
 
   .alios-surface-elevated {
-    @apply rounded-surface border border-alios-caspian/15 bg-gradient-to-br from-background via-background to-alios-saffron/5 text-card-foreground shadow-md backdrop-blur-sm;
+    @apply rounded-surface border border-alios-caspian/10 bg-gradient-to-br from-background via-background to-alios-saffron/[0.04] text-card-foreground backdrop-blur-sm;
+    box-shadow: var(--alios-shadow-raised);
+    transition: box-shadow var(--alios-transition-base);
+  }
+
+  .alios-surface-elevated:hover {
+    box-shadow: var(--alios-shadow-floating);
   }
 
   .alios-surface-soft {
@@ -260,7 +320,8 @@
   }
 
   .alios-icon-primary {
-    @apply border border-primary/30 bg-primary/10 text-primary shadow-sm;
+    @apply border border-primary/20 bg-gradient-to-br from-primary/[0.12] to-primary/[0.06] text-primary shadow-sm;
+    transition: box-shadow var(--alios-transition-fast), border-color var(--alios-transition-fast);
   }
 
   .alios-status-primary {
@@ -301,13 +362,15 @@
     border-inline-start-color: var(--alios-saffron-thread);
     box-shadow:
       0 1.35rem 3.75rem color-mix(in srgb, var(--alios-caspian-ink) 12%, transparent),
-      inset 0 0 0 1px color-mix(in srgb, var(--alios-saffron-thread) 10%, transparent);
+      0 0 0 1px color-mix(in srgb, var(--alios-saffron-thread) 12%, transparent),
+      inset 0 0 0 1px color-mix(in srgb, var(--alios-saffron-thread) 8%, transparent);
   }
 
   .dark .alios-primary-surface {
     box-shadow:
-      0 1.35rem 3.75rem color-mix(in srgb, black 34%, transparent),
-      inset 0 0 0 1px color-mix(in srgb, var(--alios-saffron-thread) 14%, transparent);
+      0 1.35rem 3.75rem color-mix(in srgb, black 36%, transparent),
+      0 0 0 1px color-mix(in srgb, var(--alios-saffron-thread) 18%, transparent),
+      inset 0 0 0 1px color-mix(in srgb, var(--alios-saffron-thread) 12%, transparent);
   }
 
   .alios-thread-accent {
@@ -438,13 +501,78 @@
   }
 
   .alios-home-context-shelf {
-    border-color: color-mix(in srgb, var(--alios-caspian-ink) 10%, hsl(var(--border)));
-    background: color-mix(in srgb, hsl(var(--card)) 96%, hsl(var(--background)));
+    border-color: color-mix(in srgb, var(--alios-caspian-ink) 8%, hsl(var(--border)));
+    background: color-mix(in srgb, hsl(var(--card)) 97%, hsl(var(--background)));
+    box-shadow: var(--alios-shadow-card);
+    transition: box-shadow var(--alios-transition-base), transform var(--alios-transition-base);
+  }
+
+  .alios-home-context-shelf:hover {
+    box-shadow: var(--alios-shadow-raised);
   }
 
   .dark .alios-home-context-shelf {
-    border-color: color-mix(in srgb, var(--alios-saffron-thread) 12%, hsl(var(--border)));
-    background: color-mix(in srgb, hsl(var(--card)) 94%, var(--alios-night-garden));
+    border-color: color-mix(in srgb, var(--alios-saffron-thread) 14%, hsl(var(--border)));
+    background: color-mix(in srgb, hsl(var(--card)) 92%, var(--alios-night-garden));
+    box-shadow: var(--alios-shadow-card);
+  }
+
+  .dark .alios-home-context-shelf:hover {
+    box-shadow: var(--alios-shadow-raised);
+  }
+
+  /* Glass morphism surface */
+  .alios-glass {
+    background: color-mix(in srgb, hsl(var(--background)) 72%, transparent);
+    backdrop-filter: var(--alios-blur-md);
+    -webkit-backdrop-filter: var(--alios-blur-md);
+    border: 1px solid color-mix(in srgb, hsl(var(--border)) 60%, transparent);
+    box-shadow: var(--alios-shadow-raised);
+  }
+
+  .dark .alios-glass {
+    background: color-mix(in srgb, hsl(var(--background)) 64%, transparent);
+    backdrop-filter: var(--alios-blur-md);
+    -webkit-backdrop-filter: var(--alios-blur-md);
+    border: 1px solid color-mix(in srgb, hsl(var(--border)) 40%, transparent);
+  }
+
+  /* Subtle press effect for interactive cards */
+  .alios-pressable {
+    transition: transform var(--alios-transition-fast), box-shadow var(--alios-transition-fast);
+    cursor: pointer;
+  }
+
+  .alios-pressable:active {
+    transform: scale(0.985);
+    box-shadow: var(--alios-shadow-card);
+  }
+
+  /* Glow accents */
+  .alios-glow-saffron {
+    box-shadow: var(--alios-shadow-glow-saffron);
+  }
+
+  .alios-glow-herb {
+    box-shadow: var(--alios-shadow-glow-herb);
+  }
+
+  /* Smooth page entry */
+  .alios-page-transition {
+    animation: alios-fade-up 280ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  /* Staggered entry for home page sections */
+  .alios-home-page > *:nth-child(1) { animation: alios-fade-up 280ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 0ms both; }
+  .alios-home-page > *:nth-child(2) { animation: alios-fade-up 280ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 60ms both; }
+  .alios-home-page > *:nth-child(3) { animation: alios-fade-up 280ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 110ms both; }
+  .alios-home-page > *:nth-child(4) { animation: alios-fade-up 280ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 155ms both; }
+  .alios-home-page > *:nth-child(5) { animation: alios-fade-up 280ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 195ms both; }
+  .alios-home-page > *:nth-child(6) { animation: alios-fade-up 280ms cubic-bezier(0.25, 0.46, 0.45, 0.94) 230ms both; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .alios-home-page > * { animation: none !important; }
+    .alios-page { animation: none !important; }
   }
 }
 
@@ -455,9 +583,26 @@
 
   .alios-page-transition,
   .animate-alios-fade-up,
+  .animate-alios-fade-up-1,
+  .animate-alios-fade-up-2,
+  .animate-alios-fade-up-3,
+  .animate-alios-fade-up-4,
+  .animate-alios-scale-in,
   .animate-pulse,
   .animate-spin,
   .alios-home-now-surface::before {
     animation: none !important;
+  }
+
+  .alios-surface-card,
+  .alios-surface-elevated,
+  .alios-home-context-shelf,
+  .alios-icon-primary,
+  .alios-pressable {
+    transition: none !important;
+  }
+
+  .alios-pressable:active {
+    transform: none;
   }
 }

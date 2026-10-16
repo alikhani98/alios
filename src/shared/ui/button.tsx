@@ -11,7 +11,7 @@ import {
 
 const buttonVariants = cva(
   cn(
-    "inline-flex items-center justify-center gap-2 whitespace-normal rounded-control text-center text-sm font-medium leading-5 ring-offset-background disabled:pointer-events-none disabled:opacity-50",
+    "inline-flex items-center justify-center gap-2 whitespace-normal rounded-control text-center text-sm font-semibold leading-5 ring-offset-background disabled:pointer-events-none disabled:opacity-50",
     aliosFocusRing,
     aliosInteractiveMotion,
     aliosInteractiveLift
@@ -20,20 +20,21 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 hover:shadow-md",
+          "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 active:bg-primary/95 hover:shadow-md",
         destructive:
           "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90 hover:shadow-md",
         outline:
-          "border border-input bg-background/95 shadow-sm hover:bg-accent hover:text-accent-foreground hover:shadow-md",
+          "border border-input/80 bg-background/90 shadow-sm backdrop-blur-sm hover:bg-accent hover:border-border hover:text-accent-foreground hover:shadow-md",
         secondary:
-          "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 hover:shadow-md",
-        ghost: "hover:bg-accent/80 hover:text-accent-foreground",
+          "bg-secondary/80 text-secondary-foreground shadow-sm backdrop-blur-sm hover:bg-secondary hover:shadow-md",
+        ghost:
+          "hover:bg-accent/70 hover:text-accent-foreground active:bg-accent/90",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
-        default: "min-h-11 px-4 py-2.5",
-        sm: "min-h-11 rounded-lg px-3 py-2 sm:min-h-10",
-        lg: "min-h-12 rounded-control px-8 py-3",
+        default: "min-h-11 px-5 py-2.5",
+        sm: "min-h-11 rounded-lg px-3.5 py-2 text-xs sm:min-h-10",
+        lg: "min-h-12 rounded-control px-8 py-3 text-base",
         icon: "h-11 w-11 shrink-0",
       },
     },
