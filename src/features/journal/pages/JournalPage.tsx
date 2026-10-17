@@ -13,7 +13,6 @@ import type { Goal, JournalEntry, Project, Task } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
 import {
   Button,
-  Card,
   CardContent,
   CardHeader,
   CardTitle,
@@ -26,6 +25,7 @@ import { JournalEntryCard } from "../components/JournalEntryCard";
 import { JournalEntryForm } from "../components/JournalEntryForm";
 import { useJournalEntries } from "../hooks/useJournalEntries";
 import type { JournalEntryFormValues } from "../types";
+import "../journal-presentation.css";
 
 export function JournalPage() {
   const { t } = useI18n();
@@ -224,10 +224,11 @@ export function JournalPage() {
   }, [entries, focusId, isLoading, t]);
 
   return (
-    <section className="alios-page space-y-6">
-      <PremiumCard className="alios-now-surface">
-        <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+    <section className="alios-page alios-journal space-y-5">
+      <PremiumCard className="journal-header">
+        <CardContent className="journal-header-content">
           <SectionHeader
+            variant="page"
             icon={<BookOpenText className="h-5 w-5" />}
             title={t("journal.title")}
             description={t("journal.description")}
@@ -240,13 +241,18 @@ export function JournalPage() {
       </PremiumCard>
 
       {formOpen ? (
-        <PremiumCard>
-          <CardHeader>
+        <PremiumCard className="journal-editor">
+          <CardHeader className="journal-editor-heading">
             <CardTitle>
               {editingEntry ? t("journal.edit") : t("journal.create")}
             </CardTitle>
+            {editingEntry ? (
+              <p className="break-words text-sm leading-6 text-muted-foreground">
+                {editingEntry.title}
+              </p>
+            ) : null}
           </CardHeader>
-          <CardContent>
+          <CardContent className="journal-editor-content">
             <JournalEntryForm
               key={editingEntry?.id ?? "new-entry"}
               entry={editingEntry}
@@ -306,7 +312,7 @@ export function JournalPage() {
           {[0, 1, 2].map((item) => (
             <div
               key={item}
-              className="h-56 animate-pulse rounded-2xl border bg-muted/60"
+              className="h-56 animate-pulse rounded-2xl border bg-muted/60 motion-reduce:animate-none"
             />
           ))}
         </div>
@@ -324,7 +330,7 @@ export function JournalPage() {
           }
         />
       ) : (
-        <div className="space-y-4">
+        <div className="journal-history space-y-4">
           {displayedEntries.map((entry) => (
             <div
               key={entry.id}

@@ -40,43 +40,44 @@ export function JournalEntryCard({
   const [confirmingDelete, setConfirmingDelete] = useState(false);
 
   return (
-    <Card>
-      <CardHeader className="gap-3">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <CardTitle className="leading-7">{entry.title}</CardTitle>
-          <div className="flex flex-wrap gap-2">
+    <Card className="journal-entry" role="article" aria-labelledby={`journal-${entry.id}-title`}>
+      <CardHeader className="journal-entry-heading gap-3">
+        <div className="journal-entry-identity">
+          <CardTitle id={`journal-${entry.id}-title`} className="min-w-0 break-words leading-8">{entry.title}</CardTitle>
+          <div className="journal-entry-date flex min-w-0 flex-wrap items-center gap-3">
+            <span className="inline-flex min-w-0 items-center gap-2 text-sm text-muted-foreground">
+              <CalendarDays className="h-4 w-4 shrink-0" aria-hidden="true" />
+              <time dateTime={entry.date}>{formatDate(entry.date)}</time>
+            </span>
             <Badge variant="secondary">
               {t(JOURNAL_TYPE_LABEL_KEYS[entry.type])}
-            </Badge>
-            <Badge variant="outline">
-              <CalendarDays className="me-1 h-3.5 w-3.5" />
-              {formatDate(entry.date)}
             </Badge>
           </div>
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4">
-        <p className="whitespace-pre-wrap text-sm leading-7 text-foreground/90">
+      <CardContent className="journal-entry-content space-y-4">
+        <p className="journal-prose whitespace-pre-wrap text-foreground">
           {entry.content}
         </p>
         {entry.moodLevel || entry.energyLevel ? (
-          <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+          <div className="journal-entry-levels flex flex-wrap gap-4 text-sm text-muted-foreground">
             {entry.moodLevel ? (
               <span className="flex items-center gap-2">
-                <Heart className="h-4 w-4" />
+                <Heart className="h-4 w-4 shrink-0" aria-hidden="true" />
                 {t("journal.mood")}: {t(LEVEL_LABEL_KEYS[entry.moodLevel])}
               </span>
             ) : null}
             {entry.energyLevel ? (
               <span className="flex items-center gap-2">
-                <BatteryMedium className="h-4 w-4" />
+                <BatteryMedium className="h-4 w-4 shrink-0" aria-hidden="true" />
                 {t("journal.energy")}: {t(LEVEL_LABEL_KEYS[entry.energyLevel])}
               </span>
             ) : null}
           </div>
         ) : null}
         <LinkedEntitySummary
+          className="journal-entry-links"
           projectId={entry.projectId}
           goalId={entry.goalId}
           taskId={entry.taskId}
@@ -86,7 +87,7 @@ export function JournalEntryCard({
         />
       </CardContent>
 
-      <CardFooter className="flex-wrap gap-2 border-t pt-4">
+      <CardFooter className="journal-entry-actions flex-wrap gap-2 border-t">
         {confirmingDelete ? (
           <>
             <Button

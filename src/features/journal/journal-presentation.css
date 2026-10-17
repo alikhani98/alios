@@ -1,0 +1,235 @@
+/* Keep writing and reading measures local to Journal, including beside the shell. */
+.alios-journal {
+  container: journal / inline-size;
+  min-inline-size: 0;
+  max-inline-size: 72rem;
+  margin-inline: auto;
+  letter-spacing: 0;
+}
+
+.alios-journal :is(h2, h3, p, time, span, label, button, a) {
+  overflow-wrap: anywhere;
+  letter-spacing: 0;
+}
+
+.alios-journal .journal-header {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+}
+
+.alios-journal .journal-header-content {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0;
+}
+
+.alios-journal .journal-header-content > .alios-page-heading {
+  flex: 1 1 20rem;
+  min-inline-size: 0;
+}
+
+.alios-journal :is(.journal-editor, .journal-entry) {
+  min-inline-size: 0;
+  border-radius: var(--alios-radius-surface);
+  box-shadow: none;
+}
+
+.alios-journal .journal-editor-heading {
+  padding: 1rem;
+  border-block-end: 1px solid hsl(var(--border) / 0.7);
+}
+
+.alios-journal .journal-editor-content {
+  padding: 1rem;
+}
+
+.alios-journal .journal-form {
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
+
+.alios-journal .journal-form :is(div, input, select, textarea) {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+
+.alios-journal .journal-form > div > div {
+  align-content: start;
+}
+
+.alios-journal :is(.journal-form-date, .journal-form-links, .journal-form-levels) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.alios-journal :is(.journal-form-links, .journal-form-levels) {
+  padding-block-start: 1rem;
+  border-block-start: 1px solid hsl(var(--border) / 0.7);
+}
+
+.alios-journal :is(.journal-form-links, .journal-form-levels) label {
+  color: hsl(var(--muted-foreground));
+  font-size: 0.8125rem;
+}
+
+.alios-journal .journal-form-title input {
+  min-block-size: 3rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.alios-journal .journal-writing-input {
+  min-block-size: 18rem;
+  padding: 1rem;
+  font-size: 1rem;
+  line-height: 1.9;
+  overflow-wrap: anywhere;
+  resize: vertical;
+}
+
+.alios-journal .journal-form-actions {
+  padding-block-start: 1rem;
+  border-block-start: 1px solid hsl(var(--border));
+}
+
+.alios-journal .journal-entry-heading {
+  padding: 1rem 1rem 0.75rem;
+}
+
+.alios-journal .journal-entry-identity {
+  display: grid;
+  gap: 0.625rem;
+}
+
+.alios-journal .journal-entry-content {
+  padding: 0 1rem 1rem;
+}
+
+.alios-journal .journal-prose {
+  max-inline-size: 75ch;
+  font-size: 1rem;
+  line-height: 1.9;
+  overflow-wrap: anywhere;
+}
+
+.alios-journal .journal-entry-levels {
+  padding-block-start: 0.75rem;
+  border-block-start: 1px solid hsl(var(--border) / 0.6);
+}
+
+.alios-journal .journal-entry-links {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+}
+
+.alios-journal .journal-entry-links > div {
+  min-inline-size: 0;
+  padding: 0.75rem 0;
+  border: 0;
+  border-block-start: 1px solid hsl(var(--border) / 0.6);
+  border-radius: 0;
+  background: transparent;
+}
+
+.alios-journal .journal-entry-links > div > div {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.alios-journal .journal-entry-links a {
+  inline-size: 100%;
+}
+
+.alios-journal .journal-entry-actions {
+  padding: 0.75rem 1rem;
+  border-color: hsl(var(--border) / 0.7);
+}
+
+.alios-journal :is(.journal-entry-actions, .journal-entry-links, .journal-form-actions) :is(button, a) {
+  min-block-size: 2.75rem;
+  max-inline-size: 100%;
+  white-space: normal;
+}
+
+@container journal (min-width: 28rem) {
+  .alios-journal :is(.journal-form-date, .journal-form-levels) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container journal (min-width: 40rem) {
+  .alios-journal :is(.journal-editor-heading, .journal-editor-content) {
+    padding: 1.5rem;
+  }
+
+  .alios-journal .journal-entry-heading {
+    padding: 1.5rem 1.5rem 0.75rem;
+  }
+
+  .alios-journal .journal-entry-content {
+    padding: 0 1.5rem 1.25rem;
+  }
+
+  .alios-journal .journal-entry-actions {
+    padding-inline: 1.5rem;
+  }
+
+  .alios-journal .journal-entry-identity {
+    grid-template-columns: minmax(0, 1fr) minmax(0, auto);
+    align-items: baseline;
+    gap: 1.5rem;
+  }
+
+  .alios-journal .journal-entry-links > div > div {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .alios-journal .journal-entry-links a {
+    inline-size: auto;
+  }
+}
+
+@container journal (min-width: 56rem) {
+  .alios-journal .journal-form {
+    grid-template-columns: minmax(0, 2fr) minmax(15rem, 1fr);
+    column-gap: 2rem;
+  }
+
+  .alios-journal .journal-form-date {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .alios-journal .journal-form-title {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .alios-journal .journal-form-writing {
+    grid-column: 1;
+    grid-row: 3;
+  }
+
+  .alios-journal .journal-form-links {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    padding-block-start: 0;
+    border-block-start: 0;
+  }
+
+  .alios-journal .journal-form-levels {
+    grid-column: 2;
+    grid-row: 3;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .alios-journal .journal-form-actions {
+    grid-column: 1 / -1;
+    grid-row: 4;
+  }
+}

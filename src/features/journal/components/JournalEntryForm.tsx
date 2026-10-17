@@ -61,10 +61,10 @@ export function JournalEntryForm({
 
   return (
     <form
-      className="grid gap-5"
+      className="journal-form grid gap-5"
       onSubmit={handleSubmit((values) => void onSubmit(values))}
     >
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="journal-form-date grid gap-4">
         <div className="grid gap-2">
           <label htmlFor="journal-date" className="text-sm font-medium">
             {t("common.date")}
@@ -98,7 +98,7 @@ export function JournalEntryForm({
         </div>
       </div>
 
-      <div className="grid gap-2">
+      <div className="journal-form-title grid gap-2">
         <label htmlFor="journal-title" className="text-sm font-medium">
           {t("common.title")}
         </label>
@@ -114,13 +114,13 @@ export function JournalEntryForm({
         ) : null}
       </div>
 
-      <div className="grid gap-2">
+      <div className="journal-form-writing grid gap-2">
         <label htmlFor="journal-content" className="text-sm font-medium">
           {t("journal.entry")}
         </label>
         <Textarea
           id="journal-content"
-          className="min-h-48"
+          className="journal-writing-input"
           placeholder={t("journal.contentPlaceholder")}
           aria-invalid={Boolean(errors.content)}
           {...register("content")}
@@ -130,7 +130,7 @@ export function JournalEntryForm({
         ) : null}
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="journal-form-links grid gap-4">
         <div className="grid gap-2">
           <label htmlFor="journal-project" className="text-sm font-medium">
             {t("links.projectLabel")}
@@ -189,7 +189,7 @@ export function JournalEntryForm({
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="journal-form-levels grid gap-4">
         <div className="grid gap-2">
           <label htmlFor="journal-mood" className="text-sm font-medium">
             {t("journal.mood")}
@@ -225,7 +225,7 @@ export function JournalEntryForm({
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-3">
+      <div className="journal-form-actions flex flex-wrap gap-3">
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting
             ? t("common.saving")
