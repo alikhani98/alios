@@ -16,7 +16,6 @@ import {
   CardContent,
   PremiumCard,
   SectionHeader,
-  SoftPanel,
 } from "@/shared/ui";
 
 import type { HomeDashboardData } from "../types";
@@ -56,18 +55,9 @@ export function ClearStartCard({
       : undefined;
 
   return (
-    <PremiumCard className="alios-home-now-surface alios-primary-surface relative overflow-hidden">
-      <CardContent className="relative p-0">
-        <div
-          className="pointer-events-none absolute inset-0 z-0 opacity-[0.07]"
-          aria-hidden="true"
-          style={{
-            background:
-              "radial-gradient(ellipse at 85% 15%, var(--alios-saffron) 0%, transparent 60%), radial-gradient(ellipse at 15% 85%, var(--alios-herb) 0%, transparent 50%)",
-          }}
-        />
-        <div className="relative z-10 grid gap-5 p-5 sm:p-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(18rem,0.9fr)]">
-        <div className="space-y-4">
+    <PremiumCard className="alios-home-focus">
+      <CardContent className="alios-home-focus-content">
+        <div className="alios-home-focus-heading">
           <SectionHeader
             icon={<Sparkles className="h-5 w-5" aria-hidden="true" />}
             title={t("home.clearStartTitle")}
@@ -75,16 +65,16 @@ export function ClearStartCard({
           />
         </div>
 
-        <SoftPanel className="alios-home-thread-panel flex h-full flex-col justify-between gap-5 border-alios-herb/30 bg-background/90">
-          <div className="alios-home-thread-item flex items-start gap-3">
-            <span className="alios-icon-primary alios-home-thread-node flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl">
+        <div className="alios-home-focus-body">
+          <div className="flex min-w-0 items-start gap-3">
+            <span className="alios-home-focus-icon flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
               {currentFocus ? (
                 <Target className="h-5 w-5" aria-hidden="true" />
               ) : (
                 <CheckSquare2 className="h-5 w-5" aria-hidden="true" />
               )}
             </span>
-            <div className="min-w-0 space-y-1">
+            <div className="min-w-0 flex-1 space-y-1.5">
               <p className="text-sm font-medium text-muted-foreground">
                 {currentFocus
                   ? t("home.clearStartFocusLabel")
@@ -93,34 +83,30 @@ export function ClearStartCard({
               <p
                 className={
                   currentFocus
-                    ? "break-words text-lg font-semibold leading-snug"
-                    : "break-words text-base font-medium leading-7"
+                    ? "alios-home-focus-title"
+                    : "break-words text-lg font-medium leading-8"
                 }
               >
                 {currentFocus?.title ?? t("home.clearStartNoTaskBody")}
               </p>
               {currentFocus ? (
-                <div className="mt-2 flex flex-wrap gap-2 text-xs font-medium text-muted-foreground">
+                <div className="alios-home-focus-meta">
                   <span
                     className={
                       currentFocus.isMit
-                        ? "inline-flex min-h-8 items-center gap-1.5 rounded-full border border-border/70 bg-alios-saffron/10 px-3 text-sm text-alios-saffron"
-                        : "inline-flex min-h-8 items-center gap-1.5 rounded-full border border-border/70 bg-background/80 px-3 text-sm"
+                        ? "alios-home-focus-reason bg-primary/10 text-foreground"
+                        : "alios-home-focus-reason bg-muted text-foreground"
                     }
                   >
                     <Target
-                      className={
-                        currentFocus.isMit
-                          ? "h-3.5 w-3.5 text-alios-saffron"
-                          : "h-3.5 w-3.5 text-primary"
-                      }
+                      className="h-3.5 w-3.5 text-primary"
                       aria-hidden="true"
                     />
                     {t(getFocusReasonKey(currentFocus))}
                   </span>
                   {typeof currentFocus.estimatedMinutes === "number" &&
                   currentFocus.estimatedMinutes > 0 ? (
-                    <span className="inline-flex min-h-8 items-center gap-1.5 rounded-full border border-border/70 bg-background/80 px-3">
+                    <span className="inline-flex min-h-7 items-center gap-1.5">
                       <Clock3 className="h-3.5 w-3.5" aria-hidden="true" />
                       {t("home.clearStartMinutes", {
                         n: currentFocus.estimatedMinutes,
@@ -128,7 +114,7 @@ export function ClearStartCard({
                     </span>
                   ) : null}
                   {currentFocusProject ? (
-                    <span className="inline-flex min-h-8 min-w-0 items-center gap-1.5 rounded-full border border-border/70 bg-background/80 px-3">
+                    <span className="inline-flex min-h-7 min-w-0 max-w-full items-center gap-1.5">
                       <FolderKanban className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                       <span className="min-w-0 truncate">
                         {currentFocusProject.title}
@@ -141,29 +127,28 @@ export function ClearStartCard({
           </div>
 
           {currentFocus ? (
-            <div className="grid gap-2 sm:grid-cols-2">
-              <Button asChild className="alios-home-thread-item w-full sm:w-auto">
+            <div className="alios-home-focus-actions">
+              <Button asChild className="min-h-12 w-full rounded-lg sm:w-auto sm:min-w-44">
                 <Link to={createFocusTaskPath(currentFocus)}>
                   <Target className="me-2 h-4 w-4" aria-hidden="true" />
                   {t("home.clearStartFocusSession")}
                   <ArrowUpLeft className="ms-2 h-4 w-4" aria-hidden="true" />
                 </Link>
               </Button>
-              <Button asChild variant="outline" className="alios-home-thread-item w-full">
+              <Button asChild variant="ghost" className="min-h-11 w-full rounded-lg text-muted-foreground sm:w-auto">
                 <Link to="/today">
                   {t("home.clearStartOtherOptions")}
                 </Link>
               </Button>
             </div>
           ) : (
-            <Button asChild className="alios-home-thread-item w-full sm:w-fit">
+            <Button asChild className="min-h-12 w-full rounded-lg sm:w-fit">
               <Link to="/today">
                 <Plus className="me-2 h-4 w-4" aria-hidden="true" />
                 {t("home.clearStartDefineTodayTask")}
               </Link>
             </Button>
           )}
-        </SoftPanel>
         </div>
       </CardContent>
     </PremiumCard>

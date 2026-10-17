@@ -70,7 +70,7 @@ export function NavigationGroupList({
             <section key={group.id} className="grid gap-1.5" aria-label={title}>
               <p
                 className={cn(
-                  "flex min-h-10 items-center rounded-2xl px-3 text-xs font-semibold text-muted-foreground",
+                  "flex min-h-7 items-center px-3 text-xs font-semibold text-muted-foreground",
                   collapsed && "sr-only"
                 )}
                 title={collapsed ? title : undefined}
@@ -98,7 +98,7 @@ export function NavigationGroupList({
               variant="ghost"
               size="sm"
               className={cn(
-                "min-h-10 justify-between rounded-2xl border border-transparent px-3 text-xs font-semibold text-muted-foreground hover:border-border/70 hover:bg-accent/70 hover:text-accent-foreground",
+                "min-h-11 justify-between rounded-lg px-3 text-xs font-semibold text-muted-foreground hover:bg-accent/70 hover:text-accent-foreground",
                 collapsed && "justify-center px-2"
               )}
               aria-expanded={isOpen}

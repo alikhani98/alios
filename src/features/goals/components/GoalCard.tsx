@@ -119,10 +119,11 @@ export function GoalCard({
     : t("common.notRecorded");
 
   return (
-    <Card className={isReviewDue ? "min-w-0 overflow-hidden border-warning/20 bg-warning/5" : "min-w-0 overflow-hidden"}>
-      <CardHeader className="space-y-4">
-        <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
-          <div className="min-w-0 flex-1 space-y-2">
+    <Card className={cn("goal-card min-w-0 overflow-hidden", isReviewDue && "border-warning/20 bg-warning/5")}>
+      <CardHeader className="goal-card-header space-y-3">
+        <div className="goal-overview">
+          <div className="goal-identity min-w-0 space-y-2">
+            <CardTitle className="break-words text-lg leading-7">{goal.title}</CardTitle>
             <div className="flex flex-wrap items-center gap-2">
               <StatusChip tone={isReviewDue ? "warning" : goal.status === "completed" ? "success" : "neutral"}>
                 {t(GOAL_STATUS_LABEL_KEYS[goal.status])}
@@ -131,17 +132,24 @@ export function GoalCard({
                 <StatusChip tone="warning">{t("goals.reviewDue")}</StatusChip>
               ) : null}
             </div>
-            <CardTitle className="break-words text-xl leading-8">{goal.title}</CardTitle>
           </div>
-          <div className="shrink-0 text-end">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-              {t("goals.progressLabel")}
-            </p>
-            <p className="mt-1 text-2xl font-semibold tabular-nums">{progressLabel}</p>
+          <div
+            className="goal-progress"
+            role="progressbar"
+            aria-label={`${t("goals.progressLabel")}: ${goal.title}`}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={displayedProgressPercent}
+          >
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-xs font-medium text-muted-foreground">{t("goals.progressLabel")}</p>
+              <p className="text-xl font-semibold tabular-nums">{progressLabel}</p>
+            </div>
+            <MiniProgressBar value={displayedProgressPercent} />
           </div>
         </div>
 
-        <div className="flex min-w-0 flex-wrap gap-2 border-t border-border/70 pt-3">
+        <div className="goal-metadata flex min-w-0 flex-wrap gap-2">
           <Badge
             variant="secondary"
             className="max-w-full break-words whitespace-normal text-start"
@@ -163,20 +171,10 @@ export function GoalCard({
         </div>
       </CardHeader>
 
-      <CardContent className="min-w-0 space-y-4">
-        <SoftPanel className="space-y-3">
-          <div className="flex items-center justify-between gap-3">
-            <p className="text-sm font-semibold">{t("goals.progressLabel")}</p>
-            <StatusChip tone={displayedProgressPercent >= 100 ? "success" : "primary"}>
-              {progressLabel}
-            </StatusChip>
-          </div>
-          <MiniProgressBar
-            value={displayedProgressPercent}
-            label={t("goals.progressLabel")}
-          />
+      <CardContent className="goal-card-content min-w-0 space-y-3">
+        <div className="goal-progress-options space-y-3">
           {keyResults.length > 0 ? (
-            <div className="space-y-3 rounded-2xl border border-alios-saffron/25 bg-background/80 p-3">
+            <div className="goal-key-results space-y-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="text-sm font-semibold">{t("goals.keyResults")}</p>
                 <StatusChip tone="primary">
@@ -185,7 +183,15 @@ export function GoalCard({
               </div>
               <div className="space-y-2">
                 {keyResults.map((keyResult) => (
-                  <div key={keyResult.id} className="space-y-1">
+                  <div
+                    key={keyResult.id}
+                    className="goal-key-result space-y-1"
+                    role="progressbar"
+                    aria-label={keyResult.title}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-valuenow={keyResult.progressPercent}
+                  >
                     <div className="flex items-center justify-between gap-3 text-sm">
                       <span className="min-w-0 break-words">{keyResult.title}</span>
                       <span className="shrink-0 tabular-nums text-muted-foreground">
@@ -194,14 +200,13 @@ export function GoalCard({
                     </div>
                     <MiniProgressBar
                       value={keyResult.progressPercent}
-                      label={keyResult.title}
                     />
                   </div>
                 ))}
               </div>
             </div>
           ) : null}
-          <label className="flex min-h-11 cursor-pointer items-start gap-3 rounded-xl border border-border/70 bg-background/70 p-3 text-sm">
+          <label className="goal-auto-progress flex min-h-11 cursor-pointer items-start gap-3 text-sm">
             <input
               type="checkbox"
               className="mt-1 h-4 w-4 shrink-0 accent-alios-caspian"
@@ -218,19 +223,18 @@ export function GoalCard({
               </span>
             </span>
           </label>
-        </SoftPanel>
+        </div>
 
         <CollapsibleSection
           id={`goal-${goal.id}-details`}
           title={t("goals.goalDetails")}
           description={t("goals.goalDetailsDescription")}
           icon={<Target className="h-5 w-5" />}
-          status={<StatusChip tone="primary">{progressLabel}</StatusChip>}
           expandLabel={t("common.expandSection")}
           collapseLabel={t("common.collapseSection")}
           defaultOpen={false}
-          className="rounded-2xl border border-border/70 bg-muted/20 shadow-none"
-          contentClassName="space-y-4"
+          className="goal-details"
+          contentClassName="goal-details-content space-y-4"
         >
           <SoftPanel className="space-y-2">
             <p className="text-sm font-semibold">{t("goals.descriptionLabel")}</p>
@@ -299,7 +303,7 @@ export function GoalCard({
 
               <div className="space-y-3 border-t border-border/70 pt-4">
                 <p className="text-sm font-semibold">{t("goals.progressSignals")}</p>
-                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                <div className="goal-signals grid gap-3">
                   <LearningSignal
                     label={t("goals.goalProgressSignal")}
                     value={`${learningContext.progressSignals.goalProgress}%`}
@@ -341,7 +345,7 @@ export function GoalCard({
             </SoftPanel>
           ) : null}
 
-          <div className="grid gap-3 lg:grid-cols-2">
+          <div className="goal-work-links grid gap-3">
             <SoftPanel className="min-w-0">
               <div className="flex min-w-0 items-start justify-between gap-3">
                 <div className="min-w-0 space-y-1">
@@ -385,7 +389,7 @@ export function GoalCard({
             </SoftPanel>
           </div>
 
-          <div className="grid gap-2 border-t border-border/70 pt-4 text-sm text-muted-foreground sm:grid-cols-2">
+          <div className="goal-dates grid gap-2 border-t border-border/70 pt-4 text-sm text-muted-foreground">
             <p className="min-w-0 break-words">
               {t("goals.targetDateLabel")}:{" "}
               {goal.targetDate ? formatDate(goal.targetDate) : t("common.notRecorded")}
@@ -538,7 +542,7 @@ export function GoalCard({
           ) : null}
         </CollapsibleSection>
 
-        <div className="flex flex-col gap-2 border-t border-border/70 pt-4 sm:flex-row sm:flex-wrap">
+        <div className="goal-actions flex flex-wrap gap-2 border-t border-border/70 pt-3">
           <Button
             type="button"
             size="sm"
@@ -560,7 +564,7 @@ export function GoalCard({
             <Trash2 className="me-2 h-4 w-4" />
             {t("common.delete")}
           </Button>
-          <div className="relative">
+          <div className="goal-overflow relative">
             <Button
               type="button"
               size="sm"
@@ -573,7 +577,7 @@ export function GoalCard({
               <MoreHorizontal className="h-4 w-4" />
             </Button>
             <div
-              className="mt-2 grid min-w-56 gap-1 rounded-xl border border-border/70 bg-popover p-2 text-popover-foreground shadow-aliosFloating"
+              className="goal-overflow-panel mt-2 grid gap-1 rounded-xl border border-border/70 bg-popover p-2 text-popover-foreground"
               hidden={!showOverflowActions}
               aria-hidden={!showOverflowActions}
             >
@@ -659,7 +663,7 @@ function LearningContextRelationList({
   const { t } = useI18n();
 
   return (
-    <div className="space-y-2">
+    <div className="goal-relation-list space-y-2">
       <p className="text-sm font-semibold">{label}</p>
       {items.length > 0 ? (
         <ul className="space-y-2">
@@ -702,7 +706,7 @@ function LearningSignal({
   detail?: string;
 }) {
   return (
-    <div className="rounded-xl border border-border/70 bg-muted/20 p-3">
+    <div className="goal-signal">
       <p className="text-xs text-muted-foreground">{label}</p>
       <p className="mt-1 text-base font-semibold tabular-nums">{value}</p>
       {detail ? <p className="mt-1 text-xs text-muted-foreground">{detail}</p> : null}

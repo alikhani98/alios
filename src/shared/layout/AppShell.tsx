@@ -143,7 +143,7 @@ export function AppShell() {
   }, [setRecoveryModeEnabled]);
 
   return (
-    <div className="relative min-h-screen text-foreground alios-shell-background">
+    <div className="alios-workspace relative min-h-screen text-foreground alios-shell-background">
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:fixed focus:start-3 focus:top-3 focus:z-[90] focus:rounded-2xl focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-primary-foreground focus:shadow-aliosFloating"

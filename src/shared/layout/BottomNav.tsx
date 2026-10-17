@@ -50,10 +50,10 @@ export function BottomNav({
 
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-border/70 bg-background/92 px-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] pt-2 shadow-[0_-18px_45px_-28px_rgba(15,23,42,0.55)] backdrop-blur-xl supports-[backdrop-filter]:bg-background/82 md:hidden"
+      className="alios-workspace-bottom-nav fixed inset-x-0 bottom-0 z-40 border-t border-border/70 px-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] pt-2 md:hidden"
       aria-label={t("nav.mobile")}
     >
-      <div className="mx-auto grid max-w-md grid-cols-5 gap-1 rounded-[1.4rem] border border-border/70 bg-card/85 p-1 shadow-sm">
+      <div className="mx-auto grid max-w-md grid-cols-5 gap-1">
         {primaryTabs.map((item) => {
           const Icon = navigationIcons[item.icon];
           const label = t(item.titleKey);
@@ -65,11 +65,11 @@ export function BottomNav({
               end={item.href === "/"}
               className={({ isActive }) =>
                 cn(
-                  "relative flex min-h-11 min-w-0 flex-col items-center justify-center gap-1 rounded-2xl px-1 py-1.5 text-[0.7rem] font-medium leading-none",
+                  "relative flex min-h-14 min-w-0 flex-col items-center justify-center gap-1 rounded-lg px-1 py-2 text-xs font-medium leading-4 active:bg-accent",
                   aliosFocusRing,
                   aliosInteractiveMotion,
                   isActive
-                    ? "text-primary"
+                    ? "bg-primary/10 font-semibold text-foreground"
                     : "text-muted-foreground hover:bg-accent/70 hover:text-foreground"
                 )
               }
@@ -78,13 +78,13 @@ export function BottomNav({
                 <>
                   <span
                     className={cn(
-                      "absolute top-1 h-1 w-6 rounded-full transition-colors duration-150",
+                      "absolute top-0 h-0.5 w-5 rounded-full transition-colors duration-150 motion-reduce:transition-none",
                       isActive ? "bg-primary" : "bg-transparent"
                     )}
                     aria-hidden="true"
                   />
-                  <Icon className="mt-1 h-5 w-5 shrink-0" aria-hidden="true" />
-                  <span className="max-w-full truncate">{label}</span>
+                  <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />
+                  <span className="max-w-full break-words text-center">{label}</span>
                 </>
               )}
             </NavLink>
@@ -94,11 +94,11 @@ export function BottomNav({
         <button
           type="button"
           className={cn(
-            "relative flex min-h-11 min-w-0 flex-col items-center justify-center gap-1 rounded-2xl px-1 py-1.5 text-[0.7rem] font-medium leading-none",
+            "relative flex min-h-14 min-w-0 flex-col items-center justify-center gap-1 rounded-lg px-1 py-2 text-xs font-medium leading-4 active:bg-accent",
             aliosFocusRing,
             aliosInteractiveMotion,
             menuOpen
-              ? "text-primary"
+              ? "bg-primary/10 font-semibold text-foreground"
               : "text-muted-foreground hover:bg-accent/70 hover:text-foreground"
           )}
           aria-label={menuAriaLabel}
@@ -107,7 +107,7 @@ export function BottomNav({
         >
           <span
             className={cn(
-              "absolute top-1 h-1 w-6 rounded-full transition-colors duration-150",
+              "absolute top-0 h-0.5 w-5 rounded-full transition-colors duration-150 motion-reduce:transition-none",
               menuOpen ? "bg-primary" : "bg-transparent"
             )}
             aria-hidden="true"
@@ -118,8 +118,8 @@ export function BottomNav({
               aria-hidden="true"
             />
           ) : null}
-          <Menu className="mt-1 h-5 w-5 shrink-0" aria-hidden="true" />
-          <span className="max-w-full truncate">{t("nav.menu")}</span>
+          <Menu className="h-5 w-5 shrink-0" aria-hidden="true" />
+          <span className="max-w-full break-words text-center">{t("nav.menu")}</span>
         </button>
       </div>
     </nav>

@@ -48,10 +48,10 @@ describe("BottomNav", () => {
     expect(container.querySelector("button")?.textContent).toContain("Menu");
     expect(
       container.querySelector('a[href="/today"]')?.className
-    ).toContain("min-h-11");
+    ).toContain("min-h-14");
     expect(
-      container.querySelector('a[href="/today"]')?.className
-    ).toContain("text-primary");
+      container.querySelector('a[href="/today"]')?.getAttribute("aria-current")
+    ).toBe("page");
   });
 
   it("opens the existing mobile navigation drawer from the Menu tab", () => {
@@ -70,7 +70,6 @@ describe("BottomNav", () => {
     const menuButton = container.querySelector("button");
 
     expect(menuButton?.getAttribute("aria-expanded")).toBe("true");
-    expect(menuButton?.className).toContain("text-primary");
 
     act(() => {
       menuButton?.click();

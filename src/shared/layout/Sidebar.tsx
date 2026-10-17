@@ -17,21 +17,21 @@ export function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) {
   return (
     <aside
       className={cn(
-        "sticky top-0 hidden h-dvh shrink-0 p-2 transition-all duration-300 ease-in-out motion-reduce:transition-none md:flex md:flex-col",
+        "alios-workspace-sidebar sticky top-0 hidden h-dvh shrink-0 p-2 transition-all duration-300 ease-in-out motion-reduce:transition-none md:flex md:flex-col",
         aliosSurfaceMotion,
         direction === "rtl" ? "md:border-l" : "md:border-r",
         collapsed ? "md:w-[5.25rem]" : "md:w-[var(--alios-sidebar-width)]"
       )}
     >
-      <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-[2rem] border bg-card/85 shadow-[0_18px_50px_-24px_rgba(15,23,42,0.35)] backdrop-blur-xl">
-        <div className="flex h-16 items-center justify-between border-b border-border/70 px-4">
+      <div className="alios-workspace-sidebar-surface flex h-full min-h-0 flex-col overflow-hidden">
+        <div className={cn("alios-workspace-brand flex min-h-16 items-center justify-between gap-2 px-3", collapsed && "flex-col px-0 py-3")}>
           {!collapsed ? (
             <div className="flex min-w-0 flex-col">
-              <span className="text-lg font-semibold tracking-tight">AliOS</span>
+              <span className="text-xl font-semibold">AliOS<span className="ms-1 text-primary" aria-hidden="true">.</span></span>
               <span className="truncate text-xs text-muted-foreground">{t("app.tagline")}</span>
             </div>
           ) : (
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-alios-caspian to-alios-caspian/85 text-sm font-bold text-white shadow-lg shadow-alios-caspian/20 dark:from-alios-paper dark:to-alios-paper/85 dark:text-alios-night">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-sm font-bold text-primary-foreground">
               A
             </div>
           )}
@@ -40,7 +40,7 @@ export function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) {
             type="button"
             variant="ghost"
             size="icon"
-            className="shrink-0 border border-transparent bg-background/70 shadow-sm hover:bg-background"
+            className="shrink-0 rounded-lg text-muted-foreground"
             onClick={onToggleCollapsed}
             aria-label={collapsed ? t("shell.openSidebar") : t("shell.closeSidebar")}
           >
@@ -53,7 +53,7 @@ export function Sidebar({ collapsed, onToggleCollapsed }: SidebarProps) {
         </div>
 
         <nav
-          className="flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto p-3"
+          className="alios-workspace-navigation flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-2 py-4"
           aria-label={t("nav.main")}
         >
           <NavigationGroupList collapsed={collapsed} />

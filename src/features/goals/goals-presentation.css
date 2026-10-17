@@ -1,0 +1,316 @@
+/* Goals composes existing surfaces without changing their shared contracts. */
+.alios-goals {
+  container: goals / inline-size;
+  min-inline-size: 0;
+  letter-spacing: 0;
+}
+
+.alios-goals :is(h2, h3, p, span, dt, dd, a, label, button) {
+  overflow-wrap: anywhere;
+  letter-spacing: 0;
+}
+
+.alios-goals :is(.goals-header, .goals-filters) {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.alios-goals .goals-header {
+  display: grid;
+  gap: 1rem;
+  overflow: visible;
+}
+
+.alios-goals .goals-header .alios-page-heading {
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.alios-goals .goals-header .alios-page-heading > div:first-child {
+  flex: 1 1 20rem;
+  min-inline-size: 0;
+}
+
+.alios-goals .goals-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  padding-block: 0.75rem;
+  border-block: 1px solid hsl(var(--border));
+}
+
+.alios-goals .goals-summary > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.alios-goals .goals-summary dt {
+  font-size: 0.75rem;
+  color: hsl(var(--muted-foreground));
+}
+
+.alios-goals .goals-summary dd {
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.alios-goals .goals-header-context {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.alios-goals .goals-primary-context {
+  min-inline-size: 0;
+  max-inline-size: 75ch;
+}
+
+.alios-goals .goals-guidance > .mt-4 {
+  margin-block-start: 0.5rem;
+}
+
+.alios-goals .goals-create-disclosure > .alios-collapsible-trigger {
+  padding: 0.75rem;
+}
+
+.alios-goals .goals-filter-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.alios-goals :is(.goals-search-field, .goals-filter-actions) {
+  grid-column: 1 / -1;
+}
+
+.alios-goals .goals-filter-fields select {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+
+.alios-goals .goals-filters .shrink-0:has(> .goals-filter-summary) {
+  flex-shrink: 1;
+  max-inline-size: 100%;
+}
+
+.alios-goals .goals-filter-actions button {
+  inline-size: auto;
+  flex: 1 1 auto;
+}
+
+.alios-goals .goal-card {
+  container: goal-card / inline-size;
+  border-radius: var(--alios-radius-surface);
+  box-shadow: none;
+}
+
+.alios-goals .goal-card-header {
+  padding: 1rem;
+}
+
+.alios-goals .goal-overview {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
+
+.alios-goals .goal-progress {
+  min-inline-size: 0;
+  display: grid;
+  gap: 0.375rem;
+}
+
+.alios-goals :is(.goal-progress, .goal-key-result) .bg-gradient-to-r {
+  background-image: none;
+  background-color: var(--alios-accent-text);
+}
+
+.alios-goals .goal-card-content {
+  padding: 0 1rem 1rem;
+}
+
+.alios-goals .goal-key-results {
+  padding-block: 0.75rem;
+  border-block-start: 1px solid hsl(var(--border) / 0.7);
+}
+
+.alios-goals .goal-auto-progress {
+  padding-block: 0.5rem;
+}
+
+.alios-goals .goal-auto-progress input:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 3px;
+}
+
+.alios-goals .goal-details {
+  margin: 0;
+  border: 0;
+  border-block-start: 1px solid hsl(var(--border) / 0.7);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.alios-goals .goal-details > .alios-collapsible-trigger {
+  padding: 0.75rem 0;
+}
+
+.alios-goals :is(.goal-details, .goals-create-disclosure) > .alios-collapsible-trigger .text-base {
+  font-size: 0.875rem;
+  line-height: 1.75;
+}
+
+.alios-goals :is(.goal-details, .goals-create-disclosure) > .alios-collapsible-trigger .text-sm {
+  font-size: 0.75rem;
+  line-height: 1.75;
+}
+
+.alios-goals .goal-details > .goal-details-content {
+  padding: 1rem 0;
+}
+
+.alios-goals .goal-details-content > .alios-surface-soft {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.alios-goals :is(.goal-work-links, .goal-signals, .goal-dates) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.alios-goals .goal-work-links > .alios-surface-soft {
+  padding: 0.75rem 0;
+  border: 0;
+  border-block: 1px solid hsl(var(--border) / 0.65);
+  border-radius: 0;
+  background: transparent;
+}
+
+.alios-goals .goal-work-links > div > div {
+  flex-wrap: wrap;
+}
+
+.alios-goals .goal-work-links > div > div > div {
+  flex: 1 1 12rem;
+}
+
+.alios-goals .goal-signal {
+  padding-inline-start: 0.75rem;
+  border-inline-start: 2px solid hsl(var(--border));
+}
+
+.alios-goals :is(.goal-relation-list, .goals-learning-overview) a {
+  display: inline-block;
+  padding-block: 0.375rem;
+}
+
+.alios-goals a:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 3px;
+  border-radius: var(--alios-radius-control);
+}
+
+.alios-goals .goal-actions {
+  align-items: start;
+}
+
+.alios-goals .goal-actions > button {
+  inline-size: auto;
+}
+
+.alios-goals .goal-overflow {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  margin-inline-start: auto;
+}
+
+.alios-goals .goal-overflow-panel {
+  inline-size: 16rem;
+  max-inline-size: 100%;
+}
+
+.alios-goals :is(.goal-actions, .goal-work-links, .goals-filter-actions) :is(button, a) {
+  min-block-size: 2.75rem;
+  white-space: normal;
+}
+
+.alios-goals .goal-overflow-panel :is(button, a) {
+  text-align: start;
+}
+
+.alios-goals .goal-form :is(label, input, select, textarea) {
+  display: block;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+
+.alios-goals :is(.goal-form-layout, .goal-form-identity, .goal-form-properties) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.alios-goals .goals-support {
+  padding-block-start: 1.25rem;
+  border-block-start: 1px solid hsl(var(--border));
+}
+
+.alios-goals .goals-support > :is(.alios-surface-card, .alios-surface-soft) {
+  box-shadow: none;
+}
+
+.alios-goals .goals-learning-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: 1rem;
+}
+
+@container goals (min-width: 40rem) {
+  .alios-goals .goals-filter-fields {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .alios-goals .goals-search-field {
+    grid-column: span 3;
+  }
+
+  .alios-goals .goals-filter-actions {
+    grid-column: auto;
+  }
+
+  .alios-goals .goal-form-properties {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .alios-goals .goals-header-context {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+@container goals (min-width: 60rem) {
+  .alios-goals .goal-form-layout {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container goal-card (min-width: 36rem) {
+  .alios-goals .goal-overview {
+    grid-template-columns: minmax(0, 1fr) minmax(10rem, 0.3fr);
+    gap: 1.5rem;
+  }
+
+  .alios-goals :is(.goal-work-links, .goal-signals, .goal-dates) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

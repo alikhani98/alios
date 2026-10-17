@@ -1,5 +1,5 @@
 import { Paperclip } from "lucide-react";
-import { useId, useState, type ChangeEvent } from "react";
+import { useRef, useState, type ChangeEvent } from "react";
 
 import type { Attachment, AttachmentOwnerType } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
@@ -14,6 +14,8 @@ export type AttachmentCreateControlProps = {
   ownerId: string;
   dependencies: AttachmentWorkflowDependencies;
   onCreated?: (attachment: Attachment) => void;
+  onStatusChange?: (status: "saving" | "success" | "error") => void;
+  showStatus?: boolean;
 };
 
 export function AttachmentCreateControl({
@@ -21,9 +23,12 @@ export function AttachmentCreateControl({
   ownerId,
   dependencies,
   onCreated,
+  onStatusChange,
+  showStatus = true,
 }: AttachmentCreateControlProps) {
   const { t } = useI18n();
-  const inputId = useId();
+  const inputRef = useRef<HTMLInputElement>(null);
+  const savingRef = useRef(false);
   const [isSaving, setIsSaving] = useState(false);
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
 
@@ -33,12 +38,14 @@ export function AttachmentCreateControl({
     const file = event.target.files?.[0];
     event.target.value = "";
 
-    if (!file) {
+    if (!file || savingRef.current) {
       return;
     }
 
+    savingRef.current = true;
     setIsSaving(true);
     setStatus("idle");
+    onStatusChange?.("saving");
 
     try {
       const attachment = await createAttachmentForFile(
@@ -47,35 +54,42 @@ export function AttachmentCreateControl({
       );
       onCreated?.(attachment);
       setStatus("success");
+      onStatusChange?.("success");
     } catch {
       setStatus("error");
+      onStatusChange?.("error");
     } finally {
+      savingRef.current = false;
       setIsSaving(false);
     }
   };
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <Button asChild type="button" variant="outline" disabled={isSaving}>
-        <label htmlFor={inputId} className="cursor-pointer">
-          <Paperclip className="me-2 h-4 w-4" aria-hidden="true" />
-          {isSaving ? t("attachments.adding") : t("attachments.add")}
-        </label>
+      <Button
+        type="button"
+        variant="outline"
+        disabled={isSaving}
+        onClick={() => inputRef.current?.click()}
+      >
+        <Paperclip className="me-2 h-4 w-4" aria-hidden="true" />
+        {isSaving ? t("attachments.adding") : t("attachments.add")}
       </Button>
       <Input
-        id={inputId}
+        ref={inputRef}
         type="file"
         className="sr-only"
+        tabIndex={-1}
         onChange={(event) => void handleFileChange(event)}
         disabled={isSaving}
         aria-label={t("attachments.fileInputLabel")}
       />
-      {status === "success" ? (
+      {showStatus && status === "success" ? (
         <p className="text-sm text-emerald-700 dark:text-emerald-300" role="status">
           {t("attachments.added")}
         </p>
       ) : null}
-      {status === "error" ? (
+      {showStatus && status === "error" ? (
         <p className="text-sm text-destructive" role="alert">
           {t("attachments.addError")}
         </p>

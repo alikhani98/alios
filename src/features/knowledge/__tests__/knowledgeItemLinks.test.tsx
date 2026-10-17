@@ -26,6 +26,9 @@ function renderKnowledgeCard(
           <KnowledgeItemCard
             item={knowledgeItemRecord}
             isDeleting={false}
+            isOverflowOpen={false}
+            onOverflowToggle={() => undefined}
+            onOverflowClose={() => undefined}
             onEdit={() => undefined}
             onDelete={async () => undefined}
             {...props}
@@ -139,6 +142,7 @@ describe("Knowledge structural links", () => {
 
     const markup = renderKnowledgeCard({
       attachmentWorkflow,
+      isOverflowOpen: true,
     });
 
     expect(markup).toContain("Add attachment");

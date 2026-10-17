@@ -1,0 +1,251 @@
+/* Knowledge keeps the existing shared surfaces while tightening the reading rhythm. */
+.alios-knowledge {
+  container: knowledge / inline-size;
+  min-inline-size: 0;
+  max-inline-size: 80rem;
+  margin-inline: auto;
+  letter-spacing: 0;
+}
+
+.alios-knowledge :is(h2, h3, p, span, label, button, a, li) {
+  overflow-wrap: anywhere;
+  letter-spacing: 0;
+}
+
+.alios-knowledge :is(.knowledge-header, .knowledge-filters, .knowledge-editor) {
+  border: 0;
+  box-shadow: none;
+}
+
+.alios-knowledge .knowledge-header {
+  overflow: visible;
+}
+
+.alios-knowledge .knowledge-header-content {
+  flex-direction: row;
+  flex-wrap: wrap;
+  padding-block: 1rem;
+}
+
+.alios-knowledge .knowledge-header-content > div:first-child {
+  flex: 1 1 20rem;
+  min-inline-size: 0;
+}
+
+.alios-knowledge .knowledge-header-content > button {
+  flex-shrink: 0;
+  max-inline-size: 100%;
+}
+
+.alios-knowledge .knowledge-filter-form {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.alios-knowledge .knowledge-editor-heading,
+.alios-knowledge .knowledge-editor-content,
+.alios-knowledge .knowledge-filters-content {
+  padding: 1rem;
+}
+
+.alios-knowledge .knowledge-editor-heading {
+  border-block-end: 1px solid hsl(var(--border) / 0.7);
+}
+
+.alios-knowledge .knowledge-filter-form,
+.alios-knowledge .knowledge-editor form {
+  min-inline-size: 0;
+}
+
+.alios-knowledge .knowledge-filter-form > *,
+.alios-knowledge .knowledge-editor form > *,
+.alios-knowledge .knowledge-editor form :is(input, select, textarea) {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+
+.alios-knowledge .knowledge-filter-form > div:last-child {
+  align-items: stretch;
+}
+
+.alios-knowledge .knowledge-filter-form > div:last-child :is(button, a) {
+  min-block-size: 2.75rem;
+  flex: 1 1 auto;
+}
+
+.alios-knowledge .knowledge-view-toggle {
+  padding-block-end: 0.25rem;
+}
+
+.alios-knowledge .knowledge-view-toggle button,
+.alios-knowledge .knowledge-list button,
+.alios-knowledge .knowledge-list a {
+  min-block-size: 2.75rem;
+  white-space: normal;
+}
+
+.alios-knowledge .knowledge-item-card {
+  min-inline-size: 0;
+  border-radius: var(--alios-radius-surface);
+  box-shadow: none;
+}
+
+.alios-knowledge .knowledge-item-header {
+  gap: 0.625rem;
+  padding: 1rem 1rem 0.75rem;
+}
+
+.alios-knowledge .knowledge-item-identity {
+  display: flex;
+  min-inline-size: 0;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.625rem 0.875rem;
+}
+
+.alios-knowledge .knowledge-item-title {
+  min-inline-size: 0;
+  flex: 1 1 16rem;
+}
+
+.alios-knowledge .knowledge-item-summary {
+  max-inline-size: 75ch;
+  font-size: 0.875rem;
+  line-height: 1.75;
+}
+
+.alios-knowledge .knowledge-item-content {
+  display: grid;
+  gap: 0.875rem;
+  padding: 0 1rem 1rem;
+}
+
+.alios-knowledge .knowledge-item-body {
+  max-inline-size: 75ch;
+  font-size: 0.9375rem;
+  line-height: 1.85;
+}
+
+.alios-knowledge .knowledge-item-source {
+  display: flex;
+  min-inline-size: 0;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding-block-start: 0.75rem;
+  border-block-start: 1px solid hsl(var(--border) / 0.65);
+}
+
+.alios-knowledge .knowledge-item-backlinks {
+  padding: 0.75rem;
+  border: 0;
+  border-block: 1px solid hsl(var(--border) / 0.65);
+  border-radius: 0;
+  background: transparent;
+}
+
+.alios-knowledge .knowledge-item-backlinks ul {
+  margin-block-start: 0.375rem;
+}
+
+.alios-knowledge .knowledge-item-content > :is(.alios-linked-entity-summary, [data-attachment-section]) {
+  min-inline-size: 0;
+}
+
+.alios-knowledge .knowledge-item-actions {
+  position: relative;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-color: hsl(var(--border) / 0.7);
+}
+
+.alios-knowledge .knowledge-item-actions > :is(button, a) {
+  max-inline-size: 100%;
+}
+
+.alios-knowledge .knowledge-overflow {
+  position: relative;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  margin-inline-start: auto;
+}
+
+.alios-knowledge .knowledge-overflow-panel {
+  position: absolute;
+  z-index: 20;
+  inset-block-start: calc(100% + 0.5rem);
+  inset-inline-end: 0;
+  inline-size: 16rem;
+  max-inline-size: min(16rem, calc(100vw - 2rem));
+  margin: 0;
+  text-align: start;
+}
+
+.alios-knowledge .knowledge-overflow-panel :is(button, a) {
+  inline-size: 100%;
+  justify-content: flex-start;
+  text-align: start;
+  white-space: normal;
+}
+
+.alios-knowledge .knowledge-ask-panel {
+  box-shadow: none;
+}
+
+.alios-knowledge .knowledge-ask-panel > :is(.knowledge-ask-heading, .knowledge-ask-content) {
+  padding-inline: 1rem;
+}
+
+.alios-knowledge .knowledge-ask-heading {
+  padding-block: 1rem 0.75rem;
+}
+
+.alios-knowledge .knowledge-ask-content {
+  padding-block: 0 1rem;
+}
+
+.alios-knowledge .knowledge-ask-result {
+  padding: 0.75rem;
+  box-shadow: none;
+}
+
+.alios-knowledge .knowledge-graph-node:focus-visible > .knowledge-graph-node-surface {
+  stroke: hsl(var(--ring));
+  stroke-width: 6px;
+  stroke-dasharray: 6 3;
+}
+
+@container knowledge (min-width: 40rem) {
+  .alios-knowledge .knowledge-filter-form {
+    grid-template-columns: minmax(0, 1fr) 12rem auto;
+  }
+
+  .alios-knowledge .knowledge-header-content,
+  .alios-knowledge .knowledge-editor-heading,
+  .alios-knowledge .knowledge-editor-content,
+  .alios-knowledge .knowledge-filters-content,
+  .alios-knowledge .knowledge-ask-panel > :is(.knowledge-ask-heading, .knowledge-ask-content) {
+    padding-inline: 1.5rem;
+  }
+
+  .alios-knowledge .knowledge-item-header {
+    padding-inline: 1.5rem;
+  }
+
+  .alios-knowledge .knowledge-item-content {
+    padding-inline: 1.5rem;
+  }
+
+  .alios-knowledge .knowledge-item-actions {
+    padding-inline: 1.5rem;
+  }
+
+  .alios-knowledge .knowledge-ask-heading {
+    padding-block-start: 1.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .alios-knowledge * {
+    scroll-behavior: auto;
+  }
+}

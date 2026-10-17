@@ -87,6 +87,12 @@ export function buildKnowledgeGraph(
   const centerX = 500;
   const centerY = 320;
   const radius = items.length <= 2 ? 170 : 250;
+  const connectedNodeIds = new Set(
+    edges.flatMap((edge) => [edge.sourceId, edge.targetId])
+  );
+  const isolatedNodeCount = items.length - connectedNodeIds.size;
+  const useGridLayout = items.length > 12 || isolatedNodeCount > 4;
+  const gridColumns = 5;
   const nodes = items.map((item, index) => {
     if (items.length === 1) {
       return {
@@ -95,6 +101,18 @@ export function buildKnowledgeGraph(
         type: item.type,
         x: centerX,
         y: centerY,
+      };
+    }
+
+    if (useGridLayout) {
+      const column = index % gridColumns;
+      const row = Math.floor(index / gridColumns);
+      return {
+        id: item.id,
+        title: item.title,
+        type: item.type,
+        x: 110 + column * 195,
+        y: 80 + row * 125,
       };
     }
 

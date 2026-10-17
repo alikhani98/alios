@@ -451,7 +451,7 @@ export function Topbar({
   };
 
   return (
-    <header className="sticky top-0 z-30 flex min-h-[var(--alios-topbar-height)] items-center gap-2 border-b border-border/70 bg-background/80 px-3 pt-[env(safe-area-inset-top)] shadow-sm backdrop-blur-xl supports-[backdrop-filter]:bg-background/70 sm:px-4 md:gap-3 md:px-6">
+    <header className="alios-workspace-topbar sticky top-0 z-30 flex min-h-16 items-center gap-1 border-b border-border/60 px-2 pt-[env(safe-area-inset-top)] sm:px-4 md:gap-3 md:px-6">
       <Button
         type="button"
         variant="ghost"
@@ -465,7 +465,7 @@ export function Topbar({
 
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <h1 className="truncate text-lg font-semibold tracking-tight md:text-xl">
+          <h1 className="truncate text-base font-semibold leading-7 md:text-lg">
             {title}
           </h1>
           <Badge variant="secondary" className="hidden rounded-full md:inline-flex">
@@ -474,11 +474,11 @@ export function Topbar({
         </div>
       </div>
 
-      <div className="hidden w-full max-w-xs md:flex">
+      <div className="hidden w-full max-w-[16rem] xl:flex">
         <Button
           type="button"
           variant="outline"
-          className="h-10 w-full justify-start gap-2 rounded-2xl border-border/70 bg-card/80 text-muted-foreground shadow-sm"
+          className="min-h-11 w-full justify-start gap-2 rounded-lg border-border/60 bg-muted/40 text-muted-foreground shadow-none"
           onClick={onOpenCommandPalette}
           aria-label={t("command.open")}
         >
@@ -494,7 +494,7 @@ export function Topbar({
         type="button"
         variant="ghost"
         size="icon"
-        className="rounded-full md:hidden"
+        className="rounded-lg xl:hidden"
         onClick={onOpenCommandPalette}
         aria-label={t("command.open")}
       >
@@ -504,7 +504,7 @@ export function Topbar({
       <div
         ref={panelRef}
         className={cn(
-          "relative flex items-center gap-1 rounded-full border border-border/70 bg-card/70 p-1 shadow-sm backdrop-blur-sm",
+          "relative flex shrink-0 items-center gap-0.5",
           aliosSurfaceMotion
         )}
       >

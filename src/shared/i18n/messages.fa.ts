@@ -1,6 +1,11 @@
 import type { TranslationKey } from "./types";
 
 export const messagesFa: Record<TranslationKey, string> = {
+  "home.greetingMorning": "صبح بخیر",
+  "home.greetingAfternoon": "بعدازظهر بخیر",
+  "home.greetingEvening": "شب بخیر",
+  "home.quickAddTask": "ثبت کار",
+  "home.quickAddNote": "یادداشت",
   "settings.appearanceBehaviorTitle": "ظاهر و رفتار",
   "settings.appearanceBehaviorDescription": "ظاهر، تراکم نمایش، زبان، تقویم و ترجیحات محلی کم‌استفاده در این بخش هستند.",
   "settings.appearanceBehaviorSummary": "ظاهر: {theme} · تراکم: {density} · زبان: {language}",
@@ -2067,9 +2072,16 @@ export const messagesFa: Record<TranslationKey, string> = {
   "settings.personalizationTitle": "شخصی‌سازی",
   "settings.personalizationDescription": "میانبرهایی را انتخاب کنید که AliOS را به فضای کاری روزانه‌ی خودتان نزدیک‌تر می‌کند.",
   "quickAccess.title": "دسترسی سریع",
+  "quickAccess.manage": "مدیریت میان‌برها",
+  "quickAccess.choose": "انتخاب میان‌برها",
+  "quickAccess.loading": "در حال بارگذاری میان‌برها…",
+  "quickAccess.loadError": "میان‌برها بارگذاری نشدند. دوباره تلاش کنید.",
+  "quickAccess.homeEmptyDescription": "از بخش مدیریت، صفحه‌ای انتخاب یا میان‌بر پنهان را فعال کنید؛ برای افزودن آیتم‌ها، در صفحه آن‌ها «افزودن به دسترسی سریع» را بزنید.",
+  "quickAccess.removeItem": "حذف «{title}» از دسترسی سریع",
   "quickAccess.description": "صفحه‌ها و مواردی را که بیشتر استفاده می‌کنید در دسترس نگه دارید. این لانچر فقط روی همین دستگاه محلی است.",
   "quickAccess.todayWidget": "ویجت امروز",
   "quickAccess.add": "افزودن به دسترسی سریع",
+  "quickAccess.saveError": "دسترسی سریع ذخیره نشد. دوباره تلاش کنید.",
   "quickAccess.remove": "حذف از دسترسی سریع",
   "quickAccess.enabled": "فعال",
   "quickAccess.disabled": "غیرفعال",

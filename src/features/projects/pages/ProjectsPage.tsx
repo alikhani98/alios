@@ -39,6 +39,7 @@ import { findGoalProjectFilter, findLinkedGoal } from "../projectGoalLinks";
 import { getProjectTaskProgress } from "../projectTaskProgress";
 import { clearDueProjectReviewDate, isProjectReviewDue } from "../projectReviews";
 import type { ProjectFormValues } from "../types";
+import "../projects-presentation.css";
 
 function parseOptionalPositiveInteger(value: string | undefined): number | undefined {
   const parsed = Number(value ?? "");
@@ -387,10 +388,11 @@ export function ProjectsPage() {
   );
 
   return (
-    <section className="alios-page space-y-6">
-      <PremiumCard className="alios-now-surface">
-        <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+    <section className="alios-page alios-projects space-y-5">
+      <PremiumCard className="projects-header">
+        <CardContent className="projects-header-content">
           <SectionHeader
+            variant="page"
             icon={<FolderKanban className="h-5 w-5" />}
             title={t("projects.title")}
             description={t("projects.description")}
@@ -403,7 +405,7 @@ export function ProjectsPage() {
       </PremiumCard>
 
       {formOpen ? (
-        <PremiumCard>
+        <PremiumCard className="projects-form-surface">
           <CardHeader>
             <CardTitle>
               {editingProject ? t("projects.edit") : t("projects.create")}
@@ -522,13 +524,14 @@ export function ProjectsPage() {
       ) : null}
 
       {projects.length > 0 ? (
-        <div className="flex flex-col gap-3 rounded-2xl border bg-card/90 p-3 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+        <div className="projects-view-toolbar">
           <p className="text-sm text-muted-foreground">{t("projects.viewModeDescription")}</p>
-          <div className="grid gap-2 sm:flex sm:items-center" role="group" aria-label={t("projects.viewMode")}>
+          <div className="projects-view-options" role="group" aria-label={t("projects.viewMode")}>
             <Button
               type="button"
               size="sm"
               variant={viewMode === "list" ? "default" : "outline"}
+              aria-pressed={viewMode === "list"}
               onClick={() => setViewMode("list")}
             >
               <List className="me-2 h-4 w-4" aria-hidden="true" />
@@ -538,6 +541,7 @@ export function ProjectsPage() {
               type="button"
               size="sm"
               variant={viewMode === "kanban" ? "default" : "outline"}
+              aria-pressed={viewMode === "kanban"}
               onClick={() => setViewMode("kanban")}
             >
               <KanbanSquare className="me-2 h-4 w-4" aria-hidden="true" />
@@ -564,11 +568,11 @@ export function ProjectsPage() {
       ) : null}
 
       {isLoading ? (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" aria-label={t("projects.loading")}>
+        <div className="grid gap-4" aria-label={t("projects.loading")}>
           {[0, 1, 2].map((item) => (
             <div
               key={item}
-              className="h-56 animate-pulse rounded-2xl border bg-muted/60"
+              className="h-56 animate-pulse rounded-2xl border bg-muted/60 motion-reduce:animate-none"
             />
           ))}
         </div>

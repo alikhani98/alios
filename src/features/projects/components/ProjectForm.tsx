@@ -58,7 +58,7 @@ export function ProjectForm({
 
   return (
     <form
-      className="grid gap-5"
+      className="project-form grid gap-5"
       onSubmit={handleSubmit((values) => void onSubmit(values))}
     >
       <div className="grid gap-2">
@@ -201,7 +201,7 @@ export function ProjectForm({
         </p>
       </div>
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+      <div className="project-form-actions flex flex-col gap-3 sm:flex-row sm:flex-wrap">
         <Button
           type="submit"
           className="w-full sm:w-auto"

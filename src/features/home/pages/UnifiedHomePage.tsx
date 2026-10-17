@@ -33,6 +33,7 @@ import { useBackupStatus } from "@/shared/hooks";
 import { usePersistentString } from "@/shared/hooks/usePersistentString";
 import { useI18n, type TranslationKey } from "@/shared/i18n";
 import { getBackupAgeInDays } from "@/shared/preferences/backupStatus";
+import { QuickAccessLauncher } from "@/shared/quickAccess";
 import type { Task } from "@/shared/types";
 import {
   Badge,
@@ -63,6 +64,7 @@ import { useHomeDashboard } from "../hooks/useHomeDashboard";
 import type { HomeCollapsibleSectionId } from "../homeCollapsedSections";
 import type { HomeDashboardData } from "../types";
 import type { HomeLearningSnapshot } from "../homeLearningSnapshot";
+import "../home-presentation.css";
 
 const DailyCommitmentCard = lazy(() =>
   import("@/features/commitment/components/DailyCommitmentCard").then(
@@ -109,25 +111,28 @@ function HomeHeader({
   displayName: string;
   today: Date;
 }) {
+  const { language, t } = useI18n();
   const hour = today.getHours();
   const greeting =
-    hour < 12 ? "صبح بخیر" : hour < 17 ? "بعدازظهر بخیر" : "شب بخیر";
-  const formattedDate = new Intl.DateTimeFormat("fa-IR", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-  }).format(today);
+    hour < 12
+      ? t("home.greetingMorning")
+      : hour < 17
+        ? t("home.greetingAfternoon")
+        : t("home.greetingEvening");
+  const formattedDate = new Intl.DateTimeFormat(
+    language === "fa" ? "fa-IR" : "en-US",
+    { weekday: "long", month: "long", day: "numeric" }
+  ).format(today);
 
   return (
-    <div className="flex items-center justify-between px-1 pb-1 pt-2">
-      <div className="space-y-0.5">
-        <p className="text-xs font-medium text-muted-foreground">
+    <div className="alios-home-header">
+      <div className="min-w-0">
+        <p className="break-words text-sm font-medium leading-6">
           {greeting}
           {displayName ? ` ${displayName}` : ""}
         </p>
-        <p className="text-lg font-bold tracking-tight">خانه</p>
       </div>
-      <div className="text-xs font-medium text-muted-foreground tabular-nums">
+      <div className="text-xs font-medium leading-6 text-muted-foreground tabular-nums">
         {formattedDate}
       </div>
     </div>
@@ -135,28 +140,29 @@ function HomeHeader({
 }
 
 function HomeQuickBar() {
+  const { t } = useI18n();
   const itemClassName =
-    "flex shrink-0 items-center gap-1.5 rounded-2xl border bg-background/80 px-3 py-2 text-xs font-medium shadow-sm transition hover:bg-accent";
+    "alios-home-quick-action focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2";
 
   return (
-    <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+    <nav className="alios-home-quick-bar" aria-label={t("home.quickActions")}>
       <Link to="/today?action=add" className={itemClassName}>
         <Plus className="h-4 w-4" aria-hidden="true" />
-        ثبت کار
+        {t("home.quickAddTask")}
       </Link>
       <Link to="/focus" className={itemClassName}>
         <Clock3 className="h-4 w-4" aria-hidden="true" />
-        تمرکز
+        {t("nav.focus")}
       </Link>
       <Link to="/inbox?action=add" className={itemClassName}>
         <Inbox className="h-4 w-4" aria-hidden="true" />
-        یادداشت
+        {t("home.quickAddNote")}
       </Link>
       <Link to="/weekly-review" className={itemClassName}>
         <CalendarCheck2 className="h-4 w-4" aria-hidden="true" />
-        مرور هفته
+        {t("nav.weeklyReview")}
       </Link>
-    </div>
+    </nav>
   );
 }
 
@@ -238,7 +244,7 @@ function TodayPreviewCard({ data }: { data: HomeDashboardData }) {
   const previewTasks = activeTasks.slice(0, 3);
 
   return (
-    <Card className="alios-home-context-shelf overflow-hidden shadow-sm">
+    <Card className="alios-home-context-shelf alios-home-daily-card">
       <CardContent className="space-y-4 p-5 sm:p-6">
         <SectionHeader
           title={t("home.todayPreviewTitle", { count: activeTasks.length })}
@@ -251,9 +257,9 @@ function TodayPreviewCard({ data }: { data: HomeDashboardData }) {
               <Link
                 key={task.id}
                 to={createTodayTaskFocusPath(task)}
-                className="flex min-h-12 min-w-0 items-center justify-between gap-3 rounded-2xl border bg-background/80 px-4 py-3 text-sm shadow-sm transition hover:border-primary/25 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                className="alios-home-content-row focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               >
-                <span className="min-w-0 truncate font-medium">{task.title}</span>
+                <span className="min-w-0 break-words font-medium [overflow-wrap:anywhere]">{task.title}</span>
                 {task.scheduledStartTime ? (
                   <span className="shrink-0 text-xs text-muted-foreground">
                     {task.scheduledStartTime}
@@ -263,9 +269,10 @@ function TodayPreviewCard({ data }: { data: HomeDashboardData }) {
             ))}
           </div>
         ) : (
-          <p className="rounded-2xl border bg-background/80 p-4 text-sm text-muted-foreground">
-            {t("home.todayPreviewEmpty")}
-          </p>
+          <div className="alios-home-today-empty">
+            <ListTodo className="h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
+            <p className="text-sm leading-7 text-muted-foreground">{t("home.todayPreviewEmpty")}</p>
+          </div>
         )}
 
         <Button asChild variant="outline" className="w-full justify-center">
@@ -300,7 +307,7 @@ function TomorrowCard({
   const tomorrowPath = createTodayTaskFocusPath(tomorrowTask);
 
   return (
-    <Card className="alios-home-context-shelf overflow-hidden shadow-sm">
+    <Card className="alios-home-context-shelf alios-home-daily-card">
       <CardContent className="space-y-4 p-5 sm:p-6">
         <SectionHeader
           title={t("home.importantTomorrow")}
@@ -308,7 +315,7 @@ function TomorrowCard({
           icon={<CalendarDays className="h-5 w-5" aria-hidden="true" />}
         />
 
-        <p className="rounded-2xl border bg-background/80 p-4 text-sm font-medium leading-6">
+        <p className="break-words border-s-2 border-primary/30 ps-4 text-base font-medium leading-7 [overflow-wrap:anywhere]">
           {tomorrowTask.title}
         </p>
 
@@ -335,7 +342,7 @@ function HomeLearningPanel({
   }
 
   return (
-    <Card className="alios-home-context-shelf overflow-hidden shadow-sm">
+    <Card className="alios-home-context-shelf alios-home-learning">
       <CardContent className="space-y-4 p-5 sm:p-6">
         <SectionHeader
           title={t("home.learningKnowledgeTitle")}
@@ -350,7 +357,7 @@ function HomeLearningPanel({
           }
         />
 
-        <div className="grid gap-3 lg:grid-cols-3">
+        <div className="alios-home-learning-groups">
           {snapshot.activeLearningGoals.length > 0 ? (
             <HomeLearningList
               title={t("home.currentlyLearning")}
@@ -418,18 +425,18 @@ function HomeLearningList({
   }>;
 }) {
   return (
-    <div className="min-w-0 rounded-2xl border bg-background/80 p-4 shadow-sm">
+    <div className="alios-home-learning-group">
       <p className="text-sm font-semibold">{title}</p>
-      <div className="mt-3 space-y-2">
+      <div className="mt-2 divide-y divide-border/50">
         {items.map((item) => (
           <Link
             key={item.id}
             to={item.to}
-            className="flex min-h-11 min-w-0 items-center justify-between gap-3 rounded-xl border bg-card px-3 py-2 text-sm shadow-sm transition hover:border-primary/25 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            className="alios-home-content-row focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
-            <span className="min-w-0 truncate font-medium">{item.title}</span>
+            <span className="min-w-0 break-words font-medium [overflow-wrap:anywhere]">{item.title}</span>
             {item.meta ? (
-              <span className="shrink-0 text-xs text-muted-foreground">
+              <span className="max-w-[40%] shrink-0 text-xs leading-6 text-muted-foreground">
                 {item.meta}
               </span>
             ) : null}
@@ -494,7 +501,7 @@ function MoreContext({
       defaultOpen={false}
       expandLabel={t("common.expandSection")}
       collapseLabel={t("common.collapseSection")}
-      className="alios-home-context-shelf overflow-hidden shadow-sm"
+      className="alios-home-context-shelf alios-home-more"
       contentClassName="space-y-5"
     >
       <div className="grid min-w-0 gap-5 xl:grid-cols-12 xl:items-start">
@@ -847,7 +854,7 @@ export function UnifiedHomePage() {
   }
 
   return (
-    <section className="alios-page alios-home-page flex flex-col gap-5 lg:gap-6">
+    <section className="alios-page alios-home-page flex flex-col">
       {hasError ? (
         <div
           role="alert"
@@ -876,29 +883,26 @@ export function UnifiedHomePage() {
         </div>
       ) : data ? (
         <>
-          <div className="order-0 lg:hidden">
+          <div className="order-0 space-y-3">
             <HomeHeader displayName={displayName} today={today} />
             <HomeQuickBar />
+            <QuickAccessLauncher />
           </div>
-          <div className="order-1 rounded-[2rem] shadow-lg shadow-alios-caspian/10 lg:order-1">
+          <div className="order-1 min-w-0">
             <ClearStartCard data={data} />
           </div>
-          <div className="order-2 lg:order-4 [&>.alios-home-context-shelf]:grid-cols-4 [&>.alios-home-context-shelf]:gap-1.5 [&>.alios-home-context-shelf]:overflow-hidden sm:[&>.alios-home-context-shelf]:gap-2">
+          <div className="order-2 min-w-0">
             <TodaySummaryBar data={data} today={today} />
           </div>
-          <div className="order-3 grid gap-5 lg:order-5 lg:grid-cols-3 lg:items-start">
-            <div className="space-y-4 lg:col-span-1 lg:col-start-1 lg:row-start-1">
-              <TodayPreviewCard data={data} />
-              <LocalReminderPanel snapshot={data.reminderSnapshot} />
-            </div>
-            <div className="space-y-4 lg:col-span-1 lg:col-start-3 lg:row-start-1">
-              <TomorrowCard data={data} tomorrow={tomorrow} />
-            </div>
-            <div className="lg:col-span-3 lg:col-start-1 lg:row-start-2">
-              <HomeLearningPanel snapshot={data.learningSnapshot} />
-            </div>
+          <div className="alios-home-daily-grid order-3">
+            <TodayPreviewCard data={data} />
+            <LocalReminderPanel snapshot={data.reminderSnapshot} />
+            <TomorrowCard data={data} tomorrow={tomorrow} />
           </div>
-          <div className="order-5 lg:order-9">
+          <div className="order-4 empty:hidden">
+            <HomeLearningPanel snapshot={data.learningSnapshot} />
+          </div>
+          <div className="order-5 min-w-0">
             <MoreContext
               data={data}
               urgeRefreshKey={urgeRefreshKey}
@@ -910,12 +914,12 @@ export function UnifiedHomePage() {
             />
           </div>
           {showEveningBriefing ? (
-            <div className="order-6 lg:order-7">
+            <div className="order-6">
               <DailyBriefingCard data={data} />
             </div>
           ) : null}
           {data.isEmpty ? (
-            <div className="order-7 lg:order-3">
+            <div className="order-7">
               <WelcomeCard
                 key={onboardingState}
                 displayName={displayName}
@@ -923,10 +927,10 @@ export function UnifiedHomePage() {
             </div>
           ) : null}
           {showBackupReminder ? (
-            <div className="order-8 lg:order-2">
-              <SoftPanel className="flex flex-col gap-3 border-alios-saffron/30 bg-gradient-to-l from-alios-saffron/10 via-background to-background p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between sm:gap-5">
-                <div className="flex min-w-0 items-start gap-3">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-alios-saffron/30 bg-alios-saffron/15 text-alios-caspian dark:text-alios-paper">
+            <div className="order-8">
+              <SoftPanel className="alios-home-backup flex flex-col gap-3 p-4 sm:flex-row sm:items-start sm:justify-between sm:gap-5">
+                <div className="flex min-w-0 flex-1 items-start gap-3">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-warning/10 text-foreground">
                     <ShieldCheck className="h-5 w-5" aria-hidden="true" />
                   </span>
                   <div className="min-w-0 space-y-1">
@@ -945,15 +949,15 @@ export function UnifiedHomePage() {
                     </p>
                   </div>
                 </div>
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                  <Button asChild variant="outline" size="sm" className="w-full shrink-0 sm:w-auto">
+                <div className="flex flex-wrap items-center gap-2 sm:shrink-0">
+                  <Button asChild variant="outline" size="sm" className="min-h-11 flex-1 rounded-lg sm:flex-none">
                     <Link to="/settings#settings-backup-restore">{t("home.backupReminderAction")}</Link>
                   </Button>
                   <Button
                     type="button"
                     variant="ghost"
                     size="sm"
-                    className="w-full shrink-0 sm:w-auto"
+                    className="min-h-11 flex-1 rounded-lg sm:flex-none"
                     onClick={() => {
                       setBackupReminderDismissedUntil(writeHomeBackupReminderDismissal());
                     }}

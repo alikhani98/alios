@@ -5,7 +5,6 @@ import { useI18n } from "@/shared/i18n";
 import { cn } from "@/shared/utils/cn";
 import {
   aliosFocusRing,
-  aliosInteractiveLift,
   aliosInteractiveMotion,
 } from "@/shared/ui/motion";
 
@@ -33,13 +32,12 @@ export function NavigationLink({
       onClick={onNavigate}
       className={({ isActive }) =>
         cn(
-          "group flex min-h-11 items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-medium",
+          "alios-workspace-nav-link group flex min-h-11 min-w-0 items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium",
           aliosFocusRing,
           aliosInteractiveMotion,
-          aliosInteractiveLift,
           isActive
-            ? "border border-primary/15 bg-primary text-primary-foreground shadow-lg shadow-primary/10"
-            : "border border-transparent bg-transparent text-muted-foreground hover:border-border/70 hover:bg-accent/70 hover:text-accent-foreground",
+            ? "border border-primary/15 bg-primary/10 font-semibold text-foreground"
+            : "border border-transparent bg-transparent text-muted-foreground hover:bg-accent/70 hover:text-foreground",
           collapsed && "justify-center px-2"
         )
       }
@@ -49,10 +47,10 @@ export function NavigationLink({
         <>
           <span
             className={cn(
-              "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-transparent bg-background/65 text-muted-foreground shadow-sm transition-[transform,box-shadow,border-color,background-color,color] duration-200 ease-out motion-reduce:transition-none motion-reduce:transform-none",
-              isActive && "bg-primary-foreground/15 text-primary-foreground",
+              "flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors duration-150 motion-reduce:transition-none",
+              isActive && "text-primary",
               !isActive &&
-                "group-hover:bg-background group-hover:text-foreground group-hover:shadow-md"
+                "group-hover:text-foreground"
             )}
           >
             <Icon className="h-5 w-5" aria-hidden="true" />

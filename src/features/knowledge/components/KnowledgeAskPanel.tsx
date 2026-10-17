@@ -83,15 +83,15 @@ export function KnowledgeAskPanel({
   }, [knowledgeRepository, question, t]);
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="knowledge-ask-panel">
+      <CardHeader className="knowledge-ask-heading">
         <CardTitle className="flex items-center gap-2">
           <Bot className="h-5 w-5 text-primary" aria-hidden="true" />
           {t("knowledge.askTitle")}
         </CardTitle>
         <CardDescription>{t("knowledge.askDescription")}</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="knowledge-ask-content space-y-4">
         <div className="relative">
           <Search
             className={`pointer-events-none absolute top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground ${
@@ -138,7 +138,7 @@ export function KnowledgeAskPanel({
             {results.map((result) => (
               <article
                 key={result.item.id}
-                className="rounded-2xl border bg-card p-4 shadow-sm"
+                className="knowledge-ask-result rounded-2xl border bg-card p-4 shadow-sm"
               >
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <h3 className="min-w-0 flex-1 break-words text-base font-semibold">

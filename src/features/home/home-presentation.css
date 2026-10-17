@@ -1,0 +1,334 @@
+.alios-home-page {
+  gap: 1.25rem;
+  max-width: 78rem;
+  padding: 0.5rem 0 1rem;
+  color: hsl(var(--foreground));
+  letter-spacing: 0;
+  animation: none;
+}
+
+.alios-home-page > * {
+  min-width: 0;
+}
+
+/* Home enters once through the shell, rather than animating every nested surface. */
+.alios-home-page.alios-home-page > *:nth-child(n) {
+  animation: none;
+}
+
+.alios-home-page .alios-home-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+}
+
+.alios-home-page .alios-home-quick-bar {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding: 0.25rem 0.125rem 0.5rem;
+  scroll-padding-inline: 0.125rem;
+  scrollbar-width: thin;
+}
+
+.alios-home-page .alios-home-quick-action {
+  display: inline-flex;
+  min-height: 2.75rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 1px solid hsl(var(--border) / 0.8);
+  border-radius: 0.5rem;
+  padding: 0.625rem 0.875rem;
+  background: hsl(var(--card));
+  color: hsl(var(--foreground));
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.5rem;
+  transition: background-color 150ms ease, border-color 150ms ease;
+}
+
+.alios-home-page .alios-home-quick-action:hover,
+.alios-home-page .alios-home-quick-action:active {
+  border-color: hsl(var(--primary) / 0.3);
+  background: hsl(var(--primary) / 0.06);
+}
+
+.alios-home-page :is(.alios-home-context-shelf, .alios-home-focus, .alios-home-metrics) {
+  border: 1px solid hsl(var(--border) / 0.8);
+  border-radius: 0.5rem;
+  background: hsl(var(--card));
+  color: hsl(var(--foreground));
+  box-shadow: 0 2px 6px hsl(var(--foreground) / 0.035);
+  backdrop-filter: none;
+  transform: none;
+}
+
+.dark .alios-home-page :is(.alios-home-context-shelf, .alios-home-focus, .alios-home-metrics) {
+  background: color-mix(in srgb, hsl(var(--card)) 94%, white);
+  border-color: hsl(var(--foreground) / 0.1);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 0.12);
+}
+
+.alios-home-page :is(h3, button, a, .tabular-nums) {
+  letter-spacing: 0;
+}
+
+.alios-home-page .alios-home-focus {
+  border-block-start: 3px solid hsl(var(--primary));
+  background: linear-gradient(110deg, hsl(var(--primary) / 0.045), transparent 70%), hsl(var(--card));
+  box-shadow: 0 4px 16px hsl(var(--foreground) / 0.045);
+}
+
+.dark .alios-home-page .alios-home-focus {
+  background: linear-gradient(110deg, hsl(var(--primary) / 0.035), transparent 70%), color-mix(in srgb, hsl(var(--card)) 92%, white);
+}
+
+.alios-home-page .alios-home-focus-content {
+  display: grid;
+  gap: 1.25rem;
+  padding: 1.25rem;
+}
+
+.alios-home-page .alios-home-focus-heading {
+  border-block-end: 1px solid hsl(var(--border) / 0.65);
+  padding-block-end: 1rem;
+}
+
+.alios-home-page .alios-home-focus-heading h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.75rem;
+}
+
+.alios-home-page .alios-home-focus-heading p {
+  line-height: 1.75rem;
+}
+
+.alios-home-page .alios-home-focus-body {
+  display: grid;
+  min-width: 0;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.alios-home-page .alios-home-focus-icon {
+  background: hsl(var(--primary) / 0.08);
+  color: hsl(var(--primary));
+}
+
+.alios-home-page .alios-home-focus-title {
+  overflow-wrap: anywhere;
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.65;
+}
+
+.alios-home-page .alios-home-focus-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  padding-block-start: 0.5rem;
+  color: hsl(var(--muted-foreground));
+  font-size: 0.75rem;
+  line-height: 1.5rem;
+}
+
+.alios-home-page .alios-home-focus-reason {
+  display: inline-flex;
+  min-height: 1.75rem;
+  align-items: center;
+  gap: 0.375rem;
+  border-radius: 0.375rem;
+  padding-inline: 0.5rem;
+  font-weight: 600;
+}
+
+.alios-home-page .alios-home-focus-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.alios-home-page .alios-home-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding: 0;
+  overflow: hidden;
+}
+
+.alios-home-page .alios-home-metric {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.375rem;
+  padding: 0.875rem 0.375rem;
+  text-align: center;
+  transition: background-color 150ms ease;
+}
+
+.alios-home-page .alios-home-metric + .alios-home-metric {
+  border-inline-start: 1px solid hsl(var(--border) / 0.6);
+}
+
+.alios-home-page .alios-home-metric:hover {
+  background: hsl(var(--primary) / 0.04);
+}
+
+.alios-home-page .alios-home-metric-icon {
+  display: flex;
+  justify-content: center;
+}
+
+.alios-home-page .alios-home-metric-copy {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.alios-home-page .alios-home-metric-value {
+  overflow-wrap: anywhere;
+  font-size: 1.375rem;
+  font-weight: 600;
+  line-height: 1.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.alios-home-page .alios-home-metric-label {
+  overflow-wrap: anywhere;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.25rem;
+  color: hsl(var(--muted-foreground));
+}
+
+/* Only rendered cards participate; null reminder/tomorrow states reserve no tracks. */
+.alios-home-page .alios-home-daily-grid,
+.alios-home-page .alios-home-learning-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.alios-home-page :is(.alios-home-daily-grid, .alios-home-learning) h3 {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  line-height: 1.75rem;
+}
+
+.alios-home-page .alios-home-today-empty {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  border-inline-start: 2px solid hsl(var(--primary) / 0.25);
+  padding: 0.75rem 1rem;
+  background: hsl(var(--muted) / 0.3);
+}
+
+.alios-home-page .alios-home-content-row {
+  display: flex;
+  min-height: 2.75rem;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border-radius: 0.375rem;
+  padding: 0.625rem 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.75rem;
+  transition: background-color 150ms ease;
+}
+
+.alios-home-page .alios-home-content-row:hover {
+  background: hsl(var(--accent) / 0.65);
+}
+
+.alios-home-page .alios-home-learning-group {
+  min-width: 0;
+  border-block-start: 1px solid hsl(var(--border) / 0.7);
+  padding-block-start: 1rem;
+}
+
+.alios-home-page .alios-home-learning-groups {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+}
+
+.alios-home-page .alios-home-more > .alios-collapsible-trigger {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+}
+
+.alios-home-page .alios-home-more > .alios-collapsible-trigger > span:last-child {
+  width: auto;
+  flex-shrink: 0;
+}
+
+.alios-home-page .alios-home-more > .alios-collapsible-trigger > span:first-child {
+  min-width: 0;
+}
+
+.alios-home-page .alios-home-more > .alios-collapsible-trigger .alios-icon-primary {
+  display: none;
+}
+
+.alios-home-page .alios-home-more > .alios-collapsible-trigger .text-lg {
+  font-size: 1rem;
+  line-height: 1.75rem;
+}
+
+.alios-home-page .alios-home-more > .alios-collapsible-trigger .text-sm {
+  font-size: 0.75rem;
+  line-height: 1.5rem;
+}
+
+.alios-home-page .alios-home-backup {
+  flex-wrap: wrap;
+  border: 1px solid hsl(var(--border));
+  border-inline-start: 3px solid hsl(var(--warning));
+  border-radius: 0.5rem;
+  background: hsl(var(--warning) / 0.045);
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.alios-home-page .alios-home-backup > div:last-child {
+  min-width: 0;
+  max-width: 100%;
+  flex-shrink: 1;
+}
+
+.alios-home-page .alios-home-backup > div:first-child {
+  flex-basis: 20rem;
+}
+
+@media (min-width: 640px) {
+  .alios-home-page { gap: 1.5rem; padding-block: 1rem 1.5rem; }
+  .alios-home-page .alios-home-focus-content { padding: 1.5rem; }
+  .alios-home-page .alios-home-focus-actions { flex-direction: row; gap: 0.75rem; }
+  .alios-home-page .alios-home-metric { flex-direction: row; align-items: start; gap: 0.75rem; padding: 1.125rem 0.875rem; text-align: start; }
+  .alios-home-page .alios-home-metric-icon { padding-block-start: 0.375rem; }
+}
+
+@media (min-width: 1200px) {
+  .alios-home-page .alios-home-focus-body { grid-template-columns: minmax(0, 1fr) minmax(12rem, auto); gap: 2rem; }
+  .alios-home-page .alios-home-focus-actions { flex-direction: column; }
+  .alios-home-page .alios-home-focus-title { font-size: 1.5rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .alios-home-page *,
+  .alios-home-page *::before,
+  .alios-home-page *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

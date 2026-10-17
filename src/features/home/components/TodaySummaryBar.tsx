@@ -42,7 +42,7 @@ function getProgressTone(progress: number | null): SummaryMetric["tone"] {
 
 function getIconClassName(tone: SummaryMetric["tone"]) {
   return cn(
-    "h-5 w-5",
+    "h-4 w-4",
     tone === "success" && "text-alios-herb",
     tone === "warning" && "text-alios-saffron",
     tone === "neutral" && "text-muted-foreground"
@@ -105,21 +105,23 @@ export function TodaySummaryBar({ data, today }: TodaySummaryBarProps) {
   ];
 
   return (
-    <SoftPanel className="alios-home-context-shelf grid grid-cols-4 gap-2 border-alios-herb/25 bg-background/90 p-2 shadow-sm">
+    <SoftPanel className="alios-home-metrics">
       {metrics.map(({ icon: Icon, labelKey, labelValues, to, tone, value }) => (
         <Link
           key={labelKey}
           to={to}
-          className="flex min-h-16 min-w-0 items-center gap-2 rounded-2xl border bg-card/80 px-2 py-2 text-start shadow-sm transition hover:border-primary/25 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          className="alios-home-metric focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
         >
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border bg-background/80">
+          <span className="alios-home-metric-icon">
             <Icon className={getIconClassName(tone)} aria-hidden="true" />
           </span>
-          <span className="min-w-0 space-y-0.5">
-            <span className="block truncate text-lg font-semibold tabular-nums tracking-tight">
-              {value}
+          <span className="alios-home-metric-copy">
+            <span className="alios-home-metric-value">
+              {typeof value === "number"
+                ? new Intl.NumberFormat(language === "fa" ? "fa-IR" : "en-US").format(value)
+                : value}
             </span>
-            <span className="block truncate text-[10px] font-medium leading-5 text-muted-foreground">
+            <span className="alios-home-metric-label">
               {t(labelKey, labelValues)}
             </span>
           </span>

@@ -78,7 +78,7 @@ export function MobileSidebar({ open, onClose }: MobileSidebarProps) {
     >
       <div
         className={cn(
-          "absolute inset-0 bg-background/80 backdrop-blur-md transition-opacity duration-200 ease-out motion-reduce:transition-none",
+          "absolute inset-0 bg-background/80 backdrop-blur-sm transition-opacity duration-200 ease-out motion-reduce:transition-none",
           open ? "opacity-100" : "opacity-0"
         )}
         aria-hidden="true"
@@ -88,7 +88,7 @@ export function MobileSidebar({ open, onClose }: MobileSidebarProps) {
       <aside
         ref={sidebarRef}
         className={cn(
-          "absolute top-2 flex h-[calc(100%-1rem)] w-[19rem] max-w-[88vw] flex-col overflow-hidden rounded-[2rem] border bg-card/95 pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)] shadow-[0_28px_70px_-30px_rgba(15,23,42,0.45)] backdrop-blur-xl transition-transform duration-300 ease-out motion-reduce:transition-none",
+          "alios-workspace-mobile-sidebar absolute top-2 flex h-[calc(100%-1rem)] w-[19rem] max-w-[88vw] flex-col overflow-hidden rounded-lg border bg-card pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)] shadow-aliosFloating transition-transform duration-200 ease-out motion-reduce:transition-none",
           direction === "rtl" ? "right-2" : "left-2",
           open ? "translate-x-0" : direction === "rtl" ? "translate-x-full" : "-translate-x-full"
         )}
@@ -115,7 +115,7 @@ export function MobileSidebar({ open, onClose }: MobileSidebarProps) {
           </Button>
         </div>
 
-        <nav className="flex flex-1 flex-col gap-1.5 overflow-y-auto p-3" aria-label={t("nav.mobile")}>
+        <nav className="alios-workspace-navigation flex flex-1 flex-col gap-4 overflow-y-auto p-3" aria-label={t("nav.mobile")}>
           <NavigationGroupList onNavigate={onClose} />
         </nav>
       </aside>

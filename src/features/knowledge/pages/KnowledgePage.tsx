@@ -40,6 +40,7 @@ import {
   buildKnowledgeGraph,
 } from "../knowledgeGraph";
 import type { KnowledgeItemFormValues } from "../types";
+import "../knowledge-presentation.css";
 
 export function KnowledgePage() {
   const { direction, t } = useI18n();
@@ -67,6 +68,7 @@ export function KnowledgePage() {
   const [editingItem, setEditingItem] = useState<KnowledgeItem | undefined>();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [openOverflowItemId, setOpenOverflowItemId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [appliedQuery, setAppliedQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<KnowledgeItemType | "all">("all");
@@ -358,9 +360,9 @@ export function KnowledgePage() {
   ]);
 
   return (
-    <section className="alios-page space-y-6">
-      <PremiumCard className="alios-now-surface">
-        <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+    <section className="alios-page alios-knowledge space-y-5">
+      <PremiumCard className="knowledge-header alios-now-surface">
+        <CardContent className="knowledge-header-content flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
           <SectionHeader
             icon={<BookOpen className="h-5 w-5" />}
             title={t("knowledge.title")}
@@ -374,13 +376,13 @@ export function KnowledgePage() {
       </PremiumCard>
 
       {formOpen ? (
-        <PremiumCard>
-          <CardHeader>
+        <PremiumCard className="knowledge-editor">
+          <CardHeader className="knowledge-editor-heading">
             <CardTitle>
               {editingItem ? t("knowledge.edit") : t("knowledge.create")}
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="knowledge-editor-content">
             <KnowledgeItemForm
               key={editingItem?.id ?? "new-item"}
               item={editingItem}
@@ -397,10 +399,10 @@ export function KnowledgePage() {
         </PremiumCard>
       ) : null}
 
-      <PremiumCard>
-        <CardContent className="pt-6">
+      <PremiumCard className="knowledge-filters">
+        <CardContent className="knowledge-filters-content pt-6">
           <form
-            className="grid gap-3 md:grid-cols-[1fr_12rem_auto]"
+            className="knowledge-filter-form grid gap-3 md:grid-cols-[minmax(0,1fr)_12rem_auto]"
             onSubmit={(event) => {
               event.preventDefault();
               void handleSearch();
@@ -486,7 +488,7 @@ export function KnowledgePage() {
       ) : null}
 
       {isLoading ? (
-        <div className="grid gap-4" aria-label={t("knowledge.loading")}>
+        <div className="knowledge-list grid gap-4" aria-label={t("knowledge.loading")}>
           {[0, 1, 2].map((item) => (
             <div
               key={item}
@@ -523,7 +525,7 @@ export function KnowledgePage() {
         />
       ) : (
         <>
-          <div className="flex flex-wrap justify-start gap-2">
+          <div className="knowledge-view-toggle flex flex-wrap justify-start gap-2">
             <Button
               type="button"
               variant={viewMode === "list" ? "default" : "outline"}
@@ -546,7 +548,7 @@ export function KnowledgePage() {
               onSelectNode={focusKnowledgeItem}
             />
           ) : (
-        <div className="grid gap-4">
+        <div className="knowledge-list grid gap-4">
           {displayedItems.map((item) => (
             <div
               key={item.id}
@@ -602,6 +604,15 @@ export function KnowledgePage() {
                   }));
                 }}
                 isDeleting={deletingId === item.id}
+                isOverflowOpen={openOverflowItemId === item.id}
+                onOverflowToggle={() =>
+                  setOpenOverflowItemId((current) =>
+                    current === item.id ? null : item.id
+                  )
+                }
+                onOverflowClose={() =>
+                  setOpenOverflowItemId((current) => current === item.id ? null : current)
+                }
                 onEdit={() => openEditForm(item)}
                 onDelete={() => handleDelete(item)}
               />

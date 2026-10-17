@@ -39,11 +39,11 @@ export function ProjectKanbanBoard({
   };
 
   return (
-    <div className="grid gap-4 xl:grid-cols-5" aria-label={t("projects.kanbanBoard")}>
+    <div className="projects-kanban grid gap-4" aria-label={t("projects.kanbanBoard")}>
       {groupProjectsByStatus(projects).map(({ status, projects: columnProjects }) => (
         <section
           key={status}
-          className="min-w-0 rounded-2xl border bg-card/90 p-3 shadow-sm"
+          className="project-kanban-column min-w-0 rounded-2xl border bg-card/90 p-3 shadow-sm"
           onDragOver={(event) => event.preventDefault()}
           onDrop={(event) => {
             event.preventDefault();
@@ -54,7 +54,11 @@ export function ProjectKanbanBoard({
           }}
         >
           <div className="mb-3 flex min-w-0 items-center justify-between gap-2">
-            <h2 className="min-w-0 break-words text-sm font-semibold">
+            <h2 className={cn(
+              "min-w-0 break-words rounded-control px-2 py-1 text-sm font-semibold",
+              status === "completed" && "alios-status-success",
+              status === "waiting" && "alios-status-warning"
+            )}>
               {t(PROJECT_STATUS_LABEL_KEYS[status])}
             </h2>
             <span className="rounded-full bg-secondary px-2.5 py-1 font-mono text-xs tabular-nums text-secondary-foreground">
@@ -68,7 +72,7 @@ export function ProjectKanbanBoard({
                   key={project.id}
                   draggable
                   className={cn(
-                    "rounded-2xl border bg-background/95 p-3 shadow-sm transition-[border-color,box-shadow,transform] duration-200 ease-out",
+                    "project-kanban-card rounded-2xl border bg-background/95 p-3 shadow-sm transition-[border-color,box-shadow,transform] duration-200 ease-out motion-reduce:transition-none",
                     draggedProjectId === project.id
                       ? "border-primary/50 shadow-md"
                       : "border-border/70"

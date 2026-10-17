@@ -70,11 +70,11 @@ export function GoalForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)]">
+    <form onSubmit={handleSubmit} className="goal-form space-y-5">
+      <div className="goal-form-layout grid gap-5">
         <div className="space-y-5">
           <SoftPanel className="space-y-4">
-            <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_14rem]">
+            <div className="goal-form-identity grid gap-4">
               <label className="space-y-2">
                 <span className="text-sm font-medium">{t("goals.titleLabel")}</span>
                 <Input
@@ -117,7 +117,7 @@ export function GoalForm({
         </div>
 
         <div className="space-y-5">
-          <SoftPanel className="grid gap-4 sm:grid-cols-2">
+          <SoftPanel className="goal-form-properties grid gap-4">
             <label className="space-y-2">
               <span className="text-sm font-medium">{t("goals.areaLabel")}</span>
               <Select

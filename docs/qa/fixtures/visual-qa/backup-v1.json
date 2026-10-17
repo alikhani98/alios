@@ -1,0 +1,2252 @@
+{
+  "app": "AliOS",
+  "backupVersion": 1,
+  "exportedAt": "2026-10-16T18:00:00.000Z",
+  "data": {
+    "dailyCheckins": [
+      {
+        "id": "visual-qa-v1-checkin-001",
+        "createdAt": "2026-10-03T06:00:00.000Z",
+        "updatedAt": "2026-10-03T12:00:00.000Z",
+        "date": "2026-10-03",
+        "sleepQuality": "good",
+        "energyLevel": "medium",
+        "moodLevel": "good",
+        "stressLevel": "low",
+        "medicationDone": false,
+        "smokingStatus": "none",
+        "notes": "یادداشت آزمایشی: مطالعه و حرکت کوتاه در طول روز."
+      },
+      {
+        "id": "visual-qa-v1-checkin-002",
+        "createdAt": "2026-10-04T06:00:00.000Z",
+        "updatedAt": "2026-10-04T12:00:00.000Z",
+        "date": "2026-10-04",
+        "sleepQuality": "medium",
+        "energyLevel": "good",
+        "moodLevel": "medium",
+        "stressLevel": "medium",
+        "medicationDone": true,
+        "smokingStatus": "none",
+        "notes": "یادداشت آزمایشی: مطالعه و حرکت کوتاه در طول روز."
+      },
+      {
+        "id": "visual-qa-v1-checkin-003",
+        "createdAt": "2026-10-05T06:00:00.000Z",
+        "updatedAt": "2026-10-05T12:00:00.000Z",
+        "date": "2026-10-05",
+        "sleepQuality": "low",
+        "energyLevel": "low",
+        "moodLevel": "medium",
+        "stressLevel": "high",
+        "medicationDone": true,
+        "smokingStatus": "none",
+        "notes": "یادداشت آزمایشی: مطالعه و حرکت کوتاه در طول روز."
+      },
+      {
+        "id": "visual-qa-v1-checkin-004",
+        "createdAt": "2026-10-06T06:00:00.000Z",
+        "updatedAt": "2026-10-06T12:00:00.000Z",
+        "date": "2026-10-06",
+        "sleepQuality": "good",
+        "energyLevel": "medium",
+        "moodLevel": "good",
+        "stressLevel": "low",
+        "medicationDone": false,
+        "smokingStatus": "none",
+        "notes": "یادداشت آزمایشی: مطالعه و حرکت کوتاه در طول روز."
+      },
+      {
+        "id": "visual-qa-v1-checkin-005",
+        "createdAt": "2026-10-07T06:00:00.000Z",
+        "updatedAt": "2026-10-07T12:00:00.000Z",
+        "date": "2026-10-07",
+        "sleepQuality": "medium",
+        "energyLevel": "good",
+        "moodLevel": "medium",
+        "stressLevel": "medium",
+        "medicationDone": true,
+        "smokingStatus": "none",
+        "notes": "یادداشت آزمایشی: مطالعه و حرکت کوتاه در طول روز."
+      },
+      {
+        "id": "visual-qa-v1-checkin-006",
+        "createdAt": "2026-10-08T06:00:00.000Z",
+        "updatedAt": "2026-10-08T12:00:00.000Z",
+        "date": "2026-10-08",
+        "sleepQuality": "low",
+        "energyLevel": "low",
+        "moodLevel": "medium",
+        "stressLevel": "high",
+        "medicationDone": true,
+        "smokingStatus": "none",
+        "notes": "یادداشت آزمایشی: مطالعه و حرکت کوتاه در طول روز."
+      },
+      {
+        "id": "visual-qa-v1-checkin-007",
+        "createdAt": "2026-10-09T06:00:00.000Z",
+        "updatedAt": "2026-10-09T12:00:00.000Z",
+        "date": "2026-10-09",
+        "sleepQuality": "good",
+        "energyLevel": "medium",
+        "moodLevel": "good",
+        "stressLevel": "low",
+        "medicationDone": false,
+        "smokingStatus": "none",
+        "notes": "یادداشت آزمایشی: مطالعه و حرکت کوتاه در طول روز."
+      },
+      {
+        "id": "visual-qa-v1-checkin-008",
+        "createdAt": "2026-10-10T06:00:00.000Z",
+        "updatedAt": "2026-10-10T12:00:00.000Z",
+        "date": "2026-10-10",
+        "sleepQuality": "medium",
+        "energyLevel": "good",
+        "moodLevel": "medium",
+        "stressLevel": "medium",
+        "medicationDone": true,
+        "smokingStatus": "none",
+        "notes": "یادداشت آزمایشی: مطالعه و حرکت کوتاه در طول روز."
+      },
+      {
+        "id": "visual-qa-v1-checkin-009",
+        "createdAt": "2026-10-11T06:00:00.000Z",
+        "updatedAt": "2026-10-11T12:00:00.000Z",
+        "date": "2026-10-11",
+        "sleepQuality": "low",
+        "energyLevel": "low",
+        "moodLevel": "medium",
+        "stressLevel": "high",
+        "medicationDone": true,
+        "smokingStatus": "none",
+        "notes": "یادداشت آزمایشی: مطالعه و حرکت کوتاه در طول روز."
+      },
+      {
+        "id": "visual-qa-v1-checkin-010",
+        "createdAt": "2026-10-12T06:00:00.000Z",
+        "updatedAt": "2026-10-12T12:00:00.000Z",
+        "date": "2026-10-12",
+        "sleepQuality": "good",
+        "energyLevel": "medium",
+        "moodLevel": "good",
+        "stressLevel": "low",
+        "medicationDone": false,
+        "smokingStatus": "none",
+        "notes": "یادداشت آزمایشی: مطالعه و حرکت کوتاه در طول روز."
+      },
+      {
+        "id": "visual-qa-v1-checkin-011",
+        "createdAt": "2026-10-13T06:00:00.000Z",
+        "updatedAt": "2026-10-13T12:00:00.000Z",
+        "date": "2026-10-13",
+        "sleepQuality": "medium",
+        "energyLevel": "good",
+        "moodLevel": "medium",
+        "stressLevel": "medium",
+        "medicationDone": true,
+        "smokingStatus": "none",
+        "notes": "یادداشت آزمایشی: مطالعه و حرکت کوتاه در طول روز."
+      },
+      {
+        "id": "visual-qa-v1-checkin-012",
+        "createdAt": "2026-10-14T06:00:00.000Z",
+        "updatedAt": "2026-10-14T12:00:00.000Z",
+        "date": "2026-10-14",
+        "sleepQuality": "low",
+        "energyLevel": "low",
+        "moodLevel": "medium",
+        "stressLevel": "high",
+        "medicationDone": true,
+        "smokingStatus": "none",
+        "notes": "یادداشت آزمایشی: مطالعه و حرکت کوتاه در طول روز."
+      },
+      {
+        "id": "visual-qa-v1-checkin-013",
+        "createdAt": "2026-10-15T06:00:00.000Z",
+        "updatedAt": "2026-10-15T12:00:00.000Z",
+        "date": "2026-10-15",
+        "sleepQuality": "good",
+        "energyLevel": "medium",
+        "moodLevel": "good",
+        "stressLevel": "low",
+        "medicationDone": false,
+        "smokingStatus": "none",
+        "notes": "یادداشت آزمایشی: مطالعه و حرکت کوتاه در طول روز."
+      },
+      {
+        "id": "visual-qa-v1-checkin-014",
+        "createdAt": "2026-10-16T06:00:00.000Z",
+        "updatedAt": "2026-10-16T12:00:00.000Z",
+        "date": "2026-10-16",
+        "sleepQuality": "medium",
+        "energyLevel": "good",
+        "moodLevel": "medium",
+        "stressLevel": "medium",
+        "medicationDone": true,
+        "smokingStatus": "none",
+        "mitTaskId": "visual-qa-v1-task-001",
+        "notes": "رکورد کاملاً ساختگی برای بررسی ظاهر امروز؛ پیش از شروع، یک کار کوچک انتخاب شد."
+      }
+    ],
+    "dailyCommitments": [
+      {
+        "id": "visual-qa-v1-commitment-001",
+        "createdAt": "2026-10-16T04:00:00.000Z",
+        "updatedAt": "2026-10-16T12:00:00.000Z",
+        "date": "2026-10-16",
+        "title": "مرور یک بخش از گزارش",
+        "plannedStartTime": "08:30",
+        "minimumVersion": "فقط باز کردن جدول و نوشتن یک سؤال.",
+        "didStart": true,
+        "startedAt": "2026-10-16T05:00:00.000Z",
+        "preStartFeeling": "کمی پراکنده، اما آماده شروع.",
+        "mainBlocker": "باز بودن چند صفحه نامرتبط.",
+        "endOfDayNote": "نمونه ساختگی؛ قدم کوچک انجام شد."
+      },
+      {
+        "id": "visual-qa-v1-commitment-002",
+        "createdAt": "2026-10-15T06:00:00.000Z",
+        "updatedAt": "2026-10-15T12:00:00.000Z",
+        "date": "2026-10-15",
+        "title": "ده دقیقه مطالعه",
+        "plannedStartTime": "19:00",
+        "minimumVersion": "خواندن یک صفحه.",
+        "didStart": false,
+        "startedAt": null,
+        "preStartFeeling": "خسته",
+        "mainBlocker": "کارهای خانه بیشتر از انتظار زمان گرفت.",
+        "endOfDayNote": "برای فردا نسخه کوتاه‌تری نگه می‌دارم."
+      }
+    ],
+    "urgeEntries": [
+      {
+        "id": "visual-qa-v1-urge-001",
+        "date": "2026-10-16",
+        "time": "11:15",
+        "urgeType": "تلفن",
+        "intensity": 5,
+        "feeling": "حواس‌پرتی",
+        "action": "resisted",
+        "delayedTenMin": true,
+        "note": "ده دقیقه به کار اصلی برگشتم؛ رویداد کاملاً ساختگی.",
+        "createdAt": "2026-10-16T07:45:00.000Z"
+      },
+      {
+        "id": "visual-qa-v1-urge-002",
+        "date": "2026-10-16",
+        "time": "16:20",
+        "urgeType": "خرید",
+        "intensity": 7,
+        "feeling": "هیجان",
+        "action": "delayed",
+        "delayedTenMin": true,
+        "note": "کالا در فهرست انتظار نوشته شد.",
+        "createdAt": "2026-10-16T12:50:00.000Z"
+      },
+      {
+        "id": "visual-qa-v1-urge-003",
+        "date": "2026-10-13",
+        "time": "18:00",
+        "urgeType": "تلفن",
+        "intensity": 3,
+        "feeling": "بی‌حوصلگی",
+        "action": "acted",
+        "delayedTenMin": false,
+        "note": "بعد از چند دقیقه، استفاده از تلفن را تمام کردم.",
+        "createdAt": "2026-10-13T14:30:00.000Z"
+      }
+    ],
+    "tasks": [
+      {
+        "id": "visual-qa-v1-task-001",
+        "createdAt": "2026-08-31T06:00:00.000Z",
+        "updatedAt": "2026-10-16T12:00:00.000Z",
+        "title": "مرور فصل اول",
+        "description": "یک قدم مشخص برای برنامه شخصی آزمایشی.",
+        "status": "todo",
+        "priority": "high",
+        "isMit": true,
+        "dueDate": "2026-10-16",
+        "projectId": "visual-qa-v1-project-001",
+        "routineId": "visual-qa-v1-routine-001",
+        "scheduledStartTime": "08:30",
+        "estimatedMinutes": 25
+      },
+      {
+        "id": "visual-qa-v1-task-002",
+        "createdAt": "2026-08-31T06:00:00.000Z",
+        "updatedAt": "2026-10-16T12:00:00.000Z",
+        "title": "پیاده‌روی در مسیر محله و ثبت نکته‌هایی که به حفظ استمرار در روزهای شلوغ و کم‌انرژی کمک می‌کنند",
+        "description": "یک قدم مشخص برای برنامه شخصی آزمایشی.",
+        "status": "doing",
+        "priority": "high",
+        "isMit": false,
+        "dueDate": "2026-10-16",
+        "projectId": "visual-qa-v1-project-002",
+        "routineId": "visual-qa-v1-routine-002",
+        "scheduledStartTime": "13:30",
+        "estimatedMinutes": 30
+      },
+      {
+        "id": "visual-qa-v1-task-003",
+        "createdAt": "2026-08-31T06:00:00.000Z",
+        "updatedAt": "2026-10-16T12:00:00.000Z",
+        "title": "Prepare the fictional library dataset and document the assumptions for the small personal data analysis report",
+        "description": "Dataset: Library QA / نسخه ساختگی. هیچ داده شخصی یا فایل واقعی استفاده نمی‌شود.",
+        "status": "todo",
+        "priority": "medium",
+        "isMit": false,
+        "dueDate": "2026-10-16",
+        "projectId": "visual-qa-v1-project-001",
+        "scheduledStartTime": "19:00",
+        "estimatedMinutes": 45
+      },
+      {
+        "id": "visual-qa-v1-task-004",
+        "createdAt": "2026-08-31T06:00:00.000Z",
+        "updatedAt": "2026-10-15T12:00:00.000Z",
+        "title": "بازگرداندن کتاب امانتی",
+        "description": "یک قدم مشخص برای برنامه شخصی آزمایشی.",
+        "status": "todo",
+        "priority": "medium",
+        "isMit": false,
+        "dueDate": "2026-10-15",
+        "projectId": "visual-qa-v1-project-001",
+        "scheduledStartTime": "10:00",
+        "estimatedMinutes": 15
+      },
+      {
+        "id": "visual-qa-v1-task-005",
+        "createdAt": "2026-08-31T06:00:00.000Z",
+        "updatedAt": "2026-10-16T12:00:00.000Z",
+        "title": "ویرایش یادداشت گزارش",
+        "description": "یک قدم مشخص برای برنامه شخصی آزمایشی.",
+        "status": "todo",
+        "priority": "high",
+        "isMit": false,
+        "dueDate": "2026-10-17",
+        "projectId": "visual-qa-v1-project-001",
+        "scheduledStartTime": "09:00",
+        "estimatedMinutes": 40
+      },
+      {
+        "id": "visual-qa-v1-task-006",
+        "createdAt": "2026-08-31T06:00:00.000Z",
+        "updatedAt": "2026-10-16T12:00:00.000Z",
+        "title": "ثبت هزینه‌های هفته",
+        "description": "یک قدم مشخص برای برنامه شخصی آزمایشی.",
+        "status": "todo",
+        "priority": "medium",
+        "isMit": false,
+        "dueDate": "2026-10-19",
+        "projectId": "visual-qa-v1-project-003",
+        "scheduledStartTime": "10:00",
+        "estimatedMinutes": 20,
+        "recurrence": {
+          "frequency": "weekly"
+        },
+        "recurrenceSeriesId": "visual-qa-v1-task-series-001"
+      },
+      {
+        "id": "visual-qa-v1-task-007",
+        "createdAt": "2026-08-31T06:00:00.000Z",
+        "updatedAt": "2026-10-16T12:00:00.000Z",
+        "title": "مرور سقف خریدها",
+        "description": "یک قدم مشخص برای برنامه شخصی آزمایشی.",
+        "status": "todo",
+        "priority": "low",
+        "isMit": false,
+        "dueDate": "2026-10-21",
+        "projectId": "visual-qa-v1-project-003",
+        "scheduledStartTime": "17:30",
+        "estimatedMinutes": 15
+      },
+      {
+        "id": "visual-qa-v1-task-008",
+        "createdAt": "2026-08-31T06:00:00.000Z",
+        "updatedAt": "2026-10-16T12:00:00.000Z",
+        "title": "برنامه‌ریزی خرید ماه بعد",
+        "description": "یک قدم مشخص برای برنامه شخصی آزمایشی.",
+        "status": "todo",
+        "priority": "medium",
+        "isMit": false,
+        "dueDate": "2026-10-26",
+        "projectId": "visual-qa-v1-project-003",
+        "scheduledStartTime": "11:00",
+        "estimatedMinutes": 30
+      },
+      {
+        "id": "visual-qa-v1-task-009",
+        "createdAt": "2026-08-31T06:00:00.000Z",
+        "updatedAt": "2026-10-14T12:00:00.000Z",
+        "title": "مرتب‌سازی جدول منابع",
+        "description": "یک قدم مشخص برای برنامه شخصی آزمایشی.",
+        "status": "done",
+        "priority": "medium",
+        "isMit": false,
+        "dueDate": "2026-10-14",
+        "projectId": "visual-qa-v1-project-001",
+        "scheduledStartTime": "14:00",
+        "estimatedMinutes": 35,
+        "completedAt": "2026-10-14T10:00:00.000Z"
+      },
+      {
+        "id": "visual-qa-v1-task-010",
+        "createdAt": "2026-08-31T06:00:00.000Z",
+        "updatedAt": "2026-10-16T12:00:00.000Z",
+        "title": "آماده‌سازی میان‌وعده",
+        "description": "یک قدم مشخص برای برنامه شخصی آزمایشی.",
+        "status": "done",
+        "priority": "low",
+        "isMit": false,
+        "dueDate": "2026-10-16",
+        "projectId": "visual-qa-v1-project-002",
+        "estimatedMinutes": 15,
+        "completedAt": "2026-10-16T10:00:00.000Z"
+      },
+      {
+        "id": "visual-qa-v1-task-011",
+        "createdAt": "2026-08-31T06:00:00.000Z",
+        "updatedAt": "2026-10-12T12:00:00.000Z",
+        "title": "پیاده‌روی کوتاه",
+        "description": "یک قدم مشخص برای برنامه شخصی آزمایشی.",
+        "status": "done",
+        "priority": "medium",
+        "isMit": false,
+        "dueDate": "2026-10-12",
+        "projectId": "visual-qa-v1-project-002",
+        "routineId": "visual-qa-v1-routine-002",
+        "estimatedMinutes": 20,
+        "completedAt": "2026-10-12T10:00:00.000Z",
+        "completedMinimum": true
+      },
+      {
+        "id": "visual-qa-v1-task-012",
+        "createdAt": "2026-08-31T06:00:00.000Z",
+        "updatedAt": "2026-10-10T12:00:00.000Z",
+        "title": "آماده‌سازی غذای ساده",
+        "description": "یک قدم مشخص برای برنامه شخصی آزمایشی.",
+        "status": "done",
+        "priority": "medium",
+        "isMit": false,
+        "dueDate": "2026-10-10",
+        "projectId": "visual-qa-v1-project-002",
+        "estimatedMinutes": 30,
+        "completedAt": "2026-10-10T10:00:00.000Z"
+      },
+      {
+        "id": "visual-qa-v1-task-013",
+        "createdAt": "2026-08-31T06:00:00.000Z",
+        "updatedAt": "2026-10-08T12:00:00.000Z",
+        "title": "پاک‌سازی داده آزمایشی",
+        "description": "یک قدم مشخص برای برنامه شخصی آزمایشی.",
+        "status": "done",
+        "priority": "high",
+        "isMit": false,
+        "dueDate": "2026-10-08",
+        "projectId": "visual-qa-v1-project-001",
+        "estimatedMinutes": 50,
+        "completedAt": "2026-10-08T10:00:00.000Z"
+      },
+      {
+        "id": "visual-qa-v1-task-014",
+        "createdAt": "2026-08-31T06:00:00.000Z",
+        "updatedAt": "2026-10-04T12:00:00.000Z",
+        "title": "چیدن وسایل تمرین",
+        "description": "یک قدم مشخص برای برنامه شخصی آزمایشی.",
+        "status": "done",
+        "priority": "low",
+        "isMit": false,
+        "dueDate": "2026-10-04",
+        "projectId": "visual-qa-v1-project-002",
+        "estimatedMinutes": 10,
+        "completedAt": "2026-10-04T10:00:00.000Z"
+      },
+      {
+        "id": "visual-qa-v1-task-015",
+        "createdAt": "2026-08-31T06:00:00.000Z",
+        "updatedAt": "2026-10-16T12:00:00.000Z",
+        "title": "خرید پاکت",
+        "description": "بدون موعد؛ فقط وقتی خرید ضروری دیگری داریم.",
+        "status": "todo",
+        "priority": "low",
+        "isMit": false,
+        "estimatedMinutes": 5
+      },
+      {
+        "id": "visual-qa-v1-task-016",
+        "createdAt": "2026-08-31T06:00:00.000Z",
+        "updatedAt": "2026-10-16T12:00:00.000Z",
+        "title": "بررسی روش ثبت رسیدها",
+        "description": "یک قدم مشخص برای برنامه شخصی آزمایشی.",
+        "status": "deferred",
+        "priority": "low",
+        "isMit": false,
+        "dueDate": "2026-10-23",
+        "projectId": "visual-qa-v1-project-003",
+        "estimatedMinutes": 20
+      },
+      {
+        "id": "visual-qa-v1-task-017",
+        "createdAt": "2026-08-31T06:00:00.000Z",
+        "updatedAt": "2026-10-06T12:00:00.000Z",
+        "title": "مقایسه برنامه قدیمی",
+        "description": "یک قدم مشخص برای برنامه شخصی آزمایشی.",
+        "status": "cancelled",
+        "priority": "low",
+        "isMit": false,
+        "dueDate": "2026-10-06",
+        "estimatedMinutes": 15
+      },
+      {
+        "id": "visual-qa-v1-task-018",
+        "createdAt": "2026-08-31T06:00:00.000Z",
+        "updatedAt": "2026-10-13T12:00:00.000Z",
+        "title": "چیدن کتاب‌ها روی قفسه",
+        "description": "یک قدم مشخص برای برنامه شخصی آزمایشی.",
+        "status": "done",
+        "priority": "medium",
+        "isMit": false,
+        "dueDate": "2026-10-13",
+        "projectId": "visual-qa-v1-project-005",
+        "estimatedMinutes": 25,
+        "completedAt": "2026-10-13T10:00:00.000Z"
+      }
+    ],
+    "goals": [
+      {
+        "id": "visual-qa-v1-goal-001",
+        "createdAt": "2026-08-17T06:00:00.000Z",
+        "updatedAt": "2026-10-16T12:00:00.000Z",
+        "title": "یادگیری تحلیل داده با یک پروژه کوچک",
+        "description": "ساخت یک گزارش قابل توضیح از داده‌های کاملاً ساختگی.",
+        "area": "learning",
+        "timeframe": "quarter",
+        "status": "active",
+        "importance": "high",
+        "progressPercent": 45,
+        "targetDate": "2026-12-15",
+        "reviewIntervalDays": 7,
+        "lastReviewedAt": "2026-10-07T12:00:00.000Z",
+        "tags": [
+          "learning",
+          "تمرین"
+        ],
+        "milestones": [
+          {
+            "id": "visual-qa-v1-goal-milestone-001",
+            "title": "شروع برنامه",
+            "done": true,
+            "date": "2026-09-21"
+          },
+          {
+            "id": "visual-qa-v1-goal-milestone-002",
+            "title": "مرور نتیجه و ادامه مسیر",
+            "done": false,
+            "date": "2026-12-15"
+          }
+        ],
+        "keyResults": [
+          {
+            "id": "visual-qa-v1-key-result-001",
+            "title": "بخش‌های تکمیل‌شده گزارش",
+            "progressPercent": 45
+          }
+        ]
+      },
+      {
+        "id": "visual-qa-v1-goal-002",
+        "createdAt": "2026-08-17T06:00:00.000Z",
+        "updatedAt": "2026-10-15T12:00:00.000Z",
+        "title": "چهار هفته حرکت منظم و تکمیل برنامه پیاده‌روی بدون فشار برای جبران روزهای از دست‌رفته",
+        "description": "حفظ استمرار با یک نسخه کوتاه در روزهای شلوغ.",
+        "area": "health",
+        "timeframe": "month",
+        "status": "active",
+        "importance": "medium",
+        "progressPercent": 90,
+        "targetDate": "2026-10-23",
+        "reviewIntervalDays": 7,
+        "lastReviewedAt": "2026-10-13T12:00:00.000Z",
+        "tags": [
+          "health",
+          "تمرین"
+        ],
+        "milestones": [
+          {
+            "id": "visual-qa-v1-goal-milestone-003",
+            "title": "شروع برنامه",
+            "done": true,
+            "date": "2026-09-21"
+          },
+          {
+            "id": "visual-qa-v1-goal-milestone-004",
+            "title": "مرور نتیجه و ادامه مسیر",
+            "done": false,
+            "date": "2026-10-23"
+          }
+        ],
+        "keyResults": [
+          {
+            "id": "visual-qa-v1-key-result-002",
+            "title": "پیشرفت ثبت‌شده",
+            "progressPercent": 90
+          }
+        ]
+      },
+      {
+        "id": "visual-qa-v1-goal-003",
+        "createdAt": "2026-08-17T06:00:00.000Z",
+        "updatedAt": "2026-10-14T12:00:00.000Z",
+        "title": "ساخت ذخیره هزینه‌های ضروری",
+        "description": "مرور ثبت‌های مالی و تعیین سقف قابل تحمل برای هزینه‌ها.",
+        "area": "finance",
+        "timeframe": "year",
+        "status": "active",
+        "importance": "high",
+        "progressPercent": 30,
+        "targetDate": "2027-02-13",
+        "reviewIntervalDays": 7,
+        "lastReviewedAt": "2026-10-13T12:00:00.000Z",
+        "tags": [
+          "finance",
+          "تمرین"
+        ],
+        "milestones": [
+          {
+            "id": "visual-qa-v1-goal-milestone-005",
+            "title": "شروع برنامه",
+            "done": true,
+            "date": "2026-09-21"
+          },
+          {
+            "id": "visual-qa-v1-goal-milestone-006",
+            "title": "مرور نتیجه و ادامه مسیر",
+            "done": false,
+            "date": "2027-02-13"
+          }
+        ],
+        "keyResults": [
+          {
+            "id": "visual-qa-v1-key-result-003",
+            "title": "پیشرفت ثبت‌شده",
+            "progressPercent": 30
+          }
+        ]
+      },
+      {
+        "id": "visual-qa-v1-goal-004",
+        "createdAt": "2026-08-17T06:00:00.000Z",
+        "updatedAt": "2026-10-13T12:00:00.000Z",
+        "title": "مرتب‌سازی کتابخانه",
+        "description": "کامل کردن یک پروژه خانگی کوچک و قابل مشاهده.",
+        "area": "personal",
+        "timeframe": "month",
+        "status": "completed",
+        "importance": "low",
+        "progressPercent": 100,
+        "targetDate": "2026-10-09",
+        "reviewIntervalDays": 7,
+        "lastReviewedAt": "2026-10-13T12:00:00.000Z",
+        "tags": [
+          "personal",
+          "تمرین"
+        ],
+        "milestones": [
+          {
+            "id": "visual-qa-v1-goal-milestone-007",
+            "title": "شروع برنامه",
+            "done": true,
+            "date": "2026-09-21"
+          },
+          {
+            "id": "visual-qa-v1-goal-milestone-008",
+            "title": "مرور نتیجه و ادامه مسیر",
+            "done": true,
+            "date": "2026-10-09"
+          }
+        ],
+        "keyResults": [
+          {
+            "id": "visual-qa-v1-key-result-004",
+            "title": "پیشرفت ثبت‌شده",
+            "progressPercent": 100
+          }
+        ]
+      }
+    ],
+    "lifeAreas": [
+      {
+        "id": "visual-qa-v1-area-001",
+        "createdAt": "2026-07-18T06:00:00.000Z",
+        "updatedAt": "2026-10-16T12:00:00.000Z",
+        "areaKey": "learning",
+        "title": "یادگیری و مطالعه",
+        "description": "تمرین مهارت تحلیل داده و مطالعه منظم.",
+        "status": "active",
+        "attentionLevel": "high",
+        "satisfactionScore": 3,
+        "focusNote": "یک قدم کوچک و قابل انجام در هر هفته.",
+        "reviewIntervalDays": 7,
+        "lastReviewedAt": "2026-10-06T12:00:00.000Z",
+        "tags": [
+          "learning",
+          "نمونه دیداری"
+        ]
+      },
+      {
+        "id": "visual-qa-v1-area-002",
+        "createdAt": "2026-07-18T06:00:00.000Z",
+        "updatedAt": "2026-10-15T12:00:00.000Z",
+        "areaKey": "health",
+        "title": "سلامت و حرکت",
+        "description": "پیاده‌روی، خواب منظم و غذای خانگی.",
+        "status": "active",
+        "attentionLevel": "medium",
+        "satisfactionScore": 4,
+        "focusNote": "یک قدم کوچک و قابل انجام در هر هفته.",
+        "reviewIntervalDays": 7,
+        "lastReviewedAt": "2026-10-06T12:00:00.000Z",
+        "tags": [
+          "health",
+          "نمونه دیداری"
+        ]
+      },
+      {
+        "id": "visual-qa-v1-area-003",
+        "createdAt": "2026-07-18T06:00:00.000Z",
+        "updatedAt": "2026-10-14T12:00:00.000Z",
+        "areaKey": "finance",
+        "title": "آرامش مالی",
+        "description": "ثبت مخارج روزمره و مرور تعهدات ماهانه.",
+        "status": "active",
+        "attentionLevel": "high",
+        "satisfactionScore": 2,
+        "focusNote": "ابتدا هزینه‌های ضروری؛ خریدهای اختیاری بعد از مرور بودجه.",
+        "reviewIntervalDays": 7,
+        "lastReviewedAt": "2026-10-06T12:00:00.000Z",
+        "tags": [
+          "finance",
+          "نمونه دیداری"
+        ]
+      },
+      {
+        "id": "visual-qa-v1-area-004",
+        "createdAt": "2026-07-18T06:00:00.000Z",
+        "updatedAt": "2026-10-15T12:00:00.000Z",
+        "areaKey": "work",
+        "title": "کار و مهارت حرفه‌ای",
+        "description": "پیشبرد پروژه کوچک شخصی با زمان محدود.",
+        "status": "active",
+        "attentionLevel": "low",
+        "satisfactionScore": 4,
+        "focusNote": "یک قدم کوچک و قابل انجام در هر هفته.",
+        "reviewIntervalDays": 7,
+        "lastReviewedAt": "2026-10-14T12:00:00.000Z",
+        "tags": [
+          "work",
+          "نمونه دیداری"
+        ]
+      },
+      {
+        "id": "visual-qa-v1-area-005",
+        "createdAt": "2026-07-18T06:00:00.000Z",
+        "updatedAt": "2026-10-15T12:00:00.000Z",
+        "areaKey": "relationships",
+        "title": "روابط و همراهی",
+        "description": "وقت گذاشتن برای گفت‌وگو و فعالیت مشترک.",
+        "status": "paused",
+        "attentionLevel": "medium",
+        "satisfactionScore": 3,
+        "focusNote": "یک قدم کوچک و قابل انجام در هر هفته.",
+        "reviewIntervalDays": 7,
+        "lastReviewedAt": "2026-10-14T12:00:00.000Z",
+        "tags": [
+          "relationships",
+          "نمونه دیداری"
+        ]
+      },
+      {
+        "id": "visual-qa-v1-area-006",
+        "createdAt": "2026-07-18T06:00:00.000Z",
+        "updatedAt": "2026-10-15T12:00:00.000Z",
+        "areaKey": "personal",
+        "title": "زندگی شخصی و خانه",
+        "description": "رسیدگی به خانه و برنامه‌ریزی سفرهای کوتاه.",
+        "status": "active",
+        "attentionLevel": "low",
+        "satisfactionScore": 5,
+        "focusNote": "یک قدم کوچک و قابل انجام در هر هفته.",
+        "reviewIntervalDays": 7,
+        "lastReviewedAt": "2026-10-14T12:00:00.000Z",
+        "tags": [
+          "personal",
+          "نمونه دیداری"
+        ]
+      }
+    ],
+    "decisionLogEntries": [
+      {
+        "id": "visual-qa-v1-decision-001",
+        "createdAt": "2026-10-15T06:00:00.000Z",
+        "updatedAt": "2026-10-15T12:00:00.000Z",
+        "title": "انتخاب مسیر یادگیری",
+        "decisionDate": "2026-10-15",
+        "status": "open",
+        "category": "برنامه‌ریزی",
+        "context": "این تصمیم و نتیجه آن کاملاً ساختگی است؛ برای نمایش حالات مختلف تصمیم‌نامه نوشته شده است.",
+        "projectId": "visual-qa-v1-project-001",
+        "goalId": "visual-qa-v1-goal-001",
+        "taskId": "visual-qa-v1-task-003",
+        "options": [
+          "نسخه ساده و کم‌هزینه",
+          "نسخه کامل با زمان بیشتر"
+        ],
+        "reviewDate": "2026-10-21",
+        "confidence": 1,
+        "importance": 5,
+        "tags": [
+          "نمونه",
+          "تصمیم"
+        ]
+      },
+      {
+        "id": "visual-qa-v1-decision-002",
+        "createdAt": "2026-10-13T06:00:00.000Z",
+        "updatedAt": "2026-10-13T12:00:00.000Z",
+        "title": "خرید کتاب یا امانت گرفتن",
+        "decisionDate": "2026-10-13",
+        "status": "decided",
+        "category": "برنامه‌ریزی",
+        "context": "این تصمیم و نتیجه آن کاملاً ساختگی است؛ برای نمایش حالات مختلف تصمیم‌نامه نوشته شده است.",
+        "projectId": "visual-qa-v1-project-001",
+        "goalId": "visual-qa-v1-goal-001",
+        "taskId": "visual-qa-v1-task-004",
+        "options": [
+          "نسخه ساده و کم‌هزینه",
+          "نسخه کامل با زمان بیشتر"
+        ],
+        "chosenOption": "نسخه ساده و کم‌هزینه",
+        "reasoning": "هزینه و زمان کمتر، امکان ادامه را بیشتر می‌کند.",
+        "expectedOutcome": "پیشرفت کوچک اما پیوسته.",
+        "reviewDate": "2026-10-15",
+        "confidence": 2,
+        "importance": 4,
+        "tags": [
+          "نمونه",
+          "تصمیم"
+        ]
+      },
+      {
+        "id": "visual-qa-v1-decision-003",
+        "createdAt": "2026-10-10T06:00:00.000Z",
+        "updatedAt": "2026-10-10T12:00:00.000Z",
+        "title": "کاهش اصطکاک شروع برنامه حرکت در هفته‌هایی که زمان آزاد بین کارهای خانه و پروژه شخصی پراکنده می‌شود",
+        "decisionDate": "2026-10-10",
+        "status": "decided",
+        "category": "برنامه‌ریزی",
+        "context": "این تصمیم و نتیجه آن کاملاً ساختگی است؛ برای نمایش حالات مختلف تصمیم‌نامه نوشته شده است.",
+        "projectId": "visual-qa-v1-project-002",
+        "goalId": "visual-qa-v1-goal-002",
+        "taskId": "visual-qa-v1-task-002",
+        "options": [
+          "نسخه ساده و کم‌هزینه",
+          "نسخه کامل با زمان بیشتر"
+        ],
+        "chosenOption": "نسخه ساده و کم‌هزینه",
+        "reasoning": "هزینه و زمان کمتر، امکان ادامه را بیشتر می‌کند.",
+        "expectedOutcome": "پیشرفت کوچک اما پیوسته.",
+        "reviewDate": "2026-10-21",
+        "confidence": 3,
+        "importance": 3,
+        "tags": [
+          "نمونه",
+          "تصمیم"
+        ]
+      },
+      {
+        "id": "visual-qa-v1-decision-004",
+        "createdAt": "2026-10-04T06:00:00.000Z",
+        "updatedAt": "2026-10-04T12:00:00.000Z",
+        "title": "قفسه آماده یا دست‌ساز",
+        "decisionDate": "2026-10-04",
+        "status": "reviewed",
+        "category": "برنامه‌ریزی",
+        "context": "این تصمیم و نتیجه آن کاملاً ساختگی است؛ برای نمایش حالات مختلف تصمیم‌نامه نوشته شده است.",
+        "projectId": "visual-qa-v1-project-005",
+        "goalId": "visual-qa-v1-goal-004",
+        "taskId": "visual-qa-v1-task-018",
+        "options": [
+          "نسخه ساده و کم‌هزینه",
+          "نسخه کامل با زمان بیشتر"
+        ],
+        "chosenOption": "نسخه ساده و کم‌هزینه",
+        "reasoning": "هزینه و زمان کمتر، امکان ادامه را بیشتر می‌کند.",
+        "expectedOutcome": "پیشرفت کوچک اما پیوسته.",
+        "actualOutcome": "نسخه ساده برای نیاز فعلی کافی بود.",
+        "lesson": "قبل از توسعه، یک نمونه کوچک بساز.",
+        "confidence": 4,
+        "importance": 2,
+        "tags": [
+          "نمونه",
+          "تصمیم"
+        ]
+      },
+      {
+        "id": "visual-qa-v1-decision-005",
+        "createdAt": "2026-09-11T06:00:00.000Z",
+        "updatedAt": "2026-09-11T12:00:00.000Z",
+        "title": "ابزار قدیمی ثبت مخارج",
+        "decisionDate": "2026-09-11",
+        "status": "archived",
+        "category": "مالی",
+        "context": "این تصمیم و نتیجه آن کاملاً ساختگی است؛ برای نمایش حالات مختلف تصمیم‌نامه نوشته شده است.",
+        "projectId": "visual-qa-v1-project-003",
+        "goalId": "visual-qa-v1-goal-003",
+        "taskId": "visual-qa-v1-task-006",
+        "options": [
+          "نسخه ساده و کم‌هزینه",
+          "نسخه کامل با زمان بیشتر"
+        ],
+        "chosenOption": "نسخه ساده و کم‌هزینه",
+        "reasoning": "هزینه و زمان کمتر، امکان ادامه را بیشتر می‌کند.",
+        "expectedOutcome": "پیشرفت کوچک اما پیوسته.",
+        "confidence": 5,
+        "importance": 1,
+        "tags": [
+          "نمونه",
+          "تصمیم"
+        ]
+      }
+    ],
+    "experiments": [
+      {
+        "id": "visual-qa-v1-experiment-001",
+        "createdAt": "2026-10-06T06:00:00.000Z",
+        "updatedAt": "2026-10-15T12:00:00.000Z",
+        "title": "مطالعه قبل از باز کردن پیام‌ها",
+        "ifCondition": "اگر پیش از بررسی پیام‌ها ده دقیقه مطالعه کنم",
+        "thenHypothesis": "شروع کار اصلی ساده‌تر می‌شود.",
+        "startDate": "2026-10-06",
+        "endDate": "2026-10-20",
+        "status": "active"
+      },
+      {
+        "id": "visual-qa-v1-experiment-002",
+        "createdAt": "2026-09-11T06:00:00.000Z",
+        "updatedAt": "2026-09-26T12:00:00.000Z",
+        "title": "مرتب‌سازی میز در پایان روز",
+        "ifCondition": "اگر شب فقط سطح میز را مرتب کنم",
+        "thenHypothesis": "برای شروع صبح زمان کمتری صرف آماده‌سازی می‌شود.",
+        "startDate": "2026-09-11",
+        "endDate": "2026-09-25",
+        "status": "completed"
+      }
+    ],
+    "experimentLogs": [
+      {
+        "id": "visual-qa-v1-experiment-log-001",
+        "experimentId": "visual-qa-v1-experiment-001",
+        "date": "2026-10-10",
+        "conditionMet": true,
+        "hypothesisResult": true,
+        "note": "نسخه کوتاه انجام شد؛ مشاهده ساختگی.",
+        "createdAt": "2026-10-10T12:00:00.000Z"
+      },
+      {
+        "id": "visual-qa-v1-experiment-log-002",
+        "experimentId": "visual-qa-v1-experiment-001",
+        "date": "2026-10-12",
+        "conditionMet": true,
+        "hypothesisResult": false,
+        "note": "نسخه کوتاه انجام شد؛ مشاهده ساختگی.",
+        "createdAt": "2026-10-12T12:00:00.000Z"
+      },
+      {
+        "id": "visual-qa-v1-experiment-log-003",
+        "experimentId": "visual-qa-v1-experiment-001",
+        "date": "2026-10-14",
+        "conditionMet": false,
+        "hypothesisResult": false,
+        "note": "شرط این روز برقرار نبود.",
+        "createdAt": "2026-10-14T12:00:00.000Z"
+      },
+      {
+        "id": "visual-qa-v1-experiment-log-004",
+        "experimentId": "visual-qa-v1-experiment-001",
+        "date": "2026-10-15",
+        "conditionMet": true,
+        "hypothesisResult": true,
+        "note": "نسخه کوتاه انجام شد؛ مشاهده ساختگی.",
+        "createdAt": "2026-10-15T12:00:00.000Z"
+      },
+      {
+        "id": "visual-qa-v1-experiment-log-005",
+        "experimentId": "visual-qa-v1-experiment-002",
+        "date": "2026-09-18",
+        "conditionMet": true,
+        "hypothesisResult": true,
+        "note": "نسخه کوتاه انجام شد؛ مشاهده ساختگی.",
+        "createdAt": "2026-09-18T12:00:00.000Z"
+      },
+      {
+        "id": "visual-qa-v1-experiment-log-006",
+        "experimentId": "visual-qa-v1-experiment-002",
+        "date": "2026-09-24",
+        "conditionMet": true,
+        "hypothesisResult": true,
+        "note": "نسخه کوتاه انجام شد؛ مشاهده ساختگی.",
+        "createdAt": "2026-09-24T12:00:00.000Z"
+      }
+    ],
+    "ifThenPlans": [
+      {
+        "id": "visual-qa-v1-ifthen-001",
+        "createdAt": "2026-09-26T06:00:00.000Z",
+        "updatedAt": "2026-10-15T12:00:00.000Z",
+        "ifTrigger": "اگر وسط مطالعه سراغ تلفن رفتم",
+        "thenAction": "تلفن را دور می‌گذارم و فقط یک پاراگراف می‌خوانم.",
+        "isActive": true,
+        "linkedUrgeType": "تلفن"
+      },
+      {
+        "id": "visual-qa-v1-ifthen-002",
+        "createdAt": "2026-09-26T06:00:00.000Z",
+        "updatedAt": "2026-10-14T12:00:00.000Z",
+        "ifTrigger": "اگر تخفیف خرید غیرضروری دیدم",
+        "thenAction": "نام کالا را می‌نویسم و تصمیم را تا فردا عقب می‌اندازم.",
+        "isActive": true,
+        "linkedUrgeType": "خرید"
+      },
+      {
+        "id": "visual-qa-v1-ifthen-003",
+        "createdAt": "2026-09-21T06:00:00.000Z",
+        "updatedAt": "2026-10-06T12:00:00.000Z",
+        "ifTrigger": "اگر فهرست کارها طولانی شد",
+        "thenAction": "فقط یک مورد را برای امروز نگه می‌دارم.",
+        "isActive": false
+      }
+    ],
+    "moneyPauses": [
+      {
+        "id": "visual-qa-v1-money-pause-001",
+        "item": "چراغ مطالعه دوم",
+        "amount": 18500000,
+        "currency": "IRR",
+        "reason": "discount",
+        "createdAt": "2026-10-14T08:00:00.000Z",
+        "reviewAt": "2026-10-15T08:00:00.000Z"
+      },
+      {
+        "id": "visual-qa-v1-money-pause-002",
+        "item": "دفتر یادداشت اضافه",
+        "amount": 950000,
+        "currency": "IRR",
+        "reason": "boredom",
+        "createdAt": "2026-10-08T08:00:00.000Z",
+        "reviewAt": "2026-10-09T08:00:00.000Z",
+        "decision": "skip",
+        "decidedAt": "2026-10-09T09:00:00.000Z"
+      }
+    ],
+    "therapyNotes": [
+      {
+        "id": "visual-qa-v1-therapy-001",
+        "createdAt": "2026-10-13T06:00:00.000Z",
+        "updatedAt": "2026-10-13T12:00:00.000Z",
+        "date": "2026-10-13",
+        "category": "insight",
+        "content": "یادداشت داستانی QA: وقتی کار را کوچک‌تر تعریف کردم، شروع آسان‌تر شد. این متن داده سلامت واقعی نیست."
+      },
+      {
+        "id": "visual-qa-v1-therapy-002",
+        "createdAt": "2026-10-15T06:00:00.000Z",
+        "updatedAt": "2026-10-15T12:00:00.000Z",
+        "date": "2026-10-15",
+        "category": "question",
+        "content": "پرسش ساختگی برای نمایش کارت: چطور می‌توانم انتظارم از یک روز شلوغ را واقع‌بینانه‌تر تنظیم کنم؟"
+      }
+    ],
+    "manualEntries": [
+      {
+        "id": "visual-qa-v1-manual-001",
+        "createdAt": "2026-09-16T06:00:00.000Z",
+        "updatedAt": "2026-10-15T12:00:00.000Z",
+        "title": "شروع کوچک",
+        "body": "اگر شروع سخت شد، نسخه پنج‌دقیقه‌ای را انتخاب می‌کنم.",
+        "category": "principles",
+        "importance": "high",
+        "status": "active",
+        "tags": [
+          "شروع",
+          "یادگیری"
+        ],
+        "reviewIntervalDays": 7,
+        "lastReviewedAt": "2026-10-06T12:00:00.000Z"
+      },
+      {
+        "id": "visual-qa-v1-manual-002",
+        "createdAt": "2026-09-21T06:00:00.000Z",
+        "updatedAt": "2026-10-14T12:00:00.000Z",
+        "title": "حد خرید اختیاری و مکث پیش از تصمیم‌گیری در موقعیت‌هایی که تخفیف فوری توجه را از نیاز واقعی منحرف می‌کند",
+        "body": "فهرست نیازها را پیش از دیدن پیشنهادها می‌نویسم.\n\nبرای خرید غیرضروری تا فردا صبر می‌کنم و دوباره بودجه را مرور می‌کنم.",
+        "category": "decisionRules",
+        "importance": "high",
+        "status": "active",
+        "tags": [
+          "مالی",
+          "مکث"
+        ],
+        "reviewIntervalDays": 14,
+        "lastReviewedAt": "2026-10-11T12:00:00.000Z"
+      },
+      {
+        "id": "visual-qa-v1-manual-003",
+        "createdAt": "2026-10-01T06:00:00.000Z",
+        "updatedAt": "2026-10-13T12:00:00.000Z",
+        "title": "مرز زمان مطالعه",
+        "body": "در زمان مطالعه فقط فایل همان تمرین باز می‌ماند.",
+        "category": "boundaries",
+        "importance": "medium",
+        "status": "draft",
+        "tags": [
+          "تمرکز"
+        ]
+      },
+      {
+        "id": "visual-qa-v1-manual-004",
+        "createdAt": "2026-09-01T06:00:00.000Z",
+        "updatedAt": "2026-09-26T12:00:00.000Z",
+        "title": "روش قدیمی فهرست‌ها",
+        "body": "این روش بایگانی شده و فقط برای مرور سابقه نگه داشته شده است.",
+        "category": "lessons",
+        "importance": "low",
+        "status": "archived",
+        "tags": [
+          "بایگانی"
+        ]
+      }
+    ],
+    "financeTransactions": [
+      {
+        "id": "visual-qa-v1-transaction-001",
+        "createdAt": "2026-08-07T06:00:00.000Z",
+        "updatedAt": "2026-08-07T12:00:00.000Z",
+        "type": "income",
+        "title": "دستمزد پروژه آزمایشی",
+        "amount": 42000000,
+        "category": "درآمد",
+        "occurredAt": "2026-08-07",
+        "notes": "مبلغ ساختگی به تومان؛ صرفاً برای نمایش رابط و نمودار."
+      },
+      {
+        "id": "visual-qa-v1-transaction-002",
+        "createdAt": "2026-08-15T06:00:00.000Z",
+        "updatedAt": "2026-08-15T12:00:00.000Z",
+        "type": "expense",
+        "title": "کتاب",
+        "amount": 285000,
+        "category": "یادگیری",
+        "occurredAt": "2026-08-15",
+        "notes": "مبلغ ساختگی به تومان؛ صرفاً برای نمایش رابط و نمودار."
+      },
+      {
+        "id": "visual-qa-v1-transaction-003",
+        "createdAt": "2026-08-22T06:00:00.000Z",
+        "updatedAt": "2026-08-22T12:00:00.000Z",
+        "type": "expense",
+        "title": "خرید خانه",
+        "amount": 1750000,
+        "category": "خانه",
+        "occurredAt": "2026-08-22",
+        "notes": "مبلغ ساختگی به تومان؛ صرفاً برای نمایش رابط و نمودار."
+      },
+      {
+        "id": "visual-qa-v1-transaction-004",
+        "createdAt": "2026-08-30T06:00:00.000Z",
+        "updatedAt": "2026-08-30T12:00:00.000Z",
+        "type": "income",
+        "title": "درآمد کار پاره‌وقت ساختگی",
+        "amount": 18500000,
+        "category": "درآمد",
+        "occurredAt": "2026-08-30",
+        "notes": "مبلغ ساختگی به تومان؛ صرفاً برای نمایش رابط و نمودار."
+      },
+      {
+        "id": "visual-qa-v1-transaction-005",
+        "createdAt": "2026-09-06T06:00:00.000Z",
+        "updatedAt": "2026-09-06T12:00:00.000Z",
+        "type": "expense",
+        "title": "بلیت رفت‌وآمد",
+        "amount": 18000,
+        "category": "رفت‌وآمد",
+        "occurredAt": "2026-09-06",
+        "notes": "مبلغ ساختگی به تومان؛ صرفاً برای نمایش رابط و نمودار."
+      },
+      {
+        "id": "visual-qa-v1-transaction-006",
+        "createdAt": "2026-09-11T06:00:00.000Z",
+        "updatedAt": "2026-09-11T12:00:00.000Z",
+        "type": "expense",
+        "title": "تعمیر چراغ مطالعه",
+        "amount": 230000,
+        "category": "خانه",
+        "occurredAt": "2026-09-11",
+        "notes": "مبلغ ساختگی به تومان؛ صرفاً برای نمایش رابط و نمودار."
+      },
+      {
+        "id": "visual-qa-v1-transaction-007",
+        "createdAt": "2026-09-16T06:00:00.000Z",
+        "updatedAt": "2026-09-16T12:00:00.000Z",
+        "type": "income",
+        "title": "دستمزد ماه قبل",
+        "amount": 46000000,
+        "category": "درآمد",
+        "occurredAt": "2026-09-16",
+        "notes": "مبلغ ساختگی به تومان؛ صرفاً برای نمایش رابط و نمودار."
+      },
+      {
+        "id": "visual-qa-v1-transaction-008",
+        "createdAt": "2026-09-21T06:00:00.000Z",
+        "updatedAt": "2026-09-21T12:00:00.000Z",
+        "type": "expense",
+        "title": "خوراک ماهانه",
+        "amount": 6800000,
+        "category": "خوراک",
+        "occurredAt": "2026-09-21",
+        "notes": "مبلغ ساختگی به تومان؛ صرفاً برای نمایش رابط و نمودار."
+      },
+      {
+        "id": "visual-qa-v1-transaction-009",
+        "createdAt": "2026-09-26T06:00:00.000Z",
+        "updatedAt": "2026-09-26T12:00:00.000Z",
+        "type": "expense",
+        "title": "دوره آموزشی تمرینی",
+        "amount": 1450000,
+        "category": "یادگیری",
+        "occurredAt": "2026-09-26",
+        "notes": "مبلغ ساختگی به تومان؛ صرفاً برای نمایش رابط و نمودار."
+      },
+      {
+        "id": "visual-qa-v1-transaction-010",
+        "createdAt": "2026-09-30T06:00:00.000Z",
+        "updatedAt": "2026-09-30T12:00:00.000Z",
+        "type": "expense",
+        "title": "وسایل ورزشی",
+        "amount": 2350000,
+        "category": "سلامت",
+        "occurredAt": "2026-09-30",
+        "notes": "مبلغ ساختگی به تومان؛ صرفاً برای نمایش رابط و نمودار."
+      },
+      {
+        "id": "visual-qa-v1-transaction-011",
+        "createdAt": "2026-10-04T06:00:00.000Z",
+        "updatedAt": "2026-10-04T12:00:00.000Z",
+        "type": "expense",
+        "title": "خرید لوازم کوچک خانه",
+        "amount": 310000,
+        "category": "خانه",
+        "occurredAt": "2026-10-04",
+        "notes": "مبلغ ساختگی به تومان؛ صرفاً برای نمایش رابط و نمودار."
+      },
+      {
+        "id": "visual-qa-v1-transaction-012",
+        "createdAt": "2026-10-06T06:00:00.000Z",
+        "updatedAt": "2026-10-06T12:00:00.000Z",
+        "type": "expense",
+        "title": "بلیت اتوبوس",
+        "amount": 12000,
+        "category": "رفت‌وآمد",
+        "occurredAt": "2026-10-06",
+        "notes": "مبلغ ساختگی به تومان؛ صرفاً برای نمایش رابط و نمودار."
+      },
+      {
+        "id": "visual-qa-v1-transaction-013",
+        "createdAt": "2026-10-08T06:00:00.000Z",
+        "updatedAt": "2026-10-08T12:00:00.000Z",
+        "type": "income",
+        "title": "بازپرداخت هزینه مشترک ساختگی",
+        "amount": 450000,
+        "category": "درآمد",
+        "occurredAt": "2026-10-08",
+        "notes": "مبلغ ساختگی به تومان؛ صرفاً برای نمایش رابط و نمودار."
+      },
+      {
+        "id": "visual-qa-v1-transaction-014",
+        "createdAt": "2026-10-09T06:00:00.000Z",
+        "updatedAt": "2026-10-09T12:00:00.000Z",
+        "type": "expense",
+        "title": "میوه",
+        "amount": 420000,
+        "category": "خوراک",
+        "occurredAt": "2026-10-09",
+        "notes": "مبلغ ساختگی به تومان؛ صرفاً برای نمایش رابط و نمودار."
+      },
+      {
+        "id": "visual-qa-v1-transaction-015",
+        "createdAt": "2026-10-10T06:00:00.000Z",
+        "updatedAt": "2026-10-10T12:00:00.000Z",
+        "type": "expense",
+        "title": "دفتر یادداشت",
+        "amount": 95000,
+        "category": "یادگیری",
+        "occurredAt": "2026-10-10",
+        "notes": "مبلغ ساختگی به تومان؛ صرفاً برای نمایش رابط و نمودار."
+      },
+      {
+        "id": "visual-qa-v1-transaction-016",
+        "createdAt": "2026-10-11T06:00:00.000Z",
+        "updatedAt": "2026-10-11T12:00:00.000Z",
+        "type": "expense",
+        "title": "ناهار ساده",
+        "amount": 240000,
+        "category": "خوراک",
+        "occurredAt": "2026-10-11",
+        "notes": "مبلغ ساختگی به تومان؛ صرفاً برای نمایش رابط و نمودار."
+      },
+      {
+        "id": "visual-qa-v1-transaction-017",
+        "createdAt": "2026-10-12T06:00:00.000Z",
+        "updatedAt": "2026-10-12T12:00:00.000Z",
+        "type": "expense",
+        "title": "کرایه مسیر تمرین",
+        "amount": 85000,
+        "category": "رفت‌وآمد",
+        "occurredAt": "2026-10-12",
+        "notes": "مبلغ ساختگی به تومان؛ صرفاً برای نمایش رابط و نمودار."
+      },
+      {
+        "id": "visual-qa-v1-transaction-018",
+        "createdAt": "2026-10-13T06:00:00.000Z",
+        "updatedAt": "2026-10-13T12:00:00.000Z",
+        "type": "expense",
+        "title": "خرید بزرگ وسیله خانگی برای بررسی نمایش اعداد طولانی",
+        "amount": 28500000,
+        "category": "خانه",
+        "occurredAt": "2026-10-13",
+        "notes": "مبلغ ساختگی به تومان؛ صرفاً برای نمایش رابط و نمودار."
+      },
+      {
+        "id": "visual-qa-v1-transaction-019",
+        "createdAt": "2026-10-14T06:00:00.000Z",
+        "updatedAt": "2026-10-14T12:00:00.000Z",
+        "type": "expense",
+        "title": "کتاب دست دوم",
+        "amount": 175000,
+        "category": "یادگیری",
+        "occurredAt": "2026-10-14",
+        "notes": "مبلغ ساختگی به تومان؛ صرفاً برای نمایش رابط و نمودار."
+      },
+      {
+        "id": "visual-qa-v1-transaction-020",
+        "createdAt": "2026-10-15T06:00:00.000Z",
+        "updatedAt": "2026-10-15T12:00:00.000Z",
+        "type": "expense",
+        "title": "نان",
+        "amount": 25000,
+        "category": "خوراک",
+        "occurredAt": "2026-10-15",
+        "notes": "مبلغ ساختگی به تومان؛ صرفاً برای نمایش رابط و نمودار."
+      },
+      {
+        "id": "visual-qa-v1-transaction-021",
+        "createdAt": "2026-10-16T06:00:00.000Z",
+        "updatedAt": "2026-10-16T12:00:00.000Z",
+        "type": "income",
+        "title": "دستمزد گزارش نمونه",
+        "amount": 12000000,
+        "category": "درآمد",
+        "occurredAt": "2026-10-16",
+        "notes": "مبلغ ساختگی به تومان؛ صرفاً برای نمایش رابط و نمودار."
+      },
+      {
+        "id": "visual-qa-v1-transaction-022",
+        "createdAt": "2026-10-16T06:00:00.000Z",
+        "updatedAt": "2026-10-16T12:00:00.000Z",
+        "type": "expense",
+        "title": "چای",
+        "amount": 5000,
+        "category": "خوراک",
+        "occurredAt": "2026-10-16",
+        "notes": "مبلغ ساختگی به تومان؛ صرفاً برای نمایش رابط و نمودار."
+      },
+      {
+        "id": "visual-qa-v1-transaction-023",
+        "createdAt": "2026-10-16T06:00:00.000Z",
+        "updatedAt": "2026-10-16T12:00:00.000Z",
+        "type": "expense",
+        "title": "سبزیجات",
+        "amount": 280000,
+        "category": "خوراک",
+        "occurredAt": "2026-10-16",
+        "notes": "مبلغ ساختگی به تومان؛ صرفاً برای نمایش رابط و نمودار."
+      },
+      {
+        "id": "visual-qa-v1-transaction-024",
+        "createdAt": "2026-10-15T06:00:00.000Z",
+        "updatedAt": "2026-10-15T12:00:00.000Z",
+        "type": "expense",
+        "title": "رزرو جلسه تمرین",
+        "amount": 360000,
+        "category": "سلامت",
+        "occurredAt": "2026-10-15",
+        "notes": "مبلغ ساختگی به تومان؛ صرفاً برای نمایش رابط و نمودار."
+      }
+    ],
+    "financeObligations": [
+      {
+        "id": "visual-qa-v1-obligation-001",
+        "createdAt": "2026-09-11T06:00:00.000Z",
+        "updatedAt": "2026-10-16T12:00:00.000Z",
+        "type": "installment",
+        "title": "قسط ابزار مطالعه",
+        "totalAmount": 12000000,
+        "paidAmount": 6000000,
+        "dueAmount": 1500000,
+        "monthlyAmount": 1500000,
+        "dueDate": "2026-10-16",
+        "status": "active",
+        "counterparty": "فروشگاه نمونه الف",
+        "notes": "سررسید امروز؛ تمام نام‌ها ساختگی‌اند."
+      },
+      {
+        "id": "visual-qa-v1-obligation-002",
+        "createdAt": "2026-09-06T06:00:00.000Z",
+        "updatedAt": "2026-10-13T12:00:00.000Z",
+        "type": "debt",
+        "title": "تسویه سهم خرید گروهی کتاب با عنوان بلند برای بررسی شکستن متن در کارت تعهد مالی",
+        "totalAmount": 1800000,
+        "paidAmount": 400000,
+        "dueDate": "2026-10-13",
+        "status": "active",
+        "counterparty": "گروه کتاب نمونه",
+        "notes": "نمونه تعهد عقب‌افتاده با مبلغ پرداخت‌شده جزئی."
+      },
+      {
+        "id": "visual-qa-v1-obligation-003",
+        "createdAt": "2026-09-26T06:00:00.000Z",
+        "updatedAt": "2026-10-14T12:00:00.000Z",
+        "type": "debt",
+        "title": "سهم هزینه سفر کوتاه",
+        "totalAmount": 3400000,
+        "paidAmount": 0,
+        "dueDate": "2026-10-21",
+        "status": "active",
+        "counterparty": "همراه خیالی"
+      },
+      {
+        "id": "visual-qa-v1-obligation-004",
+        "createdAt": "2026-08-17T06:00:00.000Z",
+        "updatedAt": "2026-10-14T12:00:00.000Z",
+        "type": "installment",
+        "title": "قسط ماهانه میز کار",
+        "totalAmount": 24000000,
+        "paidAmount": 16000000,
+        "monthlyAmount": 2000000,
+        "dueAmount": 2000000,
+        "dueDay": 20,
+        "status": "active",
+        "notes": "سررسید تکرارشونده بر مبنای روز ماه؛ بدون تاریخ صریح."
+      },
+      {
+        "id": "visual-qa-v1-obligation-005",
+        "createdAt": "2026-08-27T06:00:00.000Z",
+        "updatedAt": "2026-10-08T12:00:00.000Z",
+        "type": "debt",
+        "title": "خرید قبلی کتاب",
+        "totalAmount": 950000,
+        "paidAmount": 950000,
+        "dueDate": "2026-10-08",
+        "status": "paid"
+      },
+      {
+        "id": "visual-qa-v1-obligation-006",
+        "createdAt": "2026-09-21T06:00:00.000Z",
+        "updatedAt": "2026-10-14T12:00:00.000Z",
+        "type": "installment",
+        "title": "قسط متوقف‌شده وسیله آموزشی",
+        "totalAmount": 6000000,
+        "paidAmount": 1000000,
+        "monthlyAmount": 500000,
+        "dueDate": "2026-10-24",
+        "status": "paused"
+      }
+    ],
+    "financeCategoryBudgets": [
+      {
+        "id": "visual-qa-v1-budget-001",
+        "createdAt": "2026-09-16T06:00:00.000Z",
+        "updatedAt": "2026-10-15T12:00:00.000Z",
+        "category": "خوراک",
+        "monthlyLimitAmount": 8500000
+      },
+      {
+        "id": "visual-qa-v1-budget-002",
+        "createdAt": "2026-09-16T06:00:00.000Z",
+        "updatedAt": "2026-10-15T12:00:00.000Z",
+        "category": "خانه",
+        "monthlyLimitAmount": 25000000
+      },
+      {
+        "id": "visual-qa-v1-budget-003",
+        "createdAt": "2026-09-16T06:00:00.000Z",
+        "updatedAt": "2026-10-15T12:00:00.000Z",
+        "category": "یادگیری",
+        "monthlyLimitAmount": 2200000
+      },
+      {
+        "id": "visual-qa-v1-budget-004",
+        "createdAt": "2026-09-16T06:00:00.000Z",
+        "updatedAt": "2026-10-15T12:00:00.000Z",
+        "category": "رفت‌وآمد",
+        "monthlyLimitAmount": 1500000
+      }
+    ],
+    "financeAssets": [
+      {
+        "id": "visual-qa-v1-asset-001",
+        "createdAt": "2026-09-06T06:00:00.000Z",
+        "updatedAt": "2026-10-14T12:00:00.000Z",
+        "title": "پس‌انداز اضطراری نمونه",
+        "type": "savings",
+        "currentValue": 35000000,
+        "notes": "ارزش فرضی؛ داده شخصی یا توصیه سرمایه‌گذاری نیست."
+      },
+      {
+        "id": "visual-qa-v1-asset-002",
+        "createdAt": "2026-09-06T06:00:00.000Z",
+        "updatedAt": "2026-10-14T12:00:00.000Z",
+        "title": "دارایی کوچک آزمایشی",
+        "type": "gold",
+        "currentValue": 8400000,
+        "notes": "ارزش فرضی؛ داده شخصی یا توصیه سرمایه‌گذاری نیست."
+      },
+      {
+        "id": "visual-qa-v1-asset-003",
+        "createdAt": "2026-09-06T06:00:00.000Z",
+        "updatedAt": "2026-10-14T12:00:00.000Z",
+        "title": "ابزار کار نمونه",
+        "type": "other",
+        "currentValue": 12000000,
+        "notes": "ارزش فرضی؛ داده شخصی یا توصیه سرمایه‌گذاری نیست."
+      }
+    ],
+    "focusSessions": [
+      {
+        "id": "visual-qa-v1-focus-001",
+        "startedAt": "2026-10-14T08:00:00.000Z",
+        "durationMinutes": 25,
+        "mode": "pomodoro",
+        "taskId": "visual-qa-v1-task-009",
+        "completedAt": "2026-10-14T08:25:00.000Z",
+        "interrupted": false
+      },
+      {
+        "id": "visual-qa-v1-focus-002",
+        "startedAt": "2026-10-16T08:00:00.000Z",
+        "durationMinutes": 25,
+        "mode": "free",
+        "taskId": "visual-qa-v1-task-010",
+        "completedAt": "2026-10-16T08:25:00.000Z",
+        "interrupted": false
+      },
+      {
+        "id": "visual-qa-v1-focus-003",
+        "startedAt": "2026-10-12T08:00:00.000Z",
+        "durationMinutes": 10,
+        "mode": "pomodoro",
+        "taskId": "visual-qa-v1-task-011",
+        "completedAt": "2026-10-12T08:10:00.000Z",
+        "interrupted": true
+      },
+      {
+        "id": "visual-qa-v1-focus-004",
+        "startedAt": "2026-10-10T08:00:00.000Z",
+        "durationMinutes": 25,
+        "mode": "free",
+        "taskId": "visual-qa-v1-task-012",
+        "completedAt": "2026-10-10T08:25:00.000Z",
+        "interrupted": false
+      },
+      {
+        "id": "visual-qa-v1-focus-005",
+        "startedAt": "2026-10-08T08:00:00.000Z",
+        "durationMinutes": 25,
+        "mode": "pomodoro",
+        "taskId": "visual-qa-v1-task-013",
+        "completedAt": "2026-10-08T08:25:00.000Z",
+        "interrupted": false
+      },
+      {
+        "id": "visual-qa-v1-focus-006",
+        "startedAt": "2026-10-04T08:00:00.000Z",
+        "durationMinutes": 25,
+        "mode": "free",
+        "taskId": "visual-qa-v1-task-014",
+        "completedAt": "2026-10-04T08:25:00.000Z",
+        "interrupted": false
+      }
+    ],
+    "projects": [
+      {
+        "id": "visual-qa-v1-project-001",
+        "createdAt": "2026-08-27T06:00:00.000Z",
+        "updatedAt": "2026-10-16T12:00:00.000Z",
+        "title": "گزارش داده‌های کتابخانه شخصی",
+        "description": "یک پروژه آموزشی با داده‌های ساختگی برای تمرین جدول، نمودار و توضیح نتیجه.",
+        "status": "active",
+        "priority": "high",
+        "goalId": "visual-qa-v1-goal-001",
+        "nextAction": "مرور قدم بعدی در زمان برنامه‌ریزی.",
+        "reviewDate": "2026-10-15",
+        "reviewIntervalDays": 7,
+        "lastReviewedAt": "2026-10-07T12:00:00.000Z",
+        "milestones": [
+          {
+            "id": "visual-qa-v1-project-milestone-001",
+            "title": "طرح اولیه",
+            "done": true
+          },
+          {
+            "id": "visual-qa-v1-project-milestone-002",
+            "title": "اجرای بخش اصلی",
+            "done": false
+          },
+          {
+            "id": "visual-qa-v1-project-milestone-003",
+            "title": "جمع‌بندی",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "visual-qa-v1-project-002",
+        "createdAt": "2026-08-27T06:00:00.000Z",
+        "updatedAt": "2026-10-15T12:00:00.000Z",
+        "title": "برنامه حرکت و آماده‌سازی غذای خانگی",
+        "description": "بخش عمده کار انجام شده؛ یک جلسه پیاده‌روی مانده است.",
+        "status": "active",
+        "priority": "medium",
+        "goalId": "visual-qa-v1-goal-002",
+        "nextAction": "مرور قدم بعدی در زمان برنامه‌ریزی.",
+        "reviewDate": "2026-10-20",
+        "reviewIntervalDays": 7,
+        "lastReviewedAt": "2026-10-14T12:00:00.000Z",
+        "milestones": [
+          {
+            "id": "visual-qa-v1-project-milestone-004",
+            "title": "طرح اولیه",
+            "done": true
+          },
+          {
+            "id": "visual-qa-v1-project-milestone-005",
+            "title": "اجرای بخش اصلی",
+            "done": true
+          },
+          {
+            "id": "visual-qa-v1-project-milestone-006",
+            "title": "جمع‌بندی",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "visual-qa-v1-project-003",
+        "createdAt": "2026-08-27T06:00:00.000Z",
+        "updatedAt": "2026-10-14T12:00:00.000Z",
+        "title": "بازطراحی روش ثبت و مرور هزینه‌های ماهانه با حفظ انعطاف برای خریدهای کوچک و ضروری",
+        "description": "برنامه‌ای سبک برای پیگیری هزینه‌ها و تعهدات، بدون پیش‌بینی یا توصیه مالی.",
+        "status": "waiting",
+        "priority": "high",
+        "goalId": "visual-qa-v1-goal-003",
+        "nextAction": "مرور قدم بعدی در زمان برنامه‌ریزی.",
+        "reviewDate": "2026-10-20",
+        "reviewIntervalDays": 7,
+        "lastReviewedAt": "2026-10-14T12:00:00.000Z",
+        "milestones": [
+          {
+            "id": "visual-qa-v1-project-milestone-007",
+            "title": "طرح اولیه",
+            "done": true
+          },
+          {
+            "id": "visual-qa-v1-project-milestone-008",
+            "title": "اجرای بخش اصلی",
+            "done": false
+          },
+          {
+            "id": "visual-qa-v1-project-milestone-009",
+            "title": "جمع‌بندی",
+            "done": false
+          }
+        ]
+      },
+      {
+        "id": "visual-qa-v1-project-004",
+        "createdAt": "2026-08-27T06:00:00.000Z",
+        "updatedAt": "2026-10-15T12:00:00.000Z",
+        "title": "قفسه کوچک",
+        "description": "اندازه‌گیری جای قفسه.",
+        "status": "later",
+        "priority": "low",
+        "nextAction": "اندازه‌گیری عرض دیوار",
+        "reviewDate": "2026-10-20",
+        "reviewIntervalDays": 7,
+        "lastReviewedAt": "2026-10-14T12:00:00.000Z",
+        "milestones": []
+      },
+      {
+        "id": "visual-qa-v1-project-005",
+        "createdAt": "2026-08-27T06:00:00.000Z",
+        "updatedAt": "2026-10-15T12:00:00.000Z",
+        "title": "سامان‌دهی کتاب‌ها",
+        "description": "پروژه تمام‌شده برای بررسی نمایش وضعیت تکمیل.",
+        "status": "completed",
+        "priority": "low",
+        "goalId": "visual-qa-v1-goal-004",
+        "nextAction": "مرور قدم بعدی در زمان برنامه‌ریزی.",
+        "reviewDate": "2026-10-20",
+        "reviewIntervalDays": 7,
+        "lastReviewedAt": "2026-10-14T12:00:00.000Z",
+        "milestones": [
+          {
+            "id": "visual-qa-v1-project-milestone-013",
+            "title": "طرح اولیه",
+            "done": true
+          },
+          {
+            "id": "visual-qa-v1-project-milestone-014",
+            "title": "اجرای بخش اصلی",
+            "done": true
+          },
+          {
+            "id": "visual-qa-v1-project-milestone-015",
+            "title": "جمع‌بندی",
+            "done": true
+          }
+        ]
+      }
+    ],
+    "journalEntries": [
+      {
+        "id": "visual-qa-v1-journal-001",
+        "createdAt": "2026-10-16T06:00:00.000Z",
+        "updatedAt": "2026-10-16T12:00:00.000Z",
+        "date": "2026-10-16",
+        "type": "daily",
+        "title": "یک قدم کافی بود",
+        "content": "امروز کار اصلی را کوچک کردم و زودتر شروع کردم.",
+        "projectId": "visual-qa-v1-project-001",
+        "goalId": "visual-qa-v1-goal-001",
+        "taskId": "visual-qa-v1-task-001",
+        "moodLevel": "good",
+        "energyLevel": "medium"
+      },
+      {
+        "id": "visual-qa-v1-journal-002",
+        "createdAt": "2026-10-15T06:00:00.000Z",
+        "updatedAt": "2026-10-15T12:00:00.000Z",
+        "date": "2026-10-15",
+        "type": "learning",
+        "title": "یادداشت یادگیری",
+        "content": "تمرین کوچک بهتر از دیدن چند درس پشت سر هم بود.\n\nدر نسخه بعدی، ابتدا سؤال گزارش را می‌نویسم و بعد سراغ نمودار می‌روم.",
+        "projectId": "visual-qa-v1-project-001",
+        "goalId": "visual-qa-v1-goal-001",
+        "taskId": "visual-qa-v1-task-003",
+        "moodLevel": "good",
+        "energyLevel": "medium"
+      },
+      {
+        "id": "visual-qa-v1-journal-003",
+        "createdAt": "2026-10-13T06:00:00.000Z",
+        "updatedAt": "2026-10-13T12:00:00.000Z",
+        "date": "2026-10-13",
+        "type": "project",
+        "title": "پایان مرتب‌سازی",
+        "content": "کتاب‌ها روی قفسه قرار گرفتند و جای میز باز شد.",
+        "projectId": "visual-qa-v1-project-005",
+        "goalId": "visual-qa-v1-goal-004",
+        "taskId": "visual-qa-v1-task-018",
+        "moodLevel": "good",
+        "energyLevel": "medium"
+      },
+      {
+        "id": "visual-qa-v1-journal-004",
+        "createdAt": "2026-10-11T06:00:00.000Z",
+        "updatedAt": "2026-10-11T12:00:00.000Z",
+        "date": "2026-10-11",
+        "type": "hard_day",
+        "title": "روز شلوغ و پیدا کردن یک نسخه کوچک از برنامه برای حفظ ارتباط با کار بدون فشار بیش از حد",
+        "content": "چند کار غیرمنتظره زمان برنامه را گرفت.\n\nنسخه کوچک برنامه فقط ده دقیقه مطالعه بود. همین مقدار کمک کرد نقطه شروع فردا مشخص باشد.",
+        "projectId": "visual-qa-v1-project-001",
+        "goalId": "visual-qa-v1-goal-001",
+        "moodLevel": "low",
+        "energyLevel": "low"
+      },
+      {
+        "id": "visual-qa-v1-journal-005",
+        "createdAt": "2026-10-09T06:00:00.000Z",
+        "updatedAt": "2026-10-09T12:00:00.000Z",
+        "date": "2026-10-09",
+        "type": "emotion",
+        "title": "آرام‌تر",
+        "content": "پس از پیاده‌روی، تصمیم‌گیری برای ادامه روز آسان‌تر شد.",
+        "projectId": "visual-qa-v1-project-002",
+        "goalId": "visual-qa-v1-goal-002",
+        "taskId": "visual-qa-v1-task-011",
+        "moodLevel": "good",
+        "energyLevel": "medium"
+      },
+      {
+        "id": "visual-qa-v1-journal-006",
+        "createdAt": "2026-10-04T06:00:00.000Z",
+        "updatedAt": "2026-10-04T12:00:00.000Z",
+        "date": "2026-10-04",
+        "type": "daily",
+        "title": "روز معمولی",
+        "content": "صبح مطالعه کردم. عصر هزینه‌ها را ثبت کردم.",
+        "projectId": "visual-qa-v1-project-003",
+        "goalId": "visual-qa-v1-goal-003",
+        "moodLevel": "good",
+        "energyLevel": "medium"
+      },
+      {
+        "id": "visual-qa-v1-journal-007",
+        "createdAt": "2026-09-11T06:00:00.000Z",
+        "updatedAt": "2026-09-11T12:00:00.000Z",
+        "date": "2026-09-11",
+        "type": "learning",
+        "title": "Small steps, clear questions",
+        "content": "A short fictional English entry for mixed-direction layout.\n\nیک سؤال مشخص، توضیح نتیجه را ساده‌تر می‌کند.",
+        "projectId": "visual-qa-v1-project-001",
+        "goalId": "visual-qa-v1-goal-001",
+        "taskId": "visual-qa-v1-task-013",
+        "moodLevel": "good",
+        "energyLevel": "medium"
+      }
+    ],
+    "knowledgeItems": [
+      {
+        "id": "visual-qa-v1-knowledge-001",
+        "createdAt": "2026-09-26T06:00:00.000Z",
+        "updatedAt": "2026-10-16T12:00:00.000Z",
+        "title": "سؤال قبل از نمودار",
+        "type": "lesson",
+        "summary": "قبل از انتخاب نمودار، سؤال را بنویس.",
+        "content": "چه چیزی را می‌خواهم مقایسه کنم؟\n\nوقتی سؤال روشن باشد، انتخاب نمایش ساده‌تر می‌شود.",
+        "source": "یادداشت ساختگی برای ممیزی دیداری",
+        "projectId": "visual-qa-v1-project-001",
+        "goalId": "visual-qa-v1-goal-001",
+        "taskId": "visual-qa-v1-task-001",
+        "resourceId": "visual-qa-v1-resource-001"
+      },
+      {
+        "id": "visual-qa-v1-knowledge-002",
+        "createdAt": "2026-09-25T06:00:00.000Z",
+        "updatedAt": "2026-10-15T12:00:00.000Z",
+        "title": "یادداشت کوتاه",
+        "type": "note",
+        "summary": "فقط یک نکته.",
+        "content": "برای شروع، یک ردیف نمونه کافی است.",
+        "source": "یادداشت ساختگی برای ممیزی دیداری",
+        "projectId": "visual-qa-v1-project-001",
+        "goalId": "visual-qa-v1-goal-001",
+        "taskId": "visual-qa-v1-task-003",
+        "resourceId": "visual-qa-v1-resource-001"
+      },
+      {
+        "id": "visual-qa-v1-knowledge-003",
+        "createdAt": "2026-09-24T06:00:00.000Z",
+        "updatedAt": "2026-10-14T12:00:00.000Z",
+        "title": "چک‌لیست آماده‌سازی محیط مطالعه و حذف اصطکاک‌های کوچک پیش از شروع کار اصلی در روزهای شلوغ",
+        "type": "checklist",
+        "summary": "سه قدم ساده پیش از کار.",
+        "content": "۱. میز را خالی کن.\n۲. فایل لازم را باز کن.\n۳. کار بعدی را در یک جمله بنویس.",
+        "source": "یادداشت ساختگی برای ممیزی دیداری",
+        "projectId": "visual-qa-v1-project-001",
+        "goalId": "visual-qa-v1-goal-001",
+        "taskId": "visual-qa-v1-task-001",
+        "resourceId": "visual-qa-v1-resource-001"
+      },
+      {
+        "id": "visual-qa-v1-knowledge-004",
+        "createdAt": "2026-09-23T06:00:00.000Z",
+        "updatedAt": "2026-10-13T12:00:00.000Z",
+        "title": "قاعده خرید",
+        "type": "rule",
+        "summary": "فرصت تصمیم را نگه دار.",
+        "content": "خرید اختیاری را همان لحظه نهایی نکن؛ ابتدا هزینه‌های ضروری را مرور کن.",
+        "source": "یادداشت ساختگی برای ممیزی دیداری",
+        "projectId": "visual-qa-v1-project-003",
+        "goalId": "visual-qa-v1-goal-003",
+        "taskId": "visual-qa-v1-task-006",
+        "resourceId": "visual-qa-v1-resource-003"
+      },
+      {
+        "id": "visual-qa-v1-knowledge-005",
+        "createdAt": "2026-09-22T06:00:00.000Z",
+        "updatedAt": "2026-10-12T12:00:00.000Z",
+        "title": "روش مرور هفته",
+        "type": "sop",
+        "summary": "مرور، انتخاب، محدودکردن.",
+        "content": "کارهای تمام‌شده را مرور کن.\n\nیک تمرکز قابل انجام برای هفته بعد انتخاب کن.\n\nفهرست باقی‌مانده را به برنامه امروز تحمیل نکن.",
+        "source": "یادداشت ساختگی برای ممیزی دیداری",
+        "projectId": "visual-qa-v1-project-003",
+        "goalId": "visual-qa-v1-goal-003",
+        "taskId": "visual-qa-v1-task-007",
+        "resourceId": "visual-qa-v1-resource-003"
+      },
+      {
+        "id": "visual-qa-v1-knowledge-006",
+        "createdAt": "2026-09-21T06:00:00.000Z",
+        "updatedAt": "2026-10-11T12:00:00.000Z",
+        "title": "پرسش‌های پایان روز",
+        "type": "prompt",
+        "summary": "پرسش‌های خودنویسی، بدون اتصال به AI.",
+        "content": "چه چیزی کمک کرد شروع کنم؟\nچه چیزی را می‌توانم برای فردا کوچک‌تر کنم؟",
+        "source": "یادداشت ساختگی برای ممیزی دیداری",
+        "projectId": "visual-qa-v1-project-002",
+        "goalId": "visual-qa-v1-goal-002",
+        "taskId": "visual-qa-v1-task-002",
+        "resourceId": "visual-qa-v1-resource-002"
+      },
+      {
+        "id": "visual-qa-v1-knowledge-007",
+        "createdAt": "2026-09-20T06:00:00.000Z",
+        "updatedAt": "2026-10-10T12:00:00.000Z",
+        "title": "منبع تمرین داده",
+        "type": "resource",
+        "summary": "فقط یک ارجاع ساختگی.",
+        "content": "این یادداشت به دوره آزمایشی متصل است؛ فایل یا محتوای بیرونی بارگیری نمی‌کند.",
+        "source": "یادداشت ساختگی برای ممیزی دیداری",
+        "projectId": "visual-qa-v1-project-001",
+        "goalId": "visual-qa-v1-goal-001",
+        "taskId": "visual-qa-v1-task-003",
+        "resourceId": "visual-qa-v1-resource-001"
+      },
+      {
+        "id": "visual-qa-v1-knowledge-008",
+        "createdAt": "2026-09-19T06:00:00.000Z",
+        "updatedAt": "2026-10-09T12:00:00.000Z",
+        "title": "قالب یادداشت کتاب",
+        "type": "template",
+        "summary": "نام فصل، یک نکته، یک کاربرد.",
+        "content": "فصل:\nنکته اصلی:\nکاربرد در برنامه شخصی:",
+        "source": "یادداشت ساختگی برای ممیزی دیداری",
+        "projectId": "visual-qa-v1-project-001",
+        "goalId": "visual-qa-v1-goal-001",
+        "taskId": "visual-qa-v1-task-001",
+        "resourceId": "visual-qa-v1-resource-001"
+      },
+      {
+        "id": "visual-qa-v1-knowledge-009",
+        "createdAt": "2026-09-18T06:00:00.000Z",
+        "updatedAt": "2026-10-08T12:00:00.000Z",
+        "title": "Readable tables before decorative charts",
+        "type": "note",
+        "summary": "Mixed Persian / English content.",
+        "content": "Column labels should explain the measure.\n\nبرچسب‌های روشن از رنگ‌های زیاد مفیدترند.",
+        "source": "یادداشت ساختگی برای ممیزی دیداری",
+        "projectId": "visual-qa-v1-project-001",
+        "goalId": "visual-qa-v1-goal-001",
+        "taskId": "visual-qa-v1-task-013",
+        "resourceId": "visual-qa-v1-resource-001"
+      },
+      {
+        "id": "visual-qa-v1-knowledge-010",
+        "createdAt": "2026-09-17T06:00:00.000Z",
+        "updatedAt": "2026-10-07T12:00:00.000Z",
+        "title": "درس مرتب‌سازی",
+        "type": "lesson",
+        "summary": "جای ثابت، تصمیم کمتر.",
+        "content": "پس از مرتب‌کردن کتاب‌ها، فقط یک قفسه برای کتاب‌های در حال مطالعه نگه داشتم.",
+        "source": "یادداشت ساختگی برای ممیزی دیداری",
+        "projectId": "visual-qa-v1-project-005",
+        "goalId": "visual-qa-v1-goal-004",
+        "taskId": "visual-qa-v1-task-018",
+        "resourceId": "visual-qa-v1-resource-004"
+      }
+    ],
+    "resources": [
+      {
+        "id": "visual-qa-v1-resource-001",
+        "createdAt": "2026-09-11T06:00:00.000Z",
+        "updatedAt": "2026-10-16T12:00:00.000Z",
+        "title": "مبانی تحلیل داده با مثال‌های ساختگی",
+        "type": "course",
+        "format": "online",
+        "status": "in_progress",
+        "progressPercent": 45,
+        "description": "منبع آموزشی خیالی برای بررسی کارت و جزئیات.",
+        "source": "کتابخانه ساختگی QA",
+        "url": "https://example.invalid/visual-qa-course",
+        "goalId": "visual-qa-v1-goal-001",
+        "projectId": "visual-qa-v1-project-001",
+        "taskId": "visual-qa-v1-task-003",
+        "startedAt": "2026-09-26"
+      },
+      {
+        "id": "visual-qa-v1-resource-002",
+        "createdAt": "2026-09-11T06:00:00.000Z",
+        "updatedAt": "2026-10-15T12:00:00.000Z",
+        "title": "عادت‌های کوچک؛ نسخه تمرینی",
+        "type": "book",
+        "format": "physical",
+        "status": "in_progress",
+        "progressPercent": 90,
+        "description": "منبع آموزشی خیالی برای بررسی کارت و جزئیات.",
+        "source": "کتابخانه ساختگی QA",
+        "location": "قفسه نمونه، ردیف دوم",
+        "goalId": "visual-qa-v1-goal-002",
+        "projectId": "visual-qa-v1-project-002",
+        "taskId": "visual-qa-v1-task-002",
+        "startedAt": "2026-09-26"
+      },
+      {
+        "id": "visual-qa-v1-resource-003",
+        "createdAt": "2026-09-11T06:00:00.000Z",
+        "updatedAt": "2026-10-14T12:00:00.000Z",
+        "title": "راهنمای ثبت هزینه‌های شخصی",
+        "type": "document",
+        "format": "digital",
+        "status": "unread",
+        "progressPercent": 0,
+        "description": "منبع آموزشی خیالی برای بررسی کارت و جزئیات.",
+        "source": "کتابخانه ساختگی QA",
+        "goalId": "visual-qa-v1-goal-003",
+        "projectId": "visual-qa-v1-project-003",
+        "taskId": "visual-qa-v1-task-006"
+      },
+      {
+        "id": "visual-qa-v1-resource-004",
+        "createdAt": "2026-09-11T06:00:00.000Z",
+        "updatedAt": "2026-10-13T12:00:00.000Z",
+        "title": "گفت‌وگو درباره کتابخانه مرتب",
+        "type": "video",
+        "format": "video",
+        "status": "completed",
+        "progressPercent": 100,
+        "description": "منبع آموزشی خیالی برای بررسی کارت و جزئیات.",
+        "source": "کتابخانه ساختگی QA",
+        "goalId": "visual-qa-v1-goal-004",
+        "projectId": "visual-qa-v1-project-005",
+        "taskId": "visual-qa-v1-task-018",
+        "startedAt": "2026-09-26",
+        "completedAt": "2026-10-12"
+      },
+      {
+        "id": "visual-qa-v1-resource-005",
+        "createdAt": "2026-09-11T06:00:00.000Z",
+        "updatedAt": "2026-10-12T12:00:00.000Z",
+        "title": "یادداشت‌های قدیمی تمرین",
+        "type": "document",
+        "format": "digital",
+        "status": "archived",
+        "progressPercent": 20,
+        "description": "منبع آموزشی خیالی برای بررسی کارت و جزئیات.",
+        "source": "کتابخانه ساختگی QA",
+        "goalId": "visual-qa-v1-goal-001",
+        "projectId": "visual-qa-v1-project-001",
+        "taskId": "visual-qa-v1-task-013"
+      }
+    ],
+    "settings": [],
+    "inboxItems": [
+      {
+        "id": "visual-qa-v1-inbox-001",
+        "createdAt": "2026-10-16T06:00:00.000Z",
+        "updatedAt": "2026-10-16T12:00:00.000Z",
+        "content": "یادداشت مسیر پیاده‌روی جدید",
+        "type": "note",
+        "status": "unprocessed"
+      },
+      {
+        "id": "visual-qa-v1-inbox-002",
+        "createdAt": "2026-10-15T06:00:00.000Z",
+        "updatedAt": "2026-10-15T12:00:00.000Z",
+        "content": "برای جلسه مرور هفته یک زمان کوتاه نگه دارم",
+        "type": "task",
+        "status": "unprocessed"
+      },
+      {
+        "id": "visual-qa-v1-inbox-003",
+        "createdAt": "2026-10-14T06:00:00.000Z",
+        "updatedAt": "2026-10-14T12:00:00.000Z",
+        "content": "ایده ساخت یک گزارش ساده برای کتاب‌های خوانده‌شده",
+        "type": "idea",
+        "status": "unprocessed"
+      },
+      {
+        "id": "visual-qa-v1-inbox-004",
+        "createdAt": "2026-10-13T06:00:00.000Z",
+        "updatedAt": "2026-10-13T12:00:00.000Z",
+        "content": "https://example.invalid/reading-list?topic=learning-and-personal-planning",
+        "type": "link",
+        "status": "unprocessed"
+      },
+      {
+        "id": "visual-qa-v1-inbox-005",
+        "createdAt": "2026-10-12T06:00:00.000Z",
+        "updatedAt": "2026-10-12T12:00:00.000Z",
+        "content": "فهرست خرید خانه: نان، میوه و پاکت؛ قبل از خرید موجودی را بررسی کنم.",
+        "type": "note",
+        "status": "processed"
+      },
+      {
+        "id": "visual-qa-v1-inbox-006",
+        "createdAt": "2026-10-11T06:00:00.000Z",
+        "updatedAt": "2026-10-11T12:00:00.000Z",
+        "content": "شاید برای ثبت هزینه‌های کوچک از یک یادداشت مشترک استفاده کنم؛ فعلاً فقط ایده است و نیازی به تغییر ابزار نیست.",
+        "type": "idea",
+        "status": "unprocessed",
+        "snoozedUntil": "2026-10-20"
+      },
+      {
+        "id": "visual-qa-v1-inbox-007",
+        "createdAt": "2026-10-10T06:00:00.000Z",
+        "updatedAt": "2026-10-10T12:00:00.000Z",
+        "content": "پیگیری اندازه قفسه کوچک",
+        "type": "task",
+        "status": "processed"
+      },
+      {
+        "id": "visual-qa-v1-inbox-008",
+        "createdAt": "2026-10-09T06:00:00.000Z",
+        "updatedAt": "2026-10-09T12:00:00.000Z",
+        "content": "یادآوری ذهنی برای فکر کردن به سفر کوتاه در ماه آینده، بدون رزرو یا پرداخت",
+        "type": "other",
+        "status": "unprocessed"
+      }
+    ],
+    "routines": [
+      {
+        "id": "visual-qa-v1-routine-001",
+        "createdAt": "2026-09-16T06:00:00.000Z",
+        "updatedAt": "2026-10-16T12:00:00.000Z",
+        "title": "مطالعه کوتاه",
+        "description": "ده دقیقه کتاب، یک یادداشت کوتاه و مشخص کردن صفحه بعد.",
+        "weekdays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "priority": "medium",
+        "isActive": true,
+        "minimumVersion": "فقط یک صفحه",
+        "minimumMinutes": 2
+      },
+      {
+        "id": "visual-qa-v1-routine-002",
+        "createdAt": "2026-09-16T06:00:00.000Z",
+        "updatedAt": "2026-10-15T12:00:00.000Z",
+        "title": "پیاده‌روی",
+        "description": "حرکت آرام در مسیر نزدیک خانه.",
+        "weekdays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "priority": "high",
+        "isActive": true,
+        "minimumVersion": "پنج دقیقه بیرون رفتن",
+        "minimumMinutes": 5
+      },
+      {
+        "id": "visual-qa-v1-routine-003",
+        "createdAt": "2026-09-16T06:00:00.000Z",
+        "updatedAt": "2026-10-14T12:00:00.000Z",
+        "title": "مرور هفتگی",
+        "description": "۱. مرور کارهای تمام‌شده\n۲. مرور هزینه‌ها\n۳. انتخاب یک تمرکز برای هفته بعد",
+        "weekdays": [
+          1
+        ],
+        "priority": "high",
+        "isActive": true,
+        "minimumVersion": "انتخاب یک کار اصلی",
+        "minimumMinutes": 5
+      },
+      {
+        "id": "visual-qa-v1-routine-004",
+        "createdAt": "2026-09-16T06:00:00.000Z",
+        "updatedAt": "2026-10-13T12:00:00.000Z",
+        "title": "تمرین قدرتی سبک",
+        "description": "آماده‌کردن فضا، گرم‌کردن و چند حرکت ساده.",
+        "weekdays": [
+          2,
+          4
+        ],
+        "priority": "medium",
+        "isActive": true,
+        "minimumVersion": "فقط گرم‌کردن",
+        "minimumMinutes": 5
+      },
+      {
+        "id": "visual-qa-v1-routine-005",
+        "createdAt": "2026-09-16T06:00:00.000Z",
+        "updatedAt": "2026-10-12T12:00:00.000Z",
+        "title": "جمع‌بندی آرام پایان روز و آماده‌سازی محیط برای شروع فردا بدون افزودن کار جدید",
+        "description": "مرتب‌کردن میز، ثبت یک یادداشت و بستن صفحه‌ها.",
+        "weekdays": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "priority": "low",
+        "isActive": true,
+        "minimumVersion": "مرتب‌کردن یک گوشه میز",
+        "minimumMinutes": 2
+      },
+      {
+        "id": "visual-qa-v1-routine-006",
+        "createdAt": "2026-09-16T06:00:00.000Z",
+        "updatedAt": "2026-10-11T12:00:00.000Z",
+        "title": "مرتب‌سازی کمد",
+        "description": "این روتین فعلاً متوقف است.",
+        "weekdays": [
+          6
+        ],
+        "priority": "low",
+        "isActive": false,
+        "minimumVersion": "مرتب‌کردن یک طبقه",
+        "minimumMinutes": 5
+      }
+    ],
+    "weeklyPlans": [
+      {
+        "id": "visual-qa-v1-week-plan-001",
+        "createdAt": "2026-10-12T06:00:00.000Z",
+        "updatedAt": "2026-10-12T12:00:00.000Z",
+        "weekStart": "2026-10-12",
+        "focusTitle": "یک گزارش کوچک و قابل توضیح",
+        "intention": "هر روز یک قدم کوتاه؛ هدف، تکمیل یک نمونه است.",
+        "goalId": "visual-qa-v1-goal-001",
+        "projectId": "visual-qa-v1-project-001",
+        "taskId": "visual-qa-v1-task-001"
+      },
+      {
+        "id": "visual-qa-v1-week-plan-002",
+        "createdAt": "2026-10-05T06:00:00.000Z",
+        "updatedAt": "2026-10-05T12:00:00.000Z",
+        "weekStart": "2026-10-05",
+        "focusTitle": "استمرار در حرکت روزانه",
+        "intention": "روزهای شلوغ نسخه کوچک برنامه را انجام می‌دهم.",
+        "goalId": "visual-qa-v1-goal-002",
+        "projectId": "visual-qa-v1-project-002",
+        "taskId": "visual-qa-v1-task-011"
+      }
+    ],
+    "attachments": []
+  }
+}

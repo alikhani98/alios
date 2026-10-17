@@ -34,6 +34,7 @@ import {
   CardTitle,
   CollapsibleSection,
   SoftPanel,
+  StatusChip,
 } from "@/shared/ui";
 import { cn } from "@/shared/utils";
 import { QuickAccessToggleButton } from "@/shared/quickAccess";
@@ -84,37 +85,48 @@ export function ProjectCard({
     project.status === "active" && isReviewDue && onMarkReviewed;
 
   return (
-    <Card className="flex h-full min-w-0 flex-col overflow-hidden">
-      <CardHeader className="gap-3">
-        <div className="flex min-w-0 flex-col items-start gap-3 sm:flex-row sm:justify-between">
-          <CardTitle className="min-w-0 break-words leading-7">
-            {project.title}
-          </CardTitle>
-          <div className="flex w-full min-w-0 flex-wrap justify-start gap-2 sm:w-auto sm:justify-end">
-            <Badge
-              variant="secondary"
-              className="max-w-full break-words whitespace-normal text-start"
-            >
-              {t(PROJECT_STATUS_LABEL_KEYS[project.status])}
-            </Badge>
-            <Badge
-              variant="outline"
-              className="max-w-full break-words whitespace-normal text-start"
-            >
-              {t(PROJECT_PRIORITY_LABEL_KEYS[project.priority])}
-            </Badge>
+    <Card className="project-card flex h-full min-w-0 flex-col overflow-hidden">
+      <CardHeader className="project-card-header gap-3">
+        <div className="project-overview">
+          <div className="project-identity">
+            <CardTitle className="min-w-0 break-words leading-7">
+              {project.title}
+            </CardTitle>
+            <div className="flex min-w-0 flex-wrap items-center gap-2">
+              <StatusChip
+                tone={project.status === "completed" ? "success" : project.status === "waiting" ? "warning" : "neutral"}
+              >
+                {t(PROJECT_STATUS_LABEL_KEYS[project.status])}
+              </StatusChip>
+              <Badge
+                variant="outline"
+                className="max-w-full break-words whitespace-normal text-start"
+              >
+                {t(PROJECT_PRIORITY_LABEL_KEYS[project.priority])}
+              </Badge>
+            </div>
           </div>
+          <dl className="project-progress">
+            <dt className="text-xs font-medium text-muted-foreground">
+              {t("projects.taskProgress")}
+            </dt>
+            <dd className="break-words text-base font-semibold tabular-nums leading-7">
+              {taskProgress.total === 0
+                ? t("projects.notStartedYet")
+                : t("projects.taskProgressValue", taskProgress)}
+            </dd>
+          </dl>
         </div>
         {project.description ? (
-          <p className="break-words whitespace-pre-wrap text-sm leading-7 text-muted-foreground">
+          <p className="project-description break-words whitespace-pre-wrap text-sm leading-7 text-muted-foreground">
             {project.description}
           </p>
         ) : null}
       </CardHeader>
 
-      <CardContent className="min-w-0 flex-1 space-y-3">
+      <CardContent className="project-card-content min-w-0 flex-1 space-y-3">
         {project.nextAction ? (
-          <div className="flex items-start gap-2 text-sm">
+          <div className="project-next-action flex items-start gap-2 text-sm">
             <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
             <span className="min-w-0 break-words">
               <span className="font-medium">{t("projects.next")} </span>
@@ -131,20 +143,15 @@ export function ProjectCard({
           expandLabel={t("common.expandSection")}
           collapseLabel={t("common.collapseSection")}
           defaultOpen={false}
-          className="rounded-2xl border border-border/70 bg-muted/20 shadow-none"
-          contentClassName="space-y-3"
+          className="project-details"
+          contentClassName="project-details-content space-y-4"
         >
-          <div className="min-w-0 rounded-2xl border bg-muted/30 p-3">
+          <div className="project-relationship min-w-0">
             <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="min-w-0 space-y-1">
                 <p className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
                   <ListChecks className="h-4 w-4 shrink-0 text-primary" />
                   {t("projects.taskProgress")}
-                </p>
-                <p className="break-words text-sm font-medium">
-                  {taskProgress.total === 0
-                    ? t("projects.notStartedYet")
-                    : t("projects.taskProgressValue", taskProgress)}
                 </p>
               </div>
               <Button asChild size="sm" variant="outline" className="w-full shrink-0 sm:w-auto">
@@ -155,7 +162,7 @@ export function ProjectCard({
             </div>
           </div>
           {project.goalId ? (
-            <div className="min-w-0 rounded-2xl border border-primary/15 bg-primary/5 p-3">
+            <div className="project-relationship min-w-0">
               <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="min-w-0 space-y-1">
                   <p className="flex min-w-0 items-center gap-2 text-xs font-medium text-muted-foreground">
@@ -203,7 +210,7 @@ export function ProjectCard({
               </span>
             </div>
           ) : null}
-          <div className="grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
+          <div className="project-review-metadata grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
             <p className="min-w-0 break-words">
               {t("goals.reviewIntervalDaysLabel")}: {project.reviewIntervalDays ?? t("common.notRecorded")}
             </p>
@@ -327,7 +334,7 @@ export function ProjectCard({
         </CollapsibleSection>
       </CardContent>
 
-      <CardFooter className="flex flex-col gap-2 border-t pt-4 sm:flex-row sm:flex-wrap">
+      <CardFooter className="project-actions flex flex-wrap gap-2 border-t">
         {confirmingDelete ? (
           <>
             <Button
@@ -374,7 +381,7 @@ export function ProjectCard({
             </Button>
           </>
         )}
-        <div className="relative">
+        <div className="project-overflow relative">
           <Button
             type="button"
             size="sm"
@@ -386,7 +393,7 @@ export function ProjectCard({
             <MoreHorizontal className="h-4 w-4" />
           </Button>
           {showOverflowActions ? (
-            <div className="mt-2 grid min-w-56 gap-1 rounded-xl border bg-popover p-2 text-popover-foreground shadow-aliosFloating">
+            <div className="project-overflow-panel mt-2 grid gap-1 rounded-xl border bg-popover p-2 text-popover-foreground shadow-aliosFloating">
               {canMarkReviewed ? (
                 <Button
                   type="button"

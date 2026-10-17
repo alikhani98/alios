@@ -1,3 +1,5 @@
+import { BookOpenText, FolderKanban, Library, Repeat2, Target } from "lucide-react";
+
 import type { StorageAdapter } from "@/core/storage";
 import type { TranslationKey } from "@/shared/i18n";
 import type { QuickAccessItem, QuickAccessModule } from "./quickAccess";
@@ -6,6 +8,7 @@ import { QUICK_ACCESS_MODULES } from "./quickAccess";
 export type ResolvedQuickAccessItem = {
   item: QuickAccessItem;
   title: string;
+  description?: string;
   href?: string;
   icon?: QuickAccessModule["icon"];
   unavailable: boolean;
@@ -81,6 +84,11 @@ export async function resolveQuickAccessItems(
       return {
         item,
         title: target?.title ?? translate("quickAccess.unavailable"),
+        description: target && ("summary" in target ? target.summary : "description" in target ? target.description : undefined),
+        icon: item.itemType === "goal" ? Target
+          : item.itemType === "project" ? FolderKanban
+          : item.itemType === "resource" ? Library
+          : item.itemType === "knowledge" ? BookOpenText : Repeat2,
         href: target ? route : undefined,
         unavailable: !target,
       };

@@ -1,0 +1,230 @@
+/* Projects follows the available workspace width, including beside the sidebar. */
+.alios-projects {
+  container: projects / inline-size;
+  min-inline-size: 0;
+  letter-spacing: 0;
+}
+
+.alios-projects :is(p, h2, h3, span, a, button, label, dt, dd) {
+  overflow-wrap: anywhere;
+  letter-spacing: 0;
+}
+
+.alios-projects .projects-header {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.alios-projects .projects-header-content {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0;
+}
+
+.alios-projects .projects-header-content > .alios-page-heading {
+  flex: 1 1 18rem;
+  min-inline-size: 0;
+}
+
+.alios-projects .projects-view-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-block: 0.75rem;
+  border-block: 1px solid hsl(var(--border));
+}
+
+.alios-projects .projects-view-toolbar > p {
+  flex: 1 1 18rem;
+}
+
+.alios-projects .projects-view-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.alios-projects :is(.projects-view-options, .project-actions, .project-relationship, .project-kanban-card) :is(button, a) {
+  min-block-size: 2.75rem;
+  white-space: normal;
+}
+
+.alios-projects .project-card {
+  background: hsl(var(--card));
+  border-radius: var(--alios-radius-surface);
+  box-shadow: none;
+}
+
+.alios-projects .project-card-header {
+  padding: 1rem;
+}
+
+.alios-projects .project-overview {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: 1rem;
+}
+
+.alios-projects .project-identity {
+  display: grid;
+  min-inline-size: 0;
+  gap: 0.625rem;
+}
+
+.alios-projects .project-progress {
+  min-inline-size: 0;
+  padding-inline-start: 0.75rem;
+  border-inline-start: 2px solid hsl(var(--border));
+}
+
+.alios-projects .project-description {
+  max-inline-size: 75ch;
+}
+
+.alios-projects .project-card-content {
+  padding: 0 1rem;
+}
+
+.alios-projects .project-next-action {
+  padding-block: 0.25rem 0.75rem;
+  line-height: 1.75;
+}
+
+.alios-projects .project-details {
+  margin: 0;
+  border: 0;
+  border-block-start: 1px solid hsl(var(--border) / 0.7);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.alios-projects .project-details > .alios-collapsible-trigger {
+  padding: 0.75rem 0;
+  gap: 0.5rem;
+}
+
+.alios-projects .project-details > .alios-collapsible-trigger > span:first-child {
+  gap: 0.625rem;
+}
+
+.alios-projects .project-details > .alios-collapsible-trigger .text-base {
+  font-size: 0.875rem;
+  line-height: 1.75;
+}
+
+.alios-projects .project-details > .alios-collapsible-trigger .text-sm {
+  font-size: 0.75rem;
+  line-height: 1.75;
+}
+
+.alios-projects .project-details > .project-details-content {
+  padding: 1rem 0;
+}
+
+.alios-projects .project-details-content > .alios-surface-soft {
+  padding: 1rem 0 0;
+  border: 0;
+  border-block-start: 1px solid hsl(var(--border) / 0.65);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.alios-projects .project-relationship {
+  padding-block-end: 1rem;
+  border-block-end: 1px solid hsl(var(--border) / 0.65);
+}
+
+.alios-projects .project-actions {
+  align-items: start;
+  padding: 0.75rem 1rem;
+  border-color: hsl(var(--border) / 0.7);
+}
+
+.alios-projects .project-actions > button {
+  inline-size: auto;
+  max-inline-size: 100%;
+}
+
+.alios-projects .project-overflow {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  margin-inline-start: auto;
+}
+
+.alios-projects .project-overflow-panel {
+  inline-size: 16rem;
+  max-inline-size: 100%;
+  box-shadow: none;
+}
+
+.alios-projects .project-overflow-panel button {
+  block-size: auto;
+  text-align: start;
+}
+
+.alios-projects .projects-kanban {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  align-items: start;
+}
+
+.alios-projects :is(.project-kanban-column, .project-kanban-card, .projects-form-surface) {
+  border-radius: var(--alios-radius-surface);
+  box-shadow: none;
+}
+
+.alios-projects .project-form :is(input, select, textarea),
+.alios-projects .project-form > div,
+.alios-projects .project-form > div > div {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+
+.alios-projects .project-form-actions {
+  padding-block-start: 1rem;
+  border-block-start: 1px solid hsl(var(--border));
+}
+
+/* Keep form pairs and summary columns wide enough at sidebar/zoom transitions. */
+@container projects (max-width: 39rem) {
+  .alios-projects .project-form > .grid,
+  .alios-projects .project-review-metadata {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .alios-projects .project-relationship > div {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .alios-projects .project-relationship a {
+    inline-size: 100%;
+  }
+}
+
+@container projects (min-width: 44rem) {
+  .alios-projects .project-overview {
+    grid-template-columns: minmax(0, 1fr) minmax(12rem, 0.35fr);
+    gap: 1.5rem;
+  }
+
+  .alios-projects .project-card-header {
+    padding: 1.25rem 1.5rem 1rem;
+  }
+
+  .alios-projects .project-card-content {
+    padding-inline: 1.5rem;
+  }
+
+  .alios-projects .project-actions {
+    padding-inline: 1.5rem;
+  }
+}
