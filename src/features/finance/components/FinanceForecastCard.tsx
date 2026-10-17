@@ -1,5 +1,6 @@
 import { format, startOfMonth, subMonths } from "date-fns";
 import { useMemo } from "react";
+import { ChartNoAxesCombined } from "lucide-react";
 
 import { useI18n } from "@/shared/i18n";
 import { SoftPanel } from "@/shared/ui";
@@ -100,17 +101,15 @@ export function FinanceForecastCard({
   }, [obligations, transactions]);
   const projectedBalanceTone =
     forecast.projectedBalance > 0
-      ? "text-emerald-600 dark:text-emerald-400"
+      ? "text-success"
       : forecast.projectedBalance < 0
         ? "text-destructive"
         : "text-foreground";
 
   return (
-    <SoftPanel className="space-y-4 border-alios-saffron/25 bg-background/85">
+    <SoftPanel className="finance-forecast space-y-4">
       <div className="flex items-center gap-2">
-        <span aria-hidden="true" className="text-lg">
-          📊
-        </span>
+        <ChartNoAxesCombined aria-hidden="true" className="h-5 w-5 text-muted-foreground" />
         <h3 className="text-lg font-semibold">{t("finance.forecast.title")}</h3>
       </div>
 
@@ -119,7 +118,7 @@ export function FinanceForecastCard({
           {t("finance.forecast.noData")}
         </p>
       ) : (
-        <div className="space-y-3">
+        <div className="finance-forecast-values space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
             <span className="text-muted-foreground">
               {t("finance.forecast.variable")}
@@ -139,7 +138,7 @@ export function FinanceForecastCard({
           <div className="border-t border-border/70" />
           <div className="flex flex-wrap items-center justify-between gap-3">
             <span className="font-semibold">{t("finance.forecast.total")}</span>
-            <span className="text-lg font-bold text-saffron-thread tabular-nums">
+            <span className="text-lg font-semibold tabular-nums">
               {formatAmount(forecast.total)}
             </span>
           </div>

@@ -77,7 +77,7 @@ const accentColorPalette: Record<
   rose: {
     light: {
       primary: "346 77% 55%",
-      primaryForeground: "210 40% 98%",
+      primaryForeground: "0 0% 0%",
       ring: "346 77% 55%",
     },
     dark: {
@@ -101,7 +101,7 @@ const accentColorPalette: Record<
   emerald: {
     light: {
       primary: "158 64% 36%",
-      primaryForeground: "210 40% 98%",
+      primaryForeground: "222.2 47.4% 11.2%",
       ring: "158 64% 36%",
     },
     dark: {
@@ -113,7 +113,7 @@ const accentColorPalette: Record<
   slate: {
     light: {
       primary: "215 16% 47%",
-      primaryForeground: "210 40% 98%",
+      primaryForeground: "0 0% 100%",
       ring: "215 16% 47%",
     },
     dark: {
@@ -161,7 +161,7 @@ const accentColorPalette: Record<
   herb: {
     light: {
       primary: "134 19% 46%",
-      primaryForeground: "210 40% 98%",
+      primaryForeground: "222.2 47.4% 11.2%",
       ring: "134 19% 46%",
     },
     dark: {

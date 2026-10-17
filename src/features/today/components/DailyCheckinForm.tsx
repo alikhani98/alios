@@ -40,7 +40,7 @@ export function DailyCheckinForm({
       className="grid gap-5"
       onSubmit={handleSubmit((values) => void onSubmit(values))}
     >
-      <div className="grid gap-5 xl:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)]">
+      <div className="grid min-w-0 gap-5">
         <div className="alios-surface-muted grid gap-4 border-border/60 p-4 sm:grid-cols-2">
           {[
             ["sleepQuality", t("today.sleepQuality")],

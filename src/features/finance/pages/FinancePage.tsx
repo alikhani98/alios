@@ -71,6 +71,7 @@ import type {
   FinanceObligation,
   FinanceTransaction,
 } from "@/shared/types";
+import "../finance-presentation.css";
 
 type FinanceViewFilter =
   | "all"
@@ -836,12 +837,13 @@ export function FinancePage() {
   };
 
   return (
-    <section className="alios-page space-y-6">
+    <section className="alios-page alios-finance space-y-5 px-0 sm:px-6">
       <section id={FINANCE_SECTION_ANCHORS.summary} className="scroll-mt-32 space-y-4">
-        <PremiumCard className="alios-now-surface alios-primary-surface">
-          <div className="grid gap-5 p-5 lg:grid-cols-[minmax(0,1.25fr)_minmax(18rem,0.75fr)] sm:p-6">
-            <div className="space-y-5">
+        <PremiumCard className="alios-now-surface alios-primary-surface alios-page-entry finance-overview">
+          <div className="alios-page-entry-layout">
+            <div className="alios-page-entry-main">
               <SectionHeader
+                variant="page"
                 icon={<Landmark className="h-5 w-5" />}
                 eyebrow={t("finance.title")}
                 title={t("finance.title")}
@@ -849,25 +851,26 @@ export function FinancePage() {
                 status={
                   <StatusChip tone="neutral">{t("finance.localSummaryNote")}</StatusChip>
                 }
+                actions={
+                  <>
+                    <Button
+                      type="button"
+                      onClick={() => handleQuickNav(FINANCE_SECTION_ANCHORS.addTransaction)}
+                    >
+                      {t("finance.addTransaction")}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => handleQuickNav(FINANCE_SECTION_ANCHORS.addObligation)}
+                    >
+                      {t("finance.addObligation")}
+                    </Button>
+                  </>
+                }
               />
 
-              <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                  {t("finance.budgetGuard")}
-                </p>
-                <p className="max-w-3xl text-2xl font-semibold leading-9 tracking-tight sm:text-3xl">
-                  {currentMoneySignal}
-                </p>
-                <p className="max-w-3xl text-sm leading-7 text-muted-foreground">
-                  {t(getBudgetGuardSummaryKey(budgetGuard.status))}
-                </p>
-              </div>
-
-              <p className="max-w-3xl text-sm leading-7 text-muted-foreground">
-                {t("finance.noAdviceNote")}
-              </p>
-
-              <div className="grid gap-3 sm:grid-cols-3">
+              <div className="alios-page-entry-stats finance-summary-stats">
                 <SoftPanel className="gap-2 border-alios-saffron/25 bg-background/85">
                   <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                     {t("finance.remainingLiquidity")}
@@ -900,86 +903,26 @@ export function FinancePage() {
                   </p>
                 </SoftPanel>
               </div>
+              <div className="alios-page-entry-focus space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                  {t("finance.budgetGuard")}
+                </p>
+                <p className="max-w-3xl text-2xl font-semibold leading-9 tracking-tight sm:text-3xl">
+                  {currentMoneySignal}
+                </p>
+                <p className="max-w-3xl text-sm leading-7 text-muted-foreground">
+                  {t(getBudgetGuardSummaryKey(budgetGuard.status))}
+                </p>
+              </div>
+
+              <p className="max-w-3xl text-sm leading-7 text-muted-foreground">
+                {t("finance.noAdviceNote")}
+              </p>
             </div>
-
-            <SoftPanel className="space-y-4 alios-thread-accent">
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-muted-foreground">
-                  {t("finance.sectionAdd")}
-                </p>
-                <p className="text-xl font-semibold leading-8">
-                  {t("finance.localOnlyData")}
-                </p>
-              </div>
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
-                <Button
-                  type="button"
-                  className="w-full"
-                  onClick={() => handleQuickNav(FINANCE_SECTION_ANCHORS.addTransaction)}
-                >
-                  {t("finance.addTransaction")}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => handleQuickNav(FINANCE_SECTION_ANCHORS.addObligation)}
-                >
-                  {t("finance.addObligation")}
-                </Button>
-              </div>
-              <div className="grid gap-3">
-                <SoftPanel className="gap-3 border-border/70 bg-background/85">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <p className="text-sm font-medium">{t("finance.syncStatusTitle")}</p>
-                    <StatusChip tone={financeSyncTone}>{financeSyncLabel}</StatusChip>
-                  </div>
-                  <p className="text-sm leading-7 text-muted-foreground">
-                    {financeSyncDescription}
-                  </p>
-                  <div className="grid gap-2 text-xs text-muted-foreground sm:grid-cols-2">
-                    <p>
-                      {t("settings.syncLastSyncedLabel")}:{" "}
-                      {accountRuntimeState.syncStatus.lastSyncedAt
-                        ? formatDate(accountRuntimeState.syncStatus.lastSyncedAt)
-                        : t("settings.syncLastSyncedNever")}
-                    </p>
-                    <p>
-                      {t("settings.syncConflictReviewDetectedBadge", {
-                        count: accountRuntimeState.syncStatus.conflictCount ?? 0,
-                      })}
-                    </p>
-                  </div>
-                </SoftPanel>
-
-                <SoftPanel className="gap-3 border-border/70 bg-background/85">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <p className="text-sm font-medium">{t("finance.spendingOverviewTitle")}</p>
-                    <StatusChip tone="neutral">
-                      {t("finance.recentTransactionsCount", {
-                        count: sortedTransactions.length,
-                      })}
-                    </StatusChip>
-                  </div>
-                  <p className="text-sm leading-7 text-muted-foreground">
-                    {topExpenseCategory
-                      ? t("finance.topExpenseCategory", {
-                          category: t(
-                            getFinanceTransactionCategoryLabelKey(
-                              topExpenseCategory.category
-                            )
-                          ),
-                          amount: formatAmount(topExpenseCategory.amount),
-                        })
-                      : t("finance.spendingOverviewEmpty")}
-                  </p>
-                </SoftPanel>
-              </div>
-            </SoftPanel>
           </div>
         </PremiumCard>
 
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="finance-metrics">
           {summaryCards.map((card) => (
             <MetricCard
               key={card.label}
@@ -988,9 +931,68 @@ export function FinancePage() {
               value={card.value}
               description={card.description}
               status={card.status}
+              className="finance-metric"
             />
           ))}
         </div>
+
+        <SoftPanel className="finance-context space-y-3">
+          <div className="space-y-1">
+            <p className="text-sm font-medium text-muted-foreground">
+              {t("finance.sectionAdd")}
+            </p>
+            <p className="text-xl font-semibold leading-8">
+              {t("finance.localOnlyData")}
+            </p>
+          </div>
+          <div className="grid gap-3">
+            <SoftPanel className="gap-3 border-border/70 bg-background/85">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-sm font-medium">{t("finance.syncStatusTitle")}</p>
+                <StatusChip tone={financeSyncTone}>{financeSyncLabel}</StatusChip>
+              </div>
+              <p className="text-sm leading-7 text-muted-foreground">
+                {financeSyncDescription}
+              </p>
+              <div className="grid gap-2 text-xs text-muted-foreground sm:grid-cols-2">
+                <p>
+                  {t("settings.syncLastSyncedLabel")}:{" "}
+                  {accountRuntimeState.syncStatus.lastSyncedAt
+                    ? formatDate(accountRuntimeState.syncStatus.lastSyncedAt)
+                    : t("settings.syncLastSyncedNever")}
+                </p>
+                <p>
+                  {t("settings.syncConflictReviewDetectedBadge", {
+                    count: accountRuntimeState.syncStatus.conflictCount ?? 0,
+                  })}
+                </p>
+              </div>
+            </SoftPanel>
+
+            <SoftPanel className="gap-3 border-border/70 bg-background/85">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-sm font-medium">{t("finance.spendingOverviewTitle")}</p>
+                <StatusChip tone="neutral">
+                  {t("finance.recentTransactionsCount", {
+                    count: sortedTransactions.length,
+                  })}
+                </StatusChip>
+              </div>
+              <p className="text-sm leading-7 text-muted-foreground">
+                {topExpenseCategory
+                  ? t("finance.topExpenseCategory", {
+                      category: t(
+                        getFinanceTransactionCategoryLabelKey(
+                          topExpenseCategory.category
+                        )
+                      ),
+                      amount: formatAmount(topExpenseCategory.amount),
+                    })
+                  : t("finance.spendingOverviewEmpty")}
+              </p>
+            </SoftPanel>
+          </div>
+        </SoftPanel>
       </section>
 
       {showCsvImportReminder ? (
@@ -1033,7 +1035,7 @@ export function FinancePage() {
         </SoftPanel>
       ) : null}
 
-      <div className="alios-surface-card sticky top-[calc(4rem+env(safe-area-inset-top))] z-20 px-3 py-2 backdrop-blur-xl sm:px-4 md:top-20">
+      <div className="alios-surface-card finance-quick-nav sticky top-[calc(4rem+env(safe-area-inset-top))] z-20 px-3 py-2 sm:px-4 md:top-20">
         <nav className="flex touch-pan-x gap-2 overflow-x-auto pb-1" aria-label={t("finance.quickNavigation")}>
           {financeQuickNavItems.map((item) => (
             <Button
@@ -1296,7 +1298,7 @@ export function FinancePage() {
       className="scroll-mt-32"
       contentClassName="space-y-4"
     >
-        <div className="grid gap-4 xl:grid-cols-3">
+        <div className="finance-chart-grid grid gap-4">
           <SoftPanel className="space-y-4">
             <div className="space-y-1">
               <h3 className="text-lg font-semibold">
@@ -1387,7 +1389,7 @@ export function FinancePage() {
         className="scroll-mt-32"
         contentClassName="space-y-4"
       >
-        <div className="grid gap-4 xl:grid-cols-3">
+        <div className="finance-review-grid grid gap-4">
           <SoftPanel className="space-y-3">
             <div className="space-y-1">
               <h3 className="text-lg font-semibold">
@@ -1485,7 +1487,7 @@ export function FinancePage() {
               </p>
             </div>
 
-            <div className="space-y-3">
+            <div className="finance-budget-list">
               {categoryBudgetUsage.length === 0 ? (
                 <SoftPanel>
                   <p className="text-sm text-muted-foreground">
@@ -1500,7 +1502,7 @@ export function FinancePage() {
                       : 0;
 
                   return (
-                    <SoftPanel key={item.budget.id} className="space-y-3">
+                    <SoftPanel key={item.budget.id} className="finance-budget space-y-3">
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div className="min-w-0 space-y-1">
                           <div className="flex flex-wrap items-center gap-2">
@@ -1526,9 +1528,9 @@ export function FinancePage() {
                           {Math.round(item.usageRatio * 100)}%
                         </p>
                       </div>
-                      <div className="h-2 overflow-hidden rounded-full bg-muted">
+                      <div className="h-1.5 overflow-hidden rounded-full bg-muted">
                         <div
-                          className="h-full rounded-full bg-alios-saffron transition-[width] duration-300 ease-out motion-reduce:transition-none"
+                          className={`h-full rounded-full transition-[width] duration-300 ease-out motion-reduce:transition-none ${item.status === "pressure" ? "bg-destructive" : item.status === "watch" ? "bg-warning" : "bg-success"}`}
                           style={{ width: `${usedPercent}%` }}
                         />
                       </div>
@@ -1576,8 +1578,8 @@ export function FinancePage() {
             </SoftPanel>
           ) : (
             review.upcomingObligations.map((item) => (
-              <SoftPanel key={item.obligation.id} className="space-y-3 border-border/70">
-                <div className="flex flex-wrap items-start justify-between gap-3">
+              <SoftPanel key={item.obligation.id} className="finance-obligation-row space-y-3">
+                <div className="finance-record-heading">
                   <div className="min-w-0 space-y-2">
                     <h3 className="text-base font-semibold leading-7">
                       {item.obligation.title}
@@ -1604,7 +1606,7 @@ export function FinancePage() {
                       {item.nextDueDate ? formatDate(item.nextDueDate) : t("finance.noDueDate")}
                     </p>
                   </div>
-                  <p className="max-w-[11rem] break-words text-end text-base font-semibold tabular-nums">
+                  <p className="finance-record-amount break-words text-base font-semibold tabular-nums">
                     {formatAmount(item.remainingAmount)}
                   </p>
                 </div>
@@ -1710,7 +1712,7 @@ export function FinancePage() {
           </div>
         </PremiumCard>
 
-        <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
+        <div className="finance-filter-grid">
           {FINANCE_VIEW_FILTERS.map((option) => {
             const isSelected = selectedFilter === option.value;
 
@@ -1719,7 +1721,8 @@ export function FinancePage() {
                 key={option.value}
                 type="button"
                 variant={isSelected ? "default" : "outline"}
-                className="flex w-full items-start justify-between gap-3 rounded-2xl text-start"
+                className="flex w-full items-center justify-between gap-3 text-start"
+                aria-pressed={isSelected}
                 onClick={() => setSelectedFilter(option.value)}
               >
                 <span className="min-w-0 flex-1 break-words">{t(option.labelKey)}</span>
@@ -1741,13 +1744,13 @@ export function FinancePage() {
                 {t("finance.searchLabel")}
               </label>
               <div className="relative">
-                <Search className="pointer-events-none absolute top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground ltr:left-3 rtl:right-3" />
+                <Search className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
                 <Input
                   id="finance-search"
                   value={searchQuery}
                   onChange={(event) => setSearchQuery(event.target.value)}
                   placeholder={t("finance.searchPlaceholder")}
-                  className="bg-background/80 ltr:pl-9 rtl:pr-9"
+                  className="bg-background/80 ps-9"
                 />
               </div>
             </div>
@@ -1821,7 +1824,7 @@ export function FinancePage() {
               }
             />
           ) : (
-            <div className={selectedFilter === "all" ? "grid gap-4 xl:grid-cols-2" : "space-y-4"}>
+            <div className="finance-record-groups space-y-5">
               {showTransactionSection ? (
                 <PremiumCard className="border-border/70 bg-card/95">
                   <div className="p-5 sm:p-6">

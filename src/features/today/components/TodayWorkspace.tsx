@@ -53,6 +53,7 @@ import {
 import type { DailyCheckinFormValues, TodayTaskFormValues } from "../types";
 import { createRoutineTaskInput, getRoutineSuggestions } from "../routineSuggestions";
 import { clearDueProjectReviewDate, isProjectReviewDue } from "@/features/projects/projectReviews";
+import "../today-presentation.css";
 
 export const TODAY_COMPLETED_TASKS_OPEN_STORAGE_KEY =
   "alios.today.completedTasks.open";
@@ -633,7 +634,7 @@ export function TodayWorkspace({
   }, [focusId, isLoading, plannedTaskOutsideToday, t, visibleTasks]);
 
   return (
-    <section className="alios-page space-y-6">
+    <section className="alios-page alios-today-workspace space-y-5">
       {projectId ? (
         <div
           role="status"
@@ -741,10 +742,14 @@ export function TodayWorkspace({
       )}
 
       {hideTaskSummaryHeader ? null : (
-        <PremiumCard className="border-border/70 bg-card/95">
-          <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+        <header className="alios-today-header">
+          <div className="min-w-0 space-y-2">
+            <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+              <time dateTime={today} className="tabular-nums">{formatDate(today)}</time>
+              {mitTask ? <span className="text-xs">· {t("today.mit")}</span> : null}
+            </div>
             <SectionHeader
-              eyebrow={mitTask ? t("today.mit") : undefined}
+              variant="page"
               title={t("today.tasks")}
               description={t("today.tasksDescription")}
               status={
@@ -753,8 +758,10 @@ export function TodayWorkspace({
                 </StatusChip>
               }
             />
-            <Button type="button" variant="outline" onClick={openCreateTask}>
-              <Plus className="me-2 h-4 w-4" />
+          </div>
+          <div className="alios-today-header-actions">
+            <Button type="button" onClick={openCreateTask}>
+              <Plus className="h-4 w-4" aria-hidden="true" />
               {t("today.newTask")}
             </Button>
             <Button
@@ -763,15 +770,15 @@ export function TodayWorkspace({
               onClick={() => setIsFocusMode((current) => !current)}
               aria-pressed={isFocusMode}
             >
-              <Target className="me-2 h-4 w-4" />
+              <Target className="h-4 w-4" aria-hidden="true" />
               {isFocusMode ? t("today.focusModeOn") : t("today.focusMode")}
             </Button>
-          </CardContent>
-        </PremiumCard>
+          </div>
+        </header>
       )}
 
       {taskFormOpen ? (
-        <PremiumCard className="border-border/70 bg-card/95">
+        <PremiumCard className="alios-today-editor border-border/70 bg-card/95">
           <CardHeader>
             <CardTitle>{editingTask ? t("today.editTask") : t("today.createTask")}</CardTitle>
           </CardHeader>
@@ -814,8 +821,8 @@ export function TodayWorkspace({
         </div>
       ) : null}
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)]">
-        <div className="space-y-6">
+      <div className="alios-today-layout">
+        <div className="alios-today-execution min-w-0 space-y-4">
           {isLoading ? (
             <div className="space-y-3" aria-label={t("today.loadingTasks")}>
               {[0, 1, 2].map((item) => (
@@ -824,6 +831,7 @@ export function TodayWorkspace({
             </div>
           ) : visibleTasks.length === 0 && !hideEmptyTaskState ? (
             <EmptyState
+              className="alios-today-empty"
               icon={<CheckSquare2 className="h-6 w-6" />}
               title={t("today.noTasks")}
               description={t("today.noTasksDescription")}
@@ -835,7 +843,7 @@ export function TodayWorkspace({
               }
             />
           ) : visibleTasks.length > 0 ? (
-            <div className="space-y-3">
+            <div className="alios-today-task-list space-y-3">
               {isFocusMode ? (
                 <SoftPanel className="border-alios-saffron/40 bg-alios-saffron/10">
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -868,7 +876,7 @@ export function TodayWorkspace({
                     taskRefs.current[task.id] = node;
                   }}
                   className={cn(
-                    "scroll-mt-24 rounded-2xl transition-[transform,box-shadow,border-color] duration-200 ease-out motion-reduce:transition-none motion-reduce:transform-none",
+                    "scroll-mt-24 rounded-surface transition-[transform,box-shadow,border-color] duration-200 ease-out motion-reduce:transition-none motion-reduce:transform-none",
                     aliosListItemMotion,
                     aliosStaggerDelay(index),
                     "motion-reduce:animate-none motion-reduce:opacity-100",
@@ -908,7 +916,7 @@ export function TodayWorkspace({
                   expandLabel={t("common.expandSection")}
                   collapseLabel={t("common.collapseSection")}
                   contentClassName="space-y-3"
-                  className="border-border/70 bg-card/95"
+                  className="alios-today-completed border-border/70 bg-card/95"
                 >
                   {visibleCompletedTasks.map((task, index) => (
                     <div
@@ -917,7 +925,7 @@ export function TodayWorkspace({
                         taskRefs.current[task.id] = node;
                       }}
                       className={cn(
-                        "scroll-mt-24 rounded-2xl transition-[transform,box-shadow,border-color] duration-200 ease-out motion-reduce:transition-none motion-reduce:transform-none",
+                        "scroll-mt-24 rounded-surface transition-[transform,box-shadow,border-color] duration-200 ease-out motion-reduce:transition-none motion-reduce:transform-none",
                         aliosListItemMotion,
                         aliosStaggerDelay(index),
                         "motion-reduce:animate-none motion-reduce:opacity-100",
@@ -959,9 +967,9 @@ export function TodayWorkspace({
           ) : null}
         </div>
 
-        <div className="space-y-6">
+        <div className="alios-today-context min-w-0 space-y-4">
           {dailyCommitment ? (
-            <SoftPanel className="border-primary/15 bg-primary/5">
+            <SoftPanel className="alios-today-commitment border-primary/15 bg-primary/5">
               <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div className="min-w-0 space-y-1">
                   <p className="text-sm font-semibold">

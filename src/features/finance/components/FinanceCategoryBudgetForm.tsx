@@ -46,7 +46,7 @@ export function FinanceCategoryBudgetForm({
 
   return (
     <form
-      className="grid gap-3"
+      className="finance-form grid gap-3"
       onSubmit={(event) => {
         event.preventDefault();
 
@@ -60,7 +60,7 @@ export function FinanceCategoryBudgetForm({
         });
       }}
     >
-      <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(8rem,0.65fr)]">
+      <div className="finance-form-fields grid gap-3">
         <label className="grid gap-1.5 text-sm font-medium">
           <span>{t("finance.categoryBudgetCategory")}</span>
           <Select

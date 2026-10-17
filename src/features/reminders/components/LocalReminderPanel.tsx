@@ -52,7 +52,7 @@ export function LocalReminderPanel({
     : buildFinanceLink();
 
   return (
-    <Card className="alios-home-context-shelf overflow-hidden shadow-sm">
+    <Card className="alios-home-context-shelf alios-home-reminders">
       <CardContent className="space-y-4 p-5 sm:p-6">
         <SectionHeader
           title={t("home.attentionTitle")}
@@ -62,7 +62,7 @@ export function LocalReminderPanel({
           icon={<CalendarClock className="h-5 w-5" aria-hidden="true" />}
         />
 
-        <div className="grid gap-3 lg:grid-cols-2">
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,16rem),1fr))] gap-3">
           <ReminderGroup
             title={t("reminders.tasks")}
             icon={<ListTodo className="h-4 w-4" aria-hidden="true" />}
@@ -103,7 +103,7 @@ function ReminderGroup({
   const { t } = useI18n();
 
   return (
-    <div className="min-w-0 rounded-2xl border bg-background/80 p-4 shadow-sm">
+    <div className="min-w-0 border-t border-border/60 pt-3">
       <p className="flex items-center gap-2 text-sm font-semibold">
         {icon}
         {title}
@@ -123,9 +123,9 @@ function ReminderGroup({
               <Link
                 key={item.id}
                 to={to}
-                className="flex min-h-11 min-w-0 items-center justify-between gap-3 rounded-xl border bg-card px-3 py-2 text-sm shadow-sm transition hover:border-primary/25 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                className="flex min-h-11 min-w-0 flex-wrap items-center justify-between gap-x-3 gap-y-1 rounded-md px-1 py-2 text-sm leading-7 transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 motion-reduce:transition-none"
               >
-                <span className="min-w-0 truncate font-medium">{title}</span>
+                <span className="min-w-0 flex-1 basis-48 break-words font-medium [overflow-wrap:anywhere]">{title}</span>
                 <span className="shrink-0 text-xs text-muted-foreground">
                   {reason}
                 </span>

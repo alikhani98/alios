@@ -1,4 +1,5 @@
 @import "./design-tokens.css";
+@import "./workspace.css";
 
 @tailwind base;
 @tailwind components;
@@ -158,7 +159,7 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 41 80% 53%;
 
-    --radius: 0.875rem;
+    --radius: var(--alios-radius-control);
   }
 
   .dark {
@@ -264,6 +265,36 @@
 }
 
 @layer components {
+  /* Portaled overlays escape route transforms and the main isolation context. */
+  .alios-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: var(--alios-layer-overlay);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-block-start: max(var(--alios-space-control), env(safe-area-inset-top));
+    padding-block-end: max(var(--alios-space-control), env(safe-area-inset-bottom));
+    padding-inline: max(var(--alios-space-control), env(safe-area-inset-left), env(safe-area-inset-right));
+    background: hsl(var(--background) / 0.8);
+  }
+
+  .alios-modal-panel {
+    min-inline-size: 0;
+    max-block-size: calc(100vh - max(var(--alios-space-control), env(safe-area-inset-top)) - max(var(--alios-space-control), env(safe-area-inset-bottom)));
+    max-block-size: calc(100dvh - max(var(--alios-space-control), env(safe-area-inset-top)) - max(var(--alios-space-control), env(safe-area-inset-bottom)));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scroll-padding-block: var(--alios-space-card);
+    border-radius: var(--alios-radius-shell);
+  }
+
+  @media (min-width: 640px) {
+    .alios-modal-overlay {
+      align-items: center;
+    }
+  }
+
   .alios-page-transition {
     animation: alios-fade-up 220ms ease-out;
   }
@@ -291,87 +322,48 @@
 
   .alios-surface-card {
     @apply rounded-surface text-card-foreground;
-    background: color-mix(in srgb, hsl(var(--background)) 94%, hsl(var(--card)));
-    border: 1px solid color-mix(in srgb, hsl(var(--border)) 55%, transparent);
-    box-shadow:
-      0 1px 0 0 color-mix(in srgb, white 60%, transparent) inset,
-      var(--alios-shadow-raised);
-    backdrop-filter: var(--alios-blur-sm);
-    -webkit-backdrop-filter: var(--alios-blur-sm);
-    transition: box-shadow var(--alios-transition-base), border-color var(--alios-transition-base), transform var(--alios-transition-base);
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    box-shadow: var(--alios-shadow-card);
+    transition: border-color var(--alios-transition-base);
   }
 
   .alios-surface-card:hover {
-    border-color: color-mix(in srgb, hsl(var(--border)) 80%, transparent);
-    box-shadow:
-      0 1px 0 0 color-mix(in srgb, white 60%, transparent) inset,
-      var(--alios-shadow-floating);
+    border-color: hsl(var(--border));
   }
 
   .dark .alios-surface-card {
-    background: color-mix(in srgb, hsl(240 12% 9%) 90%, hsl(var(--card)));
-    border: 1px solid color-mix(in srgb, white 7%, transparent);
-    box-shadow:
-      0 1px 0 0 color-mix(in srgb, white 6%, transparent) inset,
-      var(--alios-shadow-raised);
+    background: color-mix(in srgb, hsl(var(--card)) 90%, hsl(var(--muted)));
   }
 
   .dark .alios-surface-card:hover {
-    border-color: color-mix(in srgb, white 12%, transparent);
-    box-shadow:
-      0 1px 0 0 color-mix(in srgb, white 7%, transparent) inset,
-      var(--alios-shadow-floating);
+    border-color: hsl(var(--border));
   }
 
   .alios-surface-elevated {
     @apply rounded-surface text-card-foreground;
-    background: linear-gradient(145deg,
-      color-mix(in srgb, hsl(var(--background)) 96%, hsl(var(--card))) 0%,
-      color-mix(in srgb, hsl(var(--background)) 98%, var(--alios-saffron-thread)) 100%);
-    border: 1px solid color-mix(in srgb, var(--alios-saffron-thread) 18%, hsl(var(--border)));
-    box-shadow:
-      0 1px 0 0 color-mix(in srgb, white 70%, transparent) inset,
-      var(--alios-shadow-floating);
-    backdrop-filter: var(--alios-blur-sm);
-    -webkit-backdrop-filter: var(--alios-blur-sm);
-    transition: box-shadow var(--alios-transition-base), transform var(--alios-transition-base);
+    background: hsl(var(--card));
+    border: 1px solid color-mix(in srgb, hsl(var(--ring)) 15%, hsl(var(--border)));
+    box-shadow: var(--alios-shadow-raised);
   }
 
   .alios-surface-elevated:hover {
-    box-shadow:
-      0 1px 0 0 color-mix(in srgb, white 70%, transparent) inset,
-      0 24px 48px -8px color-mix(in srgb, var(--alios-saffron-thread) 16%, rgb(15 23 42 / 0.16)),
-      0 8px 20px -4px rgb(15 23 42 / 0.10),
-      0 0 0 1px color-mix(in srgb, var(--alios-saffron-thread) 20%, transparent);
+    box-shadow: var(--alios-shadow-raised);
   }
 
   .dark .alios-surface-elevated {
-    background: linear-gradient(145deg,
-      hsl(240 12% 10%) 0%,
-      color-mix(in srgb, hsl(240 12% 10%) 92%, var(--alios-saffron-thread)) 100%);
-    border: 1px solid color-mix(in srgb, var(--alios-saffron-thread) 22%, hsl(var(--border)));
-    box-shadow:
-      0 1px 0 0 color-mix(in srgb, white 8%, transparent) inset,
-      var(--alios-shadow-floating);
+    background: color-mix(in srgb, hsl(var(--card)) 80%, hsl(var(--muted)));
   }
 
   .alios-surface-soft {
     @apply rounded-section text-card-foreground;
-    background: color-mix(in srgb, hsl(var(--background)) 92%, hsl(var(--card)));
-    border: 1px solid color-mix(in srgb, hsl(var(--border)) 50%, transparent);
-    box-shadow:
-      0 1px 0 0 color-mix(in srgb, white 55%, transparent) inset,
-      var(--alios-shadow-raised);
-    backdrop-filter: var(--alios-blur-sm);
-    -webkit-backdrop-filter: var(--alios-blur-sm);
+    background: color-mix(in srgb, hsl(var(--card)) 65%, hsl(var(--muted)));
+    border: 1px solid hsl(var(--border) / 0.7);
+    box-shadow: none;
   }
 
   .dark .alios-surface-soft {
-    background: color-mix(in srgb, hsl(240 12% 8%) 88%, hsl(var(--card)));
-    border: 1px solid color-mix(in srgb, white 6%, transparent);
-    box-shadow:
-      0 1px 0 0 color-mix(in srgb, white 5%, transparent) inset,
-      var(--alios-shadow-raised);
+    background: color-mix(in srgb, hsl(var(--card)) 65%, hsl(var(--muted)));
   }
 
   .alios-surface-muted {
@@ -400,16 +392,19 @@
   }
 
   .alios-icon-primary {
-    @apply border border-primary/20 bg-gradient-to-br from-primary/[0.12] to-primary/[0.06] text-primary shadow-sm;
+    @apply border border-primary/20 bg-primary/10;
+    color: var(--alios-accent-text);
     transition: box-shadow var(--alios-transition-fast), border-color var(--alios-transition-fast);
   }
 
   .alios-status-primary {
-    @apply border-transparent bg-primary/10 text-primary;
+    @apply border-transparent bg-primary/10;
+    color: var(--alios-accent-text);
   }
 
   .alios-status-success {
-    @apply border-transparent bg-alios-herb/10 text-alios-herb;
+    @apply border-transparent bg-alios-herb/10;
+    color: color-mix(in srgb, var(--alios-herb-glass) 55%, hsl(var(--foreground)));
   }
 
   .alios-status-warning {
@@ -645,6 +640,134 @@
 
   .alios-glow-herb {
     box-shadow: var(--alios-shadow-glow-herb);
+  }
+
+  .alios-page-entry.alios-now-surface {
+    background: transparent;
+    border: 0;
+    border-block-end: 1px solid hsl(var(--border));
+    border-radius: 0;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+
+  .alios-page-entry-layout {
+    display: grid;
+    gap: var(--alios-space-card);
+    padding-block-end: var(--alios-space-card);
+  }
+
+  .alios-page-entry-main {
+    min-inline-size: 0;
+    display: grid;
+    align-content: start;
+    gap: var(--alios-space-control);
+  }
+
+  .alios-page-heading {
+    animation: none;
+  }
+
+  .alios-page-entry p {
+    letter-spacing: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .alios-page-entry-focus > p:nth-child(2) {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+  }
+
+  .alios-page-entry-stats {
+    display: grid;
+    gap: var(--alios-space-control);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  }
+
+  .alios-page-entry-stats > .alios-surface-soft {
+    min-inline-size: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: baseline;
+    align-content: start;
+    gap: 0.25rem;
+    padding: 0;
+    padding-block-start: var(--alios-space-compact);
+    border: 0;
+    border-block-start: 1px solid hsl(var(--border));
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .alios-page-entry-stats > div > p:nth-child(2) {
+    text-align: end;
+  }
+
+  .alios-page-entry-stats > div > p:nth-child(n + 3) {
+    grid-column: 1 / -1;
+  }
+
+  .alios-page-entry .alios-page-entry-actions {
+    min-inline-size: 0;
+    padding: 0;
+    padding-block-start: var(--alios-space-control);
+    border: 0;
+    border-block-start: 1px solid hsl(var(--border));
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .alios-page-entry-actions > div:first-child > p:last-child {
+    font-size: 1rem;
+    line-height: 1.75rem;
+  }
+
+  .alios-page-entry-actions .alios-surface-soft {
+    padding: 0;
+    padding-block-start: var(--alios-space-control);
+    border: 0;
+    border-block-start: 1px solid hsl(var(--border));
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .alios-task-relationships > div,
+  .alios-linked-summary > div {
+    min-inline-size: 0;
+    padding: 0;
+    padding-block-start: var(--alios-space-control);
+    border: 0;
+    border-block-start: 1px solid hsl(var(--border) / 0.7);
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .alios-linked-summary > div > div {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .alios-linked-summary > div > div > p {
+    flex: 1 1 12rem;
+    overflow-wrap: anywhere;
+  }
+
+  @media (min-width: 1280px) {
+    .alios-page-entry-layout {
+      grid-template-columns: minmax(0, 1fr) minmax(16rem, 0.45fr);
+    }
+
+    .alios-page-entry .alios-page-entry-actions {
+      padding-block-start: 0;
+      padding-inline-start: var(--alios-space-card);
+      border-block-start: 0;
+      border-inline-start: 1px solid hsl(var(--border));
+    }
   }
 
   /* Smooth page entry */

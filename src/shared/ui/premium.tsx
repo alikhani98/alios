@@ -33,8 +33,7 @@ export function PremiumCard({ className, ...props }: PremiumCardProps) {
     <Card
       className={cn(
         "alios-surface-elevated overflow-hidden",
-        "hover:border-alios-saffron/25 hover:shadow-lg",
-        "transition-[box-shadow,border-color,transform] duration-200 ease-out motion-reduce:transition-none",
+        "transition-[box-shadow,border-color] duration-200 ease-out motion-reduce:transition-none",
         className
       )}
       {...props}
@@ -50,7 +49,6 @@ export function SoftPanel({ className, ...props }: SoftPanelProps) {
       className={cn(
         "alios-surface-soft p-4 sm:p-5",
         aliosSubtleOutlineMotion,
-        "hover:border-border/80 hover:bg-background/95",
         "transition-[border-color,background-color,box-shadow] duration-200 ease-out motion-reduce:transition-none",
         className
       )}
@@ -60,6 +58,7 @@ export function SoftPanel({ className, ...props }: SoftPanelProps) {
 }
 
 export type SectionHeaderProps = {
+  variant?: "section" | "page";
   eyebrow?: React.ReactNode;
   title: React.ReactNode;
   description?: React.ReactNode;
@@ -70,6 +69,7 @@ export type SectionHeaderProps = {
 };
 
 export function SectionHeader({
+  variant = "section",
   eyebrow,
   title,
   description,
@@ -78,10 +78,13 @@ export function SectionHeader({
   icon,
   className,
 }: SectionHeaderProps) {
+  const Heading = variant === "page" ? "h2" : "h3";
+
   return (
     <div
       className={cn(
         "flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4",
+        variant === "page" && "alios-page-heading",
         aliosSectionMotion,
         className
       )}
@@ -94,9 +97,9 @@ export function SectionHeader({
         ) : null}
         <div className="flex flex-wrap items-center gap-2">
           {icon ? <span className="text-primary">{icon}</span> : null}
-          <h3 className="break-words text-xl font-bold tracking-tight sm:text-[1.35rem]">
+          <Heading className="break-words text-xl font-bold leading-snug tracking-normal sm:text-[1.35rem]">
             {title}
-          </h3>
+          </Heading>
           {status ? <div className="shrink-0">{status}</div> : null}
         </div>
         {description ? (
@@ -178,19 +181,19 @@ export function MetricCard({
   className,
 }: MetricCardProps) {
   return (
-    <PremiumCard className={cn("h-full min-h-40", className)}>
-      <CardContent className="flex h-full flex-col justify-between gap-5 p-5 sm:p-6">
-        <div className="flex items-center justify-between gap-3">
-          <div className="alios-icon-primary flex h-12 w-12 items-center justify-center rounded-[1.15rem] shadow-sm ring-1 ring-primary/10">
+    <PremiumCard className={cn("h-full", className)}>
+      <CardContent className="flex h-full flex-wrap items-start gap-3 p-4 sm:p-5">
+        <div className="flex shrink-0 items-center gap-2">
+          <div className="alios-icon-primary flex h-9 w-9 items-center justify-center rounded-control">
             {icon}
           </div>
           {status ? <div className="shrink-0">{status}</div> : null}
         </div>
-        <div className="min-w-0 space-y-1">
+        <div className="min-w-0 flex-1 basis-32 space-y-1">
           <p className="break-words text-xs font-semibold text-muted-foreground">
             {label}
           </p>
-          <p className="text-[2rem] font-semibold tabular-nums leading-none tracking-tight sm:text-[2.35rem]">
+          <p className="break-words text-2xl font-semibold tabular-nums leading-snug [overflow-wrap:anywhere]">
             {value}
           </p>
           {description ? (

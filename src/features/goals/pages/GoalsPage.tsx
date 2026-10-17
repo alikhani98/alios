@@ -704,11 +704,12 @@ export function GoalsPage() {
   };
 
   return (
-    <section className="alios-page space-y-6">
-      <PremiumCard className="alios-now-surface alios-primary-surface">
-        <div className="grid gap-5 p-5 sm:p-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(18rem,0.8fr)]">
-          <div className="space-y-5">
+    <section className="alios-page space-y-5 px-0 sm:px-6">
+      <PremiumCard className="alios-now-surface alios-primary-surface alios-page-entry">
+        <div className="alios-page-entry-layout">
+          <div className="alios-page-entry-main">
             <SectionHeader
+              variant="page"
               eyebrow={t("goals.title")}
               icon={<Target className="h-5 w-5" />}
               title={t("goals.title")}
@@ -716,7 +717,7 @@ export function GoalsPage() {
               status={<StatusChip tone="neutral">{t("goals.localOnlyNote")}</StatusChip>}
             />
 
-            <div className="space-y-2">
+            <div className="alios-page-entry-focus space-y-2">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                 {t("goals.averageProgress")}
               </p>
@@ -728,7 +729,7 @@ export function GoalsPage() {
               </p>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-3">
+            <div className="alios-page-entry-stats">
               <SoftPanel className="gap-2 border-alios-saffron/25 bg-background/85">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                   {t("goals.activeGoals")}
@@ -761,7 +762,7 @@ export function GoalsPage() {
             </div>
           </div>
 
-          <SoftPanel className="space-y-4 alios-thread-accent">
+          <SoftPanel className="alios-page-entry-actions space-y-3">
             <div className="space-y-1">
               <p className="text-sm font-medium text-muted-foreground">
                 {t("goals.newGoal")}

@@ -152,7 +152,7 @@ export function TodayTimeBlockingTimeline({
               <div
                 key={hour}
                 className={cn(
-                  "grid gap-3 rounded-2xl border border-border/60 bg-background/80 p-3 sm:grid-cols-[4.5rem_minmax(0,1fr)]",
+                  "alios-today-time-row grid gap-3 rounded-control border border-border/60 bg-transparent p-3",
                   draggedTaskId ? "border-primary/30 bg-primary/5" : null
                 )}
                 onDragOver={(event) => {
@@ -178,7 +178,7 @@ export function TodayTimeBlockingTimeline({
                         }}
                         onDragEnd={() => setDraggedTaskId(null)}
                         className={cn(
-                          "gap-2 border-alios-saffron/35 bg-alios-saffron/10",
+                          "alios-today-time-task gap-2 border-alios-saffron/35 bg-alios-saffron/10",
                           onTaskScheduleChange ? "cursor-grab active:cursor-grabbing" : null,
                           conflictingTaskIds.has(task.id)
                             ? "border-warning/70 bg-warning/10"

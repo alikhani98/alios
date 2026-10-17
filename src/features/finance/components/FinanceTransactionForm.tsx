@@ -93,13 +93,13 @@ export function FinanceTransactionForm({
 
   return (
     <form
-      className="grid gap-5"
+      className="finance-form grid gap-5"
       onSubmit={handleSubmit((values) => void onSubmit(values))}
     >
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1.1fr)_minmax(18rem,0.9fr)]">
+      <div className="finance-form-layout grid gap-5">
         <div className="space-y-5">
           <SoftPanel className="space-y-4 bg-background/80">
-            <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_14rem]">
+            <div className="finance-form-fields grid gap-4">
               <div className="grid gap-2">
                 <label htmlFor="finance-transaction-title" className="text-sm font-medium">
                   {t("common.title")}
@@ -133,7 +133,7 @@ export function FinanceTransactionForm({
               </div>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="finance-form-fields grid gap-4">
               <div className="grid gap-2">
                 <label htmlFor="finance-transaction-amount" className="text-sm font-medium">
                   {t("finance.amount")}

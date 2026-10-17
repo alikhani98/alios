@@ -53,7 +53,7 @@ export function FinanceAssetForm({
 
   return (
     <form
-      className="grid gap-4"
+      className="finance-form grid gap-4"
       onSubmit={(event) => {
         event.preventDefault();
 
@@ -69,7 +69,7 @@ export function FinanceAssetForm({
         });
       }}
     >
-      <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_12rem]">
+      <div className="finance-form-fields grid gap-4">
         <label className="grid gap-2 text-sm font-medium">
           <span>{t("common.title")}</span>
           <Input
@@ -98,7 +98,7 @@ export function FinanceAssetForm({
         </label>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-[minmax(0,0.75fr)_minmax(0,1.25fr)]">
+      <div className="finance-form-fields grid gap-4">
         <label className="grid gap-2 text-sm font-medium">
           <span>{t("finance.assetCurrentValue")}</span>
           <Input

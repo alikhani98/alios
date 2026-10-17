@@ -5,7 +5,6 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/shared/utils/cn";
 import {
   aliosFocusRing,
-  aliosInteractiveLift,
   aliosInteractiveMotion,
 } from "./motion";
 
@@ -13,23 +12,22 @@ const buttonVariants = cva(
   cn(
     "inline-flex items-center justify-center gap-2 whitespace-normal rounded-control text-center text-sm font-semibold leading-5 ring-offset-background disabled:pointer-events-none disabled:opacity-50",
     aliosFocusRing,
-    aliosInteractiveMotion,
-    aliosInteractiveLift
+    aliosInteractiveMotion
   ),
   {
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 active:bg-primary/95 hover:shadow-md",
+          "bg-primary text-primary-foreground shadow-sm hover:bg-primary hover:outline hover:outline-1 hover:outline-offset-2 hover:outline-primary/40",
         destructive:
-          "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90 hover:shadow-md",
+          "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
         outline:
-          "border border-input/80 bg-background/90 shadow-sm backdrop-blur-sm hover:bg-accent hover:border-border hover:text-accent-foreground hover:shadow-md",
+          "border border-input/80 bg-background hover:bg-accent hover:border-border hover:text-accent-foreground",
         secondary:
-          "bg-secondary/80 text-secondary-foreground shadow-sm backdrop-blur-sm hover:bg-secondary hover:shadow-md",
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost:
           "hover:bg-accent/70 hover:text-accent-foreground active:bg-accent/90",
-        link: "text-primary underline-offset-4 hover:underline",
+        link: "text-[color:var(--alios-accent-text)] underline-offset-4 hover:underline",
       },
       size: {
         default: "min-h-11 px-5 py-2.5",

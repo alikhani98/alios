@@ -27,6 +27,7 @@ import type {
   TaskStatus,
 } from "@/shared/types";
 import { useI18n } from "@/shared/i18n";
+import { cn } from "@/shared/utils/cn";
 import { Badge, Button, Card, CardContent, Select, StatusChip, SwipeActionSurface } from "@/shared/ui";
 import {
   TASK_PRIORITY_LABEL_KEYS,
@@ -67,7 +68,7 @@ export function TodayTaskCard({
   onSelectMit,
   onDelete,
 }: TodayTaskCardProps) {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const completed = task.status === "done" || task.status === "cancelled";
   const statusOption = TASK_STATUS_OPTIONS.find((option) => option.value === task.status);
@@ -102,15 +103,13 @@ export function TodayTaskCard({
       onDeleteIntent={() => setConfirmingDelete(true)}
     >
     <Card
-      className={
-        completed
-          ? "min-w-0 overflow-hidden border-border/70 bg-muted/40"
-          : task.isMit
-            ? "min-w-0 overflow-hidden border-primary/25 bg-primary/5 shadow-sm"
-            : "min-w-0 overflow-hidden border-border/70 bg-card/95"
-      }
+      className={cn(
+        "alios-today-task min-w-0 overflow-hidden",
+        completed && "alios-today-task-completed",
+        task.isMit && "alios-today-task-mit"
+      )}
     >
-      <CardContent className="grid min-w-0 gap-5 p-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
+      <CardContent className="alios-today-task-content grid min-w-0 gap-3 p-4 sm:p-5">
         <div className="min-w-0 space-y-3">
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2">
@@ -121,14 +120,15 @@ export function TodayTaskCard({
                 </span>
               </StatusChip>
               {task.isMit ? (
-                <Badge>
-                  <Star className="me-1 h-3.5 w-3.5 fill-current" />
+                <Badge className="alios-today-mit-label">
+                  <Star className="me-1 h-3.5 w-3.5 fill-current" aria-hidden="true" />
                   {t("today.mit")}
                 </Badge>
               ) : null}
               {contextLabel ? <Badge variant="secondary">{contextLabel}</Badge> : null}
             </div>
             <h3
+              dir="auto"
               className={
                 completed
                   ? "min-w-0 break-words text-lg font-semibold leading-7 text-muted-foreground line-through"
@@ -139,43 +139,54 @@ export function TodayTaskCard({
             >
               {task.title}
             </h3>
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="alios-today-task-metadata flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+              {task.scheduledStartTime ? (
+                <span className="inline-flex items-center gap-1.5">
+                  <Clock3 className="h-3.5 w-3.5" aria-hidden="true" />
+                  <time className="tabular-nums" dir="ltr">{task.scheduledStartTime}</time>
+                </span>
+              ) : null}
+              {task.estimatedMinutes ? (
+                <span className="inline-flex items-center gap-1.5">
+                  <Timer className="h-3.5 w-3.5" aria-hidden="true" />
+                  {t("today.suggestedDurationMinutes", {
+                    minutes: task.estimatedMinutes.toLocaleString(language),
+                  })}
+                </span>
+              ) : null}
               {task.recurrence ? (
-                <Badge variant="secondary">
+                <span className="inline-flex items-center gap-1">
                   <Repeat2 className="me-1 h-3.5 w-3.5" />
                   {task.recurrence.frequency === "daily"
                     ? t("today.recurrenceDaily")
                     : t("today.recurrenceWeekly")}
-                </Badge>
+                </span>
               ) : null}
-              <Badge
-                variant="outline"
-                className="max-w-full break-words whitespace-normal text-start"
-              >
+              <span className="break-words">
                 {t("today.priority", {
                   value: t(TASK_PRIORITY_LABEL_KEYS[task.priority]),
                 })}
-              </Badge>
+              </span>
             </div>
           </div>
           {task.description ? (
-            <div className="alios-surface-muted border-border/60 px-4 py-3">
-              <p className="break-words whitespace-pre-wrap text-sm leading-7 text-muted-foreground">
+            <div className="alios-today-task-description">
+              <p dir="auto" className="break-words whitespace-pre-wrap text-sm leading-6 text-muted-foreground">
                 {task.description}
               </p>
             </div>
           ) : null}
           {task.projectId ? (
-            <div className="alios-surface-muted min-w-0 border-primary/15 bg-primary/5 p-3">
-              <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="min-w-0 space-y-1">
+            <div className="alios-today-task-project">
+              <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
+                <div className="min-w-0 flex-1 basis-48 space-y-1">
                   <p className="flex min-w-0 items-center gap-2 text-xs font-medium text-muted-foreground">
-                    <FolderKanban className="h-4 w-4 shrink-0 text-primary" />
+                    <FolderKanban className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                     <span className="break-words">{t("today.linkedProject")}</span>
                   </p>
                   {linkedProject ? (
-                    <div className="flex min-w-0 flex-col items-start gap-2 sm:flex-row sm:flex-wrap sm:items-center">
-                      <p className="w-full min-w-0 break-words text-sm font-medium sm:w-auto sm:min-w-[12rem] sm:flex-1">
+                    <div className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-1">
+                      <p dir="auto" className="min-w-0 break-words text-sm">
                         {linkedProject.title}
                       </p>
                       <Badge variant="secondary">
@@ -194,8 +205,8 @@ export function TodayTaskCard({
                   <Button
                     asChild
                     size="sm"
-                    variant="outline"
-                    className="w-full shrink-0 sm:w-auto"
+                    variant="link"
+                    className="min-w-0 px-0 text-xs"
                   >
                     <Link to={createLinkedProjectPath(linkedProject.id)}>
                       {t("today.openLinkedProject")}
@@ -208,16 +219,16 @@ export function TodayTaskCard({
           {linkedJournalEntries.length > 0 ||
           linkedDecisions.length > 0 ||
           linkedKnowledgeItems.length > 0 ? (
-            <div className="grid gap-3 sm:grid-cols-3">
+            <div className="alios-today-task-relationships">
               {linkedJournalEntries.length > 0 ? (
-                <div className="alios-surface-muted border-primary/15 bg-primary/5 p-3">
+                <div className="alios-today-task-relation">
                   <p className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-                    <BookOpenText className="h-4 w-4 shrink-0 text-primary" />
+                    <BookOpenText className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                     {t("links.relatedJournalEntries")}
                   </p>
-                  <ul className="mt-2 space-y-1">
+                  <ul className="alios-today-relation-items">
                     {linkedJournalEntries.map((entry) => (
-                      <li key={entry.id} className="min-w-0 break-words text-sm font-medium">
+                      <li key={entry.id} dir="auto" className="min-w-0 break-words text-sm">
                         {entry.title}
                       </li>
                     ))}
@@ -225,14 +236,14 @@ export function TodayTaskCard({
                 </div>
               ) : null}
               {linkedDecisions.length > 0 ? (
-                <div className="alios-surface-muted border-primary/15 bg-primary/5 p-3">
+                <div className="alios-today-task-relation">
                   <p className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-                    <GitBranch className="h-4 w-4 shrink-0 text-primary" />
+                    <GitBranch className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                     {t("links.relatedDecisions")}
                   </p>
-                  <ul className="mt-2 space-y-1">
+                  <ul className="alios-today-relation-items">
                     {linkedDecisions.map((decision) => (
-                      <li key={decision.id} className="min-w-0 break-words text-sm font-medium">
+                      <li key={decision.id} dir="auto" className="min-w-0 break-words text-sm">
                         {decision.title}
                       </li>
                     ))}
@@ -240,14 +251,14 @@ export function TodayTaskCard({
                 </div>
               ) : null}
               {linkedKnowledgeItems.length > 0 ? (
-                <div className="alios-surface-muted border-primary/15 bg-primary/5 p-3">
+                <div className="alios-today-task-relation">
                   <p className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-                    <BookOpen className="h-4 w-4 shrink-0 text-primary" />
+                    <BookOpen className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                     {t("links.relatedKnowledgeItems")}
                   </p>
-                  <ul className="mt-2 space-y-1">
+                  <ul className="alios-today-relation-items">
                     {linkedKnowledgeItems.map((item) => (
-                      <li key={item.id} className="min-w-0 break-words text-sm font-medium">
+                      <li key={item.id} dir="auto" className="min-w-0 break-words text-sm">
                         {item.title}
                       </li>
                     ))}
@@ -258,7 +269,7 @@ export function TodayTaskCard({
           ) : null}
         </div>
 
-        <div className="flex min-w-0 flex-col gap-2 border-t border-border/70 pt-4 sm:flex-row sm:flex-wrap sm:items-center lg:justify-end lg:border-t-0 lg:pt-0">
+        <div className="alios-today-task-actions">
           <Select
             aria-label={t("today.statusFor", { title: task.title })}
             value={task.status}
@@ -266,7 +277,7 @@ export function TodayTaskCard({
             onChange={(event) =>
               void onStatusChange(event.target.value as TaskStatus)
             }
-            className="max-w-full rounded-lg sm:w-auto"
+            className="alios-today-status-control min-h-11 max-w-full rounded-control text-sm"
           >
             {TASK_STATUS_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
@@ -280,17 +291,18 @@ export function TodayTaskCard({
               type="button"
               size="sm"
               variant="ghost"
-              className="w-full sm:w-auto"
+              className="alios-today-icon-action h-11 w-11 shrink-0 p-0"
+              aria-label={t("today.makeMitShort")}
+              title={t("today.makeMitShort")}
               disabled={isBusy}
               onClick={() => void onSelectMit()}
             >
-              <Star className="me-2 h-4 w-4" />
-              {t("today.makeMitShort")}
+              <Star className="h-4 w-4" aria-hidden="true" />
             </Button>
           ) : null}
 
           {focusSessionPath ? (
-            <Button asChild size="sm" variant="outline" className="w-full sm:w-auto">
+            <Button asChild size="sm" className="alios-today-focus-action min-h-11">
               <Link to={focusSessionPath}>
                 <Timer className="me-2 h-4 w-4" aria-hidden="true" />
                 {t("today.startFocusSession")}
@@ -325,22 +337,24 @@ export function TodayTaskCard({
               <Button
                 type="button"
                 size="sm"
-                variant="outline"
-                className="w-full sm:w-auto"
+                variant="ghost"
+                className="alios-today-icon-action h-11 w-11 shrink-0 p-0"
+                aria-label={t("common.edit")}
+                title={t("common.edit")}
                 onClick={onEdit}
               >
-                <Pencil className="me-2 h-4 w-4" />
-                {t("common.edit")}
+                <Pencil className="h-4 w-4" aria-hidden="true" />
               </Button>
               <Button
                 type="button"
                 size="sm"
                 variant="ghost"
-                className="w-full text-destructive hover:text-destructive sm:w-auto"
+                className="alios-today-icon-action h-11 w-11 shrink-0 p-0 text-destructive hover:text-destructive"
+                aria-label={t("common.delete")}
+                title={t("common.delete")}
                 onClick={() => setConfirmingDelete(true)}
               >
-                <Trash2 className="me-2 h-4 w-4" />
-                {t("common.delete")}
+                <Trash2 className="h-4 w-4" aria-hidden="true" />
               </Button>
             </>
           )}

@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import { cn } from "@/shared/utils/cn";
-import { aliosInteractiveLift, aliosSurfaceMotion } from "./motion";
+import { aliosSurfaceMotion } from "./motion";
 
 const Card = React.forwardRef<
   HTMLDivElement,
@@ -12,8 +12,7 @@ const Card = React.forwardRef<
     className={cn(
       "alios-surface-card",
       aliosSurfaceMotion,
-      aliosInteractiveLift,
-      "hover:border-border/70 focus-within:shadow-md",
+      "focus-within:border-ring/50",
       className
     )}
     {...props}

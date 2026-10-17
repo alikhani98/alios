@@ -1,5 +1,6 @@
 import { X } from "lucide-react";
 import { useState, type FormEvent } from "react";
+import { createPortal } from "react-dom";
 
 import { useStorageAdapter } from "@/core/storage";
 import { useI18n, type TranslationKey } from "@/shared/i18n";
@@ -97,9 +98,9 @@ export function MoneyPauseForm({ open, onClose, onSaved }: MoneyPauseFormProps) 
     }
   };
 
-  return (
+  const dialog = (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-background/70 p-3 backdrop-blur-sm sm:items-center"
+      className="alios-modal-overlay"
       role="dialog"
       aria-modal="true"
       aria-labelledby="money-pause-form-title"
@@ -111,7 +112,7 @@ export function MoneyPauseForm({ open, onClose, onSaved }: MoneyPauseFormProps) 
         aria-label={t("common.cancel")}
         onClick={onClose}
       />
-      <Card className="relative max-h-[92vh] w-full max-w-xl overflow-y-auto border-border/70 bg-card shadow-aliosFloating">
+      <Card className="alios-modal-panel relative w-full max-w-xl bg-card shadow-aliosFloating">
         <CardHeader className="flex flex-row items-start justify-between gap-4">
           <CardTitle id="money-pause-form-title">
             {t("money.formTitle")}
@@ -218,4 +219,6 @@ export function MoneyPauseForm({ open, onClose, onSaved }: MoneyPauseFormProps) 
       </Card>
     </div>
   );
+
+  return typeof document === "undefined" ? dialog : createPortal(dialog, document.body);
 }

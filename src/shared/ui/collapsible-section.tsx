@@ -69,22 +69,22 @@ export function CollapsibleSection({
       <button
         type="button"
         className={cn(
-          "alios-collapsible-trigger flex w-full flex-col items-start justify-between gap-3 p-5 text-start transition-colors duration-200 hover:bg-accent/30 motion-reduce:transition-none sm:flex-row sm:items-start sm:gap-4 sm:p-6",
+          "alios-collapsible-trigger flex w-full flex-wrap items-start justify-between gap-3 p-4 text-start transition-colors duration-200 hover:bg-accent/30 motion-reduce:transition-none sm:p-5",
           aliosFocusRing,
-          "focus-visible:-m-px focus-visible:rounded-[1.65rem]"
+          "focus-visible:-m-px focus-visible:rounded-section"
         )}
         aria-expanded={isOpen}
         aria-controls={contentId}
         onClick={handleToggle}
       >
-        <span className="flex w-full min-w-0 items-start gap-3 text-start sm:w-auto">
+        <span className="flex min-w-0 flex-1 basis-40 items-start gap-3 text-start">
           {icon ? (
-            <span className="alios-icon-primary mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl shadow-sm ring-1 ring-primary/10">
+            <span className="alios-icon-primary mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-control">
               {icon}
             </span>
           ) : null}
           <span className="min-w-0 space-y-1">
-            <span className="block break-words text-lg font-semibold leading-7 sm:text-xl">
+            <span className="block break-words text-base font-semibold leading-7 sm:text-lg">
               {title}
             </span>
             {description ? (
@@ -95,8 +95,8 @@ export function CollapsibleSection({
           </span>
         </span>
 
-        <span className="flex w-full items-center justify-between gap-2 sm:w-auto sm:justify-end">
-          {status ? <span className="shrink-0">{status}</span> : null}
+        <span className="flex max-w-full flex-wrap items-center justify-end gap-2">
+          {status ? <span className="min-w-0">{status}</span> : null}
           <span className="sr-only">{isOpen ? collapseLabel : expandLabel}</span>
           <ChevronDown
             className={cn(
@@ -113,7 +113,7 @@ export function CollapsibleSection({
         hidden={!isOpen}
         aria-hidden={!isOpen}
         className={cn(
-          "alios-collapsible-content border-t border-border/50 px-5 py-5 sm:px-6",
+          "alios-collapsible-content border-t border-border/50 p-4 sm:p-5",
           contentClassName
         )}
       >

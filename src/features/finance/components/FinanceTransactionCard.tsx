@@ -33,9 +33,9 @@ export function FinanceTransactionCard({
   const typeTone = transaction.type === "income" ? "success" : "danger";
 
   return (
-    <SoftPanel className="space-y-4 border-border/70 bg-background/80">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="min-w-0 flex-1 space-y-3">
+    <SoftPanel className="finance-record space-y-3">
+      <div className="finance-record-heading">
+        <div className="finance-record-main min-w-0 space-y-2">
           <div className="flex flex-wrap items-center gap-2">
             <StatusChip tone={typeTone}>
               {t(
@@ -49,17 +49,17 @@ export function FinanceTransactionCard({
             </StatusChip>
           </div>
           <div className="space-y-1">
-            <h3 className="break-words text-lg font-semibold leading-7">{transaction.title}</h3>
+            <h3 className="break-words text-base font-semibold leading-7">{transaction.title}</h3>
             <p className="text-sm text-muted-foreground">{formatDate(transaction.occurredAt)}</p>
           </div>
         </div>
-        <div className="shrink-0 text-end">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+        <div className="finance-record-amount">
+          <p className="text-xs font-medium text-muted-foreground">
             {t("finance.amount")}
           </p>
           <p
             className={cn(
-              "mt-1 max-w-[12rem] break-words text-2xl font-semibold tabular-nums leading-8",
+              "mt-1 break-words text-xl font-semibold tabular-nums leading-8",
               transaction.type === "income" ? "text-success" : "text-destructive"
             )}
           >
@@ -69,16 +69,16 @@ export function FinanceTransactionCard({
       </div>
 
       {transaction.notes ? (
-        <SoftPanel className="space-y-2 bg-muted/60">
-          <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+        <div className="finance-record-notes space-y-1">
+          <p className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
             <ReceiptText className="h-4 w-4 shrink-0" />
             {t("common.notes")}
           </p>
           <p className="text-sm leading-7 text-muted-foreground">{transaction.notes}</p>
-        </SoftPanel>
+        </div>
       ) : null}
 
-      <div className="flex flex-col gap-2 border-t border-border/70 pt-4 sm:flex-row sm:flex-wrap">
+      <div className="finance-record-actions flex flex-wrap items-center gap-2">
         <Button
           type="button"
           size="sm"

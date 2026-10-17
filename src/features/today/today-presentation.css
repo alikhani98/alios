@@ -1,0 +1,275 @@
+.alios-today-workspace.alios-page {
+  max-inline-size: 82rem;
+  padding: var(--alios-space-control) 0 var(--alios-space-card);
+  letter-spacing: 0;
+}
+
+.alios-today-workspace .alios-today-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--alios-space-control);
+  padding-block-end: var(--alios-space-card);
+  border-block-end: 1px solid hsl(var(--border));
+}
+
+.alios-today-workspace .alios-today-header h2 {
+  font-size: 1.375rem;
+  line-height: 1.75rem;
+}
+
+.alios-today-workspace .alios-today-header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--alios-space-compact);
+}
+
+.alios-today-workspace .alios-today-header-actions > button {
+  flex: 1 1 auto;
+  padding-inline: var(--alios-space-control);
+}
+
+.alios-today-workspace .alios-today-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: var(--alios-space-section);
+}
+
+.alios-today-workspace .alios-today-task {
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border) / 0.8);
+  box-shadow: none;
+}
+
+.dark .alios-today-workspace .alios-today-task {
+  background: color-mix(in srgb, hsl(var(--card)) 90%, hsl(var(--muted)));
+}
+
+.alios-today-workspace .alios-today-task-mit {
+  border-inline-start: 3px solid hsl(var(--primary));
+}
+
+.alios-today-workspace .alios-today-task-completed {
+  background: color-mix(in srgb, hsl(var(--card)) 75%, hsl(var(--muted)));
+}
+
+.dark .alios-today-workspace .alios-today-task-completed {
+  background: color-mix(in srgb, hsl(var(--card)) 75%, hsl(var(--muted)));
+}
+
+.alios-today-workspace .alios-today-mit-label {
+  border: 0;
+  padding-inline: 0;
+  background: transparent;
+  color: var(--alios-accent-text);
+}
+
+.alios-today-workspace .alios-today-task h3 {
+  overflow-wrap: anywhere;
+  letter-spacing: 0;
+}
+
+.alios-today-workspace .alios-today-task-metadata {
+  line-height: 1.5rem;
+}
+
+.alios-today-workspace .alios-today-task-project {
+  border-block-start: 1px solid hsl(var(--border) / 0.5);
+  padding-block-start: var(--alios-space-compact);
+}
+
+.alios-today-workspace .alios-today-task-project p,
+.alios-today-workspace .alios-today-relation-items li {
+  overflow-wrap: anywhere;
+}
+
+.alios-today-workspace .alios-today-task-project a {
+  max-inline-size: 100%;
+  justify-content: start;
+}
+
+.alios-today-workspace .alios-today-task-relationships {
+  display: grid;
+  gap: var(--alios-space-compact);
+  color: hsl(var(--muted-foreground));
+}
+
+.alios-today-workspace .alios-today-task-relation > p {
+  display: inline-flex;
+  margin-inline-end: var(--alios-space-compact);
+  line-height: 1.5rem;
+}
+
+.alios-today-workspace .alios-today-relation-items {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0 var(--alios-space-compact);
+  max-inline-size: 100%;
+  vertical-align: top;
+  list-style: none;
+  line-height: 1.5rem;
+}
+
+.alios-today-workspace .alios-today-relation-items li {
+  display: inline;
+}
+
+.alios-today-workspace .alios-today-relation-items li + li {
+  border-inline-start: 1px solid hsl(var(--border));
+  padding-inline-start: var(--alios-space-compact);
+}
+
+.alios-today-workspace .alios-today-task-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+  border-block-start: 1px solid hsl(var(--border) / 0.6);
+  padding-block-start: var(--alios-space-compact);
+}
+
+.alios-today-workspace .alios-today-status-control {
+  flex: 1 1 7rem;
+  inline-size: auto;
+  min-inline-size: 7rem;
+}
+
+.alios-today-workspace .alios-today-focus-action {
+  flex: 1 1 100%;
+}
+
+.alios-today-workspace .alios-today-completed,
+.alios-today-workspace .alios-today-context > .alios-collapsible-section {
+  border: 0;
+  border-block-start: 1px solid hsl(var(--border));
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.alios-today-workspace .alios-today-context > .alios-collapsible-section > .alios-collapsible-trigger,
+.alios-today-workspace .alios-today-completed > .alios-collapsible-trigger {
+  gap: var(--alios-space-compact);
+  padding: var(--alios-space-control) 0;
+}
+
+.alios-today-workspace .alios-collapsible-trigger:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: -2px;
+}
+
+.alios-today-workspace .alios-today-context .alios-icon-primary {
+  border: 0;
+  background: transparent;
+  color: hsl(var(--muted-foreground));
+  box-shadow: none;
+}
+
+.alios-today-workspace .alios-today-context > .alios-collapsible-section > .alios-collapsible-content,
+.alios-today-workspace .alios-today-completed > .alios-collapsible-content {
+  padding: var(--alios-space-control) 0;
+}
+
+.alios-today-workspace .alios-today-commitment {
+  padding: var(--alios-space-control) 0;
+  border: 0;
+  border-block-start: 1px solid hsl(var(--border));
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.alios-today-workspace .alios-today-empty {
+  border-style: solid;
+  box-shadow: none;
+  background: hsl(var(--card));
+}
+
+.alios-today-workspace .alios-today-empty > div {
+  align-items: start;
+  padding: var(--alios-space-section) var(--alios-space-card);
+  text-align: start;
+}
+
+.alios-today-workspace .alios-today-empty .alios-icon-primary {
+  border: 0;
+  border-radius: var(--alios-radius-control);
+  box-shadow: none;
+}
+
+.alios-today-workspace .alios-today-editor {
+  box-shadow: none;
+}
+
+.alios-today-workspace .alios-today-context .alios-surface-muted {
+  min-inline-size: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.alios-today-workspace .alios-today-time-row {
+  padding: var(--alios-space-compact) 0;
+  border-width: 0;
+  border-block-start-width: 1px;
+  border-radius: 0;
+}
+
+.alios-today-workspace .alios-today-time-task {
+  padding: var(--alios-space-control);
+  border-radius: var(--alios-radius-control);
+  box-shadow: none;
+}
+
+.alios-today-workspace .alios-today-time-task > div {
+  flex-direction: column;
+}
+
+.alios-today-workspace #today-weekly-plan-content > div {
+  padding: 0;
+}
+
+.alios-today-workspace .alios-today-editor .alios-surface-muted {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+@media (min-width: 640px) {
+  .alios-today-workspace .alios-today-status-control {
+    flex: 0 1 11rem;
+  }
+
+  .alios-today-workspace .alios-today-focus-action {
+    flex: 0 1 auto;
+  }
+}
+
+@media (min-width: 1024px) {
+  .alios-today-workspace .alios-today-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--alios-space-card);
+  }
+
+  .alios-today-workspace .alios-today-header-actions {
+    flex-shrink: 0;
+  }
+}
+
+@media (min-width: 1280px) {
+  .alios-today-workspace .alios-today-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(16rem, 18rem);
+    gap: var(--alios-space-card-lg);
+  }
+
+  .alios-today-workspace .alios-today-context {
+    border-inline-start: 1px solid hsl(var(--border) / 0.6);
+    padding-inline-start: var(--alios-space-card);
+  }
+}

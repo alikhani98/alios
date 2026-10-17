@@ -1,0 +1,414 @@
+/* Finance presentation stays local; calculations and shared surfaces are unchanged. */
+.alios-finance {
+  min-inline-size: 0;
+  letter-spacing: 0;
+}
+
+.alios-finance :is(p, h3, h4, label, .tabular-nums) {
+  overflow-wrap: anywhere;
+  letter-spacing: 0;
+}
+
+.alios-finance :is(.grid, form, .alios-collapsible-content) > * {
+  min-inline-size: 0;
+}
+
+.alios-finance .finance-overview .alios-page-entry-layout {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+  padding-block-end: 1rem;
+}
+
+.alios-finance .finance-overview .alios-page-heading {
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.alios-finance .finance-overview .alios-page-heading > div:first-child {
+  flex: 1 1 22rem;
+}
+
+.alios-finance .finance-overview .alios-page-heading > div:last-child {
+  flex: 0 1 auto;
+}
+
+.alios-finance .finance-overview .alios-page-entry-focus {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: baseline;
+  gap: 0.25rem 0.75rem;
+}
+
+.alios-finance .finance-overview .alios-page-entry-focus > p {
+  margin: 0;
+}
+
+.alios-finance .finance-overview .alios-page-entry-focus > p:nth-child(2) {
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.alios-finance .finance-overview .alios-page-entry-focus > p:last-child {
+  grid-column: 1 / -1;
+}
+
+.alios-finance .finance-summary-stats {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem 1.25rem;
+}
+
+.alios-finance .finance-summary-stats > div:first-child {
+  grid-column: 1 / -1;
+}
+
+.alios-finance .finance-summary-stats > .alios-surface-soft {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.25rem;
+  padding-block: 0.75rem;
+}
+
+.alios-finance .finance-summary-stats > div > p:nth-child(2) {
+  text-align: start;
+  font-size: 1.25rem;
+  line-height: 1.5;
+}
+
+.alios-finance .finance-summary-stats > div:first-child > p:nth-child(2) {
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.alios-finance .finance-summary-stats > div > p:nth-child(n + 3) {
+  font-size: 0.75rem;
+  line-height: 1.65;
+}
+
+.alios-finance .finance-context {
+  padding: 0;
+  border: 0;
+  border-block-start: 1px solid hsl(var(--border));
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.alios-finance .finance-context > div:first-child {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding-block-start: 0.75rem;
+}
+
+.alios-finance .finance-context > div:first-child > p {
+  margin: 0;
+  font-size: 0.75rem;
+}
+
+.alios-finance .finance-context > div:last-child {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  gap: 1.25rem;
+}
+
+.alios-finance .finance-context .alios-surface-soft {
+  border: 0;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.alios-finance .finance-context .alios-surface-soft p {
+  font-size: 0.75rem;
+  line-height: 1.75;
+}
+
+.alios-finance .finance-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+  gap: 0.75rem 1.25rem;
+}
+
+.alios-finance .finance-metric {
+  background: transparent;
+  border: 0;
+  border-block-end: 1px solid hsl(var(--border));
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.alios-finance .finance-metric > div {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.75rem 0;
+}
+
+.alios-finance .finance-metric .alios-icon-primary {
+  inline-size: 1.75rem;
+  block-size: 1.75rem;
+  background: transparent;
+  border: 0;
+}
+
+.alios-finance .finance-metric .text-2xl {
+  font-size: 1.125rem;
+}
+
+.alios-finance .finance-metric .text-sm {
+  font-size: 0.75rem;
+  line-height: 1.65;
+}
+
+.alios-finance .finance-quick-nav {
+  box-shadow: none;
+  background: hsl(var(--card));
+}
+
+.alios-finance .finance-quick-nav button {
+  border-radius: var(--alios-radius-control);
+  border-color: transparent;
+}
+
+.alios-finance .finance-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+  gap: 0.5rem;
+}
+
+.alios-finance .finance-filter-grid button {
+  min-block-size: 2.75rem;
+  border-radius: var(--alios-radius-control);
+}
+
+.alios-finance .finance-record-groups > .alios-surface-elevated,
+.alios-finance #finance-assets-content > .alios-surface-elevated,
+.alios-finance :is(#finance-transactions, #finance-add) > .alios-surface-elevated {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+}
+
+.alios-finance .finance-record-groups > .alios-surface-elevated > div,
+.alios-finance #finance-assets-content > .alios-surface-elevated > div,
+.alios-finance :is(#finance-transactions, #finance-add) > .alios-surface-elevated > div {
+  padding: 0;
+}
+
+.alios-finance .finance-record {
+  padding: 1rem 0;
+  border: 0;
+  border-block-start: 1px solid hsl(var(--border));
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  container-type: inline-size;
+}
+
+.alios-finance .finance-obligation-row {
+  container-type: inline-size;
+  padding: 0.75rem 0;
+  border: 0;
+  border-block-end: 1px solid hsl(var(--border));
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.alios-finance .finance-record-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.75rem;
+}
+
+.alios-finance .finance-record-amount {
+  min-inline-size: 0;
+  text-align: start;
+}
+
+.alios-finance .finance-record-notes {
+  border-inline-start: 2px solid hsl(var(--border));
+  padding-inline-start: 0.75rem;
+}
+
+.alios-finance .finance-record-notes > p:last-child {
+  line-height: 1.75;
+}
+
+.alios-finance .finance-record-actions > button {
+  inline-size: auto;
+  min-block-size: 2.75rem;
+}
+
+.alios-finance .finance-record-details {
+  border-inline: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.alios-finance .finance-record-details > button {
+  padding-inline: 0;
+  padding-block: 0.75rem;
+}
+
+.alios-finance .finance-detail-values {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+}
+
+.alios-finance .finance-detail-values > div {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  padding: 0.5rem 0;
+}
+
+.alios-finance :is(.finance-chart-grid, .finance-review-grid) {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+}
+
+.alios-finance .finance-chart-grid > .alios-surface-soft:last-child {
+  grid-column: 1 / -1;
+}
+
+.alios-finance .finance-review-grid > .alios-surface-soft,
+.alios-finance .finance-chart-grid > .alios-surface-soft {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.alios-finance .finance-review-grid > .alios-surface-soft:last-child {
+  grid-column: 1 / -1;
+  border-block-start: 1px solid hsl(var(--border));
+  padding-block-start: 1rem;
+}
+
+.alios-finance .finance-review-grid .alios-surface-soft .alios-surface-soft {
+  padding: 0.75rem 0;
+  border: 0;
+  border-block-end: 1px solid hsl(var(--border));
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.alios-finance .finance-budget-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  gap: 1rem;
+}
+
+.alios-finance .finance-budget {
+  padding: 0.75rem 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.alios-finance .finance-budget .text-xs {
+  font-size: 0.875rem;
+}
+
+.alios-finance .finance-form :is(input, select, textarea) {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  font-variant-numeric: tabular-nums;
+}
+
+.alios-finance .finance-form-layout {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.alios-finance #finance-add > .grid > section {
+  block-size: auto;
+  align-self: start;
+}
+
+.alios-finance .finance-form-fields {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+}
+
+.alios-finance .finance-form-layout .alios-surface-soft {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.alios-finance .finance-forecast {
+  background: hsl(var(--card));
+  border-color: hsl(var(--border));
+  box-shadow: none;
+}
+
+.alios-finance .finance-forecast-values > div > .tabular-nums {
+  min-inline-size: 0;
+  text-align: end;
+}
+
+.alios-finance :is(.finance-record, .finance-forecast) .text-success {
+  color: color-mix(in srgb, hsl(var(--success)) 55%, hsl(var(--foreground)));
+}
+
+.alios-finance .alios-collapsible-trigger:focus-visible {
+  margin: 0;
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: -3px;
+}
+
+@container (min-width: 34rem) {
+  .alios-finance .finance-record-heading {
+    grid-template-columns: minmax(0, 1fr) minmax(12rem, 0.55fr);
+    gap: 1.25rem;
+  }
+
+  .alios-finance .finance-record-amount {
+    text-align: end;
+  }
+}
+
+@media (min-width: 1024px) {
+  .alios-finance .finance-summary-stats {
+    grid-template-columns: minmax(0, 1.3fr) repeat(2, minmax(0, 1fr));
+  }
+
+  .alios-finance .finance-summary-stats > div:first-child {
+    grid-column: auto;
+  }
+
+  .alios-finance .finance-record {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.75rem 1rem;
+  }
+
+  .alios-finance .finance-record > * {
+    margin-block: 0;
+  }
+
+  .alios-finance .finance-record-heading,
+  .alios-finance .finance-record-details {
+    grid-column: 1 / -1;
+  }
+
+  .alios-finance .finance-record-actions {
+    grid-column: 2;
+    align-self: end;
+  }
+}
+
+@media (max-width: 639px) {
+  .alios-finance .finance-overview .alios-page-heading > div {
+    flex-basis: auto;
+  }
+
+  .alios-finance .finance-overview .alios-page-heading button {
+    flex: 1 1 10rem;
+  }
+}

@@ -53,9 +53,9 @@ export function FinanceObligationCard({
   const dueDateLabel = obligation.dueDate ? formatDate(obligation.dueDate) : t("finance.noDueDate");
 
   return (
-    <SoftPanel className="space-y-4 border-border/70 bg-background/80">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="min-w-0 flex-1 space-y-3">
+    <SoftPanel className="finance-record space-y-3">
+      <div className="finance-record-heading">
+        <div className="finance-record-main min-w-0 space-y-2">
           <div className="flex flex-wrap items-center gap-2">
             <StatusChip tone={getStatusTone(obligation.status)}>
               {t(
@@ -73,7 +73,7 @@ export function FinanceObligationCard({
             </StatusChip>
           </div>
           <div className="space-y-1">
-            <h3 className="break-words text-lg font-semibold leading-7">{obligation.title}</h3>
+            <h3 className="break-words text-base font-semibold leading-7">{obligation.title}</h3>
             <p className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
               <CalendarClock className="h-4 w-4 shrink-0" />
               <span>{dueDateLabel}</span>
@@ -85,11 +85,11 @@ export function FinanceObligationCard({
             </p>
           </div>
         </div>
-        <div className="shrink-0 text-end">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+        <div className="finance-record-amount">
+          <p className="text-xs font-medium text-muted-foreground">
             {t("finance.remainingAmount")}
           </p>
-          <p className="mt-1 max-w-[12rem] break-words text-2xl font-semibold tabular-nums leading-8">
+          <p className="mt-1 break-words text-xl font-semibold tabular-nums leading-8">
             {formatFinanceAmount(remainingAmount, language === "fa" ? "fa-IR" : "en-US")}{" "}
             {t("finance.currency")}
           </p>
@@ -112,7 +112,7 @@ export function FinanceObligationCard({
         defaultOpen={false}
         expandLabel={t("common.expandSection")}
         collapseLabel={t("common.collapseSection")}
-        className="border-border/70 bg-muted/35"
+        className="finance-record-details border-border/70 bg-muted/35"
         contentClassName="space-y-4"
       >
         {paidPercentage !== null ? (
@@ -129,7 +129,7 @@ export function FinanceObligationCard({
           </SoftPanel>
         ) : null}
 
-        <div className="grid gap-3 text-sm sm:grid-cols-2 xl:grid-cols-4">
+        <div className="finance-detail-values grid gap-3 text-sm">
           <div className="alios-surface-muted px-4 py-3">
             <p className="text-xs text-muted-foreground">{t("finance.totalAmount")}</p>
             <p className="mt-1 font-medium tabular-nums">
@@ -193,7 +193,7 @@ export function FinanceObligationCard({
         </div>
       </CollapsibleSection>
 
-      <div className="flex flex-col gap-2 border-t border-border/70 pt-4 sm:flex-row sm:flex-wrap">
+      <div className="finance-record-actions flex flex-wrap items-center gap-2">
         <Button
           type="button"
           size="sm"

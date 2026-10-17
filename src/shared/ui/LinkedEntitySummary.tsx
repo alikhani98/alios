@@ -42,7 +42,7 @@ export function LinkedEntitySummary({
   }
 
   return (
-    <div className={cn("grid gap-3 sm:grid-cols-2 xl:grid-cols-4", className)}>
+    <div className={cn("alios-linked-summary grid grid-cols-[repeat(auto-fit,minmax(min(100%,16rem),1fr))] gap-3", className)}>
       {projectId ? (
         <div className="rounded-2xl border border-primary/15 bg-primary/5 p-3">
           <p className="flex items-center gap-2 text-xs font-medium text-muted-foreground">

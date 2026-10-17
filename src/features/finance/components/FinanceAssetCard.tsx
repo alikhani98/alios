@@ -32,9 +32,9 @@ export function FinanceAssetCard({
   const locale = language === "fa" ? "fa-IR" : "en-US";
 
   return (
-    <SoftPanel className="space-y-4 border-border/70 bg-background/80">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="min-w-0 flex-1 space-y-2">
+    <SoftPanel className="finance-record space-y-3">
+      <div className="finance-record-heading">
+        <div className="finance-record-main min-w-0 space-y-2">
           <div className="flex flex-wrap items-center gap-2">
             <StatusChip tone="primary">
               <WalletCards className="me-1 h-3.5 w-3.5" />
@@ -42,7 +42,7 @@ export function FinanceAssetCard({
             </StatusChip>
           </div>
           <div className="space-y-1">
-            <h3 className="break-words text-lg font-semibold leading-7">
+            <h3 className="break-words text-base font-semibold leading-7">
               {asset.title}
             </h3>
             {asset.notes ? (
@@ -53,18 +53,18 @@ export function FinanceAssetCard({
           </div>
         </div>
 
-        <div className="shrink-0 text-end">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+        <div className="finance-record-amount">
+          <p className="text-xs font-medium text-muted-foreground">
             {t("finance.assetCurrentValue")}
           </p>
-          <p className="mt-1 max-w-[12rem] break-words text-2xl font-semibold tabular-nums leading-8">
+          <p className="mt-1 break-words text-xl font-semibold tabular-nums leading-8">
             {formatFinanceAmount(asset.currentValue, locale)}{" "}
             {t("finance.currency")}
           </p>
         </div>
       </div>
 
-      <div className="flex flex-col gap-2 border-t border-border/70 pt-4 sm:flex-row sm:flex-wrap">
+      <div className="finance-record-actions flex flex-wrap items-center gap-2">
         <Button
           type="button"
           size="sm"

@@ -1,5 +1,6 @@
 import { X } from "lucide-react";
 import { useState, type FormEvent } from "react";
+import { createPortal } from "react-dom";
 
 import { useStorageAdapter } from "@/core/storage";
 import { useI18n, type TranslationKey } from "@/shared/i18n";
@@ -175,7 +176,7 @@ export function UrgeQuickForm({ open, onClose, onSaved }: UrgeQuickFormProps) {
   };
 
   const renderIntensityButtons = (onPick: (value: number) => void) => (
-    <div className="grid grid-cols-10 gap-1.5">
+    <div className="grid grid-cols-5 gap-1.5 sm:grid-cols-10">
       {Array.from({ length: 10 }, (_, index) => index + 1).map((value) => (
         <button
           key={value}
@@ -183,7 +184,7 @@ export function UrgeQuickForm({ open, onClose, onSaved }: UrgeQuickFormProps) {
           aria-label={`${t("urge.intensityLabel")} ${value}`}
           aria-pressed={intensity === value}
           className={cn(
-            "aspect-square min-h-8 rounded-full border text-xs font-semibold tabular-nums transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:min-h-9",
+            "min-h-11 rounded-control border text-sm font-semibold tabular-nums transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
             intensity === value
               ? "border-primary bg-primary text-primary-foreground"
               : "border-border bg-background text-foreground hover:bg-accent"
@@ -210,9 +211,9 @@ export function UrgeQuickForm({ open, onClose, onSaved }: UrgeQuickFormProps) {
     return preset ? translate(preset.labelKey) : value;
   }
 
-  return (
+  const dialog = (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-background/70 p-3 backdrop-blur-sm sm:items-center"
+      className="alios-modal-overlay"
       role="dialog"
       aria-modal="true"
       aria-labelledby="urge-quick-form-title"
@@ -224,7 +225,7 @@ export function UrgeQuickForm({ open, onClose, onSaved }: UrgeQuickFormProps) {
         aria-label={t("common.cancel")}
         onClick={handleClose}
       />
-      <Card className="relative max-h-[92vh] w-full max-w-2xl overflow-y-auto border-border/70 bg-card shadow-aliosFloating">
+      <Card className="alios-modal-panel relative w-full max-w-2xl bg-card shadow-aliosFloating">
         <CardHeader className="flex flex-row items-start justify-between gap-4 pb-3">
           <CardTitle id="urge-quick-form-title">{t("urge.formTitle")}</CardTitle>
           <Button
@@ -349,4 +350,6 @@ export function UrgeQuickForm({ open, onClose, onSaved }: UrgeQuickFormProps) {
       </Card>
     </div>
   );
+
+  return typeof document === "undefined" ? dialog : createPortal(dialog, document.body);
 }

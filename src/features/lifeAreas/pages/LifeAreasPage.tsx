@@ -271,10 +271,11 @@ export function LifeAreasPage() {
   }, [areas, filteredAreas, focusAreaKey, isLoading, t]);
 
   return (
-    <section className="alios-page min-w-0 space-y-6">
-      <PremiumCard className="alios-now-surface shadow-sm">
-        <div className="p-4 sm:p-6">
+    <section className="alios-page min-w-0 space-y-5 px-0 sm:px-6">
+      <PremiumCard className="alios-now-surface alios-page-entry">
+        <div className="pb-4 sm:pb-5">
           <SectionHeader
+            variant="page"
             eyebrow={t("lifeAreas.title")}
             icon={<Compass className="h-5 w-5" />}
             title={t("lifeAreas.title")}

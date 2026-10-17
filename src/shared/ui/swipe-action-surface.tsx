@@ -81,7 +81,7 @@ export function SwipeActionSurface({
 
   return (
     <div
-      className={cn("relative min-w-0 overflow-hidden rounded-2xl", className)}
+      className={cn("relative min-w-0 overflow-hidden rounded-surface", className)}
       onPointerCancel={reset}
       onPointerDown={handlePointerDown}
       onPointerLeave={reset}
@@ -107,7 +107,7 @@ export function SwipeActionSurface({
         </button>
       </div>
       <div
-        className="relative transition-transform duration-150 ease-out motion-reduce:transition-none md:translate-x-0"
+        className="relative rounded-surface bg-card transition-transform duration-150 ease-out motion-reduce:transition-none md:translate-x-0"
         style={{
           transform: boundedOffset ? `translateX(${boundedOffset}px)` : undefined,
         }}

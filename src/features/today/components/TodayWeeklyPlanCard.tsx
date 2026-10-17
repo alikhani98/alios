@@ -56,15 +56,12 @@ export function TodayWeeklyPlanCard({ focus, isLoading }: TodayWeeklyPlanCardPro
       expandLabel={t("common.expandSection")}
       collapseLabel={t("common.collapseSection")}
       contentClassName="p-0"
-      className="border-primary/20 bg-gradient-to-br from-primary/10 via-background to-background"
+      className="border-border/70 bg-card/95"
     >
-      <CardContent className="grid gap-5 p-5 sm:p-6 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,0.7fr)]">
+      <CardContent className="grid min-w-0 gap-4 p-4">
         <div className="min-w-0 space-y-4">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="flex min-w-0 items-start gap-3">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-primary/10 bg-primary/10 text-primary">
-                <CalendarDays className="h-5 w-5" aria-hidden="true" />
-              </span>
               <div className="min-w-0">
                 <p className="text-xs font-semibold text-muted-foreground">
                   {t("weeklyReview.title")}
