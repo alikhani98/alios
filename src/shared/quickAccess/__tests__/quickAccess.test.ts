@@ -4,6 +4,8 @@ import type { StorageAdapter } from "@/core/storage";
 import {
   addQuickAccessItem,
   createQuickAccessItem,
+  createModuleQuickAccessItem,
+  moveQuickAccessItem,
   normalizeQuickAccessPreference,
   parseQuickAccessPreference,
   QUICK_ACCESS_DEFAULT_PREFERENCE,
@@ -11,6 +13,16 @@ import {
 import { resolveQuickAccessItems } from "../resolver";
 
 describe("quick access preferences", () => {
+  it("preserves explicit moves through normalization and a preference reload", () => {
+    const preference = normalizeQuickAccessPreference({ items: [
+      createModuleQuickAccessItem("today", 0), createModuleQuickAccessItem("calendar", 1),
+    ] });
+    const moved = moveQuickAccessItem(preference, "module:today", "down");
+    expect(parseQuickAccessPreference(JSON.stringify(moved)).items.map((item) => item.id))
+      .toEqual(["module:calendar", "module:today"]);
+    expect(moveQuickAccessItem(moved, "module:today", "up")).toEqual(preference);
+    expect(preference.items[0].id).toBe("module:today");
+  });
   it("parses and normalizes the versioned preference shape", () => {
     expect(
       parseQuickAccessPreference(

@@ -6,7 +6,7 @@ import { Button, Card, CardContent, CardHeader, CardTitle, EmptyState, StatusChi
 import { createModuleQuickAccessItem, QUICK_ACCESS_MODULES } from "./quickAccess";
 import { useQuickAccessPreference, useResolvedQuickAccessItems } from "./useQuickAccess";
 
-export function QuickAccessManager() {
+export function QuickAccessManager({ compact = false }: { compact?: boolean }) {
   const { t } = useI18n();
   const { preference, setEnabled, remove, move, reset, addItem } = useQuickAccessPreference();
   const { items, isLoading, hasError, retry } = useResolvedQuickAccessItems(preference.items);
@@ -14,8 +14,8 @@ export function QuickAccessManager() {
   const reportSave = (saved: boolean) => setSaveStatus(saved ? "success" : "error");
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className={compact ? "border-0 bg-transparent shadow-none" : undefined}>
+      <CardHeader className={compact ? "sr-only" : undefined}>
         <CardTitle className="flex items-center gap-2">
           <Pin className="h-5 w-5 text-primary" aria-hidden="true" />
           {t("quickAccess.title")}
@@ -24,7 +24,7 @@ export function QuickAccessManager() {
           {t("quickAccess.description")}
         </p>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className={compact ? "space-y-3 p-2 sm:p-2" : "space-y-4"}>
         {saveStatus ? <p role={saveStatus === "error" ? "alert" : "status"} className="text-sm">
           {t(saveStatus === "error" ? "quickAccess.saveError" : "common.changesSaved")}
         </p> : null}
@@ -44,7 +44,9 @@ export function QuickAccessManager() {
             {items.map((item, index) => (
               <div
                 key={item.item.id}
-                className="flex min-h-11 flex-col gap-3 rounded-xl border border-border/70 p-3 sm:flex-row sm:items-center"
+                className={compact
+                  ? "flex min-h-11 flex-col gap-2 border-b border-border/70 py-3"
+                  : "flex min-h-11 flex-col gap-3 rounded-xl border border-border/70 p-3 sm:flex-row sm:items-center"}
               >
                 <div className="flex min-w-0 flex-1 items-center gap-3">
                   {item.icon ? <item.icon className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" /> : <Pin className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />}

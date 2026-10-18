@@ -3,53 +3,30 @@ import type { TranslationKey } from "@/shared/i18n";
 export const HOME_DASHBOARD_LAYOUT_STORAGE_KEY =
   "alios.home.dashboardLayout";
 
-export const homeDashboardSectionIds = [
-  "hero",
-  "emptyState",
-  "routineNudge",
-  "wellnessBadminton",
-  "routineTemplates",
-  "upcomingTasks",
-  "calendar",
-  "summaryStats",
-  "personalInsights",
-  "projectsOverview",
-  "journalOverview",
-  "knowledgeOverview",
-  "manualOverview",
-  "quickActions",
-] as const;
+export const homeDashboardSections = [
+  { id: "quickAccess", titleKey: "quickAccess.title" },
+  { id: "clearStart", titleKey: "home.clearStartTitle" },
+  { id: "summaryStats", titleKey: "home.sectionSummaryStats" },
+  { id: "todayTasks", titleKey: "home.sectionTodayTasks" },
+  { id: "reminders", titleKey: "home.sectionReminders" },
+  { id: "tomorrow", titleKey: "home.sectionTomorrow" },
+  { id: "learning", titleKey: "home.learningKnowledgeTitle" },
+  { id: "moreSections", titleKey: "home.moreDashboard" },
+  { id: "eveningBriefing", titleKey: "home.sectionEveningBriefing" },
+  { id: "welcome", titleKey: "home.sectionWelcome" },
+  { id: "backupReminder", titleKey: "home.backupReminderTitle" },
+] as const satisfies ReadonlyArray<{ id: string; titleKey: TranslationKey }>;
+
+export const homeDashboardSectionIds = homeDashboardSections.map(
+  ({ id }) => id
+);
 
 export type HomeDashboardSectionId =
-  (typeof homeDashboardSectionIds)[number];
+  (typeof homeDashboardSections)[number]["id"];
 
 export type HomeDashboardLayout = {
   orderedSectionIds: HomeDashboardSectionId[];
   hiddenSectionIds: HomeDashboardSectionId[];
-};
-
-export type HomeDashboardSectionMeta = {
-  titleKey: TranslationKey;
-};
-
-export const homeDashboardSectionMeta: Record<
-  HomeDashboardSectionId,
-  HomeDashboardSectionMeta
-> = {
-  hero: { titleKey: "home.sectionHero" },
-  emptyState: { titleKey: "home.sectionEmptyState" },
-  routineNudge: { titleKey: "home.sectionRoutineNudge" },
-  wellnessBadminton: { titleKey: "home.sectionWellnessBadminton" },
-  routineTemplates: { titleKey: "home.sectionRoutineTemplates" },
-  upcomingTasks: { titleKey: "home.sectionUpcomingTasks" },
-  calendar: { titleKey: "home.sectionCalendar" },
-  summaryStats: { titleKey: "home.sectionSummaryStats" },
-  personalInsights: { titleKey: "home.sectionPersonalInsights" },
-  projectsOverview: { titleKey: "home.sectionProjectsOverview" },
-  journalOverview: { titleKey: "home.sectionJournalOverview" },
-  knowledgeOverview: { titleKey: "home.sectionKnowledgeOverview" },
-  manualOverview: { titleKey: "home.sectionManualOverview" },
-  quickActions: { titleKey: "home.sectionQuickActions" },
 };
 
 function isHomeDashboardSectionId(value: unknown): value is HomeDashboardSectionId {
@@ -125,29 +102,59 @@ function moveSection(
   sectionId: HomeDashboardSectionId,
   direction: -1 | 1
 ): HomeDashboardLayout {
-  const currentIndex = layout.orderedSectionIds.indexOf(sectionId);
-
-  if (currentIndex < 0) {
+  const isHidden = layout.hiddenSectionIds.includes(sectionId);
+  const group = layout.orderedSectionIds.filter(
+    (id) => layout.hiddenSectionIds.includes(id) === isHidden
+  );
+  const currentIndex = group.indexOf(sectionId);
+  const targetId = group[currentIndex + direction];
+  if (currentIndex < 0 || !targetId) {
     return layout;
   }
+  return moveDashboardSectionTo(
+    layout,
+    sectionId,
+    targetId,
+    direction === -1 ? "before" : "after"
+  );
+}
 
-  const targetIndex = currentIndex + direction;
-
+export function moveDashboardSectionTo(
+  layout: HomeDashboardLayout,
+  sectionId: HomeDashboardSectionId,
+  targetId: HomeDashboardSectionId,
+  placement: "before" | "after"
+): HomeDashboardLayout {
+  const isHidden = layout.hiddenSectionIds.includes(sectionId);
   if (
-    targetIndex < 0 ||
-    targetIndex >= layout.orderedSectionIds.length
+    sectionId === targetId ||
+    !layout.orderedSectionIds.includes(sectionId) ||
+    !layout.orderedSectionIds.includes(targetId) ||
+    layout.hiddenSectionIds.includes(targetId) !== isHidden
   ) {
     return layout;
   }
 
-  const orderedSectionIds = [...layout.orderedSectionIds];
-  const [movedSectionId] = orderedSectionIds.splice(currentIndex, 1);
-  orderedSectionIds.splice(targetIndex, 0, movedSectionId);
+  const group = layout.orderedSectionIds.filter(
+    (id) => layout.hiddenSectionIds.includes(id) === isHidden
+  );
+  const reorderedGroup = group.filter((id) => id !== sectionId);
+  const targetIndex = reorderedGroup.indexOf(targetId);
+  reorderedGroup.splice(
+    targetIndex + (placement === "after" ? 1 : 0),
+    0,
+    sectionId
+  );
+  let groupIndex = 0;
+  const orderedSectionIds = layout.orderedSectionIds.map((id) =>
+    layout.hiddenSectionIds.includes(id) === isHidden
+      ? reorderedGroup[groupIndex++]
+      : id
+  );
 
-  return {
-    ...layout,
-    orderedSectionIds,
-  };
+  return orderedSectionIds.every((id, index) => id === layout.orderedSectionIds[index])
+    ? layout
+    : { ...layout, orderedSectionIds };
 }
 
 export function moveDashboardSectionUp(

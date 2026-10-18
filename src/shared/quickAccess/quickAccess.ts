@@ -285,7 +285,7 @@ export function moveQuickAccessItem(
   [items[index], items[nextIndex]] = [items[nextIndex], items[index]];
   return normalizeQuickAccessPreference({
     version: QUICK_ACCESS_PREFERENCE_VERSION,
-    items,
+    items: items.map((item, order) => ({ ...item, order })),
   });
 }
 

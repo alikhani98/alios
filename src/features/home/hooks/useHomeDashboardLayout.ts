@@ -12,6 +12,7 @@ import {
   getDefaultDashboardLayout,
   homeDashboardSectionIds,
   moveDashboardSectionDown,
+  moveDashboardSectionTo,
   moveDashboardSectionUp,
   normalizeDashboardLayout,
   resetDashboardLayout,
@@ -123,6 +124,17 @@ export function useHomeDashboardLayout() {
     [layout, updateLayout]
   );
 
+  const moveSectionTo = useCallback(
+    (
+      sectionId: HomeDashboardSectionId,
+      targetId: HomeDashboardSectionId,
+      placement: "before" | "after"
+    ) => {
+      updateLayout(moveDashboardSectionTo(layout, sectionId, targetId, placement));
+    },
+    [layout, updateLayout]
+  );
+
   const toggleSectionVisibility = useCallback(
     (sectionId: HomeDashboardSectionId) => {
       updateLayout(toggleDashboardSectionVisibility(layout, sectionId));
@@ -140,6 +152,7 @@ export function useHomeDashboardLayout() {
     layout,
     moveSectionUp,
     moveSectionDown,
+    moveSectionTo,
     toggleSectionVisibility,
     resetLayout,
     isDefaultLayout:

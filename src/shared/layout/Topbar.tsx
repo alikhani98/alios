@@ -3,10 +3,10 @@ import {
   Clock3,
   ImageIcon,
   LayoutDashboard,
-  Languages,
   Menu,
   Moon,
   MonitorSmartphone,
+  Pin,
   Search,
   SunMedium,
   SunMoon,
@@ -22,12 +22,12 @@ import {
   useRef,
   useState,
 } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { GlobalQuickAccessPanel } from "@/shared/quickAccess/GlobalQuickAccessPanel";
+import { useQuickAccessPreference } from "@/shared/quickAccess/useQuickAccess";
 
 import {
   APPEARANCE_STORAGE_KEY,
-  APPEARANCE_SCHEDULE_END_STORAGE_KEY,
-  APPEARANCE_SCHEDULE_START_STORAGE_KEY,
   DISPLAY_NAME_STORAGE_KEY,
   PROFILE_AVATAR_IMAGE_STORAGE_KEY,
   PROFILE_AVATAR_STORAGE_KEY,
@@ -37,28 +37,19 @@ import { usePersistentString } from "@/shared/hooks/usePersistentString";
 import { useI18n } from "@/shared/i18n";
 import { lazyWithRetry } from "@/shared/runtime/lazyWithRetry";
 import {
-  applyAccentColorThemeVariables,
-  getAccentColorThemeVariables,
-  useAccentColorPreference,
-} from "@/shared/preferences/accentColor";
-import {
   DEFAULT_APPEARANCE_PREFERENCE,
-  DEFAULT_APPEARANCE_SCHEDULE,
   parseAppearancePreference,
-  resolveAppearance,
 } from "@/shared/preferences/appearance";
 import {
   getDisplayNameInitials,
   normalizeDisplayName,
-  normalizeProfileAvatarPreference,
-  type ProfileAvatarPreference,
 } from "@/shared/preferences/profile";
 import { Badge, Button, SectionHeader } from "@/shared/ui";
 import { Input } from "@/shared/ui";
 import { aliosPopoverMotion, aliosSurfaceMotion } from "@/shared/ui/motion";
 import { cn } from "@/shared/utils/cn";
 
-type ActivePanel = "dashboard" | "theme" | "profile" | null;
+type ActivePanel = "dashboard" | "theme" | "profile" | "quickAccess" | null;
 
 const TopbarDashboardPanel = lazyWithRetry(() =>
   import("./TopbarDashboardPanel").then((module) => ({
@@ -78,70 +69,8 @@ type TopbarProps = {
   onOpenMobileSidebar: () => void;
   onOpenCommandPalette: () => void;
   showDashboardControls?: boolean;
+  shellOverlayOpen?: boolean;
 };
-
-const accentColorOptions = [
-  { value: "default", labelKey: "settings.accentDefault" },
-  { value: "violet", labelKey: "settings.accentViolet" },
-  { value: "rose", labelKey: "settings.accentRose" },
-  { value: "amber", labelKey: "settings.accentAmber" },
-  { value: "emerald", labelKey: "settings.accentEmerald" },
-  { value: "slate", labelKey: "settings.accentSlate" },
-  { value: "caspian", labelKey: "settings.accentCaspian" },
-  { value: "pomegranate", labelKey: "settings.accentPomegranate" },
-  { value: "saffron", labelKey: "settings.accentSaffron" },
-  { value: "herb", labelKey: "settings.accentHerb" },
-] as const;
-
-const profileAvatarOptions: ReadonlyArray<{
-  value: ProfileAvatarPreference;
-  labelKey:
-    | "settings.profileAvatarInitials"
-    | "settings.profileAvatarSaffron"
-    | "settings.profileAvatarHerb"
-    | "settings.profileAvatarPomegranate"
-    | "settings.profileAvatarCaspian"
-    | "settings.profileAvatarPaper";
-  symbol: string | null;
-  className: string;
-}> = [
-  {
-    value: "initials",
-    labelKey: "settings.profileAvatarInitials",
-    symbol: null,
-    className: "bg-alios-caspian text-white dark:bg-alios-paper dark:text-alios-night",
-  },
-  {
-    value: "saffron",
-    labelKey: "settings.profileAvatarSaffron",
-    symbol: "✦",
-    className: "bg-alios-saffron text-alios-caspian",
-  },
-  {
-    value: "herb",
-    labelKey: "settings.profileAvatarHerb",
-    symbol: "◆",
-    className: "bg-alios-herb text-white",
-  },
-  {
-    value: "pomegranate",
-    labelKey: "settings.profileAvatarPomegranate",
-    symbol: "●",
-    className: "bg-alios-pomegranate text-white",
-  },
-  {
-    value: "caspian",
-    labelKey: "settings.profileAvatarCaspian",
-    symbol: "◇",
-    className: "bg-alios-caspian text-white",
-  },
-  {
-    value: "paper",
-    labelKey: "settings.profileAvatarPaper",
-    symbol: "◐",
-    className: "bg-alios-paper text-alios-caspian",
-  },
-];
 
 const PROFILE_AVATAR_IMAGE_SIZE = 160;
 
@@ -212,8 +141,11 @@ export function Topbar({
   onOpenMobileSidebar,
   onOpenCommandPalette,
   showDashboardControls = false,
+  shellOverlayOpen = false,
 }: TopbarProps) {
-  const { direction, language, setLanguage, t } = useI18n();
+  const { direction, t } = useI18n();
+  const location = useLocation();
+  const { preference: quickAccessPreference } = useQuickAccessPreference();
   const panelRef = useRef<HTMLDivElement>(null);
   const activePanelContentRef = useRef<HTMLDivElement>(null);
   const activePanelTriggerRef = useRef<HTMLButtonElement | null>(null);
@@ -223,19 +155,11 @@ export function Topbar({
       key: APPEARANCE_STORAGE_KEY,
       defaultValue: DEFAULT_APPEARANCE_PREFERENCE,
     });
-  const { value: appearanceScheduleStart } = usePersistentString({
-    key: APPEARANCE_SCHEDULE_START_STORAGE_KEY,
-    defaultValue: DEFAULT_APPEARANCE_SCHEDULE.start,
-  });
-  const { value: appearanceScheduleEnd } = usePersistentString({
-    key: APPEARANCE_SCHEDULE_END_STORAGE_KEY,
-    defaultValue: DEFAULT_APPEARANCE_SCHEDULE.end,
-  });
   const { value: displayName, setValue: setDisplayName } = usePersistentString({
     key: DISPLAY_NAME_STORAGE_KEY,
     defaultValue: "",
   });
-  const { value: rawProfileAvatar, setValue: setProfileAvatar } =
+  const { setValue: setProfileAvatar } =
     usePersistentString({
       key: PROFILE_AVATAR_STORAGE_KEY,
       defaultValue: "initials",
@@ -245,9 +169,13 @@ export function Topbar({
       key: PROFILE_AVATAR_IMAGE_STORAGE_KEY,
       defaultValue: "",
     });
-  const { value: accentColorPreference, setValue: setAccentColorPreference } =
-    useAccentColorPreference();
   const [activePanel, setActivePanel] = useState<ActivePanel>(null);
+  useEffect(() => {
+    setActivePanel((current) => current === "quickAccess" ? null : current);
+  }, [location.pathname, location.search, location.hash]);
+  useEffect(() => {
+    if (shellOverlayOpen) setActivePanel(null);
+  }, [shellOverlayOpen]);
   const [draftDisplayName, setDraftDisplayName] = useState(displayName);
   const [savedMessage, setSavedMessage] = useState<string | null>(null);
   const [avatarImageStatus, setAvatarImageStatus] = useState<
@@ -256,38 +184,13 @@ export function Topbar({
   const [avatarImageError, setAvatarImageError] = useState<string | null>(null);
   const savedMessageTimer = useRef<number | null>(null);
   const currentAppearance = parseAppearancePreference(appearancePreference);
-  const resolvedAppearance =
-    currentAppearance === "system"
-      ? resolveAppearance(
-          currentAppearance,
-          typeof window !== "undefined"
-            ? window.matchMedia("(prefers-color-scheme: dark)").matches
-            : false
-        )
-      : currentAppearance === "scheduled"
-        ? resolveAppearance(
-            currentAppearance,
-            false,
-            {
-              start: appearanceScheduleStart,
-              end: appearanceScheduleEnd,
-            }
-          )
-      : currentAppearance;
   const hasDisplayName = displayName.trim().length > 0;
   const initials = getDisplayNameInitials(displayName);
-  const profileAvatarPreference =
-    normalizeProfileAvatarPreference(rawProfileAvatar);
   const hasProfileAvatarPhoto =
-    profileAvatarPreference === "photo" &&
     isStoredProfileAvatarImage(profileAvatarImage);
-  const selectedProfileAvatar =
-    profileAvatarOptions.find(
-      (option) => option.value === profileAvatarPreference
-    ) ?? profileAvatarOptions[0];
   const profileAvatarLabel = hasProfileAvatarPhoto
     ? t("settings.profileAvatarPhoto")
-    : t(selectedProfileAvatar.labelKey);
+    : t("settings.profileAvatarInitials");
 
   useEffect(() => {
     if (!showDashboardControls && activePanel === "dashboard") {
@@ -326,7 +229,7 @@ export function Topbar({
     };
 
     const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
+      if (event.key === "Escape" && activePanelContentRef.current) {
         event.preventDefault();
         closeActivePanel(true);
       }
@@ -388,20 +291,6 @@ export function Topbar({
     }, 1800);
   };
 
-  const handleSelectAccentColor = (
-    value: (typeof accentColorOptions)[number]["value"]
-  ) => {
-    applyAccentColorThemeVariables(value, resolvedAppearance === "dark");
-    setAccentColorPreference(value);
-    showSavedFeedback();
-  };
-
-  const handleSelectProfileAvatar = (value: ProfileAvatarPreference) => {
-    setProfileAvatar(normalizeProfileAvatarPreference(value));
-    setAvatarImageError(null);
-    showSavedFeedback();
-  };
-
   const handleProfileAvatarImageChange = async (
     event: ChangeEvent<HTMLInputElement>
   ) => {
@@ -431,11 +320,6 @@ export function Topbar({
     setProfileAvatarImage("");
     setProfileAvatar("initials");
     setAvatarImageError(null);
-    showSavedFeedback();
-  };
-
-  const handleSelectLanguage = (nextLanguage: "fa" | "en") => {
-    setLanguage(nextLanguage);
     showSavedFeedback();
   };
 
@@ -508,6 +392,20 @@ export function Topbar({
           aliosSurfaceMotion
         )}
       >
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className={cn("rounded-full", activePanel === "quickAccess" && "bg-accent text-accent-foreground")}
+          aria-label={t("quickAccess.openGlobal")}
+          title={t("quickAccess.openGlobal")}
+          aria-expanded={activePanel === "quickAccess"}
+          aria-controls="topbar-quick-access"
+          aria-haspopup="dialog"
+          onClick={(event) => togglePanel("quickAccess", event.currentTarget)}
+        >
+          <Pin className={cn("h-5 w-5", quickAccessPreference.items.some((item) => item.enabled) && "fill-primary/20 text-primary")} aria-hidden="true" />
+        </Button>
         {showDashboardControls ? (
           <div className="group relative">
             <Button
@@ -569,23 +467,12 @@ export function Topbar({
               aria-hidden="true"
               title={profileAvatarLabel}
             />
-          ) : selectedProfileAvatar.symbol ? (
-            <span
-              className={cn(
-                "flex h-7 w-7 items-center justify-center rounded-full text-sm font-semibold shadow-sm",
-                selectedProfileAvatar.className
-              )}
-              aria-hidden="true"
-              title={profileAvatarLabel}
-            >
-              {selectedProfileAvatar.symbol}
-            </span>
           ) : hasDisplayName ? (
             <span
               className={cn(
-                "flex h-7 w-7 items-center justify-center rounded-full text-[0.65rem] font-semibold shadow-sm",
-                selectedProfileAvatar.className
+                "flex h-7 w-7 items-center justify-center rounded-full bg-muted text-foreground text-[0.65rem] font-semibold shadow-sm"
               )}
+              title={profileAvatarLabel}
             >
               {initials}
             </span>
@@ -593,6 +480,17 @@ export function Topbar({
             <UserCircle className="h-5 w-5" />
           )}
         </Button>
+
+        {activePanel === "quickAccess" ? (
+          <div ref={activePanelContentRef} id="topbar-quick-access"
+            role="dialog" aria-modal="false" aria-label={t("quickAccess.title")}
+            className={cn(
+              "absolute end-0 top-full z-50 mt-2 flex max-h-[calc(100dvh-11rem-env(safe-area-inset-top)-env(safe-area-inset-bottom))] w-[min(24rem,calc(100vw-1.5rem))] flex-col overflow-hidden rounded-2xl border border-border bg-popover text-popover-foreground shadow-aliosFloating md:max-h-[calc(100dvh-6rem)]",
+              aliosPopoverMotion,
+            )}>
+            <GlobalQuickAccessPanel onClose={() => closeActivePanel(true)} />
+          </div>
+        ) : null}
 
         {activePanel === "theme" ? (
           <div
@@ -641,9 +539,8 @@ export function Topbar({
             ref={activePanelContentRef}
             id="topbar-dashboard-controls"
             className={cn(
-              "absolute top-full z-50 mt-2 max-h-[calc(100vh-7rem)] w-[min(30rem,calc(100vw-1rem))] max-w-[calc(100vw-1rem)] overflow-y-auto rounded-2xl border bg-card p-3 shadow-aliosFloating",
+              "absolute end-0 top-full z-50 mt-2 flex max-h-[calc(100dvh-11rem)] w-[min(26.25rem,calc(100vw-1.5rem))] flex-col overflow-hidden rounded-2xl border bg-card shadow-aliosFloating md:max-h-[calc(100dvh-5.5rem)]",
               aliosPopoverMotion,
-              direction === "rtl" ? "left-0" : "right-0"
             )}
             role="dialog"
             aria-modal="false"
@@ -668,7 +565,7 @@ export function Topbar({
                 </div>
               }
             >
-              <TopbarDashboardPanel onChange={showSavedFeedback} />
+              <TopbarDashboardPanel onChange={showSavedFeedback} onClose={() => closeActivePanel(true)} />
             </Suspense>
           </div>
         ) : null}
@@ -689,8 +586,8 @@ export function Topbar({
             <div className="flex items-center gap-3">
               <div
                 className={cn(
-                  "flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-base font-semibold shadow-sm",
-                  hasProfileAvatarPhoto ? "overflow-hidden bg-muted" : selectedProfileAvatar.className
+                  "flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-muted text-foreground text-base font-semibold shadow-sm",
+                  hasProfileAvatarPhoto && "overflow-hidden"
                 )}
                 title={profileAvatarLabel}
               >
@@ -702,7 +599,6 @@ export function Topbar({
                     aria-hidden="true"
                   />
                 ) : (
-                  selectedProfileAvatar.symbol ??
                   (hasDisplayName ? initials : <UserCircle className="h-6 w-6" />)
                 )}
               </div>
@@ -754,55 +650,6 @@ export function Topbar({
             </form>
 
             <div className="mt-4 space-y-3 rounded-2xl border border-border/70 bg-background/70 p-3">
-              <div className="space-y-1">
-                <p className="text-sm font-semibold">
-                  {t("settings.profileAvatar")}
-                </p>
-                <p className="text-xs leading-5 text-muted-foreground">
-                  {t("settings.profileAvatarDescription")}
-                </p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                {profileAvatarOptions.map((option) => {
-                  const isSelected = profileAvatarPreference === option.value;
-                  const preview =
-                    option.symbol ??
-                    (hasDisplayName ? initials : getDisplayNameInitials(""));
-
-                  return (
-                    <Button
-                      key={option.value}
-                      type="button"
-                      variant={isSelected ? "secondary" : "outline"}
-                      className="h-auto justify-start gap-3 rounded-2xl px-3 py-3 text-start"
-                      onClick={() => handleSelectProfileAvatar(option.value)}
-                      aria-pressed={isSelected}
-                    >
-                      <span
-                        className={cn(
-                          "flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-semibold shadow-sm",
-                          option.className
-                        )}
-                        aria-hidden="true"
-                      >
-                        {preview}
-                      </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="block text-sm font-medium">
-                          {t(option.labelKey)}
-                        </span>
-                        <span className="block text-xs text-muted-foreground">
-                          {isSelected
-                            ? t("home.currentAccentColor")
-                            : t("home.selectAccentColor")}
-                        </span>
-                      </span>
-                    </Button>
-                  );
-                })}
-              </div>
-
               <div className="space-y-2 rounded-2xl border border-dashed border-border/70 bg-card/70 p-3">
                 <div className="flex items-start gap-2">
                   <ImageIcon className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
@@ -858,103 +705,6 @@ export function Topbar({
                     {avatarImageError}
                   </p>
                 ) : null}
-              </div>
-            </div>
-
-            <div className="mt-4 space-y-3 rounded-2xl border border-border/70 bg-background/70 p-3">
-              <div className="flex items-start gap-2">
-                <Languages className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                <div className="min-w-0 space-y-1">
-                  <p className="text-sm font-semibold">{t("settings.language")}</p>
-                  <p className="text-xs leading-5 text-muted-foreground">
-                    {t("settings.languageDescription")}
-                  </p>
-                </div>
-              </div>
-
-              <div
-                className="grid grid-cols-2 gap-2"
-                role="group"
-                aria-label={t("settings.language")}
-              >
-                <Button
-                  type="button"
-                  variant={language === "fa" ? "secondary" : "outline"}
-                  aria-pressed={language === "fa"}
-                  onClick={() => handleSelectLanguage("fa")}
-                >
-                  {t("settings.persian")}
-                </Button>
-                <Button
-                  type="button"
-                  variant={language === "en" ? "secondary" : "outline"}
-                  aria-pressed={language === "en"}
-                  onClick={() => handleSelectLanguage("en")}
-                >
-                  {t("settings.english")}
-                </Button>
-              </div>
-            </div>
-
-            <div className="mt-4 space-y-3 rounded-2xl border border-border/70 bg-background/70 p-3">
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0 space-y-1">
-                  <p className="text-sm font-semibold">
-                    {t("settings.accentColor")}
-                  </p>
-                  <p className="text-xs leading-5 text-muted-foreground">
-                    {t("settings.accentColorDescription")}
-                  </p>
-                </div>
-                <Badge variant="outline" className="shrink-0">
-                  {t("settings.appearance")}
-                </Badge>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                {accentColorOptions.map(({ value, labelKey }) => {
-                  const palette = getAccentColorThemeVariables(
-                    value,
-                    resolvedAppearance === "dark"
-                  );
-                  const isSelected = accentColorPreference === value;
-
-                  return (
-                    <Button
-                      key={value}
-                      type="button"
-                      variant={isSelected ? "secondary" : "outline"}
-                      className="h-auto justify-start gap-3 rounded-2xl px-3 py-3 text-start"
-                      onClick={() => handleSelectAccentColor(value)}
-                      aria-pressed={isSelected}
-                    >
-                      <span
-                        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/50 shadow-sm"
-                        style={{ backgroundColor: `hsl(${palette.primary})` }}
-                      >
-                        {isSelected ? (
-                          <Check
-                            className={`h-4 w-4 ${
-                              value === "amber" || value === "saffron"
-                                ? "text-slate-900"
-                                : "text-white"
-                            }`}
-                          />
-                        ) : null}
-                      </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="block text-sm font-medium">
-                          {t(labelKey)}
-                        </span>
-                        <span className="block text-xs text-muted-foreground">
-                          {isSelected
-                            ? t("home.currentAccentColor")
-                            : t("home.selectAccentColor")}
-                        </span>
-                      </span>
-                    </Button>
-                  );
-                })}
               </div>
             </div>
 

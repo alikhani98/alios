@@ -19,6 +19,15 @@ import { buildHomeLearningSnapshot } from "../homeLearningSnapshot";
 import { getDailyBriefingViewModel } from "../components/DailyBriefingCard";
 import { buildHomePersonalMetrics } from "../personalMetrics";
 import { buildLocalReminderSnapshot } from "@/features/reminders";
+import {
+  getDefaultDashboardLayout,
+  homeDashboardSectionIds,
+  moveDashboardSectionUp,
+  resetDashboardLayout,
+  toggleDashboardSectionVisibility,
+  type HomeDashboardLayout,
+} from "../dashboardLayout";
+import { HomeDashboardCustomizer } from "../components/HomeDashboardCustomizer";
 
 const todayTask = {
   id: "home-task-1",
@@ -141,10 +150,11 @@ vi.mock("@/features/today/components/TodayWorkspace", () => ({
 }));
 
 vi.mock("@/shared/quickAccess", () => ({
-  QuickAccessLauncher: () => null,
+  QuickAccessLauncher: () => <div data-testid="quick-access-launcher" />,
 }));
 
 let mockedDashboardData: HomeDashboardData = dashboardData;
+let mockedDashboardLayout: HomeDashboardLayout = getDefaultDashboardLayout();
 let mockedBackupStatus: BackupStatusMetadata | null = null;
 let mockedBackupFreshness: BackupStatusFreshness = "fresh";
 
@@ -154,6 +164,13 @@ vi.mock("../hooks/useHomeDashboard", () => ({
     isLoading: false,
     hasError: false,
     loadDashboard: vi.fn(),
+  }),
+}));
+
+vi.mock("../hooks/useHomeDashboardLayout", () => ({
+  useHomeDashboardLayout: () => ({
+    layout: mockedDashboardLayout,
+    resetLayout: vi.fn(),
   }),
 }));
 
@@ -184,6 +201,20 @@ function renderUnifiedHome(initialEntry = "/?date=2026-08-09") {
   );
 }
 
+function renderLayoutPanel(layout: HomeDashboardLayout) {
+  return renderToStaticMarkup(
+    <I18nProvider>
+      <HomeDashboardCustomizer
+        layout={layout}
+        onMoveUp={vi.fn()}
+        onMoveDown={vi.fn()}
+        onMoveTo={vi.fn()}
+        onToggleVisibility={vi.fn()}
+      />
+    </I18nProvider>
+  );
+}
+
 describe("UnifiedHomePage", () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -191,6 +222,7 @@ describe("UnifiedHomePage", () => {
     localStorage.clear();
     localStorage.setItem(LANGUAGE_STORAGE_KEY, "en");
     mockedDashboardData = dashboardData;
+    mockedDashboardLayout = getDefaultDashboardLayout();
     mockedBackupStatus = {
       lastBackupAt: "2026-08-09T07:00:00.000Z",
       lastBackupVersion: 1,
@@ -229,6 +261,58 @@ describe("UnifiedHomePage", () => {
     expect(markup).toContain('aria-expanded="false"');
     expect(markup).toContain('id="unified-home-more-context-content" hidden="" aria-hidden="true"');
     expect(markup).toContain("Quick links");
+  });
+
+  it("renders only canonical rows and keeps them aligned with Home sections", () => {
+    const panel = renderLayoutPanel(getDefaultDashboardLayout());
+    const home = renderUnifiedHome();
+
+    expect([...panel.matchAll(/data-dashboard-section-id="([^"]+)"/g)].map((match) => match[1]))
+      .toEqual(homeDashboardSectionIds);
+    expect(panel).not.toContain('data-dashboard-section-id="hero"');
+    expect(panel).not.toContain('data-dashboard-section-id="emptyState"');
+    expect(panel).not.toContain('data-dashboard-section-id="calendar"');
+    for (const sectionId of homeDashboardSectionIds) {
+      if (home.includes(`data-dashboard-section="${sectionId}"`)) {
+        expect(panel).toContain(`data-dashboard-section-id="${sectionId}"`);
+      }
+    }
+  });
+
+  it("hides, restores, and reorders real Home content in React order", () => {
+    mockedDashboardLayout = toggleDashboardSectionVisibility(getDefaultDashboardLayout(), "todayTasks");
+    expect(renderUnifiedHome()).not.toContain("Today’s tasks (1)");
+
+    mockedDashboardLayout = toggleDashboardSectionVisibility(mockedDashboardLayout, "todayTasks");
+    expect(renderUnifiedHome()).toContain("Today’s tasks (1)");
+
+    mockedDashboardLayout = moveDashboardSectionUp(mockedDashboardLayout, "todayTasks");
+    const markup = renderUnifiedHome();
+    const panel = renderLayoutPanel(mockedDashboardLayout);
+    expect(markup.indexOf('data-dashboard-section="todayTasks"')).toBeLessThan(
+      markup.indexOf('data-dashboard-section="summaryStats"')
+    );
+    expect(panel.indexOf('data-dashboard-section-id="todayTasks"')).toBeLessThan(
+      panel.indexOf('data-dashboard-section-id="summaryStats"')
+    );
+    expect(markup).toContain('data-testid="quick-access-launcher"');
+
+    mockedDashboardLayout = resetDashboardLayout();
+    const resetMarkup = renderUnifiedHome();
+    expect(resetMarkup.indexOf('data-dashboard-section="summaryStats"')).toBeLessThan(
+      resetMarkup.indexOf('data-dashboard-section="todayTasks"')
+    );
+  });
+
+  it("offers a recovery action when all configurable sections are hidden", () => {
+    mockedDashboardLayout = {
+      ...getDefaultDashboardLayout(),
+      hiddenSectionIds: [...homeDashboardSectionIds],
+    };
+    const markup = renderUnifiedHome();
+    expect(markup).toContain("Your dashboard is empty");
+    expect(markup).toContain("Reset dashboard layout");
+    expect(markup).not.toContain('data-dashboard-section="quickAccess"');
   });
 
   it("shows a compact Learning & Knowledge panel after Quick Access", () => {

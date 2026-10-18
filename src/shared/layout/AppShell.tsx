@@ -171,6 +171,7 @@ export function AppShell() {
             onOpenMobileSidebar={() => setMobileSidebarOpen(true)}
             onOpenCommandPalette={() => setCommandPaletteOpen(true)}
             showDashboardControls={location.pathname === "/"}
+            shellOverlayOpen={mobileSidebarOpen || commandPaletteOpen}
           />
 
           <main

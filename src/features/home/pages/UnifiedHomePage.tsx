@@ -61,6 +61,8 @@ import {
   writeHomeBackupReminderDismissal,
 } from "../backupReminder";
 import { useHomeDashboard } from "../hooks/useHomeDashboard";
+import { useHomeDashboardLayout } from "../hooks/useHomeDashboardLayout";
+import { getVisibleDashboardSections, type HomeDashboardSectionId } from "../dashboardLayout";
 import type { HomeCollapsibleSectionId } from "../homeCollapsedSections";
 import type { HomeDashboardData } from "../types";
 import type { HomeLearningSnapshot } from "../homeLearningSnapshot";
@@ -816,6 +818,7 @@ export function UnifiedHomePage() {
   const { t } = useI18n();
   const { freshness: backupFreshness, status: backupStatus } = useBackupStatus();
   const { data, isLoading, hasError, loadDashboard } = useHomeDashboard();
+  const { layout, resetLayout } = useHomeDashboardLayout();
   const { value: displayName } = usePersistentString({
     key: DISPLAY_NAME_STORAGE_KEY,
     defaultValue: "",
@@ -848,6 +851,79 @@ export function UnifiedHomePage() {
       : t("home.backupReminderDaysAgo", { count: backupAgeInDays });
   const showEveningBriefing =
     today.getHours() >= 18 && (data?.today.tasks.length ?? 0) > 0;
+  const visibleSections = getVisibleDashboardSections(layout);
+
+  const sectionContent: Record<HomeDashboardSectionId, ReactNode> | null = data
+    ? {
+        quickAccess: <QuickAccessLauncher />,
+        clearStart: <ClearStartCard data={data} />,
+        summaryStats: <TodaySummaryBar data={data} today={today} />,
+        todayTasks: <TodayPreviewCard data={data} />,
+        reminders:
+          data.reminderSnapshot.dueTodayTasks.length +
+            data.reminderSnapshot.dueTodayObligations.length >
+          0 ? <LocalReminderPanel snapshot={data.reminderSnapshot} /> : null,
+        tomorrow: data.tasks.some(
+          (task) => isActiveTask(task) && task.dueDate === format(tomorrow, "yyyy-MM-dd")
+        ) ? <TomorrowCard data={data} tomorrow={tomorrow} /> : null,
+        learning: data.learningSnapshot.hasAnyData ? (
+          <HomeLearningPanel snapshot={data.learningSnapshot} />
+        ) : null,
+        moreSections: (
+          <MoreContext
+            data={data}
+            urgeRefreshKey={urgeRefreshKey}
+            setUrgeRefreshKey={setUrgeRefreshKey}
+            moneyPauseRefreshKey={moneyPauseRefreshKey}
+            setMoneyPauseRefreshKey={setMoneyPauseRefreshKey}
+            selectedRoutineTemplateId={selectedRoutineTemplateId}
+            setSelectedRoutineTemplateId={setSelectedRoutineTemplateId}
+          />
+        ),
+        eveningBriefing: showEveningBriefing ? <DailyBriefingCard data={data} /> : null,
+        welcome: data.isEmpty ? <WelcomeCard key={onboardingState} displayName={displayName} /> : null,
+        backupReminder: showBackupReminder ? (
+          <SoftPanel className="alios-home-backup flex flex-col gap-3 p-4 sm:flex-row sm:items-start sm:justify-between sm:gap-5">
+            <div className="flex min-w-0 flex-1 items-start gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-warning/10 text-foreground">
+                <ShieldCheck className="h-5 w-5" aria-hidden="true" />
+              </span>
+              <div className="min-w-0 space-y-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="font-semibold leading-6">{t("home.backupReminderTitle")}</p>
+                  <StatusChip>
+                    {t(
+                      backupFreshness === "never"
+                        ? "settings.backupStatusNever"
+                        : "settings.backupStatusOverdue"
+                    )}
+                  </StatusChip>
+                </div>
+                <p className="text-sm leading-6 text-muted-foreground">{backupReminderBody}</p>
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center gap-2 sm:shrink-0">
+              <Button asChild variant="outline" size="sm" className="min-h-11 flex-1 rounded-lg sm:flex-none">
+                <Link to="/settings#settings-backup-restore">{t("home.backupReminderAction")}</Link>
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="min-h-11 flex-1 rounded-lg sm:flex-none"
+                onClick={() => setBackupReminderDismissedUntil(writeHomeBackupReminderDismissal())}
+              >
+                <X className="me-2 h-4 w-4" aria-hidden="true" />
+                {t("home.backupReminderDismiss")}
+              </Button>
+            </div>
+          </SoftPanel>
+        ) : null,
+      }
+    : null;
+  const hasRenderableDashboardSection = visibleSections.some(
+    (sectionId) => sectionContent?.[sectionId] != null
+  );
 
   if (!data && !isLoading && !hasError) {
     return null;
@@ -883,92 +959,34 @@ export function UnifiedHomePage() {
         </div>
       ) : data ? (
         <>
-          <div className="order-0 space-y-3">
+          <div className="space-y-3">
             <HomeHeader displayName={displayName} today={today} />
             <HomeQuickBar />
-            <QuickAccessLauncher />
           </div>
-          <div className="order-1 min-w-0">
-            <ClearStartCard data={data} />
-          </div>
-          <div className="order-2 min-w-0">
-            <TodaySummaryBar data={data} today={today} />
-          </div>
-          <div className="alios-home-daily-grid order-3">
-            <TodayPreviewCard data={data} />
-            <LocalReminderPanel snapshot={data.reminderSnapshot} />
-            <TomorrowCard data={data} tomorrow={tomorrow} />
-          </div>
-          <div className="order-4 empty:hidden">
-            <HomeLearningPanel snapshot={data.learningSnapshot} />
-          </div>
-          <div className="order-5 min-w-0">
-            <MoreContext
-              data={data}
-              urgeRefreshKey={urgeRefreshKey}
-              setUrgeRefreshKey={setUrgeRefreshKey}
-              moneyPauseRefreshKey={moneyPauseRefreshKey}
-              setMoneyPauseRefreshKey={setMoneyPauseRefreshKey}
-              selectedRoutineTemplateId={selectedRoutineTemplateId}
-              setSelectedRoutineTemplateId={setSelectedRoutineTemplateId}
-            />
-          </div>
-          {showEveningBriefing ? (
-            <div className="order-6">
-              <DailyBriefingCard data={data} />
-            </div>
+          {!hasRenderableDashboardSection ? (
+            <Card className="border-dashed">
+              <CardContent className="flex flex-col items-start gap-3 p-5 sm:p-6">
+                <SectionHeader
+                  title={t("home.emptyDashboardTitle")}
+                  description={t("home.emptyDashboardDescription")}
+                />
+                <Button type="button" onClick={resetLayout}>
+                  <RotateCcw className="me-2 h-4 w-4" aria-hidden="true" />
+                  {t("home.resetDashboardLayout")}
+                </Button>
+              </CardContent>
+            </Card>
           ) : null}
-          {data.isEmpty ? (
-            <div className="order-7">
-              <WelcomeCard
-                key={onboardingState}
-                displayName={displayName}
-              />
-            </div>
-          ) : null}
-          {showBackupReminder ? (
-            <div className="order-8">
-              <SoftPanel className="alios-home-backup flex flex-col gap-3 p-4 sm:flex-row sm:items-start sm:justify-between sm:gap-5">
-                <div className="flex min-w-0 flex-1 items-start gap-3">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-warning/10 text-foreground">
-                    <ShieldCheck className="h-5 w-5" aria-hidden="true" />
-                  </span>
-                  <div className="min-w-0 space-y-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <p className="font-semibold leading-6">{t("home.backupReminderTitle")}</p>
-                      <StatusChip>
-                        {t(
-                          backupFreshness === "never"
-                            ? "settings.backupStatusNever"
-                            : "settings.backupStatusOverdue"
-                        )}
-                      </StatusChip>
-                    </div>
-                    <p className="text-sm leading-6 text-muted-foreground">
-                      {backupReminderBody}
-                    </p>
-                  </div>
+          <div className="alios-home-dashboard-grid">
+            {visibleSections.map((sectionId) => {
+              const content = sectionContent?.[sectionId];
+              return content ? (
+                <div key={sectionId} className="min-w-0" data-dashboard-section={sectionId}>
+                  {content}
                 </div>
-                <div className="flex flex-wrap items-center gap-2 sm:shrink-0">
-                  <Button asChild variant="outline" size="sm" className="min-h-11 flex-1 rounded-lg sm:flex-none">
-                    <Link to="/settings#settings-backup-restore">{t("home.backupReminderAction")}</Link>
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="min-h-11 flex-1 rounded-lg sm:flex-none"
-                    onClick={() => {
-                      setBackupReminderDismissedUntil(writeHomeBackupReminderDismissal());
-                    }}
-                  >
-                    <X className="me-2 h-4 w-4" aria-hidden="true" />
-                    {t("home.backupReminderDismiss")}
-                  </Button>
-                </div>
-              </SoftPanel>
-            </div>
-          ) : null}
+              ) : null;
+            })}
+          </div>
         </>
       ) : null}
     </section>
