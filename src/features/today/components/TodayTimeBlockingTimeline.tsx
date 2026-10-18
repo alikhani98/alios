@@ -6,9 +6,6 @@ import { useI18n } from "@/shared/i18n";
 import { CollapsibleSection, SoftPanel, StatusChip } from "@/shared/ui";
 import { cn } from "@/shared/utils";
 
-const TIMELINE_START_HOUR = 8;
-const TIMELINE_END_HOUR = 22;
-
 type ScheduledTimelineTask = Task & {
   scheduledStartTime: string;
   estimatedMinutes: number;
@@ -94,13 +91,7 @@ export function TodayTimeBlockingTimeline({
       left.scheduledStartTime.localeCompare(right.scheduledStartTime)
     );
   const conflictingTaskIds = findConflictingTimeBlockTaskIds(scheduledTasks);
-  const hours = Array.from(
-    { length: TIMELINE_END_HOUR - TIMELINE_START_HOUR + 1 },
-    (_value, index) => TIMELINE_START_HOUR + index
-  );
-  const scheduledHours = hours.filter((hour) =>
-    scheduledTasks.some((task) => getTaskHour(task) === hour)
-  );
+  const scheduledHours = [...new Set(scheduledTasks.map(getTaskHour))];
 
   const handleDrop = (hour: number) => {
     const draggedTask = scheduledTasks.find((task) => task.id === draggedTaskId);

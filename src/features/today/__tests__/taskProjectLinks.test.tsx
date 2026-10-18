@@ -308,6 +308,22 @@ describe("Task project links", () => {
     expect(html).toContain("45m planned");
   });
 
+  it("renders scheduled tasks across the full valid day in chronological order", () => {
+    const html = renderTodayUi(
+      <TodayTimeBlockingTimeline tasks={[
+        { ...taskRecord, id: "late", title: "Late block", scheduledStartTime: "23:45", estimatedMinutes: 15 },
+        { ...taskRecord, id: "early", title: "Early block", scheduledStartTime: "00:15", estimatedMinutes: 30 },
+        { ...taskRecord, id: "morning", title: "Morning block", scheduledStartTime: "07:30", estimatedMinutes: 30 },
+      ]} />
+    );
+
+    expect(html).toContain("Early block");
+    expect(html).toContain("Morning block");
+    expect(html).toContain("Late block");
+    expect(html.indexOf("Early block")).toBeLessThan(html.indexOf("Morning block"));
+    expect(html.indexOf("Morning block")).toBeLessThan(html.indexOf("Late block"));
+  });
+
   it("flags overlapping time blocks without changing unscheduled tasks", () => {
     const conflicts = findConflictingTimeBlockTaskIds([
       {

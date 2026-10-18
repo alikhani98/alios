@@ -1,4 +1,5 @@
 import { AlertCircle, CheckCircle2, CheckSquare2, Clock3, Plus, Repeat2, RotateCcw, Sparkles, Target } from "lucide-react";
+import { parseISO } from "date-fns";
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 
@@ -46,10 +47,7 @@ import {
   findLinkedProject,
   findProjectFilter,
 } from "../taskProjectLinks";
-import {
-  createTodayTasksPath,
-  findRoutineFilter,
-} from "@/features/routines/routineTaskLinks";
+import { findRoutineFilter } from "@/features/routines/routineTaskLinks";
 import type { DailyCheckinFormValues, TodayTaskFormValues } from "../types";
 import { createRoutineTaskInput, getRoutineSuggestions } from "../routineSuggestions";
 import { clearDueProjectReviewDate, isProjectReviewDue } from "@/features/projects/projectReviews";
@@ -57,6 +55,12 @@ import "../today-presentation.css";
 
 export const TODAY_COMPLETED_TASKS_OPEN_STORAGE_KEY =
   "alios.today.completedTasks.open";
+
+function getScrollBehavior(): ScrollBehavior {
+  return window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+    ? "auto"
+    : "smooth";
+}
 
 const RecoveryCard = lazy(() =>
   import("@/features/recovery/components/RecoveryCard").then((module) => ({
@@ -219,6 +223,8 @@ export function TodayWorkspace({
   const [showAllRoutineSuggestions, setShowAllRoutineSuggestions] = useState(false);
   const [showAllTasks, setShowAllTasks] = useState(false);
   const [completedTasksOpen, setCompletedTasksOpen] = useState(true);
+  const [dailyInsightsOpen, setDailyInsightsOpen] = useState(false);
+  const [revealedFocusId, setRevealedFocusId] = useState<string | null>(null);
   const [linkedJournalEntries, setLinkedJournalEntries] = useState<JournalEntry[]>([]);
   const [linkedDecisions, setLinkedDecisions] = useState<DecisionLogEntry[]>([]);
   const [linkedKnowledgeItems, setLinkedKnowledgeItems] = useState<KnowledgeItem[]>([]);
@@ -229,17 +235,22 @@ export function TodayWorkspace({
   const plannedTaskRef = useRef<HTMLDivElement | null>(null);
   const filteredProject = findProjectFilter(projectId, projects);
   const filteredRoutine = findRoutineFilter(routineId, routines);
-  const linkedGoalProjectIds = new Set(
+  const clearFilterPath = (filter: "goalId" | "projectId" | "routineId") => {
+    const nextParams = new URLSearchParams(searchParams);
+    nextParams.delete(filter);
+    return `/today?${nextParams.toString()}`;
+  };
+  const linkedGoalProjectIds = useMemo(() => new Set(
     projects
       .filter((project) => project.goalId === goalId)
       .map((project) => project.id)
-  );
-  const visibleTasks = tasks.filter(
+  ), [goalId, projects]);
+  const visibleTasks = useMemo(() => tasks.filter(
     (task) =>
       (!goalId || (task.projectId ? linkedGoalProjectIds.has(task.projectId) : false)) &&
       (!projectId || task.projectId === projectId) &&
       (!routineId || task.routineId === routineId)
-  );
+  ), [goalId, linkedGoalProjectIds, projectId, routineId, tasks]);
   const orderedVisibleTasks = useMemo(() => {
     const rank = (task: Task) => {
       if (task.isMit) {
@@ -306,7 +317,7 @@ export function TodayWorkspace({
     routines,
     tasks,
     today,
-    new Date().getDay()
+    parseISO(today).getDay()
   );
   const routineSuggestionPreviewLimit = isSimpleView ? 3 : 6;
   const visibleRoutineSuggestions = showAllRoutineSuggestions
@@ -324,7 +335,9 @@ export function TodayWorkspace({
   const completedTaskCount = orderedVisibleTasks.filter((task) => task.status === "done").length;
   const deferredTaskCount = orderedVisibleTasks.filter((task) => task.status === "deferred").length;
   const visibleOpenTasks = displayedTasks.filter((task) => task.status !== "done");
-  const visibleCompletedTasks = orderedVisibleTasks.filter((task) => task.status === "done");
+  const visibleCompletedTasks = displayedTasks.filter((task) => task.status === "done");
+  const focusedCompletedTaskId = visibleCompletedTasks.find((task) => task.id === focusId)?.id;
+  const focusedPlannedTaskId = plannedTaskOutsideToday?.id === focusId ? focusId : null;
   const shouldShowDailyCheckin = new Date().getHours() >= 17;
   const linkedContentForTask = (task: Task) => ({
     journalEntries: linkedJournalEntries.filter((entry) => entry.taskId === task.id),
@@ -335,6 +348,16 @@ export function TodayWorkspace({
   useEffect(() => {
     setCompletedTasksOpen(readStoredTodayCompletedTasksOpen(completedTaskCount));
   }, [completedTaskCount]);
+
+  useEffect(() => {
+    if (focusedCompletedTaskId) {
+      setCompletedTasksOpen(true);
+    }
+    if (focusedPlannedTaskId) {
+      setDailyInsightsOpen(true);
+    }
+    setRevealedFocusId(focusedCompletedTaskId ?? focusedPlannedTaskId);
+  }, [focusedCompletedTaskId, focusedPlannedTaskId]);
 
   useEffect(() => {
     let isCancelled = false;
@@ -424,7 +447,7 @@ export function TodayWorkspace({
     setTaskFormOpen(true);
     setActionError(null);
     setSuccessMessage(null);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    window.scrollTo({ top: 0, behavior: getScrollBehavior() });
   };
 
   const closeTaskForm = () => {
@@ -605,7 +628,10 @@ export function TodayWorkspace({
     if (!focusedTask && plannedTaskOutsideToday?.id === focusId) {
       setFocusMessage(null);
       setFocusedTaskId(focusId);
-      plannedTaskRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      if (revealedFocusId !== focusId) {
+        return;
+      }
+      plannedTaskRef.current?.scrollIntoView({ behavior: getScrollBehavior(), block: "center" });
 
       const timeout = window.setTimeout(() => {
         setFocusedTaskId((current) => (current === focusId ? null : current));
@@ -623,15 +649,19 @@ export function TodayWorkspace({
 
     setFocusMessage(null);
     setFocusedTaskId(focusId);
+    // Wait for the completed disclosure to reveal the deep-link destination.
+    if (focusedTask.status === "done" && revealedFocusId !== focusId) {
+      return;
+    }
     const node = taskRefs.current[focusId];
-    node?.scrollIntoView({ behavior: "smooth", block: "center" });
+    node?.scrollIntoView({ behavior: getScrollBehavior(), block: "center" });
 
     const timeout = window.setTimeout(() => {
       setFocusedTaskId((current) => (current === focusId ? null : current));
     }, 2200);
 
     return () => window.clearTimeout(timeout);
-  }, [focusId, isLoading, plannedTaskOutsideToday, t, visibleTasks]);
+  }, [focusId, isLoading, plannedTaskOutsideToday, revealedFocusId, t, visibleTasks]);
 
   return (
     <section className="alios-page alios-today-workspace space-y-5">
@@ -646,7 +676,7 @@ export function TodayWorkspace({
               : t("today.projectFilterUnavailable")}
           </p>
           <Button asChild size="sm" variant="outline" className="w-full shrink-0 sm:w-auto">
-            <Link to={createTodayTasksPath({ goalId, routineId })}>
+            <Link to={clearFilterPath("projectId")}>
               {t("today.clearProjectFilter")}
             </Link>
           </Button>
@@ -666,7 +696,7 @@ export function TodayWorkspace({
               : t("today.projectFilterUnavailable")}
           </p>
           <Button asChild size="sm" variant="outline" className="w-full shrink-0 sm:w-auto">
-            <Link to={createTodayTasksPath({ projectId, routineId })}>
+            <Link to={clearFilterPath("goalId")}>
               {t("goals.clearFilters")}
             </Link>
           </Button>
@@ -684,7 +714,7 @@ export function TodayWorkspace({
               : t("today.routineFilterUnavailable")}
           </p>
           <Button asChild size="sm" variant="outline" className="w-full shrink-0 sm:w-auto">
-            <Link to={createTodayTasksPath({ goalId, projectId })}>
+            <Link to={clearFilterPath("routineId")}>
               {t("today.clearRoutineFilter")}
             </Link>
           </Button>
@@ -822,14 +852,15 @@ export function TodayWorkspace({
       ) : null}
 
       <div className="alios-today-layout">
-        <div className="alios-today-execution min-w-0 space-y-4">
+        <div className="alios-today-execution min-w-0 space-y-4" aria-busy={isLoading}>
           {isLoading ? (
-            <div className="space-y-3" aria-label={t("today.loadingTasks")}>
+            <div className="space-y-3" role="status">
+              <p className="sr-only">{t("today.loadingTasks")}</p>
               {[0, 1, 2].map((item) => (
-                <div key={item} className="alios-surface-muted h-28 animate-pulse bg-muted/60" />
+                <div key={item} aria-hidden="true" className="alios-surface-muted h-28 motion-safe:animate-pulse bg-muted/60" />
               ))}
             </div>
-          ) : visibleTasks.length === 0 && !hideEmptyTaskState ? (
+          ) : visibleTasks.length === 0 && !error && !hideEmptyTaskState ? (
             <EmptyState
               className="alios-today-empty"
               icon={<CheckSquare2 className="h-6 w-6" />}
@@ -908,9 +939,9 @@ export function TodayWorkspace({
               {visibleCompletedTasks.length > 0 ? (
                 <CollapsibleSection
                   id="today-completed-tasks"
-                  title={`${t("common.completed")} (${visibleCompletedTasks.length})`}
+                  title={`${t("common.completed")} (${completedTaskCount})`}
                   icon={<CheckCircle2 className="h-5 w-5" aria-hidden="true" />}
-                  status={<StatusChip tone="success">{visibleCompletedTasks.length}</StatusChip>}
+                  status={<StatusChip tone="success">{completedTaskCount}</StatusChip>}
                   open={completedTasksOpen}
                   onOpenChange={handleCompletedTasksOpenChange}
                   expandLabel={t("common.expandSection")}
@@ -951,7 +982,7 @@ export function TodayWorkspace({
                   ))}
                 </CollapsibleSection>
               ) : null}
-              {!isFocusMode && visibleTasks.length > taskPreviewLimit ? (
+              {!isFocusMode && (hiddenTaskCount > 0 || showAllTasks) ? (
                 <Button
                   type="button"
                   variant="outline"
@@ -1022,7 +1053,7 @@ export function TodayWorkspace({
                   <Button size="sm" variant="outline" onClick={() => void loadRoutines()}>{t("common.tryAgain")}</Button>
                 </div>
               ) : isRoutinesLoading ? (
-                <div className="alios-surface-muted h-16 animate-pulse bg-muted/60" />
+                <div className="alios-surface-muted h-16 motion-safe:animate-pulse bg-muted/60" />
               ) : routineSuggestions.length > 0 ? (
                 <>
                   <div className="grid gap-3">
@@ -1099,7 +1130,7 @@ export function TodayWorkspace({
               className="border-border/70 bg-card/95"
             >
                 {isLoading ? (
-                  <div className="alios-surface-muted h-72 animate-pulse bg-muted/60" />
+                  <div className="alios-surface-muted h-72 motion-safe:animate-pulse bg-muted/60" />
                 ) : (
                   <DailyCheckinForm
                     key={checkin?.updatedAt ?? "new-checkin"}
@@ -1118,6 +1149,8 @@ export function TodayWorkspace({
               icon={<Clock3 className="h-5 w-5" />}
               status={<StatusChip tone="neutral">{reviewDueProjects.length + deferredTaskCount + (plannedTaskOutsideToday ? 1 : 0)}</StatusChip>}
               defaultOpen={false}
+              open={dailyInsightsOpen}
+              onOpenChange={setDailyInsightsOpen}
               expandLabel={t("common.expandSection")}
               collapseLabel={t("common.collapseSection")}
               contentClassName="space-y-4"
