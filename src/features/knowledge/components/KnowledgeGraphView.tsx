@@ -44,7 +44,7 @@ export function KnowledgeGraphView({
   };
 
   return (
-    <Card className="overflow-hidden">
+    <Card className="min-w-0 overflow-hidden">
       <CardContent className="space-y-4 p-4 sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2 text-sm font-medium text-foreground">
@@ -94,7 +94,8 @@ export function KnowledgeGraphView({
           <svg
             role="img"
             aria-label={t("knowledge.graphAriaLabel")}
-            className="h-[32rem] w-full"
+            width={1000}
+            height={graphHeight}
             viewBox={`0 0 1000 ${graphHeight}`}
             preserveAspectRatio="xMidYMid meet"
           >

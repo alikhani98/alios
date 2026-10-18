@@ -214,6 +214,20 @@
   stroke-dasharray: 6 3;
 }
 
+.alios-knowledge .knowledge-graph-canvas {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  overflow-x: auto;
+}
+
+.alios-knowledge .knowledge-graph-canvas > svg {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+  min-inline-size: 36rem;
+  max-inline-size: none;
+}
+
 @container knowledge (min-width: 40rem) {
   .alios-knowledge .knowledge-filter-form {
     grid-template-columns: minmax(0, 1fr) 12rem auto;
