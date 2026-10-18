@@ -16,7 +16,7 @@ import {
 import { useDateFormatter } from "@/shared/date";
 import { useI18n, type TranslationKey } from "@/shared/i18n";
 import type { Task } from "@/shared/types";
-import { Badge, Button, Card, CardContent, CardHeader, CardTitle, PremiumCard, SectionHeader } from "@/shared/ui";
+import { Badge, Button, CardContent, CardHeader, CardTitle, PremiumCard, SectionHeader } from "@/shared/ui";
 import { cn } from "@/shared/utils";
 import { downloadCalendarIcs, getCalendarExportTasks } from "../calendarIcsExport";
 import "../calendar-presentation.css";
@@ -126,7 +126,7 @@ export function CalendarPage() {
               </Button>
             </div>
           </CardHeader>
-          <CardContent className="calendar-grid-content space-y-3">
+          <CardContent className="calendar-grid-content space-y-3" aria-busy={isLoading}>
             {hasError ? (
               <div className="flex flex-col gap-3 rounded-2xl border p-4 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-sm text-muted-foreground">{t("calendar.loadError")}</p>
@@ -136,7 +136,7 @@ export function CalendarPage() {
                 </Button>
               </div>
             ) : isLoading ? (
-              <div className="h-96 animate-pulse rounded-2xl bg-muted/60" />
+              <div aria-hidden="true" className="h-96 rounded-2xl bg-muted/60 motion-safe:animate-pulse" />
             ) : calendarMode === "week" ? (
               <div className="calendar-week-grid">
                 {weekDates.map((date, index) => {
@@ -214,7 +214,11 @@ export function CalendarPage() {
             </Button>
           </CardHeader>
           <CardContent className="calendar-details-content">
-            {selectedTasks.length === 0 ? (
+            {isLoading || hasError ? (
+              <p role="status" className="text-sm leading-7 text-muted-foreground">
+                {t(isLoading ? "common.loading" : "calendar.loadError")}
+              </p>
+            ) : selectedTasks.length === 0 ? (
               <p className="calendar-empty text-sm leading-7 text-muted-foreground">{t("calendar.noTasks")}</p>
             ) : (
               <ul className="calendar-task-list">
