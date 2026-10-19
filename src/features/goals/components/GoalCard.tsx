@@ -12,7 +12,7 @@ import {
   Target,
   Trash2,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { useDateFormatter } from "@/shared/date";
@@ -90,6 +90,50 @@ export function GoalCard({
   const { t } = useI18n();
   const { formatDateTime, formatDate } = useDateFormatter();
   const [showOverflowActions, setShowOverflowActions] = useState(false);
+  const overflowId = useId();
+  const overflowRef = useRef<HTMLDivElement>(null);
+  const overflowTriggerRef = useRef<HTMLButtonElement>(null);
+  const overflowPanelRef = useRef<HTMLDivElement>(null);
+  const actionHandledRef = useRef(false);
+
+  function closeOverflow() {
+    setShowOverflowActions(false);
+    overflowTriggerRef.current?.focus();
+  }
+
+  function runOverflowAction(action: () => void) {
+    if (actionHandledRef.current) return;
+    actionHandledRef.current = true;
+    closeOverflow();
+    action();
+  }
+
+  useEffect(() => {
+    if (!showOverflowActions) return;
+    actionHandledRef.current = false;
+    overflowPanelRef.current?.querySelector<HTMLElement>("a[href], button:not(:disabled)")?.focus();
+
+    function dismissOutside(event: Event) {
+      if (event.target instanceof Node && !overflowRef.current?.contains(event.target)) {
+        setShowOverflowActions(false);
+      }
+    }
+    function dismissOnEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setShowOverflowActions(false);
+        overflowTriggerRef.current?.focus();
+      }
+    }
+    document.addEventListener("pointerdown", dismissOutside);
+    document.addEventListener("click", dismissOutside);
+    document.addEventListener("keydown", dismissOnEscape);
+    return () => {
+      document.removeEventListener("pointerdown", dismissOutside);
+      document.removeEventListener("click", dismissOutside);
+      document.removeEventListener("keydown", dismissOnEscape);
+    };
+  }, [showOverflowActions]);
   const autoProgressPercent =
     !isProjectProgressLoading && projectProgress?.completionPercent !== null
       ? projectProgress?.completionPercent
@@ -564,78 +608,88 @@ export function GoalCard({
             <Trash2 className="me-2 h-4 w-4" />
             {t("common.delete")}
           </Button>
-          <div className="goal-overflow relative">
+          <div
+            ref={overflowRef}
+            className="goal-overflow relative"
+            onBlur={(event) => {
+              if (!event.currentTarget.contains(event.relatedTarget)) {
+                setShowOverflowActions(false);
+              }
+            }}
+          >
             <Button
+              ref={overflowTriggerRef}
               type="button"
               size="sm"
               variant="outline"
               className="w-full sm:w-auto"
               aria-label={t("command.quickActions")}
               aria-expanded={showOverflowActions}
+              aria-controls={overflowId}
               onClick={() => setShowOverflowActions((current) => !current)}
             >
               <MoreHorizontal className="h-4 w-4" />
             </Button>
-            <div
-              className="goal-overflow-panel mt-2 grid gap-1 rounded-xl border border-border/70 bg-popover p-2 text-popover-foreground"
-              hidden={!showOverflowActions}
-              aria-hidden={!showOverflowActions}
-            >
-              <Button size="sm" variant="ghost" className="justify-start" asChild>
-                <Link
-                  to={createLifeAreaFocusPath(goal.area)}
-                  onClick={() => setShowOverflowActions(false)}
-                >
-                  <Compass className="me-2 h-4 w-4" />
-                  {t("goals.openLifeArea")}
-                </Link>
-              </Button>
-              {goal.status === "active" && isReviewDue ? (
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="ghost"
-                  className="justify-start"
-                  onClick={() => {
-                    setShowOverflowActions(false);
-                    onMarkReviewed();
-                  }}
-                >
-                  <Clock3 className="me-2 h-4 w-4" />
-                  {t("goals.markReviewed")}
+            {showOverflowActions ? (
+              <div
+                ref={overflowPanelRef}
+                id={overflowId}
+                role="group"
+                aria-label={t("command.quickActions")}
+                className="goal-overflow-panel mt-2 grid gap-1 rounded-xl border border-border/70 bg-popover p-2 text-popover-foreground"
+              >
+                <Button size="sm" variant="ghost" className="justify-start" asChild>
+                  <Link
+                    to={createLifeAreaFocusPath(goal.area)}
+                    onClick={closeOverflow}
+                  >
+                    <Compass className="me-2 h-4 w-4" />
+                    {t("goals.openLifeArea")}
+                  </Link>
                 </Button>
-              ) : null}
-              {goal.status !== "completed" ? (
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="ghost"
-                  className="justify-start"
-                  onClick={() => {
-                    setShowOverflowActions(false);
-                    onMarkCompleted();
-                  }}
-                >
-                  <CheckCircle2 className="me-2 h-4 w-4" />
-                  {t("goals.markCompleted")}
-                </Button>
-              ) : (
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="ghost"
-                  className="justify-start"
-                  onClick={() => {
-                    setShowOverflowActions(false);
-                    onReactivate();
-                  }}
-                >
-                  <RotateCcw className="me-2 h-4 w-4" />
-                  {t("goals.reactivate")}
-                </Button>
-              )}
-              <QuickAccessToggleButton itemType="goal" targetId={goal.id} />
-            </div>
+                {goal.status === "active" && isReviewDue ? (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    className="justify-start"
+                    onClick={() => runOverflowAction(onMarkReviewed)}
+                  >
+                    <Clock3 className="me-2 h-4 w-4" />
+                    {t("goals.markReviewed")}
+                  </Button>
+                ) : null}
+                {goal.status !== "completed" ? (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    className="justify-start"
+                    onClick={() => runOverflowAction(onMarkCompleted)}
+                  >
+                    <CheckCircle2 className="me-2 h-4 w-4" />
+                    {t("goals.markCompleted")}
+                  </Button>
+                ) : (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    className="justify-start"
+                    onClick={() => runOverflowAction(onReactivate)}
+                  >
+                    <RotateCcw className="me-2 h-4 w-4" />
+                    {t("goals.reactivate")}
+                  </Button>
+                )}
+                <QuickAccessToggleButton
+                  itemType="goal"
+                  targetId={goal.id}
+                  onSuccess={closeOverflow}
+                  onError={closeOverflow}
+                />
+              </div>
+            ) : null}
           </div>
         </div>
       </CardContent>

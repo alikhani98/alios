@@ -69,9 +69,10 @@ describe("Goals disclosure density", () => {
     expect(markup).toContain("Edit");
     expect(markup).toContain("Delete");
     expect(markup).toContain('aria-label="Quick actions"');
-    expect(markup).toContain("View life area");
-    expect(markup).toContain("Mark completed");
-    expect(markup).toContain('hidden="" aria-hidden="true"');
+    expect(markup).not.toContain("View life area");
+    expect(markup).not.toContain("Mark completed");
+    expect(markup).toContain('aria-expanded="false"');
+    expect(markup).not.toContain("goal-overflow-panel");
     expect(markup).toContain("Goal details");
     expect(markup).toContain('id="goal-fixture-id-details-content" hidden="" aria-hidden="true"');
     expect(countOccurrences(markup, "Keep a regular bedtime and morning routine.")).toBe(1);

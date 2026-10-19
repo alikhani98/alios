@@ -2,8 +2,6 @@ import {
   AlertCircle,
   Flame,
   ListChecks,
-  MoreHorizontal,
-  Pencil,
   Plus,
   Repeat2,
   RotateCcw,
@@ -28,7 +26,7 @@ import {
   SectionHeader,
   SoftPanel,
 } from "@/shared/ui";
-import { QuickAccessToggleButton } from "@/shared/quickAccess";
+import { RoutineOverflowMenu } from "../components/RoutineOverflowMenu";
 
 import {
   ROUTINE_WEEKDAY_LABEL_KEYS,
@@ -60,7 +58,6 @@ function RoutineCard({
   onDelete,
 }: RoutineCardProps) {
   const { t } = useI18n();
-  const [showOverflowActions, setShowOverflowActions] = useState(false);
   const progress = getRoutineTaskProgress(routine.id, tasks);
   const streak = getRoutineCurrentStreak(routine, tasks);
 
@@ -135,34 +132,7 @@ function RoutineCard({
             <Trash2 className="me-2 h-4 w-4" />
             {deletingId === routine.id ? t("common.deleting") : t("common.delete")}
           </Button>
-          <div className="relative">
-            <Button
-              type="button"
-              variant="outline"
-              aria-label={t("command.quickActions")}
-              aria-expanded={showOverflowActions}
-              onClick={() => setShowOverflowActions((current) => !current)}
-            >
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-            {showOverflowActions ? (
-              <div className="absolute end-0 z-20 mt-2 grid min-w-56 gap-1 rounded-xl border bg-popover p-2 text-popover-foreground shadow-aliosFloating">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="justify-start"
-                  onClick={() => {
-                    setShowOverflowActions(false);
-                    onEdit(routine);
-                  }}
-                >
-                  <Pencil className="me-2 h-4 w-4" />
-                  {t("common.edit")}
-                </Button>
-                <QuickAccessToggleButton itemType="routine" targetId={routine.id} />
-              </div>
-            ) : null}
-          </div>
+          <RoutineOverflowMenu routine={routine} onEdit={onEdit} />
         </div>
       </CardContent>
     </PremiumCard>
