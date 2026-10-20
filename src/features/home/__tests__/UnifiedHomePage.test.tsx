@@ -1,9 +1,16 @@
+// @vitest-environment jsdom
+import { act } from "react";
+import { createRoot } from "react-dom/client";
 import { renderToStaticMarkup } from "react-dom/server";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { MORNING_WARMUP_ENABLED_STORAGE_KEY } from "@/shared/constants/preferences";
 import { DateDisplayProvider } from "@/shared/date";
 import { I18nProvider, LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
+import { loadMessages } from "@/shared/i18n/i18n";
+import { messagesEn } from "@/shared/i18n/messages.en";
+import { getRoutineTemplateById } from "@/features/routines/routineTemplates";
 import type {
   BackupStatusFreshness,
   BackupStatusMetadata,
@@ -154,6 +161,14 @@ vi.mock("@/shared/quickAccess", () => ({
   QuickAccessLauncher: () => <div data-testid="quick-access-launcher" />,
 }));
 
+// These repository-backed panels are outside the nudge-to-template presentation flow.
+vi.mock("@/features/commitment/components/DailyCommitmentCard", () => ({ DailyCommitmentCard: () => null }));
+vi.mock("@/features/ifthen/components/IfThenContextCard", () => ({ IfThenContextCard: () => null }));
+vi.mock("@/features/money/components/MoneyPauseButton", () => ({ MoneyPauseButton: () => null }));
+vi.mock("@/features/money/components/MoneyPauseReviewCard", () => ({ MoneyPauseReviewCard: () => null }));
+vi.mock("@/features/urge/components/UrgeLogButton", () => ({ UrgeLogButton: () => null }));
+vi.mock("@/features/urge/components/UrgeTodayList", () => ({ UrgeTodayList: () => null }));
+
 let mockedDashboardData: HomeDashboardData = dashboardData;
 let mockedDashboardLayout: HomeDashboardLayout = getDefaultDashboardLayout();
 let mockedBackupStatus: BackupStatusMetadata | null = null;
@@ -264,6 +279,76 @@ describe("UnifiedHomePage", () => {
     expect(markup).toContain('id="unified-home-more-context-content" hidden="" aria-hidden="true"');
     expect(markup).toContain("Quick links");
   });
+
+  it("connects the existing local warm-up preference to the unified Home morning card", () => {
+    vi.setSystemTime(new Date(2026, 7, 9, 5, 30));
+    expect(renderUnifiedHome()).toContain('id="unified-home-routineNudge"');
+    vi.setSystemTime(new Date(2026, 7, 9, 7, 0));
+    expect(renderUnifiedHome()).not.toContain('id="unified-home-routineNudge"');
+  });
+
+  it.each(["morningWarmup", "parkBadmintonRoutine"] as const)(
+    "opens the actual %s template preview from the Home nudge",
+    async (templateId) => {
+      await loadMessages("en");
+      vi.setSystemTime(new Date(2026, 7, 9, 5, 30));
+      window.localStorage.setItem(LANGUAGE_STORAGE_KEY, "en");
+      window.localStorage.setItem(MORNING_WARMUP_ENABLED_STORAGE_KEY, "true");
+      const template = getRoutineTemplateById(templateId);
+      if (!template) throw new Error("Missing existing routine template");
+      const container = document.createElement("div");
+      document.body.appendChild(container);
+      const root = createRoot(container);
+
+      function trigger(id: string) {
+        const button = container.querySelector<HTMLButtonElement>(`#${id} > button`);
+        if (!button) throw new Error(`Missing disclosure trigger: ${id}`);
+        return button;
+      }
+
+      try {
+        await act(async () => root.render(
+          <MemoryRouter initialEntries={["/?date=2026-08-09"]}>
+            <I18nProvider><DateDisplayProvider><UnifiedHomePage /></DateDisplayProvider></I18nProvider>
+          </MemoryRouter>
+        ));
+        expect(container.querySelector("#unified-home-routineNudge")).not.toBeNull();
+        await act(async () => trigger("unified-home-more-context").click());
+        await act(async () => trigger("unified-home-routineNudge").click());
+        expect(trigger("unified-home-more-context").getAttribute("aria-expanded")).toBe("true");
+        expect(trigger("unified-home-routineNudge").getAttribute("aria-expanded")).toBe("true");
+        expect(trigger("unified-home-routineTemplates").getAttribute("aria-expanded")).toBe("false");
+        const templateContent = container.querySelector<HTMLElement>("#unified-home-routineTemplates-content");
+        if (!templateContent) throw new Error("Missing existing routine template content");
+        expect(templateContent.hidden).toBe(true);
+        expect(templateContent.textContent).toContain(messagesEn["routines.selectTemplateHint"]);
+
+        const label = templateId === "morningWarmup"
+          ? messagesEn["routines.viewRoutine"]
+          : messagesEn["wellness.badmintonRoutineTitle"];
+        const action = Array.from(container.querySelectorAll<HTMLButtonElement>("#unified-home-routineNudge button"))
+          .find((button) => button.textContent?.trim() === label);
+        if (!action) throw new Error("Missing nudge template action");
+        await act(async () => action.click());
+
+        expect(trigger("unified-home-routineTemplates").getAttribute("aria-expanded")).toBe("true");
+        expect(templateContent.hidden).toBe(false);
+        expect(templateContent.getAttribute("aria-hidden")).toBe("false");
+        expect(templateContent.textContent).not.toContain(messagesEn["routines.selectTemplateHint"]);
+        const previewAction = Array.from(templateContent.querySelectorAll("button"))
+          .find((button) => button.textContent?.trim() === messagesEn["routines.startPreview"]);
+        expect(previewAction).toBeDefined();
+        const preview = previewAction?.parentElement?.parentElement;
+        expect(preview?.textContent).toContain(messagesEn[template.titleKey]);
+        for (const stepKey of template.stepKeys) {
+          expect(preview?.textContent).toContain(messagesEn[stepKey]);
+        }
+      } finally {
+        await act(async () => root.unmount());
+        container.remove();
+      }
+    },
+  );
 
   it("renders Finance through the section registry and follows existing visibility, ordering, and reset", () => {
     const original = renderUnifiedHome();

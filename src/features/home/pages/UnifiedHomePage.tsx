@@ -54,6 +54,7 @@ import { HomeCalendarCard } from "../components/HomeCalendarCard";
 import { HomeManualCard } from "../components/HomeManualCard";
 import { HomePersonalMetricsCard } from "../components/HomePersonalMetricsCard";
 import { HomePersonalInsightsCard } from "../components/HomePersonalInsightsCard";
+import { HomeRoutineNudgeCard } from "../components/HomeRoutineNudgeCard";
 import { TodaySummaryBar } from "../components/TodaySummaryBar";
 import { WelcomeCard } from "../components/WelcomeCard";
 import {
@@ -500,7 +501,6 @@ function MoreContext({
       title={t("home.moreDashboard")}
       description={t("home.moreDashboardDescription")}
       icon={<SparklesIcon />}
-      status={<Badge variant="secondary" className="font-mono tabular-nums">11</Badge>}
       defaultOpen={false}
       expandLabel={t("common.expandSection")}
       collapseLabel={t("common.collapseSection")}
@@ -508,6 +508,15 @@ function MoreContext({
       contentClassName="space-y-5"
     >
       <div className="grid min-w-0 gap-5 xl:grid-cols-12 xl:items-start">
+        <HomeRoutineNudgeCard
+          id="unified-home-routineNudge"
+          sectionId="routineNudge"
+          {...sectionOpenProps("routineNudge")}
+          onViewRoutine={(templateId) => {
+            setSelectedRoutineTemplateId(templateId);
+            setOpenSections((current) => ({ ...current, routineTemplates: true }));
+          }}
+        />
         <div className="min-w-0 space-y-4 xl:col-span-12">
           <Suspense
             fallback={
