@@ -2213,6 +2213,7 @@ export const messagesEn = {
   "settings.storageUsageUnknown": "Unknown",
   "settings.storageUsageProgressLabel": "Storage usage percentage",
   "settings.storageUsageUnavailable": "Storage usage information is not available in this browser.",
+  "settings.storageUsageError": "Storage usage could not be checked. Try refreshing the storage usage again.",
   "settings.storageUsageLoading": "Checking storage usage...",
   "settings.storageUsageRefresh": "Refresh storage usage",
   "settings.storageUsageWarning": "Storage usage is getting high. Consider exporting a backup soon.",

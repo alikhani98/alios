@@ -2214,6 +2214,7 @@ export const messagesFa: Record<TranslationKey, string> = {
   "settings.storageUsageUnknown": "نامشخص",
   "settings.storageUsageProgressLabel": "درصد استفاده از فضای ذخیره‌سازی",
   "settings.storageUsageUnavailable": "اطلاعات فضا در این مرورگر در دسترس نیست.",
+  "settings.storageUsageError": "بررسی فضای ذخیره‌سازی انجام نشد. دوباره گزینهٔ تازه‌سازی فضای ذخیره‌سازی را بزنید.",
   "settings.storageUsageLoading": "در حال بررسی فضای ذخیره‌سازی...",
   "settings.storageUsageRefresh": "به‌روزرسانی میزان فضا",
   "settings.storageUsageWarning": "استفاده از فضا زیاد شده است. بهتر است به‌زودی یک پشتیبان خروجی بگیرید.",

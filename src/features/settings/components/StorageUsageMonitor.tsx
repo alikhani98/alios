@@ -1,5 +1,5 @@
 import { HardDrive, RefreshCw } from "lucide-react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useI18n } from "@/shared/i18n";
 import {
@@ -79,33 +79,42 @@ function getProgressClassName(percent: number | null) {
 export function StorageUsageMonitor() {
   const { language, t } = useI18n();
   const [state, setState] = useState<StorageUsageState>({ status: "loading" });
+  const mounted = useRef(false);
+  const pending = useRef(false);
 
   const loadEstimate = useCallback(async () => {
+    if (!mounted.current || pending.current) return;
     if (!isStorageEstimateAvailable()) {
       setState({ status: "unavailable" });
       return;
     }
 
+    pending.current = true;
     setState({ status: "loading" });
 
     try {
       const estimate = await navigator.storage.estimate();
+      if (!mounted.current) return;
       const usage = estimate.usage ?? 0;
       const quota = estimate.quota ?? 0;
 
-      if (quota <= 0) {
+      if (!Number.isFinite(usage) || usage < 0 || !Number.isFinite(quota) || quota <= 0) {
         setState({ status: "unavailable" });
         return;
       }
 
       setState({ status: "ready", usage, quota });
     } catch {
-      setState({ status: "error" });
+      if (mounted.current) setState({ status: "error" });
+    } finally {
+      pending.current = false;
     }
   }, []);
 
   useEffect(() => {
+    mounted.current = true;
     void loadEstimate();
+    return () => { mounted.current = false; };
   }, [loadEstimate]);
 
   const usagePercent = useMemo(() => {
@@ -137,7 +146,7 @@ export function StorageUsageMonitor() {
           </StatusChip>
         </div>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4" aria-busy={state.status === "loading"}>
         {state.status === "ready" ? (
           <>
             <div className="grid gap-3 sm:grid-cols-3">
@@ -196,10 +205,12 @@ export function StorageUsageMonitor() {
           </>
         ) : (
           <SoftPanel className="alios-surface-muted">
-            <p className="text-sm leading-7 text-muted-foreground">
+            <p role={state.status === "error" ? "alert" : "status"} className="text-sm leading-7 text-muted-foreground">
               {state.status === "loading"
                 ? t("settings.storageUsageLoading")
-                : t("settings.storageUsageUnavailable")}
+                : state.status === "error"
+                  ? t("settings.storageUsageError")
+                  : t("settings.storageUsageUnavailable")}
             </p>
           </SoftPanel>
         )}
@@ -208,6 +219,7 @@ export function StorageUsageMonitor() {
           type="button"
           variant="outline"
           className="w-full sm:w-auto"
+          disabled={state.status === "loading"}
           onClick={() => void loadEstimate()}
         >
           <RefreshCw className="me-2 h-4 w-4" />
