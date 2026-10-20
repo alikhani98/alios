@@ -16,7 +16,7 @@ import {
   Target,
   X,
 } from "lucide-react";
-import { lazy, Suspense, type ReactNode, useState } from "react";
+import { lazy, Suspense, type ReactNode, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { addDays, format } from "date-fns";
 
@@ -470,6 +470,7 @@ function MoreContext({
 }) {
   const { t } = useI18n();
   const { formatDate } = useDateFormatter();
+  const moreContextTriggerRef = useRef<HTMLButtonElement>(null);
   const [openSections, setOpenSections] = useState<Record<HomeCollapsibleSectionId, boolean>>({
     emptyState: false,
     routineNudge: false,
@@ -498,6 +499,7 @@ function MoreContext({
   return (
     <CollapsibleSection
       id="unified-home-more-context"
+      triggerRef={moreContextTriggerRef}
       title={t("home.moreDashboard")}
       description={t("home.moreDashboardDescription")}
       icon={<SparklesIcon />}
@@ -511,6 +513,7 @@ function MoreContext({
         <HomeRoutineNudgeCard
           id="unified-home-routineNudge"
           sectionId="routineNudge"
+          onReturnFocus={() => moreContextTriggerRef.current?.focus()}
           {...sectionOpenProps("routineNudge")}
           onViewRoutine={(templateId) => {
             setSelectedRoutineTemplateId(templateId);

@@ -1,5 +1,5 @@
 import { ChevronDown } from "lucide-react";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode, type Ref } from "react";
 
 import { cn } from "@/shared/utils/cn";
 
@@ -19,6 +19,8 @@ type CollapsibleSectionProps = {
   defaultOpen?: boolean;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  sectionRef?: Ref<HTMLElement>;
+  triggerRef?: Ref<HTMLButtonElement>;
 };
 
 export function CollapsibleSection({
@@ -35,6 +37,8 @@ export function CollapsibleSection({
   defaultOpen = true,
   open,
   onOpenChange,
+  sectionRef,
+  triggerRef,
 }: CollapsibleSectionProps) {
   const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
 
@@ -59,6 +63,7 @@ export function CollapsibleSection({
 
   return (
     <section
+      ref={sectionRef}
       id={id}
       className={cn(
         "alios-collapsible-section alios-surface-soft overflow-hidden bg-card/90",
@@ -67,6 +72,7 @@ export function CollapsibleSection({
       )}
     >
       <button
+        ref={triggerRef}
         type="button"
         className={cn(
           "alios-collapsible-trigger flex w-full flex-wrap items-start justify-between gap-3 p-4 text-start transition-colors duration-200 hover:bg-accent/30 motion-reduce:transition-none sm:p-5",

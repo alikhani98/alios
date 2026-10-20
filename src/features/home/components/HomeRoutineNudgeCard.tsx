@@ -6,7 +6,7 @@ import {
   Trees,
   X,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
 import {
@@ -39,6 +39,7 @@ type HomeRoutineNudgeCardProps = {
   sectionId: HomeCollapsibleSectionId;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onReturnFocus?: () => void;
 };
 
 export function HomeRoutineNudgeCard({
@@ -47,8 +48,10 @@ export function HomeRoutineNudgeCard({
   sectionId,
   open,
   onOpenChange,
+  onReturnFocus,
 }: HomeRoutineNudgeCardProps) {
   const { t } = useI18n();
+  const sectionRef = useRef<HTMLElement>(null);
   const { value: morningWarmupEnabled, setValue: setMorningWarmupEnabled } =
     usePersistentBoolean({
       key: MORNING_WARMUP_ENABLED_STORAGE_KEY,
@@ -78,16 +81,26 @@ export function HomeRoutineNudgeCard({
     return null;
   }
 
+  const returnFocusIfNeeded = () => {
+    const section = sectionRef.current;
+    if (section?.contains(section.ownerDocument.activeElement)) {
+      onReturnFocus?.();
+    }
+  };
+
   const handleDismissForToday = () => {
+    returnFocusIfNeeded();
     setDismissedDate(dismissMorningWarmupForToday(now));
   };
 
   const handleDisable = () => {
+    returnFocusIfNeeded();
     setMorningWarmupEnabled(false);
   };
 
   return (
     <CollapsibleSection
+      sectionRef={sectionRef}
       id={id}
       title={t("home.morningWarmupTitle")}
       description={t("home.morningWarmupDescription")}

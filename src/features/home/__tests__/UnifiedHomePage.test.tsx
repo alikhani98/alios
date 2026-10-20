@@ -5,7 +5,10 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { MORNING_WARMUP_ENABLED_STORAGE_KEY } from "@/shared/constants/preferences";
+import {
+  MORNING_WARMUP_DISMISSED_DATE_STORAGE_KEY,
+  MORNING_WARMUP_ENABLED_STORAGE_KEY,
+} from "@/shared/constants/preferences";
 import { DateDisplayProvider } from "@/shared/date";
 import { I18nProvider, LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
 import { loadMessages } from "@/shared/i18n/i18n";
@@ -286,6 +289,46 @@ describe("UnifiedHomePage", () => {
     vi.setSystemTime(new Date(2026, 7, 9, 7, 0));
     expect(renderUnifiedHome()).not.toContain('id="unified-home-routineNudge"');
   });
+
+  it.each(["dismiss", "disable"] as const)(
+    "returns focus to the real MoreContext trigger after nudge %s",
+    async (action) => {
+      await loadMessages("en");
+      vi.setSystemTime(new Date(2026, 7, 9, 5, 30));
+      window.localStorage.setItem(LANGUAGE_STORAGE_KEY, "en");
+      window.localStorage.setItem(MORNING_WARMUP_ENABLED_STORAGE_KEY, "true");
+      const container = document.createElement("div");
+      document.body.appendChild(container);
+      const root = createRoot(container);
+      try {
+        await act(async () => root.render(
+          <MemoryRouter initialEntries={["/?date=2026-08-09"]}>
+            <I18nProvider><DateDisplayProvider><UnifiedHomePage /></DateDisplayProvider></I18nProvider>
+          </MemoryRouter>
+        ));
+        const parent = container.querySelector<HTMLButtonElement>("#unified-home-more-context > button");
+        const nudge = container.querySelector<HTMLButtonElement>("#unified-home-routineNudge > button");
+        if (!parent || !nudge) throw new Error("Missing actual Home disclosure triggers");
+        await act(async () => parent.click());
+        await act(async () => nudge.click());
+        const label = action === "dismiss" ? messagesEn["home.dismissForToday"] : messagesEn["home.disableReminder"];
+        const control = Array.from(container.querySelectorAll<HTMLButtonElement>("#unified-home-routineNudge button"))
+          .find((button) => button.textContent?.trim() === label);
+        if (!control) throw new Error("Missing nudge hide action");
+        control.focus();
+        await act(async () => control.click());
+        expect(container.querySelector("#unified-home-routineNudge")).toBeNull();
+        expect(document.activeElement).toBe(parent);
+        expect(parent.isConnected).toBe(true);
+        expect(parent.getAttribute("aria-expanded")).toBe("true");
+        expect(window.localStorage.getItem(MORNING_WARMUP_ENABLED_STORAGE_KEY)).toBe(action === "disable" ? "false" : "true");
+        expect(window.localStorage.getItem(MORNING_WARMUP_DISMISSED_DATE_STORAGE_KEY)).toBe(action === "dismiss" ? "2026-08-09" : null);
+      } finally {
+        await act(async () => root.unmount());
+        container.remove();
+      }
+    },
+  );
 
   it.each(["morningWarmup", "parkBadmintonRoutine"] as const)(
     "opens the actual %s template preview from the Home nudge",

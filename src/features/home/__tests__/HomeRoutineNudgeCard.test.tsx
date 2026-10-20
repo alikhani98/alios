@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { act } from "react";
+import { act, useRef } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -13,12 +13,25 @@ import { I18nProvider, LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
 import { loadMessages } from "@/shared/i18n/i18n";
 import { messagesEn } from "@/shared/i18n/messages.en";
 import { messagesFa } from "@/shared/i18n/messages.fa";
+import type { RoutineTemplateId } from "@/features/routines";
+import { CollapsibleSection } from "@/shared/ui";
 import { HomeRoutineNudgeCard } from "../components/HomeRoutineNudgeCard";
 
 function SettingsToggle() {
   const { value, setValue } = usePersistentBoolean({ key: MORNING_WARMUP_ENABLED_STORAGE_KEY, defaultValue: true });
   return <button type="button" aria-label="Warm-up preference" aria-pressed={value}
     onClick={() => setValue(!value)}>Toggle warm-up</button>;
+}
+
+function WarmupContext({ onViewRoutine }: { onViewRoutine: (templateId: RoutineTemplateId) => void }) {
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  return (
+    <CollapsibleSection id="warmup-parent" title="Supporting Home information" triggerRef={triggerRef}>
+      <HomeRoutineNudgeCard id="warmup-test" sectionId="routineNudge" open
+        onOpenChange={() => {}} onViewRoutine={onViewRoutine}
+        onReturnFocus={() => triggerRef.current?.focus()} />
+    </CollapsibleSection>
+  );
 }
 
 describe("restored Home warm-up connection", () => {
@@ -52,8 +65,7 @@ describe("restored Home warm-up connection", () => {
   async function render() {
     await act(async () => root.render(<MemoryRouter><I18nProvider>
       <SettingsToggle />
-      <HomeRoutineNudgeCard id="warmup-test" sectionId="routineNudge" open
-        onOpenChange={() => {}} onViewRoutine={viewRoutine} />
+      <WarmupContext onViewRoutine={viewRoutine} />
     </I18nProvider></MemoryRouter>));
   }
   function card() { return container.querySelector("#warmup-test"); }
@@ -105,6 +117,31 @@ describe("restored Home warm-up connection", () => {
     expect(card()).toBeNull();
     expect(button("Warm-up preference").getAttribute("aria-pressed")).toBe("false");
     expect(window.localStorage.getItem(MORNING_WARMUP_ENABLED_STORAGE_KEY)).toBe("false");
+  });
+
+  it.each(["dismiss", "disable"] as const)("returns focus to the parent before %s removes the focused card", async (action) => {
+    await render();
+    const parent = container.querySelector<HTMLButtonElement>("#warmup-parent > button");
+    if (!parent) throw new Error("Missing stable parent trigger");
+    const label = action === "dismiss" ? messagesEn["home.dismissForToday"] : messagesEn["home.disableReminder"];
+    button(label).focus();
+    // jsdom does not perform native Enter activation; real-browser coverage exercises Tab and Enter.
+    await click(label);
+    expect(card()).toBeNull();
+    expect(document.activeElement).toBe(parent);
+    expect(parent.isConnected).toBe(true);
+    expect(parent.getAttribute("aria-expanded")).toBe("true");
+    expect(window.localStorage.getItem(MORNING_WARMUP_ENABLED_STORAGE_KEY)).toBe(action === "disable" ? "false" : "true");
+    expect(window.localStorage.getItem(MORNING_WARMUP_DISMISSED_DATE_STORAGE_KEY)).toBe(action === "dismiss" ? "2026-08-09" : null);
+  });
+
+  it.each(["dismiss", "disable"] as const)("does not steal outside focus during unfocused %s activation", async (action) => {
+    await render();
+    const outside = button("Warm-up preference");
+    outside.focus();
+    await click(action === "dismiss" ? messagesEn["home.dismissForToday"] : messagesEn["home.disableReminder"]);
+    expect(card()).toBeNull();
+    expect(document.activeElement).toBe(outside);
   });
 
   it("updates when an open page enters or leaves the time window", async () => {
