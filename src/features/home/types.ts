@@ -56,7 +56,7 @@ export type HomeDashboardData = {
     activeObligationCount: number;
     remainingLiquidity: number;
     remainingObligationTotal: number;
-  };
+  } | null;
   lifeAreas: {
     totalCount: number;
     activeCount: number;

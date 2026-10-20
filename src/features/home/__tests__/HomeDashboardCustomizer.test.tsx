@@ -4,10 +4,14 @@ import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { I18nProvider, LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
+import { loadMessages } from "@/shared/i18n/i18n";
+import { messagesEn } from "@/shared/i18n/messages.en";
 
 import { HomeDashboardCustomizer } from "../components/HomeDashboardCustomizer";
 import {
   getDefaultDashboardLayout,
+  homeDashboardSectionIds,
+  homeDashboardSections,
   moveDashboardSectionDown,
   moveDashboardSectionTo,
   moveDashboardSectionUp,
@@ -35,7 +39,11 @@ describe("HomeDashboardCustomizer", () => {
   let container: HTMLDivElement;
   let root: Root;
 
-  beforeEach(() => {
+  beforeEach(async () => {
+    await loadMessages("en");
+    localStorage.clear();
+    window.localStorage.clear();
+    window.localStorage.setItem(LANGUAGE_STORAGE_KEY, "en");
     localStorage.setItem(LANGUAGE_STORAGE_KEY, "en");
     container = document.createElement("div");
     document.body.appendChild(container);
@@ -49,24 +57,27 @@ describe("HomeDashboardCustomizer", () => {
     localStorage.clear();
   });
 
-  it("separates visible and hidden rows through the eye control", () => {
-    const visible = () => container.querySelector('[data-dashboard-group="visible"]');
-    const hidden = () => container.querySelector('[data-dashboard-group="hidden"]');
-    expect(visible()?.querySelectorAll("[data-dashboard-section-id]")).toHaveLength(11);
-    expect(hidden()?.querySelectorAll("[data-dashboard-section-id]")).toHaveLength(0);
-
-    const hide = container.querySelector<HTMLButtonElement>(
-      '[aria-label="Hide section: Today\'s tasks"]'
-    );
+  it.each(["todayTasks", "financeOverview"] as const)("moves only %s between visible and hidden groups through the eye control", (sectionId) => {
+    const ids = (group: "visible" | "hidden") => Array.from(container.querySelectorAll(
+      `[data-dashboard-group="${group}"] [data-dashboard-section-id]`
+    )).map((row) => row.getAttribute("data-dashboard-section-id"));
+    expect(ids("visible")).toEqual(homeDashboardSectionIds);
+    expect(ids("hidden")).toEqual([]);
+    const section = homeDashboardSections.find((entry) => entry.id === sectionId);
+    if (!section) throw new Error("Missing section registration");
+    const label = messagesEn[section.titleKey];
+    const hide = Array.from(container.querySelectorAll<HTMLButtonElement>("button"))
+      .find((button) => button.getAttribute("aria-label") === `Hide section: ${label}`);
+    expect(hide).toBeDefined();
     act(() => hide?.click());
-    expect(visible()?.querySelector('[data-dashboard-section-id="todayTasks"]')).toBeNull();
-    expect(hidden()?.querySelector('[data-dashboard-section-id="todayTasks"]')).not.toBeNull();
-
-    const show = container.querySelector<HTMLButtonElement>(
-      '[aria-label="Show section: Today\'s tasks"]'
-    );
+    expect(ids("visible")).toEqual(homeDashboardSectionIds.filter((id) => id !== sectionId));
+    expect(ids("hidden")).toEqual([sectionId]);
+    const show = Array.from(container.querySelectorAll<HTMLButtonElement>("button"))
+      .find((button) => button.getAttribute("aria-label") === `Show section: ${label}`);
+    expect(show).toBeDefined();
     act(() => show?.click());
-    expect(visible()?.querySelector('[data-dashboard-section-id="todayTasks"]')).not.toBeNull();
+    expect(ids("visible")).toEqual(homeDashboardSectionIds);
+    expect(ids("hidden")).toEqual([]);
   });
 
   it("moves a focused handle with arrow keys without toggling visibility", () => {
@@ -80,8 +91,14 @@ describe("HomeDashboardCustomizer", () => {
     const ids = Array.from(
       container.querySelectorAll('[data-dashboard-group="visible"] [data-dashboard-section-id]')
     ).map((row) => row.getAttribute("data-dashboard-section-id"));
-    expect(ids[2]).toBe("todayTasks");
-    expect(ids[3]).toBe("summaryStats");
+    const originalIndex = homeDashboardSectionIds.indexOf("todayTasks");
+    const previousId = homeDashboardSectionIds[originalIndex - 1];
+    expect(previousId).toBeDefined();
+    expect(ids).toEqual([
+      ...homeDashboardSectionIds.slice(0, originalIndex - 1),
+      "todayTasks", previousId,
+      ...homeDashboardSectionIds.slice(originalIndex + 1),
+    ]);
     expect(container.querySelector('[data-dashboard-group="hidden"] [data-dashboard-section-id]'))
       .toBeNull();
     expect(document.activeElement).toBe(handle);

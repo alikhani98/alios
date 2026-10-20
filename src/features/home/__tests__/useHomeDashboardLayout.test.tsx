@@ -70,6 +70,16 @@ describe("useHomeDashboardLayout persistence", () => {
     expect(localStorage.getItem(HOME_DASHBOARD_LAYOUT_STORAGE_KEY)).toBeNull();
   });
 
+  it("accepts Finance in an existing saved layout without rewriting the preference on mount", () => {
+    const legacyIds = homeDashboardSectionIds.filter((id) => id !== "financeOverview").reverse();
+    const stored = JSON.stringify({ orderedSectionIds: legacyIds, hiddenSectionIds: ["summaryStats"] });
+    localStorage.setItem(HOME_DASHBOARD_LAYOUT_STORAGE_KEY, stored);
+    mount();
+    expect(readLayout().orderedSectionIds).toEqual([...legacyIds, "financeOverview"]);
+    expect(readLayout().hiddenSectionIds).toEqual(["summaryStats"]);
+    expect(localStorage.getItem(HOME_DASHBOARD_LAYOUT_STORAGE_KEY)).toBe(stored);
+  });
+
   it("keeps canonical order when the only hidden section cannot move within its group", () => {
     mount();
     act(() => container.querySelector<HTMLButtonElement>("button:nth-of-type(1)")?.click());

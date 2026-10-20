@@ -1,10 +1,10 @@
 import { format, getDay } from "date-fns";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useStorageAdapter } from "@/core/storage";
 import { useI18n } from "@/shared/i18n";
-import type { Goal, Project, Task, WeeklyPlan } from "@/shared/types";
-import { calculateFinanceSummary } from "@/features/finance/financeCalculations";
+import type { FinanceObligation, Goal, Project, Task, WeeklyPlan } from "@/shared/types";
+import { buildHomeFinanceOverview, type HomeFinanceOverviewState } from "../homeFinanceOverview";
 import { getGoalsSummary } from "@/features/goals";
 import { getLifeAreasSummary, mergeLifeAreas } from "@/features/lifeAreas";
 import { getManualEntrySummary } from "@/features/manual";
@@ -54,7 +54,32 @@ export function useHomeDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
 
+  const [financeOverview, setFinanceOverview] = useState<HomeFinanceOverviewState>({
+    data: null, isLoading: true, hasError: false,
+  });
+  const loadVersion = useRef(0);
+  const lastObligations = useRef<FinanceObligation[]>([]);
+
   const loadDashboard = useCallback(async () => {
+    const version = ++loadVersion.current;
+    setFinanceOverview((previous) => ({ ...previous, isLoading: true }));
+    const referenceDate = new Date();
+    // Share these reads with the existing Home summary and reminder projection.
+    const financeLoad = Promise.resolve().then(() => Promise.all([
+      finance.listTransactions(), finance.listObligations(),
+    ])).then(([transactions, obligations]) => {
+      const snapshot = buildHomeFinanceOverview(transactions, obligations, referenceDate);
+      if (version === loadVersion.current) {
+        lastObligations.current = obligations;
+        setFinanceOverview({ data: snapshot, isLoading: false, hasError: false });
+      }
+      return { snapshot, transactions, obligations };
+    }).catch(() => {
+      if (version === loadVersion.current) {
+        setFinanceOverview((previous) => ({ ...previous, isLoading: false, hasError: true }));
+      }
+      return null;
+    });
     setIsLoading(true);
     setHasError(false);
 
@@ -71,8 +96,7 @@ export function useHomeDashboard() {
         manualEntries,
         inboxItems,
         weeklyPlan,
-        financeTransactions,
-        financeObligations,
+        financeResult,
         routineEntries,
         resourceItems,
       ] =
@@ -87,8 +111,7 @@ export function useHomeDashboard() {
           manual.list(),
           inbox.list(),
           weeklyPlans.getByWeekStart(getWeeklyPlanWeekStart()),
-          finance.listTransactions(),
-          finance.listObligations(),
+          financeLoad,
           routines.list(),
           resources.list(),
         ]);
@@ -116,13 +139,10 @@ export function useHomeDashboard() {
       const lifeAreaViews = mergeLifeAreas(lifeAreaEntries, t);
       const lifeAreaSummary = getLifeAreasSummary(lifeAreaViews, new Date());
       const manualSummary = getManualEntrySummary(manualEntries, new Date());
-      const financeSummary = calculateFinanceSummary(
-        financeTransactions,
-        financeObligations,
-        new Date()
-      );
+      if (version !== loadVersion.current) return;
+      const taskReminders = buildLocalReminderSnapshot(allTasks, financeResult?.obligations ?? lastObligations.current, referenceDate);
 
-      setData({
+      setData((previous) => ({
         tasks: allTasks,
         today: {
           tasks: todayTasks,
@@ -162,14 +182,7 @@ export function useHomeDashboard() {
           averageActiveProgress: goalSummary.averageActiveProgress,
           latest: goalSummary.latestUpdatedGoal,
         },
-        finance: {
-          transactionCount: financeTransactions.length,
-          activeObligationCount: financeObligations.filter(
-            (obligation) => obligation.status === "active"
-          ).length,
-          remainingLiquidity: financeSummary.remainingLiquidity,
-          remainingObligationTotal: financeSummary.totalRemainingObligation,
-        },
+        finance: financeResult?.snapshot ?? previous?.finance ?? null,
         lifeAreas: {
           totalCount: lifeAreaSummary.totalCount,
           activeCount: lifeAreaSummary.activeCount,
@@ -196,11 +209,7 @@ export function useHomeDashboard() {
           resources: resourceItems,
           knowledgeItems,
         }),
-        reminderSnapshot: buildLocalReminderSnapshot(
-          allTasks,
-          financeObligations,
-          new Date()
-        ),
+        reminderSnapshot: taskReminders,
         personalMetrics: buildHomePersonalMetrics({
           tasks: allTasks,
           journalEntries,
@@ -217,22 +226,24 @@ export function useHomeDashboard() {
           knowledgeItems.length === 0 &&
           goalEntries.length === 0 &&
           lifeAreaEntries.length === 0 &&
-          financeTransactions.length === 0 &&
-          financeObligations.length === 0 &&
+          financeResult !== null &&
+          financeResult.transactions.length === 0 &&
+          financeResult.obligations.length === 0 &&
           manualEntries.length === 0 &&
           resourceItems.length === 0 &&
           inboxItems.length === 0,
-      });
+      }));
     } catch {
-      setHasError(true);
+      if (version === loadVersion.current) setHasError(true);
     } finally {
-      setIsLoading(false);
+      if (version === loadVersion.current) setIsLoading(false);
     }
   }, [dailyCheckins, finance, goals, inbox, journal, knowledge, lifeAreas, manual, projects, resources, routines, tasks, t, weeklyPlans]);
 
   useEffect(() => {
     void loadDashboard();
+    return () => { loadVersion.current += 1; };
   }, [loadDashboard]);
 
-  return { data, isLoading, hasError, loadDashboard };
+  return { data, isLoading, hasError, financeOverview, loadDashboard };
 }

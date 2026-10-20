@@ -49,6 +49,7 @@ import {
 
 import { ClearStartCard } from "../components/ClearStartCard";
 import { DailyBriefingCard } from "../components/DailyBriefingCard";
+import { HomeFinanceOverviewCard } from "../components/HomeFinanceOverviewCard";
 import { HomeCalendarCard } from "../components/HomeCalendarCard";
 import { HomeManualCard } from "../components/HomeManualCard";
 import { HomePersonalMetricsCard } from "../components/HomePersonalMetricsCard";
@@ -817,7 +818,7 @@ function QuickActions() {
 export function UnifiedHomePage() {
   const { t } = useI18n();
   const { freshness: backupFreshness, status: backupStatus } = useBackupStatus();
-  const { data, isLoading, hasError, loadDashboard } = useHomeDashboard();
+  const { data, isLoading, hasError, financeOverview, loadDashboard } = useHomeDashboard();
   const { layout, resetLayout } = useHomeDashboardLayout();
   const { value: displayName } = usePersistentString({
     key: DISPLAY_NAME_STORAGE_KEY,
@@ -853,8 +854,13 @@ export function UnifiedHomePage() {
     today.getHours() >= 18 && (data?.today.tasks.length ?? 0) > 0;
   const visibleSections = getVisibleDashboardSections(layout);
 
-  const sectionContent: Record<HomeDashboardSectionId, ReactNode> | null = data
+  const financeContent = <HomeFinanceOverviewCard
+    state={financeOverview ?? { data: null, isLoading, hasError }}
+    onRetry={() => void loadDashboard()}
+  />;
+  const sectionContent: Partial<Record<HomeDashboardSectionId, ReactNode>> = data
     ? {
+        financeOverview: financeContent,
         quickAccess: <QuickAccessLauncher />,
         clearStart: <ClearStartCard data={data} />,
         summaryStats: <TodaySummaryBar data={data} today={today} />,
@@ -920,7 +926,7 @@ export function UnifiedHomePage() {
           </SoftPanel>
         ) : null,
       }
-    : null;
+    : { financeOverview: financeContent };
   const hasRenderableDashboardSection = visibleSections.some(
     (sectionId) => sectionContent?.[sectionId] != null
   );
@@ -952,12 +958,15 @@ export function UnifiedHomePage() {
         </div>
       ) : null}
 
-      {isLoading ? (
+      {isLoading && !data ? (
         <div className="space-y-4" aria-label={t("home.loading")}>
+          {visibleSections.includes("financeOverview") ? (
+            <div data-dashboard-section="financeOverview">{financeContent}</div>
+          ) : null}
           <div className="h-72 animate-pulse rounded-[2rem] border border-alios-saffron/20 bg-gradient-to-br from-alios-paper via-muted/55 to-muted/70 shadow-sm dark:from-alios-night" />
           <div className="h-96 animate-pulse rounded-[2rem] border border-alios-saffron/20 bg-gradient-to-br from-alios-paper via-muted/50 to-muted/65 shadow-sm dark:from-alios-night" />
         </div>
-      ) : data ? (
+      ) : data || financeOverview ? (
         <>
           <div className="space-y-3">
             <HomeHeader displayName={displayName} today={today} />

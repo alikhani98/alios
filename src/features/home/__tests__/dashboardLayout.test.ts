@@ -16,9 +16,27 @@ import {
 } from "../dashboardLayout";
 
 describe("home dashboard layout helpers", () => {
+  it("appends Finance to legacy layouts without changing their order or hidden sections", () => {
+    const legacyIds = homeDashboardSectionIds.filter((id) => id !== "financeOverview").reverse();
+    const normalized = normalizeDashboardLayout({ orderedSectionIds: legacyIds, hiddenSectionIds: ["todayTasks", "summaryStats"] });
+    expect(normalized.orderedSectionIds).toEqual([...legacyIds, "financeOverview"]);
+    expect(normalized.hiddenSectionIds).toEqual(["todayTasks", "summaryStats"]);
+    const hidden = toggleDashboardSectionVisibility(normalized, "financeOverview");
+    expect(getVisibleDashboardSections(hidden)).not.toContain("financeOverview");
+    const restored = toggleDashboardSectionVisibility(hidden, "financeOverview");
+    expect(getVisibleDashboardSections(restored)).toContain("financeOverview");
+    const moved = moveDashboardSectionUp(restored, "financeOverview");
+    expect(moved.orderedSectionIds).not.toEqual(restored.orderedSectionIds);
+    expect(moved.hiddenSectionIds).toEqual(restored.hiddenSectionIds);
+    expect(resetDashboardLayout().orderedSectionIds).toEqual(homeDashboardSectionIds);
+    expect(resetDashboardLayout().hiddenSectionIds).toEqual([]);
+  });
+
   it("uses the canonical Home registry for default order", () => {
     const layout = getDefaultDashboardLayout();
 
+    expect(homeDashboardSectionIds.filter((id) => id === "financeOverview")).toHaveLength(1);
+    expect(new Set(homeDashboardSectionIds).size).toBe(homeDashboardSectionIds.length);
     expect(layout.orderedSectionIds).toEqual(homeDashboardSectionIds);
     expect(homeDashboardSections.map(({ id }) => id)).toEqual(homeDashboardSectionIds);
     expect(homeDashboardSectionIds).not.toContain("hero");
@@ -98,19 +116,23 @@ describe("home dashboard layout helpers", () => {
   });
 
   it("moves sections up and down safely", () => {
-    const movedUp = moveDashboardSectionUp(
-      getDefaultDashboardLayout(),
-      "todayTasks"
-    );
-    expect(movedUp.orderedSectionIds[2]).toBe("todayTasks");
-    expect(movedUp.orderedSectionIds[3]).toBe("summaryStats");
-
-    const movedDown = moveDashboardSectionDown(
-      getDefaultDashboardLayout(),
-      "todayTasks"
-    );
-    expect(movedDown.orderedSectionIds[3]).toBe("reminders");
-    expect(movedDown.orderedSectionIds[4]).toBe("todayTasks");
+    const layout = getDefaultDashboardLayout();
+    const original = layout.orderedSectionIds;
+    const index = original.indexOf("todayTasks");
+    const previousId = original[index - 1];
+    const nextId = original[index + 1];
+    expect(previousId).toBeDefined();
+    expect(nextId).toBeDefined();
+    const movedUp = moveDashboardSectionUp(layout, "todayTasks");
+    expect(movedUp.orderedSectionIds).toEqual([
+      ...original.slice(0, index - 1), "todayTasks", previousId, ...original.slice(index + 1),
+    ]);
+    const movedDown = moveDashboardSectionDown(layout, "todayTasks");
+    expect(movedDown.orderedSectionIds).toEqual([
+      ...original.slice(0, index), nextId, "todayTasks", ...original.slice(index + 2),
+    ]);
+    expect(movedUp.hiddenSectionIds).toEqual(layout.hiddenSectionIds);
+    expect(movedDown.hiddenSectionIds).toEqual(layout.hiddenSectionIds);
   });
 
   it("keeps the first and last items fixed when moving past the edges", () => {
@@ -129,8 +151,11 @@ describe("home dashboard layout helpers", () => {
 
     expect(getVisibleDashboardSections(moved)[0]).toBe("todayTasks");
     expect(moved.hiddenSectionIds).toEqual(["clearStart", "tomorrow"]);
-    expect(moved.orderedSectionIds[1]).toBe("clearStart");
-    expect(moved.orderedSectionIds[5]).toBe("tomorrow");
+    for (const id of hidden.hiddenSectionIds) {
+      expect(moved.orderedSectionIds.indexOf(id)).toBe(hidden.orderedSectionIds.indexOf(id));
+    }
+    expect(getVisibleDashboardSections(moved).filter((id) => id !== "todayTasks"))
+      .toEqual(getVisibleDashboardSections(hidden).filter((id) => id !== "todayTasks"));
     expect(moveDashboardSectionTo(moved, "todayTasks", "tomorrow", "after")).toEqual(moved);
   });
 
@@ -143,8 +168,8 @@ describe("home dashboard layout helpers", () => {
 
     expect(getVisibleDashboardSections(moved)).toEqual(getVisibleDashboardSections(hidden));
     expect(moved.hiddenSectionIds).toEqual(hidden.hiddenSectionIds);
-    expect(moved.orderedSectionIds[1]).toBe("tomorrow");
-    expect(moved.orderedSectionIds[5]).toBe("clearStart");
+    expect(moved.orderedSectionIds.indexOf("tomorrow")).toBe(hidden.orderedSectionIds.indexOf("clearStart"));
+    expect(moved.orderedSectionIds.indexOf("clearStart")).toBe(hidden.orderedSectionIds.indexOf("tomorrow"));
     expect(moveDashboardSectionDown(moved, "tomorrow")).toEqual(hidden);
   });
 

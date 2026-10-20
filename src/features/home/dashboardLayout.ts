@@ -8,6 +8,7 @@ export const homeDashboardSections = [
   { id: "clearStart", titleKey: "home.clearStartTitle" },
   { id: "summaryStats", titleKey: "home.sectionSummaryStats" },
   { id: "todayTasks", titleKey: "home.sectionTodayTasks" },
+  { id: "financeOverview", titleKey: "home.financeOverviewTitle" },
   { id: "reminders", titleKey: "home.sectionReminders" },
   { id: "tomorrow", titleKey: "home.sectionTomorrow" },
   { id: "learning", titleKey: "home.learningKnowledgeTitle" },

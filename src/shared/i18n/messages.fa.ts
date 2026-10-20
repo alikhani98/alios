@@ -1,6 +1,25 @@
 import type { TranslationKey } from "./types";
 
 export const messagesFa: Record<TranslationKey, string> = {
+  "home.financeOverviewTitle": "نمای مالی",
+  "home.financeRecordedIncome": "درآمد ثبت‌شده",
+  "home.financeRecordedExpenses": "هزینهٔ ثبت‌شده",
+  "home.financeTransactionNet": "خالص تراکنش‌های ثبت‌شده",
+  "home.financeGregorianMonth": "ماه میلادی جاری: {start} تا {end}",
+  "home.financeShowAmounts": "نمایش مبالغ این ویجت",
+  "home.financeHideAmounts": "پنهان‌کردن مبالغ این ویجت",
+  "home.financeAmountsHidden": "مبلغ پنهان است",
+  "home.financeActiveObligations": "تعهدهای فعال",
+  "home.financeDisclaimer": "بر اساس داده‌های مالی ثبت‌شده؛ این اعداد موجودی حساب نیستند.",
+  "home.financeOpen": "مشاهدهٔ امور مالی",
+  "home.financeLoading": "در حال بارگذاری داده‌های مالی ثبت‌شده…",
+  "home.financeRefreshing": "در حال تازه‌سازی داده‌های مالی ثبت‌شده…",
+  "home.financeEmpty": "هنوز تراکنش یا تعهدی ثبت نشده است.",
+  "home.financeNoMonthlyTransactions": "سوابق مالی موجود است؛ در این ماه میلادی تراکنشی ثبت نشده است.",
+  "home.financeError": "داده‌های مالی بارگذاری نشد. برای مشاهدهٔ خلاصه دوباره تلاش کنید.",
+  "home.financeStale": "تازه‌سازی انجام نشد. خلاصهٔ مالی قبلی ممکن است قدیمی باشد.",
+  "home.financeRetry": "تلاش دوباره برای خلاصهٔ مالی",
+
   "home.greetingMorning": "صبح بخیر",
   "home.greetingAfternoon": "بعدازظهر بخیر",
   "home.greetingEvening": "شب بخیر",

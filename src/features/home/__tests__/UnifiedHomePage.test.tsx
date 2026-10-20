@@ -14,6 +14,7 @@ import {
   resourceRecord,
 } from "@/test/factories";
 import type { HomeDashboardData } from "../types";
+import { buildHomeFinanceOverview } from "../homeFinanceOverview";
 import { HOME_BACKUP_REMINDER_DISMISSED_UNTIL_KEY } from "../backupReminder";
 import { buildHomeLearningSnapshot } from "../homeLearningSnapshot";
 import { getDailyBriefingViewModel } from "../components/DailyBriefingCard";
@@ -163,6 +164,7 @@ vi.mock("../hooks/useHomeDashboard", () => ({
     data: mockedDashboardData,
     isLoading: false,
     hasError: false,
+    financeOverview: { data: buildHomeFinanceOverview([], [], new Date()), isLoading: false, hasError: false },
     loadDashboard: vi.fn(),
   }),
 }));
@@ -261,6 +263,21 @@ describe("UnifiedHomePage", () => {
     expect(markup).toContain('aria-expanded="false"');
     expect(markup).toContain('id="unified-home-more-context-content" hidden="" aria-hidden="true"');
     expect(markup).toContain("Quick links");
+  });
+
+  it("renders Finance through the section registry and follows existing visibility, ordering, and reset", () => {
+    const original = renderUnifiedHome();
+    expect(original).toContain('data-dashboard-section="financeOverview"');
+    expect(original).toContain("Finance Overview");
+    expect(original).toContain('href="/finance"');
+    mockedDashboardLayout = toggleDashboardSectionVisibility(getDefaultDashboardLayout(), "financeOverview");
+    expect(renderUnifiedHome()).not.toContain('data-dashboard-section="financeOverview"');
+    mockedDashboardLayout = toggleDashboardSectionVisibility(mockedDashboardLayout, "financeOverview");
+    mockedDashboardLayout = moveDashboardSectionUp(mockedDashboardLayout, "financeOverview");
+    const moved = renderUnifiedHome();
+    expect(moved.indexOf('data-dashboard-section="financeOverview"')).toBeLessThan(moved.indexOf('data-dashboard-section="todayTasks"'));
+    mockedDashboardLayout = resetDashboardLayout();
+    expect(renderUnifiedHome()).toContain('data-dashboard-section="financeOverview"');
   });
 
   it("renders only canonical rows and keeps them aligned with Home sections", () => {
