@@ -5,6 +5,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { saveViewDensityMode, VIEW_DENSITY_MODE_STORAGE_KEY } from "@/shared/preferences/viewDensityMode";
 import {
   MORNING_WARMUP_DISMISSED_DATE_STORAGE_KEY,
   MORNING_WARMUP_ENABLED_STORAGE_KEY,
@@ -31,6 +32,7 @@ import { getDailyBriefingViewModel } from "../components/DailyBriefingCard";
 import { buildHomePersonalMetrics } from "../personalMetrics";
 import { buildLocalReminderSnapshot } from "@/features/reminders";
 import {
+  HOME_DASHBOARD_LAYOUT_STORAGE_KEY,
   getDefaultDashboardLayout,
   homeDashboardSectionIds,
   moveDashboardSectionUp,
@@ -273,6 +275,115 @@ describe("UnifiedHomePage", () => {
     expect(markup).not.toContain("Morning briefing");
   });
 
+  it("discloses supporting Home information in Simple View while retaining primary actions and layout order", () => {
+    const full = renderUnifiedHome();
+    localStorage.setItem(VIEW_DENSITY_MODE_STORAGE_KEY, "simple");
+    const simple = renderUnifiedHome();
+    expect(full).not.toContain('id="home-simple-summaryStats"');
+    expect(simple).toContain('id="home-simple-summaryStats"');
+    expect(simple).toContain('id="home-simple-summaryStats-content" hidden="" aria-hidden="true"');
+    expect(simple).toContain("What should I do now?");
+    expect(simple).toContain("Start Focus");
+    expect(simple).toContain("Today’s tasks (1)");
+    const sections = (markup: string) => [...markup.matchAll(/data-dashboard-section="([^"]+)"/g)].map((match) => match[1]);
+    expect(sections(simple)).toEqual(sections(full));
+    localStorage.removeItem(VIEW_DENSITY_MODE_STORAGE_KEY);
+    expect(renderUnifiedHome()).not.toContain('id="home-simple-summaryStats"');
+  });
+
+  it("keeps backup safety actions directly available in Simple View", () => {
+    localStorage.setItem(VIEW_DENSITY_MODE_STORAGE_KEY, "simple");
+    mockedBackupFreshness = "never";
+    mockedBackupStatus = null;
+    const markup = renderUnifiedHome();
+    expect(markup).toContain('data-dashboard-section="backupReminder"');
+    expect(markup).toContain("/settings#settings-backup-restore");
+    expect(markup).not.toContain('id="home-simple-backupReminder"');
+    expect(markup).not.toContain('id="home-simple-clearStart"');
+    expect(markup).not.toContain('id="home-simple-todayTasks"');
+  });
+
+  it.each(["en", "fa"] as const)(
+    "toggles all three Simple View disclosures and retains saved layout and data in %s",
+    async (language) => {
+      await loadMessages(language);
+      vi.setSystemTime(new Date(2026, 7, 9, 19, 0));
+      const originalStorage = Object.getOwnPropertyDescriptor(window, "localStorage");
+      Object.defineProperty(window, "localStorage", { configurable: true, value: localStorage });
+      localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
+      mockedDashboardData = {
+        ...dashboardData,
+        learningSnapshot: buildHomeLearningSnapshot({
+          goals: [], resources: [], knowledgeItems: [knowledgeItemRecord],
+        }),
+      };
+      mockedDashboardLayout = {
+        orderedSectionIds: ["eveningBriefing", ...homeDashboardSectionIds.filter((id) => id !== "eveningBriefing")],
+        hiddenSectionIds: ["reminders"],
+      };
+      const savedLayout = JSON.stringify(mockedDashboardLayout);
+      const originalData = structuredClone(mockedDashboardData);
+      localStorage.setItem(HOME_DASHBOARD_LAYOUT_STORAGE_KEY, savedLayout);
+      const container = document.createElement("div");
+      document.body.appendChild(container);
+      const root = createRoot(container);
+      const home = (
+        <MemoryRouter initialEntries={["/?date=2026-08-09"]}>
+          <I18nProvider><DateDisplayProvider><UnifiedHomePage /></DateDisplayProvider></I18nProvider>
+        </MemoryRouter>
+      );
+      const sections = () => [...container.querySelectorAll("[data-dashboard-section]")]
+        .map((node) => node.getAttribute("data-dashboard-section"));
+      try {
+        await act(async () => root.render(home));
+        const fullOrder = sections();
+        expect(fullOrder).not.toContain("reminders");
+        expect(container.querySelector('[id^="home-simple-"]')).toBeNull();
+        await act(async () => { expect(saveViewDensityMode("simple")).toBe(true); });
+        expect(document.documentElement.dir).toBe(language === "fa" ? "rtl" : "ltr");
+        expect(sections()).toEqual(fullOrder);
+        const ids = ["eveningBriefing", "summaryStats", "learning"];
+        expect([...container.querySelectorAll('[id^="home-simple-"]:not([id$="-content"])')]
+          .map((node) => node.id)).toEqual(ids.map((id) => `home-simple-${id}`));
+        for (const id of ids) {
+          const trigger = container.querySelector<HTMLButtonElement>(`#home-simple-${id} > button`);
+          const content = container.querySelector<HTMLElement>(`#home-simple-${id}-content`);
+          if (!trigger || !content) throw new Error(`Missing Simple View disclosure: ${id}`);
+          expect(trigger.textContent?.trim().length).toBeGreaterThan(0);
+          expect(trigger.getAttribute("aria-controls")).toBe(content.id);
+          expect(trigger.getAttribute("aria-expanded")).toBe("false");
+          expect(content.hidden).toBe(true);
+          trigger.focus();
+          await act(async () => trigger.click());
+          expect(trigger.getAttribute("aria-expanded")).toBe("true");
+          expect(content.hidden).toBe(false);
+          expect(content.getAttribute("aria-hidden")).toBe("false");
+          expect(document.activeElement).toBe(trigger);
+          await act(async () => trigger.click());
+          expect(trigger.getAttribute("aria-expanded")).toBe("false");
+          expect(content.hidden).toBe(true);
+        }
+        expect(container.querySelector('[data-dashboard-section="financeOverview"] a[href="/finance"]')).not.toBeNull();
+        expect(container.querySelector('#home-simple-financeOverview')).toBeNull();
+        await act(async () => root.render(null));
+        await act(async () => root.render(home));
+        expect(container.querySelector("#home-simple-summaryStats-content")?.hasAttribute("hidden")).toBe(true);
+        expect(sections()).toEqual(fullOrder);
+        await act(async () => { expect(saveViewDensityMode("full")).toBe(true); });
+        expect(container.querySelector('[id^="home-simple-"]')).toBeNull();
+        expect(sections()).toEqual(fullOrder);
+        expect(localStorage.getItem(HOME_DASHBOARD_LAYOUT_STORAGE_KEY)).toBe(savedLayout);
+        expect(mockedDashboardLayout).toEqual(JSON.parse(savedLayout));
+        expect(mockedDashboardData).toEqual(originalData);
+      } finally {
+        await act(async () => root.unmount());
+        container.remove();
+        if (originalStorage) Object.defineProperty(window, "localStorage", originalStorage);
+        else Reflect.deleteProperty(window, "localStorage");
+      }
+    },
+  );
+
   it("keeps More sections collapsed by default", () => {
     const markup = renderUnifiedHome();
 
@@ -290,13 +401,19 @@ describe("UnifiedHomePage", () => {
     expect(renderUnifiedHome()).not.toContain('id="unified-home-routineNudge"');
   });
 
-  it.each(["dismiss", "disable"] as const)(
-    "returns focus to the real MoreContext trigger after nudge %s",
-    async (action) => {
+  it.each([
+    { action: "dismiss", mode: "full" },
+    { action: "disable", mode: "full" },
+    { action: "dismiss", mode: "simple" },
+    { action: "disable", mode: "simple" },
+  ] as const)(
+    "returns focus to the real MoreContext trigger after nudge $action in $mode mode",
+    async ({ action, mode }) => {
       await loadMessages("en");
       vi.setSystemTime(new Date(2026, 7, 9, 5, 30));
       window.localStorage.setItem(LANGUAGE_STORAGE_KEY, "en");
       window.localStorage.setItem(MORNING_WARMUP_ENABLED_STORAGE_KEY, "true");
+      window.localStorage.setItem(VIEW_DENSITY_MODE_STORAGE_KEY, mode);
       const container = document.createElement("div");
       document.body.appendChild(container);
       const root = createRoot(container);
@@ -326,6 +443,7 @@ describe("UnifiedHomePage", () => {
       } finally {
         await act(async () => root.unmount());
         container.remove();
+        window.localStorage.removeItem(VIEW_DENSITY_MODE_STORAGE_KEY);
       }
     },
   );

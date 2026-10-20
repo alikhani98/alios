@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   DEFAULT_VIEW_DENSITY_MODE,
@@ -18,6 +18,7 @@ describe("viewDensityMode preference", () => {
   });
 
   afterEach(() => {
+    vi.restoreAllMocks();
     localStorage.clear();
   });
 
@@ -32,11 +33,11 @@ describe("viewDensityMode preference", () => {
   it("persists simple view and treats full view as the default clear state", () => {
     expect(readStoredViewDensityMode()).toBe("full");
 
-    saveViewDensityMode("simple");
+    expect(saveViewDensityMode("simple")).toBe(true);
     expect(localStorage.getItem(VIEW_DENSITY_MODE_STORAGE_KEY)).toBe("simple");
     expect(readStoredViewDensityMode()).toBe("simple");
 
-    saveViewDensityMode("full");
+    expect(saveViewDensityMode("full")).toBe(true);
     expect(localStorage.getItem(VIEW_DENSITY_MODE_STORAGE_KEY)).toBeNull();
     expect(readStoredViewDensityMode()).toBe("full");
   });
@@ -46,9 +47,29 @@ describe("viewDensityMode preference", () => {
     expect(readStoredViewDensityMode()).toBe("full");
 
     saveViewDensityMode("simple");
-    resetViewDensityModePreference();
+    expect(resetViewDensityModePreference()).toBe(true);
 
     expect(localStorage.getItem(VIEW_DENSITY_MODE_STORAGE_KEY)).toBeNull();
+    expect(readStoredViewDensityMode()).toBe("full");
+  });
+
+  it("falls back to Full View when reading browser storage throws", () => {
+    vi.spyOn(localStorage, "getItem").mockImplementation(() => { throw new Error("storage unavailable"); });
+    expect(readStoredViewDensityMode()).toBe("full");
+  });
+
+  it("reports failed writes and failed resets without replacing the saved value", () => {
+    const writeFailure = vi.spyOn(localStorage, "setItem").mockImplementation(() => { throw new Error("storage unavailable"); });
+    expect(saveViewDensityMode("simple")).toBe(false);
+    expect(readStoredViewDensityMode()).toBe("full");
+    writeFailure.mockRestore();
+    expect(saveViewDensityMode("simple")).toBe(true);
+    const resetFailure = vi.spyOn(localStorage, "removeItem").mockImplementation(() => { throw new Error("storage unavailable"); });
+    expect(saveViewDensityMode("full")).toBe(false);
+    expect(resetViewDensityModePreference()).toBe(false);
+    expect(readStoredViewDensityMode()).toBe("simple");
+    resetFailure.mockRestore();
+    expect(resetViewDensityModePreference()).toBe(true);
     expect(readStoredViewDensityMode()).toBe("full");
   });
 
@@ -60,6 +81,7 @@ describe("viewDensityMode preference", () => {
 
     expect(source).toContain("LOCAL_PREFERENCE_CHANGE_EVENT");
     expect(source).toContain("window.addEventListener(\"storage\"");
-    expect(source).toContain("window.dispatchEvent");
+    const storageSource = readFileSync(join(process.cwd(), "src/shared/preferences/storage.ts"), "utf8");
+    expect(storageSource).toContain("window.dispatchEvent");
   });
 });

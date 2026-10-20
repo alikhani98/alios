@@ -205,23 +205,23 @@ const viewDensityOptions: {
     value: "full",
     label: { en: "Full View", fa: "نمای کامل" },
     description: {
-      en: "Show the current detailed layout with all supporting panels visible.",
-      fa: "چیدمان کامل فعلی را با پنل‌های پشتیبان قابل مشاهده نگه می‌دارد.",
+      en: "Use detailed previews and supporting information on pages that support view density.",
+      fa: "پیش‌نمایش‌های کامل و اطلاعات تکمیلی را در صفحه‌های پشتیبان این تنظیم نشان می‌دهد.",
     },
   },
   {
     value: "simple",
     label: { en: "Simple View", fa: "نمای ساده" },
     description: {
-      en: "Keep primary actions visible and tuck lower-priority context behind clear disclosures.",
-      fa: "اقدام‌های اصلی را آشکار نگه می‌دارد و زمینه‌های کم‌اولویت را پشت بخش‌های بازشدنی قرار می‌دهد.",
+      en: "Show fewer preview items and collapse supporting information on supported pages, keeping primary actions visible.",
+      fa: "در صفحه‌های پشتیبان، پیش‌نمایش‌ها را کوتاه‌تر و اطلاعات تکمیلی را جمع می‌کند؛ اقدام‌های اصلی در دسترس می‌مانند.",
     },
   },
 ] as const;
 
 export function ViewDensityModeControl() {
-  const { language } = useI18n();
-  const { value, setValue, reset } = useViewDensityMode();
+  const { language, t } = useI18n();
+  const { value, setValue, reset, persistenceFailed } = useViewDensityMode();
   const labels =
     language === "fa"
       ? {
@@ -289,6 +289,7 @@ export function ViewDensityModeControl() {
             );
           })}
         </div>
+        {persistenceFailed ? <p role="alert" className="text-sm text-destructive">{t("settings.localPersistenceError")}</p> : null}
         <SoftPanel className="flex flex-col gap-3 alios-surface-muted sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-muted-foreground">
             {labels.active}: {viewDensityOptions.find((option) => option.value === value)?.label[language]}

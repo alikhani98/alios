@@ -1,4 +1,5 @@
 export const messagesEn = {
+  "settings.localPersistenceError": "Changes could not be saved in this browser. Check available storage and browser storage permissions, then try again.",
   "home.financeOverviewTitle": "Finance Overview",
   "home.financeRecordedIncome": "Recorded income",
   "home.financeRecordedExpenses": "Recorded expenses",

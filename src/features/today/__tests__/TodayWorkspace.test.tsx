@@ -4,6 +4,7 @@ import { createRoot, type Root } from "react-dom/client";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { saveViewDensityMode } from "@/shared/preferences/viewDensityMode";
 import { DateDisplayProvider } from "@/shared/date";
 import { I18nProvider, LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
 import type { Project, Routine, Task } from "@/shared/types";
@@ -195,6 +196,30 @@ describe("Today workspace presentation", () => {
     expect(reveal).toBeDefined();
     await act(async () => reveal?.click());
     expect(container.querySelectorAll(".alios-today-task")).toHaveLength(15);
+  });
+
+  it("updates real task-card previews when the density preference changes in the same tab", async () => {
+    const originalStorage = Object.getOwnPropertyDescriptor(window, "localStorage");
+    Object.defineProperty(window, "localStorage", { configurable: true, value: localStorage });
+    try {
+      state.tasks = Array.from({ length: 15 }, (_, index) => ({
+        ...taskRecord, id: `density-${index}`, title: `Density task ${index}`, status: "todo", isMit: false,
+      }));
+      const originalTasks = structuredClone(state.tasks);
+      await renderWorkspace();
+      expect(container.querySelectorAll(".alios-today-task")).toHaveLength(12);
+      await act(async () => { expect(saveViewDensityMode("simple")).toBe(true); });
+      expect(container.querySelectorAll(".alios-today-task")).toHaveLength(6);
+      expect(container.textContent).toContain("Show 9 more");
+      await act(async () => { expect(saveViewDensityMode("full")).toBe(true); });
+      expect(container.querySelectorAll(".alios-today-task")).toHaveLength(12);
+      expect(container.textContent).toContain("Show 3 more");
+      expect(state.tasks).toEqual(originalTasks);
+    } finally {
+      await act(async () => root.render(null));
+      if (originalStorage) Object.defineProperty(window, "localStorage", originalStorage);
+      else Reflect.deleteProperty(window, "localStorage");
+    }
   });
 
   it("keeps completed cards out of Focus Mode when active tasks exist", async () => {

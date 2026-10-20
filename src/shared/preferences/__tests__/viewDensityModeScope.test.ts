@@ -32,6 +32,7 @@ describe("Stage 156 view density scope", () => {
 
   it("connects Simple View only to the approved presentation pages", () => {
     const scopedPages = [
+      "src/features/home/pages/UnifiedHomePage.tsx",
       "src/features/today/components/TodayWorkspace.tsx",
       "src/features/weeklyReview/pages/WeeklyReviewPage.tsx",
       "src/features/settings/pages/SettingsPage.tsx",

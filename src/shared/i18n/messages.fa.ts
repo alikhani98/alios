@@ -1,6 +1,7 @@
 import type { TranslationKey } from "./types";
 
 export const messagesFa: Record<TranslationKey, string> = {
+  "settings.localPersistenceError": "تغییرات در این مرورگر ذخیره نشد. فضای خالی و اجازهٔ ذخیره‌سازی مرورگر را بررسی کنید و دوباره تلاش کنید.",
   "home.financeOverviewTitle": "نمای مالی",
   "home.financeRecordedIncome": "درآمد ثبت‌شده",
   "home.financeRecordedExpenses": "هزینهٔ ثبت‌شده",

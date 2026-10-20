@@ -18,18 +18,6 @@ export function parseViewDensityMode(value: string | null | undefined): ViewDens
     : DEFAULT_VIEW_DENSITY_MODE;
 }
 
-function notifyLocalPreferenceChange() {
-  if (typeof window === "undefined") {
-    return;
-  }
-
-  window.dispatchEvent(
-    new CustomEvent(LOCAL_PREFERENCE_CHANGE_EVENT, {
-      detail: { key: VIEW_DENSITY_MODE_STORAGE_KEY },
-    })
-  );
-}
-
 export function readStoredViewDensityMode(): ViewDensityMode {
   const storage = getPreferenceStorage();
 
@@ -37,33 +25,21 @@ export function readStoredViewDensityMode(): ViewDensityMode {
     return DEFAULT_VIEW_DENSITY_MODE;
   }
 
-  return parseViewDensityMode(storage.getItem(VIEW_DENSITY_MODE_STORAGE_KEY));
+  try {
+    return parseViewDensityMode(storage.getItem(VIEW_DENSITY_MODE_STORAGE_KEY));
+  } catch {
+    return DEFAULT_VIEW_DENSITY_MODE;
+  }
 }
 
-export function saveViewDensityMode(value: ViewDensityMode) {
-  const storage = getPreferenceStorage();
-
-  if (storage) {
-    if (value === DEFAULT_VIEW_DENSITY_MODE) {
-      removeStoredPreference(VIEW_DENSITY_MODE_STORAGE_KEY, storage);
-    } else {
-      writeStoredPreference(VIEW_DENSITY_MODE_STORAGE_KEY, value, storage);
-    }
-    return;
-  }
-
-  notifyLocalPreferenceChange();
+export function saveViewDensityMode(value: ViewDensityMode): boolean {
+  return value === DEFAULT_VIEW_DENSITY_MODE
+    ? removeStoredPreference(VIEW_DENSITY_MODE_STORAGE_KEY)
+    : writeStoredPreference(VIEW_DENSITY_MODE_STORAGE_KEY, value);
 }
 
-export function resetViewDensityModePreference() {
-  const storage = getPreferenceStorage();
-
-  if (storage) {
-    removeStoredPreference(VIEW_DENSITY_MODE_STORAGE_KEY, storage);
-    return;
-  }
-
-  notifyLocalPreferenceChange();
+export function resetViewDensityModePreference(): boolean {
+  return removeStoredPreference(VIEW_DENSITY_MODE_STORAGE_KEY);
 }
 
 export function useViewDensityMode() {
@@ -86,18 +62,22 @@ export function useViewDensityMode() {
     };
   }, []);
 
+  const [persistenceFailed, setPersistenceFailed] = useState(false);
   const setMode = useCallback((nextValue: ViewDensityMode) => {
-    setValue(nextValue);
-    saveViewDensityMode(nextValue);
+    const persisted = saveViewDensityMode(nextValue);
+    setPersistenceFailed(!persisted);
+    if (persisted) setValue(nextValue);
   }, []);
 
   const reset = useCallback(() => {
-    setValue(DEFAULT_VIEW_DENSITY_MODE);
-    resetViewDensityModePreference();
+    const persisted = resetViewDensityModePreference();
+    setPersistenceFailed(!persisted);
+    if (persisted) setValue(DEFAULT_VIEW_DENSITY_MODE);
   }, []);
 
   return {
     value,
+    persistenceFailed,
     isFullView: value === "full",
     isSimpleView: value === "simple",
     setValue: setMode,

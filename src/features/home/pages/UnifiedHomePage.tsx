@@ -32,6 +32,7 @@ import { DISPLAY_NAME_STORAGE_KEY } from "@/shared/constants/preferences";
 import { useBackupStatus } from "@/shared/hooks";
 import { usePersistentString } from "@/shared/hooks/usePersistentString";
 import { useI18n, type TranslationKey } from "@/shared/i18n";
+import { useViewDensityMode } from "@/shared/preferences/viewDensityMode";
 import { getBackupAgeInDays } from "@/shared/preferences/backupStatus";
 import { QuickAccessLauncher } from "@/shared/quickAccess";
 import type { Task } from "@/shared/types";
@@ -827,8 +828,15 @@ function QuickActions() {
   );
 }
 
+const simpleDisclosureTitles: Partial<Record<HomeDashboardSectionId, TranslationKey>> = {
+  summaryStats: "home.sectionSummaryStats",
+  learning: "home.learningKnowledgeTitle",
+  eveningBriefing: "home.sectionEveningBriefing",
+};
+
 export function UnifiedHomePage() {
   const { t } = useI18n();
+  const { isSimpleView } = useViewDensityMode();
   const { freshness: backupFreshness, status: backupStatus } = useBackupStatus();
   const { data, isLoading, hasError, financeOverview, loadDashboard } = useHomeDashboard();
   const { layout, resetLayout } = useHomeDashboardLayout();
@@ -1001,9 +1009,20 @@ export function UnifiedHomePage() {
           <div className="alios-home-dashboard-grid">
             {visibleSections.map((sectionId) => {
               const content = sectionContent?.[sectionId];
+              const disclosureTitle = simpleDisclosureTitles[sectionId];
               return content ? (
                 <div key={sectionId} className="min-w-0" data-dashboard-section={sectionId}>
-                  {content}
+                  {isSimpleView && disclosureTitle ? (
+                    <CollapsibleSection
+                      id={`home-simple-${sectionId}`}
+                      title={t(disclosureTitle)}
+                      defaultOpen={false}
+                      expandLabel={t("common.expandSection")}
+                      collapseLabel={t("common.collapseSection")}
+                    >
+                      {content}
+                    </CollapsibleSection>
+                  ) : content}
                 </div>
               ) : null;
             })}
