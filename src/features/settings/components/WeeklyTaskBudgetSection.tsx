@@ -51,38 +51,31 @@ import {
   type WeeklyTaskBudgetContentKey,
 } from "../weeklyTaskBudgetContent";
 
-function readStoredBudget(): number | undefined {
+function readStoredBudget(): { value: number | undefined } | null {
   const storage = getPreferenceStorage();
 
   if (!storage) {
-    return undefined;
-  }
-
-  return normalizeStoredWeeklyTaskBudget(
-    storage.getItem(WEEKLY_TASK_BUDGET_STORAGE_KEY)
-  );
-}
-
-function persistBudget(value: number | undefined): void {
-  const storage = getPreferenceStorage();
-
-  if (!storage) {
-    return;
+    return null;
   }
 
   try {
-    if (value === undefined) {
-      removeStoredPreference(WEEKLY_TASK_BUDGET_STORAGE_KEY, storage);
-    } else {
-      writeStoredPreference(
-        WEEKLY_TASK_BUDGET_STORAGE_KEY,
-        serializeWeeklyTaskBudget(value),
-        storage
-      );
-    }
+    return {
+      value: normalizeStoredWeeklyTaskBudget(
+        storage.getItem(WEEKLY_TASK_BUDGET_STORAGE_KEY)
+      ),
+    };
   } catch {
-    // Keep the visible value in memory if localStorage is unavailable.
+    return null;
   }
+}
+
+function persistBudget(value: number | undefined): boolean {
+  return value === undefined
+    ? removeStoredPreference(WEEKLY_TASK_BUDGET_STORAGE_KEY)
+    : writeStoredPreference(
+        WEEKLY_TASK_BUDGET_STORAGE_KEY,
+        serializeWeeklyTaskBudget(value)
+      );
 }
 
 function getValidationMessageKey(
@@ -152,12 +145,12 @@ export function WeeklyTaskBudgetSection() {
   const { language, t } = useI18n();
   const { tasks: tasksRepository } = useStorageAdapter();
   const [savedBudget, setSavedBudget] = useState<number | undefined>(
-    readStoredBudget
+    () => readStoredBudget()?.value
   );
   const [inputValue, setInputValue] = useState(() =>
-    formatWeeklyTaskBudgetInput(readStoredBudget())
+    formatWeeklyTaskBudgetInput(savedBudget)
   );
-  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [statusMessage, setStatusMessage] = useState<TranslationKey | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [taskLoadError, setTaskLoadError] = useState(false);
 
@@ -198,8 +191,12 @@ export function WeeklyTaskBudgetSection() {
         return;
       }
       const nextBudget = readStoredBudget();
-      setSavedBudget(nextBudget);
-      setInputValue(formatWeeklyTaskBudgetInput(nextBudget));
+      if (!nextBudget) {
+        return;
+      }
+      setSavedBudget(nextBudget.value);
+      setInputValue(formatWeeklyTaskBudgetInput(nextBudget.value));
+      setStatusMessage(null);
     };
 
     window.addEventListener("storage", handleSync);
@@ -436,10 +433,13 @@ export function WeeklyTaskBudgetSection() {
                 return;
               }
 
-              persistBudget(validation.value);
+              if (!persistBudget(validation.value)) {
+                setStatusMessage("settings.localPersistenceError");
+                return;
+              }
               setSavedBudget(validation.value);
               setInputValue(formatWeeklyTaskBudgetInput(validation.value));
-              setStatusMessage(t("settings.wbSv"));
+              setStatusMessage("settings.wbSv");
             }}
           >
             {t("settings.wbS")}
@@ -450,10 +450,13 @@ export function WeeklyTaskBudgetSection() {
             className="w-full sm:w-auto"
             disabled={savedBudget === undefined && inputIsEmpty}
             onClick={() => {
-              persistBudget(undefined);
+              if (!persistBudget(undefined)) {
+                setStatusMessage("settings.localPersistenceError");
+                return;
+              }
               setSavedBudget(undefined);
               setInputValue("");
-              setStatusMessage(t("settings.wbCl"));
+              setStatusMessage("settings.wbCl");
             }}
           >
             {t("settings.wbC")}
@@ -469,10 +472,15 @@ export function WeeklyTaskBudgetSection() {
 
         {statusMessage ? (
           <p
-            role="status"
-            className="alios-status-success rounded-xl px-4 py-3 text-sm"
+            role={statusMessage === "settings.localPersistenceError" ? "alert" : "status"}
+            className={cn(
+              "rounded-xl px-4 py-3 text-sm",
+              statusMessage === "settings.localPersistenceError"
+                ? "text-destructive"
+                : "alios-status-success"
+            )}
           >
-            {statusMessage}
+            {t(statusMessage)}
           </p>
         ) : null}
       </CardContent>
