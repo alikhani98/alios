@@ -185,7 +185,18 @@ export function WeeklyTaskBudgetSection() {
   }, [tasksRepository]);
 
   useEffect(() => {
-    const handleSync = () => {
+    const handleSync = (event: Event) => {
+      if (event instanceof StorageEvent) {
+        if (event.key !== null && event.key !== WEEKLY_TASK_BUDGET_STORAGE_KEY) return;
+      } else if (event instanceof CustomEvent) {
+        const detail: unknown = event.detail;
+        if (
+          !detail || typeof detail !== "object" ||
+          !("key" in detail) || detail.key !== WEEKLY_TASK_BUDGET_STORAGE_KEY
+        ) return;
+      } else {
+        return;
+      }
       const nextBudget = readStoredBudget();
       setSavedBudget(nextBudget);
       setInputValue(formatWeeklyTaskBudgetInput(nextBudget));
