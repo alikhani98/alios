@@ -70,6 +70,16 @@ function normalizeStackPreview(stackPreview: unknown): string | undefined {
   return clampText(normalized, LOCAL_ERROR_LOG_STACK_PREVIEW_LIMIT);
 }
 
+type StoredErrorEntry = Pick<LocalErrorLogEntry, "id" | "message" | "createdAt"> &
+  Partial<Record<"source" | "route" | "hash" | "stackPreview", unknown>>;
+
+function isStoredErrorEntry(value: unknown): value is StoredErrorEntry {
+  return typeof value === "object" && value !== null &&
+    "id" in value && typeof value.id === "string" &&
+    "message" in value && typeof value.message === "string" &&
+    "createdAt" in value && typeof value.createdAt === "string";
+}
+
 function parseErrorEntries(value: string | null): LocalErrorLogEntry[] {
   if (!value) {
     return [];
@@ -83,18 +93,11 @@ function parseErrorEntries(value: string | null): LocalErrorLogEntry[] {
 
     return parsed
       .map((entry): LocalErrorLogEntry | null => {
-        if (!entry || typeof entry !== "object") {
+        if (!isStoredErrorEntry(entry)) {
           return null;
         }
 
-        const candidate = entry as Partial<LocalErrorLogEntry>;
-        if (
-          typeof candidate.id !== "string" ||
-          typeof candidate.message !== "string" ||
-          typeof candidate.createdAt !== "string"
-        ) {
-          return null;
-        }
+        const candidate = entry;
 
         return {
           id: candidate.id,
@@ -116,7 +119,7 @@ function parseErrorEntries(value: string | null): LocalErrorLogEntry[] {
             typeof candidate.stackPreview === "string"
               ? clampText(candidate.stackPreview, LOCAL_ERROR_LOG_STACK_PREVIEW_LIMIT)
               : undefined,
-        } as LocalErrorLogEntry;
+        };
       })
       .filter((entry): entry is LocalErrorLogEntry => entry !== null)
       .slice(-LOCAL_ERROR_LOG_MAX_ENTRIES);
@@ -143,6 +146,30 @@ function writeErrorEntries(
   }
 }
 
+export type LocalErrorLogReadResult =
+  | { status: "ready"; entries: LocalErrorLogEntry[] }
+  | { status: "unavailable" | "error" };
+
+export function readRecentLocalErrorsResult(
+  storage: StorageLike | null = getStorage()
+): LocalErrorLogReadResult {
+  if (!storage) return { status: "unavailable" };
+  try {
+    const raw = storage.getItem(LOCAL_ERROR_LOG_STORAGE_KEY);
+    if (raw !== null) {
+      const parsed: unknown = JSON.parse(raw);
+      if (!Array.isArray(parsed) || !parsed.every(isStoredErrorEntry)) {
+        return { status: "error" };
+      }
+      const entries = parseErrorEntries(raw);
+      return { status: "ready", entries };
+    }
+    return { status: "ready", entries: [] };
+  } catch {
+    return { status: "error" };
+  }
+}
+
 export function readRecentLocalErrors(
   storage: StorageLike | null = getStorage()
 ): LocalErrorLogEntry[] {
@@ -159,15 +186,13 @@ export function readRecentLocalErrors(
 
 export function clearRecentLocalErrors(
   storage: StorageLike | null = getStorage()
-): void {
-  if (!storage) {
-    return;
-  }
-
+): boolean {
+  if (!storage) return false;
   try {
     storage.removeItem(LOCAL_ERROR_LOG_STORAGE_KEY);
+    return true;
   } catch {
-    // No-op when storage is unavailable or locked down.
+    return false;
   }
 }
 
