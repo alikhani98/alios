@@ -1,4 +1,6 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
+
+import { Button } from "@/shared/ui/button";
 
 import {
   readStoredPreference,
@@ -27,29 +29,61 @@ function getInitialLanguage(): Language {
 }
 
 export function I18nProvider({ children }: I18nProviderProps) {
-  const [language, setLanguageState] = useState<Language>(getInitialLanguage);
+  const [initialLanguage] = useState<Language>(getInitialLanguage);
+  const [language, setLanguageState] = useState(initialLanguage);
   const [messagesReady, setMessagesReady] = useState(
     () => getLoadedMessages(language) !== null
   );
+  const [failure, setFailure] = useState<"load" | "storage" | null>(null);
+  const activeLanguage = useRef<Language | null>(messagesReady ? language : null);
+  const requestedLanguage = useRef(initialLanguage);
+  const requestId = useRef(0);
+  const mounted = useRef(false);
   const direction = getDirection(language);
 
-  useEffect(() => {
-    let isActive = true;
+  const prepareLanguage = useCallback((nextLanguage: Language, initial = false) => {
+    const request = ++requestId.current;
+    requestedLanguage.current = nextLanguage;
+    setFailure(null);
+    if (activeLanguage.current === nextLanguage) return;
 
-    setMessagesReady(getLoadedMessages(language) !== null);
-    void loadMessages(language).then(() => {
-      if (isActive) {
-        setMessagesReady(true);
+    const isCurrent = () => mounted.current && request === requestId.current;
+    const activate = () => {
+      if (!isCurrent()) return;
+      const saved = writeStoredPreference(LANGUAGE_STORAGE_KEY, nextLanguage);
+      // Initial local-only rendering must remain available even if storage is locked.
+      if (!saved && !initial) {
+        setFailure("storage");
+        return;
       }
-    });
-
-    return () => {
-      isActive = false;
+      activeLanguage.current = nextLanguage;
+      setLanguageState(nextLanguage);
+      setMessagesReady(true);
     };
-  }, [language]);
+
+    if (getLoadedMessages(nextLanguage)) {
+      activate();
+    } else {
+      void loadMessages(nextLanguage).then(activate, () => {
+        if (isCurrent()) setFailure("load");
+      });
+    }
+  }, []);
 
   useEffect(() => {
-    writeStoredPreference(LANGUAGE_STORAGE_KEY, language);
+    mounted.current = true;
+    if (activeLanguage.current === null) {
+      prepareLanguage(initialLanguage, true);
+    } else {
+      writeStoredPreference(LANGUAGE_STORAGE_KEY, activeLanguage.current);
+    }
+    return () => {
+      mounted.current = false;
+      requestId.current += 1;
+    };
+  }, [initialLanguage, prepareLanguage]);
+
+  useLayoutEffect(() => {
     document.documentElement.lang = language;
     document.documentElement.dir = direction;
   }, [direction, language]);
@@ -58,13 +92,46 @@ export function I18nProvider({ children }: I18nProviderProps) {
     () => ({
       language,
       direction,
-      setLanguage: setLanguageState,
+      setLanguage: prepareLanguage,
       t: (key, values) => translate(language, key, values),
     }),
-    [direction, language]
+    [direction, language, prepareLanguage]
   );
 
+  // This fallback must also work before any catalog is available.
+  const retryLabel = language === "fa" ? "تلاش دوباره" : "Retry";
+  const failureText = failure === "storage"
+    ? language === "fa"
+      ? "ترجیح زبان ذخیره نشد. زبان فعلی حفظ شده است. دوباره تلاش کنید."
+      : "The language preference could not be saved. The current language is unchanged. Try again."
+    : language === "fa"
+      ? "زبان بارگذاری نشد. دوباره تلاش کنید."
+      : "The language could not be loaded. Try again.";
+  const failureNotice = failure ? (
+    <div role="alert" dir={direction} className="space-y-3 p-4 pb-24 text-sm text-destructive sm:pb-4">
+      <p>{failureText}</p>
+      {failure === "load" ? (
+        <p className="text-muted-foreground">
+          {language === "fa"
+            ? "اگر تلاش دوباره نتیجه نداد، صفحه را بارگذاری مجدد کنید؛ ویرایش‌های ذخیره‌نشده از دست می‌روند."
+            : "If retry still fails, reload the page; unsaved edits will be lost."}
+        </p>
+      ) : null}
+      <div className="flex flex-wrap gap-3">
+        <Button type="button" variant="outline" onClick={() => prepareLanguage(requestedLanguage.current, activeLanguage.current === null)}>
+          {retryLabel}
+        </Button>
+        {failure === "load" ? (
+          <Button type="button" variant="outline" onClick={() => window.location.reload()}>
+            {language === "fa" ? "بارگذاری مجدد صفحه" : "Reload page"}
+          </Button>
+        ) : null}
+      </div>
+    </div>
+  ) : null;
+
   if (!messagesReady) {
+    if (failureNotice) return failureNotice;
     return (
       <div
         aria-busy="true"
@@ -72,10 +139,15 @@ export function I18nProvider({ children }: I18nProviderProps) {
         dir={direction}
         role="status"
       >
-        Loading...
+        {language === "fa" ? "در حال بارگذاری زبان…" : "Loading language…"}
       </div>
     );
   }
 
-  return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
+  return (
+    <I18nContext.Provider value={value}>
+      {children}
+      {failureNotice}
+    </I18nContext.Provider>
+  );
 }

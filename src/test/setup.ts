@@ -1,5 +1,7 @@
 import "fake-indexeddb/auto";
 
+import { loadMessages } from "@/shared/i18n/i18n";
+
 (
   globalThis as typeof globalThis & {
     IS_REACT_ACT_ENVIRONMENT: boolean;
@@ -37,3 +39,9 @@ Object.defineProperty(globalThis, "localStorage", {
   configurable: true,
   value: new MemoryStorage(),
 });
+
+// Ordinary render tests need ready catalogs. Cold-loading tests explicitly reset
+// the module or control its loader; production code must never eagerly load both.
+if (process.env.ALIOS_TEST_COLD_CATALOGS !== "true") {
+  await Promise.all([loadMessages("en"), loadMessages("fa")]);
+}
