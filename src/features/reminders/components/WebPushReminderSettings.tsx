@@ -50,7 +50,7 @@ async function getCurrentPushSubscription(): Promise<PushSubscription | null> {
   return registration.pushManager.getSubscription();
 }
 
-export function WebPushReminderSettings() {
+export function WebPushReminderSettings({ active = true }: { active?: boolean }) {
   const { t } = useI18n();
   const authSession = useAuthSession();
   const [status, setStatus] = useState<WebPushDeviceStatus>("checking");
@@ -101,8 +101,8 @@ export function WebPushReminderSettings() {
   }, [t]);
 
   useEffect(() => {
-    void refreshStatus();
-  }, [refreshStatus]);
+    if (active) void refreshStatus();
+  }, [active, refreshStatus]);
 
   const enableWebPush = async () => {
     if (!getVapidPublicKey()) {

@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 import { BookOpenText, ShieldCheck, Sparkles } from "lucide-react";
 
 import { useI18n } from "@/shared/i18n";
@@ -118,7 +120,20 @@ function SectionBody({
   );
 }
 
-export function SettingsHelpCenter() {
+export function SettingsHelpCenter({ sectionId, navigationKey }: { sectionId?: string; navigationKey?: string }) {
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
+  useEffect(() => {
+    if (!sectionId?.startsWith("settings-help-")) return;
+    setOpenSections((current) => ({ ...current, [sectionId]: true }));
+    const frame = window.requestAnimationFrame(() => {
+      const target = document.getElementById(sectionId);
+      if (!target) return;
+      target.scrollIntoView?.({ block: "start", behavior: "auto" });
+      target.setAttribute("tabindex", "-1");
+      target.focus({ preventScroll: true });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [sectionId, navigationKey]);
   const { language } = useI18n();
   const isPersian = language === "fa";
   const title = isPersian ? "راهنمای AliOS" : "AliOS Help Center";
@@ -151,6 +166,8 @@ export function SettingsHelpCenter() {
                 : "Open the full planning-loop walkthrough only when you need it."
             }
             icon={<Sparkles className="h-4 w-4" />}
+            open={openSections["settings-help-planning-loop-guide"] ?? false}
+            onOpenChange={(open) => setOpenSections((current) => ({ ...current, "settings-help-planning-loop-guide": open }))}
             defaultOpen={false}
             className="border-border/60 bg-background/70"
           >
@@ -164,6 +181,8 @@ export function SettingsHelpCenter() {
               title={getLocalizedText(language, section.title)}
               description={getLocalizedText(language, section.summary)}
               icon={<ShieldCheck className="h-4 w-4" />}
+              open={openSections[`settings-help-${section.id}`] ?? false}
+              onOpenChange={(open) => setOpenSections((current) => ({ ...current, [`settings-help-${section.id}`]: open }))}
               defaultOpen={false}
               className="border-border/60 bg-background/70"
             >

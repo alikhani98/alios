@@ -32,6 +32,7 @@ import { EmailAccountAuthForm } from "./EmailAccountAuthForm";
 
 type SyncStatusCardProps = Readonly<{
   onGoToBackupRestore: () => void;
+  active?: boolean;
 }>;
 
 type InteractiveGoogleAuthProvider = AuthProvider &
@@ -108,7 +109,7 @@ function getUserFacingSyncDetail(
     : detail;
 }
 
-export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
+export function SyncStatusCard({ onGoToBackupRestore, active = true }: SyncStatusCardProps) {
   const { t } = useI18n();
   const { boundary } = useAccountRuntime();
   const runtimeState = useAccountRuntimeState();
@@ -487,7 +488,7 @@ export function SyncStatusCard({ onGoToBackupRestore }: SyncStatusCardProps) {
           ) : null}
         </SoftPanel>
 
-        <TelegramReminderSettings />
+        <TelegramReminderSettings active={active} />
 
         <CollapsibleSection
           id="account-sync-advanced-panel-loader"

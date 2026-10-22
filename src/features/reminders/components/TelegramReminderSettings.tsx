@@ -1,5 +1,5 @@
 import { Send, Smartphone } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { useAuthSession } from "@/core/auth";
 import { getSupabaseSyncConfiguration } from "@/core/sync";
@@ -39,7 +39,7 @@ function createInitialPreference(): TelegramReminderPreferenceInput {
   };
 }
 
-export function TelegramReminderSettings() {
+export function TelegramReminderSettings({ active = true }: { active?: boolean }) {
   const { t } = useI18n();
   const authSession = useAuthSession();
   const [draft, setDraft] = useState<TelegramReminderPreferenceInput>(
@@ -47,6 +47,9 @@ export function TelegramReminderSettings() {
   );
   const [pendingAction, setPendingAction] = useState<PendingAction>(null);
   const [feedback, setFeedback] = useState<Feedback>(null);
+
+  const loadedSession = useRef<string | null>(null);
+  const sessionKey = `${authSession.provider}:${authSession.user?.userId ?? ""}`;
 
   const isAuthenticated = authSession.status === "authenticated";
   const isSupabaseConfigured = getSupabaseSyncConfiguration() !== null;
@@ -68,8 +71,14 @@ export function TelegramReminderSettings() {
 
   useEffect(() => {
     if (!canUseRemoteSettings) {
+      loadedSession.current = null;
       return;
     }
+    if (!active) {
+      setPendingAction((current) => current === "load" ? null : current);
+      return;
+    }
+    if (loadedSession.current === sessionKey) return;
 
     let isActive = true;
     setPendingAction("load");
@@ -78,6 +87,7 @@ export function TelegramReminderSettings() {
     void loadTelegramReminderPreference()
       .then((preference) => {
         if (!isActive) return;
+        loadedSession.current = sessionKey;
         setDraft({
           enabled: preference.enabled,
           channel: "telegram",
@@ -105,7 +115,7 @@ export function TelegramReminderSettings() {
     return () => {
       isActive = false;
     };
-  }, [canUseRemoteSettings, t]);
+  }, [active, canUseRemoteSettings, sessionKey, t]);
 
   const setField = <Key extends keyof TelegramReminderPreferenceInput>(
     key: Key,

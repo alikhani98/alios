@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 import { ClipboardList, Download, FileJson, ShieldCheck } from "lucide-react";
 
 import { useI18n } from "@/shared/i18n";
@@ -20,6 +22,7 @@ type RecoveryModeSectionProps = {
   onGoToExportCenter: () => void;
   onGoToLocalErrorLog: () => void;
   detailsDefaultOpen?: boolean;
+  revealDetailsKey?: string;
 };
 
 export function RecoveryModeSection({
@@ -29,8 +32,13 @@ export function RecoveryModeSection({
   onGoToExportCenter,
   onGoToLocalErrorLog,
   detailsDefaultOpen = true,
+  revealDetailsKey,
 }: RecoveryModeSectionProps) {
   const { t } = useI18n();
+  const [detailsOpen, setDetailsOpen] = useState(detailsDefaultOpen);
+  useEffect(() => {
+    if (revealDetailsKey) setDetailsOpen(true);
+  }, [revealDetailsKey]);
 
   return (
     <Card id="settings-recovery-mode">
@@ -79,6 +87,8 @@ export function RecoveryModeSection({
           expandLabel={t("common.expandSection")}
           collapseLabel={t("common.collapseSection")}
           defaultOpen={detailsDefaultOpen}
+          open={detailsOpen}
+          onOpenChange={setDetailsOpen}
         >
           {enabled ? (
             <SoftPanel className="space-y-3 alios-surface-card">

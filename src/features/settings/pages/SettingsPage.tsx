@@ -8,26 +8,23 @@ import {
   HardDrive,
   Info,
   Languages,
-  Moon,
-  MonitorSmartphone,
+  X,
   RotateCcw,
   RefreshCw,
   ShieldCheck,
   SlidersHorizontal,
   Sunrise,
+  SunMoon,
   Trash2,
   Upload,
-  SunMoon,
-  SunMedium,
   Trees,
 } from "lucide-react";
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import {
   useAccountRuntimeState,
 } from "@/core/account";
-import { useAuthSession } from "@/core/auth";
-import { getSupabaseSyncConfiguration } from "@/core/sync";
 import {
   APPEARANCE_STORAGE_KEY,
   APPEARANCE_SCHEDULE_END_STORAGE_KEY,
@@ -69,17 +66,14 @@ import {
   WELLNESS_BADMINTON_ROUTINE_ENABLED_STORAGE_KEY,
 } from "@/features/wellness";
 import {
-  getWebPushCapabilities,
   ReminderChannelSelector,
   TelegramReminderSettings,
-  type ReminderDeliveryChannel,
-  type TelegramReminderPreference,
   WebPushReminderSettings,
 } from "@/features/reminders";
-import {
-  loadTelegramReminderPreference,
-  saveTelegramReminderPreference,
-} from "@/features/reminders/telegramReminderSettingsClient";
+import { useAuthSession } from "@/core/auth";
+import { getSupabaseSyncConfiguration } from "@/core/sync";
+import { getWebPushCapabilities, type ReminderDeliveryChannel, type TelegramReminderPreference } from "@/features/reminders";
+import { loadTelegramReminderPreference, saveTelegramReminderPreference } from "@/features/reminders/telegramReminderSettingsClient";
 import { RecoveryModeSection } from "../components/RecoveryModeSection";
 import { LocalErrorLogSection } from "../components/LocalErrorLogSection";
 import { SyncStatusCard } from "../components/SyncStatusCard";
@@ -95,6 +89,14 @@ import { useLocalDataManagement } from "../hooks/useLocalDataManagement";
 import type { BackupStatusFreshness } from "@/shared/preferences";
 import { checkForServiceWorkerUpdate, type ServiceWorkerUpdateResult } from "@/shared/pwa";
 import { AttachmentPackageSection } from "@/features/attachments";
+import { ProfileSettings } from "../components/ProfileSettings";
+import { AccentColorSettings, ThemePreviewPicker } from "../components/AppearanceControls";
+import {
+  resolveSettingsTab,
+  SettingsPanel,
+  SettingsTabs,
+  type SettingsTab,
+} from "../components/SettingsTabs";
 
 const LazySettingsHelpCenter = lazy(() =>
   import("../components/SettingsHelpCenter").then((module) => ({
@@ -187,13 +189,6 @@ const backupTableLabelKeys = [
   "settings.routinesCount",
   "settings.weeklyPlansCount",
   "settings.attachmentsCount",
-] as const;
-
-const appearanceOptions = [
-  { value: "light", icon: SunMedium, labelKey: "settings.light" },
-  { value: "dark", icon: Moon, labelKey: "settings.dark" },
-  { value: "system", icon: MonitorSmartphone, labelKey: "settings.system" },
-  { value: "scheduled", icon: Clock3, labelKey: "settings.scheduled" },
 ] as const;
 
 const viewDensityOptions: {
@@ -384,44 +379,67 @@ export function SettingsPage() {
   const accountRuntimeState = useAccountRuntimeState();
   const authSession = useAuthSession();
   const { language, setLanguage, t } = useI18n();
-  const { value: viewDensityMode } = useViewDensityMode();
+
+  const [calendarSaveFailed, setCalendarSaveFailed] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const activeTab = resolveSettingsTab(location.search, location.hash);
+  const [accountOpen, setAccountOpen] = useState(true);
+  const [localDataOpen, setLocalDataOpen] = useState(false);
+  const [dataDetailsOpen, setDataDetailsOpen] = useState(false);
+  const [backupOpen, setBackupOpen] = useState(true);
+  const [appInfoOpen, setAppInfoOpen] = useState(false);
+  const selectTab = (tab: SettingsTab) => {
+    const search = new URLSearchParams(location.search);
+    search.set("tab", tab);
+    navigate(
+      { pathname: location.pathname, search: search.toString(), hash: "" },
+      { preventScrollReset: true }
+    );
+  };
   const { calendarDisplay, formatDateTime, setCalendarDisplay } =
     useDateFormatter();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { value: appearancePreference, setValue: setAppearancePreference } =
+  const { value: appearancePreference, setStoredValue: setAppearancePreference, persistenceFailed: appearanceFailed } =
     usePersistentString({
       key: APPEARANCE_STORAGE_KEY,
       defaultValue: DEFAULT_APPEARANCE_PREFERENCE,
     });
   const {
     value: appearanceScheduleStart,
-    setValue: setAppearanceScheduleStart,
+    setStoredValue: setAppearanceScheduleStart,
+    persistenceFailed: scheduleStartFailed,
   } = usePersistentString({
     key: APPEARANCE_SCHEDULE_START_STORAGE_KEY,
     defaultValue: DEFAULT_APPEARANCE_SCHEDULE.start,
   });
   const {
     value: appearanceScheduleEnd,
-    setValue: setAppearanceScheduleEnd,
+    setStoredValue: setAppearanceScheduleEnd,
+    persistenceFailed: scheduleEndFailed,
   } = usePersistentString({
     key: APPEARANCE_SCHEDULE_END_STORAGE_KEY,
     defaultValue: DEFAULT_APPEARANCE_SCHEDULE.end,
   });
-  const { value: morningWarmupEnabled, setValue: setMorningWarmupEnabled } =
+  const { value: morningWarmupEnabled, setValue: setMorningWarmupEnabled, persistenceFailed: morningWarmupEnabledFailed } =
     usePersistentBoolean({
+      requirePersistence: true,
       key: MORNING_WARMUP_ENABLED_STORAGE_KEY,
       defaultValue: true,
     });
-  const { value: wellnessRoutineEnabled, setValue: setWellnessRoutineEnabled } =
+  const { value: wellnessRoutineEnabled, setValue: setWellnessRoutineEnabled, persistenceFailed: wellnessRoutineEnabledFailed } =
     usePersistentBoolean({
+      requirePersistence: true,
       key: WELLNESS_BADMINTON_ROUTINE_ENABLED_STORAGE_KEY,
       defaultValue: true,
     });
-  const { value: recoveryModeEnabled, setValue: setRecoveryModeEnabled } =
+  const { value: recoveryModeEnabled, setValue: setRecoveryModeEnabled, persistenceFailed: recoveryModeEnabledFailed } =
     usePersistentBoolean({
+      requirePersistence: true,
       key: RECOVERY_MODE_ENABLED_STORAGE_KEY,
       defaultValue: false,
     });
+  const [homeLayoutResetError, setHomeLayoutResetError] = useState(false);
   const [homeLayoutResetMessage, setHomeLayoutResetMessage] = useState<
     string | null
   >(null);
@@ -442,6 +460,7 @@ export function SettingsPage() {
   const [reminderChannelError, setReminderChannelError] = useState<
     string | null
   >(null);
+
   const dataManagement = useLocalDataManagement();
   const backup = useBackupRestore(dataManagement.loadSummary);
   const restorePreview = backup.pendingBackup
@@ -451,20 +470,6 @@ export function SettingsPage() {
     ? createBackupRestoreImpactPreview(backup.pendingBackup, dataManagement.summary)
     : null;
   const currentAppearance = parseAppearancePreference(appearancePreference);
-  const appearanceLabelKey =
-    appearanceOptions.find((option) => option.value === currentAppearance)?.labelKey ??
-    "settings.system";
-  const viewDensityLabel =
-    viewDensityOptions.find((option) => option.value === viewDensityMode)?.label[
-      language
-    ] ?? viewDensityOptions[0].label[language];
-  const languageLabel =
-    language === "fa" ? t("settings.persian") : t("settings.english");
-  const appearanceBehaviorSummary = t("settings.appearanceBehaviorSummary", {
-    theme: t(appearanceLabelKey),
-    density: viewDensityLabel,
-    language: languageLabel,
-  });
   const totalLocalRecords = dataManagement.summary
     ? getTotalRecords(dataManagement.summary)
     : 0;
@@ -509,15 +514,60 @@ export function SettingsPage() {
   };
 
   const scrollToSection = (id: string) => {
-    if (typeof document === "undefined") {
-      return;
-    }
-
-    document.getElementById(id)?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
+    navigate(
+      { pathname: location.pathname, search: location.search, hash: `#${id}` },
+      { preventScrollReset: true }
+    );
   };
+
+  useEffect(() => {
+    const secondarySections: Partial<Record<typeof activeTab, string>> = {
+      help: "settings-help-center",
+      diagnostics: "settings-advanced-developer-group",
+      about: "settings-app-info",
+    };
+    const id = location.hash.slice(1) || secondarySections[activeTab] || "";
+    if (!id.startsWith("settings-")) return;
+    if (/account-sync/.test(id)) setAccountOpen(true);
+    if (/backup|export/.test(id)) setBackupOpen(true);
+    if (/local-data|recovery/.test(id)) setLocalDataOpen(true);
+    if (/local-data-details/.test(id)) setDataDetailsOpen(true);
+    if (/export-center/.test(id)) setExportCenterOpen(true);
+    if (/local-error|advanced/.test(id)) setAdvancedDeveloperOpen(true);
+    if (/local-error|advanced-local/.test(id)) setAdvancedLocalToolsOpen(true);
+    if (/app-info/.test(id)) setAppInfoOpen(true);
+    if (/help-/.test(id)) setHelpCenterOpen(true);
+    if (/personalization/.test(id)) setQuickAccessOpen(true);
+    if (/additional|dashboard/.test(id)) setAdditionalPreferencesOpen(true);
+    // Scroll to the stable disclosure wrapper when its lazy content is loading.
+    const aliases: Readonly<Record<string, string>> = {
+      "settings-export-center": "settings-export-center-group",
+      "settings-profile": "settings-profile-group",
+      "settings-profile-settings-group": "settings-profile-group",
+    };
+    const targetId = aliases[id] ?? (id.startsWith("settings-help-") ? "settings-help-center" : id);
+    let secondFrame: number | undefined;
+    const frame = window.requestAnimationFrame(() => {
+      secondFrame = window.requestAnimationFrame(() => {
+        const target = (id.startsWith("settings-help-") ? document.getElementById(id) : null) ?? document.getElementById(targetId);
+        target?.scrollIntoView({ block: "start", behavior: "auto" });
+        if (target) {
+          target.setAttribute("tabindex", "-1");
+          target.focus({ preventScroll: true });
+        }
+      });
+    });
+    return () => {
+      window.cancelAnimationFrame(frame);
+      if (secondFrame !== undefined) window.cancelAnimationFrame(secondFrame);
+    };
+  }, [activeTab, location.hash, location.key]);
+
+  useEffect(() => {
+    if (!location.hash) {
+      document.getElementById(`settings-tab-${activeTab}`)?.focus({ preventScroll: true });
+    }
+  }, [activeTab, location.hash, location.key]);
 
   const handleCheckForUpdate = async () => {
     setPwaUpdateStatus("checking");
@@ -533,6 +583,7 @@ export function SettingsPage() {
   }, []);
 
   useEffect(() => {
+    if (activeTab !== "notifications") return;
     void refreshWebPushSubscriptionStatus();
 
     if (typeof window === "undefined") {
@@ -550,11 +601,12 @@ export function SettingsPage() {
       window.removeEventListener("focus", handleFocus);
       window.clearInterval(subscriptionStatusInterval);
     };
-  }, [refreshWebPushSubscriptionStatus]);
+  }, [refreshWebPushSubscriptionStatus, activeTab]);
 
   useEffect(() => {
     let isActive = true;
 
+    if (activeTab !== "notifications") return;
     if (!canUseRemoteReminderSettings) {
       setReminderPreference(null);
       setReminderChannelError(null);
@@ -583,7 +635,7 @@ export function SettingsPage() {
     return () => {
       isActive = false;
     };
-  }, [canUseRemoteReminderSettings, t]);
+  }, [canUseRemoteReminderSettings, t, activeTab]);
 
   const handleReminderChannelChange = async (
     channel: ReminderDeliveryChannel
@@ -613,50 +665,118 @@ export function SettingsPage() {
   };
 
   return (
-    <section className="alios-page space-y-6">
-      <PremiumCard className="alios-now-surface shadow-sm">
-        <CardContent className="grid gap-5 p-5 sm:p-6 lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)]">
-          <SectionHeader
-            icon={<SlidersHorizontal className="h-5 w-5" />}
-            title={t("settings.title")}
-            description={t("settings.description")}
-          />
-          <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
-            <SoftPanel className="alios-surface-muted">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                {t("settings.totalLocalRecords")}
-              </p>
-              <p className="mt-1 text-2xl font-semibold tabular-nums leading-none">
-                {dataManagement.isLoading ? "..." : totalLocalRecords}
-              </p>
-            </SoftPanel>
-            <SoftPanel className="alios-surface-muted">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                {t("settings.backupLastManualBackup")}
-              </p>
-              <p className="mt-1 text-sm font-medium">
-                {backup.lastBackupExportedAt
-                  ? formatDateTime(backup.lastBackupExportedAt)
-                  : t("common.notRecorded")}
-              </p>
-            </SoftPanel>
-            <SoftPanel className="alios-surface-muted">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                {t("settings.localFirst")}
-              </p>
-              <div className="mt-2">
-                <StatusChip tone="neutral">
-                  {accountRuntimeState.localOnly
-                    ? t("settings.syncStatusLocalOnly")
-                    : accountRuntimeState.hasActiveAccount
-                      ? t("settings.accountStatusSignedIn")
-                      : t("settings.accountStatusSignedOut")}
-                </StatusChip>
-              </div>
-            </SoftPanel>
+    <section className="alios-page min-w-0 space-y-6">
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0 space-y-1">
+          <h2 className="text-2xl font-semibold tracking-tight">{t("settings.title")}</h2>
+          <p className="text-sm leading-6 text-muted-foreground">{t("settings.description")}</p>
+        </div>
+        <Button asChild variant="ghost" size="icon">
+          <Link to="/" aria-label={t("common.close")}><X className="h-5 w-5" aria-hidden="true" /></Link>
+        </Button>
+      </div>
+      {calendarSaveFailed || appearanceFailed || scheduleStartFailed || scheduleEndFailed || morningWarmupEnabledFailed || wellnessRoutineEnabledFailed || recoveryModeEnabledFailed ? <p role="alert" className="text-sm text-destructive">{t("settings.localPersistenceError")}</p> : null}
+      <SettingsTabs activeTab={activeTab} onChange={selectTab} />
+      <nav aria-label={t("settings.supportNavigation")} className="flex flex-wrap gap-2">
+        {([
+          ["help", "settings-help-center", t("settings.helpTab")],
+          ["diagnostics", "settings-advanced-developer-group", t("settings.diagnosticsTab")],
+          ["about", "settings-app-info", t("settings.aboutUpdatesTab")],
+        ] as const).map(([destination, id, label]) => (
+          <Button key={id} asChild variant={activeTab === destination ? "secondary" : "ghost"} size="sm">
+            <Link id={`settings-tab-${destination}`} to={{ pathname: location.pathname, search: location.search, hash: `#${id}` }} aria-current={activeTab === destination ? "page" : undefined}>{label}</Link>
+          </Button>
+        ))}
+      </nav>
+      <SettingsPanel tab="general" activeTab={activeTab}>
+        <h3 className="text-lg font-semibold">{t("settings.generalTab")}</h3>
+        <div id="settings-profile-group"><ProfileSettings /></div>
+      <Card id="settings-language">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Languages className="h-5 w-5 text-primary" />
+            {t("settings.language")}
+          </CardTitle>
+          <CardDescription>{t("settings.languageDescription")}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div
+            className="flex flex-wrap gap-3"
+            role="group"
+            aria-label={t("settings.language")}
+          >
+            <Button
+              type="button"
+              variant={language === "fa" ? "default" : "outline"}
+              className="w-full sm:w-auto"
+              aria-pressed={language === "fa"}
+              onClick={() => setLanguage("fa")}
+            >
+              {t("settings.persian")}
+            </Button>
+            <Button
+              type="button"
+              variant={language === "en" ? "default" : "outline"}
+              className="w-full sm:w-auto"
+              aria-pressed={language === "en"}
+              onClick={() => setLanguage("en")}
+            >
+              {t("settings.english")}
+            </Button>
           </div>
         </CardContent>
-      </PremiumCard>
+      </Card>
+
+      <Card id="settings-calendar">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <CalendarDays className="h-5 w-5 text-primary" />
+            {t("settings.calendarDisplay")}
+          </CardTitle>
+          <CardDescription>{t("settings.calendarDescription")}</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div
+            className="flex flex-wrap gap-3"
+            role="group"
+            aria-label={t("settings.calendarDisplay")}
+          >
+            <Button
+              type="button"
+              variant={calendarDisplay === "auto" ? "default" : "outline"}
+              className="w-full sm:w-auto"
+              aria-pressed={calendarDisplay === "auto"}
+              onClick={() => setCalendarSaveFailed(!setCalendarDisplay("auto"))}
+            >
+              {t("settings.calendarAuto")}
+            </Button>
+            <Button
+              type="button"
+              variant={
+                calendarDisplay === "gregorian" ? "default" : "outline"
+              }
+              className="w-full sm:w-auto"
+              aria-pressed={calendarDisplay === "gregorian"}
+              onClick={() => setCalendarSaveFailed(!setCalendarDisplay("gregorian"))}
+            >
+              {t("settings.calendarGregorian")}
+            </Button>
+            <Button
+              type="button"
+              variant={calendarDisplay === "jalali" ? "default" : "outline"}
+              className="w-full sm:w-auto"
+              aria-pressed={calendarDisplay === "jalali"}
+              onClick={() => setCalendarSaveFailed(!setCalendarDisplay("jalali"))}
+            >
+              {t("settings.calendarJalali")}
+            </Button>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            {t("settings.calendarAutoDescription")}
+          </p>
+        </CardContent>
+      </Card>
+      </SettingsPanel>
 
       {backup.success || dataManagement.success ? (
         <div
@@ -678,233 +798,11 @@ export function SettingsPage() {
         </div>
       ) : null}
 
-      <CollapsibleSection
-        id="settings-account-sync-group"
-        icon={<ShieldCheck className="h-4 w-4" />}
-        title={t("settings.accountSyncTitle")}
-        description={t("settings.accountSyncDescription")}
-        status={
-          <StatusChip
-            tone={
-              accountRuntimeState.localOnly
-                ? "neutral"
-                : accountRuntimeState.hasActiveAccount
-                  ? "primary"
-                  : "warning"
-            }
-          >
-            {accountRuntimeState.localOnly
-              ? t("settings.syncStatusLocalOnly")
-              : accountRuntimeState.hasActiveAccount
-                ? t("settings.accountStatusSignedIn")
-                : t("settings.accountStatusSignedOut")}
-          </StatusChip>
-        }
-        expandLabel={t("common.expandSection")}
-        collapseLabel={t("common.collapseSection")}
-        defaultOpen
-      >
-        <SyncStatusCard onGoToBackupRestore={() => scrollToSection("settings-backup-restore")} />
-      </CollapsibleSection>
+      <SettingsPanel tab="appearance" activeTab={activeTab}>
+        <div id="settings-appearance-behavior-group" className="space-y-4">
+        <h3 className="text-lg font-semibold">{t("settings.appearance")}</h3>
 
-      <CollapsibleSection
-        id="settings-reminder-settings-group"
-        icon={<Bell className="h-4 w-4" />}
-        title={t("settings.reminderSettingsTitle")}
-        description={t("settings.reminderSettingsDescription")}
-        expandLabel={t("common.expandSection")}
-        collapseLabel={t("common.collapseSection")}
-        defaultOpen={false}
-      >
-        <div className="space-y-4">
-          <TelegramReminderSettings />
-          <WebPushReminderSettings />
-          <ReminderChannelSelector
-            currentChannel={currentReminderChannel}
-            hasTelegram={hasTelegramReminderChannel}
-            hasWebPush={hasWebPushSubscription}
-            onChannelChange={handleReminderChannelChange}
-            disabled={!canUseRemoteReminderSettings || !reminderPreference}
-          />
-          {reminderChannelError ? (
-            <p role="alert" className="text-sm leading-6 text-destructive">
-              {reminderChannelError}
-            </p>
-          ) : null}
-        </div>
-      </CollapsibleSection>
-
-      <CollapsibleSection
-        id="settings-local-data-recovery-group"
-        icon={<ShieldCheck className="h-4 w-4" />}
-        title={t("settings.localDataRecoveryTitle")}
-        description={t("settings.localDataRecoveryDescription")}
-        status={
-          <StatusChip tone={backup.backupFreshness === "overdue" ? "warning" : "neutral"}>
-            {t(getBackupStatusLabelKey(backup.backupFreshness))}
-          </StatusChip>
-        }
-        expandLabel={t("common.expandSection")}
-        collapseLabel={t("common.collapseSection")}
-        defaultOpen={false}
-      >
-        <div className="space-y-4">
-
-        <Card>
-          <CardContent className="grid gap-3 p-5 sm:p-6 md:grid-cols-3">
-            <InfoItem
-              label={t("settings.totalLocalRecords")}
-              value={dataManagement.isLoading ? "..." : String(totalLocalRecords)}
-            />
-            <InfoItem
-              label={t("settings.backupLastManualBackup")}
-              value={
-                backup.lastBackupExportedAt
-                  ? formatDateTime(backup.lastBackupExportedAt)
-                  : t("common.notRecorded")
-              }
-            />
-            <InfoItem
-              label={t("settings.lastRestoredAt")}
-              value={
-                backup.lastRestoredAt
-                  ? formatDateTime(backup.lastRestoredAt)
-                  : t("common.notRecorded")
-              }
-            />
-          </CardContent>
-        </Card>
-
-        <CollapsibleSection
-          id="settings-local-data-details"
-          title={t("settings.dataSummary")}
-          description={t("settings.dataSummaryDescription")}
-          icon={<ShieldCheck className="h-4 w-4" />}
-          expandLabel={t("common.expandSection")}
-          collapseLabel={t("common.collapseSection")}
-          defaultOpen={false}
-        >
-          <div className="space-y-4">
-            {dataManagement.isLoading ? (
-              <div
-                className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
-                aria-label={t("settings.dataSummaryLoading")}
-              >
-                {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
-                  <div
-                    key={item}
-                    className="h-20 animate-pulse rounded-xl border bg-muted/60"
-                  />
-                ))}
-              </div>
-            ) : dataManagement.summary ? (
-              <>
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                  <CountItem
-                    label={t("settings.totalLocalRecords")}
-                    value={totalLocalRecords}
-                  />
-                  {displayedDataCounts.map((item) => (
-                    <CountItem key={item.label} label={item.label} value={item.value} />
-                  ))}
-                </div>
-                {localDataCounts.length > dataCountPreviewLimit ? (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setShowAllDataCounts((current) => !current)}
-                  >
-                    {showAllDataCounts
-                      ? t("common.showFewer")
-                      : t("common.showMoreCount", { count: hiddenDataCount })}
-                  </Button>
-                ) : null}
-                <SoftPanel className="alios-surface-muted border-primary/20">
-                  <p className="text-sm leading-7 text-muted-foreground">
-                    {t("settings.localDataWarning")}
-                  </p>
-                </SoftPanel>
-                <SoftPanel className="alios-surface-muted">
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                    <div className="space-y-1">
-                      <p className="text-sm font-medium">
-                        {t("settings.backupLastManualBackup")}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {backup.lastBackupExportedAt
-                          ? formatDateTime(backup.lastBackupExportedAt)
-                          : t("common.notRecorded")}
-                      </p>
-                    </div>
-                    <Badge variant="secondary" className="w-fit">
-                      {t(getBackupStatusLabelKey(backup.backupFreshness))}
-                    </Badge>
-                  </div>
-                  <p className="mt-3 text-sm leading-7 text-muted-foreground">
-                    {t(getBackupStatusSummaryKey(backup.backupFreshness))}
-                  </p>
-                </SoftPanel>
-              </>
-            ) : (
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full sm:w-auto"
-                onClick={() => void dataManagement.loadSummary()}
-              >
-                <RotateCcw className="me-2 h-4 w-4" />
-                {t("common.tryAgain")}
-              </Button>
-            )}
-          </div>
-        </CollapsibleSection>
-
-        <RecoveryModeSection
-          enabled={recoveryModeEnabled}
-          onToggle={() => setRecoveryModeEnabled(!recoveryModeEnabled)}
-          onGoToBackupRestore={() => scrollToSection("settings-backup-restore")}
-          onGoToExportCenter={() => scrollToSection("settings-export-center")}
-          onGoToLocalErrorLog={() => scrollToSection("settings-local-error-log")}
-          detailsDefaultOpen={false}
-        />
-        </div>
-      </CollapsibleSection>
-
-      <CollapsibleSection
-        id="settings-help-center"
-        title={language === "fa" ? "راهنمای AliOS" : "AliOS Help Center"}
-        description={
-          language === "fa"
-            ? "راهنمای شروع و آشنایی با بخش‌ها اینجا می‌ماند، اما برای خلوت‌تر شدن تنظیمات بسته است."
-            : "Getting-started and section guidance stays here, collapsed so Settings opens with the controls first."
-        }
-        icon={<Info className="h-4 w-4" />}
-        expandLabel={t("common.expandSection")}
-        collapseLabel={t("common.collapseSection")}
-        defaultOpen={false}
-        open={helpCenterOpen}
-        onOpenChange={setHelpCenterOpen}
-      >
-        {helpCenterOpen ? (
-          <Suspense fallback={<RouteLoadingFallback />}>
-            <LazySettingsHelpCenter />
-          </Suspense>
-        ) : null}
-      </CollapsibleSection>
-
-      <CollapsibleSection
-        id="settings-appearance-behavior-group"
-        icon={<SlidersHorizontal className="h-4 w-4" />}
-        title={t("settings.appearanceBehaviorTitle")}
-        description={t("settings.appearanceBehaviorDescription")}
-        status={<StatusChip tone="neutral">{appearanceBehaviorSummary}</StatusChip>}
-        expandLabel={t("common.expandSection")}
-        collapseLabel={t("common.collapseSection")}
-        defaultOpen={false}
-      >
-        <div className="space-y-4">
-
-        <div className="grid gap-4 xl:grid-cols-2">
+        <div className="grid gap-4">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -914,24 +812,7 @@ export function SettingsPage() {
           <CardDescription>{t("settings.appearanceDescription")}</CardDescription>
         </CardHeader>
         <CardContent>
-          <div
-            className="flex flex-wrap gap-3"
-            role="group"
-            aria-label={t("settings.appearance")}
-          >
-            {appearanceOptions.map(({ value, icon: Icon, labelKey }) => (
-              <Button
-                key={value}
-                type="button"
-                variant={currentAppearance === value ? "default" : "outline"}
-                aria-pressed={currentAppearance === value}
-                onClick={() => setAppearancePreference(value)}
-              >
-                <Icon className="me-2 h-4 w-4" />
-                {t(labelKey)}
-              </Button>
-            ))}
-          </div>
+          <ThemePreviewPicker value={currentAppearance} onChange={setAppearancePreference} />
           {currentAppearance === "scheduled" ? (
             <SoftPanel className="mt-4 space-y-3 alios-surface-muted">
               <div className="flex items-start gap-2">
@@ -968,95 +849,17 @@ export function SettingsPage() {
         </CardContent>
       </Card>
 
+      <AccentColorSettings />
+
       <ViewDensityModeControl />
+      <SoftPanel><p className="text-sm leading-7 text-muted-foreground">{t("settings.reducedMotionExplanation")}</p></SoftPanel>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Languages className="h-5 w-5 text-primary" />
-            {t("settings.language")}
-          </CardTitle>
-          <CardDescription>{t("settings.languageDescription")}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div
-            className="flex flex-wrap gap-3"
-            role="group"
-            aria-label={t("settings.language")}
-          >
-            <Button
-              type="button"
-              variant={language === "fa" ? "default" : "outline"}
-              className="w-full sm:w-auto"
-              aria-pressed={language === "fa"}
-              onClick={() => setLanguage("fa")}
-            >
-              {t("settings.persian")}
-            </Button>
-            <Button
-              type="button"
-              variant={language === "en" ? "default" : "outline"}
-              className="w-full sm:w-auto"
-              aria-pressed={language === "en"}
-              onClick={() => setLanguage("en")}
-            >
-              {t("settings.english")}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CalendarDays className="h-5 w-5 text-primary" />
-            {t("settings.calendarDisplay")}
-          </CardTitle>
-          <CardDescription>{t("settings.calendarDescription")}</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div
-            className="flex flex-wrap gap-3"
-            role="group"
-            aria-label={t("settings.calendarDisplay")}
-          >
-            <Button
-              type="button"
-              variant={calendarDisplay === "auto" ? "default" : "outline"}
-              className="w-full sm:w-auto"
-              aria-pressed={calendarDisplay === "auto"}
-              onClick={() => setCalendarDisplay("auto")}
-            >
-              {t("settings.calendarAuto")}
-            </Button>
-            <Button
-              type="button"
-              variant={
-                calendarDisplay === "gregorian" ? "default" : "outline"
-              }
-              className="w-full sm:w-auto"
-              aria-pressed={calendarDisplay === "gregorian"}
-              onClick={() => setCalendarDisplay("gregorian")}
-            >
-              {t("settings.calendarGregorian")}
-            </Button>
-            <Button
-              type="button"
-              variant={calendarDisplay === "jalali" ? "default" : "outline"}
-              className="w-full sm:w-auto"
-              aria-pressed={calendarDisplay === "jalali"}
-              onClick={() => setCalendarDisplay("jalali")}
-            >
-              {t("settings.calendarJalali")}
-            </Button>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            {t("settings.calendarAutoDescription")}
-          </p>
-        </CardContent>
-      </Card>
         </div>
 
+        </div>
+      </SettingsPanel>
+      <SettingsPanel tab="workspace" activeTab={activeTab}>
+        <h3 className="text-lg font-semibold">{t("settings.workspaceTab")}</h3>
       <CollapsibleSection
         id="settings-personalization-group"
         title={t("settings.personalizationTitle")}
@@ -1093,7 +896,7 @@ export function SettingsPage() {
               </Suspense>
             ) : null}
 
-      <Card>
+      <Card id="settings-dashboard">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
           <SlidersHorizontal className="h-5 w-5 text-alios-caspian dark:text-alios-paper" />
@@ -1110,10 +913,11 @@ export function SettingsPage() {
               {t("home.dashboardSections")}
             </p>
           </SoftPanel>
+          <Button asChild variant="outline"><Link to="/">{t("nav.home")}</Link></Button>
           {homeLayoutResetMessage ? (
             <div
-              role="status"
-              className="alios-status-success rounded-surface border px-4 py-3 text-sm"
+              role={homeLayoutResetError ? "alert" : "status"}
+              className={homeLayoutResetError ? "rounded-surface border px-4 py-3 text-sm text-destructive" : "alios-status-success rounded-surface border px-4 py-3 text-sm"}
             >
               {homeLayoutResetMessage}
             </div>
@@ -1122,8 +926,9 @@ export function SettingsPage() {
             type="button"
             variant="outline"
             onClick={() => {
-              resetHomeDashboardLayoutPreference();
-              setHomeLayoutResetMessage(t("home.dashboardLayoutReset"));
+              const persisted = resetHomeDashboardLayoutPreference();
+              setHomeLayoutResetError(!persisted);
+              setHomeLayoutResetMessage(persisted ? t("home.dashboardLayoutReset") : t("settings.localPersistenceError"));
             }}
           >
             <RotateCcw className="me-2 h-4 w-4" />
@@ -1132,41 +937,6 @@ export function SettingsPage() {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Sunrise className="h-5 w-5 text-primary" />
-            {t("settings.morningWarmupReminder")}
-          </CardTitle>
-          <CardDescription>
-            {t("settings.morningWarmupReminderDescription")}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <SoftPanel className="alios-surface-muted">
-            <p className="text-sm leading-7 text-muted-foreground">
-              {t("settings.enableMorningWarmupReminder")}
-            </p>
-            <p className="mt-2 text-xs leading-5 text-muted-foreground">
-              {t("settings.localInAppReminder")}
-            </p>
-            <p className="text-xs leading-5 text-muted-foreground">
-              {t("settings.noPushNotification")}
-            </p>
-          </SoftPanel>
-          <Button
-            type="button"
-            variant={morningWarmupEnabled ? "default" : "outline"}
-            className="w-full sm:w-auto"
-            aria-pressed={morningWarmupEnabled}
-            onClick={() => setMorningWarmupEnabled(!morningWarmupEnabled)}
-          >
-            {morningWarmupEnabled
-              ? t("home.disableReminder")
-              : t("settings.enableMorningWarmupReminder")}
-          </Button>
-        </CardContent>
-      </Card>
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -1206,8 +976,145 @@ export function SettingsPage() {
           </div>
         </CollapsibleSection>
 
+      </SettingsPanel>
+      <SettingsPanel tab="notifications" activeTab={activeTab}>
+      <CollapsibleSection
+        id="settings-reminder-settings-group"
+        icon={<Bell className="h-4 w-4" />}
+        title={t("settings.reminderSettingsTitle")}
+        description={t("settings.reminderSettingsDescription")}
+        expandLabel={t("common.expandSection")}
+        collapseLabel={t("common.collapseSection")}
+        defaultOpen
+      >
+        <div className="space-y-4">
+          <TelegramReminderSettings active={activeTab === "notifications"} />
+          <WebPushReminderSettings active={activeTab === "notifications"} />
+          <ReminderChannelSelector
+            currentChannel={currentReminderChannel}
+            hasTelegram={hasTelegramReminderChannel}
+            hasWebPush={hasWebPushSubscription}
+            onChannelChange={handleReminderChannelChange}
+            disabled={!canUseRemoteReminderSettings || !reminderPreference}
+          />
+          {reminderChannelError ? (
+            <p role="alert" className="text-sm leading-6 text-destructive">
+              {reminderChannelError}
+            </p>
+          ) : null}
         </div>
       </CollapsibleSection>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Sunrise className="h-5 w-5 text-primary" />
+            {t("settings.morningWarmupReminder")}
+          </CardTitle>
+          <CardDescription>
+            {t("settings.morningWarmupReminderDescription")}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <SoftPanel className="alios-surface-muted">
+            <p className="text-sm leading-7 text-muted-foreground">
+              {t("settings.enableMorningWarmupReminder")}
+            </p>
+            <p className="mt-2 text-xs leading-5 text-muted-foreground">
+              {t("settings.localInAppReminder")}
+            </p>
+            <p className="text-xs leading-5 text-muted-foreground">
+              {t("settings.noPushNotification")}
+            </p>
+          </SoftPanel>
+          <Button
+            type="button"
+            variant={morningWarmupEnabled ? "default" : "outline"}
+            className="w-full sm:w-auto"
+            aria-pressed={morningWarmupEnabled}
+            onClick={() => setMorningWarmupEnabled(!morningWarmupEnabled)}
+          >
+            {morningWarmupEnabled
+              ? t("home.disableReminder")
+              : t("settings.enableMorningWarmupReminder")}
+          </Button>
+        </CardContent>
+      </Card>
+      </SettingsPanel>
+      <SettingsPanel tab="account" activeTab={activeTab}>
+        <h3 className="text-lg font-semibold">{t("settings.accountSyncTitle")}</h3>
+      <CollapsibleSection
+        id="settings-account-sync-group"
+        icon={<ShieldCheck className="h-4 w-4" />}
+        title={t("settings.accountSyncTitle")}
+        description={t("settings.accountSyncDescription")}
+        status={
+          <StatusChip
+            tone={
+              accountRuntimeState.localOnly
+                ? "neutral"
+                : accountRuntimeState.hasActiveAccount
+                  ? "primary"
+                  : "warning"
+            }
+          >
+            {accountRuntimeState.localOnly
+              ? t("settings.syncStatusLocalOnly")
+              : accountRuntimeState.hasActiveAccount
+                ? t("settings.accountStatusSignedIn")
+                : t("settings.accountStatusSignedOut")}
+          </StatusChip>
+        }
+        expandLabel={t("common.expandSection")}
+        collapseLabel={t("common.collapseSection")}
+        defaultOpen
+        open={accountOpen}
+        onOpenChange={setAccountOpen}
+      >
+        <SyncStatusCard active={activeTab === "account"} onGoToBackupRestore={() => scrollToSection("settings-backup-restore")} />
+      </CollapsibleSection>
+
+      </SettingsPanel>
+      <SettingsPanel tab="data" activeTab={activeTab}>
+        <h3 className="text-lg font-semibold">{t("settings.dataSafetyTab")}</h3>
+      <PremiumCard className="shadow-none">
+        <CardContent className="p-5 sm:p-6">
+          <div className="grid gap-3 md:grid-cols-3">
+            <SoftPanel className="alios-surface-muted">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                {t("settings.totalLocalRecords")}
+              </p>
+              <p className="mt-1 text-2xl font-semibold tabular-nums leading-none">
+                {dataManagement.isLoading ? "..." : totalLocalRecords}
+              </p>
+            </SoftPanel>
+            <SoftPanel className="alios-surface-muted">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                {t("settings.backupLastManualBackup")}
+              </p>
+              <p className="mt-1 text-sm font-medium">
+                {backup.lastBackupExportedAt
+                  ? formatDateTime(backup.lastBackupExportedAt)
+                  : t("common.notRecorded")}
+              </p>
+            </SoftPanel>
+            <SoftPanel className="alios-surface-muted">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                {t("settings.localFirst")}
+              </p>
+              <div className="mt-2">
+                <StatusChip tone="neutral">
+                  {accountRuntimeState.localOnly
+                    ? t("settings.syncStatusLocalOnly")
+                    : accountRuntimeState.hasActiveAccount
+                      ? t("settings.accountStatusSignedIn")
+                      : t("settings.accountStatusSignedOut")}
+                </StatusChip>
+              </div>
+            </SoftPanel>
+          </div>
+        </CardContent>
+      </PremiumCard>
 
       <CollapsibleSection
         id="settings-backup-export-group"
@@ -1217,6 +1124,8 @@ export function SettingsPage() {
         expandLabel={t("common.expandSection")}
         collapseLabel={t("common.collapseSection")}
         defaultOpen
+        open={backupOpen}
+        onOpenChange={setBackupOpen}
       >
         <div className="space-y-4">
 
@@ -1414,121 +1323,147 @@ export function SettingsPage() {
       </CollapsibleSection>
 
       <CollapsibleSection
-        id="settings-advanced-developer-group"
-        icon={<FileJson className="h-4 w-4" />}
-        title={t("settings.advancedDeveloperTitle")}
-        description={t("settings.advancedDeveloperDescription")}
-        status={<StatusChip tone="neutral">{t("settings.advancedDeveloperStatus")}</StatusChip>}
+        id="settings-local-data-recovery-group"
+        icon={<ShieldCheck className="h-4 w-4" />}
+        title={t("settings.localDataRecoveryTitle")}
+        description={t("settings.localDataRecoveryDescription")}
+        status={
+          <StatusChip tone={backup.backupFreshness === "overdue" ? "warning" : "neutral"}>
+            {t(getBackupStatusLabelKey(backup.backupFreshness))}
+          </StatusChip>
+        }
         expandLabel={t("common.expandSection")}
         collapseLabel={t("common.collapseSection")}
         defaultOpen={false}
-        open={advancedDeveloperOpen}
-        onOpenChange={setAdvancedDeveloperOpen}
+        open={localDataOpen}
+        onOpenChange={setLocalDataOpen}
       >
         <div className="space-y-4">
 
+        <Card>
+          <CardContent className="grid gap-3 p-5 sm:p-6 md:grid-cols-3">
+            <InfoItem
+              label={t("settings.totalLocalRecords")}
+              value={dataManagement.isLoading ? "..." : String(totalLocalRecords)}
+            />
+            <InfoItem
+              label={t("settings.backupLastManualBackup")}
+              value={
+                backup.lastBackupExportedAt
+                  ? formatDateTime(backup.lastBackupExportedAt)
+                  : t("common.notRecorded")
+              }
+            />
+            <InfoItem
+              label={t("settings.lastRestoredAt")}
+              value={
+                backup.lastRestoredAt
+                  ? formatDateTime(backup.lastRestoredAt)
+                  : t("common.notRecorded")
+              }
+            />
+          </CardContent>
+        </Card>
+
         <CollapsibleSection
-          id="settings-advanced-local-tools"
-          title={t("settings.advancedLocalTools")}
-          description={t("settings.advancedLocalToolsDescription")}
-          icon={<FileJson className="h-4 w-4" />}
+          id="settings-local-data-details"
+          open={dataDetailsOpen}
+          onOpenChange={setDataDetailsOpen}
+          title={t("settings.dataSummary")}
+          description={t("settings.dataSummaryDescription")}
+          icon={<ShieldCheck className="h-4 w-4" />}
           expandLabel={t("common.expandSection")}
           collapseLabel={t("common.collapseSection")}
           defaultOpen={false}
-          open={advancedLocalToolsOpen}
-          onOpenChange={setAdvancedLocalToolsOpen}
         >
           <div className="space-y-4">
-            <LocalErrorLogSection id="settings-local-error-log" />
-            {advancedLocalToolsOpen ? (
-              <Suspense fallback={<RouteLoadingFallback />}>
-                <LazyLocalAiSetupCard />
-              </Suspense>
-            ) : null}
-            {advancedLocalToolsOpen ? (
-              <Suspense fallback={<RouteLoadingFallback />}>
-                <LazyAISettingsCard />
-              </Suspense>
-            ) : null}
+            {dataManagement.isLoading ? (
+              <div
+                className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
+                aria-label={t("settings.dataSummaryLoading")}
+              >
+                {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
+                  <div
+                    key={item}
+                    className="h-20 animate-pulse rounded-xl border bg-muted/60"
+                  />
+                ))}
+              </div>
+            ) : dataManagement.summary ? (
+              <>
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  <CountItem
+                    label={t("settings.totalLocalRecords")}
+                    value={totalLocalRecords}
+                  />
+                  {displayedDataCounts.map((item) => (
+                    <CountItem key={item.label} label={item.label} value={item.value} />
+                  ))}
+                </div>
+                {localDataCounts.length > dataCountPreviewLimit ? (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setShowAllDataCounts((current) => !current)}
+                  >
+                    {showAllDataCounts
+                      ? t("common.showFewer")
+                      : t("common.showMoreCount", { count: hiddenDataCount })}
+                  </Button>
+                ) : null}
+                <SoftPanel className="alios-surface-muted border-primary/20">
+                  <p className="text-sm leading-7 text-muted-foreground">
+                    {t("settings.localDataWarning")}
+                  </p>
+                </SoftPanel>
+                <SoftPanel className="alios-surface-muted">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium">
+                        {t("settings.backupLastManualBackup")}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {backup.lastBackupExportedAt
+                          ? formatDateTime(backup.lastBackupExportedAt)
+                          : t("common.notRecorded")}
+                      </p>
+                    </div>
+                    <Badge variant="secondary" className="w-fit">
+                      {t(getBackupStatusLabelKey(backup.backupFreshness))}
+                    </Badge>
+                  </div>
+                  <p className="mt-3 text-sm leading-7 text-muted-foreground">
+                    {t(getBackupStatusSummaryKey(backup.backupFreshness))}
+                  </p>
+                </SoftPanel>
+              </>
+            ) : (
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full sm:w-auto"
+                onClick={() => void dataManagement.loadSummary()}
+              >
+                <RotateCcw className="me-2 h-4 w-4" />
+                {t("common.tryAgain")}
+              </Button>
+            )}
           </div>
         </CollapsibleSection>
 
-        <CollapsibleSection
-          id="settings-app-info"
-          icon={<Info className="h-4 w-4" />}
-          title={t("settings.appInfo")}
-          description={t("settings.appInfoDescription")}
-          status={<StatusChip tone="neutral">{appConfig.version}</StatusChip>}
-          expandLabel={t("common.expandSection")}
-          collapseLabel={t("common.collapseSection")}
-          defaultOpen={false}
-        >
-          <div className="grid gap-4 xl:grid-cols-2">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Info className="h-5 w-5 text-primary" />
-            {t("settings.appInfo")}
-          </CardTitle>
-          <CardDescription>{t("settings.appInfoDescription")}</CardDescription>
-        </CardHeader>
-        <CardContent className="grid gap-x-8 md:grid-cols-2">
-          <InfoItem label={t("settings.appName")} value={appConfig.name} />
-          <InfoItem label={t("settings.appVersion")} value={appConfig.version} />
-          <InfoItem label={t("settings.appMode")} value={t("settings.localFirst")} />
-          <InfoItem label={t("settings.storage")} value={t("settings.indexedDb")} />
-          <InfoItem label={t("settings.backend")} value={t("settings.none")} />
-          <InfoItem label={t("settings.ai")} value={t("settings.aiDisabled")} />
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <RefreshCw className="h-5 w-5 text-primary" />
-            {t("settings.pwaUpdateTitle")}
-          </CardTitle>
-          <CardDescription>{t("settings.pwaUpdateDescription")}</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-sm leading-7 text-muted-foreground">
-            {t("settings.pwaUpdateLifecycleNote")}
-          </p>
-          {pwaUpdateStatus ? (
-            <p role="status" className="alios-surface-muted rounded-xl px-4 py-3 text-sm text-muted-foreground">
-              {t(
-                pwaUpdateStatus === "checking"
-                  ? "settings.pwaUpdateChecking"
-                  : pwaUpdateStatus === "checked"
-                    ? "settings.pwaUpdateChecked"
-                    : pwaUpdateStatus === "notRegistered"
-                      ? "settings.pwaUpdateNotRegistered"
-                      : pwaUpdateStatus === "unsupported"
-                        ? "settings.pwaUpdateUnsupported"
-                        : "settings.pwaUpdateFailed"
-              )}
-            </p>
-          ) : null}
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full sm:w-auto"
-            disabled={pwaUpdateStatus === "checking"}
-            onClick={() => void handleCheckForUpdate()}
-          >
-            <RefreshCw className="me-2 h-4 w-4" />
-            {pwaUpdateStatus === "checking"
-              ? t("settings.pwaUpdateChecking")
-              : t("settings.pwaUpdateAction")}
-          </Button>
-        </CardContent>
-      </Card>
-          </div>
-        </CollapsibleSection>
+        <RecoveryModeSection
+          enabled={recoveryModeEnabled}
+          onToggle={() => setRecoveryModeEnabled(!recoveryModeEnabled)}
+          onGoToBackupRestore={() => scrollToSection("settings-backup-restore")}
+          onGoToExportCenter={() => scrollToSection("settings-export-center")}
+          onGoToLocalErrorLog={() => scrollToSection("settings-local-error-log")}
+          detailsDefaultOpen={false}
+          revealDetailsKey={location.hash === "#settings-recovery-mode-details" ? location.key : undefined}
+        />
         </div>
       </CollapsibleSection>
 
-      <section className="space-y-4">
+      <section id="settings-clear-data" className="space-y-4">
         <Card className="border-destructive/40">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-destructive">
@@ -1587,6 +1522,155 @@ export function SettingsPage() {
           </CardContent>
         </Card>
       </section>
+      </SettingsPanel>
+      <SettingsPanel tab="help" activeTab={activeTab}>
+      <CollapsibleSection
+        id="settings-help-center"
+        title={language === "fa" ? "راهنمای AliOS" : "AliOS Help Center"}
+        description={
+          language === "fa"
+            ? "راهنمای شروع و آشنایی با بخش‌ها اینجا می‌ماند، اما برای خلوت‌تر شدن تنظیمات بسته است."
+            : "Getting-started and section guidance stays here, collapsed so Settings opens with the controls first."
+        }
+        icon={<Info className="h-4 w-4" />}
+        expandLabel={t("common.expandSection")}
+        collapseLabel={t("common.collapseSection")}
+        defaultOpen={false}
+        open={helpCenterOpen}
+        onOpenChange={setHelpCenterOpen}
+      >
+        {helpCenterOpen ? (
+          <Suspense fallback={<RouteLoadingFallback />}>
+            <LazySettingsHelpCenter sectionId={location.hash.slice(1)} navigationKey={location.key} />
+          </Suspense>
+        ) : null}
+      </CollapsibleSection>
+
+      </SettingsPanel>
+      <SettingsPanel tab="diagnostics" activeTab={activeTab}>
+        <h3 className="text-lg font-semibold">{t("settings.diagnosticsTab")}</h3>
+      <CollapsibleSection
+        id="settings-advanced-developer-group"
+        icon={<FileJson className="h-4 w-4" />}
+        title={t("settings.advancedDeveloperTitle")}
+        description={t("settings.advancedDeveloperDescription")}
+        status={<StatusChip tone="neutral">{t("settings.advancedDeveloperStatus")}</StatusChip>}
+        expandLabel={t("common.expandSection")}
+        collapseLabel={t("common.collapseSection")}
+        defaultOpen={false}
+        open={advancedDeveloperOpen}
+        onOpenChange={setAdvancedDeveloperOpen}
+      >
+        <div className="space-y-4">
+
+        <CollapsibleSection
+          id="settings-advanced-local-tools"
+          title={t("settings.advancedLocalTools")}
+          description={t("settings.advancedLocalToolsDescription")}
+          icon={<FileJson className="h-4 w-4" />}
+          expandLabel={t("common.expandSection")}
+          collapseLabel={t("common.collapseSection")}
+          defaultOpen={false}
+          open={advancedLocalToolsOpen}
+          onOpenChange={setAdvancedLocalToolsOpen}
+        >
+          <div className="space-y-4">
+            <LocalErrorLogSection id="settings-local-error-log" />
+            {advancedLocalToolsOpen ? (
+              <Suspense fallback={<RouteLoadingFallback />}>
+                <LazyLocalAiSetupCard />
+              </Suspense>
+            ) : null}
+            {advancedLocalToolsOpen ? (
+              <Suspense fallback={<RouteLoadingFallback />}>
+                <LazyAISettingsCard />
+              </Suspense>
+            ) : null}
+          </div>
+        </CollapsibleSection>
+
+
+        </div>
+      </CollapsibleSection>
+
+      </SettingsPanel>
+      <SettingsPanel tab="about" activeTab={activeTab}>
+        <h3 className="text-lg font-semibold">{t("settings.aboutUpdatesTab")}</h3>
+        <CollapsibleSection
+          id="settings-app-info"
+          open={appInfoOpen}
+          onOpenChange={setAppInfoOpen}
+          icon={<Info className="h-4 w-4" />}
+          title={t("settings.appInfo")}
+          description={t("settings.appInfoDescription")}
+          status={<StatusChip tone="neutral">{appConfig.version}</StatusChip>}
+          expandLabel={t("common.expandSection")}
+          collapseLabel={t("common.collapseSection")}
+          defaultOpen={false}
+        >
+          <div className="grid gap-4 xl:grid-cols-2">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Info className="h-5 w-5 text-primary" />
+            {t("settings.appInfo")}
+          </CardTitle>
+          <CardDescription>{t("settings.appInfoDescription")}</CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-x-8 md:grid-cols-2">
+          <InfoItem label={t("settings.appName")} value={appConfig.name} />
+          <InfoItem label={t("settings.appVersion")} value={appConfig.version} />
+          <InfoItem label={t("settings.appMode")} value={t("settings.localFirst")} />
+          <InfoItem label={t("settings.storage")} value={t("settings.indexedDb")} />
+          <InfoItem label={t("settings.backend")} value={t("settings.optionalBackendInfo")} />
+          <InfoItem label={t("settings.ai")} value={t("settings.advancedAiInfo")} />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <RefreshCw className="h-5 w-5 text-primary" />
+            {t("settings.pwaUpdateTitle")}
+          </CardTitle>
+          <CardDescription>{t("settings.pwaUpdateDescription")}</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm leading-7 text-muted-foreground">
+            {t("settings.pwaUpdateLifecycleNote")}
+          </p>
+          {pwaUpdateStatus ? (
+            <p role="status" className="alios-surface-muted rounded-xl px-4 py-3 text-sm text-muted-foreground">
+              {t(
+                pwaUpdateStatus === "checking"
+                  ? "settings.pwaUpdateChecking"
+                  : pwaUpdateStatus === "checked"
+                    ? "settings.pwaUpdateChecked"
+                    : pwaUpdateStatus === "notRegistered"
+                      ? "settings.pwaUpdateNotRegistered"
+                      : pwaUpdateStatus === "unsupported"
+                        ? "settings.pwaUpdateUnsupported"
+                        : "settings.pwaUpdateFailed"
+              )}
+            </p>
+          ) : null}
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full sm:w-auto"
+            disabled={pwaUpdateStatus === "checking"}
+            onClick={() => void handleCheckForUpdate()}
+          >
+            <RefreshCw className="me-2 h-4 w-4" />
+            {pwaUpdateStatus === "checking"
+              ? t("settings.pwaUpdateChecking")
+              : t("settings.pwaUpdateAction")}
+          </Button>
+        </CardContent>
+      </Card>
+          </div>
+        </CollapsibleSection>
+      </SettingsPanel>
     </section>
   );
 }
