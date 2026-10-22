@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
+import { writeStoredPreference } from "@/shared/preferences/storage";
+
 import { LOCAL_PREFERENCE_CHANGE_EVENT } from "@/shared/constants/preferences";
 
 type UsePersistentStringOptions = {
@@ -30,7 +32,11 @@ export function usePersistentString({
 
   useEffect(() => {
     const handleSync = () => {
-      setValue(readStoredString(key, defaultValue));
+      try {
+        setValue(window.localStorage.getItem(key) ?? defaultValue);
+      } catch {
+        // An unavailable read must not replace the last readable value.
+      }
     };
 
     window.addEventListener("storage", handleSync);
@@ -60,7 +66,17 @@ export function usePersistentString({
     [key]
   );
 
+  const [persistenceFailed, setPersistenceFailed] = useState(false);
+  const setStoredValue = useCallback((nextValue: string): boolean => {
+    const persisted = writeStoredPreference(key, nextValue);
+    setPersistenceFailed(!persisted);
+    if (persisted) setValue(nextValue);
+    return persisted;
+  }, [key]);
+
   return {
+    persistenceFailed,
+    setStoredValue,
     value,
     setValue: setPersistentValue,
   } as const;

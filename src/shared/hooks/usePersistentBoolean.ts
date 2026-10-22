@@ -1,15 +1,19 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+
+import { writeStoredPreference } from "@/shared/preferences/storage";
 
 import { LOCAL_PREFERENCE_CHANGE_EVENT } from "@/shared/constants/preferences";
 
 type UsePersistentBooleanOptions = {
   key: string;
   defaultValue: boolean;
+  requirePersistence?: boolean;
 };
 
 export function usePersistentBoolean({
   key,
   defaultValue,
+  requirePersistence = false,
 }: UsePersistentBooleanOptions) {
   const [value, setValue] = useState<boolean>(() => {
     if (typeof window === "undefined") {
@@ -29,6 +33,10 @@ export function usePersistentBoolean({
     }
   });
 
+  const currentValue = useRef(value);
+  currentValue.current = value;
+  const [persistenceFailed, setPersistenceFailed] = useState(false);
+
   useEffect(() => {
     const handleSync = () => {
       if (typeof window === "undefined") {
@@ -39,13 +47,15 @@ export function usePersistentBoolean({
         const storedValue = window.localStorage.getItem(key);
 
         if (storedValue === null) {
+          currentValue.current = defaultValue;
           setValue(defaultValue);
           return;
         }
 
-        setValue(storedValue === "true");
+        currentValue.current = storedValue === "true";
+        setValue(currentValue.current);
       } catch {
-        setValue(defaultValue);
+        if (!requirePersistence) setValue(defaultValue);
       }
     };
 
@@ -56,9 +66,10 @@ export function usePersistentBoolean({
       window.removeEventListener("storage", handleSync);
       window.removeEventListener(LOCAL_PREFERENCE_CHANGE_EVENT, handleSync);
     };
-  }, [defaultValue, key]);
+  }, [defaultValue, key, requirePersistence]);
 
   useEffect(() => {
+    if (requirePersistence) return;
     try {
       const serializedValue = String(value);
       const storedValue = window.localStorage.getItem(key);
@@ -72,11 +83,25 @@ export function usePersistentBoolean({
     } catch {
       // Keep the boolean in memory if storage is unavailable.
     }
-  }, [key, value]);
+  }, [key, value, requirePersistence]);
+
+  const setPersistentValue = useCallback((next: boolean | ((current: boolean) => boolean)) => {
+    const resolved = typeof next === "function" ? next(currentValue.current) : next;
+    const persisted = writeStoredPreference(key, String(resolved));
+    setPersistenceFailed(!persisted);
+    if (persisted) {
+      currentValue.current = resolved;
+      setValue(resolved);
+    }
+    return persisted;
+  }, [key]);
 
   return {
     value,
-    setValue,
-    toggle: () => setValue((currentValue) => !currentValue),
+    persistenceFailed,
+    setValue: requirePersistence ? setPersistentValue : setValue,
+    toggle: () => requirePersistence
+      ? setPersistentValue((current) => !current)
+      : setValue((current) => !current),
   } as const;
 }

@@ -237,7 +237,7 @@ export function applyAccentColorThemeVariables(
 }
 
 function writeStoredAccentColorPreference(preference: AccentColorPreference) {
-  writeStoredPreference(ACCENT_COLOR_STORAGE_KEY, preference);
+  return writeStoredPreference(ACCENT_COLOR_STORAGE_KEY, preference);
 }
 
 function removeStoredAccentColorPreference() {
@@ -255,7 +255,13 @@ export function useAccentColorPreference() {
 
   useEffect(() => {
     const handleSync = () => {
-      setValue(readStoredAccentColorPreference());
+      const storage = getPreferenceStorage();
+      if (!storage) return;
+      try {
+        setValue(parseAccentColorPreference(storage.getItem(ACCENT_COLOR_STORAGE_KEY)));
+      } catch {
+        // A transient read failure must not replace the last readable accent.
+      }
     };
 
     window.addEventListener("storage", handleSync);
@@ -267,11 +273,13 @@ export function useAccentColorPreference() {
     };
   }, []);
 
+  const [persistenceFailed, setPersistenceFailed] = useState(false);
   const setAccentColorPreference = useCallback(
     (nextValue: AccentColorPreference) => {
       const normalizedValue = normalizeAccentColorPreference(nextValue);
-      setValue(normalizedValue);
-      writeStoredAccentColorPreference(normalizedValue);
+      const persisted = writeStoredAccentColorPreference(normalizedValue);
+      setPersistenceFailed(!persisted);
+      if (persisted) setValue(normalizedValue);
     },
     []
   );
@@ -279,5 +287,6 @@ export function useAccentColorPreference() {
   return {
     value,
     setValue: setAccentColorPreference,
+    persistenceFailed,
   } as const;
 }

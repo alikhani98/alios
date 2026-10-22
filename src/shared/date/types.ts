@@ -6,7 +6,7 @@ export type ResolvedCalendar = Exclude<CalendarDisplay, "auto">;
 export type DateDisplayContextValue = {
   calendarDisplay: CalendarDisplay;
   resolvedCalendar: ResolvedCalendar;
-  setCalendarDisplay: (calendar: CalendarDisplay) => void;
+  setCalendarDisplay: (calendar: CalendarDisplay) => boolean;
   formatDate: (value: string | Date) => string;
   formatDateTime: (value: string | Date) => string;
 };

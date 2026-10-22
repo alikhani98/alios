@@ -1,4 +1,6 @@
-import { createContext, useMemo, useState, type ReactNode } from "react";
+import { createContext, useEffect, useMemo, useState, type ReactNode } from "react";
+
+import { LOCAL_PREFERENCE_CHANGE_EVENT } from "@/shared/constants/preferences";
 
 import { useI18n } from "@/shared/i18n";
 import {
@@ -35,9 +37,29 @@ export function DateDisplayProvider({ children }: DateDisplayProviderProps) {
     useState<CalendarDisplay>(getInitialCalendarDisplay);
   const resolvedCalendar = resolveCalendar(calendarDisplay, language);
 
+  useEffect(() => {
+    const sync = (event: Event) => {
+      if (event instanceof StorageEvent && event.key !== null && event.key !== CALENDAR_DISPLAY_STORAGE_KEY) return;
+      if (event instanceof CustomEvent && event.detail?.key !== CALENDAR_DISPLAY_STORAGE_KEY) return;
+      try {
+        const stored = window.localStorage.getItem(CALENDAR_DISPLAY_STORAGE_KEY);
+        setCalendarDisplayState(isCalendarDisplay(stored) ? stored : DEFAULT_CALENDAR_DISPLAY);
+      } catch {
+        // Keep the last readable calendar while storage is unavailable.
+      }
+    };
+    window.addEventListener("storage", sync);
+    window.addEventListener(LOCAL_PREFERENCE_CHANGE_EVENT, sync);
+    return () => {
+      window.removeEventListener("storage", sync);
+      window.removeEventListener(LOCAL_PREFERENCE_CHANGE_EVENT, sync);
+    };
+  }, []);
+
   const setCalendarDisplay = (calendar: CalendarDisplay) => {
-    writeStoredPreference(CALENDAR_DISPLAY_STORAGE_KEY, calendar);
+    if (!writeStoredPreference(CALENDAR_DISPLAY_STORAGE_KEY, calendar)) return false;
     setCalendarDisplayState(calendar);
+    return true;
   };
 
   const value = useMemo<DateDisplayContextValue>(

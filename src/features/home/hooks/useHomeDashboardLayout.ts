@@ -63,22 +63,12 @@ function writeStoredDashboardLayout(layout: HomeDashboardLayout) {
   }
 }
 
-function removeStoredDashboardLayout() {
-  const storage = getPreferenceStorage();
-
-  if (!storage) {
-    return;
-  }
-
-  try {
-    removeStoredPreference(HOME_DASHBOARD_LAYOUT_STORAGE_KEY, storage);
-  } catch {
-    // Keep the layout in memory if storage is unavailable.
-  }
+function removeStoredDashboardLayout(): boolean {
+  return removeStoredPreference(HOME_DASHBOARD_LAYOUT_STORAGE_KEY);
 }
 
-export function resetHomeDashboardLayoutPreference() {
-  removeStoredDashboardLayout();
+export function resetHomeDashboardLayoutPreference(): boolean {
+  return removeStoredDashboardLayout();
 }
 
 export function useHomeDashboardLayout() {
