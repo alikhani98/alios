@@ -1,8 +1,10 @@
+import { z } from "zod";
+
 import { SUPABASE_AUTH_STORAGE_KEY } from "@/core/auth/supabaseAuthConfig";
 import { getSupabaseSyncConfiguration } from "@/core/sync";
 
 import type {
-  ReminderDeliveryChannel,
+  PersistedReminderDeliveryChannel,
   TelegramReminderPreference,
   TelegramReminderPreferenceInput,
 } from "./telegramReminderSettings";
@@ -26,9 +28,24 @@ type ReminderSettingsResponse = Readonly<{
   preference?: ReminderPreferenceRow | null;
 }>;
 
+const persistedPreferenceSchema = z.object({
+  enabled: z.boolean(),
+  channel: z.enum(["telegram", "web_push", "both"]),
+  telegram_chat_id: z.string().nullable(),
+  timezone: z.string().min(1),
+  morning_time: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/),
+  last_sent_local_date: z.string().nullable().optional(),
+});
+
+const savedPreferenceSchema = persistedPreferenceSchema.extend({
+  channel: z.enum(["telegram", "web_push"]),
+});
+
 function toReminderChannel(
   channel: string | null | undefined
-): ReminderDeliveryChannel {
+): PersistedReminderDeliveryChannel {
+  // Reading a legacy value must not choose a delivery channel or rewrite the remote preference.
+  if (channel === "both") return "both";
   return channel === "web_push" ? "web_push" : "telegram";
 }
 
@@ -110,12 +127,18 @@ async function invokeReminderSettings(
 
 export async function loadTelegramReminderPreference(): Promise<TelegramReminderPreference> {
   const payload = await invokeReminderSettings({ action: "get" });
-  return toPreference(payload.preference);
+  return payload.preference === null
+    ? defaultTelegramReminderPreference
+    : toPreference(persistedPreferenceSchema.parse(payload.preference));
 }
 
 export async function saveTelegramReminderPreference(
   input: TelegramReminderPreferenceInput
 ): Promise<TelegramReminderPreference> {
+  // Legacy `both` is read-only, including calls that bypass TypeScript.
+  if (input.channel !== "telegram" && input.channel !== "web_push") {
+    throw new Error("Choose a supported reminder channel before saving.");
+  }
   const preference = normalizeTelegramReminderPreference(input);
   const payload = await invokeReminderSettings({
     action: "save",
@@ -128,7 +151,7 @@ export async function saveTelegramReminderPreference(
     },
   });
 
-  return toPreference(payload.preference);
+  return toPreference(savedPreferenceSchema.parse(payload.preference));
 }
 
 export async function sendTelegramReminderTest(

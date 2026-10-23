@@ -1,8 +1,6 @@
 import { Send, Smartphone } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo } from "react";
 
-import { useAuthSession } from "@/core/auth";
-import { getSupabaseSyncConfiguration } from "@/core/sync";
 import { useI18n, type TranslationKey } from "@/shared/i18n";
 import {
   Button,
@@ -13,195 +11,51 @@ import {
 } from "@/shared/ui";
 
 import {
-  defaultTelegramReminderPreference,
-  getBrowserTimeZone,
   getTelegramReminderTimeZoneOptions,
-  normalizeTelegramReminderPreference,
   validateTelegramReminderPreference,
-  type TelegramReminderPreferenceInput,
 } from "../telegramReminderSettings";
 import {
-  loadTelegramReminderPreference,
-  saveTelegramReminderPreference,
-  sendTelegramReminderTest,
-} from "../telegramReminderSettingsClient";
+  useTelegramReminderSettings,
+  type TelegramReminderSettingsController,
+} from "../useTelegramReminderSettings";
 
-type PendingAction = "load" | "save" | "test" | null;
-type Feedback = Readonly<{
-  tone: "success" | "danger" | "neutral";
-  message: string;
-}> | null;
-
-function createInitialPreference(): TelegramReminderPreferenceInput {
-  return {
-    ...defaultTelegramReminderPreference,
-    timezone: getBrowserTimeZone(),
-  };
+function StandaloneTelegramReminderSettings({ active }: { active: boolean }) {
+  const settings = useTelegramReminderSettings(active);
+  return <TelegramReminderSettingsForm settings={settings} active={active} />;
 }
 
-export function TelegramReminderSettings({ active = true }: { active?: boolean }) {
+export function TelegramReminderSettings({ settings, active = true }: {
+  settings?: TelegramReminderSettingsController;
+  active?: boolean;
+}) {
+  return settings
+    ? <TelegramReminderSettingsForm settings={settings} active={active} />
+    : <StandaloneTelegramReminderSettings active={active} />;
+}
+
+function TelegramReminderSettingsForm({ settings, active }: { settings: TelegramReminderSettingsController; active: boolean }) {
   const { t } = useI18n();
-  const authSession = useAuthSession();
-  const [draft, setDraft] = useState<TelegramReminderPreferenceInput>(
-    createInitialPreference
-  );
-  const [pendingAction, setPendingAction] = useState<PendingAction>(null);
-  const [feedback, setFeedback] = useState<Feedback>(null);
-
-  const loadedSession = useRef<string | null>(null);
-  const sessionKey = `${authSession.provider}:${authSession.user?.userId ?? ""}`;
-
-  const isAuthenticated = authSession.status === "authenticated";
-  const isSupabaseConfigured = getSupabaseSyncConfiguration() !== null;
+  const {
+    draft, preference, pendingAction, feedback, isBusy, isSupabaseConfigured,
+    canUseRemoteSettings, setField, saveSettings, sendTest, retry,
+  } = settings;
   const timeZoneOptions = useMemo(
-    () => getTelegramReminderTimeZoneOptions(draft.timezone),
-    [draft.timezone]
+    () => getTelegramReminderTimeZoneOptions(draft.timezone), [draft.timezone]
   );
-  const validationKey = validateTelegramReminderPreference(draft) as
-    | TranslationKey
-    | null;
-  const isBusy = pendingAction !== null;
-  const canUseRemoteSettings = isAuthenticated && isSupabaseConfigured;
-  const canSave = canUseRemoteSettings && !isBusy && validationKey === null;
-  const canTest =
-    canUseRemoteSettings &&
-    !isBusy &&
+  const validationKey = (draft.channel === "both"
+    ? "reminders.channelSelector.legacyBoth"
+    : validateTelegramReminderPreference({ ...draft, channel: draft.channel })) as TranslationKey | null;
+  const canSave = active && canUseRemoteSettings && preference !== null && !isBusy && validationKey === null;
+  const canTest = active && canUseRemoteSettings && preference !== null && !isBusy &&
     draft.telegramChatId.trim().length > 0 &&
-    validateTelegramReminderPreference({ ...draft, enabled: true }) === null;
-
-  useEffect(() => {
-    if (!canUseRemoteSettings) {
-      loadedSession.current = null;
-      return;
-    }
-    if (!active) {
-      setPendingAction((current) => current === "load" ? null : current);
-      return;
-    }
-    if (loadedSession.current === sessionKey) return;
-
-    let isActive = true;
-    setPendingAction("load");
-    setFeedback(null);
-
-    void loadTelegramReminderPreference()
-      .then((preference) => {
-        if (!isActive) return;
-        loadedSession.current = sessionKey;
-        setDraft({
-          enabled: preference.enabled,
-          channel: "telegram",
-          telegramChatId: preference.telegramChatId,
-          timezone: preference.timezone,
-          morningTime: preference.morningTime,
-        });
-      })
-      .catch((error: unknown) => {
-        if (!isActive) return;
-        setFeedback({
-          tone: "danger",
-          message:
-            error instanceof Error
-              ? error.message
-              : t("settings.telegramReminderLoadError"),
-        });
-      })
-      .finally(() => {
-        if (isActive) {
-          setPendingAction(null);
-        }
-      });
-
-    return () => {
-      isActive = false;
-    };
-  }, [active, canUseRemoteSettings, sessionKey, t]);
-
-  const setField = <Key extends keyof TelegramReminderPreferenceInput>(
-    key: Key,
-    value: TelegramReminderPreferenceInput[Key]
-  ) => {
-    setDraft((current) => ({ ...current, [key]: value }));
-    setFeedback(null);
-  };
-
-  const saveSettings = async () => {
-    const validation = validateTelegramReminderPreference(draft) as
-      | TranslationKey
-      | null;
-    if (validation) {
-      setFeedback({ tone: "danger", message: t(validation) });
-      return;
-    }
-
-    setPendingAction("save");
-    setFeedback(null);
-    try {
-      const saved = await saveTelegramReminderPreference(
-        normalizeTelegramReminderPreference(draft)
-      );
-      setDraft({
-        enabled: saved.enabled,
-        channel: "telegram",
-        telegramChatId: saved.telegramChatId,
-        timezone: saved.timezone,
-        morningTime: saved.morningTime,
-      });
-      setFeedback({
-        tone: "success",
-        message: t("settings.telegramReminderSaveSuccess"),
-      });
-    } catch (error) {
-      setFeedback({
-        tone: "danger",
-        message:
-          error instanceof Error
-            ? error.message
-            : t("settings.telegramReminderSaveError"),
-      });
-    } finally {
-      setPendingAction(null);
-    }
-  };
-
-  const sendTest = async () => {
-    const validation = validateTelegramReminderPreference({
-      ...draft,
-      enabled: true,
-    }) as TranslationKey | null;
-    if (validation) {
-      setFeedback({ tone: "danger", message: t(validation) });
-      return;
-    }
-
-    setPendingAction("test");
-    setFeedback(null);
-    try {
-      const message = await sendTelegramReminderTest(draft.telegramChatId);
-      setFeedback({
-        tone: "success",
-        message: message || t("settings.telegramReminderTestSuccess"),
-      });
-    } catch (error) {
-      setFeedback({
-        tone: "danger",
-        message:
-          error instanceof Error
-            ? error.message
-            : t("settings.telegramReminderTestError"),
-      });
-    } finally {
-      setPendingAction(null);
-    }
-  };
-
+    validateTelegramReminderPreference({ ...draft, channel: "telegram", enabled: true }) === null;
   const statusText = !isSupabaseConfigured
     ? t("settings.telegramReminderSupabaseRequired")
-    : !isAuthenticated
+    : !canUseRemoteSettings
       ? t("settings.telegramReminderSignInRequired")
-      : draft.enabled
-        ? t("settings.telegramReminderEnabled")
-        : t("settings.telegramReminderDisabled");
+      : !preference
+        ? t(pendingAction === "load" ? "common.loading" : "settings.telegramReminderLoadError")
+        : t(preference.enabled ? "settings.telegramReminderEnabled" : "settings.telegramReminderDisabled");
 
   return (
     <SoftPanel className="space-y-4">
@@ -219,7 +73,7 @@ export function TelegramReminderSettings({ active = true }: { active?: boolean }
         </div>
         <StatusChip
           tone={
-            !canUseRemoteSettings ? "warning" : draft.enabled ? "primary" : "neutral"
+            !canUseRemoteSettings ? "warning" : preference?.enabled ? "primary" : "neutral"
           }
         >
           {statusText}
@@ -231,7 +85,7 @@ export function TelegramReminderSettings({ active = true }: { active?: boolean }
           <input
             type="checkbox"
             checked={draft.enabled}
-            disabled={!canUseRemoteSettings || isBusy}
+            disabled={!active || !canUseRemoteSettings || !preference || isBusy}
             onChange={(event) => setField("enabled", event.currentTarget.checked)}
             className="h-4 w-4 accent-primary"
           />
@@ -246,7 +100,7 @@ export function TelegramReminderSettings({ active = true }: { active?: boolean }
           </span>
           <Input
             value={draft.telegramChatId}
-            disabled={!canUseRemoteSettings || isBusy}
+            disabled={!active || !canUseRemoteSettings || !preference || isBusy}
             inputMode="numeric"
             placeholder="123456789"
             onChange={(event) =>
@@ -264,7 +118,7 @@ export function TelegramReminderSettings({ active = true }: { active?: boolean }
           </span>
           <Select
             value={draft.timezone}
-            disabled={!canUseRemoteSettings || isBusy}
+            disabled={!active || !canUseRemoteSettings || !preference || isBusy}
             onChange={(event) => setField("timezone", event.currentTarget.value)}
           >
             {timeZoneOptions.map((timezone) => (
@@ -282,7 +136,7 @@ export function TelegramReminderSettings({ active = true }: { active?: boolean }
           <Input
             type="time"
             value={draft.morningTime}
-            disabled={!canUseRemoteSettings || isBusy}
+            disabled={!active || !canUseRemoteSettings || !preference || isBusy}
             onChange={(event) =>
               setField("morningTime", event.currentTarget.value)
             }
@@ -308,8 +162,12 @@ export function TelegramReminderSettings({ active = true }: { active?: boolean }
               : "text-sm leading-6 text-muted-foreground"
           }
         >
-          {feedback.message}
+          {t(feedback.key)}
         </p>
+      ) : null}
+
+      {active && canUseRemoteSettings && !preference && !isBusy ? (
+        <Button type="button" variant="outline" onClick={retry}>{t("common.tryAgain")}</Button>
       ) : null}
 
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">

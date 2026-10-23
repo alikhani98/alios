@@ -502,7 +502,7 @@ export function SettingsPage() {
   const canUseRemoteReminderSettings =
     authSession.status === "authenticated" &&
     getSupabaseSyncConfiguration() !== null;
-  const currentReminderChannel: ReminderDeliveryChannel =
+  const currentReminderChannel: TelegramReminderPreference["channel"] =
     reminderPreference?.channel ?? "telegram";
   const hasTelegramReminderChannel =
     (reminderPreference?.telegramChatId.trim().length ?? 0) > 0;

@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useI18n } from "@/shared/i18n";
 import { SoftPanel } from "@/shared/ui";
+import type { PersistedReminderDeliveryChannel, ReminderDeliveryChannel } from "../telegramReminderSettings";
 
-export type ReminderChannel = "telegram" | "web_push";
+export type ReminderChannel = ReminderDeliveryChannel;
 
 export interface ReminderChannelSelectorProps {
-  currentChannel: ReminderChannel;
+  currentChannel: PersistedReminderDeliveryChannel;
   hasTelegram: boolean;
   hasWebPush: boolean;
   onChannelChange: (channel: ReminderChannel) => Promise<void>;
@@ -30,26 +31,40 @@ export function ReminderChannelSelector({
   onChannelChange,
   disabled = false,
 }: ReminderChannelSelectorProps) {
-  const { t } = useI18n();
+  const { t, direction } = useI18n();
   const [pendingChannel, setPendingChannel] = useState<ReminderChannel | null>(
     null
   );
+  const submitting = useRef(false);
+  const group = useRef<HTMLDivElement>(null);
+  const [selectionError, setSelectionError] = useState(false);
+  useEffect(() => {
+    if (pendingChannel !== null || !group.current?.contains(document.activeElement)) return;
+    group.current.querySelector<HTMLButtonElement>(`[data-channel="${currentChannel}"]`)?.focus();
+  }, [currentChannel, pendingChannel]);
 
-  if (!hasTelegram || !hasWebPush) {
+  if (!hasTelegram && !hasWebPush && currentChannel !== "both") {
     return null;
   }
 
   const isBusy = pendingChannel !== null;
+  const availableOptions = options.filter((option) => option.value === "telegram" ? hasTelegram || currentChannel === "both" : hasWebPush);
+  const tabStop = availableOptions.find((option) => option.value === currentChannel)?.value ?? availableOptions[0]?.value;
 
   const selectChannel = async (channel: ReminderChannel) => {
-    if (disabled || isBusy || channel === currentChannel) {
+    if (disabled || submitting.current || channel === currentChannel) {
       return;
     }
 
+    setSelectionError(false);
+    submitting.current = true;
     setPendingChannel(channel);
     try {
       await onChannelChange(channel);
+    } catch {
+      setSelectionError(true);
     } finally {
+      submitting.current = false;
       setPendingChannel(null);
     }
   };
@@ -59,7 +74,17 @@ export function ReminderChannelSelector({
       <p className="text-sm font-semibold text-alios-caspian dark:text-alios-paper">
         {t("reminders.channelSelector.label")}
       </p>
+      <p className="text-sm leading-6 text-muted-foreground">
+        {t("reminders.channelSelector.help")}
+      </p>
+      {currentChannel === "both" ? (
+        <p role="status" className="text-sm leading-6 text-muted-foreground">
+          {t("reminders.channelSelector.legacyBoth")}
+        </p>
+      ) : null}
       <div
+        ref={group}
+        dir={direction}
         role="radiogroup"
         aria-label={t("reminders.channelSelector.label")}
         aria-busy={isBusy}
@@ -74,8 +99,25 @@ export function ReminderChannelSelector({
               key={option.value}
               type="button"
               role="radio"
+              data-channel={option.value}
               aria-checked={isSelected}
-              disabled={disabled || isBusy}
+              aria-disabled={disabled || isBusy}
+              tabIndex={option.value === tabStop ? 0 : -1}
+              onKeyDown={(event) => {
+                if (!["ArrowRight", "ArrowLeft", "ArrowDown", "ArrowUp"].includes(event.key)) return;
+                event.preventDefault();
+                if (disabled || submitting.current) return;
+                const enabled = availableOptions;
+                const index = enabled.findIndex((item) => item.value === option.value);
+                const forward = event.key === "ArrowDown" || event.key === (direction === "rtl" ? "ArrowLeft" : "ArrowRight");
+                const next = enabled[(index + (forward ? 1 : -1) + enabled.length) % enabled.length];
+                if (!next) return;
+                group.current?.querySelector<HTMLButtonElement>(`[data-channel="${next.value}"]`)?.focus();
+                void selectChannel(next.value);
+              }}
+              disabled={(disabled && !isBusy) || !(option.value === "telegram"
+                ? hasTelegram || currentChannel === "both"
+                : hasWebPush)}
               onClick={() => {
                 void selectChannel(option.value);
               }}
@@ -90,6 +132,7 @@ export function ReminderChannelSelector({
           );
         })}
       </div>
+      {selectionError ? <p role="alert" className="text-sm text-destructive">{t("settings.telegramReminderSaveError")}</p> : null}
     </SoftPanel>
   );
 }
