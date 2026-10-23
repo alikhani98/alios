@@ -298,7 +298,7 @@ export function TherapyBridgePage() {
             <p className="rounded-2xl border border-border/70 bg-card p-3 text-sm text-muted-foreground">
               <Link
                 className="font-medium text-primary underline-offset-4 hover:underline"
-                to="/settings"
+                to="/settings#settings-advanced-local-tools"
               >
                 {t("therapy.noProviderHint")}
               </Link>

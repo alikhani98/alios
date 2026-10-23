@@ -3067,4 +3067,5 @@ export const messagesEn = {
   "settings.optionalBackendInfo": "Optional account & sync (Supabase)",
   "settings.advancedAiInfo": "See advanced settings",
   "settings.notificationsTab": "Notifications",
+  "settings.editLocalProfile": "Edit local profile",
 } as const;

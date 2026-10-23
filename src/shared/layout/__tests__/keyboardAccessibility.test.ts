@@ -42,7 +42,6 @@ describe("shell keyboard accessibility", () => {
 
     [
       "topbar-dashboard-controls",
-      "topbar-theme-controls",
       "topbar-profile-controls",
       'aria-haspopup="dialog"',
       "closeActivePanel(true)",

@@ -913,7 +913,7 @@ export function SettingsPage() {
               {t("home.dashboardSections")}
             </p>
           </SoftPanel>
-          <Button asChild variant="outline"><Link to="/">{t("nav.home")}</Link></Button>
+          <Button asChild variant="outline"><Link to="/?panel=dashboard">{t("home.customizeDashboard")}</Link></Button>
           {homeLayoutResetMessage ? (
             <div
               role={homeLayoutResetError ? "alert" : "status"}

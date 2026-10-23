@@ -42,6 +42,7 @@ export function TopbarDashboardPanel({
             className="h-10 w-10 shrink-0"
             onClick={onClose}
             aria-label={t("common.close")}
+            autoFocus
           >
             <X className="h-4 w-4" aria-hidden="true" />
           </Button>

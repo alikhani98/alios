@@ -107,7 +107,11 @@ describe("global Quick Access", () => {
     await act(async () => { document.body.dispatchEvent(new MouseEvent("mousedown", { bubbles: true })); });
     expect(container.querySelector("#topbar-quick-access")).toBeNull();
     await open();
-    await click(button("Appearance"));
+    const appearance = container.querySelector<HTMLAnchorElement>('a[aria-label="Appearance"]');
+    expect(appearance?.getAttribute("href")).toBe("/settings?tab=appearance");
+    if (!appearance) throw new Error("Missing appearance Settings link");
+    await click(appearance);
+    expect(container.querySelector("[data-location]")?.textContent).toBe("/settings?tab=appearance");
     expect(container.querySelector("#topbar-quick-access")).toBeNull();
     await open();
     expect(container.querySelector("#topbar-theme-controls")).toBeNull();

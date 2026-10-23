@@ -3069,4 +3069,5 @@ export const messagesFa: Record<TranslationKey, string> = {
   "settings.optionalBackendInfo": "حساب و همگام‌سازی اختیاری (Supabase)",
   "settings.advancedAiInfo": "در تنظیمات پیشرفته بررسی کنید",
   "settings.notificationsTab": "اعلان‌ها",
+  "settings.editLocalProfile": "ویرایش پروفایل محلی",
 };

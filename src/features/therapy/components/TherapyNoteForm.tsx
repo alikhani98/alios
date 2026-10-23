@@ -1,5 +1,6 @@
 import { X } from "lucide-react";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
+import { createPortal } from "react-dom";
 
 import { useStorageAdapter } from "@/core/storage";
 import { getLocalDateKey } from "@/shared/preferences/routineNudges";
@@ -69,6 +70,55 @@ export function TherapyNoteForm({
   const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const submitButtonRef = useRef<HTMLButtonElement>(null);
+  const sessionRef = useRef(0);
+
+  useEffect(() => {
+    if (!open) return;
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    sessionRef.current++;
+    setIsSubmitting(false);
+    setError(null);
+    // Close is a predictable initial target without opening the mobile keyboard.
+    closeButtonRef.current?.focus({ preventScroll: true });
+    return () => {
+      sessionRef.current++;
+      if (opener?.isConnected) opener.focus({ preventScroll: true });
+    };
+  }, [open]);
+
+  useEffect(() => {
+    if (error) submitButtonRef.current?.focus({ preventScroll: true });
+  }, [error]);
+
+  const handleDialogKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    // A modal owns its keyboard events; do not open a competing shell overlay.
+    event.stopPropagation();
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+      event.preventDefault();
+    } else if (event.key === "Escape") {
+      event.preventDefault();
+      onClose();
+    } else if (event.key === "Tab") {
+      const controls = Array.from(dialogRef.current?.querySelectorAll<HTMLElement>(
+        "button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled])"
+      ) ?? []).filter((element) => element.tabIndex >= 0 && !element.hidden);
+      const first = controls[0];
+      const last = controls.at(-1);
+      if (!first || !last) {
+        event.preventDefault();
+        dialogRef.current?.focus();
+      } else if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+  };
 
   useEffect(() => {
     if (open) {
@@ -85,10 +135,13 @@ export function TherapyNoteForm({
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!canSubmit) {
+    if (!canSubmit || isSubmitting) {
       return;
     }
 
+    const session = sessionRef.current;
+    // Save becomes disabled while pending, so keep focus on an enabled control.
+    closeButtonRef.current?.focus({ preventScroll: true });
     setIsSubmitting(true);
     setError(null);
 
@@ -98,22 +151,30 @@ export function TherapyNoteForm({
         category,
         content: content.trim(),
       });
+      if (session !== sessionRef.current) {
+        onSaved?.();
+        return;
+      }
       setCategory(initialCategory);
       setContent("");
       onSaved?.();
       onClose();
     } catch (caught) {
+      if (session !== sessionRef.current) return;
       setError(
         caught instanceof Error ? caught.message : t("therapy.saveError")
       );
     } finally {
-      setIsSubmitting(false);
+      if (session === sessionRef.current) setIsSubmitting(false);
     }
   };
 
-  return (
+  const dialog = (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-background/70 p-3 backdrop-blur-sm sm:items-center"
+      ref={dialogRef}
+      tabIndex={-1}
+      onKeyDown={handleDialogKeyDown}
+      className="alios-modal-overlay backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
       aria-labelledby="therapy-note-form-title"
@@ -121,17 +182,19 @@ export function TherapyNoteForm({
     >
       <button
         type="button"
+        tabIndex={-1}
         className="absolute inset-0 cursor-default"
         aria-label={t("common.cancel")}
         onClick={onClose}
       />
-      <Card className="relative max-h-[92vh] w-full max-w-2xl overflow-y-auto border-border/70 bg-card shadow-aliosFloating">
+      <Card className="alios-modal-panel relative w-full max-w-2xl border-border/70 bg-card shadow-aliosFloating">
         <CardHeader className="flex flex-row items-start justify-between gap-4">
           <CardTitle id="therapy-note-form-title">
             {t("therapy.formTitle")}
           </CardTitle>
           <Button
             type="button"
+            ref={closeButtonRef}
             variant="ghost"
             size="icon"
             aria-label={t("common.cancel")}
@@ -180,7 +243,7 @@ export function TherapyNoteForm({
               <Button type="button" variant="ghost" onClick={onClose}>
                 {t("common.cancel")}
               </Button>
-              <Button type="submit" disabled={!canSubmit || isSubmitting}>
+              <Button ref={submitButtonRef} type="submit" disabled={!canSubmit || isSubmitting}>
                 {t("therapy.submit")}
               </Button>
             </div>
@@ -189,4 +252,6 @@ export function TherapyNoteForm({
       </Card>
     </div>
   );
+
+  return typeof document === "undefined" ? dialog : createPortal(dialog, document.body);
 }

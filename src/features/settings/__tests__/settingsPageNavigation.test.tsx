@@ -193,12 +193,12 @@ describe("Settings route and existing data entry points", () => {
     expect(container.querySelector('[data-testid="location"]')?.textContent).toContain("safe=1");
   });
 
-  it("uses the existing Home destination without depending on the E3 dashboard query handler", async () => {
+  it("connects dashboard customization to the E3 Home panel destination", async () => {
     await render("/settings?tab=workspace#settings-dashboard");
     const link = container.querySelector<HTMLAnchorElement>('#settings-dashboard a');
-    expect(link?.getAttribute("href")).toBe("/");
-    expect(link?.textContent).toBe(messagesEn["nav.home"]);
-    expect(container.querySelector('a[href="/?panel=dashboard"]')).toBeNull();
+    expect(link?.getAttribute("href")).toBe("/?panel=dashboard");
+    expect(link?.textContent).toBe(messagesEn["home.customizeDashboard"]);
+    expect(container.querySelector('a[href="/"]')).not.toBe(link);
   });
 
   it("preserves the E1 v2 accent during unreadable synchronization and accepts later valid updates", async () => {

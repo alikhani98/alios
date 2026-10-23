@@ -1,23 +1,13 @@
 import {
-  Check,
-  Clock3,
-  ImageIcon,
   LayoutDashboard,
   Menu,
-  Moon,
-  MonitorSmartphone,
   Pin,
   Search,
-  SunMedium,
   SunMoon,
-  Trash2,
-  Upload,
   UserCircle,
 } from "lucide-react";
 import {
   Suspense,
-  ChangeEvent,
-  FormEvent,
   useEffect,
   useRef,
   useState,
@@ -27,42 +17,27 @@ import { GlobalQuickAccessPanel } from "@/shared/quickAccess/GlobalQuickAccessPa
 import { useQuickAccessPreference } from "@/shared/quickAccess/useQuickAccess";
 
 import {
-  APPEARANCE_STORAGE_KEY,
   DISPLAY_NAME_STORAGE_KEY,
   PROFILE_AVATAR_IMAGE_STORAGE_KEY,
-  PROFILE_AVATAR_STORAGE_KEY,
 } from "@/shared/constants/preferences";
 import { appConfig } from "@/shared/constants/app";
 import { usePersistentString } from "@/shared/hooks/usePersistentString";
 import { useI18n } from "@/shared/i18n";
 import { lazyWithRetry } from "@/shared/runtime/lazyWithRetry";
 import {
-  DEFAULT_APPEARANCE_PREFERENCE,
-  parseAppearancePreference,
-} from "@/shared/preferences/appearance";
-import {
   getDisplayNameInitials,
-  normalizeDisplayName,
 } from "@/shared/preferences/profile";
 import { Badge, Button, SectionHeader } from "@/shared/ui";
-import { Input } from "@/shared/ui";
 import { aliosPopoverMotion, aliosSurfaceMotion } from "@/shared/ui/motion";
 import { cn } from "@/shared/utils/cn";
 
-type ActivePanel = "dashboard" | "theme" | "profile" | "quickAccess" | null;
+type ActivePanel = "dashboard" | "profile" | "quickAccess" | null;
 
 const TopbarDashboardPanel = lazyWithRetry(() =>
   import("./TopbarDashboardPanel").then((module) => ({
     default: module.TopbarDashboardPanel,
   }))
 );
-
-const appearanceOptions = [
-  { value: "light", icon: SunMedium, labelKey: "settings.light" },
-  { value: "dark", icon: Moon, labelKey: "settings.dark" },
-  { value: "system", icon: MonitorSmartphone, labelKey: "settings.system" },
-  { value: "scheduled", icon: Clock3, labelKey: "settings.scheduled" },
-] as const;
 
 type TopbarProps = {
   title: string;
@@ -72,70 +47,6 @@ type TopbarProps = {
   shellOverlayOpen?: boolean;
 };
 
-const PROFILE_AVATAR_IMAGE_SIZE = 160;
-
-function isStoredProfileAvatarImage(value: string): boolean {
-  return value.startsWith("data:image/");
-}
-
-function resizeProfileAvatarImage(file: File): Promise<string> {
-  if (!file.type.startsWith("image/")) {
-    return Promise.reject(new Error("Unsupported avatar image type"));
-  }
-
-  return new Promise((resolve, reject) => {
-    const objectUrl = URL.createObjectURL(file);
-    const image = new window.Image();
-
-    image.onload = () => {
-      try {
-        const canvas = document.createElement("canvas");
-        canvas.width = PROFILE_AVATAR_IMAGE_SIZE;
-        canvas.height = PROFILE_AVATAR_IMAGE_SIZE;
-
-        const context = canvas.getContext("2d");
-        if (!context) {
-          throw new Error("Avatar canvas context unavailable");
-        }
-
-        const sourceSize = Math.min(image.naturalWidth, image.naturalHeight);
-        const sourceX = Math.max(0, (image.naturalWidth - sourceSize) / 2);
-        const sourceY = Math.max(0, (image.naturalHeight - sourceSize) / 2);
-
-        context.drawImage(
-          image,
-          sourceX,
-          sourceY,
-          sourceSize,
-          sourceSize,
-          0,
-          0,
-          PROFILE_AVATAR_IMAGE_SIZE,
-          PROFILE_AVATAR_IMAGE_SIZE
-        );
-
-        const webpDataUrl = canvas.toDataURL("image/webp", 0.78);
-        resolve(
-          webpDataUrl.startsWith("data:image/webp")
-            ? webpDataUrl
-            : canvas.toDataURL("image/jpeg", 0.82)
-        );
-      } catch (error) {
-        reject(error);
-      } finally {
-        URL.revokeObjectURL(objectUrl);
-      }
-    };
-
-    image.onerror = () => {
-      URL.revokeObjectURL(objectUrl);
-      reject(new Error("Avatar image could not be loaded"));
-    };
-
-    image.src = objectUrl;
-  });
-}
-
 export function Topbar({
   title,
   onOpenMobileSidebar,
@@ -143,51 +54,44 @@ export function Topbar({
   showDashboardControls = false,
   shellOverlayOpen = false,
 }: TopbarProps) {
-  const { direction, t } = useI18n();
+  const { t } = useI18n();
   const location = useLocation();
   const { preference: quickAccessPreference } = useQuickAccessPreference();
+  const dashboardTriggerRef = useRef<HTMLButtonElement>(null);
+  const dashboardEntryRef = useRef<string | null>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const activePanelContentRef = useRef<HTMLDivElement>(null);
   const activePanelTriggerRef = useRef<HTMLButtonElement | null>(null);
-  const avatarImageInputRef = useRef<HTMLInputElement>(null);
-  const { value: appearancePreference, setValue: setAppearancePreference } =
-    usePersistentString({
-      key: APPEARANCE_STORAGE_KEY,
-      defaultValue: DEFAULT_APPEARANCE_PREFERENCE,
-    });
-  const { value: displayName, setValue: setDisplayName } = usePersistentString({
+  const { value: displayName } = usePersistentString({
     key: DISPLAY_NAME_STORAGE_KEY,
     defaultValue: "",
   });
-  const { setValue: setProfileAvatar } =
-    usePersistentString({
-      key: PROFILE_AVATAR_STORAGE_KEY,
-      defaultValue: "initials",
-    });
-  const { value: profileAvatarImage, setValue: setProfileAvatarImage } =
+  const { value: profileAvatarImage } =
     usePersistentString({
       key: PROFILE_AVATAR_IMAGE_STORAGE_KEY,
       defaultValue: "",
     });
   const [activePanel, setActivePanel] = useState<ActivePanel>(null);
   useEffect(() => {
-    setActivePanel((current) => current === "quickAccess" ? null : current);
-  }, [location.pathname, location.search, location.hash]);
+    const entry = `${location.key}:${showDashboardControls}`;
+    const newEntry = dashboardEntryRef.current !== entry;
+    dashboardEntryRef.current = entry;
+    // A dismissed URL request stays consumed until a new navigation entry arrives.
+    if (!newEntry && !shellOverlayOpen) return;
+    const openDashboard = !shellOverlayOpen && showDashboardControls &&
+      new URLSearchParams(location.search).get("panel") === "dashboard";
+    if (openDashboard) activePanelTriggerRef.current = dashboardTriggerRef.current;
+    setActivePanel(openDashboard ? "dashboard" : null);
+  }, [location.key, location.pathname, location.search, location.hash, showDashboardControls, shellOverlayOpen]);
   useEffect(() => {
     if (shellOverlayOpen) setActivePanel(null);
   }, [shellOverlayOpen]);
-  const [draftDisplayName, setDraftDisplayName] = useState(displayName);
   const [savedMessage, setSavedMessage] = useState<string | null>(null);
-  const [avatarImageStatus, setAvatarImageStatus] = useState<
-    "idle" | "processing"
-  >("idle");
-  const [avatarImageError, setAvatarImageError] = useState<string | null>(null);
   const savedMessageTimer = useRef<number | null>(null);
-  const currentAppearance = parseAppearancePreference(appearancePreference);
   const hasDisplayName = displayName.trim().length > 0;
   const initials = getDisplayNameInitials(displayName);
   const hasProfileAvatarPhoto =
-    isStoredProfileAvatarImage(profileAvatarImage);
+    profileAvatarImage.startsWith("data:image/");
   const profileAvatarLabel = hasProfileAvatarPhoto
     ? t("settings.profileAvatarPhoto")
     : t("settings.profileAvatarInitials");
@@ -205,9 +109,7 @@ export function Topbar({
 
     const frame = window.requestAnimationFrame(() => {
       const focusableSelector =
-        activePanel === "profile" && window.matchMedia("(max-width: 767px)").matches
-          ? "button:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href]"
-          : "button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href]";
+        "button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href]";
 
       activePanelContentRef.current
         ?.querySelector<HTMLElement>(focusableSelector)
@@ -273,11 +175,6 @@ export function Topbar({
     });
   };
 
-  const handleSelectAppearance = (value: string) => {
-    setAppearancePreference(value);
-    closeActivePanel(true);
-  };
-
   const showSavedFeedback = () => {
     setSavedMessage(t("common.changesSaved"));
 
@@ -289,49 +186,6 @@ export function Topbar({
       setSavedMessage(null);
       savedMessageTimer.current = null;
     }, 1800);
-  };
-
-  const handleProfileAvatarImageChange = async (
-    event: ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = event.target.files?.[0];
-
-    if (!file) {
-      return;
-    }
-
-    setAvatarImageStatus("processing");
-    setAvatarImageError(null);
-
-    try {
-      const resizedImage = await resizeProfileAvatarImage(file);
-      setProfileAvatarImage(resizedImage);
-      setProfileAvatar("photo");
-      showSavedFeedback();
-    } catch {
-      setAvatarImageError(t("settings.profileAvatarPhotoError"));
-    } finally {
-      setAvatarImageStatus("idle");
-      event.target.value = "";
-    }
-  };
-
-  const handleRemoveProfileAvatarImage = () => {
-    setProfileAvatarImage("");
-    setProfileAvatar("initials");
-    setAvatarImageError(null);
-    showSavedFeedback();
-  };
-
-  const handleOpenProfilePanel = (trigger: HTMLButtonElement) => {
-    setDraftDisplayName(displayName);
-    togglePanel("profile", trigger);
-  };
-
-  const handleSaveDisplayName = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setDisplayName(normalizeDisplayName(draftDisplayName));
-    closeActivePanel(true);
   };
 
   return (
@@ -415,6 +269,7 @@ export function Topbar({
               className="rounded-full"
               aria-label={t("home.dashboardLayoutTooltip")}
               aria-expanded={activePanel === "dashboard"}
+              ref={dashboardTriggerRef}
               aria-controls="topbar-dashboard-controls"
               aria-haspopup="dialog"
               title={t("home.dashboardLayoutTooltip")}
@@ -432,19 +287,10 @@ export function Topbar({
           </div>
         ) : null}
 
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="rounded-full"
-          aria-label={t("settings.appearance")}
-          aria-expanded={activePanel === "theme"}
-          aria-controls="topbar-theme-controls"
-          aria-haspopup="dialog"
-          title={t("settings.appearance")}
-          onClick={(event) => togglePanel("theme", event.currentTarget)}
-        >
-          <SunMoon className="h-5 w-5" />
+        <Button asChild variant="ghost" size="icon" className="rounded-full">
+          <Link to="/settings?tab=appearance" aria-label={t("settings.appearance")} title={t("settings.appearance")}>
+            <SunMoon className="h-5 w-5" aria-hidden="true" />
+          </Link>
         </Button>
 
         <Button
@@ -457,7 +303,7 @@ export function Topbar({
           aria-controls="topbar-profile-controls"
           aria-haspopup="dialog"
           title={t("settings.localProfile")}
-          onClick={(event) => handleOpenProfilePanel(event.currentTarget)}
+          onClick={(event) => togglePanel("profile", event.currentTarget)}
         >
           {hasProfileAvatarPhoto ? (
             <img
@@ -489,48 +335,6 @@ export function Topbar({
               aliosPopoverMotion,
             )}>
             <GlobalQuickAccessPanel onClose={() => closeActivePanel(true)} />
-          </div>
-        ) : null}
-
-        {activePanel === "theme" ? (
-          <div
-            ref={activePanelContentRef}
-            id="topbar-theme-controls"
-            className={cn(
-              "absolute top-full z-50 mt-2 max-h-[calc(100vh-6rem)] w-64 overflow-y-auto rounded-2xl border bg-card p-2 shadow-aliosFloating",
-              aliosPopoverMotion,
-              direction === "rtl" ? "left-0" : "right-0"
-            )}
-            role="dialog"
-            aria-modal="false"
-            aria-label={t("settings.appearance")}
-          >
-            <div className="px-2 py-1.5">
-              <p className="text-sm font-semibold">{t("settings.appearance")}</p>
-              <p className="text-xs leading-5 text-muted-foreground">
-                {t("settings.appearanceDescription")}
-              </p>
-            </div>
-            <div className="space-y-1">
-              {appearanceOptions.map(({ value, icon: Icon, labelKey }) => (
-                <Button
-                  key={value}
-                  type="button"
-                  variant={
-                    currentAppearance === value ? "secondary" : "ghost"
-                  }
-                  className="w-full justify-start gap-2"
-                  aria-pressed={currentAppearance === value}
-                  onClick={() => handleSelectAppearance(value)}
-                >
-                  <Icon className="h-4 w-4 shrink-0" />
-                  <span className="flex-1 text-start">{t(labelKey)}</span>
-                  {currentAppearance === value ? (
-                    <Check className="h-4 w-4 shrink-0" />
-                  ) : null}
-                </Button>
-              ))}
-            </div>
           </div>
         ) : null}
 
@@ -577,7 +381,7 @@ export function Topbar({
             className={cn(
               "absolute top-full z-50 mt-2 max-h-[calc(100vh-6rem)] w-[22rem] max-w-[calc(100vw-1.5rem)] overflow-y-auto rounded-2xl border bg-card p-4 shadow-aliosFloating",
               aliosPopoverMotion,
-              direction === "rtl" ? "left-0" : "right-0"
+              "end-0"
             )}
             role="dialog"
             aria-modal="false"
@@ -612,99 +416,6 @@ export function Topbar({
                 <p className="text-xs leading-5 text-muted-foreground">
                   {t("settings.localOnlyProfile")}
                 </p>
-                <p className="text-xs leading-5 text-muted-foreground">
-                  {t("settings.noOnlineAccount")}
-                </p>
-              </div>
-            </div>
-
-            <form className="mt-4 space-y-3" onSubmit={handleSaveDisplayName}>
-              <label className="block space-y-1">
-                <span className="text-sm font-medium">
-                  {t("settings.displayName")}
-                </span>
-                <Input
-                  value={draftDisplayName}
-                  onChange={(event) => setDraftDisplayName(event.target.value)}
-                  placeholder={t("settings.displayNamePlaceholder")}
-                  aria-label={t("settings.displayName")}
-                />
-              </label>
-
-              <div className="flex flex-wrap gap-2">
-                <Button type="submit" className="flex-1">
-                  {t("common.saveChanges")}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="flex-1"
-                  onClick={() => {
-                    setDraftDisplayName(displayName);
-                    closeActivePanel(true);
-                  }}
-                >
-                  {t("common.cancel")}
-                </Button>
-              </div>
-            </form>
-
-            <div className="mt-4 space-y-3 rounded-2xl border border-border/70 bg-background/70 p-3">
-              <div className="space-y-2 rounded-2xl border border-dashed border-border/70 bg-card/70 p-3">
-                <div className="flex items-start gap-2">
-                  <ImageIcon className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                  <div className="min-w-0 space-y-1">
-                    <p className="text-sm font-semibold">
-                      {t("settings.profileAvatarPhoto")}
-                    </p>
-                    <p className="text-xs leading-5 text-muted-foreground">
-                      {t("settings.profileAvatarPhotoDescription")}
-                    </p>
-                  </div>
-                </div>
-
-                <input
-                  ref={avatarImageInputRef}
-                  type="file"
-                  accept="image/*"
-                  className="sr-only"
-                  onChange={handleProfileAvatarImageChange}
-                  aria-label={t("settings.profileAvatarPhotoUpload")}
-                />
-
-                <div className="flex flex-wrap gap-2">
-                  <Button
-                    type="button"
-                    variant={hasProfileAvatarPhoto ? "secondary" : "outline"}
-                    className="flex-1 justify-center gap-2"
-                    onClick={() => avatarImageInputRef.current?.click()}
-                    disabled={avatarImageStatus === "processing"}
-                    aria-pressed={hasProfileAvatarPhoto}
-                  >
-                    <Upload className="h-4 w-4 shrink-0" />
-                    {avatarImageStatus === "processing"
-                      ? t("settings.profileAvatarPhotoProcessing")
-                      : t("settings.profileAvatarPhotoUpload")}
-                  </Button>
-
-                  {isStoredProfileAvatarImage(profileAvatarImage) ? (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="flex-1 justify-center gap-2"
-                      onClick={handleRemoveProfileAvatarImage}
-                    >
-                      <Trash2 className="h-4 w-4 shrink-0" />
-                      {t("settings.profileAvatarPhotoRemove")}
-                    </Button>
-                  ) : null}
-                </div>
-
-                {avatarImageError ? (
-                  <p className="text-xs leading-5 text-destructive">
-                    {avatarImageError}
-                  </p>
-                ) : null}
               </div>
             </div>
 
@@ -713,7 +424,7 @@ export function Topbar({
               variant="ghost"
               className="mt-2 w-full justify-start"
             >
-              <Link to="/settings">{t("nav.settings")}</Link>
+              <Link to="/settings?tab=profile" onClick={() => closeActivePanel()}>{t("settings.editLocalProfile")}</Link>
             </Button>
           </div>
         ) : null}
