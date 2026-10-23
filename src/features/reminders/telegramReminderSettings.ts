@@ -1,8 +1,10 @@
 export type ReminderDeliveryChannel = "telegram" | "web_push";
+// The database historically accepted `both`; retain it on reads until the user selects one channel.
+export type PersistedReminderDeliveryChannel = ReminderDeliveryChannel | "both";
 
 export type TelegramReminderPreference = Readonly<{
   enabled: boolean;
-  channel: ReminderDeliveryChannel;
+  channel: PersistedReminderDeliveryChannel;
   telegramChatId: string;
   timezone: string;
   morningTime: string;
