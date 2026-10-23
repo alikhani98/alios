@@ -1,5 +1,7 @@
 import { createContext } from "react";
 
+import { loadRetryCatalog } from "./catalogRetry";
+
 import type {
   I18nContextValue,
   Language,
@@ -13,11 +15,12 @@ export const DEFAULT_LANGUAGE: Language = "fa";
 
 export const I18nContext = createContext<I18nContextValue | null>(null);
 
-type MessageCatalog = Record<TranslationKey, string>;
+export type MessageCatalog = Record<TranslationKey, string>;
 
 const messageCatalogs: Partial<Record<Language, MessageCatalog>> = {};
 const messageCatalogPromises: Partial<Record<Language, Promise<MessageCatalog>>> =
   {};
+const catalogFailureCounts: Partial<Record<Language, number>> = {};
 
 export function isLanguage(value: unknown): value is Language {
   return value === "fa" || value === "en";
@@ -39,15 +42,21 @@ export function loadMessages(language: Language): Promise<MessageCatalog> {
   const pending = messageCatalogPromises[language];
   if (pending) return pending;
 
+  const previousFailures = catalogFailureCounts[language] ?? 0;
   const request = (language === "fa"
     ? import("./messages.fa").then((module) => module.messagesFa)
     : import("./messages.en").then((module) => module.messagesEn)
-  ).then((messages) => {
+  ).catch((error: unknown) => {
+    if (previousFailures === 0) throw error;
+    return loadRetryCatalog(language, previousFailures);
+  }).then((messages) => {
     messageCatalogs[language] = messages;
+    delete catalogFailureCounts[language];
     return messages;
   }, (error: unknown) => {
     // A rejected request must not permanently poison future explicit retries.
     delete messageCatalogPromises[language];
+    catalogFailureCounts[language] = previousFailures + 1;
     throw error;
   });
   messageCatalogPromises[language] = request;

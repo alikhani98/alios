@@ -12,6 +12,7 @@ module.exports = defineConfig(({ mode }) => ({
     },
   },
   build: {
+    manifest: "build-manifest.json",
     rollupOptions: {
       output: {
         manualChunks(id) {
