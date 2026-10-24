@@ -1,0 +1,39 @@
+{
+  "app": "AliOS Attachment Package",
+  "packageVersion": 1,
+  "exportedAt": "2026-10-24T08:00:00.000Z",
+  "bundleFilename": "shared.bin",
+  "attachments": [
+    {
+      "id": "a1-resource-reference",
+      "ownerType": "resource",
+      "ownerId": "REPLACE_WITH_SYNTHETIC_RESOURCE_ID",
+      "kind": "document",
+      "filename": "a1-shared.txt",
+      "mimeType": "text/plain",
+      "size": 38,
+      "storageKey": "attachments/a1-manual-shared",
+      "createdAt": "2026-10-24T08:00:00.000Z",
+      "updatedAt": "2026-10-24T08:00:00.000Z"
+    },
+    {
+      "id": "a1-knowledge-reference",
+      "ownerType": "knowledge",
+      "ownerId": "REPLACE_WITH_SYNTHETIC_KNOWLEDGE_ID",
+      "kind": "document",
+      "filename": "a1-shared.txt",
+      "mimeType": "text/plain",
+      "size": 38,
+      "storageKey": "attachments/a1-manual-shared",
+      "createdAt": "2026-10-24T08:00:00.000Z",
+      "updatedAt": "2026-10-24T08:00:00.000Z"
+    }
+  ],
+  "binaries": [
+    {
+      "storageKey": "attachments/a1-manual-shared",
+      "offset": 0,
+      "length": 38
+    }
+  ]
+}

@@ -1,7 +1,9 @@
 import type {
   AttachmentRepository,
   CreateAttachmentInput,
+  DeleteAttachmentOptions,
 } from "@/core/repositories";
+import { StorageError } from "@/core/errors";
 import {
   attachmentSchema,
   type Attachment,
@@ -32,7 +34,22 @@ export class DexieAttachmentRepository
 
   async restore(attachment: Attachment): Promise<void> {
     return this.execute("restoring an attachment", async () => {
-      await this.database.attachments.put(attachmentSchema.parse(attachment));
+      const parsed = attachmentSchema.parse(attachment);
+      // Package preflight may precede a concurrent last-reference deletion.
+      // Standard JSON restore has its own metadata-only backup boundary.
+      await this.database.transaction(
+        "rw",
+        this.database.attachments,
+        this.database.attachmentBlobs,
+        async () => {
+          if (!(await this.database.attachmentBlobs.get(parsed.storageKey))) {
+            throw new StorageError(
+              "Attachment content disappeared before package metadata could be restored."
+            );
+          }
+          await this.database.attachments.put(parsed);
+        }
+      );
     });
   }
 
@@ -64,14 +81,28 @@ export class DexieAttachmentRepository
     });
   }
 
-  async delete(id: string): Promise<void> {
+  async delete(id: string, options: DeleteAttachmentOptions = {}): Promise<void> {
     return this.execute("deleting an attachment", async () => {
-      this.requireEntity(
-        "Attachment",
-        id,
-        await this.database.attachments.get(id)
+      await this.database.transaction(
+        "rw",
+        this.database.attachments,
+        this.database.attachmentBlobs,
+        async () => {
+          const attachment = await this.database.attachments.get(id);
+          if (!attachment) return;
+
+          await this.database.attachments.delete(id);
+          if (!options.deleteUnreferencedBinary) return;
+
+          // Both stores stay locked against overlapping writers, including other tabs.
+          const references = await this.database.attachments
+            .filter((record) => record.storageKey === attachment.storageKey)
+            .count();
+          if (references === 0) {
+            await this.database.attachmentBlobs.delete(attachment.storageKey);
+          }
+        }
       );
-      await this.database.attachments.delete(id);
     });
   }
 }
