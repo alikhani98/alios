@@ -7,6 +7,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { StorageAdapterProvider } from "@/core/storage";
 import { type AliosDatabase, type DexieStorageAdapter } from "@/db/dexie";
 import { I18nProvider, LANGUAGE_STORAGE_KEY } from "@/shared/i18n";
+import { messagesEn } from "@/shared/i18n/messages.en";
+import { messagesFa } from "@/shared/i18n/messages.fa";
 import { loadMessages } from "@/shared/i18n/i18n";
 import { Topbar } from "@/shared/layout/Topbar";
 import { createTestStorage, destroyTestDatabase } from "@/test/database";
@@ -210,4 +212,63 @@ describe("global Quick Access", () => {
       expect(panel().querySelector("[dir]")?.getAttribute("dir")).toBe(direction);
       expect(panel().textContent).not.toContain("quickAccess.");
     });
+  it.each([
+    ["en", "profile"], ["en", "dashboard"], ["fa", "profile"], ["fa", "dashboard"],
+  ] as const)("replaces %s %s and Quick Access in both directions and restores the active opener on Escape", async (language, other) => {
+    await loadMessages(language);
+    for (const store of [localStorage, window.localStorage]) store.setItem(LANGUAGE_STORAGE_KEY, language);
+    await render("/");
+    const messages = language === "fa" ? messagesFa : messagesEn;
+    const quick = button(messages["quickAccess.openGlobal"]);
+    const otherId = `topbar-${other}-controls`;
+    const otherTrigger = container.querySelector<HTMLButtonElement>(`[aria-controls="${otherId}"]`)!;
+    const otherPanel = () => container.querySelector<HTMLElement>(`#${otherId}`);
+    const escape = async () => { await act(async () => document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }))); };
+    await click(otherTrigger);
+    await until(() => { expect(otherPanel()).not.toBeNull(); expect(otherPanel()!.contains(document.activeElement)).toBe(true); });
+    expect(document.documentElement.dir).toBe(language === "fa" ? "rtl" : "ltr");
+    await click(quick);
+    await until(() => expect(document.activeElement).toBe(button(messages["common.close"], panel())));
+    expect(otherPanel()).toBeNull(); expect(otherTrigger.getAttribute("aria-expanded")).toBe("false");
+    expect(quick.getAttribute("aria-expanded")).toBe("true");
+    await escape();
+    await until(() => expect(document.activeElement).toBe(quick));
+    expect(quick.isConnected).toBe(true); expect(container.querySelector("#topbar-quick-access")).toBeNull();
+    expect(quick.getAttribute("aria-expanded")).toBe("false");
+    await click(quick);
+    await until(() => expect(document.activeElement).toBe(button(messages["common.close"], panel())));
+    await click(otherTrigger);
+    await until(() => { expect(otherPanel()).not.toBeNull(); expect(otherPanel()!.contains(document.activeElement)).toBe(true); });
+    expect(container.querySelector("#topbar-quick-access")).toBeNull(); expect(quick.getAttribute("aria-expanded")).toBe("false");
+    expect(otherTrigger.getAttribute("aria-expanded")).toBe("true");
+    await escape(); await until(() => expect(document.activeElement).toBe(otherTrigger));
+    expect(otherTrigger.isConnected).toBe(true); expect(otherPanel()).toBeNull();
+    expect(otherTrigger.getAttribute("aria-expanded")).toBe("false");
+  });
+
+  it.each(["en", "fa"] as const)("closes replaced menus during shortcut navigation and restores the surviving Quick Access trigger in %s", async language => {
+    await loadMessages(language);
+    for (const store of [localStorage, window.localStorage]) store.setItem(LANGUAGE_STORAGE_KEY, language);
+    writeQuickAccessPreference({ version: 1, items: [createModuleQuickAccessItem("today", 0)] });
+    await render("/"); const messages = language === "fa" ? messagesFa : messagesEn;
+    const dashboardTrigger = container.querySelector<HTMLButtonElement>('[aria-controls="topbar-dashboard-controls"]')!;
+    await click(dashboardTrigger);
+    await until(() => expect(container.querySelector('#topbar-dashboard-controls button[aria-label]')).not.toBeNull());
+    const quick = button(messages["quickAccess.openGlobal"]); await click(quick);
+    await until(() => expect(panel().querySelector<HTMLAnchorElement>('li a[href="/today"]')).not.toBeNull());
+    const oldPanel = panel(); const link = oldPanel.querySelector<HTMLAnchorElement>('li a[href="/today"]')!;
+    link.focus(); await click(link);
+    expect(container.querySelector("[data-location]")?.textContent).toBe("/today");
+    expect(oldPanel.isConnected).toBe(false); expect(dashboardTrigger.isConnected).toBe(false);
+    expect(container.querySelector("#topbar-dashboard-controls")).toBeNull();
+    expect(container.querySelector("#topbar-profile-controls")).toBeNull();
+    const currentQuick = button(messages["quickAccess.openGlobal"]);
+    expect(currentQuick.getAttribute("aria-expanded")).toBe("false"); await click(currentQuick);
+    await until(() => expect(document.activeElement).toBe(button(messages["common.close"], panel())));
+    await act(async () => document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true })));
+    await until(() => expect(document.activeElement).toBe(currentQuick));
+    expect(currentQuick.isConnected).toBe(true); expect(container.querySelector("#topbar-quick-access")).toBeNull();
+    expect(document.activeElement).not.toBe(link); expect(document.activeElement).not.toBe(dashboardTrigger);
+  });
+
 });
