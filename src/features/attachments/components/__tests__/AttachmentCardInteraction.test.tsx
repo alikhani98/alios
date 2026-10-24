@@ -93,10 +93,10 @@ describe("AttachmentCard interactions", () => {
       await Promise.resolve();
     });
 
-    expect(dependencies.attachments.delete).toHaveBeenCalledWith(attachment.id);
-    expect(dependencies.binaryStorage.delete).toHaveBeenCalledWith(
-      attachment.storageKey
-    );
+    expect(dependencies.attachments.delete).toHaveBeenCalledWith(attachment.id, {
+      deleteUnreferencedBinary: true,
+    });
+    expect(dependencies.binaryStorage.delete).not.toHaveBeenCalled();
     expect(onDeleted).toHaveBeenCalledWith(attachment.id);
   });
 });

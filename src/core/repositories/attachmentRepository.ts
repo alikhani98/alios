@@ -5,6 +5,11 @@ export type CreateAttachmentInput = Omit<
   "id" | "createdAt" | "updatedAt"
 >;
 
+export type DeleteAttachmentOptions = Readonly<{
+  /** Remove metadata atomically with binary cleanup; retain any shared binary. */
+  deleteUnreferencedBinary?: boolean;
+}>;
+
 export interface AttachmentRepository {
   create(input: CreateAttachmentInput): Promise<Attachment>;
   getById(id: string): Promise<Attachment | undefined>;
@@ -13,5 +18,6 @@ export interface AttachmentRepository {
     ownerType: AttachmentOwnerType,
     ownerId: string
   ): Promise<Attachment[]>;
-  delete(id: string): Promise<void>;
+  /** Missing IDs are a no-op. By default, only metadata is removed (rollback). */
+  delete(id: string, options?: DeleteAttachmentOptions): Promise<void>;
 }

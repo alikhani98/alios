@@ -60,13 +60,7 @@ export async function deleteAttachment(
   id: string,
   dependencies: AttachmentWorkflowDependencies
 ): Promise<void> {
-  const attachment = await dependencies.attachments.getById(id);
-  if (!attachment) {
-    return;
-  }
-
-  await dependencies.attachments.delete(id);
-  await dependencies.binaryStorage.delete(attachment.storageKey);
+  await dependencies.attachments.delete(id, { deleteUnreferencedBinary: true });
 }
 
 function validateAttachmentFileInput({

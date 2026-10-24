@@ -49,7 +49,20 @@ export class DexieAttachmentBinaryStorage implements BinaryStorage {
 
   async delete(storageKey: string): Promise<void> {
     try {
-      await this.database.attachmentBlobs.delete(storageKey);
+      // Package rollback must not remove content adopted by another attachment.
+      await this.database.transaction(
+        "rw",
+        this.database.attachments,
+        this.database.attachmentBlobs,
+        async () => {
+          const references = await this.database.attachments
+            .filter((record) => record.storageKey === storageKey)
+            .count();
+          if (references === 0) {
+            await this.database.attachmentBlobs.delete(storageKey);
+          }
+        }
+      );
     } catch (error) {
       throw new StorageError("Attachment content could not be deleted.", {
         cause: error,

@@ -126,7 +126,7 @@ describe("attachment creation workflow", () => {
 });
 
 describe("attachment deletion workflow", () => {
-  it("deletes metadata and then the binary", async () => {
+  it("delegates deletion to the coordinated repository operation", async () => {
     const dependencies = createDependencies();
     const file = new File(["audio"], "lesson.mp3", { type: "audio/mpeg" });
     const attachment = await createAttachmentForFile(
@@ -137,11 +137,10 @@ describe("attachment deletion workflow", () => {
     await deleteAttachment(attachment.id, dependencies);
 
     expect(dependencies.attachments.delete).toHaveBeenLastCalledWith(
-      attachment.id
+      attachment.id,
+      { deleteUnreferencedBinary: true }
     );
-    expect(dependencies.binaryStorage.delete).toHaveBeenCalledWith(
-      attachment.storageKey
-    );
+    expect(dependencies.binaryStorage.delete).not.toHaveBeenCalled();
     expect(
       await dependencies.attachments.getById(attachment.id)
     ).toBeUndefined();
