@@ -1,4 +1,8 @@
 import type { Attachment, AttachmentOwnerType } from "@/shared/types";
+import type {
+  AttachmentPackageImportData,
+  AttachmentPackageImportResult,
+} from "./attachmentPackageImport";
 
 export type CreateAttachmentInput = Omit<
   Attachment,
@@ -11,6 +15,8 @@ export type DeleteAttachmentOptions = Readonly<{
 }>;
 
 export interface AttachmentRepository {
+  /** Prepared package only; revalidate current state and commit both stores atomically. */
+  importPackage?(data: AttachmentPackageImportData): Promise<AttachmentPackageImportResult>;
   create(input: CreateAttachmentInput): Promise<Attachment>;
   getById(id: string): Promise<Attachment | undefined>;
   listAll(): Promise<Attachment[]>;

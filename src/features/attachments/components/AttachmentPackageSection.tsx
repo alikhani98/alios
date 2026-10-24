@@ -40,6 +40,7 @@ function formatConflict(
 
   switch (conflict.type) {
     case "metadata_id_conflict":
+    case "metadata_binary_size_mismatch":
       return t("attachments.packageConflictMetadataId", {
         id: values.id,
         reason: conflict.reason,

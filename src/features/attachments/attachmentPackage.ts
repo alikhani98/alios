@@ -1,5 +1,11 @@
 import { AppError, StorageError, ValidationError } from "@/core/errors";
 import type { AttachmentRepository } from "@/core/repositories";
+import {
+  AttachmentPackageConflictError,
+  collectAttachmentPackageConflicts,
+  type AttachmentPackageConflict,
+  type AttachmentPackageImportResult,
+} from "@/core/repositories/attachmentPackageImport";
 import type { BinaryStorage } from "@/core/storage";
 import {
   attachmentSchema,
@@ -7,6 +13,13 @@ import {
 } from "@/shared/types";
 import { isoDateTimeSchema } from "@/shared/utils";
 import { z } from "zod";
+
+export { AttachmentPackageConflictError } from "@/core/repositories/attachmentPackageImport";
+export type {
+  AttachmentPackageConflict,
+  AttachmentPackageConflictType,
+  AttachmentPackageImportResult,
+} from "@/core/repositories/attachmentPackageImport";
 
 export const ATTACHMENT_PACKAGE_APP = "AliOS Attachment Package" as const;
 export const ATTACHMENT_PACKAGE_VERSION = 1 as const;
@@ -31,39 +44,9 @@ export type AttachmentPackageManifest = z.infer<
 >;
 
 export type AttachmentPackageDependencies = {
-  attachments: AttachmentRepository & {
-    restore?(attachment: Attachment): Promise<void>;
-  };
+  attachments: AttachmentRepository;
   binaryStorage: BinaryStorage;
 };
-
-export type AttachmentPackageConflictType =
-  | "metadata_id_conflict"
-  | "storage_key_conflict"
-  | "package_duplicate_metadata_id"
-  | "package_missing_binary"
-  | "package_orphan_binary"
-  | "invalid_binary_range";
-
-export type AttachmentPackageConflict = Readonly<{
-  type: AttachmentPackageConflictType;
-  attachmentId?: string;
-  storageKey?: string;
-  reason: string;
-}>;
-
-export class AttachmentPackageConflictError extends AppError {
-  readonly conflicts: ReadonlyArray<AttachmentPackageConflict>;
-
-  constructor(conflicts: ReadonlyArray<AttachmentPackageConflict>) {
-    super(
-      `Attachment package import was rejected because ${conflicts.length} conflict(s) were found.`,
-      { code: "ATTACHMENT_PACKAGE_CONFLICT" }
-    );
-    this.name = "AttachmentPackageConflictError";
-    this.conflicts = conflicts;
-  }
-}
 
 export type AttachmentPackageExport = Readonly<{
   manifest: AttachmentPackageManifest;
@@ -78,13 +61,6 @@ export type AttachmentPackageExport = Readonly<{
 export type AttachmentPackageImportInput = Readonly<{
   manifestFile: File | Blob;
   bundleFile: File | Blob;
-}>;
-
-export type AttachmentPackageImportResult = Readonly<{
-  importedMetadataCount: number;
-  importedBinaryCount: number;
-  reusedMetadataCount: number;
-  reusedBinaryCount: number;
 }>;
 
 type PreparedBinary = Readonly<{
@@ -188,7 +164,7 @@ export async function importAttachmentPackage(
   const existingMetadata = await dependencies.attachments.listAll();
   const existingById = new Map(existingMetadata.map((item) => [item.id, item]));
 
-  const conflicts = collectPackageConflicts(
+  const conflicts = collectAttachmentPackageConflicts(
     manifest.attachments,
     prepared,
     existingById
@@ -217,49 +193,14 @@ export async function importAttachmentPackage(
     throw new AttachmentPackageConflictError(conflicts);
   }
 
-  if (!dependencies.attachments.restore) {
-    throw new StorageError(
-      "Attachment metadata restore is unavailable in this storage adapter."
-    );
+  if (!dependencies.attachments.importPackage) {
+    throw new StorageError("Atomic attachment package import is unavailable in this storage adapter.");
   }
 
-  const metadataToCreate = manifest.attachments.filter(
-    (attachment) => !existingById.has(attachment.id)
-  );
-  const binariesToSave = prepared.filter(
-    (binary) => !existingBinaries.get(binary.storageKey)
-  );
-  const savedBinaryKeys: string[] = [];
-  const createdMetadataIds: string[] = [];
-
-  try {
-    for (const binary of binariesToSave) {
-      await dependencies.binaryStorage.save(binary.storageKey, binary.blob);
-      savedBinaryKeys.push(binary.storageKey);
-    }
-
-    for (const attachment of metadataToCreate) {
-      await dependencies.attachments.restore(attachment);
-      createdMetadataIds.push(attachment.id);
-    }
-  } catch (error) {
-    await Promise.all(
-      createdMetadataIds.map((id) => dependencies.attachments.delete(id))
-    );
-    await Promise.all(
-      savedBinaryKeys.map((storageKey) =>
-        dependencies.binaryStorage.delete(storageKey)
-      )
-    );
-    throw error;
-  }
-
-  return {
-    importedMetadataCount: metadataToCreate.length,
-    importedBinaryCount: binariesToSave.length,
-    reusedMetadataCount: manifest.attachments.length - metadataToCreate.length,
-    reusedBinaryCount: prepared.length - binariesToSave.length,
-  };
+  return dependencies.attachments.importPackage({
+    attachments: manifest.attachments,
+    binaries: prepared,
+  });
 }
 
 export async function parseAttachmentPackageManifest(
@@ -300,7 +241,9 @@ function preparePackageBinaries(
     }
     seenStorageKeys.add(entry.storageKey);
 
-    if (entry.offset + entry.length > bundleBytes.byteLength) {
+    if (!Number.isSafeInteger(entry.offset) || !Number.isSafeInteger(entry.length) ||
+        !Number.isSafeInteger(entry.offset + entry.length) ||
+        entry.offset + entry.length > bundleBytes.byteLength) {
       conflicts.push({
         type: "invalid_binary_range",
         storageKey: entry.storageKey,
@@ -356,55 +299,6 @@ function preparePackageBinaries(
   }
 
   return binaries;
-}
-
-function collectPackageConflicts(
-  incoming: Attachment[],
-  prepared: PreparedBinary[],
-  existingById: Map<string, Attachment>
-): AttachmentPackageConflict[] {
-  const conflicts: AttachmentPackageConflict[] = [];
-  const binariesByStorageKey = new Set(prepared.map((binary) => binary.storageKey));
-
-  for (const attachment of incoming) {
-    const existing = existingById.get(attachment.id);
-    if (existing && !sameAttachmentMetadata(existing, attachment)) {
-      conflicts.push({
-        type: "metadata_id_conflict",
-        attachmentId: attachment.id,
-        storageKey: attachment.storageKey,
-        reason: describeMetadataDifference(existing, attachment),
-      });
-    }
-
-    if (!binariesByStorageKey.has(attachment.storageKey)) {
-      conflicts.push({
-        type: "package_missing_binary",
-        attachmentId: attachment.id,
-        storageKey: attachment.storageKey,
-        reason: "No binary entry exists for this metadata record.",
-      });
-    }
-  }
-
-  return conflicts;
-}
-
-function sameAttachmentMetadata(left: Attachment, right: Attachment): boolean {
-  return JSON.stringify(left) === JSON.stringify(right);
-}
-
-function describeMetadataDifference(left: Attachment, right: Attachment): string {
-  if (left.storageKey !== right.storageKey) {
-    return `The existing metadata points to ${left.storageKey}, but the package points to ${right.storageKey}.`;
-  }
-  if (left.filename !== right.filename) {
-    return "The existing metadata has a different filename.";
-  }
-  if (left.ownerType !== right.ownerType || left.ownerId !== right.ownerId) {
-    return "The existing metadata has a different owner.";
-  }
-  return "The existing metadata differs from the package record.";
 }
 
 async function blobsEqual(left: Blob, right: Blob): Promise<boolean> {

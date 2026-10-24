@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
 import type { AttachmentRepository } from "@/core/repositories";
+import type { AttachmentPackageImportData } from "@/core/repositories/attachmentPackageImport";
 import type { BinaryStorage } from "@/core/storage";
 import type { Attachment } from "@/shared/types";
 import {
@@ -12,7 +13,8 @@ import {
 const makeAttachment = (
   id: string,
   storageKey: string,
-  filename = `${id}.pdf`
+  filename = `${id}.pdf`,
+  size = 5
 ): Attachment => ({
   id,
   ownerType: "resource",
@@ -20,7 +22,7 @@ const makeAttachment = (
   kind: "document",
   filename,
   mimeType: "application/pdf",
-  size: 5,
+  size,
   storageKey,
   createdAt: "2026-07-05T08:30:00.000Z",
   updatedAt: "2026-07-05T08:30:00.000Z",
@@ -41,6 +43,20 @@ function createDependencies(
   const attachments: AttachmentRepository & {
     restore(attachment: Attachment): Promise<void>;
   } = {
+    importPackage: vi.fn(async (data: AttachmentPackageImportData) => {
+      const addedMetadata = data.attachments.filter((record) => !metadata.has(record.id));
+      const addedBinaries = data.binaries.filter((binary) => !binaries.has(binary.storageKey));
+      for (const record of addedMetadata) metadata.set(record.id, record);
+      for (const binary of addedBinaries) {
+        binaries.set(binary.storageKey, new Blob([Uint8Array.from(binary.bytes)]));
+      }
+      return {
+        importedMetadataCount: addedMetadata.length,
+        importedBinaryCount: addedBinaries.length,
+        reusedMetadataCount: data.attachments.length - addedMetadata.length,
+        reusedBinaryCount: data.binaries.length - addedBinaries.length,
+      };
+    }),
     create: vi.fn(),
     getById: vi.fn(async (id: string) => metadata.get(id)),
     listAll: vi.fn(async () => [...metadata.values()]),
@@ -69,8 +85,8 @@ function createDependencies(
 
 describe("attachment package export/import", () => {
   it("exports each shared storageKey binary once", async () => {
-    const first = makeAttachment("first", "attachments/shared");
-    const second = makeAttachment("second", "attachments/shared", "copy.pdf");
+    const first = makeAttachment("first", "attachments/shared", undefined, 6);
+    const second = makeAttachment("second", "attachments/shared", "copy.pdf", 6);
     const dependencies = createDependencies(
       [first, second],
       { "attachments/shared": "shared" }
@@ -120,7 +136,7 @@ describe("attachment package export/import", () => {
   });
 
   it("rejects metadata ID conflicts before any package mutation", async () => {
-    const incoming = makeAttachment("same-id", "attachments/incoming");
+    const incoming = makeAttachment("same-id", "attachments/incoming", undefined, 8);
     const source = createDependencies(
       [incoming],
       { "attachments/incoming": "incoming" }
@@ -152,7 +168,7 @@ describe("attachment package export/import", () => {
   });
 
   it("rejects incompatible existing storageKey content with clear details", async () => {
-    const incoming = makeAttachment("incoming", "attachments/shared");
+    const incoming = makeAttachment("incoming", "attachments/shared", undefined, 15);
     const source = createDependencies(
       [incoming],
       { "attachments/shared": "package-content" }
@@ -181,5 +197,97 @@ describe("attachment package export/import", () => {
     ]);
     expect(destination.attachments.restore).not.toHaveBeenCalled();
     expect(destination.binaryStorage.save).not.toHaveBeenCalled();
+  });
+
+  it.each(["duplicate metadata", "duplicate binary", "missing binary", "orphan binary", "invalid range"])(
+    "rejects %s without calling the mutation boundary", async (defect) => {
+      const first = makeAttachment("first", "attachments/first");
+      const second = makeAttachment("second", "attachments/second", undefined, 6);
+      const source = createDependencies([first, second], {
+        "attachments/first": "first", "attachments/second": "second",
+      });
+      const exported = await exportAttachmentPackage(source);
+      const manifest = exported.manifest;
+      if (defect === "duplicate metadata") manifest.attachments.push(first);
+      if (defect === "duplicate binary") manifest.binaries.push(manifest.binaries[0]);
+      if (defect === "missing binary") manifest.binaries.pop();
+      if (defect === "orphan binary") manifest.attachments.pop();
+      if (defect === "invalid range") manifest.binaries[0].length = 100;
+      const destination = createDependencies();
+      await expect(importAttachmentPackage({
+        manifestFile: new Blob([JSON.stringify(manifest)]), bundleFile: exported.bundleBlob,
+      }, destination)).rejects.toBeInstanceOf(AttachmentPackageConflictError);
+      expect(destination.attachments.importPackage).not.toHaveBeenCalled();
+      expect(destination.metadata.size).toBe(0);
+      expect(destination.binaries.size).toBe(0);
+    }
+  );
+
+  it("fails closed if the adapter cannot provide atomic import", async () => {
+    const record = makeAttachment("first", "attachments/first");
+    const exported = await exportAttachmentPackage(createDependencies([record], { "attachments/first": "first" }));
+    const destination = createDependencies();
+    delete destination.attachments.importPackage;
+    await expect(importAttachmentPackage({
+      manifestFile: exported.manifestBlob, bundleFile: exported.bundleBlob,
+    }, destination)).rejects.toThrow("Atomic attachment package import is unavailable");
+    expect(destination.attachments.restore).not.toHaveBeenCalled();
+    expect(destination.binaryStorage.save).not.toHaveBeenCalled();
+  });
+
+  it.each([0, 4, 6])("rejects a declared size of %i for five bytes before mutation", async (declaredSize) => {
+    const incoming = makeAttachment("incoming", "attachments/incoming");
+    const exported = await exportAttachmentPackage(createDependencies([incoming], {
+      "attachments/incoming": "hello",
+    }));
+    exported.manifest.attachments[0].size = declaredSize;
+    const existing = makeAttachment("existing", "attachments/existing");
+    const destination = createDependencies([existing], { "attachments/existing": "saved" });
+    await expect(importAttachmentPackage({
+      manifestFile: new Blob([JSON.stringify(exported.manifest)]), bundleFile: exported.bundleBlob,
+    }, destination)).rejects.toMatchObject({
+      conflicts: [{
+        type: "metadata_binary_size_mismatch", attachmentId: incoming.id,
+        storageKey: incoming.storageKey,
+        reason: `The metadata declares ${declaredSize} bytes, but its binary contains 5 bytes.`,
+      }],
+    });
+    expect(destination.attachments.importPackage).not.toHaveBeenCalled();
+    expect(destination.metadata).toEqual(new Map([[existing.id, existing]]));
+    expect([...destination.binaries.keys()]).toEqual([existing.storageKey]);
+    expect(await destination.binaries.get(existing.storageKey)?.text()).toBe("saved");
+  });
+
+  it("checks every shared reference against the same binary byte length", async () => {
+    const first = makeAttachment("first", "attachments/shared");
+    const second = { ...makeAttachment("second", first.storageKey), ownerType: "knowledge" as const };
+    const third = makeAttachment("third", first.storageKey);
+    const exported = await exportAttachmentPackage(createDependencies([first, second, third], {
+      [first.storageKey]: "hello",
+    }));
+    exported.manifest.attachments[0].size = 4;
+    exported.manifest.attachments[1].size = 6;
+    const destination = createDependencies([third], { [first.storageKey]: "hello" });
+    await expect(importAttachmentPackage({
+      manifestFile: new Blob([JSON.stringify(exported.manifest)]), bundleFile: exported.bundleBlob,
+    }, destination)).rejects.toMatchObject({
+      conflicts: [
+        expect.objectContaining({ type: "metadata_binary_size_mismatch", attachmentId: first.id, storageKey: first.storageKey }),
+        expect.objectContaining({ type: "metadata_binary_size_mismatch", attachmentId: second.id, storageKey: first.storageKey }),
+      ],
+    });
+    expect(destination.attachments.importPackage).not.toHaveBeenCalled();
+    expect([...destination.metadata.values()]).toEqual([third]);
+    expect([...destination.binaries.keys()]).toEqual([first.storageKey]);
+    expect(await destination.binaries.get(first.storageKey)?.text()).toBe("hello");
+  });
+
+  it.each(["سلام🌱", ""])("accepts the exact byte size for %j", async (content) => {
+    const record = makeAttachment("incoming", "attachments/incoming", undefined, new Blob([content]).size);
+    const exported = await exportAttachmentPackage(createDependencies([record], { [record.storageKey]: content }));
+    const destination = createDependencies();
+    await importAttachmentPackage({ manifestFile: exported.manifestBlob, bundleFile: exported.bundleBlob }, destination);
+    expect(destination.metadata.get(record.id)?.size).toBe(new Blob([content]).size);
+    expect(await destination.binaries.get(record.storageKey)?.text()).toBe(content);
   });
 });

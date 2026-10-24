@@ -32,4 +32,15 @@ describe("AttachmentPackageSection error reporting", () => {
     expect(message).toContain("attachments.packageConflictStorageKey");
     expect(message).toContain("attachments/shared");
   });
+
+  it("shows the attachment ID and declared-versus-actual size for size conflicts", () => {
+    const reason = "The metadata declares 4 bytes, but its binary contains 5 bytes.";
+    const message = formatAttachmentPackageError(new AttachmentPackageConflictError([{
+      type: "metadata_binary_size_mismatch",
+      attachmentId: "size-conflict", storageKey: "attachments/shared", reason,
+    }]), translate);
+    expect(message).toContain("attachments.packageImportConflictSummary");
+    expect(message).toContain("size-conflict");
+    expect(message).toContain(reason);
+  });
 });
