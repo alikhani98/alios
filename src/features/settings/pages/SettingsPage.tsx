@@ -19,7 +19,7 @@ import {
   Upload,
   Trees,
 } from "lucide-react";
-import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import {
@@ -70,10 +70,7 @@ import {
   TelegramReminderSettings,
   WebPushReminderSettings,
 } from "@/features/reminders";
-import { useAuthSession } from "@/core/auth";
-import { getSupabaseSyncConfiguration } from "@/core/sync";
-import { getWebPushCapabilities, type ReminderDeliveryChannel, type TelegramReminderPreference } from "@/features/reminders";
-import { loadTelegramReminderPreference, saveTelegramReminderPreference } from "@/features/reminders/telegramReminderSettingsClient";
+import { useTelegramReminderSettings } from "@/features/reminders/useTelegramReminderSettings";
 import { RecoveryModeSection } from "../components/RecoveryModeSection";
 import { LocalErrorLogSection } from "../components/LocalErrorLogSection";
 import { SyncStatusCard } from "../components/SyncStatusCard";
@@ -128,23 +125,6 @@ const LazyQuickAccessManager = lazyWithRetry(() =>
     default: module.QuickAccessManager,
   }))
 );
-
-async function getCurrentWebPushSubscriptionStatus(): Promise<boolean> {
-  if (
-    typeof window === "undefined" ||
-    typeof navigator === "undefined" ||
-    !getWebPushCapabilities().supported
-  ) {
-    return false;
-  }
-
-  const registration = await navigator.serviceWorker.getRegistration();
-  if (!registration) {
-    return false;
-  }
-
-  return (await registration.pushManager.getSubscription()) !== null;
-}
 
 type CountItemProps = { label: string; value: number };
 
@@ -377,13 +357,14 @@ function getBackupStatusSummaryKey(
 
 export function SettingsPage() {
   const accountRuntimeState = useAccountRuntimeState();
-  const authSession = useAuthSession();
   const { language, setLanguage, t } = useI18n();
 
   const [calendarSaveFailed, setCalendarSaveFailed] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const activeTab = resolveSettingsTab(location.search, location.hash);
+  const notificationsActive = activeTab === "notifications";
+  const reminderSettings = useTelegramReminderSettings(notificationsActive);
   const [accountOpen, setAccountOpen] = useState(true);
   const [localDataOpen, setLocalDataOpen] = useState(false);
   const [dataDetailsOpen, setDataDetailsOpen] = useState(false);
@@ -454,13 +435,7 @@ export function SettingsPage() {
   const [exportCenterOpen, setExportCenterOpen] = useState(false);
   const [advancedDeveloperOpen, setAdvancedDeveloperOpen] = useState(false);
   const [advancedLocalToolsOpen, setAdvancedLocalToolsOpen] = useState(false);
-  const [reminderPreference, setReminderPreference] =
-    useState<TelegramReminderPreference | null>(null);
   const [hasWebPushSubscription, setHasWebPushSubscription] = useState(false);
-  const [reminderChannelError, setReminderChannelError] = useState<
-    string | null
-  >(null);
-
   const dataManagement = useLocalDataManagement();
   const backup = useBackupRestore(dataManagement.loadSummary);
   const restorePreview = backup.pendingBackup
@@ -499,13 +474,9 @@ export function SettingsPage() {
     ? localDataCounts
     : localDataCounts.slice(0, dataCountPreviewLimit);
   const hiddenDataCount = Math.max(localDataCounts.length - displayedDataCounts.length, 0);
-  const canUseRemoteReminderSettings =
-    authSession.status === "authenticated" &&
-    getSupabaseSyncConfiguration() !== null;
-  const currentReminderChannel: TelegramReminderPreference["channel"] =
-    reminderPreference?.channel ?? "telegram";
+  const currentReminderChannel = reminderSettings.preference?.channel ?? "telegram";
   const hasTelegramReminderChannel =
-    (reminderPreference?.telegramChatId.trim().length ?? 0) > 0;
+    (reminderSettings.preference?.telegramChatId.trim().length ?? 0) > 0;
 
   const resetFileInput = () => {
     if (fileInputRef.current) {
@@ -572,96 +543,6 @@ export function SettingsPage() {
   const handleCheckForUpdate = async () => {
     setPwaUpdateStatus("checking");
     setPwaUpdateStatus(await checkForServiceWorkerUpdate());
-  };
-
-  const refreshWebPushSubscriptionStatus = useCallback(async () => {
-    try {
-      setHasWebPushSubscription(await getCurrentWebPushSubscriptionStatus());
-    } catch {
-      setHasWebPushSubscription(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (activeTab !== "notifications") return;
-    void refreshWebPushSubscriptionStatus();
-
-    if (typeof window === "undefined") {
-      return undefined;
-    }
-
-    const handleFocus = () => {
-      void refreshWebPushSubscriptionStatus();
-    };
-
-    window.addEventListener("focus", handleFocus);
-    const subscriptionStatusInterval = window.setInterval(handleFocus, 5000);
-
-    return () => {
-      window.removeEventListener("focus", handleFocus);
-      window.clearInterval(subscriptionStatusInterval);
-    };
-  }, [refreshWebPushSubscriptionStatus, activeTab]);
-
-  useEffect(() => {
-    let isActive = true;
-
-    if (activeTab !== "notifications") return;
-    if (!canUseRemoteReminderSettings) {
-      setReminderPreference(null);
-      setReminderChannelError(null);
-      return () => {
-        isActive = false;
-      };
-    }
-
-    loadTelegramReminderPreference()
-      .then((preference) => {
-        if (isActive) {
-          setReminderPreference(preference);
-          setReminderChannelError(null);
-        }
-      })
-      .catch((error) => {
-        if (isActive) {
-          setReminderChannelError(
-            error instanceof Error
-              ? error.message
-              : t("settings.telegramReminderLoadError")
-          );
-        }
-      });
-
-    return () => {
-      isActive = false;
-    };
-  }, [canUseRemoteReminderSettings, t, activeTab]);
-
-  const handleReminderChannelChange = async (
-    channel: ReminderDeliveryChannel
-  ) => {
-    if (!reminderPreference) {
-      return;
-    }
-
-    setReminderChannelError(null);
-
-    try {
-      const saved = await saveTelegramReminderPreference({
-        enabled: reminderPreference.enabled,
-        channel,
-        telegramChatId: reminderPreference.telegramChatId,
-        timezone: reminderPreference.timezone,
-        morningTime: reminderPreference.morningTime,
-      });
-      setReminderPreference({ ...saved, channel });
-    } catch (error) {
-      setReminderChannelError(
-        error instanceof Error
-          ? error.message
-          : t("settings.telegramReminderSaveError")
-      );
-    }
   };
 
   return (
@@ -988,20 +869,15 @@ export function SettingsPage() {
         defaultOpen
       >
         <div className="space-y-4">
-          <TelegramReminderSettings active={activeTab === "notifications"} />
-          <WebPushReminderSettings active={activeTab === "notifications"} />
+          <TelegramReminderSettings settings={reminderSettings} active={notificationsActive} />
+          <WebPushReminderSettings active={notificationsActive} onSubscriptionChange={setHasWebPushSubscription} />
           <ReminderChannelSelector
             currentChannel={currentReminderChannel}
             hasTelegram={hasTelegramReminderChannel}
             hasWebPush={hasWebPushSubscription}
-            onChannelChange={handleReminderChannelChange}
-            disabled={!canUseRemoteReminderSettings || !reminderPreference}
+            onChannelChange={reminderSettings.changeChannel}
+            disabled={!notificationsActive || !reminderSettings.canUseRemoteSettings || !reminderSettings.preference || reminderSettings.isBusy}
           />
-          {reminderChannelError ? (
-            <p role="alert" className="text-sm leading-6 text-destructive">
-              {reminderChannelError}
-            </p>
-          ) : null}
         </div>
       </CollapsibleSection>
 
