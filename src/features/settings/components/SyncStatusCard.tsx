@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import {
   ArrowUpRight,
   CloudOff,
@@ -26,7 +26,6 @@ import {
   SoftPanel,
   StatusChip,
 } from "@/shared/ui";
-import { TelegramReminderSettings } from "@/features/reminders";
 
 import { EmailAccountAuthForm } from "./EmailAccountAuthForm";
 
@@ -123,6 +122,17 @@ export function SyncStatusCard({ onGoToBackupRestore, active = true }: SyncStatu
   const [syncActionPending, setSyncActionPending] = useState(false);
   const [syncActionFeedback, setSyncActionFeedback] = useState<string | null>(null);
   const [advancedOpen, setAdvancedOpen] = useState(false);
+  const [advancedLoaded, setAdvancedLoaded] = useState(false);
+  const advancedAccountKey = JSON.stringify([
+    provider.name,
+    runtimeState.identity?.providerId,
+    runtimeState.identity?.accountId,
+    runtimeState.hasActiveAccount,
+  ]);
+
+  useEffect(() => {
+    if (active && advancedOpen) setAdvancedLoaded(true);
+  }, [active, advancedOpen]);
 
   const interactiveGoogleProvider = getInteractiveGoogleProvider(provider);
   const interactiveEmailProvider = getInteractiveEmailProvider(provider);
@@ -488,8 +498,6 @@ export function SyncStatusCard({ onGoToBackupRestore, active = true }: SyncStatu
           ) : null}
         </SoftPanel>
 
-        <TelegramReminderSettings active={active} />
-
         <CollapsibleSection
           id="account-sync-advanced-panel-loader"
           icon={<ShieldCheck className="h-5 w-5" />}
@@ -502,9 +510,11 @@ export function SyncStatusCard({ onGoToBackupRestore, active = true }: SyncStatu
           open={advancedOpen}
           onOpenChange={setAdvancedOpen}
         >
-          {advancedOpen ? (
+          {advancedLoaded ? (
             <Suspense fallback={<RouteLoadingFallback />}>
               <LazySyncStatusAdvancedPanel
+                key={advancedAccountKey}
+                showAccountActions={false}
                 onGoToBackupRestore={onGoToBackupRestore}
               />
             </Suspense>

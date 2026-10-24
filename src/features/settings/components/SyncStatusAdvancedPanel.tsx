@@ -48,6 +48,7 @@ import {
 import { EmailAccountAuthForm } from "./EmailAccountAuthForm";
 
 type SyncStatusAdvancedPanelProps = Readonly<{
+  showAccountActions?: boolean;
   onGoToBackupRestore: () => void;
 }>;
 
@@ -658,6 +659,7 @@ function getRuntimeAccountPresentation(
 }
 
 export function SyncStatusAdvancedPanel({
+  showAccountActions = true,
   onGoToBackupRestore,
 }: SyncStatusAdvancedPanelProps) {
   const { t } = useI18n();
@@ -1133,6 +1135,7 @@ export function SyncStatusAdvancedPanel({
           </SoftPanel>
         </div>
 
+        {showAccountActions ? (
         <SoftPanel className="space-y-4">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex items-start gap-2">
@@ -1243,6 +1246,7 @@ export function SyncStatusAdvancedPanel({
             {t(accountPresentation.noteKey)}
           </p>
         </SoftPanel>
+        ) : null}
 
         <CollapsibleSection
           id="account-sync-advanced-details"
