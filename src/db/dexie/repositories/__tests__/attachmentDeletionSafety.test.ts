@@ -251,51 +251,60 @@ describe("attachment deletion storage coordination", () => {
     expect(await (await peer.attachmentBinary.retrieve(sharedKey))?.text()).toBe(contents);
   });
 
-  it("rejects stale package reuse if the last reference was deleted after preflight", async () => {
+  it("revalidates stale package reuse after the final reference was deleted", async () => {
     const first = await seed();
     const exported = await exportAttachmentPackage(dependencies());
     exported.manifest.attachments[0] = {
-      ...first,
-      id: "incoming-synthetic",
-      ownerType: "knowledge",
+      ...first, id: "incoming-synthetic", ownerType: "knowledge",
     };
-    const restore = storage.attachments.restore.bind(storage.attachments);
-    vi.spyOn(storage.attachments, "restore").mockImplementationOnce(async (attachment) => {
-      // This callback runs after the package has decided to reuse the binary.
+    const importPackage = storage.attachments.importPackage.bind(storage.attachments);
+    vi.spyOn(storage.attachments, "importPackage").mockImplementationOnce(async (data) => {
+      // Runs after file preflight, but before the atomic import transaction.
       await peer.attachments.delete(first.id, coordinated);
-      await restore(attachment);
+      return importPackage(data);
     });
-    await expect(importAttachmentPackage({
+    await importAttachmentPackage({
       manifestFile: new Blob([JSON.stringify(exported.manifest)]),
       bundleFile: exported.bundleBlob,
-    }, dependencies())).rejects.toThrow("disappeared");
-    expect(await storage.attachments.getById("incoming-synthetic")).toBeUndefined();
+    }, dependencies());
+    expect(await storage.attachments.getById(first.id)).toBeUndefined();
+    expect(await storage.attachments.getById("incoming-synthetic")).toBeDefined();
+    expect(await (await getAttachmentBinary("incoming-synthetic", dependencies()))?.blob.text()).toBe(contents);
   });
 
-  it("protects a concurrent adopter from package rollback binary cleanup", async () => {
+  it("preserves shared content for a concurrent adopter when package import aborts", async () => {
     await seed();
     await storage.attachments.create(input({ ownerType: "knowledge" }));
     const exported = await exportAttachmentPackage(dependencies());
     await storage.backup.clearAll();
-    const restore = storage.attachments.restore.bind(storage.attachments);
+    await storage.attachmentBinary.save(sharedKey, new Blob([contents]));
     let restored = 0;
-    let adopterId = "";
-    vi.spyOn(storage.attachments, "restore").mockImplementation(async (attachment) => {
-      if (restored++ === 0) {
-        await restore(attachment);
-        return;
-      }
-      const adopter = await peer.attachments.create(input({ ownerId: "concurrent-adopter" }));
-      adopterId = adopter.id;
+    let adopter: ReturnType<typeof peer.attachments.create> | undefined;
+    const failLate = () => {
+      if (restored++ === 0) return;
+      adopter = Dexie.ignoreTransaction(() =>
+        peer.attachments.create(input({ ownerId: "concurrent-adopter" }))
+      );
       throw new Error("synthetic import failure");
-    });
-    await expect(importAttachmentPackage({
-      manifestFile: exported.manifestBlob,
-      bundleFile: exported.bundleBlob,
-    }, dependencies())).rejects.toThrow("synthetic import failure");
+    };
+    database.attachments.hook("creating", failLate);
+    try {
+      const importing = importAttachmentPackage({
+        manifestFile: exported.manifestBlob, bundleFile: exported.bundleBlob,
+      }, dependencies());
+      await expect(importing).rejects.toThrow();
+      await expect(importing).rejects.toMatchObject({
+        cause: expect.objectContaining({ message: "synthetic import failure" }),
+      });
+    } finally {
+      database.attachments.hook("creating").unsubscribe(failLate);
+    }
+    const created = await adopter;
+    expect(created).toBeDefined();
     expect(await storage.attachments.listAll()).toEqual([
-      expect.objectContaining({ id: adopterId }),
+      expect.objectContaining({ id: created?.id }),
     ]);
-    expect(await (await getAttachmentBinary(adopterId, dependencies()))?.blob.text()).toBe(contents);
+    const accessed = created && await getAttachmentBinary(created.id, dependencies());
+    expect(await accessed?.blob.text()).toBe(contents);
   });
 });

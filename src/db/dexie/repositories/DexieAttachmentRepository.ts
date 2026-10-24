@@ -3,7 +3,13 @@ import type {
   CreateAttachmentInput,
   DeleteAttachmentOptions,
 } from "@/core/repositories";
-import { StorageError } from "@/core/errors";
+import Dexie from "dexie";
+import {
+  AttachmentPackageConflictError,
+  collectAttachmentPackageConflicts,
+  type AttachmentPackageImportData,
+  type AttachmentPackageImportResult,
+} from "@/core/repositories/attachmentPackageImport";
 import {
   attachmentSchema,
   type Attachment,
@@ -32,25 +38,58 @@ export class DexieAttachmentRepository
     });
   }
 
-  async restore(attachment: Attachment): Promise<void> {
-    return this.execute("restoring an attachment", async () => {
-      const parsed = attachmentSchema.parse(attachment);
-      // Package preflight may precede a concurrent last-reference deletion.
-      // Standard JSON restore has its own metadata-only backup boundary.
-      await this.database.transaction(
-        "rw",
-        this.database.attachments,
-        this.database.attachmentBlobs,
-        async () => {
-          if (!(await this.database.attachmentBlobs.get(parsed.storageKey))) {
-            throw new StorageError(
-              "Attachment content disappeared before package metadata could be restored."
-            );
-          }
-          await this.database.attachments.put(parsed);
-        }
-      );
+  async importPackage(data: AttachmentPackageImportData): Promise<AttachmentPackageImportResult> {
+    // Snapshot caller-owned inputs and prepare blobs before opening a transaction.
+    const attachments = data.attachments.map((attachment) => attachmentSchema.parse(attachment));
+    const binaries = data.binaries.map((binary) => {
+      const bytes = Uint8Array.from(binary.bytes);
+      return { storageKey: binary.storageKey, bytes, blob: new Blob([bytes]) };
     });
+    return this.execute("importing an attachment package", () => this.database.transaction(
+      "rw", this.database.attachments, this.database.attachmentBlobs, async () => {
+        const existing = (await this.database.attachments.toArray())
+          .map((record) => attachmentSchema.parse(record));
+        const existingById = new Map(existing.map((record) => [record.id, record]));
+        const conflicts = collectAttachmentPackageConflicts(attachments, binaries, existingById);
+        const binariesToCreate: typeof binaries = [];
+        for (const binary of binaries) {
+          const stored = await this.database.attachmentBlobs.get(binary.storageKey);
+          if (!stored) {
+            binariesToCreate.push(binary);
+            continue;
+          }
+          // Blob reads are not IDB requests. Keep this exact-content comparison
+          // alive explicitly; a timeout rejects and aborts the whole transaction.
+          const storedBytes = new Uint8Array(
+            await Dexie.waitFor(stored.blob.arrayBuffer())
+          );
+          if (
+            storedBytes.length !== binary.bytes.length ||
+            !storedBytes.every((value, index) => value === binary.bytes[index])
+          ) {
+            conflicts.push({
+              type: "storage_key_conflict",
+              storageKey: binary.storageKey,
+              reason: "An existing binary uses this storageKey but its content differs from the package.",
+            });
+          }
+        }
+        if (conflicts.length > 0) throw new AttachmentPackageConflictError(conflicts);
+        const metadataToCreate = attachments.filter((record) => !existingById.has(record.id));
+        for (const binary of binariesToCreate) {
+          await this.database.attachmentBlobs.add({ storageKey: binary.storageKey, blob: binary.blob });
+        }
+        for (const attachment of metadataToCreate) {
+          await this.database.attachments.add(attachment);
+        }
+        return {
+          importedMetadataCount: metadataToCreate.length,
+          importedBinaryCount: binariesToCreate.length,
+          reusedMetadataCount: attachments.length - metadataToCreate.length,
+          reusedBinaryCount: binaries.length - binariesToCreate.length,
+        };
+      }
+    ));
   }
 
   async getById(id: string): Promise<Attachment | undefined> {
