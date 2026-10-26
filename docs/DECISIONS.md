@@ -1,5 +1,38 @@
 # Architecture Decision Records
 
+## ADR-086: Preserve channel selection and independent reminder device outcomes
+
+**Status:** Owner-approved architecture (A3, 2026-10-24); local automated, SQL and
+real two-connection concurrency validation confirmed by the owner on 2026-10-26.
+Manual QA and release approval remain pending. Hosted activation is not authorized.
+
+V1 scheduled notifications include Task due/overdue and Finance obligations only.
+Weekly Review remains an application feature, with scheduled outbound delivery
+excluded. Exactly one explicitly selected channel may send. Invalid/legacy channel
+values fail closed, and preference changes cancel queued old work.
+
+Retain the existing per-user/channel/date parent identity. Add one independently
+tracked target per first-claim Web Push subscription snapshot, rather than retrying
+all devices after a partial failure. Keep accepted targets terminal, enforce
+five-attempt budgets and the existing 5/15/60/360-minute delays. Ambiguous sends
+become unknown without automatic same-day resend; exactly-once delivery is not
+claimed. The legacy shared last-sent date is informational only.
+
+Use a new forward-only migration with atomic, service-role-only RPCs, bounded
+leases, RLS and composite ownership foreign keys. Do not modify historical
+migrations or move feature/storage responsibilities into the scheduler. Failed
+source reads prevent incomplete digests from being sent. Authorization is checked
+inside the scheduler HTTP handler independently of unverified gateway settings.
+
+This is narrower than a notification redesign and introduces no dependency,
+mandatory cloud capability or change to Account, Sync, Attachment or Backup.
+The tradeoff is possible lost delivery for unknown outcomes, rather than blind
+same-day replay. Legacy nonterminal device outcomes cannot be reconstructed and
+are closed conservatively during migration. A coordinated, separately approved
+rollout must drain old invocations before migration and matching Function deploy.
+
+See `docs/A3_REMINDER_SCHEDULER_RELIABILITY.md` for policy and validation details.
+
 ## ADR-001: Use Vite instead of Next.js
 
 Reason:

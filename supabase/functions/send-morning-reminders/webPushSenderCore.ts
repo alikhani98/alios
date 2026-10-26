@@ -1,245 +1,62 @@
-import {
-  emptyDeliveryResult,
-  type DeliveryResult,
-  type WebPushNotificationPayload,
-} from "./deliveryTypes.ts";
+import { callRpc, isRecord, readPagedRows, type DeliveryClaim, type DeliveryStateDependencies } from "./deliveryState.ts";
+import { emptyDeliveryResult, isPreDispatchNetworkFailure, isRetryableStatus, providerErrorCode, type DeliveryResult, type ProviderOutcome, type WebPushNotificationPayload } from "./deliveryTypes.ts";
 
 export type StoredPushSubscription = Readonly<{
-  id?: string;
-  endpoint: string;
-  p256dh: string;
-  auth: string;
-  user_agent: string | null;
-  consecutive_failures?: number;
+  endpoint: string; p256dh: string; auth: string; user_agent: string | null;
 }>;
-
-export type WebPushAttemptResult = Readonly<{
-  ok: boolean;
-  status?: number;
-  error?: string;
+export type WebPushAttemptResult = ProviderOutcome;
+export type WebPushSenderCoreDependencies = DeliveryStateDependencies & Readonly<{
+  send: (subscription: StoredPushSubscription, payload: WebPushNotificationPayload) => Promise<WebPushAttemptResult>;
 }>;
-
-export type WebPushSenderCoreDependencies = Readonly<{
-  supabaseUrl: string;
-  supabaseServiceKey: string;
-  fetch: typeof fetch;
-  send: (
-    subscription: StoredPushSubscription,
-    payload: WebPushNotificationPayload
-  ) => Promise<WebPushAttemptResult>;
-}>;
-
-function serviceRoleHeaders(
-  deps: WebPushSenderCoreDependencies
-): HeadersInit {
-  return {
-    apikey: deps.supabaseServiceKey,
-    Authorization: `Bearer ${deps.supabaseServiceKey}`,
-  };
-}
-
-async function loadSubscriptions(
-  userId: string,
-  deps: WebPushSenderCoreDependencies
-): Promise<StoredPushSubscription[]> {
-  const query = new URLSearchParams({
-    select: "id,endpoint,p256dh,auth,user_agent,consecutive_failures",
-    user_id: `eq.${userId}`,
-  });
-  const response = await deps.fetch(
-    `${deps.supabaseUrl}/rest/v1/push_subscriptions?${query.toString()}`,
-    {
-      method: "GET",
-      headers: serviceRoleHeaders(deps),
-    }
-  );
-
-  if (!response.ok) {
-    throw new Error(
-      `Failed to load Web Push subscriptions: ${response.statusText}`
-    );
-  }
-
-  const rows = (await response.json()) as StoredPushSubscription[] | null;
-  return Array.isArray(rows) ? rows : [];
-}
-
-async function updateSubscriptionLifecycle(
-  userId: string,
-  subscription: StoredPushSubscription,
-  update: Readonly<Record<string, unknown>>,
-  deps: WebPushSenderCoreDependencies
-): Promise<void> {
-  const query = new URLSearchParams({
-    user_id: `eq.${userId}`,
-    endpoint: `eq.${subscription.endpoint}`,
-  });
-  const response = await deps.fetch(
-    `${deps.supabaseUrl}/rest/v1/push_subscriptions?${query.toString()}`,
-    {
-      method: "PATCH",
-      headers: {
-        ...serviceRoleHeaders(deps),
-        "Content-Type": "application/json",
-        Prefer: "return=minimal",
-      },
-      body: JSON.stringify(update),
-    }
-  );
-
-  if (!response.ok) {
-    throw new Error(
-      `Failed to update Web Push subscription lifecycle: ${response.statusText}`
-    );
-  }
-}
-
-async function removeSubscription(
-  userId: string,
-  endpoint: string,
-  deps: WebPushSenderCoreDependencies
-): Promise<void> {
-  const query = new URLSearchParams({
-    user_id: `eq.${userId}`,
-    endpoint: `eq.${endpoint}`,
-  });
-  const response = await deps.fetch(
-    `${deps.supabaseUrl}/rest/v1/push_subscriptions?${query.toString()}`,
-    {
-      method: "DELETE",
-      headers: {
-        ...serviceRoleHeaders(deps),
-        Prefer: "return=minimal",
-      },
-    }
-  );
-
-  if (!response.ok) {
-    throw new Error(
-      `Failed to remove expired Web Push subscription: ${response.statusText}`
-    );
-  }
-}
 
 export async function sendWebPushNotifications(
-  userId: string,
-  payload: WebPushNotificationPayload,
-  deps: WebPushSenderCoreDependencies
+  userId: string, payload: WebPushNotificationPayload, claim: DeliveryClaim, deps: WebPushSenderCoreDependencies,
 ): Promise<DeliveryResult> {
-  let subscriptions: StoredPushSubscription[];
-
-  try {
-    subscriptions = await loadSubscriptions(userId, deps);
-  } catch (error) {
-    return {
-      successCount: 0,
-      failureCount: 1,
-      removedCount: 0,
-      errors: [
-        error instanceof Error
-          ? error.message
-          : "Failed to load Web Push subscriptions.",
-      ],
-    };
+  const context = { p_attempt_id: claim.attempt_id, p_lease_token: claim.lease_token, p_user_id: userId };
+  const targets = await readPagedRows("rpc/list_reminder_push_targets", new URLSearchParams({ order: "target_id.asc" }), deps, context);
+  const identities = new Set<string>();
+  if (!targets.every((target): target is { target_id: string } => {
+    if (!isRecord(target) || typeof target.target_id !== "string" || identities.has(target.target_id)) return false;
+    identities.add(target.target_id);
+    return true;
+  })) {
+    throw new Error("web_push_targets_invalid");
   }
-
-  if (subscriptions.length === 0) {
-    return emptyDeliveryResult();
-  }
-
   let successCount = 0;
   let failureCount = 0;
   let removedCount = 0;
   const errors: string[] = [];
-
-  for (const subscription of subscriptions) {
-    let attempt: WebPushAttemptResult;
-
+  for (const target of targets) {
+    const started = await callRpc("begin_reminder_push_target", { ...context, p_target_id: target.target_id }, deps);
+    if (started === null) continue; // Suppressed preference, terminal target, removed device or expired lease.
+    if (!isRecord(started) || typeof started.endpoint !== "string" || typeof started.p256dh !== "string" || typeof started.auth !== "string") {
+      throw new Error("web_push_target_invalid");
+    }
+    let outcome: ProviderOutcome;
     try {
-      attempt = await deps.send(subscription, payload);
+      outcome = await deps.send({
+        endpoint: started.endpoint, p256dh: started.p256dh, auth: started.auth,
+        user_agent: typeof started.user_agent === "string" ? started.user_agent : null,
+      }, payload);
     } catch (error) {
-      attempt = {
-        ok: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Web Push delivery failed.",
-      };
+      const preDispatchFailure = isPreDispatchNetworkFailure(error);
+      outcome = { ok: false, preDispatchFailure, unknown: !preDispatchFailure };
     }
-
-    if (attempt.ok) {
-      successCount++;
-      try {
-        await updateSubscriptionLifecycle(
-          userId,
-          subscription,
-          {
-            last_used_at: new Date().toISOString(),
-            last_failure_at: null,
-            consecutive_failures: 0,
-            last_error: null,
-          },
-          deps
-        );
-      } catch (error) {
-        errors.push(
-          error instanceof Error
-            ? error.message
-            : "Failed to update Web Push subscription usage."
-        );
-      }
-      continue;
+    // HTTP acceptance is required even when an adapter incorrectly returns ok.
+    const accepted = outcome.ok && outcome.status !== undefined && outcome.status >= 200 && outcome.status < 300 && !outcome.unknown && !outcome.preDispatchFailure;
+    const error = providerErrorCode("web_push", outcome);
+    const recorded = await callRpc("finish_reminder_push_target", {
+      ...context, p_target_id: target.target_id,
+      p_outcome: accepted ? "sent" : outcome.unknown ? "unknown" : outcome.preDispatchFailure ? "retryable_failure" : outcome.status === undefined ? "unknown" : isRetryableStatus(outcome.status) ? "retryable_failure" : "permanent_failure",
+      p_http_status: outcome.status ?? null,
+    }, deps);
+    if (recorded !== true) throw new Error("web_push_target_not_recorded");
+    if (accepted) successCount++;
+    else {
+      failureCount++;
+      errors.push(error);
+      if (outcome.status === 404 || outcome.status === 410) removedCount++;
     }
-
-    if (attempt.status === 404 || attempt.status === 410) {
-      try {
-        await removeSubscription(userId, subscription.endpoint, deps);
-        removedCount++;
-      } catch (error) {
-        failureCount++;
-        errors.push(
-          error instanceof Error
-            ? error.message
-            : "Failed to remove expired Web Push subscription."
-        );
-      }
-      continue;
-    }
-
-    failureCount++;
-    try {
-      await updateSubscriptionLifecycle(
-        userId,
-        subscription,
-        {
-          last_failure_at: new Date().toISOString(),
-          consecutive_failures:
-            (subscription.consecutive_failures ?? 0) + 1,
-          last_error:
-            attempt.error ??
-            `Web Push delivery failed with status ${
-              attempt.status ?? "unknown"
-            }.`,
-        },
-        deps
-      );
-    } catch (error) {
-      errors.push(
-        error instanceof Error
-          ? error.message
-          : "Failed to update Web Push subscription failure state."
-      );
-    }
-    errors.push(
-      attempt.error ??
-        `Web Push delivery failed with status ${attempt.status ?? "unknown"}.`
-    );
   }
-
-  return {
-    successCount,
-    failureCount,
-    removedCount,
-    errors,
-  };
+  return { ...emptyDeliveryResult(), successCount, failureCount, removedCount, errors };
 }

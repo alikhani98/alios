@@ -1,4 +1,6 @@
 import * as webpush from "jsr:@negrel/webpush@0.5.0";
+import type { DeliveryClaim } from "./deliveryState.ts";
+import { isPreDispatchNetworkFailure } from "./deliveryTypes.ts";
 
 import type {
   DeliveryResult,
@@ -60,7 +62,8 @@ export function createWebPushSender(
   configuration: WebPushSenderConfiguration
 ): (
   userId: string,
-  payload: WebPushNotificationPayload
+  payload: WebPushNotificationPayload,
+  claim: DeliveryClaim
 ) => Promise<DeliveryResult> {
   let applicationServerPromise:
     | Promise<webpush.ApplicationServer>
@@ -88,23 +91,34 @@ export function createWebPushSender(
     return applicationServerPromise;
   };
 
-  return (userId, payload) =>
-    sendWebPushNotifications(userId, payload, {
+  return (userId, payload, claim) =>
+    sendWebPushNotifications(userId, payload, claim, {
       supabaseUrl: configuration.supabaseUrl,
       supabaseServiceKey: configuration.supabaseServiceKey,
       fetch: configuration.fetch,
       send: async (subscription, notificationPayload) => {
+        let applicationServer: webpush.ApplicationServer;
         try {
-          const applicationServer = await getApplicationServer();
-          const subscriber = applicationServer.subscribe({
+          applicationServer = await getApplicationServer();
+        } catch {
+          // Configuration failed before dispatch; retry is safe.
+          return { ok: false, preDispatchFailure: true };
+        }
+        let subscriber: ReturnType<webpush.ApplicationServer["subscribe"]>;
+        try {
+          subscriber = applicationServer.subscribe({
             endpoint: subscription.endpoint,
             keys: {
               p256dh: subscription.p256dh,
               auth: subscription.auth,
             },
           });
-
-          await subscriber.pushTextMessage(
+        } catch {
+          // Invalid stored subscription data failed before any provider request.
+          return { ok: false, status: 400 };
+        }
+        try {
+          const sending = subscriber.pushTextMessage(
             JSON.stringify(notificationPayload),
             {
               topic: "reminders",
@@ -112,6 +126,17 @@ export function createWebPushSender(
               urgency: webpush.Urgency.Normal,
             }
           );
+          let timer: ReturnType<typeof setTimeout> | undefined;
+          try {
+            await Promise.race([
+              sending,
+              new Promise<never>((_resolve, reject) => {
+                timer = setTimeout(() => reject(new Error("push_timeout")), 30_000);
+              }),
+            ]);
+          } finally {
+            clearTimeout(timer);
+          }
 
           return { ok: true, status: 201 };
         } catch (error) {
@@ -119,17 +144,11 @@ export function createWebPushSender(
             return {
               ok: false,
               status: error.response.status,
-              error: error.toString(),
             };
           }
 
-          return {
-            ok: false,
-            error:
-              error instanceof Error
-                ? error.message
-                : "Web Push delivery failed.",
-          };
+          const preDispatchFailure = isPreDispatchNetworkFailure(error);
+          return { ok: false, preDispatchFailure, unknown: !preDispatchFailure };
         }
       },
     });
