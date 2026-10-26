@@ -1,5 +1,26 @@
 # AliOS Project State
 
+## A3 Reminder Scheduler — Local Release Candidate
+
+- The owner approved the narrow A3 architecture and local implementation on
+  2026-10-24. Code and a new forward-only migration are present locally. On
+  2026-10-26 the owner confirmed successful migration application, SQL regression
+  and real two-connection PostgreSQL concurrency checks against disposable local
+  Supabase, plus 2,009 Vitest tests, 95 focused Scheduler tests, app/strict Edge
+  TypeScript, production build and diff checks. Manual QA and release approval
+  remain pending; this is not a completed-stage or hosted-release record.
+- The baseline already contains Telegram/Web Push scheduler code beyond the
+  historical Stage 273A description below. That historical description is not
+  evidence that the current scheduler is absent or that hosted deployment exists.
+- A3 restricts V1 scheduled delivery to Task due/overdue and Finance obligations,
+  enforces one selected channel, and tracks Web Push outcomes independently per
+  snapshotted device. The application Weekly Review feature remains unchanged;
+  its scheduled outbound reminders are excluded.
+- No hosted migration, Function deployment, cron modification, real notification,
+  commit or push has been performed for A3. This is not a completed-stage record.
+- See `docs/A3_REMINDER_SCHEDULER_RELIABILITY.md` for the approved contracts,
+  transition policy, owner-run checks and remaining rollout requirements.
+
 ## Project
 
 - Project name: AliOS
@@ -8,7 +29,7 @@
 - Current architecture direction: local-first remains the primary product model, while optional account authentication, sync backend support, and multi-device access are approved product directions so long as local ownership, local usability, and explicit sync consent remain intact.
 - Documentation authority order: `AGENTS.md` -> `PROJECT_STATE.md` -> `docs/ARCHITECTURE.md` -> `docs/DECISIONS.md` -> `README.md` -> `docs/ROADMAP.md` -> stage-specific docs.
 - Current status: AliOS includes validated mobile-first Inbox capture, processing, global search, focused search-result navigation, filters, bulk triage, local appearance switching, local profile preferences, calendar month view foundation, home time-window routine nudges, upcoming task grouping, routine templates, Wellness / Badminton Routine foundation, visual motion polish, premium Home dashboard visual upgrade, premium app shell polish, Home dashboard customization, premium reusable components, lightweight Personal Insights, Stage 37 premium Home showcase polish, light core-page visual alignment, hardened backup/restore safety, Stage 38 UI regression QA and release hardening with desktop sticky sidebar accessibility improvements, Stage 39 topbar dashboard controls plus accent color personalization, Stage 40 finance foundation, Stage 41 finance review and budget guard, Stage 42 lightweight finance charts foundation, Stage 43 lightweight motion and interaction polish, Stage 44 finance mobile UX and section navigation, Stage 45 performance audit and bundle optimization, Stage 46 Home collapsible dashboard sections, Stage 47 Settings Help Center Foundation, Stage 48 Weekly Review Foundation, Stage 49 Decision Log Foundation, Stage 50 Backup / Restore Safety & Migration Foundation, Stage 51 App Error Boundary & Local Error Log Foundation, Stage 53 Mobile UX Hardening for dense pages, Stage 54 Empty States & First-Run Guidance Foundation, Stage 55 Backup Reminder & Last Backup Status Foundation, Stage 56 Export Center Foundation, Stage 57 Recovery Mode / Safe Mode Foundation, Stage 58 Finance Monthly Plan Foundation, Stage 59 Personal Manual Foundation, Stage 60 Personal Manual QA & Release Hardening, Stage 61 Personal Manual Export Center Integration, Stage 62 Bundle Size Audit & Initial Load Hardening, Stage 63 Personal Manual Weekly Review Integration, Stage 64 Personal Manual Search & Focus Navigation, Stage 65 Personal Manual Templates Foundation, Stage 66 Personal Manual Mobile & Dense Page Polish, Stage 67 Personal Manual Track Release Hardening, Stage 68 v1.50 Release Hardening, Stage 69 Goals Track Foundation, Stage 70 Goals Track QA & Mobile Hardening, Stage 71 Goals Templates & Quick Start, Stage 72 Life Areas Foundation, Stage 73 App Startup Resilience & Release Hygiene, Stage 74 Pull Request CI Foundation, Stage 75 Life Areas QA & Mobile Hardening, Stage 76 Goals ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â Life Areas Derived Integration, Stage 77 Goals & Life Areas Release Hardening, Stage 78 Projects ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ Goals Link Foundation, Stage 79 Tasks ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ Projects Link Activation, Stage 80 Life Areas Persian Localization & Help Center Refresh, Stage 81 AliOS Design System Contract, Stage 82 Design Contract Adoption & Form Control Consistency, Stage 83 UI Accessibility & Design Contract Release Hardening, Stage 84 Real-World Usage QA & Product Prioritization Foundation, and Stage 85 Bundle Performance & Initial Load Hardening, and remains ready for static GitHub Pages deployment. Stage 166 focused Weekly Review real-world QA is complete. Stage 167 finance debt edit crash fix is complete. Stage 168 finance trim type crash fix is complete. Stage 169 finance trim crash source mapping is complete. Stage 170 deploy freshness and service worker diagnosis is complete. Stage 171 finance post-fix live QA closure is complete. Stage 172 visual design system discovery is complete.
-- Current Stage: Stage 273A Telegram Reminder Configuration is implemented locally and awaiting manual QA before commit. Stage 272A Attachment Backup Metadata + Binary Package, Stage 272B Unified Search Attachment Integration, Stage 271, Reminders V0, and the earlier Resource, Learning Context, Search, Review, and Attachment foundation stages remain completed product work. Standard attachment backups include metadata only, while the explicit Settings package flow exports/imports a manifest plus deduplicated binary bundle without changing sync or cloud behavior. Stage 273A adds only authenticated Telegram preference settings and manual test-send support; the migration and Edge Function still require manual Supabase deployment.
+- Historical stage snapshot (before A3): Stage 273A Telegram Reminder Configuration is implemented locally and awaiting manual QA before commit. Stage 272A Attachment Backup Metadata + Binary Package, Stage 272B Unified Search Attachment Integration, Stage 271, Reminders V0, and the earlier Resource, Learning Context, Search, Review, and Attachment foundation stages remain completed product work. Standard attachment backups include metadata only, while the explicit Settings package flow exports/imports a manifest plus deduplicated binary bundle without changing sync or cloud behavior. Stage 273A adds only authenticated Telegram preference settings and manual test-send support; the migration and Edge Function still require manual Supabase deployment.
 - Current implementation reality:
   - Implementation complete: Stages 254 through 259 are committed product stages. Stage 260A and Stage 260B are implemented locally and ready for final validation and commit approval after review.
   - Automated validation complete: the project-local TypeScript compiler (`.\node_modules\.bin\tsc.CMD --noEmit`), `pnpm test:run`, `pnpm build`, and `git diff --check` passed. The `pnpm exec tsc --noEmit` wrapper remains unable to resolve `tsc` in this Windows environment. Automated checks remain separate from live QA evidence and do not prove real-world behavior by themselves.
@@ -56,7 +77,7 @@
 - Package import/export is local-only and does not change sync, cloud storage,
   search, Review, Home, OCR, AI, or notification behavior.
 
-## Stage Reminders V0 Local-Only Boundary
+## Stage Reminders V0 Local-Only Boundary (Historical Scope)
 
 - Home now derives a compact reminder snapshot from existing open Tasks and
   active unpaid Finance obligations. It shows overdue and due-today items
@@ -72,7 +93,7 @@
   Supabase Edge Functions, notification tables, recurrence, and delivery
   history remain deferred.
 
-## Stage 273A Telegram Settings Boundary
+## Stage 273A Telegram Settings Boundary (Historical Scope)
 
 - Added the `reminder_preferences` migration with per-user RLS policies and
   Telegram-only preference validation.

@@ -1,5 +1,36 @@
 # AliOS Architecture
 
+## A3 Scheduled Reminder Delivery Boundary
+
+Owner-approved on 2026-10-24 for local implementation; the owner confirmed local
+automated, SQL and real two-connection concurrency validation on 2026-10-26.
+Manual QA, release approval and hosted activation remain pending.
+The baseline includes scheduler and Web Push code
+beyond the older Stage 273A scope descriptions. A3 adds no Account, Sync,
+Attachment or Backup changes and no new dependency.
+
+The optional scheduler reads existing user-scoped synced data only after explicit
+reminder opt-in. V1 scheduled categories are Task due/overdue and active unpaid
+Finance obligations. Application Weekly Review remains available, but its
+scheduled outbound delivery is excluded. Only the selected Telegram or Web Push
+channel can claim work; legacy/invalid channels fail closed.
+
+Parent ownership remains user/channel/local date. Web Push snapshots device IDs
+on first claim and records each target independently under atomic, bounded
+leases. Successful targets never retry because another device failed. Ambiguous
+dispatch becomes terminal unknown without automatic same-day resend. Full parent
+success requires every intended target to be sent. Shared last-sent metadata is
+informational, not retry eligibility. Preference changes cancel queued work.
+
+Service-role-only scheduler RPCs own delivery-state mutations; RLS and composite
+foreign keys enforce target ownership. Actual provider operations occur outside
+database transactions. The HTTP entry point independently authorizes the existing
+service-role bearer. One reference instant drives digest dates; database wall
+time fences dispatch and records actual completion/backoff timestamps.
+
+See `docs/A3_REMINDER_SCHEDULER_RELIABILITY.md` and ADR-086 for the exact state
+machine, legacy transition, security limits and owner-run validation requirements.
+
 AliOS 1.0 is a local-first web app. Static-only deployment remains valid for stages that do not enable optional account or sync infrastructure.
 
 ## Product Direction Boundary

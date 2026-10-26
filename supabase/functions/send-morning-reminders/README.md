@@ -1,114 +1,70 @@
-# send-morning-reminders Edge Function
+# Morning reminder scheduler — A3
 
-## Purpose
+Status: local implementation awaiting owner-run validation. No hosted migration,
+deployment, cron change, or provider send is part of this work.
 
-Scheduled Supabase Edge Function that runs periodically (e.g., every 15-30 minutes via Supabase cron) to check if any user's local morning time has arrived, and sends them a Telegram message with due tasks and finance obligations.
+V1 outbound categories are **Task due/overdue** and **Finance obligations**.
+Weekly Review remains an application feature, but is never included in this
+scheduler's Telegram messages, Web Push payloads, or delivery logs.
 
-## Scope (Reminders V1 — Step 2)
+Only the explicitly selected channel is eligible. Disabled, unknown and legacy
+`both` preferences fail closed. Telegram requires a numeric Chat ID; Web Push
+does not require one. Selection changes cancel old queued work, including when
+switching back later that day.
 
-- Reads `reminder_preferences` table to find users with `enabled = true` and a valid `telegram_chat_id`.
-- Checks each user's timezone and `morning_time` against the current UTC time to determine if it's time to send.
-- Skips users who have already received a reminder today (`last_sent_local_date = today`).
-- Queries `alios_sync_records` table where `entity = 'tasks'` for due/overdue items (status ≠ done, ≠ cancelled, dueDate ≤ today).
-- Queries `alios_sync_records` table where `entity = 'financeObligations'` for active obligations (status = active, dueDate ≤ today OR dueDay ≤ today's day-of-month).
-- Sends a single Telegram message via Bot API (token from `Deno.env.get('TELEGRAM_BOT_TOKEN')`).
-- Logs delivery attempts to `reminder_delivery_log`.
-- Updates `last_sent_local_date` in `reminder_preferences` after successful send.
+Eligibility uses one injected reference instant, the user's IANA timezone, and
+the configured morning time including seconds. Open Tasks are `todo`, `doing`
+and `deferred` with a valid date no later than today. Finance preserves the
+existing scheduler's inclusive today-through-three-days-ahead explicit-date or
+day-of-month window, limited to active, unpaid obligations. Source query errors
+abort that user's batch before claiming or sending. This is a digest of existing
+synced copies; it neither activates sync nor uploads local records.
 
-## Dependencies
+The authoritative idempotency key is user/channel/local date. The legacy shared
+`last_sent_local_date` is informational, updated transactionally only for full
+success, and never used to suppress a retry.
 
-- `SUPABASE_URL`: Supabase project URL (auto-provided by Supabase runtime).
-- `SUPABASE_SERVICE_ROLE_KEY`: service role key (auto-provided by Supabase runtime).
-- `TELEGRAM_BOT_TOKEN`: Telegram Bot API token (must be set as a Supabase secret — see below).
+Web Push snapshots subscription identities on first claim. Each target is
+authorized and recorded independently; sent devices are excluded from retries.
+Partial, unknown, removed-device and zero-device outcomes are not full success.
+HTTP 404/410 remove the expired subscription and remain permanent delivery
+failures. Known 429/5xx rejections retry with 5/15/60/360-minute delays, at most five
+attempts. Whitelisted pre-dispatch connection/DNS failures retry without a fake
+HTTP status; reset, timeout and lost-response failures remain ambiguous.
+Potentially accepted but unestablished sends become terminal
+`unknown`, without automatic same-day resend. Exactly-once delivery is not
+claimed.
 
-## Setting the Telegram Bot Token Secret
+The parent is successful only when every snapshotted target is durably sent.
+The response's Web Push success/failure counts describe the processed batches'
+durable target snapshots (including previously accepted devices); they are not
+a count of new sends in this invocation. Target failure totals include pending
+retries and unknown outcomes. `removedCount` describes removals acknowledged in
+this invocation. A zero-device batch is `skipped`, never `sent`.
 
-Run this command **once** in your terminal (replace `YOUR_ACTUAL_TOKEN` with the real bot token):
+## Invocation and secrets
 
-```bash
-supabase secrets set TELEGRAM_BOT_TOKEN=YOUR_ACTUAL_TOKEN
-```
+POST only; the handler independently compares the bearer token with the
+configured service-role key. User/anon JWTs are rejected regardless of gateway
+settings. The existing service-role cron bearer contract is preserved; gateway
+configuration must still be verified by the owner. Never disable gateway
+verification to bypass an authorization problem.
 
-After setting the secret, you must **redeploy** the function for the change to take effect:
+Secrets remain runtime environment variables: `SUPABASE_URL`,
+`SUPABASE_SERVICE_ROLE_KEY`, `TELEGRAM_BOT_TOKEN`, `VAPID_KEYS_JSON`, and
+`VAPID_SUBJECT`. No provider payload, raw error, response description, subscription
+key or token-bearing URL is logged or returned. Provider failures are stored as
+bounded application-generated codes. Telegram messages are plain text.
 
-```bash
-supabase functions deploy send-morning-reminders
-```
+## Required rollout boundary
 
-## Deployment
+The new forward-only migration
+`20261024090000_reminder_scheduler_reliability.sql` and this Function must be
+activated together in a separately approved rollout. The old scheduler must be
+paused and in-flight old invocations drained before applying it. The migration
+conservatively closes legacy Web Push retries and legacy in-flight Telegram
+attempts as unknown, because their prior device outcomes cannot be reconstructed.
+Historic sent/skipped records and audit logs are preserved.
 
-```bash
-supabase functions deploy send-morning-reminders
-```
-
-## Scheduling (via Supabase cron)
-
-To run this function every 15 minutes, create a Postgres cron job:
-
-```sql
-select cron.schedule(
-  'send-morning-reminders',
-  '*/15 * * * *',
-  $$
-  select net.http_post(
-    url := 'https://YOUR_PROJECT_REF.supabase.co/functions/v1/send-morning-reminders',
-    headers := '{"Authorization": "Bearer YOUR_SERVICE_ROLE_KEY"}'::jsonb
-  );
-  $$
-);
-```
-
-Replace `YOUR_PROJECT_REF` and `YOUR_SERVICE_ROLE_KEY` with your actual values.
-
-## Manual Testing
-
-1. Insert a test user row in `reminder_preferences`:
-   ```sql
-   insert into public.reminder_preferences (user_id, enabled, telegram_chat_id, timezone, morning_time)
-   values (
-     'YOUR_AUTH_USER_ID',
-     true,
-     'YOUR_TELEGRAM_CHAT_ID',
-     'Asia/Tehran',
-     '08:00:00'
-   );
-   ```
-
-2. Insert a test task or finance obligation in `alios_sync_records`:
-   ```sql
-   -- Test task
-   insert into public.alios_sync_records (user_id, entity, record_id, payload, updated_at, created_at)
-   values (
-     'YOUR_AUTH_USER_ID',
-     'tasks',
-     'test-task-1',
-     '{"id":"test-task-1","title":"Test Task","status":"pending","dueDate":"2026-09-23","priority":"medium","isMit":false,"createdAt":"2026-09-23T00:00:00Z","updatedAt":"2026-09-23T00:00:00Z"}',
-     now(),
-     now()
-   );
-
-   -- Test finance obligation
-   insert into public.alios_sync_records (user_id, entity, record_id, payload, updated_at, created_at)
-   values (
-     'YOUR_AUTH_USER_ID',
-     'financeObligations',
-     'test-obligation-1',
-     '{"id":"test-obligation-1","title":"Test Obligation","status":"active","dueDate":"2026-09-23","type":"debt","totalAmount":1000,"paidAmount":0,"createdAt":"2026-09-23T00:00:00Z","updatedAt":"2026-09-23T00:00:00Z"}',
-     now(),
-     now()
-   );
-   ```
-
-3. Invoke the function manually via Supabase CLI:
-   ```bash
-   supabase functions invoke send-morning-reminders --method POST
-   ```
-
-4. Check your Telegram bot chat to see if the message arrives.
-5. Verify `reminder_delivery_log` for a new row.
-
-## Notes
-
-- This function uses **service role key** to bypass RLS, allowing it to read all users' preferences and items.
-- The function is idempotent per day: it skips users who have already received a reminder today.
-- If `alios_sync_records` table does not exist or contains no matching records, the function will log warnings and skip those categories gracefully.
+See [A3 design, tests and owner commands](../../../docs/A3_REMINDER_SCHEDULER_RELIABILITY.md).
+Do not use a production invocation as a local smoke test.
