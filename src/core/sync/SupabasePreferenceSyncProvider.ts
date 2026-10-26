@@ -1917,20 +1917,19 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
         connectedSession.user.user_metadata as Record<string, unknown> | undefined
       );
       let mergedSnapshot = mergePreferenceSnapshots(localSnapshot, remoteSnapshot);
-      this.internalPreferenceEventSuppressionDepth += 1;
       let localPreferenceChanges = 0;
-      try {
-        localPreferenceChanges = applyRemotePreferencesToLocal(
-          storage,
-          localSnapshot,
-          mergedSnapshot
-        );
-      } finally {
-        this.internalPreferenceEventSuppressionDepth = Math.max(
-          0,
-          this.internalPreferenceEventSuppressionDepth - 1
-        );
-      }
+      const applyPreferences = () => {
+        this.internalPreferenceEventSuppressionDepth += 1;
+        try {
+          localPreferenceChanges = applyRemotePreferencesToLocal(
+            storage, localSnapshot, mergedSnapshot
+          );
+        } finally {
+          this.internalPreferenceEventSuppressionDepth = Math.max(
+            0, this.internalPreferenceEventSuppressionDepth - 1
+          );
+        }
+      };
       let remotePreferenceChanges = 0;
       const syncAt = this.now().toISOString();
 
@@ -1961,6 +1960,8 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
         }
 
         await assertCurrent();
+        // Hydrate no user preferences until every remote record page has succeeded.
+        applyPreferences();
         const remoteRows = [...remoteRecordsResult.data];
         if (this.mutationOutboxRepository) {
           const mutationOutboxProcessor = new MutationOutboxProcessor({
@@ -2022,6 +2023,8 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
           throw upsertResult.error;
         }
 
+      } else {
+        applyPreferences();
       }
 
       await assertCurrent();
