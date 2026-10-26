@@ -392,6 +392,43 @@ function encodeInFilter(values: ReadonlyArray<string>) {
   return `(${values.map((value) => `"${value}"`).join(",")})`;
 }
 
+const SYNC_RECORD_PAGE_SIZE = 500;
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function readSyncRecordRow(
+  value: unknown, userId: string, entities: ReadonlySet<string>
+): SupabaseRecordRow {
+  if (!isRecord(value) || value.user_id !== userId ||
+      typeof value.entity !== "string" || !entities.has(value.entity) ||
+      typeof value.record_id !== "string" || !value.record_id ||
+      !isRecord(value.payload) || typeof value.updated_at !== "string" ||
+      typeof value.created_at !== "string" ||
+      (value.has_conflict !== undefined && typeof value.has_conflict !== "boolean")) {
+    throw new Error("Supabase record listing returned invalid or out-of-scope data.");
+  }
+  if (value.payload.__aliosTombstone !== true && value.payload.id !== value.record_id) {
+    throw new Error("Supabase record listing returned an inconsistent record identity.");
+  }
+  const nullableTextFields = ["last_synced_at", "last_synced_by_device_id", "conflict_reason"] as const;
+  for (const field of nullableTextFields) {
+    if (value[field] !== undefined && value[field] !== null && typeof value[field] !== "string") {
+      throw new Error("Supabase record listing returned invalid metadata.");
+    }
+  }
+  // SQL nullable metadata maps to the existing optional-string client contract.
+  return {
+    user_id: userId, entity: value.entity, record_id: value.record_id,
+    payload: value.payload, updated_at: value.updated_at, created_at: value.created_at,
+    ...(typeof value.last_synced_at === "string" ? { last_synced_at: value.last_synced_at } : {}),
+    ...(typeof value.last_synced_by_device_id === "string" ? { last_synced_by_device_id: value.last_synced_by_device_id } : {}),
+    ...(typeof value.has_conflict === "boolean" ? { has_conflict: value.has_conflict } : {}),
+    ...(typeof value.conflict_reason === "string" ? { conflict_reason: value.conflict_reason } : {}),
+  };
+}
+
 async function parseErrorResponse(
   response: Response,
   fallback: string
@@ -902,58 +939,77 @@ export function createSupabaseBrowserClient(
     },
     records: {
       async list({ table, userId, entities }) {
-        const currentSession = readStoredSession(authStorageKey);
-        if (!currentSession) {
+        const storage = resolveStorage();
+        const currentSession = readStoredSession(authStorageKey, storage);
+        if (!currentSession || currentSession.user.id !== userId) {
           return {
             data: [],
-            error: new Error(
-              "Supabase sync is unavailable until this device has an authenticated session."
-            ),
+            error: new Error("Supabase record listing requires the requested account's authenticated session."),
           };
         }
-
-        if (entities.length === 0) {
-          return { data: [], error: null };
-        }
+        if (entities.length === 0) return { data: [], error: null };
 
         try {
+          const entityScope = new Set(entities);
           const query = new URLSearchParams({
-            select:
-              "user_id,entity,record_id,payload,updated_at,created_at,last_synced_at,last_synced_by_device_id,has_conflict,conflict_reason",
+            select: "user_id,entity,record_id,payload,updated_at,created_at,last_synced_at,last_synced_by_device_id,has_conflict,conflict_reason",
             user_id: `eq.${userId}`,
             entity: `in.${encodeInFilter(entities)}`,
+            // Unique within this user: the existing (user_id, entity, record_id) constraint.
+            order: "entity.asc,record_id.asc",
+            limit: String(SYNC_RECORD_PAGE_SIZE),
           });
-          const response = await fetch(
-            `${url}/rest/v1/${table}?${query.toString()}`,
-            {
+          const rows: SupabaseRecordRow[] = [];
+          const identities = new Set<string>();
+          let expectedTotal: number | undefined;
+          for (let offset = 0; ;) {
+            if (!sessionsMatch(currentSession, readStoredSession(authStorageKey, storage))) {
+              throw new Error("The sync session changed during record listing. Retry sync.");
+            }
+            query.set("offset", String(offset));
+            const response = await fetch(`${url}/rest/v1/${table}?${query}`, {
               method: "GET",
               headers: {
-                ...baseHeaders,
-                Authorization: `Bearer ${currentSession.access_token}`,
+                ...baseHeaders, Authorization: `Bearer ${currentSession.access_token}`,
+                Prefer: "count=exact",
               },
+            });
+            if (!response.ok) {
+              throw await parseErrorResponse(response, "Supabase record listing failed.");
             }
-          );
-
-          if (!response.ok) {
-            return {
-              data: [],
-              error: await parseErrorResponse(
-                response,
-                "Supabase record listing failed."
-              ),
-            };
+            const page: unknown = await response.json();
+            const range = /^(?:(\d+)-(\d+)|\*)\/(\d+)$/.exec(response.headers.get("content-range") ?? "");
+            if (!Array.isArray(page) || !range) {
+              throw new Error("Supabase record listing is incomplete or invalid. Retry sync.");
+            }
+            const total = Number(range[3]);
+            if (!Number.isSafeInteger(total) || total < 0 ||
+                (expectedTotal !== undefined && expectedTotal !== total) ||
+                page.length > SYNC_RECORD_PAGE_SIZE || offset + page.length > total ||
+                (page.length === 0 ? range[1] !== undefined || total !== 0 || offset !== 0 :
+                  Number(range[1]) !== offset || Number(range[2]) !== offset + page.length - 1)) {
+              throw new Error("Supabase record listing changed or is incomplete. Retry sync.");
+            }
+            expectedTotal = total;
+            for (const value of page) {
+              const row = readSyncRecordRow(value, userId, entityScope);
+              const identity = JSON.stringify([row.entity, row.record_id]);
+              if (identities.has(identity)) {
+                // Deduplicating would disguise missing rows behind the advertised total.
+                throw new Error("Supabase record listing contains overlapping pages. Retry sync.");
+              }
+              identities.add(identity);
+              rows.push(row);
+            }
+            if (!sessionsMatch(currentSession, readStoredSession(authStorageKey, storage))) {
+              throw new Error("The sync session changed during record listing. Retry sync.");
+            }
+            offset += page.length;
+            if (offset === total) return { data: rows, error: null };
           }
-
-          const payload = (await response.json()) as ReadonlyArray<SupabaseRecordRow>;
-          return {
-            data: Array.isArray(payload) ? payload : [],
-            error: null,
-          };
         } catch (error) {
-          return {
-            data: [],
-            error: toError(error, "Supabase record listing failed."),
-          };
+          // A caller never receives a successful partial snapshot, including on later-page errors.
+          return { data: [], error: toError(error, "Supabase record listing failed.") };
         }
       },
 
