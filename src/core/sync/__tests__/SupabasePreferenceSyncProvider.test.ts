@@ -334,6 +334,9 @@ function createBackupStorageStub(input?: {
 
   const backupStorage: BackupStorage = {
     readAll: vi.fn(async () => structuredClone(data)),
+    applySyncChanges: vi.fn(async (_before: AliosBackupData, nextData: AliosBackupData) => {
+      data = structuredClone(nextData);
+    }),
     replaceAll: vi.fn(async (nextData: AliosBackupData) => {
       data = structuredClone(nextData);
     }),
@@ -866,6 +869,7 @@ describe("SupabasePreferenceSyncProvider", () => {
       );
       await flushMicrotasks();
 
+      await syncSpy.mock.results[0]?.value;
       expect(syncSpy).toHaveBeenCalledTimes(1);
       expect(harness.client.auth.updateUser).toHaveBeenCalledTimes(1);
     } finally {
@@ -942,12 +946,15 @@ describe("SupabasePreferenceSyncProvider", () => {
           initialSession: true,
         }
       );
+      let markUpdateStarted!: () => void;
+      const updateStarted = new Promise<void>((resolve) => { markUpdateStarted = resolve; });
       let resolveUpdateUser:
         | ((value: { data: { user: FakeSessionUser | null }; error: Error | null }) => void)
         | undefined;
       harness.client.auth.updateUser.mockImplementationOnce(
         () =>
           new Promise((resolve) => {
+            markUpdateStarted();
             resolveUpdateUser = resolve as (
               value: { data: { user: FakeSessionUser | null }; error: Error | null }
             ) => void;
@@ -981,7 +988,7 @@ describe("SupabasePreferenceSyncProvider", () => {
       windowHarness.window.dispatchEvent(new Event(LOCAL_PREFERENCE_CHANGE_EVENT));
       windowHarness.window.dispatchEvent(new Event(LOCAL_PREFERENCE_CHANGE_EVENT));
       windowHarness.window.dispatchEvent(new Event(LOCAL_PREFERENCE_CHANGE_EVENT));
-      await flushMicrotasks();
+      await updateStarted;
 
       expect(harness.client.auth.updateUser).toHaveBeenCalledTimes(1);
 

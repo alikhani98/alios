@@ -34,6 +34,13 @@ export interface BackupStorage {
     data: AliosBackupData,
     options?: BackupRestoreOptions
   ): Promise<void>;
+  // Apply only changed sync records, atomically comparing each with its baseline.
+  // Never clears tables or writes non-sync collections; stale writes fail closed.
+  applySyncChanges(
+    before: AliosBackupData,
+    after: AliosBackupData,
+    isCurrent?: () => boolean
+  ): Promise<void>;
   getSummary(): Promise<LocalDataSummary>;
   clearAll(): Promise<void>;
 }

@@ -1,4 +1,5 @@
 import {
+  MutationOutboxRetryableError,
   type MutationOutboxEntry,
   type MutationOutboxProcessResult,
   type MutationOutboxRepository,
@@ -121,6 +122,7 @@ export function getMutationOutboxRetryDelayMs(
 }
 
 export function isRetryableMutationOutboxError(error: unknown) {
+  if (error instanceof MutationOutboxRetryableError) return true;
   if (typeof navigator !== "undefined" && navigator.onLine === false) {
     return true;
   }

@@ -186,6 +186,39 @@ export class DexieBackupStorage implements BackupStorage {
     }
   }
 
+  async applySyncChanges(
+    before: AliosBackupData,
+    after: AliosBackupData,
+    isCurrent: () => boolean = () => true
+  ): Promise<void> {
+    const entities = [
+      "inboxItems", "tasks", "routines", "projects", "goals",
+      "financeTransactions", "financeObligations", "manualEntries",
+    ] as const;
+    const tables = entities.map((entity) => this.database[entity]);
+    await this.database.transaction("rw", tables, async () => {
+      if (!isCurrent()) throw new StorageError("The sync session changed. Local data was retained.");
+      for (const entity of entities) {
+        const baseline = new Map(before[entity].map((record) => [record.id, record]));
+        const next = new Map(after[entity].map((record) => [record.id, record]));
+        const table = this.database.table<AliosBackupData[typeof entity][number], string>(entity);
+        for (const id of new Set([...baseline.keys(), ...next.keys()])) {
+          const expected = baseline.get(id);
+          const replacement = next.get(id);
+          if (JSON.stringify(expected) === JSON.stringify(replacement)) continue;
+          const current = await table.get(id);
+          if (JSON.stringify(current) !== JSON.stringify(expected)) {
+            throw new StorageError("Local records changed during sync. Retry with current local data.");
+          }
+          if (replacement) await table.put(replacement);
+          else await table.delete(id);
+        }
+      }
+      // Cancellation during an IndexedDB await rolls back the whole transaction.
+      if (!isCurrent()) throw new StorageError("The sync session changed. Local data was retained.");
+    });
+  }
+
   async getSummary(): Promise<LocalDataSummary> {
     try {
       const [

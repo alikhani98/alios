@@ -38,6 +38,10 @@ export type MutationOutboxProcessResult = Readonly<{
   blockedConflicts: number;
 }>;
 
+export class MutationOutboxRetryableError extends Error {
+  readonly name = "MutationOutboxRetryableError";
+}
+
 export class MutationOutboxConflictError extends Error {
   readonly name = "MutationOutboxConflictError";
 
