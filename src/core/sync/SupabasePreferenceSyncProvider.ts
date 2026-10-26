@@ -55,6 +55,7 @@ import {
 } from "./supabaseClient";
 import {
   MutationOutboxConflictError,
+  MutationOutboxRetryableError,
   type MutationOutboxEntry,
   type MutationOutboxProcessResult,
   type MutationOutboxRepository,
@@ -236,6 +237,15 @@ type AuthSessionSubscription = ReturnType<SyncAuthSessionSource["subscribe"]>;
 
 type RecordMap<TRecord extends SyncableRecord> = Map<string, TRecord>;
 
+class SyncSessionChangedError extends MutationOutboxRetryableError {
+  constructor() {
+    super("The sync session changed. Local data was retained.");
+  }
+}
+function authIdentity(session: AuthSession): string {
+  return JSON.stringify([session.provider, session.user?.userId ?? session.status]);
+}
+
 function createFallbackDeviceId() {
   return `device-${Date.now().toString(36)}-${Math.random()
     .toString(36)
@@ -378,7 +388,10 @@ function applyRemotePreferencesToLocal(
     const localValue = localSnapshot[key];
     const mergedValue = mergedSnapshot[key];
 
-    if (typeof localValue === "string" || typeof mergedValue !== "string") {
+    if (
+      storage?.getItem(key) !== (localValue ?? null) ||
+      typeof localValue === "string" || typeof mergedValue !== "string"
+    ) {
       return;
     }
 
@@ -1171,10 +1184,14 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
   private readonly mutationOutboxRepository: MutationOutboxRepository | null;
   private readonly listeners = new Set<SyncStateListener>();
   private authSessionSubscription: AuthSessionSubscription | null = null;
+  private sessionOperations = 0;
   private preferenceChangeListener: (() => void) | null = null;
   private isActivated = false;
   private internalPreferenceEventSuppressionDepth = 0;
   private syncInFlight: Promise<SyncResult> | null = null;
+  private syncGeneration = 0;
+  private authIdentity: string | null = null;
+  private syncRequested = false;
   private conflictSnapshot: ReadonlyArray<SyncConflictRecord> = [];
   private lastKnownStatus: SyncStatus = createLocalOnlyStatus(
     "AliOS is currently running only on this device."
@@ -1204,9 +1221,7 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
     }
 
     this.isActivated = true;
-    this.authSessionSubscription = this.authSessionSource.subscribe(() => {
-      void this.handleAuthSessionChange();
-    });
+    this.ensureSessionMonitoring();
 
     if (typeof window !== "undefined") {
       this.preferenceChangeListener = () => {
@@ -1230,8 +1245,9 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
     }
 
     this.isActivated = false;
-    this.authSessionSubscription?.unsubscribe();
-    this.authSessionSubscription = null;
+    this.syncGeneration++;
+    this.syncRequested = false;
+    this.releaseSessionMonitoringIfIdle();
 
     if (typeof window !== "undefined" && this.preferenceChangeListener) {
       window.removeEventListener("storage", this.preferenceChangeListener);
@@ -1357,8 +1373,14 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
 
     this.setSyncEnabled(true);
 
+    const releaseSession = this.retainSessionMonitoring();
     this.syncInFlight = this.runSync().finally(() => {
+      releaseSession();
       this.syncInFlight = null;
+      if (this.syncRequested && this.isActivated && this.isSyncEnabled()) {
+        this.syncRequested = false;
+        void this.syncNow();
+      }
     });
 
     return this.syncInFlight;
@@ -1369,13 +1391,29 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
   }
 
   async listConflicts(): Promise<ReadonlyArray<SyncConflictRecord>> {
-    const bundles = await this.loadConflictBundles();
-    const conflicts = bundles.map((bundle) => bundle.conflict);
-    this.conflictSnapshot = conflicts;
-    return conflicts;
+    const releaseSession = this.retainSessionMonitoring();
+    try {
+      const bundles = await this.loadConflictBundles();
+      const conflicts = bundles.map((bundle) => bundle.conflict);
+      this.conflictSnapshot = conflicts;
+      return conflicts;
+    } finally {
+      releaseSession();
+    }
   }
 
   async resolveConflict(
+    input: SyncConflictResolutionInput
+  ): Promise<SyncConflictResolutionResult> {
+    const releaseSession = this.retainSessionMonitoring();
+    try {
+      return await this.resolveConflictWithSession(input);
+    } finally {
+      releaseSession();
+    }
+  }
+
+  private async resolveConflictWithSession(
     input: SyncConflictResolutionInput
   ): Promise<SyncConflictResolutionResult> {
     const context = await this.loadConflictContext();
@@ -1385,6 +1423,8 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
       );
     }
 
+    const before = structuredClone(context.localData);
+    await context.assertCurrent();
     const syncAt = this.now().toISOString();
     const entityRecords = getEntityRecordMap(context.localData, input.entity);
     const localRecord = entityRecords.get(input.recordId);
@@ -1436,6 +1476,7 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
     if (!client) {
       throw new Error("AliOS sync is unavailable on this device.");
     }
+    await context.assertCurrent();
 
     const upsertResult =
       input.resolution === "keep-remote" && remoteTombstone
@@ -1461,11 +1502,14 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
       throw upsertResult.error;
     }
 
-    await this.backupStorage?.replaceAll(context.localData, {
-      preserveMutationOutbox: true,
-    });
+    await context.assertCurrent();
+    await this.backupStorage?.applySyncChanges(
+      before, context.localData, context.isCurrent
+    );
 
+    await context.assertCurrent();
     const remainingConflicts = await this.loadConflictBundles();
+    await context.assertCurrent();
     this.conflictSnapshot = remainingConflicts.map((bundle) => bundle.conflict);
     const detail =
       remainingConflicts.length > 0
@@ -1483,6 +1527,7 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
     });
 
     const status = await this.getStatus();
+    await context.assertCurrent();
     const conflict = createConflictRecord(
       input.entity,
       localRecord,
@@ -1519,6 +1564,7 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
   private async handleAuthSessionChange() {
     const session = await this.authSessionSource.getCurrentSession();
     if (session.status === "authenticated" && this.isSyncEnabled()) {
+      if (this.syncInFlight) this.syncRequested = true;
       void this.syncNow();
       return;
     }
@@ -1542,6 +1588,10 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
       return;
     }
 
+    if (this.syncInFlight) {
+      this.syncRequested = true;
+      return;
+    }
     try {
       const connectedSession = await this.ensureRemoteSession(false);
       if (connectedSession?.user) {
@@ -1563,6 +1613,8 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
     device: SyncDeviceIdentity;
     localData: AliosBackupData;
     remoteRows: ReadonlyArray<SupabaseRecordRow>;
+    assertCurrent: () => Promise<void>;
+    isCurrent: () => boolean;
   } | null> {
     if (!this.client || !this.backupStorage) {
       return null;
@@ -1573,6 +1625,12 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
       return null;
     }
 
+    const generation = this.syncGeneration;
+    const runtimeIdentity = authIdentity(await this.authSessionSource.getCurrentSession());
+    if (this.authIdentity === null) this.authIdentity = runtimeIdentity;
+    const assertCurrent = () =>
+      this.assertSyncSession(connectedSession.user.id, runtimeIdentity, generation);
+    const isCurrent = () => this.syncGeneration === generation && this.isSyncEnabled();
     const device = getOrCreateDeviceIdentity(this.getStorage());
     const localData = await this.backupStorage.readAll();
     const recordsResult = await this.client.records.list({
@@ -1585,11 +1643,10 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
       throw recordsResult.error;
     }
 
+    await assertCurrent();
     return {
       ownerUserId: connectedSession.user.id,
-      device,
-      localData,
-      remoteRows: recordsResult.data,
+      device, localData, remoteRows: recordsResult.data, assertCurrent, isCurrent,
     };
   }
 
@@ -1799,6 +1856,9 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
       };
     }
 
+    const generation = this.syncGeneration;
+    const runtimeIdentity = authIdentity(await this.authSessionSource.getCurrentSession());
+    if (this.authIdentity === null) this.authIdentity = runtimeIdentity;
     const connectedSession = await this.ensureRemoteSession(true);
     if (!connectedSession?.user) {
       const status = createLocalOnlyStatus(
@@ -1811,6 +1871,9 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
       };
     }
 
+    const assertCurrent = () =>
+      this.assertSyncSession(connectedSession.user.id, runtimeIdentity, generation);
+    const isCurrent = () => this.syncGeneration === generation && this.isSyncEnabled();
     const attemptAt = this.now().toISOString();
     const scopes = getScopes(this.backupStorage !== null);
     const syncingStatus: SyncStatus = {
@@ -1834,26 +1897,26 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
         ? "AliOS is syncing preferences, tasks, routines, projects, goals, finance, and Personal Manual records for this device."
         : "AliOS is syncing low-risk preferences for this device.",
     };
-    this.writeMetadata({
-      ...this.readMetadata(),
-      lastAttemptAt: attemptAt,
-      detail: syncingStatus.detail,
-    });
-    this.appendDiagnostic({
-      startedAt: attemptAt,
-      outcome: "started",
-      provider: "supabase",
-    });
-    this.emitStatus(syncingStatus);
-
     try {
+      await assertCurrent();
+      this.writeMetadata({
+        ...this.readMetadata(),
+        lastAttemptAt: attemptAt,
+        detail: syncingStatus.detail,
+      });
+      this.appendDiagnostic({
+        startedAt: attemptAt,
+        outcome: "started",
+        provider: "supabase",
+      });
+      this.emitStatus(syncingStatus);
       const storage = this.getStorage();
       const device = getOrCreateDeviceIdentity(storage);
       const localSnapshot = readLocalPreferenceSnapshot(storage);
       const remoteSnapshot = readRemotePreferenceSnapshot(
         connectedSession.user.user_metadata as Record<string, unknown> | undefined
       );
-      const mergedSnapshot = mergePreferenceSnapshots(localSnapshot, remoteSnapshot);
+      let mergedSnapshot = mergePreferenceSnapshots(localSnapshot, remoteSnapshot);
       this.internalPreferenceEventSuppressionDepth += 1;
       let localPreferenceChanges = 0;
       try {
@@ -1868,10 +1931,7 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
           this.internalPreferenceEventSuppressionDepth - 1
         );
       }
-      const remotePreferenceChanges = countChangedPreferences(
-        mergedSnapshot,
-        remoteSnapshot
-      );
+      let remotePreferenceChanges = 0;
       const syncAt = this.now().toISOString();
 
       let localUserDataChanges = 0;
@@ -1888,6 +1948,7 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
 
       if (this.backupStorage) {
         const localData = await this.backupStorage.readAll();
+        const before = structuredClone(localData);
         manualPreparation = buildManualPreparationStatus(localData);
         const remoteRecordsResult = await this.client.records.list({
           table: SUPABASE_SYNC_RECORDS_TABLE,
@@ -1899,20 +1960,23 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
           throw remoteRecordsResult.error;
         }
 
+        await assertCurrent();
         const remoteRows = [...remoteRecordsResult.data];
         if (this.mutationOutboxRepository) {
           const mutationOutboxProcessor = new MutationOutboxProcessor({
             repository: this.mutationOutboxRepository,
             now: this.now,
-            processEntry: (entry) =>
-              this.processMutationOutboxEntry(
+            processEntry: async (entry) => {
+              await assertCurrent();
+              return this.processMutationOutboxEntry(
                 entry,
                 localData,
                 remoteRows,
                 connectedSession.user.id,
                 syncAt,
                 device.deviceId
-              ),
+              );
+            },
           });
           mutationOutboxResult =
             await mutationOutboxProcessor.processPending();
@@ -1944,11 +2008,11 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
           conflictCount > 0 ||
           mutationOutboxResult.acknowledged > 0
         ) {
-          await this.backupStorage.replaceAll(localData, {
-            preserveMutationOutbox: true,
-          });
+          await assertCurrent();
+          await this.backupStorage.applySyncChanges(before, localData, isCurrent);
         }
 
+        await assertCurrent();
         const upsertResult = await this.client.records.upsert({
           table: SUPABASE_SYNC_RECORDS_TABLE,
           rows: uploadedRows,
@@ -1960,6 +2024,12 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
 
       }
 
+      await assertCurrent();
+      // A local preference may have changed while record hydration was pending.
+      mergedSnapshot = mergePreferenceSnapshots(
+        readLocalPreferenceSnapshot(storage), remoteSnapshot
+      );
+      remotePreferenceChanges = countChangedPreferences(mergedSnapshot, remoteSnapshot);
       const existingMetadata =
         (connectedSession.user.user_metadata as Record<string, unknown> | undefined) ??
         {};
@@ -1988,6 +2058,7 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
         throw updateUserResult.error;
       }
 
+      await assertCurrent();
       const categoryStatuses = createCategoryStatuses(
         syncAt,
         this.backupStorage !== null,
@@ -2068,6 +2139,12 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
         status,
       };
     } catch (error) {
+      if (error instanceof SyncSessionChangedError || !isCurrent()) {
+        return {
+          changedRecords: 0,
+          status: createLocalOnlyStatus("The sync session changed. Local data was retained."),
+        };
+      }
       const detail =
         error instanceof Error
           ? error.message
@@ -2126,6 +2203,50 @@ export class SupabasePreferenceSyncProvider implements SyncProvider {
         changedRecords: 0,
         status,
       };
+    }
+  }
+
+  private ensureSessionMonitoring() {
+    if (this.authSessionSubscription) return;
+    this.authSessionSubscription = this.authSessionSource.subscribe((session) => {
+      const identity = authIdentity(session);
+      if (this.authIdentity !== null && identity !== this.authIdentity) {
+        this.syncGeneration++;
+      }
+      this.authIdentity = identity;
+      if (this.isActivated) void this.handleAuthSessionChange();
+    });
+  }
+
+  private retainSessionMonitoring() {
+    // Explicit operations need fencing even without the background UI lifecycle.
+    this.sessionOperations++;
+    this.ensureSessionMonitoring();
+    return () => {
+      this.sessionOperations--;
+      this.releaseSessionMonitoringIfIdle();
+    };
+  }
+
+  private releaseSessionMonitoringIfIdle() {
+    if (this.isActivated || this.sessionOperations > 0) return;
+    this.authSessionSubscription?.unsubscribe();
+    this.authSessionSubscription = null;
+  }
+
+  private async assertSyncSession(
+    ownerUserId: string, runtimeIdentity: string, generation: number
+  ) {
+    const [runtime, remote] = await Promise.all([
+      this.authSessionSource.getCurrentSession(),
+      this.client?.auth.getSession(),
+    ]);
+    if (
+      this.syncGeneration !== generation || !this.isSyncEnabled() ||
+      authIdentity(runtime) !== runtimeIdentity || remote?.error ||
+      remote?.data.session?.user.id !== ownerUserId
+    ) {
+      throw new SyncSessionChangedError();
     }
   }
 

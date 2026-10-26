@@ -86,6 +86,9 @@ function createBackupStorage(): BackupStorage {
 
   return {
     readAll: vi.fn(async () => structuredClone(data)),
+    applySyncChanges: vi.fn(async (_before: AliosBackupData, nextData: AliosBackupData) => {
+      data = structuredClone(nextData);
+    }),
     replaceAll: vi.fn(async (nextData: AliosBackupData) => {
       data = structuredClone(nextData);
     }),

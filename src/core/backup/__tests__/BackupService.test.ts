@@ -371,6 +371,7 @@ describe("BackupService with DexieBackupStorage", () => {
     const invalidStorage = {
       readAll: vi.fn(),
       replaceAll,
+      applySyncChanges: vi.fn(),
       getSummary: vi.fn(),
       clearAll: vi.fn(),
     };
